@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install opal-react-router
+    $ gem install reactor-router
 
 ## Usage
 
