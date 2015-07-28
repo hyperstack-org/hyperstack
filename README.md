@@ -1,4 +1,4 @@
-ReactorRouter
+## ReactorRouter
 
 ReactorRouter allows you write and use the React Router in ruby through Opal.
 
