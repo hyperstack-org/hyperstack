@@ -7,7 +7,7 @@ ReactorRouter allows you write and use the React Router in Ruby through Opal.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'opal-react-router'
+gem 'reactor-router'
 ```
 
 And then execute:
@@ -30,7 +30,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/opal-react-router/fork )
+1. Fork it ( https://github.com/catprintlabs/reactor-router/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
