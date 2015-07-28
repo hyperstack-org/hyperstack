@@ -10,11 +10,7 @@ Gem::Specification.new do |s|
   s.email         = ["adamgeorge.31@gmail.com"]
   s.summary       = "react-router for Opal"
   s.description   = "Adds the ability to write and use the react-router in Ruby through Opal"
-
-  s.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  s.bindir        = "exe"
-  s.executables   = s.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  s.require_paths = ["lib"]
+  s.files = Dir["{lib}/**/*"] + ["LICENSE", "Rakefile", "README.md"]
 
   s.add_development_dependency "bundler", "~> 1.8"
   s.add_development_dependency "rake", "~> 10.0"
