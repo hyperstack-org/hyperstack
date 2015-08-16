@@ -1,15 +1,13 @@
 if RUBY_ENGINE == 'opal'
-  require 'reactor-router/component'
-  require 'reactor-router/router'
-  require 'reactor-router/version'
+  require 'reactive-router/component'
+  require 'reactive-router/router'
+  require 'reactive-router/version'
 else
   require 'opal'
   require 'opal-react'
-  require 'reactor-router/version'
+  require 'reactive-router/window_location'
+  require 'reactive-router/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
   Opal.append_path File.expand_path('../../vendor', __FILE__).untaint
-end
-
-module ReactorRouter
 end

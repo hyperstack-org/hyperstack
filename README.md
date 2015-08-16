@@ -1,13 +1,13 @@
-## ReactorRouter
+## ReactiveRouter
 
-ReactorRouter allows you write and use the React Router in Ruby through Opal.
+ReactiveRouter allows you write and use the React Router in Ruby through Opal.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'reactor-router'
+gem 'reactive-router'
 ```
 
 And then execute:
