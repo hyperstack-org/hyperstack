@@ -16,7 +16,17 @@ module React
           if RUBY_ENGINE != 'opal'
             context.eval("window.reactive_router_static_location = '#{context.controller.request.path}?#{context.controller.request.query_string}'")
           else
-            @routing = false
+            if `typeof ReactRouter === 'undefined'`
+              if on_opal_client?
+                message = "ReactRouter not defined in browser assets - you must manually include it in your assets"
+              else
+                message = "ReactRouter not defined in components.js.rb assets manifest - you must manually include it in your assets"
+              end
+              `console.error(message)`
+              @routing = true
+            else
+              @routing = false
+            end
           end
         end
 
