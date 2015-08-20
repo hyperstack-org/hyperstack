@@ -11,22 +11,18 @@ module React
 
         include React::Component
         include React::IsomorphicHelpers
-
+        
         before_first_mount do |context|
-          if RUBY_ENGINE != 'opal'
-            context.eval("window.reactive_router_static_location = '#{context.controller.request.path}?#{context.controller.request.query_string}'")
-          else
-            if `typeof ReactRouter === 'undefined'`
-              if on_opal_client?
-                message = "ReactRouter not defined in browser assets - you must manually include it in your assets"
-              else
-                message = "ReactRouter not defined in components.js.rb assets manifest - you must manually include it in your assets"
-              end
-              `console.error(message)`
-              @routing = true
+          if `typeof ReactRouter === 'undefined'`
+            if on_opal_client?
+              message = "ReactRouter not defined in browser assets - you must manually include it in your assets"
             else
-              @routing = false
+              message = "ReactRouter not defined in components.js.rb assets manifest - you must manually include it in your assets"
             end
+            `console.error(message)`
+            @routing = true
+          else
+            @routing = false
           end
         end
 
@@ -71,12 +67,13 @@ module React
 
         def self.routes(opts = {}, &block)
           @routes_opts = opts
-          @routes_opts[:handler] ||= self
           @routes_block = block
         end
         
         def self.build_routes
-          route(@routes_opts, generate_node = true, &@routes_block)
+          routes_opts = @routes_opts.dup
+          routes_opts[:handler] ||= self 
+          route(routes_opts, generate_node = true, &@routes_block)
         end
 
         def self.route(opts = {}, generate_node = nil, &block)
