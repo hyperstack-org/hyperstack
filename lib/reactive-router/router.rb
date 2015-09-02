@@ -1,3 +1,4 @@
+
 module React
 
   module Router
@@ -36,7 +37,7 @@ module React
             routes = self.class.build_routes
             %x{
               ReactRouter.run(#{routes}, window.reactive_router_static_location, function(root) {
-                self.root = React.createElement(root);
+                self.root = React.createElement(root, self.native.props);
               });
             }
             React::Element.new(@root, 'Root', {}, nil)
@@ -55,11 +56,15 @@ module React
 
         after_mount do
           unless self.class.routing!
-            dom_node = `React.findDOMNode(#{self}.native)`
+            dom_node = if `typeof React.findDOMNode === 'undefined'`
+              `#{self}.native.getDOMNode`            # v0.12.0
+            else
+              `React.findDOMNode(#{self}.native)`    # v0.13.0
+            end
             routes = self.class.build_routes
             %x{
               ReactRouter.run(#{routes}, ReactRouter.HistoryLocation, function(root) {
-                React.render(React.createElement(root), #{dom_node});
+                React.render(React.createElement(root, self.native.props), #{dom_node});
               });
             }
           end
