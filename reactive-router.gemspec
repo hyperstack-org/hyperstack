@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bundler", "~> 1.8"
   s.add_development_dependency "rake", "~> 10.0"
-  s.add_dependency "opal-rails"
-  s.add_dependency "react-rails"
+  #s.add_dependency "opal-rails"
+  #s.add_dependency "react-rails"
   s.add_dependency "reactive-ruby"
   #s.add_dependency "react-router-rails", '~>0.13.3'
 end
