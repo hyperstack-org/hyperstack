@@ -14,7 +14,6 @@ module React
         url_param_evaluators[name] = block
         
         class << self
-          
           define_method name do
             evaluated_url_params[name]
           end

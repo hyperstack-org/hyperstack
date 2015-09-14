@@ -1,6 +1,7 @@
 if RUBY_ENGINE == 'opal'
   require 'reactive-ruby'
   require 'reactive-router/component'
+  require 'reactive-router/history'
   require 'reactive-router/router'
   require 'reactive-router/version'
 else
