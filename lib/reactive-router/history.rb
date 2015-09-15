@@ -21,40 +21,53 @@ class History
 
     attr_accessor :history
 
-    def histories
-      @histories ||= {}
+    def [](name)
+      (@histories ||= {})[name]
+    end
+
+    def []=(name, value)
+      (@histories ||= {})[name] = value
     end
 
     def window_history_pop_handler(event)
       return if `event.state === undefined`
-      puts "pop handler #{`event.state.history_id`}, #{`ReactRouter.History.length`} -> #{`event.state.history_length`}, #{`event.state.path`}"
-      old_history = @history
-      old_history_length = `ReactRouter.History.length`
-      @current_path = `event.state.path`
-      @history= histories[`event.state.history_id`]
-      `ReactRouter.History.length = event.state.history_length`
-      if old_history != @history
-        if `ReactRouter.History.length` > old_history_length
-          puts "activating "
-          @history.on_state_change.call(:active) if @history.on_state_change
-        else
-          puts "deactivating"
-          old_history.on_state_change.call(:inactive) if old_history.on_state_change
+      if `event.state == null` # happens when popping off outer dialog
+        puts "pop handler pops off last value"
+        old_history = @history
+        @current_path = ""
+        @history = nil
+        `ReactRouter.History.length = 0`
+        old_history.on_state_change.call(:inactive) if old_history.on_state_change
+      else
+        puts "pop handler #{`event.state.history_id`}, #{`ReactRouter.History.length`} -> #{`event.state.history_length`}, #{`event.state.path`}"
+        old_history = @history
+        old_history_length = `ReactRouter.History.length`
+        @current_path = `event.state.path`
+        @history= History[`event.state.history_id`]
+        `ReactRouter.History.length = event.state.history_length`
+        if old_history != @history
+          if `ReactRouter.History.length` > old_history_length
+            puts "activating "
+            @history.on_state_change.call(:active) if @history.on_state_change
+          else
+            puts "deactivating"
+            old_history.on_state_change.call(:inactive) if old_history.on_state_change
+          end
         end
+        @history.notify_listeners(:pop)
       end
-      @history.notify_listeners(:pop)
     end
 
     def push_path(path)
       puts "pushing path #{path}"
-      `window.history.pushState({ path: path, history_id: #{@history.object_id}, history_length: (ReactRouter.History.length += 1)}, '', path);`
+      `window.history.pushState({ path: path, history_id: #{@history.name}, history_length: (ReactRouter.History.length += 1)}, '', path);`
       @current_path = path
       @history.notify_listeners(:push)
     end
 
     def replace_path(path)
       puts "replacing path #{path}"
-      `window.history.replaceState({ path: path, history_id: #{@history.object_id}, history_length: ReactRouter.History.length}, '', path);`
+      `window.history.replaceState({ path: path, history_id: #{@history.name}, history_length: ReactRouter.History.length}, '', path);`
       @current_path = path
       @history.notify_listeners(:replace)
     end
@@ -66,13 +79,19 @@ class History
 
   attr_reader :location
   attr_reader :on_state_change
+  attr_reader :name
 
   def to_s
-    "History<#{@initial_path}>"
+    "History<#{@name}>"
   end
 
-  def initialize(preactivate_path = nil, &on_state_change)
-    self.class.histories[self.object_id] = self
+  def initialize(name, preactivate_path = nil, &on_state_change)
+    @name = name
+    if History[@name]
+      raise "a history location named #{@name} already exists"
+    else
+      History[@name] = self
+    end
     @on_state_change = on_state_change
     @initial_path = @preactivate_path = preactivate_path
     self.class.setup_handler
@@ -92,10 +111,11 @@ class History
     puts "activating #{self}"
     @preactivate_path = nil
     initial_path ||= @initial_path || self.class.current_path
+    current_history = self.class.history
     self.class.history = self
-    @starting_history_length = `ReactRouter.History.length`
+    @starting_history_length = `ReactRouter.History.length` if current_history != self
     self.class.push_path initial_path
-    @on_state_change.call(:active) if @on_state_change
+    @on_state_change.call(:active) if @on_state_change and current_history != self
     self
   end
 

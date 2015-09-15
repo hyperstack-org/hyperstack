@@ -114,12 +114,10 @@ module React
           was_routing
         end
 
-        #def self.location  # override to provide other location handlers
-        #  `ReactRouter.HistoryLocation`
-        #end
+        # override self.location to provide application specific location handlers
 
-        def self.location
-          (@location ||= History.new).activate.location
+        def location
+          (@location ||= History.new("MainApp")).activate.location
         end
 
         after_mount do
@@ -131,7 +129,7 @@ module React
             end
             routes = self.class.build_routes(true)
             %x{
-              ReactRouter.run(#{routes}, #{self.class.location}, function(root, state) {
+              ReactRouter.run(#{routes}, #{location}, function(root, state) {
                 self.native.props.router_state = state
                 React.render(React.createElement(root, self.native.props), #{dom_node});
               });
