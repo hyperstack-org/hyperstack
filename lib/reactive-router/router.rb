@@ -19,18 +19,19 @@ module React
         native_mixin `ReactRouter.Navigation`
         native_mixin `ReactRouter.State`
 
-        def get_path
-          path = `self.native.getPath()`
+        def self.get_path
+          path = `#{@router_component}.native.getPath()`
           path = nil if `typeof path === 'undefined'`
           path
         end
 
-        def replace_with(route_or_path, params = nil, query = nil)
-          `self.native.replaceWith.apply(self.native, #{[route_or_path, params].compact})`
+        def self.replace_with(route_or_path, params = nil, query = nil)
+          `#{@router_component}.native.replaceWith.apply(self.native, #{[route_or_path, params, query].compact})`
         end
 
-        def transition_to(route_or_path, params = nil, query = nil)
-          `self.native.transitionTo.apply(self.native, #{[route_or_path, params].compact})`
+        def self.transition_to(route_or_path, params = @router_component.params[:router_state][:params], query = @router_component.params[:router_state][:query])
+          params = [route_or_path, params.to_n, query.to_n].compact
+          `#{@router_component}.native.transitionTo.apply(self.native, #{params})`
         end
 
         static_call_back "willTransitionTo" do |transition, params, query, callback|
@@ -39,9 +40,11 @@ module React
           transition = `transition.path`
           puts "willTransitionTo(#{transition}, #{params}, #{query})"
           begin
-            params.each do |param, value|
-              if evaluator = url_param_evaluators[param]
-                evaluated_url_params[param] = evaluator.call(value)
+            url_param_evaluators.each do |name, block|
+              begin
+                evaluated_url_params[name] = block.call(params[name]) if params.has_key? name
+              rescue Exception => e
+                log("failed to process router param #{name} (#{params[name]}): #{e}", :error)
               end
             end
             if self.respond_to? :will_transition_to
@@ -121,7 +124,7 @@ module React
         end
 
         after_mount do
-          unless self.class.routing!
+          if !self.class.routing!
             dom_node = if `typeof React.findDOMNode === 'undefined'`
               `#{self}.native.getDOMNode`            # v0.12.0
             else
@@ -134,6 +137,8 @@ module React
                 React.render(React.createElement(root, self.native.props), #{dom_node});
               });
             }
+          elsif respond_to? :show
+            self.class.instance_variable_set(:@router_component, self)
           end
         end
 
@@ -158,6 +163,8 @@ module React
           opts = opts.dup
           opts[:handler] = React::API.create_native_react_class(opts[:handler])
           (generate_node ? RR::Route_as_node(opts, &block) : RR::Route(opts, &block))
+        rescue Exception => e
+          React::IsomorphicHelpers.log("Could not define route #{opts}: #{e}", :error)
         end
 
         def self.default_route(ops = {}, &block)
