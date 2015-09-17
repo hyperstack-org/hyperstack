@@ -19,34 +19,68 @@ module React
         native_mixin `ReactRouter.Navigation`
         native_mixin `ReactRouter.State`
 
-        def self.get_path
-          path = `#{@router_component}.native.getPath()`
-          path = nil if `typeof path === 'undefined'`
-          path
-        end
+        class << self
 
-        def self.replace_with(route_or_path, params = nil, query = nil)
-          `#{@router_component}.native.replaceWith.apply(self.native, #{[route_or_path, params, query].compact})`
-        end
+          def get_path
+            path = `#{@router_component}.native.getPath()`
+            path = nil if `typeof path === 'undefined'`
+            path
+          end
 
-        def self.transition_to(route_or_path, params = @router_component.params[:router_state][:params], query = @router_component.params[:router_state][:query])
-          params = [route_or_path, params.to_n, query.to_n].compact
-          `#{@router_component}.native.transitionTo.apply(self.native, #{params})`
+          def replace_with(route_or_path, params = nil, query = nil)
+            `#{@router_component}.native.replaceWith.apply(self.native, #{[route_or_path, params, query].compact})`
+          end
+
+          def transition_to(route_or_path, params = {}, query = {})
+            params = @router_component.params[:router_state][:params].merge params
+            query = @router_component.params[:router_state][:query].merge query
+            `#{@router_component}.native.transitionTo.apply(self.native, #{[route_or_path, params.to_n, query.to_n]})`
+          end
+
+          def url_param_evaluators
+            @url_param_evaluators ||= []
+          end
+
+          attr_accessor :evaluated_url_params
+          attr_accessor :current_url_params
+
+          def router_param(name, opts = {}, &block)
+
+            method_name = opts[:as] || name
+
+            url_param_evaluators << [name, block]
+
+            class << self
+              define_method method_name do
+                evaluated_url_params[name]
+              end
+            end
+
+            define_method method_name do
+              self.class.send(method_name)
+            end
+
+          end
+
+          def evaluate_new_params(params)
+            url_param_evaluators.each do |name, block|
+              begin
+                evaluated_url_params[name] = block.call(params[name]) if params.has_key?(name) and current_url_params[name] != params[name]
+                current_url_params[name] = params[name]
+              rescue Exception => e
+                log("failed to process router param #{name} (#{params[name]}): #{e}", :error)
+              end
+            end
+          end
+
         end
 
         static_call_back "willTransitionTo" do |transition, params, query, callback|
           params = Hash.new(params)
           query = Hash.new(query)
           transition = `transition.path`
-          puts "willTransitionTo(#{transition}, #{params}, #{query})"
+          puts "willTransitionTo(#{transition}, #{params}, #{query}) for router #{self.object_id}, router_component = #{@router_component.object_id}"
           begin
-            url_param_evaluators.each do |name, block|
-              begin
-                evaluated_url_params[name] = block.call(params[name]) if params.has_key? name
-              rescue Exception => e
-                log("failed to process router param #{name} (#{params[name]}): #{e}", :error)
-              end
-            end
             if self.respond_to? :will_transition_to
               result = will_transition_to transition, params, query if self.respond_to? :will_transition_to
               if result.is_a? Promise
@@ -65,6 +99,7 @@ module React
         before_first_mount do |context|
 
           @evaluated_url_params = {}
+          @current_url_params = {}
           if !self.instance_methods.include?(:show)  # if there is no show method this is NOT a top level router so we assume routing will begin elsewhere
             @routing = true
           elsif `typeof ReactRouter === 'undefined'`
@@ -93,6 +128,7 @@ module React
 
         def render
           if self.class.routing?
+            self.class.evaluate_new_params url_params(params)
             show
           elsif on_opal_server?
             self.class.routing!
@@ -125,6 +161,7 @@ module React
 
         after_mount do
           if !self.class.routing!
+            puts "after mount outside of ruby router #{self.object_id}, my class router is #{self.class.object_id}"
             dom_node = if `typeof React.findDOMNode === 'undefined'`
               `#{self}.native.getDOMNode`            # v0.12.0
             else
@@ -138,6 +175,7 @@ module React
               });
             }
           elsif respond_to? :show
+            puts "after mount inside of ruby router #{self.object_id}, my class router is #{self.class.object_id}"
             self.class.instance_variable_set(:@router_component, self)
           end
         end
