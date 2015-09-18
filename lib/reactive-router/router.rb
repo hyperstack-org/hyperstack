@@ -37,6 +37,14 @@ module React
             `#{@router_component}.native.transitionTo.apply(self.native, #{[route_or_path, params.to_n, query.to_n]})`
           end
 
+          def link(opts={}, &block)
+            params = opts.delete(:params) || {}
+            query = opts.delete(:query) || {}
+            to = opts.delete(:to)
+            React::RenderingContext.render("a", opts, &block).on(:click) { transition_to(to, params, query) }
+            #React.create_element("a", opts, &block).on(:click) { transition_to(to, params, query) }
+          end
+
           def url_param_evaluators
             @url_param_evaluators ||= []
           end
