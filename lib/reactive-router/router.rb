@@ -42,7 +42,6 @@ module React
             query = opts.delete(:query) || {}
             to = opts.delete(:to)
             React::RenderingContext.render("a", opts, &block).on(:click) { transition_to(to, params, query) }
-            #React.create_element("a", opts, &block).on(:click) { transition_to(to, params, query) }
           end
 
           def url_param_evaluators
