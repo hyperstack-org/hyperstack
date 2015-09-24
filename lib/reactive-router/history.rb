@@ -4,11 +4,12 @@ class History
 
     def setup_handler
       unless @handlers_setup
+        handler = lambda { |event| window_history_pop_handler(event) }
         %x{
           if (window.addEventListener) {
-            window.addEventListener('popstate', #{method(:window_history_pop_handler).to_n}, false);
+            window.addEventListener('popstate', handler, false);
           } else {
-            window.attachEvent('onpopstate', #{method(:window_history_pop_handler).to_n});
+            window.attachEvent('onpopstate', handler);
           }
         }
       end
