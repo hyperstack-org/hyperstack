@@ -44,8 +44,8 @@ module React
             React::RenderingContext.render("a", opts, &block).on(:click) { transition_to(to, params, query) }
           end
 
-          def url_param_evaluators
-            @url_param_evaluators ||= []
+          def url_param_methods
+            @url_param_methods ||= []
           end
 
           attr_accessor :evaluated_url_params
@@ -53,31 +53,26 @@ module React
 
           def router_param(name, opts = {}, &block)
 
-            method_name = opts[:as] || name
+            # create a method visible both the instance and the class
+            # that gets passed the named router parameter (typically a db :id) and returns a
+            # meaningful value (typically a database record)
 
-            url_param_evaluators << [name, block]
+            method_name = opts[:as] || name
 
             class << self
               define_method method_name do
-                evaluated_url_params[name]
+                if @router_component
+                  block.call @router_component.url_params[name]
+                else
+                  raise "Call to #{self.name}.#{method_name} when #{self.name} is not mounted"
+                end
               end
             end
 
             define_method method_name do
-              self.class.send(method_name)
+              self.class.send method_name
             end
 
-          end
-
-          def evaluate_new_params(params)
-            url_param_evaluators.each do |name, block|
-              begin
-                evaluated_url_params[name] = block.call(params[name]) if params.has_key?(name) and current_url_params[name] != params[name]
-                current_url_params[name] = params[name]
-              rescue Exception => e
-                log("failed to process router param #{name} (#{params[name]}): #{e}", :error)
-              end
-            end
           end
 
         end
@@ -128,14 +123,13 @@ module React
         optional_param :query
         optional_param :params
 
-        def url_params(params)
-          params[:params] || (params[:router_state] && params[:router_state][:params]) || {}
+        def url_params(params = params)
+          (params && (params[:params] || (params[:router_state] && params[:router_state][:params]))) || {}
         end
-
 
         def render
           if self.class.routing?
-            self.class.evaluate_new_params url_params(params)
+            self.class.instance_variable_set(:@router_component, self)  # this was done after mount, but I think it works here
             show
           elsif on_opal_server?
             self.class.routing!
@@ -183,7 +177,7 @@ module React
             }
           elsif respond_to? :show
             puts "after mount inside of ruby router #{self.object_id}, my class router is #{self.class.object_id}"
-            self.class.instance_variable_set(:@router_component, self)
+            #self.class.instance_variable_set(:@router_component, self)  # this was done here but was moved to the first render
           end
         end
 
