@@ -21,6 +21,8 @@ module React
 
         class << self
 
+          attr_accessor :router_context
+
           def get_path
             path = `#{@router_component}.native.getPath()`
             path = nil if `typeof path === 'undefined'`
@@ -129,6 +131,11 @@ module React
 
         def render
           if self.class.routing?
+            if self.class.router_context
+              `self.native.context.router = #{self.class.router_context}`
+            else
+              self.class.router_context = `self.native.context.router`
+            end
             self.class.instance_variable_set(:@router_component, self)  # this was done after mount, but I think it works here
             show
           elsif on_opal_server?
