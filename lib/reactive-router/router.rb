@@ -164,7 +164,7 @@ module React
         # override self.location to provide application specific location handlers
 
         def location
-          (@location ||= History.new("MainApp")).activate.location
+          (@location ||= History.new("MainApp")).activate.location  # must be called MainApp for now to avoid doing an extra state push (ugh)
         end
 
         after_mount do

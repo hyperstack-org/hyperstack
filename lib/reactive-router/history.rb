@@ -35,6 +35,9 @@ class History
       if `event.state == null` # happens when popping off outer dialog
         puts "pop handler pops off last value"
         old_history = @history
+        @saved_history = @history # for safari's sake
+        @saved_path = @current_path
+        @saved_history_length = `ReactRouter.History.length`
         @current_path = ""
         @history = nil
         `ReactRouter.History.length = 0`
@@ -61,6 +64,12 @@ class History
 
     def push_path(path)
       puts "pushing path #{path}"
+      unless @history # needed because safari strangly pops off outer most history on initialization
+        @history = @saved_history
+        @current_path = @saved_path
+        `ReactRouter.History.length = #{@saved_history_length}`
+        @history.on_state_change.call(:active) if @history.on_state_change
+      end
       `window.history.pushState({ path: path, history_id: #{@history.name}, history_length: (ReactRouter.History.length += 1)}, '', path);`
       @current_path = path
       @history.notify_listeners(:push)
@@ -68,6 +77,12 @@ class History
 
     def replace_path(path)
       puts "replacing path #{path}"
+      unless @history # needed because safari strangly pops off outer most history on initialization
+        @history = @saved_history
+        @current_path = @saved_path
+        `ReactRouter.History.length = #{@saved_history_length}`
+        @history.on_state_change.call(:active) if @history.on_state_change
+      end
       `window.history.replaceState({ path: path, history_id: #{@history.name}, history_length: ReactRouter.History.length}, '', path);`
       @current_path = path
       @history.notify_listeners(:replace)
@@ -115,7 +130,11 @@ class History
     current_history = self.class.history
     self.class.history = self
     @starting_history_length = `ReactRouter.History.length` if current_history != self
-    self.class.push_path initial_path
+    if @name == "MainApp"
+      self.class.replace_path initial_path
+    else
+      self.class.push_path initial_path
+    end
     @on_state_change.call(:active) if @on_state_change and current_history != self
     self
   end
@@ -127,8 +146,11 @@ class History
   end
 
   def notify_listeners(type)
-    puts "#{self}.notify_listeners(#{type}) listeners_count: #{@listeners.count}, path: #{self.class.current_path}"
+    puts "!! #{self}.notify_listeners(#{type}) listeners_count: #{@listeners.count}, path: #{self.class.current_path}"
     @listeners.each { |listener| `listener.call(#{@location}, {path: #{self.class.current_path}, type: type})` }
+  rescue Exception => e
+    `debugger`
+    nil
   end
 
 
