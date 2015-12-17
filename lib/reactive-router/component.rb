@@ -3,8 +3,6 @@ module React
 
     module ClassMethods
 
-
-
     end
 
     def route_handler(*args)

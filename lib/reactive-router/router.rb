@@ -121,9 +121,9 @@ module React
 
         export_component
 
-        optional_param :router_state # optional because it is not initially passed in but we add it when running the router
-        optional_param :query
-        optional_param :params
+        param :router_state # optional because it is not initially passed in but we add it when running the router
+        param :query
+        param :params
 
         def url_params(params = params)
           (params && (params[:params] || (params[:router_state] && params[:router_state][:params]))) || {}
