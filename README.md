@@ -58,12 +58,12 @@ module Components
 
       # like any component routers can have params that are passed in when the router is mounted
 
-      required_param :user_param, type: User
-      required_param :user_orders_param, type: [Order]
-      required_param :production_center_address_param, type: Address
-      required_param :open_invoices_param
-      required_param :user_profiles_param, type: [PaymentProfile]
-      required_param :user_addresses_param, type: [Address]
+      param :user_param, type: User
+      param :user_orders_param, type: [Order]
+      param :production_center_address_param, type: Address
+      param :open_invoices_param
+      param :user_profiles_param, type: [PaymentProfile]
+      param :user_addresses_param, type: [Address]
       
       # because the underlying javascript router has no provisions to pass params we
       # will export states and copy the params to the states so the lower components can read them
