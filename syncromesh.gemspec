@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Mitch VanDuyn"]
   spec.email         = ["mitch@catprint.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = "Synchronization of active record models across multiple clients using Pusher, ActionCable, or Polling"
+  spec.description   = "Work in progress"
+  spec.homepage      = "https://github.com/reactive-ruby/syncromesh"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
