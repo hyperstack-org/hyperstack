@@ -1,33 +1,22 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+# -*- encoding: utf-8 -*-
+$:.push File.expand_path('../lib/', __FILE__)
+
 require 'syncromesh/version'
 
-Gem::Specification.new do |spec|
-  spec.name          = "syncromesh"
-  spec.version       = Syncromesh::VERSION
-  spec.authors       = ["Mitch VanDuyn"]
-  spec.email         = ["mitch@catprint.com"]
+Gem::Specification.new do |s|
 
-  spec.summary       = "Synchronization of active record models across multiple clients using Pusher, ActionCable, or Polling"
-  spec.description   = "Work in progress"
-  spec.homepage      = "https://github.com/reactive-ruby/syncromesh"
-  spec.license       = "MIT"
+    s.name          = "syncromesh"
+    s.version       = Syncromesh::VERSION
+    s.authors       = ["Mitch VanDuyn"]
+    s.email         = ["mitch@catprint.com"]
 
-  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
-  # delete this section to allow pushing this gem to any host.
-  # if spec.respond_to?(:metadata)
-  #   spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-  # else
-  #   raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-  # end
+    s.summary       = "Synchronization of active record models across multiple clients using Pusher, ActionCable, or Polling"
+    s.description   = "Work in progress"
+    s.homepage      = "https://github.com/reactive-ruby/syncromesh"
+    s.license       = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
-
-  spec.add_development_dependency "bundler", "~> 1.10"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec"
+    s.files          = `git ls-files`.split("\n")
+    s.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
+    s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
+    s.require_paths  = ['lib']
 end
