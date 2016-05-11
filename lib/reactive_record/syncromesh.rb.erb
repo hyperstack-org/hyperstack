@@ -1,0 +1,81 @@
+module ReactiveRecord
+
+  class Syncromesh
+
+    include React::IsomorphicHelpers
+
+    def self.sync_change(data)
+      puts "sync_change(#{data})"
+      Base.when_not_saving(Object.const_get(data[:klass])) do |klass|
+        klass._react_param_conversion(data[:record]).backing_record.sync_scopes
+      end
+    end
+
+    def self.sync_destroy(data)
+      puts "sync_destroy(#{data})"
+      record = Object.const_get(data[:klass])._react_param_conversion(data[:record])
+      ReactiveRecord::Base.load_data { record.destroy }
+      record.backing_record.destroyed = true
+      record.backing_record.sync_scopes
+    end
+
+    before_first_mount do |context|
+      if on_opal_client?
+
+        <% if Syncromesh.transport == :pusher %>
+
+          change = lambda do |data|
+            sync_change Hash.new(data)
+          end
+
+          destroy = lambda do |data|
+            sync_destroy Hash.new(data)
+          end
+
+          %x{
+            <% if Syncromesh.client_logging %>
+            Pusher.log = function(message) {
+              if (window.console && window.console.log) {
+                window.console.log(message);
+              }
+            };
+            <% end %>
+
+            var pusher = new Pusher('<%= Syncromesh.key %>', {
+              encrypted: <%= Syncromesh.encrypted %>
+            });
+
+            var channel = pusher.subscribe('<%= Syncromesh.channel %>');
+            channel.bind('change', change);
+            channel.bind('destroy', destroy);
+          }
+
+        <% elsif Syncromesh.transport == :simple_poller %>
+
+          id = nil
+
+          HTTP.get(`window.ReactiveRecordEnginePath`+"/syncromesh-subscribe/").then do |response|
+            id = response.json[:id]
+          end
+
+          puts "SECONDS BETWEEN POLL SET TO <%= Syncromesh.seconds_between_poll %> SECONDS"
+
+          every(<%= Syncromesh.seconds_between_poll %>) do
+            HTTP.get(`window.ReactiveRecordEnginePath`+"/syncromesh-read/#{id}").then do |response|
+              response.json.each do |update|
+                case update[0]
+                when :change
+                  sync_change update[1]
+                when :destroy
+                  sync_destroy update[1]
+                end
+              end
+            end
+          end
+
+        <% end %>
+
+      end
+    end
+  end
+end
