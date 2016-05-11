@@ -5,14 +5,12 @@ module ReactiveRecord
     include React::IsomorphicHelpers
 
     def self.sync_change(data)
-      puts "sync_change(#{data})"
       Base.when_not_saving(Object.const_get(data[:klass])) do |klass|
         klass._react_param_conversion(data[:record]).backing_record.sync_scopes
       end
     end
 
     def self.sync_destroy(data)
-      puts "sync_destroy(#{data})"
       record = Object.const_get(data[:klass])._react_param_conversion(data[:record])
       ReactiveRecord::Base.load_data { record.destroy }
       record.backing_record.destroyed = true
