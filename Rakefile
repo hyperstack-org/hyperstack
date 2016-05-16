@@ -1,3 +1,5 @@
+require "bundler/gem_tasks"
+
 require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
@@ -9,7 +11,6 @@ require 'opal/rspec/rake_task'
 RSpec::Core::RakeTask.new('ruby:rspec') do |s|
   s.rspec_opts = "--tag ruby"
 end
-
 Opal::RSpec::RakeTask.new('opal:rspec') do |s|
   s.append_path 'spec/vendor'
   s.index_path = 'spec/index.html.erb'
