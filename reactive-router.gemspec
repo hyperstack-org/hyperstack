@@ -18,4 +18,24 @@ Gem::Specification.new do |s|
   #s.add_dependency "react-rails"
   s.add_dependency "reactive-ruby"
   #s.add_dependency "react-router-rails", '~>0.13.3'
+
+  #s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec-rails', '3.3.3'
+  s.add_development_dependency 'timecop'
+  s.add_development_dependency 'opal-rspec', '0.4.3'
+  s.add_development_dependency 'sinatra'
+
+  # For Test Rails App
+  s.add_development_dependency 'rails', '4.2.4'
+  s.add_development_dependency 'react-rails', '1.3.1'
+  s.add_development_dependency 'opal-rails', '0.8.1'
+
+  if RUBY_PLATFORM == 'java'
+    s.add_development_dependency 'jdbc-sqlite3'
+    s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
+    s.add_development_dependency 'therubyrhino'
+  else
+    s.add_development_dependency 'sqlite3', '1.3.10'
+    s.add_development_dependency 'therubyracer', '0.12.2'
+  end
 end
