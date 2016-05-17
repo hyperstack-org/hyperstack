@@ -232,7 +232,6 @@ end
 
 The method used to convert a query string into the route components's param hash
 
-
 #### `on_error(data)`
 
 While the router is matching, errors may bubble up, here is your opportunity to catch and deal with them. Typically these will come when promises are rejected (see the DSL above for returning promises to handle async behaviors.)
@@ -249,11 +248,29 @@ This is primarily for integrating with other libraries that need to participate 
 
 Ensure that you render a <RouterContext> at the end of the line, passing all the props passed to render.
 
+### React::Router::Component
+
+The class React::Router::Component is a subclass of React::Component::Base that predefines the params that the router will be passing in to your component.  This includes
+
+`params.location`
+
+The current location.
+
+`params.params`
+
+The dynamic segments of the URL.
+
+`params.route`
+
+The route that rendered this component.
+
+`params.route_params`
+
+The subset of `params.params` that were directly specified in this component's route. For example, if the route's path is `users/:user_id` and the URL is /users/123/portfolios/345 then `params.route_params` will be `{user_id: '123'}`, and `params.params` will be `{user_id: '123', portfolio_id: 345}`.
+
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
