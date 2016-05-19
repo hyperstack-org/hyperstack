@@ -37,5 +37,28 @@ Gem::Specification.new do |s|
   else
     s.add_development_dependency 'sqlite3', '1.3.10'
     s.add_development_dependency 'therubyracer', '0.12.2'
+
+    # The following allow react code to be tested from the server side
+
+    s.add_development_dependency "rspec-mocks"
+    s.add_development_dependency "rspec-expectations"
+    s.add_development_dependency "pry"
+    s.add_development_dependency 'pry-rescue'#, git: "https://github.com/joallard/pry-rescue.git"
+    s.add_development_dependency 'pry-stack_explorer'
+    #s.add_development_dependency "factory_girl_rails"
+    s.add_development_dependency 'shoulda'
+    s.add_development_dependency 'shoulda-matchers'
+    s.add_development_dependency 'rspec-its'
+    s.add_development_dependency 'rspec-collection_matchers'
+    s.add_development_dependency 'database_cleaner' #, git: "https://github.com/DatabaseCleaner/database_cleaner.git"
+    s.add_development_dependency 'capybara'
+    s.add_development_dependency 'selenium-webdriver'
+    s.add_development_dependency "poltergeist"
+    s.add_development_dependency 'spring-commands-rspec'
+    s.add_development_dependency 'chromedriver-helper'
+    s.add_development_dependency 'rspec-steps'
+    s.add_development_dependency 'parser'
+    s.add_development_dependency 'unparser'
+    s.add_development_dependency 'jquery-rails'
   end
 end
