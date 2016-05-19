@@ -713,6 +713,14 @@ describe React::Component, type: :component do
       expect(children.size).to eq(2)
       expect(children.map(&:element_type)).to eq(['a', 'li'])
     end
+
+    it 'returns an empty Enumerator if there are no children' do
+      ele = React.create_element(Foo)
+      renderElementToDocument(ele)
+      nodes = Foo.the_children.each
+      expect(nodes.size).to eq(nil)
+      expect(nodes.count).to eq(0)
+    end
   end
 end
 end
