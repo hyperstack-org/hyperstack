@@ -27,12 +27,12 @@ This is simply a DSL wrapper on [react-router](....)
 The following DSL:
 
 ```ruby
-route("/", mounts: About, index: Home) do 
+route("/", mounts: About, index: Home) do
   route("about")
-  route("inbox") do 
+  route("inbox") do
     redirect('messages/:id').to { | params | "/messages/#{params[:id]}" }
   end
-  route(mounts: Inbox) do 
+  route(mounts: Inbox) do
     route("messages/:id")
   end
 end
@@ -81,7 +81,7 @@ The above example does not cover all the possible syntax, here are the other met
 for adding an onEnter or onLeave hook you would say:
 
 ```ruby
-route("foo").on(:leave) { | t | ... }.on(:enter) { | t |.... } 
+route("foo").on(:leave) { | t | ... }.on(:enter) { | t |.... }
 ```
 which follows the react.rb event handler convention.
 
@@ -108,7 +108,7 @@ The `mounts` option can accept a single component, or a hash which will generate
 
 `<Route path="groups" components={{main: Groups, sidebar: GroupsSidebar}} />` JSX
 
-#### The `mounts` and `index` options can also take a `Proc` or be specified as a block
+#### The `mounts` option can also take a `Proc` or be specified as a block
 
 The proc is passed a TransitionContext (see **Hooks** above) and may either return a react component to be mounted, or return a promise.  If a promise is returned the transition will wait till the promise is either resolved with a component, or rejected.
 
@@ -142,11 +142,26 @@ You can use the `mount` method multiple times with different arguments as an alt
 
 Note that if no block is given (as in `:bomb` above) the component name will be inferred from the argument (`Bomb` in this case.)
 
-#### The index route can be specified as a proc, or via a block
+#### The index component can be specified as a proc
 
 Same deal as mount...
 
-`route("foo").index { ...compute the index or just return a promise... }`
+`route("foo", index: -> { MyIndex })`
+
+#### The index method
+
+Instead of specifying the index component as a param to the parent route, it can be specified as a child using the
+index method:
+
+```ruby
+route("/", mounts: About, index: Home) do
+  index(mounts: MyIndex)
+  route("about")
+  route("privacy-policy")
+end
+```
+
+This is useful because the index method has all the features of a route except that it does not take a path or children.
 
 #### The `redirect` options
 
@@ -162,27 +177,27 @@ Or you can specify the `:to` an `:query` options with blocks:
 
 #### The `index_redirect` method
 
-just like `redirect` without the first arg: `index_redirect(to: ... query: ...)` 
+just like `redirect` without the first arg: `index_redirect(to: ... query: ...)`
 
 ### The Router Component
 
 A router is defined as a subclass of `React::Router` which is itself a `React::Component::Base`.
 
 ```ruby
-class Router < React::Router 
-  
+class Router < React::Router
+
   def routes # define your routes (there is no render method)
-    route("/", mounts: About, index: Home) do 
+    route("/", mounts: About, index: Home) do
       route("about")
-      route("inbox") do 
+      route("inbox") do
         redirect('messages/:id').to { | params | "/messages/#{params[:id]}" }
       end
-      route(mounts: Inbox) do 
+      route(mounts: Inbox) do
         route("messages/:id")
       end
     end
   end
-  
+
 end
 ```
 
@@ -194,9 +209,9 @@ There are several other methods that can be redefined to modify the routers beha
 
 #### history
 
-```ruby 
+```ruby
 class Router < React::Router
-  def history 
+  def history
   ... return a history object
   end
 end
@@ -206,7 +221,7 @@ end
 
 `create_element` is passed the component that the router will render, and its params.  Use it to modify behaviors.  
 
-```ruby 
+```ruby
 class Router < React::Router
   def create_element(component, params)
     # default behavior is to render the component with params
@@ -219,10 +234,10 @@ end
 
 The method used to convert an object from <Link>s or calls to transitionTo to a URL query string.
 
-```ruby 
+```ruby
 class Router < React::Router
   def stringify_query(params_hash)
-    # who knows doc is a little unclear on this one...is it being passed the full params_hash or just 
+    # who knows doc is a little unclear on this one...is it being passed the full params_hash or just
     # the query portion.... we shall see...
   end
 end
