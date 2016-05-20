@@ -30,16 +30,27 @@ module React
       DSL::IndexRedirect.new(opts)
     end
 
-    def add_param_if_defined(params, method, param)
-      params[param] = lambda { |*args| method(*args) } if self.respond_to? method
+    def hash_history
+      `window.ReactRouter.hashHistory`
+    end
+
+    def browser_history
+      `window.ReactRouter.browserHistory`
+    end
+
+    def add_param_fn_if_defined(params, method, param)
+      params[param] = lambda do |*args|
+        method(*args)
+      end.to_n if self.respond_to? method
     end
 
     def gather_params
       params = {routes: build_routes}
-      [:history, :create_element, :stringify_query, :parse_query_string, :on_error, :on_update].each do |method|
-        add_param_if_defined(params, method, method.camelcase(false))
+      [:create_element, :stringify_query, :parse_query_string, :on_error, :on_update].each do |method|
+        add_param_fn_if_defined(params, method, method.camelcase(false))
       end
-      add_param_if_defined(params, :on_render, "render")
+      add_param_fn_if_defined(params, :on_render, "render")
+      params[:history] = history if respond_to? :history
       params
     end
 

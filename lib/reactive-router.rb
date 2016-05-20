@@ -1,6 +1,6 @@
 if RUBY_ENGINE == 'opal'
   #require 'reactive-ruby' # how to require this conditionally????
-
+  require 'promise'
   require 'react/router/react-router'
   require 'react/router'
   require 'react/router/dsl'

@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   #s.add_dependency "opal-rails"
   #s.add_dependency "react-rails"
   s.add_dependency "reactive-ruby"
+  s.add_dependency "opal-browser"
   #s.add_dependency "react-router-rails", '~>0.13.3'
 
   #s.add_development_dependency 'rake'

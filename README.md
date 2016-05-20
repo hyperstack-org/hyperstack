@@ -90,7 +90,7 @@ A `TransitionContext` object will be passed to the handler, which has the follow
 | method | available on | description |
 |-----------|------------------|-----------------|
 | `next_state` | `:change`, `:enter` | returns the next state object |
-| `previous_state` | `:change` | returns the previous state object |
+| `prev_state` | `:change` | returns the previous state object |
 | `replace` | `:change`, `:enter` | pass `replace` a new path |
 | `promise` | `:change`, `:enter` | returns a new promise.  multiple calls returns the same promise |
 

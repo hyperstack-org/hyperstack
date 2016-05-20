@@ -201,6 +201,11 @@ module ComponentTestHelpers
     define_method(method) { |event_name| evaluate_script("Opal.React.TopLevelRailsComponent.$#{method}('#{event_name}')") }
   end
 
+  def run_on_client(&block)
+    script = Opal.compile(Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last)
+    execute_script(script)
+  end
+
   def open_in_chrome
     `open http://#{page.server.host}:#{page.server.port}#{page.current_path}`
     while true

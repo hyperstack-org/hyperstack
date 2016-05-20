@@ -38,6 +38,7 @@ module React
 
         def on(hook, &block)
           @opts[hook] = block
+          self
         end
 
         def mounts(name=nil, &block)
@@ -67,8 +68,8 @@ module React
             hash[:component] = DSL.router.lookup_component(@path)
           end
 
-          [:on_enter, :on_change, :on_leave].each do |hook|
-            hash[hook.camelcase(false)] = send("#{hook}_wrapper") if @opts[hook]
+          [:enter, :change, :leave].each do |hook|
+            hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper") if @opts[hook]
           end
 
           hash[:indexRoute] = @index.to_json if @index
@@ -118,7 +119,7 @@ module React
 
         def on_enter_wrapper
           lambda do | nextState, replace, callBack |
-            comp = @opts[:on_enter].call(TransitionContext.new(next_state: nextState, replace: replace))
+            comp = @opts[:enter].call(TransitionContext.new(next_state: nextState, replace: replace))
             if comp.class < Promise
               comp.then { `callBack()` }
             else
@@ -129,7 +130,7 @@ module React
 
         def on_change_wrapper(proc)
           lambda do | prevState, nextState, replace, callBack |
-            comp = @opts[:on_change].call(TransitionContext.new(prev_state: prevState, next_state: nextState, replace: replace))
+            comp = @opts[:change].call(TransitionContext.new(prev_state: prevState, next_state: nextState, replace: replace))
             if comp.class < Promise
               comp.then { `callBack()` }
             else
@@ -140,12 +141,7 @@ module React
 
         def on_leave_wrapper(proc)
           lambda do
-            comp = @opts[:on_leave].call(TransitionContext.new)
-            if comp.class < Promise
-              comp.then { `callBack()` }
-            else
-              `callBack()`
-            end
+            @opts[:leave].call(TransitionContext.new)
           end.to_n
         end
 
