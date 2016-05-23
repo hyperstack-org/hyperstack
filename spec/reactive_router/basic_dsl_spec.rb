@@ -30,8 +30,6 @@ describe "ReactiveRouter", js: true do
       end
     end
 
-    binding.pry
-
     page.should have_content("Rendering App: No Children")
     page.evaluate_script("window.ReactRouter.hashHistory.push('child1')")
     page.should have_content("Child1 got routed")

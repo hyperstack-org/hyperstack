@@ -18,9 +18,10 @@ module React
             raise "Route expects an optional path followed by an options hash, instead we got route(#{'"'+path+'", ' if path} #{opts})"
           end
           @children, @index = DSL.evaluate_children do
-            children.call if children
+            children.call if children && children.arity == 0
             Index.new(mounts: opts[:index]) if opts[:index]
           end
+          @get_children = children if children && children.arity > 0
           @path = path
           if opts[:mounts].is_a? Hash
             @components = opts[:mounts]
@@ -37,7 +38,7 @@ module React
         end
 
         def on(hook, &block)
-          @opts[hook] = block
+          @opts["on_#{hook}"] = block
           self
         end
 
@@ -54,6 +55,12 @@ module React
           hash = {}
           hash[:path] = @path if @path
 
+          if @get_children
+            hash[:getChildRoutes] = get_child_routes_wrapper
+          else
+            hash[:childRoutes] = @children.collect { |child| child.to_json }
+          end
+
           if @components
             if @components.detect { |k, v| v.respond_to? :call }
               hash[:getComponents] = get_components_wrapper
@@ -69,14 +76,26 @@ module React
           end
 
           [:enter, :change, :leave].each do |hook|
-            hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper") if @opts[hook]
+            hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper") if @opts["on_#{hook}"]
           end
 
           hash[:indexRoute] = @index.to_json if @index
 
-          hash[:childRoutes] = @children.collect { |child| child.to_json }
-
           hash
+        end
+
+        def get_child_routes_wrapper
+          lambda do | location, callBack |
+            children, index, promise =
+              React::Router::DSL.evaluate_children(TransitionContext.new(location: location), &@get_children)
+            if promise.class < Promise
+              promise.then do | children |
+                callBack.call(nil.to_n, React::Router::DSL.children_to_n(children))
+              end.fail { |message| callBack.call(message.to_n, nil.to_n) }
+            else
+              callBack.call(nil.to_n, DSL.children_to_n(children))
+            end
+          end
         end
 
         def get_components_wrapper
@@ -119,7 +138,7 @@ module React
 
         def on_enter_wrapper
           lambda do | nextState, replace, callBack |
-            comp = @opts[:enter].call(TransitionContext.new(next_state: nextState, replace: replace))
+            comp = @opts[:on_enter].call(TransitionContext.new(next_state: nextState, replace: replace))
             if comp.class < Promise
               comp.then { `callBack()` }
             else
@@ -130,7 +149,7 @@ module React
 
         def on_change_wrapper(proc)
           lambda do | prevState, nextState, replace, callBack |
-            comp = @opts[:change].call(TransitionContext.new(prev_state: prevState, next_state: nextState, replace: replace))
+            comp = @opts[:on_change].call(TransitionContext.new(prev_state: prevState, next_state: nextState, replace: replace))
             if comp.class < Promise
               comp.then { `callBack()` }
             else
@@ -141,7 +160,7 @@ module React
 
         def on_leave_wrapper(proc)
           lambda do
-            @opts[:leave].call(TransitionContext.new)
+            @opts[:on_leave].call(TransitionContext.new)
           end.to_n
         end
 

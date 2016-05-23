@@ -81,4 +81,45 @@ describe "transition hooks", js: true do
 
   end
 
+  it "be defined as inline procs" do
+
+    mount "TestRouter" do
+      class TestRouter < React::Router
+
+        param :_onRouteChange, type: Proc
+
+        def routes
+          route(
+            "/",
+            mounts: App,
+            on_change: lambda do |c|
+              params._onRouteChange(:app, :change, :prev, c.prev_state[:location][:pathname])
+              params._onRouteChange(:app, :change, :next, c.next_state[:location][:pathname])
+            end
+            ) do
+            route(
+              "child1",
+              mounts: Child1,
+              on_enter: lambda do |c|
+                params._onRouteChange(:child1, :enter, :next, c.next_state[:location][:pathname])
+              end,
+              on_leave: lambda do |c|
+                params._onRouteChange(:child1, :leave)
+              end
+            )
+            route("child2", mounts: Child2)
+          end
+        end
+      end
+    end
+
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child1')")
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child2')")
+    event_history_for("RouteChange").should eq([
+      ["app", "change", "prev", "/"], ["app", "change", "next", "/child1"], ["child1", "enter", "next", "/child1"], ["child1", "leave"],
+      ["app", "change", "prev", "/child1"], ["app", "change", "next", "/child2"]])
+    page.should have_content("Child2 got routed")
+  end
+
+
 end

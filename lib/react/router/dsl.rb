@@ -2,11 +2,15 @@ module React
   class Router
     class DSL
 
-      def self.evaluate_children(&children)
+      def self.build_routes(*args, &block)
+        evaluate_children(*args, &block)[0]
+      end
+
+      def self.evaluate_children(*args, &children)
         [[], nil].tap do | new_routes |
           if children
             saved_routes, @routes = [@routes, new_routes]
-            yield
+            @routes << children.call(*args)
             @routes = saved_routes
           end
         end
@@ -18,6 +22,10 @@ module React
 
       def self.set_index(index)
         @routes[1] = index
+      end
+
+      def self.children_to_n(children)
+        children.collect { |e| e.to_json.to_n }
       end
 
     end

@@ -203,7 +203,7 @@ end
 
 You will mount this component the usual way (i.e. via `render_component`, `Element#render`, `react_render`, etc) or even by mounting it within a higher level application component.
 
-#### Other router methods:
+#### Other router hooks:
 
 There are several other methods that can be redefined to modify the routers behavior
 
@@ -217,18 +217,72 @@ class Router < React::Router
 end
 ```
 
+The two standard history objects are predefined as `browser_history` and `hash_history` so you can say:
+
+```ruby
+...
+  def history
+    browser_history
+  end
+```
+
+or just
+
+```ruby
+...
+  alias_method :history :browser_history
+```
+
 #### create_element
 
-`create_element` is passed the component that the router will render, and its params.  Use it to modify behaviors.  
+`create_element` (if defined) is passed the component that the router will render, and its params.  Use it to intercept, inspect and/or modify the component behavior.
+
+`create_element` can return any of these values:
+
++ Any falsy value: indicating that rendering should continue with no modification to behavior.
++ A `React::Element`, or a native `React.Element` which will be used for rendering.
++ Any truthy value: indicating that a new Element should be created using the (probably modified) params
 
 ```ruby
 class Router < React::Router
-  def create_element(component, params)
-    # default behavior is to render the component with params
-    component.render params
+  def create_element(component, component_params)
+    # add the param :time_stamp to each element as its rendered
+    React.create_element(component, component_params.merge(time_stamp: Time.now))
   end
 end
 ```
+
+The above could be simplified to:
+
+```ruby
+...
+  def create_element(component, component_params)
+    component_params[:time_stamp] = Time.now
+  end
+```
+
+Just make sure that you return a truthy value otherwise it will ignore any changes to component or params.
+
+Or if you just wanted some kind of logging:
+
+```ruby
+...
+  def create_element(component, component_params)
+    puts "[#{Time.now}] Rendering: #{component.name}" # puts returns nil, so we are jake mate
+  end
+```
+
+The component_params will always contain the following keys as native js objects, and they must stay native js objects:
+
++ `children`
++ `history`
++ `location`
++ `params`
++ `route`
++ `route_params`
++ `routes`
+
+We will try to get more fancy with a later version of reactive-router ;-)
 
 #### `stringify_query(params_hash)` <- needs work
 

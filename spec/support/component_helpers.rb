@@ -172,6 +172,11 @@ module ComponentTestHelpers
     @client_code = "#{@client_code}#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}\n"
   end
 
+  def debugger
+    `debugger`
+    nil
+  end
+
   def mount(component_name, params=nil, opts = {}, &block)
     unless params
       params = opts
@@ -181,6 +186,9 @@ module ComponentTestHelpers
     if block
       block_with_helpers = <<-code
         module ComponentHelpers
+          def self.js_eval(s)
+            `eval(s)`
+          end
           def self.add_class(class_name, styles={})
             style = styles.collect { |attr, value| "\#{attr.dasherize}:\#{value}"}.join("; ")
             s = "<style type='text/css'> .\#{class_name}{ \#{style} } </style>"

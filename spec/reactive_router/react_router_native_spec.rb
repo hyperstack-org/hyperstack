@@ -41,4 +41,30 @@ describe "react-router native api", js: true do
     page.should have_content("Child2 got routed")
 
   end
+
+  it "react-router will dynamically route children" do
+
+    mount "NativeTestRouter" do
+      ROUTES = [
+        {
+          path: '/',
+          component: React::API::create_native_react_class(App),
+          getChildRoutes: lambda do |location, callBack|
+            routes = [
+              {path: 'child1', component: React::API::create_native_react_class(Child1)},
+              {path: 'child2', component: React::API::create_native_react_class(Child2)}
+            ].to_n
+            callBack.call(nil.to_n, routes)
+          end.to_n
+        }
+      ]
+    end
+
+    page.should have_content("Rendering App: No Children")
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child1')")
+    page.should have_content("Child1 got routed")
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child2')")
+    page.should have_content("Child2 got routed")
+
+  end
 end

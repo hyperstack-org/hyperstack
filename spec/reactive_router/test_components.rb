@@ -4,10 +4,16 @@ RSpec.configure do |config|
     on_client do
 
       class App < React::Component::Base
+
+        param optional_param: nil
+
         def render
+
           div do
             if children.count > 0
               children.each { |child| div { child.render } }
+            elsif params.optional_param
+              params.optional_param
             else
               "Rendering App: No Children"
             end
@@ -22,14 +28,27 @@ RSpec.configure do |config|
       end
 
       class Child1 < React::Component::Base
+
+        param optional_param: nil
+
         def render
-          "Child1 got routed"
+          if params.optional_param
+            params.optional_param
+          else
+            "Child1 got routed"
+          end
         end
       end
 
       class Child2 < React::Component::Base
+        param optional_param: nil
+
         def render
-          "Child2 got routed"
+          if params.optional_param
+            params.optional_param
+          else
+            "Child2 got routed"
+          end
         end
       end
 
@@ -42,7 +61,7 @@ RSpec.configure do |config|
       class NativeTestRouter < React::Component::Base
 
         def render
-          React::RR::Router(routes: ROUTES.to_n)
+          React::Router::Native::Router(routes: ROUTES.to_n)
         end
 
       end
