@@ -7,6 +7,7 @@ RSpec.configure do |config|
 
         param optional_param: nil
 
+
         def render
 
           div do
@@ -65,6 +66,15 @@ RSpec.configure do |config|
         end
 
       end
+
+      class TestRouter < React::Router
+
+        class << self
+          attr_accessor :promise
+        end
+
+      end
+
 
     end
   end

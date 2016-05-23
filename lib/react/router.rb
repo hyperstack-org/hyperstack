@@ -17,15 +17,15 @@ module React
     end
 
     def redirect(from, opts={})
-      DSL::Redirect.new(from, opts)
+      DSL::Route.new(opts.merge(path: from)).on(:enter) { |c| c.replace(opts[:to]) }
+    end
+
+    def index_redirect(opts={})
+      DSL::Index.new(opts).on(:enter) { |c| c.replace(opts[:to])}
     end
 
     def build_routes(&block)
       React::Router::DSL.build_routes(&block)
-    end
-
-    def index_redirect(opts={})
-      DSL::IndexRedirect.new(opts)
     end
 
     def hash_history
@@ -92,6 +92,12 @@ module React
         else
           React.create_element(rb_component, rb_props).to_n
         end
+      end
+    end
+
+    def on_error_wrapper
+      lambda do |message|
+        on_error(message)
       end
     end
 

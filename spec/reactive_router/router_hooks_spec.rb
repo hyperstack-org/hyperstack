@@ -61,7 +61,7 @@ describe "Router class", js: true do
 
   end
 
-  it "can have a #stringify_query hook" do
+  xit "can have a #stringify_query hook" do
     mount "TestRouter" do
       class TestRouter < React::Router
 
@@ -82,8 +82,51 @@ describe "Router class", js: true do
     page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'child1', query: {foo: 12}})")
     event_history_for("Update").flatten.should eq(["12"])
   end
+
   it "can have a #parse_query_string hook"
-  it "can have a #on_error hook"
+
+  it "can have a #on_error hook" do
+    mount "TestRouter" do
+      class TestRouter < React::Router
+
+        param :_onError, type: Proc
+
+        def on_error(message)
+          params._onError message
+        end
+
+        def routes
+          route("/", mounts: App) do
+            route("/test1", mounts: App) do |ct|
+              puts "building test1 routes now"
+              TestRouter.promise = ct.promise.fail { |msg| "Rejected: #{msg}" }
+            end
+            route("/test2", mounts: lambda  do |ct| puts "building test2 route"; TestRouter.promise = ct.promise.then do |id|
+              Object.const_get id
+          end
+          end )
+          end
+        end
+      end
+    end
+
+    page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'test2'})")
+    run_on_client { TestRouter.promise.resolve("Child1") }
+    page.should have_content("Child1 got routed")
+
+    page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: '/'})")
+    page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'test1/boom'})")
+    run_on_client { TestRouter.promise.reject("This is never going to work") }
+    page.should have_content("Rendering App: No Children")
+    event_history_for("Error").flatten.should eq(["Rejected: This is never going to work"])
+
+    page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'test2'})")
+    run_on_client { TestRouter.promise.resolve("BOGUS") }
+    event_history_for("Error").flatten.should eq(["Rejected: This is never going to work", "xome message"])
+    page.should have_content("Rendering App: No Children")
+
+  end
+
   it "can have a #on_update hook" do
     mount "TestRouter" do
       class TestRouter < React::Router

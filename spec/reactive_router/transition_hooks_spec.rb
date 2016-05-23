@@ -55,10 +55,6 @@ describe "transition hooks", js: true do
     mount "TestRouter" do
       class TestRouter < React::Router
 
-        class << self
-          attr_accessor :promise
-        end
-
         def routes
           route("/", mounts: App) do
             route("child1", mounts: Child1)

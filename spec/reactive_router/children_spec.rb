@@ -32,10 +32,6 @@ describe "Creating Children Dynamically: The DSL can", js: true do
     mount "TestRouter" do
       class TestRouter < React::Router
 
-        class << self
-          attr_accessor :promise
-        end
-
         def routes
           route("/", mounts: App) do |ct|
             TestRouter.promise = ct.promise.then_build_routes do |to|
@@ -49,7 +45,6 @@ describe "Creating Children Dynamically: The DSL can", js: true do
         end
       end
     end
-
     page.should have_content("Rendering App: No Children")
     page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'child'})")
     page.should_not have_content("got routed", wait: 1)

@@ -27,7 +27,7 @@ This is simply a DSL wrapper on [react-router](....)
 The following DSL:
 
 ```ruby
-route("/", mounts: About, index: Home) do
+route("/", mounts: App, index: Home) do
   route("about")
   route("inbox") do
     redirect('messages/:id').to { | params | "/messages/#{params[:id]}" }
@@ -309,9 +309,17 @@ While the router is matching, errors may bubble up, here is your opportunity to 
 
 Called whenever the router updates its state in response to URL changes.
 
-#### `render` <- needs work
+#### `render`
 
-By default the `render` method call the RouterContext component passing in all the router's parameters.
+A `Router` default `render` looks like this:
+
+```ruby
+  def render
+    # Router.router renders the native router component
+    Router.router(build_params)
+  end
+```
+
 
 This is primarily for integrating with other libraries that need to participate in rendering before the route components are rendered. It defaults to render={(props) => <RouterContext {...props} />}.
 
