@@ -9,7 +9,7 @@ module React
             if promise.class < Promise
               promise.then do | children |
                 callBack.call(nil.to_n, React::Router::DSL.children_to_n(children))
-              end.fail { |message| callBack.call(message.to_n, nil.to_n) }
+              end.fail { |err_object| callBack.call(err_object, nil.to_n) }
             else
               callBack.call(nil.to_n, DSL.children_to_n(children))
             end
@@ -27,7 +27,7 @@ module React
                   promises << comp
                   comp.
                   then { |component| result_hash[name] = React::API::create_native_react_class(component) }.
-                  fail { |message| `callBack(#{message.to_n}, null)`}
+                  fail { |err_object| `callBack(#{err_object}, null)`}
                 else
                   result_hash[name] = React::API::create_native_react_class(comp)
                 end
@@ -46,7 +46,8 @@ module React
               comp.then do |component|
                 component = React::API::create_native_react_class(component)
                 `callBack(null, component)`
-              end.fail { |message| `callBack(#{message.to_n}, null)` }
+              end.fail { |err_object|
+                `callBack(#{err_object}, null)` }
             else
               comp = React::API::create_native_react_class(comp)
               `callBack(null, comp)`
@@ -88,7 +89,7 @@ module React
             if comp.class < Promise
               comp.
               then { |component| `callBack(null, {component: #{component}})` }.
-              fail { |message| `callBack(#{message.to_n}, null)` }
+              fail { |err_object| `callBack(#{err_object}, null)` }
             else
               `callBack(null, {component: #{comp}})`
             end

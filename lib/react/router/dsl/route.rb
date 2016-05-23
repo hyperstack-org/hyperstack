@@ -24,6 +24,7 @@ module React
             children.call if children && children.arity == 0
             Index.new(mounts: opts[:index]) if opts[:index]
           end
+          opts.delete(:index)
           @get_children = children if children && children.arity > 0
           @path = path
           if opts[:mounts].is_a? Hash
@@ -31,7 +32,7 @@ module React
           else
             @component = opts[:mounts]
           end
-          opts[:mounts] = nil
+          opts.delete(:mounts)
           @opts = opts
           save_element
         end
@@ -65,7 +66,10 @@ module React
           end
 
           [:enter, :change, :leave].each do |hook|
-            hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper") if @opts["on_#{hook}"]
+            if @opts["on_#{hook}"]
+              hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper")
+              @opts.delete("on_#{hook}")
+            end
           end
 
           if @index.respond_to? :call
@@ -73,6 +77,11 @@ module React
           elsif @index
             hash[:indexRoute] = @index.to_json
           end
+
+          @opts.each do |key, value|
+            hash[key] = value
+          end
+
 
           hash
         end

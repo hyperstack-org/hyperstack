@@ -92,7 +92,7 @@ describe "Router class", js: true do
         param :_onError, type: Proc
 
         def on_error(message)
-          params._onError message
+          params._onError message.to_s
         end
 
         def routes
@@ -118,12 +118,12 @@ describe "Router class", js: true do
     page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'test1/boom'})")
     run_on_client { TestRouter.promise.reject("This is never going to work") }
     page.should have_content("Rendering App: No Children")
-    event_history_for("Error").flatten.should eq(["Rejected: This is never going to work"])
 
     page.evaluate_script("window.ReactRouter.hashHistory.push({pathname: 'test2'})")
     run_on_client { TestRouter.promise.resolve("BOGUS") }
-    event_history_for("Error").flatten.should eq(["Rejected: This is never going to work", "xome message"])
     page.should have_content("Rendering App: No Children")
+
+    event_history_for("Error").flatten.should eq(["Rejected: This is never going to work", "uninitialized constant Object::BOGUS"])
 
   end
 

@@ -59,6 +59,15 @@ RSpec.configure do |config|
         end
       end
 
+      class ParamChild < React::Component::Base
+
+        param :route
+
+        def render
+          "param1 = #{params.route[:param1]}"
+        end
+      end
+
       class NativeTestRouter < React::Component::Base
 
         def render

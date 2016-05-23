@@ -67,4 +67,19 @@ describe "react-router native api", js: true do
     page.should have_content("Child2 got routed")
 
   end
+
+  it "passes params to child routes" do
+
+    mount "NativeTestRouter" do
+
+      ROUTES = [
+        {path: '/', component: React::API::create_native_react_class(App)},
+        {path: '/child1', component: React::API::create_native_react_class(ParamChild), param1: :bar}
+      ]
+
+    end
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child1')")
+    page.should have_content("param1 = bar")
+
+  end
 end

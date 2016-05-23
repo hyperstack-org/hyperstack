@@ -73,5 +73,19 @@ describe "ReactiveRouter", js: true do
 
   end
 
+  it "additional params can be passed" do
+
+    mount "TestRouter" do
+      class TestRouter < React::Router
+        def routes
+          route("/", mounts: ParamChild, param1: :bar)
+        end
+      end
+    end
+
+    page.should have_content("param1 = bar")
+
+  end
+
 
 end
