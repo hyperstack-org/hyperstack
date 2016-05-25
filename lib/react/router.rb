@@ -8,6 +8,14 @@ module React
 
     include React::Component
 
+    def self.Link(to, opts={}, &children)
+      opts[:activeClassName] = opts.delete(:active_class)
+      opts[:activeStyle] = opts.delete(:active_style).to_n if opts[:active_style]
+      opts[:onlyActiveOnIndex] = opts.delete(:only_active_on_index).to_n if opts[:only_active_on_index]
+      opts[:to] = to.to_n
+      Native::Link(opts, &children)
+    end
+
     def route(*args, &children)
       DSL::Route.new(*args, &children)
     end
