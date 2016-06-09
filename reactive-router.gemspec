@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require 'reactive-router/version'
 
 Gem::Specification.new do |s|
-  s.name          = "reactive-router"
+  s.name          = "reactrb-router"
   s.version       = ReactiveRouter::VERSION
   s.authors       = ["Adam George"]
   s.email         = ["adamgeorge.31@gmail.com"]
