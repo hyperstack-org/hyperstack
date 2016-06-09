@@ -6,7 +6,7 @@
 [![Gem Version](https://badge.fury.io/rb/reactrb.svg)](https://badge.fury.io/rb/reactrb)
 
 **Reactrb is an [Opal Ruby](http://opalrb.org) wrapper of
-[React.js library](http://facebook.github.io/react/)**.
+[React.js library](http://facebook.github.io/reactrb/)**.
 
 It lets you write reactive UI components, with Ruby's elegance using the tried
 and true React.js engine. :heart:
@@ -37,7 +37,7 @@ Each react component class defines a new tag-method in the DSL that works just l
 
 As events occur, components update their state, which causes them to rerender, and perhaps pass new parameters to lower level components, thus causing them to rerender.  
 
-Under the hood the actual work is effeciently done by the [React.js](http://facebook.github.io/react/) engine.
+Under the hood the actual work is effeciently done by the [React.js](http://facebook.github.io/reactrb/) engine.
 
 Reactrb components are *isomorphic* meaning they can run on the server as well as the client.  This means that the initial expansion of the component tree to markup is done server side, just like ERB, or HAML templates.   Then the same code runs on the client and will respond to any events.   
 
@@ -70,7 +70,7 @@ The first initial version of `reactrb` is 0.8.x.
 It is very unlikely that there will be any more releases of the `reactive-ruby` gem, so users should upgrade to `reactrb`.
 
 There are no syntactic or semantic breaking changes between `reactrb` v 0.8.x and
-previous versions, however the `reactrb` does *not* include the react js source as previous versions did.  This allows you to pick the react js source compatible with other gems and react js components you may be using.
+previous versions, however the `reactrb` gem does *not* include the react-js source as previous versions did.  This allows you to pick the react js source compatible with other gems and react js components you may be using.
 
 To upgrade, replace `reactive-ruby` with `reactrb`, both in your Gemfile, and in any `requires` in your code.   You will also need to require react-js as this is no longer included in the gem.  
 
@@ -86,7 +86,7 @@ Upcoming will be an 0.9.x release which will deprecate a number of features and 
 
 Version 0.10.x **will not be** 100% backward compatible with 0.3.0 (`react.rb`) or 0.7.x (`reactive-ruby`) so its very important to begin your upgrade process now by switching to `reactrb` now.
 
-Please let us know either at [Gitter.im](https://gitter.im/react/chat) or [via an issue](https://github.com/react/reactrb/issues) if you have specific concerns with the upgrade from 0.3.0 to 0.10.x.
+Please let us know either at [Gitter.im](https://gitter.im/reactrb/chat) or [via an issue](https://github.com/reactrb/reactrb/issues) if you have specific concerns with the upgrade from 0.3.0 to 0.10.x.
 
 ## Developing
 
