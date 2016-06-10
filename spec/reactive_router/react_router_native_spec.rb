@@ -13,6 +13,7 @@ describe "react-router native api", js: true do
         {path: '/child1', component: React::API::create_native_react_class(Child1)}
       ]
     end
+    binding.pry
     page.should have_content("Rendering App: No Children")
     page.evaluate_script("window.ReactRouter.hashHistory.push('child1')")
     page.should have_content("Child1 got routed")
