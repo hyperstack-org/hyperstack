@@ -34,6 +34,8 @@ module React
                 strokeOpacity strokeWidth textAnchor transform version
                 viewBox x1 x2 x xlinkActuate xlinkArcrole xlinkHref xlinkRole
                 xlinkShow xlinkTitle xlinkType xmlBase xmlLang xmlSpace y1 y2 y)
+  HASH_ATTRIBUTES = %w(data aria)
+
 
   def self.html_tag?(name)
     tags = HTML_TAGS

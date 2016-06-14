@@ -136,6 +136,32 @@ describe 'the React DSL' do
     expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>Hello&nbsp;&nbsp;Goodby</div>')
   end
 
+  it 'should convert a hash param to hyphenated html attributes if in React::HASH_ATTRIBUTES' do
+    stub_const 'Foo', Class.new
+    Foo.class_eval do
+      include React::Component
+      def render
+        div(data: { foo: :bar }, aria: { foo_bar: :foo })
+      end
+    end
+
+    expect(React.render_to_static_markup(React.create_element(Foo)))
+      .to eq('<div data-foo="bar" aria-foo-bar="foo"></div>')
+  end
+
+  it 'should not convert a hash param to hyphenated html attributes if not in React::HASH_ATTRIBUTES' do
+    stub_const 'Foo', Class.new
+    Foo.class_eval do
+      include React::Component
+      def render
+        div(title: { bar: :foo })
+      end
+    end
+
+    expect(React.render_to_static_markup(React.create_element(Foo)))
+      .to eq('<div title="{&quot;bar&quot;=&gt;&quot;foo&quot;}"></div>')
+  end
+
   it "will remove all elements passed as params from the rendering buffer" do
     stub_const 'X2', Class.new
     X2.class_eval do
