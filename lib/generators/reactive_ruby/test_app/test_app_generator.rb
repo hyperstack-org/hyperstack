@@ -34,6 +34,10 @@ module ReactiveRuby
         "#{test_app_path}/app/views/components/hello_world.rb", force: true
       template 'views/components/todo.rb',
         "#{test_app_path}/app/views/components/todo.rb", force: true
+      template 'views/layouts/test_layout.html.erb',
+        "#{test_app_path}/app/views/layouts/test_layout.html.erb", force: true
+      template 'views/layouts/test_layout.html.erb',
+        "#{test_app_path}/app/views/layouts/explicit_layout.html.erb", force: true
     end
 
     def clean_superfluous_files
