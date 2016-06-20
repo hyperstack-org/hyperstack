@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'reactive_router/test_components'
+require 'reactrb_router/test_components'
 
-describe "ReactiveRouter", js: true do
+describe "ReactrbRouter", js: true do
 
   it "can build a simple router" do
 
@@ -17,7 +17,7 @@ describe "ReactiveRouter", js: true do
 
   end
 
-  it "reactive-router will route children" do
+  it "reactrb-router will route children" do
 
     mount "TestRouter" do
       class TestRouter < React::Router
@@ -38,7 +38,7 @@ describe "ReactiveRouter", js: true do
 
   end
 
-  it "reactive-router will route to an index route" do
+  it "reactrb-router will route to an index route" do
 
     mount "TestRouter" do
       class TestRouter < React::Router

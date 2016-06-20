@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'reactive_router/test_components'
+require 'reactrb_router/test_components'
 
 describe "Creating Children Dynamically: The DSL can", js: true do
 

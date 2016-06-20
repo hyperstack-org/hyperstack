@@ -116,7 +116,7 @@ module ComponentTestHelpers
           end
 
           #TODO figure out how to auto insert this line????  something like:
-          page = "<%= javascript_include_tag 'reactive-router' %>\n#{page}"
+          page = "<%= javascript_include_tag 'reactrb-router' %>\n#{page}"
 
           if (render_on != :server_only && !render_params[:layout]) || javascript
             page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n"+page

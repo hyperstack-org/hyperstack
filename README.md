@@ -1,13 +1,13 @@
-## ReactiveRouter
+## ReactrbRouter
 
-ReactiveRouter allows you write and use the React Router in Ruby through Opal.
+ReactrbRouter allows you write and use the React Router in Ruby through Opal.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'reactive-router'
+gem 'reactrb-router'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install reactive-router
+    $ gem install reactrb-router
 
 ## Usage
 
@@ -282,7 +282,7 @@ The component_params will always contain the following keys as native js objects
 + `route_params`
 + `routes`
 
-We will try to get more fancy with a later version of reactive-router ;-)
+We will try to get more fancy with a later version of reactrb-router ;-)
 
 #### `stringify_query(params_hash)` <- needs work
 

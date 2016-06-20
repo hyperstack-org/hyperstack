@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'reactive_router/test_components'
+require 'reactrb_router/test_components'
 
-describe "ReactiveRouter::link", js: true do
+describe "ReactrbRouter::link", js: true do
 
   it "can render a clickable link" do
 
