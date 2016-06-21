@@ -1,15 +1,10 @@
 RSpec.configure do |config|
-
   config.before(:each) do
     on_client do
-
       class App < React::Component::Base
-
         param optional_param: nil
 
-
         def render
-
           div do
             if children.count > 0
               children.each { |child| div { child.render } }
@@ -29,7 +24,6 @@ RSpec.configure do |config|
       end
 
       class Child1 < React::Component::Base
-
         param optional_param: nil
 
         def render
@@ -60,7 +54,6 @@ RSpec.configure do |config|
       end
 
       class ParamChild < React::Component::Base
-
         param :route
 
         def render
@@ -68,23 +61,33 @@ RSpec.configure do |config|
         end
       end
 
-      class NativeTestRouter < React::Component::Base
+      class QueryChild < React::Component::Base
+        param :location
 
+        def render
+          "query props = #{params.location[:query]}"
+        end
+      end
+
+      class LinkChild < React::Component::Base
+        param optional_param: nil
+
+        def render
+          TestRouter::Link('/child1', query: { foo: 12 }) { 'child1' }
+        end
+      end
+
+      class NativeTestRouter < React::Component::Base
         def render
           React::Router::Native::Router(routes: ROUTES.to_n)
         end
-
       end
 
       class TestRouter < React::Router
-
         class << self
           attr_accessor :promise
         end
-
       end
-
-
     end
   end
 end

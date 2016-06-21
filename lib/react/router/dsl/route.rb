@@ -62,16 +62,13 @@ module React
           elsif @component.respond_to? :call
             hash[:getComponent] = get_component_wrapper
           elsif @component
-            hash[:component] = React::API::create_native_react_class(@component)
+            hash[:component] = React::API.create_native_react_class(@component)
           else
             hash[:component] = DSL.router.lookup_component(@path)
           end
 
-          [:enter, :change, :leave].each do |hook|
-            if @opts["on_#{hook}"]
-              hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper")
-              @opts.delete("on_#{hook}")
-            end
+          %w(enter change leave).each do |hook|
+            hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper") if @opts["on_#{hook}"]
           end
 
           if @index.respond_to? :call
@@ -80,7 +77,9 @@ module React
             hash[:indexRoute] = @index.to_json
           end
 
-          @opts.each { |key, value| hash[key] = value }
+          @opts.each do |key, value|
+            hash[key] = value unless %w(on_enter on_change on_leave).include?(key)
+          end
 
           hash
         end

@@ -1,10 +1,8 @@
 module React
   class Router
     class DSL
-
       class TransitionContext
-
-        def initialize(opts={})
+        def initialize(opts = {})
           @prev_state = Hash.new opts[:prev_state]
           @next_state = Hash.new opts[:next_state]
           @replace = opts[:replace]
@@ -23,9 +21,7 @@ module React
         def promise
           @promise ||= Promise.new
         end
-
       end
-
     end
   end
 end

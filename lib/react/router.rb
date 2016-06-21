@@ -60,7 +60,11 @@ module React
     end
 
     def stringify_query_wrapper
-      ->(q) { stringify_query(Hash.new(q)) }
+      ->(query) { stringify_query(query) }
+    end
+
+    def parse_query_string_wrapper
+      ->(query_string) { parse_query_string(query_string) }
     end
 
     def on_update_wrapper
@@ -77,31 +81,40 @@ module React
         #   rb_component = Class.new(React::Component::Base)
         #   comp_classes[rb_component] = component
         # end
-        rb_props = {
-          children: `props.children`,
-          history: `props.history`,
-          location: `props.location`,
-          params: `props.params`,
-          route: `props.route`,
-          route_params: `props.route_params`,
-          routes: `props.routes`
-        }
+        rb_props = convert_props(props)
         result = create_element(rb_component, rb_props)
-        is_result_native_react_element = `!!result._isReactElement`
-        if is_result_native_react_element
-          result
-        elsif !result
-          `React.createElement(component, props)`
-        elsif result.is_a? React::Element
-          result.to_n
-        else
-          React.create_element(rb_component, rb_props).to_n
-        end
+        convert_or_create_element(result, component, props, rb_component, rb_props)
       end
     end
 
     def on_error_wrapper
       -> (message) { on_error(message) }
+    end
+
+    private
+
+    def convert_props(props)
+      children_are_null = `props.children == undefined || props.children == null`
+      { children:     children_are_null ? [] : [`props.children`].flatten,
+        history:      `props.history`,
+        location:     `props.location`,
+        params:       `props.params`,
+        route:        `props.route`,
+        route_params: `props.route_params`,
+        routes:       `props.routes` }
+    end
+
+    def convert_or_create_element(result, component, props, rb_component, rb_props)
+      is_result_native_react_element = `!!result._isReactElement`
+      if is_result_native_react_element
+        result
+      elsif !result
+        `React.createElement(component, props)`
+      elsif result.is_a? React::Element
+        result.to_n
+      else
+        React.create_element(rb_component, rb_props).to_n
+      end
     end
   end
 end

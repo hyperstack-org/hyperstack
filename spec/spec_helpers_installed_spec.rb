@@ -28,7 +28,6 @@ describe "A component", js: true do
         end
       end
     end
-    binding.pry
     page.should have_content(test_message)
   end
 end

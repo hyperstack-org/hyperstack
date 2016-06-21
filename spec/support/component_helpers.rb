@@ -215,7 +215,12 @@ module ComponentTestHelpers
   end
 
   def open_in_chrome
-    `open http://#{page.server.host}:#{page.server.port}#{page.current_path}`
+    on_linux = `which google-chrome`
+    if on_linux
+      `google-chrome http://#{page.server.host}:#{page.server.port}#{page.current_path}`
+    else
+      `open http://#{page.server.host}:#{page.server.port}#{page.current_path}`
+    end
     while true
       sleep 1.hour
     end
