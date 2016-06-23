@@ -29,7 +29,8 @@ module React
       base.extend(ClassMethods)
 
       if base.name
-        class << base.parent
+        parent = base.name.split("::").inject([Module]) { |nesting, next_const| nesting + [nesting.last.const_get(next_const)] }[-2]
+        class << parent
           def method_missing(n, *args, &block)
             name = n
             if name =~ /_as_node$/

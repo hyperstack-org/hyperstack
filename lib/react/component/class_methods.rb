@@ -27,14 +27,20 @@ module React
         end
       end
 
-      def render(*args, &block)
-        if args[0].is_a? Hash
-          define_method :render do
-            yield
+      def render(container=nil, params={}, &block)
+        if container
+          if block
+            define_method :render do
+              send(container, params) { instance_eval &block }
+            end
+          else
+            define_method :render do
+              send(container, params)
+            end
           end
         else
           define_method :render do
-            send *args, &block
+            instance_eval &block
           end
         end
       end
@@ -172,6 +178,12 @@ module React
         export_name = (opts[:as] || name).split("::")
         first_name = export_name.first
         Native(`window`)[first_name] = add_item_to_tree(Native(`window`)[first_name], [React::API.create_native_react_class(self)] + export_name[1..-1].reverse).to_n
+      end
+
+      def imports(native_component_name)
+        React::API.import_native_component(native_component_name, self)
+        render {} # define a dummy render method - will never be called...
+        self
       end
 
       def add_item_to_tree(current_tree, new_item)

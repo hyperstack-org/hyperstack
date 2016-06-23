@@ -3,16 +3,46 @@ require 'spec_helper'
 if opal?
 describe 'the React DSL' do
 
-  it "can define the render method with the render macro", only: true do
-    stub_const 'Foo', Class.new
-    Foo.class_eval do
-      include React::Component
-      render(:div, class: :foot) do
-        "hello"
+  context "render macro" do
+
+    it "can define the render method with the render macro with a html tag container" do
+      stub_const 'Foo', Class.new
+      Foo.class_eval do
+        include React::Component
+        render(:div, class: :foo) do
+          "hello"
+        end
       end
+
+      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div class="foo">hello</div>')
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div class="foot">hello</div>')
+    it "can define the render method with the render macro without a container" do
+      stub_const 'Foo', Class.new
+      Foo.class_eval do
+        include React::Component
+        render do
+          "hello"
+        end
+      end
+
+      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>hello</span>')
+    end
+
+    it "can define the render method with the render macro with a application defined container" do
+      stub_const 'Bar', Class.new(React::Component::Base)
+      Bar.class_eval do
+        param :p1
+        render { "hello #{params.p1}" }
+      end
+      stub_const 'Foo', Class.new(React::Component::Base)
+      Foo.class_eval do
+        render Bar, p1: "fred"
+      end
+
+      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>hello fred</span>')
+    end
+
   end
 
   it "will turn the last string in a block into a element" do

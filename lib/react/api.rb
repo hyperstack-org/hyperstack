@@ -5,7 +5,7 @@ module React
     @@component_classes = {}
 
     def self.import_native_component(opal_class, native_class)
-      @@component_classes[opal_class.to_s] = native_class
+      @@component_classes[opal_class] = native_class
     end
 
     def self.create_native_react_class(type)
