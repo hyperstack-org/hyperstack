@@ -4,12 +4,11 @@ module React
       attr_accessor :waiting_on_resources
     end
 
-    def self.build_or_render(node_only, name, *args, &block)
-      if node_only
-        React::RenderingContext.build { React::RenderingContext.render(name, *args, &block) }.to_n
-      else
-        React::RenderingContext.render(name, *args, &block)
-      end
+    def build_only(name, *args, &block)
+      React::Component.deprecation_warning(
+        '..._as_node is deprecated.  Render component and then use the .node method instead'
+      )
+      React::RenderingContext.build { React::RenderingContext.render(name, *args, &block) }.to_n
     end
 
     def self.render(name, *args, &block)
@@ -55,15 +54,12 @@ module React
       element
     end
 
-    def self.build(&block)
+    def self.build
       current = @buffer
       @buffer = []
       return_val = yield @buffer
       @buffer = current
       return_val
-    #ensure
-    #  @buffer = current
-    #  return_val
     end
 
     def self.as_node(element)
@@ -71,7 +67,7 @@ module React
       element
     end
 
-    class << self; alias_method :delete, :as_node; end
+    class << self; alias delete as_node; end
 
     def self.replace(e1, e2)
       @buffer[@buffer.index(e1)] = e2
@@ -85,24 +81,26 @@ module React
   end
 
   class ::Object
-
-    ["span", "td", "th", "while_loading"].each do |tag|
-      define_method(tag) do | *args, &block |
+    [:span, :td, :th, :while_loading].each do |tag|
+      define_method(tag) do |*args, &block|
         args.unshift(tag)
-        return self.method_missing(*args, &block) if self.is_a? React::Component
-        React::RenderingContext.render(*args) { self.to_s }
+        return send(*args, &block) if is_a? React::Component
+        React::RenderingContext.render(*args) { to_s }
       end
     end
 
     def para(*args, &block)
-      args.unshift("p")
-      return self.method_missing(*args, &block) if self.is_a? React::Component
-      React::RenderingContext.render(*args) { self.to_s }
+      args.unshift(:p)
+      return send(*args, &block) if is_a? React::Component
+      React::RenderingContext.render(*args) { to_s }
     end
 
     def br
-      return self.method_missing(*["br"]) if self.is_a? React::Component
-      React::RenderingContext.render("span") { React::RenderingContext.render(self.to_s); React::RenderingContext.render("br") }
+      return send(:br) if is_a? React::Component
+      React::RenderingContext.render(:span) do
+        React::RenderingContext.render(to_s)
+        React::RenderingContext.render(:br)
+      end
     end
   end
 end

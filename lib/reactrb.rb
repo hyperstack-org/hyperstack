@@ -2,26 +2,25 @@
 
 if RUBY_ENGINE == 'opal'
   if `window.React === undefined || window.React.version === undefined`
-    raise [
-      "No React.js Available",
-      "",
-      "React.js must be defined before requiring 'reactrb'",
-      "'reactrb' has been tested with react v13, v14, and v15.",
-      "",
-      "IF USING 'react-rails':",
-      "   add 'require \"react\"' immediately before the 'require \"reactive-ruby\" directive in 'views/components.rb'.",
-      "IF USING WEBPACK:",
-      "   add 'react' to your webpack manifest.",
-      "OTHERWISE TO GET THE LATEST TESTED VERSION",
-      "   add 'require \"react-latest\"' immediately before the require of 'reactrb',",
-      "OR TO USE A SPECIFIC VERSION",
-      "   add 'require \"react-v1x\"' immediately before the require of 'reactrb'."
-    ].join("\n")
+    raise "No React.js Available\n\n"\
+          "React.js must be defined before requiring 'reactrb'\n"\
+          "'reactrb' has been tested with react v13, v14, and v15.\n\n"\
+          "IF USING 'react-rails':\n"\
+          "   add 'require \"react\"' immediately before the 'require \"reactive-ruby\" "\
+              "directive in 'views/components.rb'.\n"\
+          "IF USING WEBPACK:\n"\
+          "   add 'react' to your webpack manifest.\n"\
+          "OTHERWISE TO GET THE LATEST TESTED VERSION\n"\
+          "   add 'require \"react-latest\"' immediately before the require of 'reactrb',\n"\
+          "OR TO USE A SPECIFIC VERSION\n"\
+          "   add 'require \"react-v1x\"' immediately before the require of 'reactrb'."
   end
   require 'react/hash'
   require 'react/top_level'
   require 'react/observable'
   require 'react/component'
+  require 'react/component/dsl_instance_methods'
+  require 'react/component/tags'
   require 'react/component/base'
   require 'react/element'
   require 'react/event'
@@ -36,10 +35,12 @@ if RUBY_ENGINE == 'opal'
 else
   require 'opal'
   require 'opal-browser'
+  # rubocop:disable Lint/HandleExceptions
   begin
     require 'opal-jquery'
   rescue LoadError
   end
+  # rubocop:enable Lint/HandleExceptions
   require 'opal-activesupport'
   require 'reactive-ruby/version'
   require 'reactive-ruby/rails' if defined?(Rails)

@@ -1,23 +1,26 @@
 # rubocop:disable Style/FileName
 # require 'reactrb/auto-import' to automatically
 # import JS libraries and components when they are detected
-class Object
-  class << self
-    alias _reactrb_original_const_missing const_missing
+if RUBY_ENGINE == 'opal'
+  # modifies const and method_missing so that they will attempt
+  # to auto import native libraries and components using React::NativeLibrary
+  class Object
+    class << self
+      alias _reactrb_original_const_missing const_missing
+      alias _reactrb_original_method_missing method_missing
 
-    def const_missing(const_name)
-      # Opal uses const_missing to initially define things,
-      # so we always call the original, and respond to the exception
-      _reactrb_original_const_missing(const_name)
-    rescue StandardError => e
-      puts "Object const_missing: #{const_name}"
-      React::NativeLibrary.import_const_from_native(Object, const_name) || raise(e)
-    end
+      def const_missing(const_name)
+        # Opal uses const_missing to initially define things,
+        # so we always call the original, and respond to the exception
+        _reactrb_original_const_missing(const_name)
+      rescue StandardError => e
+        React::NativeLibrary.import_const_from_native(Object, const_name, true) || raise(e)
+      end
 
-    def xmethod_missing(method_name, *args, &block)
-      puts "Object method_missing: #{method_name}"
-      React::NativeLibrary.register_method(Object, method_name, args, block) do
-        _reactrb_original_const_missing(method_name, *args, &block)
+      def method_missing(method_name, *args, &block)
+        component_class = React::NativeLibrary.import_const_from_native(self, method_name, false)
+        return React::RenderingContext.render(component_class, *args, &block) if component_class
+        _reactrb_original_method_missing(method_name, *args, &block)
       end
     end
   end
