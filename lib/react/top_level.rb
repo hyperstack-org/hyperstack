@@ -105,12 +105,17 @@ module React
 end
 
 Element.instance_eval do
-
-  class ::Element::DummyContext < React::Component::Base
+  class Element
+    class DummyContext < React::Component::Base
+    end
   end
 
   def self.find(selector)
-    selector = selector.dom_node if selector.respond_to? :dom_node rescue selector
+    selector = begin
+      selector.dom_node
+    rescue
+      selector
+    end if selector.respond_to? :dom_node
     `$(#{selector})`
   end
 
@@ -118,7 +123,11 @@ Element.instance_eval do
     find(selector)
   end
 
-  def render(&block)
-    React.render(React::RenderingContext.render(nil) {::Element::DummyContext.new.instance_eval &block}, self)
+  define_method :render do |&block|
+    React.render(
+      React::RenderingContext.render(nil) do
+        ::Element::DummyContext.new.instance_eval(&block)
+      end, self
+    )
   end
-end if Object.const_defined?("Element")
+end if Object.const_defined?('Element')
