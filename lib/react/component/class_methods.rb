@@ -1,5 +1,6 @@
 module React
   module Component
+    # class level methods (macros) for components
     module ClassMethods
       def backtrace(*args)
         @dont_catch_exceptions = (args[0] == :none)
@@ -9,39 +10,34 @@ module React
       def process_exception(e, component, reraise = nil)
         message = ["Exception raised while rendering #{component}"]
         if e.backtrace && e.backtrace.length > 1 && !@backtrace_off
-          message << "    #{e.backtrace[0]}"
-          message += e.backtrace[1..-1].collect { |line| line }
+          append_backtrace(message, e.backtrace)
         else
           message[0] += ": #{e.message}"
         end
-        message = message.join("\n")
-        `console.error(message)`
+        `console.error(#{message.join("\n")})`
         raise e if reraise || @dont_catch_exceptions
+      end
+
+      def append_backtrace(message_array, backtrace)
+        message_array << "    #{backtrace[0]}"
+        backtrace[1..-1].each { |line| message_array << line }
       end
 
       def deprecation_warning(message)
         @deprecation_messages ||= []
-        message = "Warning: Deprecated feature used in #{self.name}. #{message}"
+        message = "Warning: Deprecated feature used in #{name}. #{message}"
         unless @deprecation_messages.include? message
           @deprecation_messages << message
           IsomorphicHelpers.log message, :warning
         end
       end
 
-      def render(container=nil, params={}, &block)
-        if container
-          if block
-            define_method :render do
-              send(container, params) { instance_eval &block }
-            end
+      def render(container = nil, params = {}, &block)
+        define_method :render do
+          if container
+            React::RenderingContext.render(container, params) { instance_eval(&block) if block }
           else
-            define_method :render do
-              send(container, params)
-            end
-          end
-        else
-          define_method :render do
-            instance_eval &block
+            instance_eval(&block)
           end
         end
       end
@@ -176,15 +172,19 @@ module React
       end
 
       def export_component(opts = {})
-        export_name = (opts[:as] || name).split("::")
+        export_name = (opts[:as] || name).split('::')
         first_name = export_name.first
-        Native(`window`)[first_name] = add_item_to_tree(Native(`window`)[first_name], [React::API.create_native_react_class(self)] + export_name[1..-1].reverse).to_n
+        Native(`window`)[first_name] = add_item_to_tree(
+          Native(`window`)[first_name],
+          [React::API.create_native_react_class(self)] + export_name[1..-1].reverse
+        ).to_n
       end
 
       def imports(component_name)
-        React::API.import_native_component(self,
-                                           React::API.eval_native_react_component(component_name))
-        render {} # define a dummy render method - will never be called...
+        React::API.import_native_component(
+          self, React::API.eval_native_react_component(component_name)
+        )
+        define_method(:render) {} # define a dummy render method - will never be called...
       rescue Exception => e # rubocop:disable Lint/RescueException : we need to catch everything!
         raise "#{self} cannot import '#{component_name}': #{e.message}."
         # rubocop:enable Lint/RescueException
@@ -194,9 +194,11 @@ module React
 
       def add_item_to_tree(current_tree, new_item)
         if Native(current_tree).class != Native::Object || new_item.length == 1
-          new_item.inject { |memo, sub_name| { sub_name => memo } }
+          new_item.inject { |a, e| { e => a } }
         else
-          Native(current_tree)[new_item.last] = add_item_to_tree(Native(current_tree)[new_item.last], new_item[0..-2])
+          Native(current_tree)[new_item.last] = add_item_to_tree(
+            Native(current_tree)[new_item.last], new_item[0..-2]
+          )
           current_tree
         end
       end

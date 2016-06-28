@@ -6,8 +6,10 @@ describe 'Element' do
     React::API.clear_component_class_cache
   end
 
-  it 'responds to render' do
-    expect(Element['body']).to respond_to :render
+  it 'renders a top level component using render' do
+    test_div = Element.new(:div)
+    test_div.render(:span, id: :render_test_span) { 'hello' }
+    expect(Element[test_div].find('#render_test_span').html).to eq('hello')
   end
 
   it 'will find the DOM node given a react element' do

@@ -7,13 +7,13 @@ module NativeLibraryTestModule
   class Component < React::Component::Base
     param :time_stamp
     backtrace :none
-    render { puts "about to render Component"; NativeComponent(name: "There - #{params.time_stamp}") }
+    render { NativeComponent(name: "There - #{params.time_stamp}") }
   end
 
   class NestedComponent < React::Component::Base
     param :time_stamp
     backtrace :none
-    render { puts "about to render NestedComponent"; NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{params.time_stamp}") }
+    render { NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{params.time_stamp}") }
   end
 end
 

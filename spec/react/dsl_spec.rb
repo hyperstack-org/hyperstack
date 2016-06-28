@@ -42,7 +42,6 @@ describe 'the React DSL' do
 
       expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>hello fred</span>')
     end
-
   end
 
   it "will turn the last string in a block into a element" do
@@ -51,6 +50,18 @@ describe 'the React DSL' do
       include React::Component
       def render
         div { "hello" }
+      end
+    end
+
+    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>hello</div>')
+  end
+
+  it "can use the upcase version of builtin tags" do
+    stub_const 'Foo', Class.new
+    Foo.class_eval do
+      include React::Component
+      def render
+        DIV { "hello" }
       end
     end
 
