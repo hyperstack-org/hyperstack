@@ -116,6 +116,38 @@ describe 'the React DSL' do
     expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div><p>hello</p></div>')
   end
 
+  it 'can do a method call on a class name that is not a direct sibling' do
+    stub_const 'Mod', Module.new
+    stub_const 'Mod::NestedMod', Module.new
+    stub_const 'Mod::Comp', Class.new(React::Component::Base)
+    Mod::Comp.class_eval do
+      render { 'Mod::Comp' }
+    end
+    stub_const 'Mod::NestedMod::NestedComp', Class.new(React::Component::Base)
+    Mod::NestedMod::NestedComp.class_eval do
+      render do
+        Comp()
+      end
+    end
+    expect(React.render_to_static_markup(React.create_element(Mod::NestedMod::NestedComp)))
+      .to eq('<span>Mod::Comp</span>')
+  end
+
+  it 'raises a meaningful error if a Constant Name is not actually a component' do
+    stub_const 'Mod', Module.new
+    stub_const 'Mod::NestedMod', Module.new
+    stub_const 'Mod::Comp', Class.new
+    stub_const 'Mod::NestedMod::NestedComp', Class.new(React::Component::Base)
+    Mod::NestedMod::NestedComp.class_eval do
+      backtrace :none
+      render do
+        Comp()
+      end
+    end
+    expect { React.render_to_static_markup(React.create_element(Mod::NestedMod::NestedComp)) }
+      .to raise_error('Comp does not appear to be a react component.')
+  end
+
   it "will treat the component class name as a first class component name" do
     stub_const 'Mod::Bar', Class.new
     Mod::Bar.class_eval do

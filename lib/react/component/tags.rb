@@ -61,7 +61,6 @@ module React
           component = find_component(name)
           return React::RenderingContext.render(component, *params, &children) if component
         end
-        puts "about to super for #{name}"
         Object.method_missing(name, *params, &children)
       end
 
@@ -95,13 +94,13 @@ module React
       private
 
       def find_component(name)
-        component = self.class.const_get(name) if self.class.const_defined? name
-        if component
-          unless component.method_defined? :render
-            raise "#{name} does not appear to be a react component."
-          end
-          component
-        end
+        scopes = self.class.name.split('::').inject([Module]) do |nesting, next_const|
+          nesting + [nesting.last.const_get(next_const)]
+        end.reverse
+        scope = scopes.detect { |s| s.const_defined?(name) } || return
+        component = scope.const_get(name)
+        return component if component.method_defined?(:render)
+        raise "#{name} does not appear to be a react component."
       end
     end
   end
