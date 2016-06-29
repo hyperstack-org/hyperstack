@@ -94,7 +94,7 @@ module React
       private
 
       def find_component(name)
-        scopes = self.class.name.split('::').inject([Module]) do |nesting, next_const|
+        scopes = "#{self.class.name}".split('::').inject([Module]) do |nesting, next_const|
           nesting + [nesting.last.const_get(next_const)]
         end.reverse
         scope = scopes.detect { |s| s.const_defined?(name) } || return
