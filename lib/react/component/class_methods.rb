@@ -23,15 +23,6 @@ module React
         backtrace[1..-1].each { |line| message_array << line }
       end
 
-      def deprecation_warning(message)
-        @deprecation_messages ||= []
-        message = "Warning: Deprecated feature used in #{name}. #{message}"
-        unless @deprecation_messages.include? message
-          @deprecation_messages << message
-          IsomorphicHelpers.log message, :warning
-        end
-      end
-
       def render(container = nil, params = {}, &block)
         define_method :render do
           if container
@@ -128,16 +119,16 @@ module React
 
       def define_state_methods(this, name, from = nil, &block)
         this.define_method("#{name}") do
-          self.class.deprecation_warning "Direct access to state `#{name}`.  Use `state.#{name}` instead." if from.nil? || from == this
+          React::Component.deprecation_warning "Direct access to state `#{name}`.  Use `state.#{name}` instead." if from.nil? || from == this
           State.get_state(from || self, name)
         end
         this.define_method("#{name}=") do |new_state|
-          self.class.deprecation_warning "Direct assignment to state `#{name}`.  Use `#{(from && from != this) ? from : 'state'}.#{name}!` instead."
+          React::Component.deprecation_warning "Direct assignment to state `#{name}`.  Use `#{(from && from != this) ? from : 'state'}.#{name}!` instead."
           yield name, State.get_state(from || self, name), new_state if block && block.arity > 0
           State.set_state(from || self, name, new_state)
         end
         this.define_method("#{name}!") do |*args|
-          self.class.deprecation_warning "Direct access to state `#{name}`.  Use `state.#{name}` instead."  if from.nil? or from == this
+          React::Component.deprecation_warning "Direct access to state `#{name}`.  Use `state.#{name}` instead."  if from.nil? or from == this
           if args.count > 0
             yield name, State.get_state(from || self, name), args[0] if block && block.arity > 0
             current_value = State.get_state(from || self, name)

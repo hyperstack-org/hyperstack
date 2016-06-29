@@ -192,6 +192,48 @@ describe "React::NativeLibrary" do
         React.create_element(Foo))).to eq('<div>Hello There</div>')
     end
 
+    it 'will automatically import a React.js component when referenced in another component with the _as_node suffix' do
+      stub_const 'Foo', Class.new(React::Component::Base)
+      Foo.class_eval do
+        render(:div) do
+          e = React::Element.new(NativeComponent_as_node(name: 'There'))
+          2.times { e.render }
+        end
+      end
+      %x{
+        window.NativeComponent = React.createClass({
+          displayName: "HelloMessage",
+          render: function render() {
+            return React.createElement("div", null, "Hello ", this.props.name);
+          }
+        })
+      }
+      expect(React.render_to_static_markup(
+        React.create_element(Foo))).to eq('<div><div>Hello There</div><div>Hello There</div></div>')
+    end
+
+    it "will automatically import a React.js component in a library when referenced in another component with the _as_node suffix" do
+      stub_const 'Foo', Class.new(React::Component::Base)
+      Foo.class_eval do
+        render(:div) do
+          e = React::Element.new(NativeLibrary::NativeComponent_as_node(name: 'There'))
+          2.times { e.render }
+        end
+      end
+      %x{
+        window.NativeLibrary = {
+          NativeComponent: React.createClass({
+            displayName: "HelloMessage",
+            render: function render() {
+              return React.createElement("div", null, "Hello ", this.props.name);
+            }
+          })
+        }
+      }
+      expect(React.render_to_static_markup(
+        React.create_element(Foo))).to eq('<div><div>Hello There</div><div>Hello There</div></div>')
+    end
+
     it "will automatically import a React.js component when referenced as a constant" do
       %x{
         window.NativeComponent = React.createClass({

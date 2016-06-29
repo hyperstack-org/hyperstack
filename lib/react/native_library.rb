@@ -45,11 +45,17 @@ module React
         import_const_from_native(self, const_name, true) || super
       end
 
-      def method_missing(method, *args, &block)
+      def method_missing(method_name, *args, &block)
+        method = method_name.gsub(/_as_node$/, '')  # remove once _as_node is deprecated.
         component_class = get_const(method) if const_defined?(method)
         component_class ||= import_const_from_native(self, method, false)
-        return React::RenderingContext.render(component_class, *args, &block) if component_class
-        raise "could not import a react component named: #{scope_native_name method}"
+        raise 'could not import a react component named: '\
+              "#{scope_native_name method}" unless component_class
+        if method == method_name
+          React::RenderingContext.render(component_class, *args, &block)
+        else # remove once _as_node is deprecated.
+          React::RenderingContext.build_only(component_class, *args, &block)
+        end
       end
 
       private

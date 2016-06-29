@@ -29,6 +29,15 @@ module React
       base.extend(ClassMethods)
     end
 
+    def self.deprecation_warning(message)
+      @deprecation_messages ||= []
+      message = "Warning: Deprecated feature used in #{name}. #{message}"
+      unless @deprecation_messages.include? message
+        @deprecation_messages << message
+        IsomorphicHelpers.log message, :warning
+      end
+    end
+
     def initialize(native_element)
       @native = native_element
     end

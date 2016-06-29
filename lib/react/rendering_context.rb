@@ -4,7 +4,7 @@ module React
       attr_accessor :waiting_on_resources
     end
 
-    def build_only(name, *args, &block)
+    def self.build_only(name, *args, &block)
       React::Component.deprecation_warning(
         '..._as_node is deprecated.  Render component and then use the .node method instead'
       )

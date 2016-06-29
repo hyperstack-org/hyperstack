@@ -18,9 +18,14 @@ if RUBY_ENGINE == 'opal'
       end
 
       def method_missing(method_name, *args, &block)
-        component_class = React::NativeLibrary.import_const_from_native(self, method_name, false)
-        return React::RenderingContext.render(component_class, *args, &block) if component_class
-        _reactrb_original_method_missing(method_name, *args, &block)
+        method = method_name.gsub(/_as_node/, '') # remove once _as_node is deprecated.
+        component_class = React::NativeLibrary.import_const_from_native(self, method, false)
+        _reactrb_original_method_missing(method, *args, &block) unless component_class
+        if method == method_name
+          React::RenderingContext.render(component_class, *args, &block)
+        else # remove once _as_node is deprecated.
+          React::RenderingContext.build_only(component_class, *args, &block)
+        end
       end
     end
   end

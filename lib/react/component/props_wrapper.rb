@@ -2,7 +2,7 @@ module React
   module Component
 
     def deprecated_params_method(name, *args, &block)
-      self.class.deprecation_warning "Direct access to param `#{name}`.  Use `params.#{name}` instead."
+      React::Component.deprecation_warning"Direct access to param `#{name}`.  Use `params.#{name}` instead."
       params.send(name, *args, &block)
     end
 
