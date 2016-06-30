@@ -148,6 +148,18 @@ describe 'the React DSL' do
       .to raise_error('Comp does not appear to be a react component.')
   end
 
+  it 'raises a method missing error' do
+    stub_const 'Foo', Class.new(React::Component::Base)
+    Foo.class_eval do
+      backtrace :none
+      render do
+        _undefined_method
+      end
+    end
+    expect { React.render_to_static_markup(React.create_element(Foo)) }
+      .to raise_error(NoMethodError)
+  end
+
   it "will treat the component class name as a first class component name" do
     stub_const 'Mod::Bar', Class.new
     Mod::Bar.class_eval do

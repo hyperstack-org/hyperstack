@@ -94,13 +94,20 @@ module React
       private
 
       def find_component(name)
-        scopes = "#{self.class.name}".split('::').inject([Module]) do |nesting, next_const|
+        component = lookup_const(name)
+        if component && !component.method_defined?(:render)
+          raise "#{name} does not appear to be a react component."
+        end
+        component
+      end
+
+      def lookup_const(name)
+        return nil unless name =~ /^[A-Z]/
+        scopes = self.class.name.to_s.split('::').inject([Module]) do |nesting, next_const|
           nesting + [nesting.last.const_get(next_const)]
         end.reverse
-        scope = scopes.detect { |s| s.const_defined?(name) } || return
-        component = scope.const_get(name)
-        return component if component.method_defined?(:render)
-        raise "#{name} does not appear to be a react component."
+        scope = scopes.detect { |s| s.const_defined?(name) }
+        scope.const_get(name) if scope
       end
     end
   end
