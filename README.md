@@ -21,7 +21,7 @@ Install the gem, or load the js library
 
 + add `gem 'reactrb'` to your gem file or
 + `gem install reactrb` or
-+ install (or load via cdn) [inline-reactrb.js](http://github.com/reactrb/inline-reactrb)
++ install (or load via cdn) [reactrb-express.js](http://github.com/reactrb/reactrb-express)
 
 For gem installation it is highly recommended to read [the getting started section at reactrb.org](http://reactrb.org/docs/getting-started.html)
 
