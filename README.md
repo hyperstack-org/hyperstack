@@ -7,7 +7,7 @@ ReactrbRouter allows you write and use the React Router in Ruby through Opal.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'reactrb-router', git: 'https://github.com/reactrb/reactrb-router.git'
+gem 'reactrb-router', git: 'https://github.com/reactrb/reactrb-router.git', branch: 'v2-4-0'
 ```
 
 And then execute:
