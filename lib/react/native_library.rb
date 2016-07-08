@@ -46,7 +46,7 @@ module React
       end
 
       def method_missing(method_name, *args, &block)
-        method = method_name.gsub(/_as_node$/, '')  # remove once _as_node is deprecated.
+        method = method_name.gsub(/_as_node$/, '') # remove once _as_node is deprecated.
         component_class = get_const(method) if const_defined?(method)
         component_class ||= import_const_from_native(self, method, false)
         raise 'could not import a react component named: '\
@@ -63,8 +63,10 @@ module React
       def lookup_native_name(js_name)
         native_name = scope_native_name(js_name)
         `eval(#{native_name}) !== undefined && native_name`
-      rescue
+      # rubocop:disable Lint/RescueException  # that is what eval raises in Opal >= 0.10.
+      rescue Exception
         nil
+        # rubocop:enable Lint/RescueException
       end
 
       def scope_native_name(js_name)
