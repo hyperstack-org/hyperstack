@@ -18,7 +18,12 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
+## [0.8.7] - 2016-07-08
 
+
+### Fixed
+
+- Opal 0.10.x compatibility
 
 
 ## [0.8.6] - 2016-06-30
