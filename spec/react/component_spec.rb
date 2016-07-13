@@ -476,6 +476,25 @@ describe React::Component, type: :component do
     end
   end
 
+  describe 'Anonymous Component' do
+    it "will not generate spurious warning messages" do
+      foo = Class.new(React::Component::Base)
+      foo.class_eval do
+        def render; "hello" end
+      end
+
+      %x{
+        var log = [];
+        var org_warn_console = window.console.warn;
+        var org_error_console = window.console.error
+        window.console.warn = window.console.error = function(str){log.push(str)}
+      }
+      renderToDocument(foo)
+      `window.console.warn = org_warn_console; window.console.error = org_error_console;`
+      expect(`log`).to eq([])
+    end
+  end
+
   describe 'Event handling' do
     before do
       stub_const 'Foo', Class.new

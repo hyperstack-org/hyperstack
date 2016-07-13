@@ -43,7 +43,7 @@ module React
             _componentValidator: %x{
               function(props, propName, componentName) {
                 var errors = #{validator.validate(Hash.new(`props`))};
-                var error = new Error(#{"In component `" + self.name + "`\n" + `errors`.join("\n")});
+                var error = new Error(#{"In component `#{name}`\n" + `errors`.join("\n")});
                 return #{`errors`.count > 0 ? `error` : `undefined`};
               }
             }
