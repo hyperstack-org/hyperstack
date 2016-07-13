@@ -23,7 +23,7 @@ Whitespace conventions:
 ### Added
 
 - More helpful error messages on render failures (#152)
-- `Element#on('<my_event_name>')` subscribes `my_event_name` (#153)
+- `Element#on('<my_event_name>')` subscribes to `my_event_name` (#153)
 
 ### Changed
 
@@ -31,12 +31,12 @@ Whitespace conventions:
 
 ### Deprecated
 
-- `Element#(:event)` subscription to `_onEvent` is deprecated. Once you have changed params named `_on...` to `on_...` you can `require 'reactrb/new-event-name-convention.rb'` to avoid spurious react warning messages. (#153)
+- `Element#on(:event)` subscription to `_onEvent` is deprecated. Once you have changed params named `_on...` to `on_...` you can `require 'reactrb/new-event-name-convention.rb'` to avoid spurious react warning messages. (#153)
 
 
 ### Fixed
 
-- when using the Element['#container'].render... method generates spurious react error (#154)
+- The `Element['#container'].render...` method generates a spurious react error (#154)
 
 
 
