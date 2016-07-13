@@ -1,6 +1,18 @@
 require 'react/ext/string'
 
 module React
+  #
+  # Wraps the React Native element class
+  #
+  # adds the #on method to add event handlers to the element
+  #
+  # adds the #render method to place elements in the DOM and
+  # #delete (alias/deprecated #as_node) method to remove elements from the DOM
+  #
+  # handles the haml style class notation so that
+  #  div.bar.blat becomes div(class: "bar blat")
+  # by using method missing
+  #
   class Element
     include Native
 
@@ -20,58 +32,124 @@ module React
       @native = native_element
     end
 
-    def on(event_name)
-      name = event_name.to_s.event_camelize
-      props = if React::Event::BUILT_IN_EVENTS.include?("on#{name}")
-        {"on#{name}" => %x{
-          function(event){
-            #{yield React::Event.new(`event`)}
-          }
-        }}
-      else
-        {"_on#{name}" => %x{
-          function(){
-            #{yield *Array(`arguments`)}
-          }
-        }}
-      end
-      @native = `React.cloneElement(#{self.to_n}, #{props.to_n})`
-      @properties.merge! props
+    # Attach event handlers.
+
+    def on(*event_names, &block)
+      event_names.each { |event_name| merge_event_prop!(event_name, &block) }
+      @native = `React.cloneElement(#{to_n}, #{properties.to_n})`
       self
     end
 
-    def render(props = {})  # for rendering children
+    # Render element into DOM in the current rendering context.
+    # Used for elements that are not yet in DOM, i.e. they are provided as children
+    # or they have been explicitly removed from the rendering context using the delete method.
+
+    def render(props = {})
       if props.empty?
         React::RenderingContext.render(self)
       else
         React::RenderingContext.render(
           Element.new(
-            `React.cloneElement(#{self.to_n}, #{API.convert_props(props)})`,
-            type,
-            properties.merge(props),
-            block
+            `React.cloneElement(#{to_n}, #{API.convert_props(props)})`,
+            type, properties.merge(props), block
           )
         )
       end
     end
 
-    def method_missing(class_name, args = {}, &new_block)
-      class_name = class_name.split("__").collect { |s| s.gsub("_", "-") }.join("_")
-      new_props = properties.dup
-      new_props["class"] = "#{new_props['class']} #{class_name} #{args.delete("class")} #{args.delete('className')}".split(" ").uniq.join(" ")
-      new_props.merge! args
-      React::RenderingContext.replace(
-        self,
-        React::RenderingContext.build { React::RenderingContext.render(type, new_props, &new_block) }
-      )
+    # Delete (remove) element from rendering context, the element may later be added back in
+    # using the render method.
+
+    def delete
+      React::RenderingContext.delete(self)
     end
+
+    # Deprecated version of delete method
 
     def as_node
       React::RenderingContext.as_node(self)
     end
 
-    def delete
-      React::RenderingContext.delete(self)
+    # Any other method applied to an element will be treated as class name (haml style) thus
+    # div.foo.bar(id: :fred) is the same as saying div(class: "foo bar", id: :fred)
+    #
+    # single underscores become dashes, and double underscores become a single underscore
+    #
+    # params may be provide to each class (but typically only to the last for easy reading.)
+
+    def method_missing(class_name, args = {}, &new_block)
+      class_name = class_name.gsub(/__|_/, '__' => '_', '_' => '-')
+      new_props = properties.dup
+      new_props[:class] = "\
+        #{class_name} #{new_props[:class]} #{args.delete(:class)} #{args.delete(:className)}\
+      ".split(' ').uniq.join(' ')
+      new_props.merge! args
+      React::RenderingContext.replace(
+        self,
+        RenderingContext.build { RenderingContext.render(type, new_props, &new_block) }
+      )
+    end
+
+    private
+
+    # built in events, events going to native components, and events going to reactrb
+
+    # built in events will have their event param translated to the Event wrapper
+    # and the name will camelcased and have on prefixed, so :click becomes onClick.
+    #
+    # events emitting from native components are assumed to have the same camel case and
+    # on prefixed.
+    #
+    # events emitting from reactrb components will just have on_ prefixed.  So
+    # :play_button_pushed attaches to the :on_play_button_pushed param
+    #
+    # in all cases the default name convention can be overriden by wrapping in <...> brackets.
+    # So on("<MyEvent>") will attach to the "MyEvent" param.
+
+    def merge_event_prop!(event_name, &block)
+      if event_name =~ /^<(.+)>$/
+        merge_component_event_prop! event_name.gsub(/^<(.+)>$/, '\1'), &block
+      elsif React::Event::BUILT_IN_EVENTS.include?(name = "on#{event_name.event_camelize}")
+        merge_built_in_event_prop! name, &block
+      elsif @type.instance_variable_get('@native_import')
+        merge_component_event_prop! name, &block
+      else
+        merge_deprecated_component_event_prop! event_name, &block
+        merge_component_event_prop! "on_#{event_name}", &block
+      end
+    end
+
+    def merge_built_in_event_prop!(prop_name)
+      @properties.merge!(
+        prop_name => %x{
+          function(event){
+            return #{yield(React::Event.new(`event`))}
+          }
+        }
+      )
+    end
+
+    def merge_component_event_prop!(prop_name)
+      @properties.merge!(
+        prop_name => %x{
+          function(){
+            return #{yield(*Array(`arguments`))}
+          }
+        }
+      )
+    end
+
+    def merge_deprecated_component_event_prop!(event_name)
+      prop_name = "_on#{event_name.event_camelize}"
+      fn = %x{function(){#{
+        React::Component.deprecation_warning(
+          "In future releases React::Element#on('#{event_name}') will no longer respond "\
+          "to the '#{prop_name}' emitter.\n"\
+          "Rename your emitter param to 'on_#{event_name}' or use .on('<#{prop_name}>')"
+        )}
+        return #{yield(*Array(`arguments`))}
+      }}
+      @properties.merge!(prop_name => fn)
     end
   end
 end

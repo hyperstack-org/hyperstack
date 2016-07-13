@@ -16,6 +16,7 @@ module React
     @@component_classes = {}
 
     def self.import_native_component(opal_class, native_class)
+      opal_class.instance_variable_set("@native_import", true)
       @@component_classes[opal_class] = native_class
     end
 
