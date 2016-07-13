@@ -2,6 +2,11 @@ module React
   module Component
     # class level methods (macros) for components
     module ClassMethods
+
+      def reactrb_component?
+        true
+      end
+      
       def backtrace(*args)
         @dont_catch_exceptions = (args[0] == :none)
         @backtrace_off = @dont_catch_exceptions || (args[0] == :off)

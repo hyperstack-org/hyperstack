@@ -495,6 +495,58 @@ describe React::Component, type: :component do
     end
   end
 
+  describe 'Render Error Handling' do
+    before(:each) do
+      %x{
+        window.test_log = [];
+        window.org_warn_console = window.console.warn;
+        window.org_error_console = window.console.error
+        window.console.warn = window.console.error = function(str){window.test_log.push(str)}
+      }
+    end
+    it "will generate a message if render returns something other than an Element or a String" do
+      foo = Class.new(React::Component::Base)
+      foo.class_eval do
+        def render; Hash.new; end
+      end
+
+      renderToDocument(foo)
+      `window.console.warn = window.org_warn_console; window.console.error = window.org_error_console;`
+      expect(`test_log`.first).to match /Instead the Hash \{\} was returned/
+    end
+    it "will generate a message if render returns a Component class" do
+      stub_const 'Foo', Class.new(React::Component::Base)
+      foo = Class.new(React::Component::Base)
+      foo.class_eval do
+        def render; Foo; end
+      end
+
+      renderToDocument(foo)
+      `window.console.warn = window.org_warn_console; window.console.error = window.org_error_console;`
+      expect(`test_log`.first).to match /Did you mean Foo()/
+    end
+    it "will generate a message if more than 1 element is generated" do
+      foo = Class.new(React::Component::Base)
+      foo.class_eval do
+        def render; "hello".span; "goodby".span; end
+      end
+
+      renderToDocument(foo)
+      `window.console.warn = window.org_warn_console; window.console.error = window.org_error_console;`
+      expect(`test_log`.first).to match /Instead 2 elements were generated/
+    end
+    it "will generate a message if the element generated is not the element returned" do
+      foo = Class.new(React::Component::Base)
+      foo.class_eval do
+        def render; "hello".span; "goodby".span.delete; end
+      end
+
+      renderToDocument(foo)
+      `window.console.warn = window.org_warn_console; window.console.error = window.org_error_console;`
+      expect(`test_log`.first).to match /A different element was returned than was generated within the DSL/
+    end
+  end
+
   describe 'Event handling' do
     before do
       stub_const 'Foo', Class.new
