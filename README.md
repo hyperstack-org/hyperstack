@@ -1,4 +1,4 @@
-## ReactrbRouter
+## Reactrb-Router
 
 ReactrbRouter allows you write and use the React Router in Ruby through Opal.
 
