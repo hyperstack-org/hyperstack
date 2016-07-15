@@ -1,7 +1,29 @@
 require 'spec_helper'
-require 'reactive_router/test_components'
+require 'reactrb_router/test_components'
 
 describe "transition hooks", js: true do
+  it "reactrb-router will route children" do
+
+    mount "TestRouter" do
+      class TestRouter < React::Router
+        def routes
+          route("/", mounts: App) do
+            route("child1", mounts: Child1)
+            route("child2", mounts: Child2)
+          end.on(:change) do
+            # debugger
+            # nil
+          end
+        end
+      end
+    end
+    #binding.pry
+    page.should have_content("Rendering App: No Children")
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child1')")
+    page.should have_content("Child1 got routed")
+    page.evaluate_script("window.ReactRouter.hashHistory.push('child2')")
+    page.should have_content("Child2 got routed")
+  end
 
   it "receive the prev and next state" do
 

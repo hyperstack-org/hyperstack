@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'reactive_router/test_components'
+require 'reactrb_router/test_components'
 
 # Test assumptions on how react-router api works, and how it interfaces into react.rb
 

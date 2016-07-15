@@ -116,7 +116,7 @@ module ComponentTestHelpers
           end
 
           #TODO figure out how to auto insert this line????  something like:
-          page = "<%= javascript_include_tag 'reactive-router' %>\n#{page}"
+          page = "<%= javascript_include_tag 'reactrb-router' %>\n#{page}"
 
           if (render_on != :server_only && !render_params[:layout]) || javascript
             page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n"+page
@@ -215,7 +215,12 @@ module ComponentTestHelpers
   end
 
   def open_in_chrome
-    `open http://#{page.server.host}:#{page.server.port}#{page.current_path}`
+    on_linux = `which google-chrome`
+    if on_linux
+      `google-chrome http://#{page.server.host}:#{page.server.port}#{page.current_path}`
+    else
+      `open http://#{page.server.host}:#{page.server.port}#{page.current_path}`
+    end
     while true
       sleep 1.hour
     end

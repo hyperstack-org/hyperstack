@@ -5,23 +5,25 @@ module React
   class Router
     class DSL
       class Route
-
         def initialize(*args, &children)
-          path = if args[0].is_a? Hash
-            nil
-          else
-            args[0]
-          end
-          opts = if args[0].is_a? Hash
-            args[0]
-          else
-            args[1] || {}
-          end
+          path =
+            if args[0].is_a? Hash
+              nil
+            else
+              args[0]
+            end
+          opts =
+            if args[0].is_a? Hash
+              args[0]
+            else
+              args[1] || {}
+            end
           unless opts.is_a? Hash
-            raise "Route expects an optional path followed by an options hash, instead we got route(#{'"'+path+'", ' if path} #{opts})"
+            raise 'Route expects an optional path followed by an options hash, '\
+                  "instead we got route(#{'"' + path + '", ' if path} #{opts})"
           end
           @children, @index = DSL.evaluate_children do
-            children.call if children && children.arity == 0
+            yield if children && children.arity == 0
             Index.new(mounts: opts[:index]) if opts[:index]
           end
           opts.delete(:index)
@@ -48,11 +50,11 @@ module React
           if @get_children
             hash[:getChildRoutes] = get_child_routes_wrapper
           else
-            hash[:childRoutes] = @children.collect { |child| child.to_json }
+            hash[:childRoutes] = @children.map(&:to_json)
           end
 
           if @components
-            if @components.detect { |k, v| v.respond_to? :call }
+            if @components.detect { |_k, v| v.respond_to? :call }
               hash[:getComponents] = get_components_wrapper
             else
               hash[:components] = @components
@@ -60,16 +62,13 @@ module React
           elsif @component.respond_to? :call
             hash[:getComponent] = get_component_wrapper
           elsif @component
-            hash[:component] = React::API::create_native_react_class(@component)
+            hash[:component] = React::API.create_native_react_class(@component)
           else
             hash[:component] = DSL.router.lookup_component(@path)
           end
 
-          [:enter, :change, :leave].each do |hook|
-            if @opts["on_#{hook}"]
-              hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper")
-              @opts.delete("on_#{hook}")
-            end
+          %w(enter change leave).each do |hook|
+            hash["on#{hook.camelcase}"] = send("on_#{hook}_wrapper") if @opts["on_#{hook}"]
           end
 
           if @index.respond_to? :call
@@ -79,13 +78,11 @@ module React
           end
 
           @opts.each do |key, value|
-            hash[key] = value
+            hash[key] = value unless %w(on_enter on_change on_leave).include?(key)
           end
-
 
           hash
         end
-
       end
     end
   end

@@ -1,5 +1,5 @@
 if RUBY_ENGINE == 'opal'
-  #require 'reactive-ruby' # how to require this conditionally????
+  # require 'reactrb' # how to require this conditionally????
   require 'promise'
   require 'promise_extras'
   require 'react/router/react-router'
@@ -8,12 +8,10 @@ if RUBY_ENGINE == 'opal'
   require 'react/router/dsl/route'
   require 'react/router/dsl/index'
   require 'react/router/dsl/transition_context'
-
 else
   require 'opal'
-  require 'reactive-ruby'
-  #require 'reactive-router/window_location'
-  require 'reactive-router/version'
+  require 'reactrb'
+  require 'react/router/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
   Opal.append_path File.expand_path('../../vendor', __FILE__).untaint

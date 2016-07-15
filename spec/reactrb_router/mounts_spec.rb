@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'reactive_router/test_components'
+require 'reactrb_router/test_components'
 
 describe "specifying the component to mount with a call back", js: true do
 

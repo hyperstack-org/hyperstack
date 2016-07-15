@@ -20,7 +20,7 @@ describe "A component", js: true do
   it "can be created and mounted from rspec" do
     test_message = "I AM FOO!"
     mount "Hello", message: test_message do
-      require 'reactive-router'
+      require 'reactrb-router'
       class Hello < React::Component::Base
         param :message
         def render
@@ -28,7 +28,6 @@ describe "A component", js: true do
         end
       end
     end
-    binding.pry
     page.should have_content(test_message)
   end
 end
