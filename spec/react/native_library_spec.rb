@@ -65,6 +65,26 @@ describe "React::NativeLibrary" do
       React.create_element(Foo::NativeComponent, name: "There"))).to eq('<div>Hello There</div>')
   end
 
+  it "will import a nested React.js library into the Ruby name space" do
+    %x{
+      window.NativeLibrary = {
+        NestedLibrary: {
+          NativeComponent: React.createClass({
+            displayName: "HelloMessage",
+            render: function render() {
+              return React.createElement("div", null, "Hello ", this.props.name);
+            }
+        })}
+      }
+    }
+    stub_const 'Foo', Class.new(React::NativeLibrary)
+    Foo.class_eval do
+      imports "NativeLibrary"
+    end
+    expect(React.render_to_static_markup(
+      React.create_element(Foo::NestedLibrary::NativeComponent, name: "There"))).to eq('<div>Hello There</div>')
+  end
+
   it "will rename an imported a React.js component" do
     %x{
       window.NativeLibrary = {
