@@ -759,6 +759,79 @@ describe React::Component, type: :component do
     end
   end
 
+  describe '.params_changed?' do
+
+    before(:each) do
+      stub_const 'Foo', Class.new(React::Component::Base)
+      Foo.define_method :needs_update? do |next_params, next_state|
+        next_params.changed?
+      end
+      @foo = Foo.new
+    end
+
+    it "returns false if new and old params are the same" do
+      @foo.instance_variable_set("@native", `{props: {value1: 1, value2: 2}}`)
+      expect(@foo.should_component_update?(`{value2: 2, value1: 1}`, `null`)).to be_falsy
+    end
+
+    it "returns true if new and old params are have different values" do
+      @foo.instance_variable_set("@native", `{props: {value1: 1, value2: 2}}`)
+      expect(@foo.should_component_update?(`{value2: 2, value1: 2}`, `null`)).to be_truthy
+    end
+
+    it "returns true if new and old params are have different keys" do
+      @foo.instance_variable_set("@native", `{props: {value1: 1, value2: 2}}`)
+      expect(@foo.should_component_update?(`{value2: 2, value1: 1, value3: 3}`, `null`)).to be_truthy
+    end
+  end
+
+  describe '#state_changed?' do
+
+    empties = [`{}`, `undefined`, `null`, `false`]
+
+    before(:each) do
+      stub_const 'Foo', Class.new(React::Component::Base)
+      Foo.define_method :needs_update? do |next_params, next_state|
+        next_state.changed?
+      end
+      @foo = Foo.new
+    end
+
+    it "returns false if both new and old states are empty" do
+      empties.each do |empty1|
+        empties.each do |empty2|
+          @foo.instance_variable_set("@native", `{state: #{empty1}}`)
+          expect(@foo.should_component_update?(`{}`, empty2)).to be_falsy
+        end
+      end
+    end
+
+    it "returns true if old state is empty, but new state is not" do
+      empties.each do |empty|
+        @foo.instance_variable_set("@native", `{state: #{empty}}`)
+        expect(@foo.should_component_update?(`{}`, `{foo: 12}`)).to be_truthy
+      end
+    end
+
+    it "returns true if new state is empty, but old state is not" do
+      empties.each do |empty|
+        @foo.instance_variable_set("@native", `{state: {foo: 12}}`)
+        expect(@foo.should_component_update?(`{}`, empty)).to be_truthy
+      end
+    end
+
+    it "returns true if new state and old state have different time stamps" do
+      @foo.instance_variable_set("@native", `{state: {'***_state_updated_at-***': 12}}`)
+      expect(@foo.should_component_update?(`{}`, `{'***_state_updated_at-***': 13}`)).to be_truthy
+    end
+
+    it "returns false if new state and old state have the same time stamps" do
+      @foo.instance_variable_set("@native", `{state: {'***_state_updated_at-***': 12}}`)
+      expect(@foo.should_component_update?(`{}`, `{'***_state_updated_at-***': 12}`)).to be_falsy
+    end
+
+  end
+
   describe '#children' do
     before(:each) do
       stub_const 'Foo', Class.new

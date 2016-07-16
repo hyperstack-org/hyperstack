@@ -6,21 +6,21 @@ module React
       def reactrb_component?
         true
       end
-      
+
       def backtrace(*args)
         @dont_catch_exceptions = (args[0] == :none)
         @backtrace_off = @dont_catch_exceptions || (args[0] == :off)
       end
 
-      def process_exception(e, component, reraise = nil)
-        message = ["Exception raised while rendering #{component}"]
-        if e.backtrace && e.backtrace.length > 1 && !@backtrace_off
-          append_backtrace(message, e.backtrace)
-        else
-          message[0] += ": #{e.message}"
+      def process_exception(e, component, reraise = @dont_catch_exceptions)
+        unless @dont_catch_exceptions
+          message = ["Exception raised while rendering #{component}: #{e.message}"]
+          if e.backtrace && e.backtrace.length > 1 && !@backtrace_off
+            append_backtrace(message, e.backtrace)
+          end
+          `console.error(#{message.join("\n")})`
         end
-        `console.error(#{message.join("\n")})`
-        raise e if reraise || @dont_catch_exceptions
+        raise e if reraise
       end
 
       def append_backtrace(message_array, backtrace)

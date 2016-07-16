@@ -12,7 +12,7 @@ module React
     param :controller
     param :render_params
 
-    backtrace :on
+    backtrace :off
 
     def render
       paths_searched = []
