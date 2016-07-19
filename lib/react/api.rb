@@ -104,36 +104,42 @@ module React
         params << create_native_react_class(type)
       elsif React::Component::Tags::HTML_TAGS.include?(type)
         params << type
+        html_tag = true
       elsif type.is_a? String
         return React::Element.new(type)
       else
         raise "#{type} not implemented"
       end
 
-      # Passed in properties
-      params << convert_props(properties)
+      # Convert Passed in properties
+      properties = convert_props(properties, html_tag)
+      params << properties.shallow_to_n
 
       # Children Nodes
       if block_given?
-        children = [yield].flatten.each do |ele|
+        [yield].flatten.each do |ele|
           params << ele.to_n
         end
       end
-      return React::Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
+      React::Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
     end
 
     def self.clear_component_class_cache
       @@component_classes = {}
     end
 
-    def self.convert_props(properties)
+    def self.convert_props(properties, html_tag)
       raise "Component parameters must be a hash. Instead you sent #{properties}" unless properties.is_a? Hash
       props = {}
+      updated = false
       properties.map do |key, value|
         if key == "class_name" && value.is_a?(Hash)
           props[lower_camelize(key)] = `React.addons.classSet(#{value.to_n})`
         elsif key == "class"
           props["className"] = value
+        elsif key == 'value' && value.nil? && html_tag
+          updated = true
+          props['value'] = ''
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
         elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
@@ -142,16 +148,16 @@ module React
           props[React.html_attr?(lower_camelize(key)) ? lower_camelize(key) : key] = value
         end
       end
-      props.shallow_to_n
+      props
     end
 
     private
 
     def self.lower_camelize(snake_cased_word)
-      words = snake_cased_word.split("_")
+      words = snake_cased_word.split('_')
       result = [words.first]
       result.concat(words[1..-1].map {|word| word[0].upcase + word[1..-1] })
-      result.join("")
+      result.join('')
     end
   end
 end

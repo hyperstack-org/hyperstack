@@ -48,11 +48,10 @@ module React
       if props.empty?
         React::RenderingContext.render(self)
       else
+        props = API.convert_props(props)
         React::RenderingContext.render(
-          Element.new(
-            `React.cloneElement(#{to_n}, #{API.convert_props(props)})`,
-            type, properties.merge(props), block
-          )
+          Element.new(`React.cloneElement(#{to_n}, #{props.shallow_to_n})`,
+                      type, properties.merge(props), block)
         )
       end
     end
@@ -80,8 +79,8 @@ module React
     def method_missing(class_name, args = {}, &new_block)
       class_name = class_name.gsub(/__|_/, '__' => '_', '_' => '-')
       new_props = properties.dup
-      new_props[:class] = "\
-        #{class_name} #{new_props[:class]} #{args.delete(:class)} #{args.delete(:className)}\
+      new_props[:className] = "\
+        #{class_name} #{new_props[:className]} #{args.delete(:class)} #{args.delete(:className)}\
       ".split(' ').uniq.join(' ')
       new_props.merge! args
       React::RenderingContext.replace(

@@ -56,7 +56,32 @@ describe 'the React DSL' do
     expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>hello</div>')
   end
 
-  it "can use the upcase version of builtin tags" do
+  it "will pass the empty string for the value attribute" do
+    stub_const 'Foo', Class.new
+    Foo.class_eval do
+      include React::Component
+      def render
+        INPUT(value: nil).on(:change) {}
+      end
+    end
+
+    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<input value=""/>')
+  end
+
+
+  it "will pass converted props through event handlers" do
+    stub_const 'Foo', Class.new
+    Foo.class_eval do
+      include React::Component
+      def render
+        INPUT(data: {foo: 12}).on(:change) {}
+      end
+    end
+
+    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<input data-foo="12"/>')
+  end
+
+  it "will turn the last string in a block into a element" do
     stub_const 'Foo', Class.new
     Foo.class_eval do
       include React::Component
@@ -190,11 +215,11 @@ describe 'the React DSL' do
     stub_const 'Foo', Class.new(React::Component::Base)
     Foo.class_eval do
       def render
-        Mod::Bar().the_class
+        Mod::Bar().the_class.other_class
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span class="the-class">a man walks into a bar</span>')
+    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span class="other-class the-class">a man walks into a bar</span>')
   end
 
   it "can use the 'class' keyword for classes" do
@@ -214,11 +239,11 @@ describe 'the React DSL' do
     Foo.class_eval do
       include React::Component
       def render
-        span { "hello".span.as_node.class.name }.as_node.render
+        span(data: {size: 12}) { "hello".span.as_node.class.name }.as_node.render
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>React::Element</span>')
+    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span data-size="12">React::Element</span>')
   end
 
   it "can use the dangerously_set_inner_HTML param" do
