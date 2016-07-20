@@ -34,7 +34,7 @@ route("/", mounts: App, index: Home) do
 end
 ```
 
-Is equivilent to this route configuration:
+Is equivalent to this route configuration:
 
 ```javascript
 const routes = {
