@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in syncromesh.gemspec
+# Specify your gem's dependencies in synchromesh.gemspec
 gemspec

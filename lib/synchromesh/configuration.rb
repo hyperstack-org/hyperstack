@@ -1,4 +1,4 @@
-module Syncromesh
+module Synchromesh
   module Configuration
 
    def configuration

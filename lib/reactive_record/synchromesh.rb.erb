@@ -1,6 +1,6 @@
 module ReactiveRecord
 
-  class Syncromesh
+  class Synchromesh
 
     include React::IsomorphicHelpers
 
@@ -19,8 +19,9 @@ module ReactiveRecord
 
     before_first_mount do |context|
       if on_opal_client?
+        puts "setting up synchromesh on client: <%= Synchromesh.transport %> time now = <%= Time.now %>"
 
-        <% if Syncromesh.transport == :pusher %>
+        <% if Synchromesh.transport == :pusher %>
 
           change = lambda do |data|
             sync_change Hash.new(data)
@@ -31,7 +32,7 @@ module ReactiveRecord
           end
 
           %x{
-            <% if Syncromesh.client_logging %>
+            <% if Synchromesh.client_logging %>
             Pusher.log = function(message) {
               if (window.console && window.console.log) {
                 window.console.log(message);
@@ -39,16 +40,20 @@ module ReactiveRecord
             };
             <% end %>
 
-            var pusher = new Pusher('<%= Syncromesh.key %>', {
-              encrypted: <%= Syncromesh.encrypted %>
-            });
+            <% if defined?(PusherFake) %>
+              var pusher = <%= PusherFake.javascript %>;
+            <% else %>
+              var pusher = new Pusher('<%= Synchromesh.key %>', {
+                encrypted: <%= Synchromesh.encrypted %>
+              });
+            <% end %>
 
-            var channel = pusher.subscribe('<%= Syncromesh.channel %>');
+            var channel = pusher.subscribe('<%= Synchromesh.channel %>');
             channel.bind('change', change);
             channel.bind('destroy', destroy);
           }
 
-        <% elsif Syncromesh.transport == :simple_poller %>
+        <% elsif Synchromesh.transport == :simple_poller %>
 
           id = nil
 
@@ -56,9 +61,9 @@ module ReactiveRecord
             id = response.json[:id]
           end
 
-          puts "SECONDS BETWEEN POLL SET TO <%= Syncromesh.seconds_between_poll %> SECONDS"
+          puts "SECONDS BETWEEN POLL SET TO <%= Synchromesh.seconds_between_poll %> SECONDS"
 
-          every(<%= Syncromesh.seconds_between_poll %>) do
+          every(<%= Synchromesh.seconds_between_poll %>) do
             HTTP.get(`window.ReactiveRecordEnginePath`+"/syncromesh-read/#{id}").then do |response|
               response.json.each do |update|
                 case update[0]
