@@ -1,14 +1,24 @@
 module ReactiveRecord
-
+  # Client side handling of synchronization messages
+  # When a synchronization message comes in, the client will call
+  # either the sync_change or sync_destroy methods.
+  # Everything is setup during reactrb before_first_mount callback
+  # We use ERB to determine the configuration and implement the appropriate
+  # client interface to sync_change or sync_destroy
   class Synchromesh
-
     include React::IsomorphicHelpers
+
+    # sync_changes: Wait till we are done with any concurrent model saves, then
+    # hydrate the data (which will update any attributes) and sync the scopes.
 
     def self.sync_change(data)
       Base.when_not_saving(Object.const_get(data[:klass])) do |klass|
         klass._react_param_conversion(data[:record]).backing_record.sync_scopes
       end
     end
+
+    # sync_destroy: Hydrate the data, then destroy the record, cleanup
+    # and syncronize the scopes.
 
     def self.sync_destroy(data)
       record = Object.const_get(data[:klass])._react_param_conversion(data[:record])
@@ -17,9 +27,11 @@ module ReactiveRecord
       record.backing_record.sync_scopes
     end
 
+    # Before first mount, hook up callbacks depending on what kind of transport we
+    # are using.
+
     before_first_mount do |context|
       if on_opal_client?
-        puts "setting up synchromesh on client: <%= Synchromesh.transport %> time now = <%= Time.now %>"
 
         <% if Synchromesh.transport == :pusher %>
 
@@ -57,14 +69,12 @@ module ReactiveRecord
 
           id = nil
 
-          HTTP.get(`window.ReactiveRecordEnginePath`+"/syncromesh-subscribe/").then do |response|
+          HTTP.get(`window.ReactiveRecordEnginePath`+"/synchromesh-subscribe/").then do |response|
             id = response.json[:id]
           end
 
-          puts "SECONDS BETWEEN POLL SET TO <%= Synchromesh.seconds_between_poll %> SECONDS"
-
           every(<%= Synchromesh.seconds_between_poll %>) do
-            HTTP.get(`window.ReactiveRecordEnginePath`+"/syncromesh-read/#{id}").then do |response|
+            HTTP.get(`window.ReactiveRecordEnginePath`+"/synchromesh-read/#{id}").then do |response|
               response.json.each do |update|
                 case update[0]
                 when :change

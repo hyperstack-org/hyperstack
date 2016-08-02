@@ -1,13 +1,15 @@
-equire 'spec_helper'
+require 'spec_helper'
 
 describe "Syncromesh", js: true do
 
   # make sure to turn off main spec before running these... and they can only be run one at a time...
 
-  xit "will notify the client when models change (using polling)" do
+  it "will notify the client when models change (using polling)" do
 
     Synchromesh.configuration do |config|
       config.transport = :simple_poller
+      # slow down the polling so wait_for_ajax works
+      config.opts = { seconds_between_poll: 2 }
     end
 
     test_model = FactoryGirl.create(:test_model, test_attribute: "hello")
@@ -27,7 +29,7 @@ describe "Syncromesh", js: true do
   end
 
 
-  xit "will notify the client when models change (using real pusher account)" do
+  it "will notify the client when models change (using real pusher account)" do
 
     require 'pusher'
 
