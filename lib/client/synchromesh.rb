@@ -5,7 +5,7 @@ module ReactiveRecord
   # Everything is setup during reactrb before_first_mount callback
   # We use ERB to determine the configuration and implement the appropriate
   # client interface to sync_change or sync_destroy
-  class Synchromesh
+  class SynchromeshClient
     include React::IsomorphicHelpers
 
     # sync_changes: Wait till we are done with any concurrent model saves, then
@@ -30,10 +30,25 @@ module ReactiveRecord
     # Before first mount, hook up callbacks depending on what kind of transport we
     # are using.
 
+    prerender_footer do
+      config_hash = {
+        transport: Synchromesh.transport,
+        client_logging: Synchromesh.client_logging,
+        pusher_fake: defined?(PusherFake) && PusherFake.javascript,
+        key: Synchromesh.key,
+        encrypted: Synchromesh.encrypted,
+        channel: Synchromesh.channel,
+        seconds_between_poll: Synchromesh.seconds_between_poll
+      }
+      "<script type='text/javascript'>\n"\
+      "window.SynchromeshOpts = #{config_hash.to_json}\n"\
+      "</script>\n"
+    end if RUBY_ENGINE != 'opal'
+
     before_first_mount do |context|
       if on_opal_client?
-
-        <% if Synchromesh.transport == :pusher %>
+        opts = Hash.new(`window.SynchromeshOpts`)
+        if opts[:transport] == :pusher
 
           change = lambda do |data|
             sync_change Hash.new(data)
@@ -43,29 +58,28 @@ module ReactiveRecord
             sync_destroy Hash.new(data)
           end
 
-          %x{
-            <% if Synchromesh.client_logging %>
-            Pusher.log = function(message) {
-              if (window.console && window.console.log) {
-                window.console.log(message);
-              }
-            };
-            <% end %>
-
-            <% if defined?(PusherFake) %>
-              var pusher = <%= PusherFake.javascript %>;
-            <% else %>
-              var pusher = new Pusher('<%= Synchromesh.key %>', {
-                encrypted: <%= Synchromesh.encrypted %>
+          if opts[:client_logging] && `window.console && window.console.log`
+            %x{
+              Pusher.log = function(message) {window.console.log(message);}
+            }
+          end
+          if opts[:pusher_fake]
+            %x{
+              var pusher = eval(#{opts[:pusher_fake]});
+            }
+          else
+            %x{
+              var pusher = new Pusher(#{opts[:key]}, {
+                encrypted: #{opts[:encrypted]}
               });
-            <% end %>
-
-            var channel = pusher.subscribe('<%= Synchromesh.channel %>');
+            }
+          end
+          %x{
+            var channel = pusher.subscribe(#{opts[:channel]});
             channel.bind('change', change);
             channel.bind('destroy', destroy);
           }
-
-        <% elsif Synchromesh.transport == :simple_poller %>
+        elsif opts[:transport] == :simple_poller
 
           id = nil
 
@@ -73,7 +87,7 @@ module ReactiveRecord
             id = response.json[:id]
           end
 
-          every(<%= Synchromesh.seconds_between_poll %>) do
+          every(opts[:seconds_between_poll]) do
             HTTP.get(`window.ReactiveRecordEnginePath`+"/synchromesh-read/#{id}").then do |response|
               response.json.each do |update|
                 case update[0]
@@ -85,9 +99,7 @@ module ReactiveRecord
               end
             end
           end
-
-        <% end %>
-
+        end
       end
     end
   end

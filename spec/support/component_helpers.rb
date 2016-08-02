@@ -184,7 +184,7 @@ module ComponentTestHelpers
       opts = {}
     end
     test_url = build_test_url_for(opts.delete(:controller))
-    if block
+    if block || @client_code
       block_with_helpers = <<-code
         module ComponentHelpers
           def self.js_eval(s)
@@ -197,7 +197,7 @@ module ComponentTestHelpers
           end
         end
         #{@client_code}
-        #{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}
+        #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
       code
       opts[:code] = Opal.compile(block_with_helpers)
     end

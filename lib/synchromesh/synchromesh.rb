@@ -4,21 +4,25 @@ require 'synchromesh/configuration'
 module Synchromesh
   extend Configuration
 
+  def self.config_reset
+    @pusher = nil
+  end
+
   define_setting :transport, :none
   define_setting :opts, {}
   define_setting :channel_prefix
   define_setting :client_logging, true
 
   def self.app_id
-    opts[:app_id] || Pusher.app_id
+    opts[:app_id] || Pusher.app_id if transport == :pusher
   end
 
   def self.key
-    opts[:key] || Pusher.key
+    opts[:key] || Pusher.key if transport == :pusher
   end
 
   def self.secret
-    opts[:secret] || Pusher.secret
+    opts[:secret] || Pusher.secret if transport == :pusher
   end
 
   def self.encrypted

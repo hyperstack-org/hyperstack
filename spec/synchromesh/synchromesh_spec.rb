@@ -2,17 +2,19 @@ require 'spec_helper'
 
 describe "Syncromesh", js: true do
 
-  require 'pusher'
-  require 'pusher-fake'
-  Pusher.app_id = "MY_TEST_ID"
-  Pusher.key = "MY_TEST_KEY"
-  Pusher.secret = "MY_TEST_SECRET"
-  require 'pusher-fake/support/rspec'
+  before(:all) do
+    require 'pusher'
+    require 'pusher-fake'
+    Pusher.app_id = "MY_TEST_ID"
+    Pusher.key =    "MY_TEST_KEY"
+    Pusher.secret = "MY_TEST_SECRET"
+    require 'pusher-fake/support/rspec'
 
-  Synchromesh.configuration do |config|
-    config.transport = :pusher
-    config.channel_prefix = "synchromesh"
-    config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
+    Synchromesh.configuration do |config|
+      config.transport = :pusher
+      config.channel_prefix = "synchromesh"
+      config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
+    end
   end
 
   it "synchronize on update" do
@@ -27,8 +29,7 @@ describe "Syncromesh", js: true do
     end
 
     page.should have_content("hello")
-    test_model.test_attribute = "goodby"
-    test_model.save
+    test_model.update_attribute(:test_attribute, 'goodby')
     page.should have_content("goodby")
 
   end
@@ -84,11 +85,7 @@ describe "Syncromesh", js: true do
       page.should have_content("4 items")
     end
 
-    it "will syncronize on an attribute change" do
-      # TestModel.first.tap do |model|
-      #   model.completed = true
-      #   model.save
-      # end
+    it "will syncronize on an update" do
       TestModel.first.update_attribute(:completed, true)
       page.should have_content("4 items")
     end

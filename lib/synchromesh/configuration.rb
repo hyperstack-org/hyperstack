@@ -3,6 +3,7 @@ module Synchromesh
   module Configuration
 
     def configuration
+      config_reset
       yield self
     end
 
@@ -16,6 +17,10 @@ module Synchromesh
       define_class_method name do
         class_variable_get("@@#{name}")
       end
+    end
+
+    def config_reset
+      raise "must implement"
     end
 
     private
