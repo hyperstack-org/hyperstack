@@ -132,7 +132,7 @@ module ComponentTestHelpers
             "</script>\n"+page
           end
           if !render_params[:layout] || style_sheet
-            page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' %>\n"+page
+            page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' rescue nil %>\n"+page
           end
           if render_on == :server_only # so that test helper wait_for_ajax works
             page = "<script type='text/javascript'>window.jQuery = {'active': 0}</script>\n#{page}"

@@ -14934,3 +14934,650 @@ Completed 200 OK in 10ms (Views: 0.5ms | ActiveRecord: 0.9ms)
   [1m[35m (1.7ms)[0m  DELETE FROM "test_models";
   [1m[36m (0.3ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
   [1m[35m (1.6ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (1.8ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.3ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (0.2ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.8ms)[0m  begin transaction
+  [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "hello"], ["created_at", "2016-08-02 00:33:04.219937"], ["updated_at", "2016-08-02 00:33:04.219937"]]
+  [1m[35m (1.1ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:33:11 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (11383.5ms)
+Completed 200 OK in 11403ms (Views: 11398.8ms | ActiveRecord: 0.0ms)
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:33:23 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:33:23 -0400
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:33:23 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:33:23 -0400
+  [1m[36m (0.2ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.6ms)[0m  UPDATE "test_models" SET "test_attribute" = ?, "updated_at" = ? WHERE "test_models"."id" = ?  [["test_attribute", "goodby"], ["updated_at", "2016-08-02 00:33:25.902714"], ["id", 1]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:25 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[35m (0.5ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.3ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 11ms (Views: 0.4ms | ActiveRecord: 1.0ms)
+  [1m[35m (1.0ms)[0m  DELETE FROM "test_models";
+  [1m[36m (0.2ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (1.0ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.6ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 0"], ["created_at", "2016-08-02 00:33:26.903580"], ["updated_at", "2016-08-02 00:33:26.903580"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 1"], ["created_at", "2016-08-02 00:33:26.910502"], ["updated_at", "2016-08-02 00:33:26.910502"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 2"], ["created_at", "2016-08-02 00:33:26.915077"], ["updated_at", "2016-08-02 00:33:26.915077"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 3"], ["created_at", "2016-08-02 00:33:26.921299"], ["updated_at", "2016-08-02 00:33:26.921299"]]
+  [1m[35m (1.1ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 4"], ["created_at", "2016-08-02 00:33:26.926351"], ["updated_at", "2016-08-02 00:33:26.926351"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:33:26 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (15.9ms)
+Completed 200 OK in 17ms (Views: 16.4ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:33:27 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:33:27 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:33:27 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:33:27 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:28 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models"[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1  [["id", 1]]
+  [1m[36m (0.1ms)[0m  [1mSELECT COUNT(*) FROM "test_models"[0m
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models"
+  [1m[36m (0.2ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 9ms (Views: 0.4ms | ActiveRecord: 0.9ms)
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I'm new here!"], ["created_at", "2016-08-02 00:33:29.721841"], ["updated_at", "2016-08-02 00:33:29.721841"]]
+  [1m[35m (0.8ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:29 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 4ms (Views: 0.3ms | ActiveRecord: 0.5ms)
+  [1m[36m (1.1ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.0ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 0"], ["created_at", "2016-08-02 00:33:30.423904"], ["updated_at", "2016-08-02 00:33:30.423904"]]
+  [1m[35m (1.1ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 1"], ["created_at", "2016-08-02 00:33:30.429464"], ["updated_at", "2016-08-02 00:33:30.429464"]]
+  [1m[36m (0.8ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 2"], ["created_at", "2016-08-02 00:33:30.434437"], ["updated_at", "2016-08-02 00:33:30.434437"]]
+  [1m[35m (1.1ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 3"], ["created_at", "2016-08-02 00:33:30.439331"], ["updated_at", "2016-08-02 00:33:30.439331"]]
+  [1m[36m (1.0ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 4"], ["created_at", "2016-08-02 00:33:30.444280"], ["updated_at", "2016-08-02 00:33:30.444280"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:33:30 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (22.5ms)
+Completed 200 OK in 24ms (Views: 23.1ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:33:30 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:33:30 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:33:30 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:33:30 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:31 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.3ms)[0m  SELECT "test_models".* FROM "test_models"
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1[0m  [["id", 1]]
+  [1m[35m (0.1ms)[0m  SELECT COUNT(*) FROM "test_models"
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models"[0m
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 8ms (Views: 0.7ms | ActiveRecord: 0.8ms)
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT  "test_models".* FROM "test_models"  ORDER BY "test_models"."id" ASC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mDELETE FROM "test_models" WHERE "test_models"."id" = ?[0m  [["id", 1]]
+  [1m[35m (1.1ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:33 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 5ms (Views: 0.3ms | ActiveRecord: 0.5ms)
+  [1m[36m (1.2ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.4ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 0"], ["completed", "f"], ["created_at", "2016-08-02 00:33:33.586522"], ["updated_at", "2016-08-02 00:33:33.586522"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 1"], ["completed", "f"], ["created_at", "2016-08-02 00:33:33.592159"], ["updated_at", "2016-08-02 00:33:33.592159"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 2"], ["completed", "f"], ["created_at", "2016-08-02 00:33:33.598836"], ["updated_at", "2016-08-02 00:33:33.598836"]]
+  [1m[35m (1.1ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 3"], ["completed", "f"], ["created_at", "2016-08-02 00:33:33.604529"], ["updated_at", "2016-08-02 00:33:33.604529"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.8ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 4"], ["completed", "f"], ["created_at", "2016-08-02 00:33:33.611530"], ["updated_at", "2016-08-02 00:33:33.611530"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:33:33 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (18.0ms)
+Completed 200 OK in 20ms (Views: 18.7ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:33:33 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:33:33 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:33:33 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:33:33 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:35 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1[0m  [["id", 1]]
+  [1m[35m (0.2ms)[0m  SELECT COUNT(*) FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 10ms (Views: 1.0ms | ActiveRecord: 0.8ms)
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I'm new here!"], ["completed", "f"], ["created_at", "2016-08-02 00:33:36.541572"], ["updated_at", "2016-08-02 00:33:36.541572"]]
+  [1m[36m (1.0ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:36 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 4ms (Views: 0.2ms | ActiveRecord: 0.4ms)
+  [1m[36m (1.5ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.0ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.6ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 0"], ["completed", "f"], ["created_at", "2016-08-02 00:33:37.274858"], ["updated_at", "2016-08-02 00:33:37.274858"]]
+  [1m[35m (0.8ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 1"], ["completed", "f"], ["created_at", "2016-08-02 00:33:37.282404"], ["updated_at", "2016-08-02 00:33:37.282404"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 2"], ["completed", "f"], ["created_at", "2016-08-02 00:33:37.287563"], ["updated_at", "2016-08-02 00:33:37.287563"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 3"], ["completed", "f"], ["created_at", "2016-08-02 00:33:37.293525"], ["updated_at", "2016-08-02 00:33:37.293525"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 4"], ["completed", "f"], ["created_at", "2016-08-02 00:33:37.298410"], ["updated_at", "2016-08-02 00:33:37.298410"]]
+  [1m[35m (0.8ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:33:37 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (19.4ms)
+Completed 200 OK in 21ms (Views: 20.0ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:33:37 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:33:37 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:33:37 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:33:37 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:38 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1[0m  [["id", 1]]
+  [1m[35m (0.1ms)[0m  SELECT COUNT(*) FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 8ms (Views: 0.5ms | ActiveRecord: 0.7ms)
+  [1m[36mTestModel Load (1.2ms)[0m  [1mSELECT  "test_models".* FROM "test_models"  ORDER BY "test_models"."id" ASC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mDELETE FROM "test_models" WHERE "test_models"."id" = ?[0m  [["id", 1]]
+  [1m[35m (1.1ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:40 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 3ms (Views: 0.2ms | ActiveRecord: 0.3ms)
+  [1m[35m (1.1ms)[0m  DELETE FROM "test_models";
+  [1m[36m (0.2ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (1.3ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 0"], ["completed", "f"], ["created_at", "2016-08-02 00:33:40.435888"], ["updated_at", "2016-08-02 00:33:40.435888"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 1"], ["completed", "f"], ["created_at", "2016-08-02 00:33:40.443939"], ["updated_at", "2016-08-02 00:33:40.443939"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 2"], ["completed", "f"], ["created_at", "2016-08-02 00:33:40.449164"], ["updated_at", "2016-08-02 00:33:40.449164"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 3"], ["completed", "f"], ["created_at", "2016-08-02 00:33:40.457257"], ["updated_at", "2016-08-02 00:33:40.457257"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 4"], ["completed", "f"], ["created_at", "2016-08-02 00:33:40.463905"], ["updated_at", "2016-08-02 00:33:40.463905"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:33:40 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (20.4ms)
+Completed 200 OK in 21ms (Views: 20.8ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:33:40 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:33:40 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:33:40 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:33:40 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:41 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":932, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1  [["id", 1]]
+  [1m[36m (0.1ms)[0m  [1mSELECT COUNT(*) FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 7ms (Views: 0.4ms | ActiveRecord: 0.6ms)
+  [1m[35mTestModel Load (0.4ms)[0m  SELECT  "test_models".* FROM "test_models"  ORDER BY "test_models"."id" ASC LIMIT 1
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.6ms)[0m  UPDATE "test_models" SET "completed" = ?, "updated_at" = ? WHERE "test_models"."id" = ?  [["completed", "t"], ["updated_at", "2016-08-02 00:33:43.283423"], ["id", 1]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:33:43 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.3ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 3ms (Views: 0.2ms | ActiveRecord: 0.4ms)
+  [1m[36m (1.3ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.3ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.2ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[36m (1.8ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (0.2ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "hello"], ["created_at", "2016-08-02 00:37:25.523791"], ["updated_at", "2016-08-02 00:37:25.523791"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:37:33 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (11637.9ms)
+Completed 200 OK in 11654ms (Views: 11651.5ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:37:45 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:37:45 -0400
+Started GET "/stylesheets/application.css" for 127.0.0.1 at 2016-08-01 20:37:45 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:37:45 -0400
+Started GET "/stylesheets/application.css" for 127.0.0.1 at 2016-08-01 20:37:45 -0400
+  [1m[36m (0.2ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  UPDATE "test_models" SET "test_attribute" = ?, "updated_at" = ? WHERE "test_models"."id" = ?  [["test_attribute", "goodby"], ["updated_at", "2016-08-02 00:37:47.775302"], ["id", 1]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:37:47 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[35m (0.4ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.3ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36m (0.2ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 17ms (Views: 0.6ms | ActiveRecord: 0.9ms)
+  [1m[35m (1.2ms)[0m  DELETE FROM "test_models";
+  [1m[36m (0.2ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (1.3ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (1.7ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (0.2ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "hello"], ["created_at", "2016-08-02 00:43:02.823714"], ["updated_at", "2016-08-02 00:43:02.823714"]]
+  [1m[35m (1.2ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:43:10 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (12145.1ms)
+Completed 200 OK in 12161ms (Views: 12158.8ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:43:22 -0400
+Started GET "/stylesheets/application.css" for 127.0.0.1 at 2016-08-01 20:43:22 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:43:22 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:43:22 -0400
+Started GET "/stylesheets/application.css" for 127.0.0.1 at 2016-08-01 20:43:23 -0400
+  [1m[36m (0.2ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.6ms)[0m  UPDATE "test_models" SET "test_attribute" = ?, "updated_at" = ? WHERE "test_models"."id" = ?  [["test_attribute", "goodby"], ["updated_at", "2016-08-02 00:43:25.561632"], ["id", 1]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:43:25 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[35m (0.3ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 8ms (Views: 0.4ms | ActiveRecord: 0.7ms)
+  [1m[35m (1.6ms)[0m  DELETE FROM "test_models";
+  [1m[36m (0.3ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (1.4ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (1.4ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (1.8ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 0"], ["created_at", "2016-08-02 00:43:48.897660"], ["updated_at", "2016-08-02 00:43:48.897660"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mSQL (0.7ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 1"], ["created_at", "2016-08-02 00:43:48.929835"], ["updated_at", "2016-08-02 00:43:48.929835"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 2"], ["created_at", "2016-08-02 00:43:48.938021"], ["updated_at", "2016-08-02 00:43:48.938021"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 3"], ["created_at", "2016-08-02 00:43:48.944762"], ["updated_at", "2016-08-02 00:43:48.944762"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 4"], ["created_at", "2016-08-02 00:43:48.951829"], ["updated_at", "2016-08-02 00:43:48.951829"]]
+  [1m[36m (1.0ms)[0m  [1mcommit transaction[0m
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:43:49 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (30.5ms)
+Completed 200 OK in 34ms (Views: 32.3ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:43:49 -0400
+Started GET "/stylesheets/application.css" for 127.0.0.1 at 2016-08-01 20:43:49 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:43:49 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:43:49 -0400
+Started GET "/stylesheets/application.css" for 127.0.0.1 at 2016-08-01 20:43:49 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:43:50 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.4ms)[0m  [1mSELECT "test_models".* FROM "test_models"[0m
+  [1m[35mTestModel Load (0.3ms)[0m  SELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1  [["id", 1]]
+  [1m[36m (0.2ms)[0m  [1mSELECT COUNT(*) FROM "test_models"[0m
+  [1m[35mTestModel Load (0.3ms)[0m  SELECT "test_models".* FROM "test_models"
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 59ms (Views: 0.6ms | ActiveRecord: 1.4ms)
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I'm new here!"], ["created_at", "2016-08-02 00:43:51.986766"], ["updated_at", "2016-08-02 00:43:51.986766"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:43:52 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 6ms (Views: 0.3ms | ActiveRecord: 0.5ms)
+  [1m[36m (1.1ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (0.9ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[36m (1.3ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (0.1ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (1.0ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "hello"], ["created_at", "2016-08-02 00:44:17.953895"], ["updated_at", "2016-08-02 00:44:17.953895"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:44:23 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (11228.8ms)
+Completed 200 OK in 11258ms (Views: 11253.2ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:44:35 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:44:35 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:44:35 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:44:35 -0400
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  UPDATE "test_models" SET "test_attribute" = ?, "updated_at" = ? WHERE "test_models"."id" = ?  [["test_attribute", "goodby"], ["updated_at", "2016-08-02 00:44:38.006204"], ["id", 1]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:38 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[35m (0.4ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 9ms (Views: 0.4ms | ActiveRecord: 0.8ms)
+  [1m[35m (1.4ms)[0m  DELETE FROM "test_models";
+  [1m[36m (0.2ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (1.0ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 0"], ["created_at", "2016-08-02 00:44:39.020150"], ["updated_at", "2016-08-02 00:44:39.020150"]]
+  [1m[36m (0.8ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 1"], ["created_at", "2016-08-02 00:44:39.026705"], ["updated_at", "2016-08-02 00:44:39.026705"]]
+  [1m[35m (1.8ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 2"], ["created_at", "2016-08-02 00:44:39.033696"], ["updated_at", "2016-08-02 00:44:39.033696"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 3"], ["created_at", "2016-08-02 00:44:39.039006"], ["updated_at", "2016-08-02 00:44:39.039006"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 4"], ["created_at", "2016-08-02 00:44:39.044742"], ["updated_at", "2016-08-02 00:44:39.044742"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:44:39 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (19.5ms)
+Completed 200 OK in 21ms (Views: 20.0ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:44:39 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:44:39 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:44:39 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:44:39 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:40 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models"[0m
+  [1m[35mTestModel Load (0.3ms)[0m  SELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1  [["id", 1]]
+  [1m[36m (0.2ms)[0m  [1mSELECT COUNT(*) FROM "test_models"[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models"
+  [1m[36m (0.2ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 15ms (Views: 0.7ms | ActiveRecord: 1.2ms)
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mSQL (0.6ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I'm new here!"], ["created_at", "2016-08-02 00:44:41.829482"], ["updated_at", "2016-08-02 00:44:41.829482"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:41 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.3ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 5ms (Views: 0.2ms | ActiveRecord: 0.7ms)
+  [1m[36m (1.0ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.1ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.0ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 0"], ["created_at", "2016-08-02 00:44:42.163165"], ["updated_at", "2016-08-02 00:44:42.163165"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 1"], ["created_at", "2016-08-02 00:44:42.167928"], ["updated_at", "2016-08-02 00:44:42.167928"]]
+  [1m[36m (0.8ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 2"], ["created_at", "2016-08-02 00:44:42.173511"], ["updated_at", "2016-08-02 00:44:42.173511"]]
+  [1m[35m (1.2ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)  [["test_attribute", "I am item 3"], ["created_at", "2016-08-02 00:44:42.179279"], ["updated_at", "2016-08-02 00:44:42.179279"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "created_at", "updated_at") VALUES (?, ?, ?)[0m  [["test_attribute", "I am item 4"], ["created_at", "2016-08-02 00:44:42.184776"], ["updated_at", "2016-08-02 00:44:42.184776"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:44:42 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (20.7ms)
+Completed 200 OK in 23ms (Views: 21.2ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:44:42 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:44:42 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:44:42 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:44:42 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:43 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"all\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"all\", \"*count\"], [\"TestModel\", \"all\", \"*all\"], [\"TestModel\", \"all\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models"
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1[0m  [["id", 1]]
+  [1m[35m (0.1ms)[0m  SELECT COUNT(*) FROM "test_models"
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models"[0m
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 10ms (Views: 0.5ms | ActiveRecord: 0.9ms)
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT  "test_models".* FROM "test_models"  ORDER BY "test_models"."id" ASC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mDELETE FROM "test_models" WHERE "test_models"."id" = ?[0m  [["id", 1]]
+  [1m[35m (0.9ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:45 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"], [\"TestModel\", \"active\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 5ms (Views: 0.3ms | ActiveRecord: 0.5ms)
+  [1m[36m (1.3ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.0ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 0"], ["completed", "f"], ["created_at", "2016-08-02 00:44:45.360681"], ["updated_at", "2016-08-02 00:44:45.360681"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 1"], ["completed", "f"], ["created_at", "2016-08-02 00:44:45.365799"], ["updated_at", "2016-08-02 00:44:45.365799"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 2"], ["completed", "f"], ["created_at", "2016-08-02 00:44:45.376305"], ["updated_at", "2016-08-02 00:44:45.376305"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 3"], ["completed", "f"], ["created_at", "2016-08-02 00:44:45.382006"], ["updated_at", "2016-08-02 00:44:45.382006"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 4"], ["completed", "f"], ["created_at", "2016-08-02 00:44:45.388898"], ["updated_at", "2016-08-02 00:44:45.388898"]]
+  [1m[35m (1.1ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:44:45 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (16.7ms)
+Completed 200 OK in 18ms (Views: 17.3ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:44:45 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:44:45 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:44:45 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:44:45 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:46 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1[0m  [["id", 1]]
+  [1m[35m (0.1ms)[0m  SELECT COUNT(*) FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 8ms (Views: 0.4ms | ActiveRecord: 0.7ms)
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I'm new here!"], ["completed", "f"], ["created_at", "2016-08-02 00:44:48.153571"], ["updated_at", "2016-08-02 00:44:48.153571"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:48 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 3ms (Views: 0.3ms | ActiveRecord: 0.3ms)
+  [1m[36m (1.4ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.2ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.1ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mSQL (1.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 0"], ["completed", "f"], ["created_at", "2016-08-02 00:44:48.473349"], ["updated_at", "2016-08-02 00:44:48.473349"]]
+  [1m[35m (1.4ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 1"], ["completed", "f"], ["created_at", "2016-08-02 00:44:48.483346"], ["updated_at", "2016-08-02 00:44:48.483346"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 2"], ["completed", "f"], ["created_at", "2016-08-02 00:44:48.489147"], ["updated_at", "2016-08-02 00:44:48.489147"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 3"], ["completed", "f"], ["created_at", "2016-08-02 00:44:48.494251"], ["updated_at", "2016-08-02 00:44:48.494251"]]
+  [1m[36m (1.0ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 4"], ["completed", "f"], ["created_at", "2016-08-02 00:44:48.501039"], ["updated_at", "2016-08-02 00:44:48.501039"]]
+  [1m[35m (0.9ms)[0m  commit transaction
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:44:48 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (14.1ms)
+Completed 200 OK in 16ms (Views: 14.6ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:44:48 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:44:48 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:44:48 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:44:48 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:49 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1[0m  [["id", 1]]
+  [1m[35m (0.1ms)[0m  SELECT COUNT(*) FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36mTestModel Load (0.1ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35m (0.1ms)[0m  rollback transaction
+Completed 200 OK in 7ms (Views: 0.4ms | ActiveRecord: 0.7ms)
+  [1m[36mTestModel Load (0.4ms)[0m  [1mSELECT  "test_models".* FROM "test_models"  ORDER BY "test_models"."id" ASC LIMIT 1[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mDELETE FROM "test_models" WHERE "test_models"."id" = ?[0m  [["id", 1]]
+  [1m[35m (1.2ms)[0m  commit transaction
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:51 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}"}}
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mTestModel Load (0.2ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "t"]]
+  [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 3ms (Views: 0.3ms | ActiveRecord: 0.3ms)
+  [1m[35m (1.2ms)[0m  DELETE FROM "test_models";
+  [1m[36m (0.2ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (1.3ms)[0m  DELETE FROM sqlite_sequence where name = 'test_models';
+  [1m[36m (0.3ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 0"], ["completed", "f"], ["created_at", "2016-08-02 00:44:51.795756"], ["updated_at", "2016-08-02 00:44:51.795756"]]
+  [1m[36m (0.9ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 1"], ["completed", "f"], ["created_at", "2016-08-02 00:44:51.800774"], ["updated_at", "2016-08-02 00:44:51.800774"]]
+  [1m[35m (0.8ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 2"], ["completed", "f"], ["created_at", "2016-08-02 00:44:51.806600"], ["updated_at", "2016-08-02 00:44:51.806600"]]
+  [1m[36m (1.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["test_attribute", "I am item 3"], ["completed", "f"], ["created_at", "2016-08-02 00:44:51.812309"], ["updated_at", "2016-08-02 00:44:51.812309"]]
+  [1m[35m (1.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "test_models" ("test_attribute", "completed", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["test_attribute", "I am item 4"], ["completed", "f"], ["created_at", "2016-08-02 00:44:51.817750"], ["updated_at", "2016-08-02 00:44:51.817750"]]
+  [1m[36m (1.0ms)[0m  [1mcommit transaction[0m
+Started GET "/react_test/1" for 127.0.0.1 at 2016-08-01 20:44:51 -0400
+Processing by ReactTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendered inline template (19.7ms)
+Completed 200 OK in 21ms (Views: 20.1ms | ActiveRecord: 0.0ms)
+Started GET "/assets/jquery.js" for 127.0.0.1 at 2016-08-01 20:44:51 -0400
+Started GET "/assets/jquery_ujs.js" for 127.0.0.1 at 2016-08-01 20:44:51 -0400
+Started GET "/assets/application.css" for 127.0.0.1 at 2016-08-01 20:44:51 -0400
+Started GET "/assets/application.js" for 127.0.0.1 at 2016-08-01 20:44:51 -0400
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:53 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}", "reactive_record"=>{"json"=>"{\"models\":[{\"id\":906, \"model\":\"TestModel\", \"attributes\":{\"id\":null}, \"vector\":[\"TestModel\", \"active\", \"*0\"]}], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"active\", \"*count\"], [\"TestModel\", \"active\", \"*all\"], [\"TestModel\", \"active\", \"*0\", \"test_attribute\"]]}"}}
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT  "test_models".* FROM "test_models" WHERE "test_models"."id" = ? LIMIT 1  [["id", 1]]
+  [1m[36m (0.1ms)[0m  [1mSELECT COUNT(*) FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "f"]]
+  [1m[35mTestModel Load (0.1ms)[0m  SELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?  [["completed", "f"]]
+  [1m[36m (1.4ms)[0m  [1mrollback transaction[0m
+Completed 200 OK in 12ms (Views: 0.7ms | ActiveRecord: 1.9ms)
+  [1m[35mTestModel Load (0.4ms)[0m  SELECT  "test_models".* FROM "test_models"  ORDER BY "test_models"."id" ASC LIMIT 1
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35mSQL (0.7ms)[0m  UPDATE "test_models" SET "completed" = ?, "updated_at" = ? WHERE "test_models"."id" = ?  [["completed", "t"], ["updated_at", "2016-08-02 00:44:54.556001"], ["id", 1]]
+  [1m[36m (1.5ms)[0m  [1mcommit transaction[0m
+Started POST "/rr" for 127.0.0.1 at 2016-08-01 20:44:54 -0400
+Processing by ReactiveRecord::ReactiveRecordController#fetch as */*
+  Parameters: {"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}", "reactive_record"=>{"json"=>"{\"models\":[], \"associations\":[], \"pending_fetches\":[[\"TestModel\", \"completed\", \"*all\"]]}"}}
+  [1m[35m (0.2ms)[0m  begin transaction
+  [1m[36mTestModel Load (0.2ms)[0m  [1mSELECT "test_models".* FROM "test_models" WHERE "test_models"."completed" = ?[0m  [["completed", "t"]]
+  [1m[35m (0.2ms)[0m  rollback transaction
+Completed 200 OK in 12ms (Views: 0.4ms | ActiveRecord: 0.5ms)
+  [1m[36m (1.6ms)[0m  [1mDELETE FROM "test_models";[0m
+  [1m[35m (0.3ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (1.3ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'test_models';[0m
