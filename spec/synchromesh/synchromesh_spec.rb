@@ -1,6 +1,7 @@
 require 'spec_helper'
+require 'synchromesh/test_components'
 
-describe "Syncromesh", js: true do
+describe "Synchromesh", js: true do
 
   before(:all) do
     require 'pusher'
@@ -17,35 +18,18 @@ describe "Syncromesh", js: true do
     end
   end
 
-  it "synchronize on update" do
-
-    test_model = FactoryGirl.create(:test_model, test_attribute: "hello")
-
-    mount "TestComponent", test_model: test_model do
-      class TestComponent < React::Component::Base
-        param :test_model, type: TestModel
-        render { params.test_model.test_attribute }
-      end
-    end
-
+  it "will synchronize on an attribute update" do
+    mount "TestComponent"
+    FactoryGirl.create(:test_model, test_attribute: "hello")
     page.should have_content("hello")
-    test_model.update_attribute(:test_attribute, 'goodby')
+    TestModel.first.update_attribute(:test_attribute, 'goodby')
     page.should have_content("goodby")
-
   end
 
-  describe ".all" do
+  describe "the .all method" do
     before(:each) do
+      mount "TestComponent"
       5.times { |i| FactoryGirl.create(:test_model, test_attribute: "I am item #{i}") }
-
-      mount "TestComponent" do
-        class TestComponent < React::Component::Base
-          render(:div) do
-            div { "#{TestModel.all.count} items" }
-            ul { TestModel.all.each { |model| li { model.test_attribute }}}
-          end
-        end
-      end
       page.should have_content("5 items")
     end
 
@@ -62,16 +46,8 @@ describe "Syncromesh", js: true do
 
   describe "scopes" do
     before(:each) do
+      mount "TestComponent", scope: :active
       5.times { |i| FactoryGirl.create(:test_model, test_attribute: "I am item #{i}", completed: false) }
-
-      mount "TestComponent" do
-        class TestComponent < React::Component::Base
-          render(:div) do
-            div { "#{TestModel.active.count} items" }
-            ul { TestModel.active.each { |model| li { model.test_attribute }}}
-          end
-        end
-      end
       page.should have_content("5 items")
     end
 

@@ -134,12 +134,12 @@ module ComponentTestHelpers
           if !render_params[:layout] || style_sheet
             page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' rescue nil %>\n"+page
           end
+          page = "<script src='https://rawgit.com/bahmutov/console-log-div/master/console-log-div.js'></script>\n#{page}"
           if render_on == :server_only # so that test helper wait_for_ajax works
             page = "<script type='text/javascript'>window.jQuery = {'active': 0}</script>\n#{page}"
           else
             page = "<%= javascript_include_tag 'jquery' %>\n<%= javascript_include_tag 'jquery_ujs' %>\n#{page}"
           end
-
           render_params[:inline] = page
           render render_params
         end
@@ -216,8 +216,7 @@ module ComponentTestHelpers
   end
 
   def open_in_chrome
-    on_linux = `which google-chrome`
-    if on_linux
+    if ['linux', 'freebsd'].include?(`uname`.downcase)
       `google-chrome http://#{page.server.host}:#{page.server.port}#{page.current_path}`
     else
       `open http://#{page.server.host}:#{page.server.port}#{page.current_path}`

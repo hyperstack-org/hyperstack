@@ -1,18 +1,20 @@
 require 'spec_helper'
+require 'synchromesh/test_components'
+
+
+SKIP_MESSAGE = 'Pusher credentials not specified. '\
+ 'To run set env variable PUSHER=xxxx-yyy-zzz (app id - key - secret)'
+
+def pusher_credentials
+  Hash[*[:app_id, :key, :secret].zip(ENV['PUSHER'].split('-')).flatten]
+rescue
+  nil
+end
 
 describe "Transport Tests", js: true do
 
   before(:each) do
     5.times { |i| FactoryGirl.create(:test_model, test_attribute: "I am item #{i}") }
-
-    on_client do
-      class TestComponent < React::Component::Base
-        render(:div) do
-          div { "#{TestModel.all.count} items" }
-          ul { TestModel.all.each { |model| li { model.test_attribute }}}
-        end
-      end
-    end
   end
 
   context "Simple Polling" do
@@ -39,7 +41,7 @@ describe "Transport Tests", js: true do
 
   end
 
-  context "Real Pusher Account" do
+  context "Real Pusher Account", skip: (pusher_credentials ? false : SKIP_MESSAGE) do
 
     before(:all) do
       require 'pusher'
@@ -49,7 +51,7 @@ describe "Transport Tests", js: true do
       Synchromesh.configuration do |config|
         config.transport = :pusher
         config.channel_prefix = "synchromesh"
-        config.opts = {app_id: '231029', key: 'cfd95af0404b4d8a0dc7', secret: 'b91650d692c606e33818'}
+        config.opts = pusher_credentials
       end
     end
 

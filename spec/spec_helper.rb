@@ -199,7 +199,7 @@ if RUBY_ENGINE != 'opal'
     end
 
     config.before(:each) do |x|
-      puts "            RUNNING #{x.full_description}"
+      #puts "            RUNNING #{x.full_description}"
     end
 
     config.before(:each, :js => true) do
@@ -233,12 +233,13 @@ if RUBY_ENGINE != 'opal'
       Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
     end
 
-    options = {js_errors: false,
-               timeout: 180,
-               phantomjs_logger: StringIO.new,
-               logger: StringIO.new,
-               inspector: true,
-               phantomjs_options: ['--load-images=no', '--ignore-ssl-errors=yes']}
+    options = {
+      js_errors: false,
+      timeout: 180,
+      inspector: true,
+      phantomjs_options: ['--load-images=no', '--ignore-ssl-errors=yes']
+    }
+    options.merge!({phantomjs_logger: StringIO.new, logger: StringIO.new,}) unless ENV['SHOW-LOGS']
     Capybara.register_driver :poltergeist do |app|
       Capybara::Poltergeist::Driver.new(app, options)
     end
@@ -308,15 +309,15 @@ if RUBY_ENGINE != 'opal'
       Capybara::Selenium::Driver.new(app, :browser => :chrome)
     end
 
-    if ENV['DRIVER'] =~ /^pg/
-      Capybara.javascript_driver = :poltergeist
+    if ENV['DRIVER'] =~ /^ff/
+      Capybara.javascript_driver = :selenium_with_firebug
     elsif ENV['DRIVER'] == 'chrome'
       Capybara.javascript_driver = :chrome
     else
-      Capybara.javascript_driver = :selenium_with_firebug
+      Capybara.javascript_driver = :poltergeist
     end
 
-    config.include ComponentTestHelpers
+    include ComponentTestHelpers
 
   end
 
