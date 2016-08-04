@@ -13,5 +13,5 @@ else
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end
-require_relative 'client/synchromesh'
+require_relative 'synchromesh/client_drivers'
 require_relative 'active_record/base'

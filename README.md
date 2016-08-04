@@ -1,6 +1,6 @@
 # Synchromesh ![](logo.jpg?raw=true)
 
-Synchromesh provides multi-client synchronization for [reactive-record](https://github.com/catprintlabs/reactive-record)
+Synchromesh provides multi-client synchronization for [reactive-record.](https://github.com/catprintlabs/reactive-record)
 
 In other words browser 1 creates, updates, or destroys a model, and the changes are broadcast to all other clients.
 
@@ -8,10 +8,9 @@ Add the gem, setup your configuration, and synchromesh does the rest.
 
 ## Transports
 
-Currently there are three transport mechanisms:  
+Currently there are two transport mechanisms:  
 
 + [Pusher](http://pusher.com) which gives you zero config websockets.  
-+ [PusherFake](https://github.com/tristandunn/pusher-fake) which
 + Short cycle polling (for development)
 
 As soon as Opal is working on Rails 5, we will add ActionCable.   
@@ -20,9 +19,9 @@ Also near term we will have a simple mechanism to plug in your own transport.
 
 ## Security [NOT IMPLEMENTED YET]
 
-Synchromesh builds on top of ReactiveRecord's model-based permission mechanism:
+Synchromesh will build on top of ReactiveRecord's model-based permission mechanism:
 
-Each *user* or *user group* gets a private transport channel.  Before broadcasting an update to a user's channel Synchromesh filters the data based on that user's permissions.
+Each *user* or *user group* will get a private transport channel.  Before broadcasting an update to a user's channel Synchromesh will filter the data based on that user's permissions.
 
 ## Installation
 
@@ -56,7 +55,7 @@ end
 
 ### Pusher Configuration Specifics
 
-Add `gem 'pusher'` to your gem file, and and `require synchromesh/pusher` to the client only portion of your components manifest.
+Add `gem 'pusher'` to your gem file, and add `require synchromesh/pusher` to the client only portion of your components manifest.
 
 ```ruby
 # typically config/initializers/synchromesh.rb
@@ -115,9 +114,66 @@ Synchromesh.configuration do |config|
 end
 ```
 
+## ActiveRecord Scope Enhancement
+
+Because keeping data scopes synced as data changes is important (and difficult) Synchromesh adds some assist to the ActiveRecord `scope` macro.  You must use the `scope` macro (and not class methods) for things to work with Synchromesh.
+
+The `scope` macro now takes an optional third parameter, with the following variations:
+
+```ruby
+
+class Todo < ActiveRecord::Base
+
+  # Standard ActiveRecord form:
+  # the proc will be evaluated as normal on the server, but also
+  # will be used to update the scope as data changes on the client.
+  # The client can only use simple "where" clauses that match attributes
+  # to values.  
+  scope :active, -> () { where(completed: true) }
+
+  # For more complex scopes you can have different server and client procs:
+  # In this form the 3rd param is the proc that is executed on the client to determine
+  # if the changed (or new) record now should remain, be added, or removed from the scope.
+  # If the value returned by the proc is truthy, then the record will be added (or remain)
+  # in the scope.  Otherwise it will be removed from the scope.
+  scope :with_recent_comments,
+        -> () { joins(:comments).where('created_at >= ?', Time.now-1.week) }   # server
+        -> () { comments.detect { |order| order.created_at >= Time.now-1.week }} # client
+  # Note that while this may seem inefficient, the work is spread over each client, and the
+  # client side scope proc will only be executed on clients that are currently observing that
+  # scope.
+
+  # Sometimes its just better to let the scope be computed on the server:
+  scope :complex_todo, :no_client_sync, -> () { ... big complex sql ... }
+  # In this case any clients that need to know if the scope is changed will make a followup
+  # request to the server to get the new scope.
+
+  # Or you can declare an entire model to have all its scopes computed on the server:
+  no_client_sync
+  # Now all following scope declarations will be computed on server
+  # unless they explicitly have two procs
+
+end
+```
+
 ## Development
 
-TBD
+Specs run in rspec/capybara/selenium. To run do:
+
+```
+bundle exec rspec
+```
+
+You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  You can add `SHOW_LOGS=true` if running in poltergeist (the default) to see what is going on, but ff is a lot better.
+
+## How it works
+
+The design goal is to push as much work onto the client side as possible.
+
+* `ActiveRecord` after_commit hooks are used to broadcast changes and deletions to all participating clients.
+* Each client then hooks into the underlying `Reactive-Record` mechanism as if the change was made locally, but *already* saved.
+* `Reactive-Record` then updates scopes, and notifies `React` of the state changes as it would for any other change.
+
 
 ## Contributing
 

@@ -23,15 +23,14 @@ Gem::Specification.new do |s|
 
     s.add_development_dependency 'bundler', '~> 1.8'
     s.add_development_dependency 'rake', '~> 10.0'
-    s.add_development_dependency 'rspec-rails', '3.3.3'
+    s.add_development_dependency 'rspec-rails'#, '3.3.3'
     s.add_development_dependency 'timecop'
-    s.add_development_dependency 'opal-rspec'#, '0.4.3'
-    s.add_development_dependency 'sinatra'
+    #s.add_development_dependency 'opal-rspec'#, '0.4.3'
 
     # For Test Rails App
     s.add_development_dependency 'rails', '4.2.4'
-    s.add_development_dependency 'react-rails', '1.3.1'
-    s.add_development_dependency 'opal-rails', '0.8.1'
+    s.add_development_dependency 'react-rails'#, '1.3.1'
+    s.add_development_dependency 'opal-rails'#, '0.8.1'
     s.add_development_dependency 'factory_girl_rails'
     s.add_development_dependency 'reactrb-rails-generator'
     #s.add_development_dependency 'thin'

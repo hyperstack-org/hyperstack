@@ -17,18 +17,18 @@ module ActiveRecord
     end
 
     class << self
-      def no_auto_sync
-        @no_auto_sync = true
+      def no_client_sync
+        @no_client_sync = true
       end
 
       alias old_scope scope
 
       def scope(name, server_proc, client_proc = nil)
-        if server_proc == :no_sync
+        if !server_proc.respond_to?(:call)
           server_proc = client_proc
         elsif client_proc.nil?
-          add_client_scope(name, server_proc) unless @no_auto_sync
-        else
+          add_client_scope(name, server_proc) unless @no_client_sync
+        elsif client_proc.respond_to?(:call)
           add_client_scope(name, client_proc)
         end
         old_scope(name, server_proc)

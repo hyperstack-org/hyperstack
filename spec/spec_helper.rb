@@ -2,7 +2,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
-require 'opal-rspec'
+#require 'opal-rspec'
 
 def opal?
   RUBY_ENGINE == 'opal'
@@ -142,7 +142,7 @@ if RUBY_ENGINE != 'opal'
       result = page.evaluate_script("(function(active) {console.log('jquery is active? '+active); return active})(jQuery.active)")
       result && !result.zero?
     rescue Exception => e
-      puts "something wrong: #{e}"
+      puts "wait_for_ajax failed while testing state of jQuery.active: #{e}"
     end
 
     def finished_all_ajax_requests?
@@ -189,6 +189,8 @@ if RUBY_ENGINE != 'opal'
     config.include FactoryGirl::Syntax::Methods if defined? FactoryGirl
 
     config.use_transactional_fixtures = false
+
+    Capybara.default_max_wait_time = 10.seconds
 
     config.before(:suite) do
       DatabaseCleaner.clean_with(:truncation)
@@ -239,7 +241,7 @@ if RUBY_ENGINE != 'opal'
       inspector: true,
       phantomjs_options: ['--load-images=no', '--ignore-ssl-errors=yes']
     }
-    options.merge!({phantomjs_logger: StringIO.new, logger: StringIO.new,}) unless ENV['SHOW-LOGS']
+    options.merge!({phantomjs_logger: StringIO.new, logger: StringIO.new,}) unless ENV['SHOW_LOGS']
     Capybara.register_driver :poltergeist do |app|
       Capybara::Poltergeist::Driver.new(app, options)
     end
