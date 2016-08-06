@@ -207,7 +207,6 @@ module ComponentTestHelpers
     end
     Rails.cache.write(test_url, [component_name, params, opts])
     visit test_url
-    sleep 5
     wait_for_ajax
   end
 

@@ -20,10 +20,15 @@ describe "Synchromesh", js: true do
 
   it "will synchronize on an attribute update" do
     mount "TestComponent"
+    puts "mounted"
     FactoryGirl.create(:test_model, test_attribute: "hello")
+    puts "model built"
     page.should have_content("hello")
+    puts "testing for hello"
     TestModel.first.update_attribute(:test_attribute, 'goodby')
+    puts "updated attribute"
     page.should have_content("goodby")
+    puts "test complete"
   end
 
   describe "the .all method" do

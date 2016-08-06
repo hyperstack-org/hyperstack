@@ -147,7 +147,7 @@ if RUBY_ENGINE != 'opal'
 
     def finished_all_ajax_requests?
       unless running?
-        sleep 1
+        sleep 0.25 # this was 1 second, not sure if its necessary to be so long...
         !running?
       end
     rescue Capybara::NotSupportedByDriverError

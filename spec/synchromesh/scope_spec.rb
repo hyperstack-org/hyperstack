@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'synchromesh/test_components'
 
-describe "scope enhancements", js: true do
+describe "scope enhancements", js: true, skip: true do
 
   before(:all) do
     require 'pusher'

@@ -1,5 +1,6 @@
 if RUBY_ENGINE == 'opal'
   require_relative 'synchromesh/version'
+  require_relative 'json/parse_patch'
   require_relative 'reactive_record/base'
   require_relative 'reactive_record/sync_wrapper'
 else
