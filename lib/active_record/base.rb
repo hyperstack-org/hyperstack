@@ -4,8 +4,8 @@ module ActiveRecord
   # 2 - Update scope to accept different procs for server and client
   class Base
     if RUBY_ENGINE != 'opal'
-      after_commit :synchromesh_after_change, on: [:create, :update]
-      after_commit :synchromesh_after_destroy, on: [:destroy]
+      #after_commit :synchromesh_after_change, on: [:create, :update]
+      #after_commit :synchromesh_after_destroy, on: [:destroy]
 
       def synchromesh_after_change
         Synchromesh.after_change self
