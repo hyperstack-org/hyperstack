@@ -13,6 +13,7 @@ else
     require 'reactrb'
   rescue LoadError
   end
+  require 'active_record'
   require 'reactive-record'
   require 'synchromesh/version'
   require 'synchromesh/synchromesh'
