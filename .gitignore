@@ -7,3 +7,6 @@
 /spec/reports/
 /tmp/
 /spec/test_app/tmp/
+/spec/test_app/db/test.sqlite3
+/spec/test_app/log/test.log
+/synchromesh-simple-poller-store

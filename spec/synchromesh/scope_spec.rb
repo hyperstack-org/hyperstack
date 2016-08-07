@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'synchromesh/test_components'
 
-describe "scope enhancements", js: true, skip: true do
+describe "scope enhancements", js: true, skip: "not working yet" do
 
   before(:all) do
     require 'pusher'
@@ -20,25 +20,9 @@ describe "scope enhancements", js: true, skip: true do
 
   it "can have a hash in the scope" do
     isomorphic do
-      puts "doing the isomorphic dance"
-      begin
-        TestModel.class_eval { scope :with_args, :no_client_sync, lambda { |opts| where(completed: true)}} #JSON.parse(opts)) } }
-        puts "scope method added"
-      rescue Exception => e
-        puts "failed! #{e}"
-      end
+      TestModel.class_eval { scope :with_args, :no_client_sync, lambda { |opts| where(completed: true)}}
     end
     mount "TestComponent2" do
-      JSON.class_eval do
-        class << self
-          alias old_parse parse
-        end
-        def self.parse(*args, &block)
-          old_parse *args, &block
-        rescue Exception => e
-          raise StandardError.new e.message
-        end
-      end
       class TestComponent2 < React::Component::Base
         render do
           "count = #{TestModel.with_args(true).count}"
@@ -46,7 +30,6 @@ describe "scope enhancements", js: true, skip: true do
       end
     end
     page.should have_content('count = 0')
-    binding.pry
     FactoryGirl.create(:test_model, test_attribute: "model 1", completed: true)
     page.should have_content('count = 1')
     FactoryGirl.create(:test_model, test_attribute: "model 2", completed: false)
