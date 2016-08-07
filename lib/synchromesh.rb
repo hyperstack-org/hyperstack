@@ -1,3 +1,4 @@
+require_relative 'active_record_base'
 if RUBY_ENGINE == 'opal'
   require_relative 'synchromesh/version'
   require_relative 'json/parse_patch'
@@ -13,7 +14,7 @@ else
     require 'reactrb'
   rescue LoadError
   end
-  require 'active_record/transactions'
+  #require 'active_record/transactions'
   require 'reactive-record'
   require 'synchromesh/version'
   require 'synchromesh/synchromesh'
@@ -23,4 +24,3 @@ else
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end
 require_relative 'synchromesh/client_drivers'
-require_relative 'active_record/base'

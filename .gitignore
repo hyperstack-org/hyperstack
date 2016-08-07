@@ -9,4 +9,6 @@
 /spec/test_app/tmp/
 /spec/test_app/db/test.sqlite3
 /spec/test_app/log/test.log
+/spec/test_app/log/development.log
 /synchromesh-simple-poller-store
+/Gemfile.lock
