@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     synchromesh (0.4.0)
+      activerecord (>= 0.3.0)
       reactive-record (>= 0.7.43)
 
 GEM
@@ -351,4 +352,4 @@ DEPENDENCIES
   unparser
 
 BUNDLED WITH
-   1.10.6
+   1.12.5

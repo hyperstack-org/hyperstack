@@ -5,7 +5,14 @@ if RUBY_ENGINE == 'opal'
   require_relative 'reactive_record/sync_wrapper'
 else
   require 'opal'
-  require 'reactrb'
+  # This is temporarily needed so that the todo-tutorial
+  # which is still using reactive-ruby, will work.  Once
+  # the todo-tutorial is updated, this can be a straight
+  # require of reactrb.
+  begin
+    require 'reactrb'
+  rescue LoadError
+  end
   require 'reactive-record'
   require 'synchromesh/version'
   require 'synchromesh/synchromesh'
