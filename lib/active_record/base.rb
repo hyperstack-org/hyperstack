@@ -1,3 +1,5 @@
+require 'active_record' unless RUBY_ENGINE == 'opal'
+
 class Dummy < ActiveRecord::Base
   after_commit :foo, on: [:destroy]
   def foo
