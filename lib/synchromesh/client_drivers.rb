@@ -16,7 +16,7 @@ module Synchromesh
         record = klass._react_param_conversion(data[:record])
         record.backing_record.previous_changes = data[:previous_changes]
         puts "sync_change receives record #{record}"
-        record.backing_record.sync_scopes
+        record.backing_record.sync_scopes2
         puts "scopes have been synced"
       end
     end
@@ -29,7 +29,7 @@ module Synchromesh
                      ._react_param_conversion(data[:record])
       ReactiveRecord::Base.load_data { record.destroy }
       record.backing_record.destroyed = true
-      record.backing_record.sync_scopes
+      record.backing_record.sync_scopes2
     end
 
     # Before first mount, hook up callbacks depending on what kind of transport

@@ -5,6 +5,10 @@ module ReactiveRecord
   class Base
 
     def sync_scopes
+      # all changes will be rebroadcast and updated by sync_scopes2 so this is now a no-op
+    end
+
+    def sync_scopes2
       Collection.sync_scopes(@ar_instance)
       model.all << @ar_instance if ReactiveRecord::Base.class_scopes(model)[:all] # add this only if model.all has been fetched already
     end
@@ -28,17 +32,17 @@ module ReactiveRecord
       @previous_changes ||= {}
     end
 
-    def set_previous_changes(hash)
-      @previous_changes = {}
-      hash.each { |attr, new_value| @previous_changes[attr] = [@attributes[attr], new_value] }
-    end
-
-    alias pre_synchromesh_sync! sync!
-
-    def sync!(hash={})
-      set_previous_changes(hash)
-      pre_synchromesh_sync(hash)
-    end
+    # def set_previous_changes(hash)
+    #   @previous_changes = {}
+    #   hash.each { |attr, new_value| @previous_changes[attr] = [@attributes[attr], new_value] }
+    # end
+    #
+    # alias pre_synchromesh_sync! sync!
+    #
+    # def sync!(hash={})
+    #   set_previous_changes(hash)
+    #   pre_synchromesh_sync!(hash)
+    # end
 
   end
 end

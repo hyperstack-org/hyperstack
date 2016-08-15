@@ -128,7 +128,7 @@ class Todo < ActiveRecord::Base
 
   # Standard ActiveRecord form:
   # the proc will be evaluated as normal on the server, and as needed updates
-  # will be requested from the server.
+  # will be requested from the clients
   scope :active, -> () { where(completed: true) }
   # In the simple form the scope will be reevaluated if the model that is
   # being scoped changes, and if the scope is currently being used to render data.
@@ -146,15 +146,16 @@ class Todo < ActiveRecord::Base
   scope :active, -> () { where(completed: true) } do |record|
     (record.completed.nil? && record.destroyed?) || record.previous_changes[:completed]
   end
-  # In other words only reevaluate if an active record was destroyed or if the
-  # completed attribute has changed.  Note the use of the ActiveRecord
-  # previous_changes method.
+  # In other words only reevaluate if an "uncompleted" record was destroyed or if
+  # the completed attribute has changed.  Note the use of the ActiveRecord
+  # previous_changes method.  Also note that the attributes in record are "after"
+  # changes are made unless the record is destroyed.
 
   # For heavily used scopes you can even update the scope manually on the client
   # using the second parameter passed to the block:
   scope :active, -> () { where(completed: true) } do |record, collection|
-    if (record.completed && record.destroyed?) ||
-       (record.completed.nil? && record.previous_changes[:completed])
+    if (record.completed.nil? && record.destroyed?) ||
+       (record.completed && record.previous_changes[:completed])
       collection.delete(record)
     elsif record.completed && record.previous_changes[:completed]
       collection << record
