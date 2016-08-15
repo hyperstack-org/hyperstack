@@ -116,42 +116,71 @@ end
 
 ## ActiveRecord Scope Enhancement
 
-Because keeping data scopes synced as data changes is important (and difficult) Synchromesh adds some assist to the ActiveRecord `scope` macro.  You must use the `scope` macro (and not class methods) for things to work with Synchromesh.
+When the client receives notification that a record has changed Synchromesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-The `scope` macro now takes an optional third parameter, with the following variations:
+To give you control over this process Synchromesh adds some features to the ActiveRecord scope macro.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
+
+The `scope` macro now takes an optional third parameter and an optional block:
 
 ```ruby
 
 class Todo < ActiveRecord::Base
 
   # Standard ActiveRecord form:
-  # the proc will be evaluated as normal on the server, but also
-  # will be used to update the scope as data changes on the client.
-  # The client can only use simple "where" clauses that match attributes
-  # to values.  
+  # the proc will be evaluated as normal on the server, and as needed updates
+  # will be requested from the server.
   scope :active, -> () { where(completed: true) }
+  # In the simple form the scope will be reevaluated if the model that is
+  # being scoped changes, and if the scope is currently being used to render data.
 
-  # For more complex scopes you can have different server and client procs:
-  # In this form the 3rd param is the proc that is executed on the client to determine
-  # if the changed (or new) record now should remain, be added, or removed from the scope.
-  # If the value returned by the proc is truthy, then the record will be added (or remain)
-  # in the scope.  Otherwise it will be removed from the scope.
+  # If the scope joins with other data you will need to specify this by
+  # passing an array of the joined models:
   scope :with_recent_comments,
-        -> () { joins(:comments).where('created_at >= ?', Time.now-1.week) }   # server
-        -> () { comments.detect { |order| order.created_at >= Time.now-1.week }} # client
-  # Note that while this may seem inefficient, the work is spread over each client, and the
-  # client side scope proc will only be executed on clients that are currently observing that
-  # scope.
+        -> () { joins(:comments).where('created_at >= ?', Time.now-1.week) },
+        [Comments]
+  # Now with_recent_comments will be re-evaluated whenever Comments or Todo records
+  # change.  The array can be the second or third parameter.
 
-  # Sometimes its just better to let the scope be computed on the server:
-  scope :complex_todo, :no_client_sync, -> () { ... big complex sql ... }
-  # In this case any clients that need to know if the scope is changed will make a followup
-  # request to the server to get the new scope.
+  # It is possible to optimize when the scope is re-evaluated by attaching a block to
+  # the scope.  If the block returns true, then the scope will be re-evaluated.
+  scope :active, -> () { where(completed: true) } do |record|
+    (record.completed.nil? && record.destroyed?) || record.previous_changes[:completed]
+  end
+  # In other words only reevaluate if an active record was destroyed or if the
+  # completed attribute has changed.  Note the use of the ActiveRecord
+  # previous_changes method.
 
-  # Or you can declare an entire model to have all its scopes computed on the server:
-  no_client_sync
-  # Now all following scope declarations will be computed on server
-  # unless they explicitly have two procs
+  # For heavily used scopes you can even update the scope manually on the client
+  # using the second parameter passed to the block:
+  scope :active, -> () { where(completed: true) } do |record, collection|
+    if (record.completed && record.destroyed?) ||
+       (record.completed.nil? && record.previous_changes[:completed])
+      collection.delete(record)
+    elsif record.completed && record.previous_changes[:completed]
+      collection << record
+    end
+    nil # return nil so we don't resync the scope from the server
+  end
+
+  # The 'joins-array' applies to the block as well.  in other words if no joins
+  # array is provided the block will only be called if records for scoped model
+  # change.  If an array is provided, then the additional models will be added
+  # to the join filter.  However if any empty array is provided all changes will
+  # passed.
+  scope :scope1, [AnotherModel], -> () {...} do |record|
+    # record will be either a Todo, or AnotherModel
+  end
+
+  scope :scope2, [], -> () { ... } do |record|
+    # any change to any model will be passed to the block
+  end
+
+  # The empty join array can also be used to prevent a scope from ever being
+  # updated:
+  scope :never_synced_scope, [], -> () { ... }
+
+  # Or if you prefer just pass any non-array value of your choice:
+  scope :never_synced_scope, :no_sync, -> () {...}
 
 end
 ```
@@ -171,8 +200,10 @@ You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  Yo
 The design goal is to push as much work onto the client side as possible.
 
 * `ActiveRecord` after_commit hooks are used to broadcast changes and deletions to all participating clients.
-* Each client then hooks into the underlying `Reactive-Record` mechanism as if the change was made locally, but *already* saved.
+* Each client then searches for any scopes currently being rendered that will need to be
+updated.
 * `Reactive-Record` then updates scopes, and notifies `React` of the state changes as it would for any other change.
+
 
 
 ## Contributing

@@ -17,32 +17,35 @@ module ActiveRecord
     end
 
     class << self
-      def no_client_sync
-        @no_client_sync = true
-      end
 
       alias old_scope scope
 
-      def scope(name, server_proc, client_proc = nil)
-        if !server_proc.respond_to?(:call)
-          server_proc = client_proc
-        elsif client_proc.nil?
-          add_client_scope(name, server_proc) unless @no_client_sync
-        elsif client_proc.respond_to?(:call)
-          add_client_scope(name, client_proc)
+      if RUBY_ENGINE != 'opal'
+
+        def scope(name, server_side_arg, joins_list = [], &block)
+          server_side_arg = joins_list unless server_side_arg.respond_to? :call
+          old_scope(name, server_side_arg)
         end
-        old_scope(name, server_proc)
+
+      else
+
+        def reactive_record_scopes
+          @rr_scopes ||= {}
+        end
+
+        def scope(name, server_side_arg, joins_list = nil, &block)
+          ReactiveRecord::Collection.add_scope(self, name, server_side_arg, joins_list, &block)
+          singleton_class.send(:define_method, name) do | *args |
+            args = (args.count == 0) ? name : [name, *args]
+            ReactiveRecord::Base.class_scopes(self)[args] ||=
+              ReactiveRecord::Collection.new(self, nil, nil, self, args).set_scope(name)
+          end
+          singleton_class.send(:define_method, "#{name}=") do |collection|
+            ReactiveRecord::Base.class_scopes(self)[name] = collection
+          end
+        end
       end
 
-      def add_client_scope(name, client)
-        to_sync name do |scope, model|
-          if ReactiveRecord::SyncWrapper.new(model).instance_eval(&client)
-            scope << model
-          else
-            scope.delete(model)
-          end
-        end if RUBY_ENGINE == 'opal'
-      end
     end
   end
 end

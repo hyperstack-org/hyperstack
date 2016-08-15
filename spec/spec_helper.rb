@@ -128,6 +128,8 @@ if RUBY_ENGINE != 'opal'
     end
   end
 
+  Capybara.default_max_wait_time = 4
+
   module WaitForAjax
 
     def wait_for_ajax

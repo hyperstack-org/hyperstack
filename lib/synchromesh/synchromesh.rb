@@ -63,7 +63,7 @@ module Synchromesh
   end
 
   def self.send_to_transport(message, model)
-    data_hash = { klass: model.class.name, record: model.react_serializer }
+    data_hash = { klass: model.class.name, record: model.react_serializer, previous_changes: model.previous_changes }
     case transport
     when :pusher
       pusher.trigger(Synchromesh.channel, message, data_hash)

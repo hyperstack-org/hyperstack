@@ -5,5 +5,9 @@ class CreateTestModels < ActiveRecord::Migration
       t.boolean :completed
       t.timestamps null: false
     end
+    create_table :child_models do |t|
+      t.string :child_attribute
+      t.belongs_to :test_model
+    end
   end
 end

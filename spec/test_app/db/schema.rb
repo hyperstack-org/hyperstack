@@ -13,6 +13,11 @@
 
 ActiveRecord::Schema.define(version: 20160731182106) do
 
+  create_table "child_models", force: :cascade do |t|
+    t.string  "child_attribute"
+    t.integer "test_model_id"
+  end
+
   create_table "test_models", force: :cascade do |t|
     t.string   "test_attribute"
     t.boolean  "completed"

@@ -13,7 +13,11 @@ module Synchromesh
 
     def self.sync_change(data)
       ReactiveRecord::Base.when_not_saving(Object.const_get(data[:klass])) do |klass|
-        klass._react_param_conversion(data[:record]).backing_record.sync_scopes
+        record = klass._react_param_conversion(data[:record])
+        record.backing_record.previous_changes = data[:previous_changes]
+        puts "sync_change receives record #{record}"
+        record.backing_record.sync_scopes
+        puts "scopes have been synced"
       end
     end
 
