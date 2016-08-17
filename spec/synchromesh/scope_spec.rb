@@ -119,7 +119,7 @@ describe "synchronized scopes", js: true do
   it "can have params" do
     isomorphic do
       TestModel.class_eval do
-        scope :with_args, lambda { |match| where(test_attribute: match) }
+        scope :with_args, lambda { |match, match2| where(test_attribute: match) }
       end
     end
     m1 = FactoryGirl.create(:test_model, test_attribute: "123")
@@ -134,7 +134,7 @@ describe "synchronized scopes", js: true do
         end
         render(:div) do
           div { "rendered #{@render_count} times"}
-          div { "with_args('match').count = #{TestModel.with_args(params.m.test_attribute).count}" }
+          div { "with_args('match').count = #{TestModel.with_args(params.m.test_attribute, :foo).count}" }
         end
       end
     end
@@ -144,6 +144,25 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 2')
     m1.update_attribute(:test_attribute, '456')
     page.should have_content('.count = 1')
+  end
+
+  it "scopes with params can be nested" do
+    isomorphic do
+      TestModel.class_eval do
+        scope :scope1, lambda { where(completed: true) }
+        scope :with_args, lambda { |match| where(test_attribute: match) }
+      end
+    end
+    mount "TestComponent2" do
+      class TestComponent2 < React::Component::Base
+        render(:div) do
+          div { "scope1.scope2.count = #{TestModel.scope1.with_args(:foo).count}" }
+        end
+      end
+    end
+    page.should have_content('scope1.scope2.count = 0')
+    FactoryGirl.create(:test_model, test_attribute: "foo", completed: true)
+    page.should have_content('scope1.scope2.count = 1')
   end
 
   it 'can have a joins array' do

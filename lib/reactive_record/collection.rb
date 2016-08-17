@@ -37,9 +37,9 @@ module ReactiveRecord
     def apply_scope(scope, *args)
       # The value returned is another ReactiveRecordCollection with the scope added to the vector
       # no additional action is taken
-      scope = [scope, *args] if args.count > 0
-      @scopes[scope] ||=
-        Collection.new(@target_klass, @owner, @association, *@vector, [scope]).set_scope(scope)
+      scope_vector = [scope, *args] if args.count > 0
+      @scopes[scope_vector] ||=
+        Collection.new(@target_klass, @owner, @association, *@vector, [scope_vector]).set_scope(scope)
     end
 
     def sync_scope(record)
