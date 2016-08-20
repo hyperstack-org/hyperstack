@@ -5,7 +5,13 @@ module ReactiveRecord
   class Base
 
     def sync_scopes
-      # all changes will be rebroadcast and updated by sync_scopes2 so this is now a no-op
+      # all changes will be rebroadcast and updated by sync_scopes2 so this now a NOP, otherwise
+      # we end up syncing twice - once when we save (which calls sync_scopes) and again
+      # when synchromesh broadcasts the change.
+      # The only iffy thing is that you might have permission to update the record and save it
+      # but yet not have a policy to get the syncronized updates.  This needs to be worked
+      # probably by making all authorizations work through the same policy mechanisms, Instead
+      # of having the distinct mechanism for synchromesh vs. reactive-record.
     end
 
     def sync_scopes2

@@ -55,12 +55,31 @@ module Synchromesh
   end
 
   def self.after_change(model)
-    send_to_transport('change', model)
+    run_policies('change', model)
+    #send_to_transport('change', model)
   end
 
   def self.after_destroy(model)
-    send_to_transport('destroy', model)
+    run_policies('destroy', model)
+    #send_to_transport('destroy', model)
   end
+
+  def self.send_to_policy(method, obj, *args, &block)
+    broadcast = if model.class.respond_to? :broadcast
+                   model.class.method(:broadcast)
+                 else
+                   policy = Pundit::PolicyFinder(model).policy
+                   if policy && policy.respond_to? :broadcast
+
+
+  def self.run_policies(message, model)
+    transport = Transport.new
+    broadcast = if model.class.respond_to? :broadcast
+                   model.class.method(:broadcast)
+                 else
+                   policy = Pundit::PolicyFinder(model).policy
+                   if policy && policy.respond_to? :broadcast
+
 
   def self.send_to_transport(message, model)
     data_hash = { klass: model.class.name, record: model.react_serializer, previous_changes: model.previous_changes }
