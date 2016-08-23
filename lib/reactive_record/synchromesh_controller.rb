@@ -1,12 +1,13 @@
 module ReactiveRecord
   # defines the callbacks for simpler poller to use
   class SynchromeshController < ::ActionController::Base
+
     def subscribe
-      render json: { id: Synchromesh::SimplePoller.subscribe }
+      Synchromesh::SimplePoller.subscribe(session.id, acting_user, params[:channel])
     end
 
     def read
-      render json: Synchromesh::SimplePoller.read(params[:subscriber])
+      render json: Synchromesh::SimplePoller.read(session.id)
     end
   end
 

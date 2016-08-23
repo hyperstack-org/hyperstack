@@ -64,30 +64,26 @@ module Synchromesh
     #send_to_transport('destroy', model)
   end
 
-  def self.send_to_policy(method, obj, *args, &block)
-    broadcast = if model.class.respond_to? :broadcast
-                   model.class.method(:broadcast)
-                 else
-                   policy = Pundit::PolicyFinder(model).policy
-                   if policy && policy.respond_to? :broadcast
+  def self.filter(h, attribute_set)
+    h.delete_if { |key, _value| !attribute_set.member? key}
+  end
 
+  def self.filter_previous_changes(model, attribute_set)
+    model.previous_changes
 
-  def self.run_policies(message, model)
-    transport = Transport.new
-    broadcast = if model.class.respond_to? :broadcast
-                   model.class.method(:broadcast)
-                 else
-                   policy = Pundit::PolicyFinder(model).policy
-                   if policy && policy.respond_to? :broadcast
-
-
-  def self.send_to_transport(message, model)
-    data_hash = { klass: model.class.name, record: model.react_serializer, previous_changes: model.previous_changes }
+  def self.send_to_transport(channel, channels, message, model, attribute_set)
+    data_hash = {
+      channel: channel,
+      channels: channels,
+      klass: model.class.name,
+      record: filter(model.react_serializer, attribute_set),
+      previous_changes: filter(model.previous_changes, attribute_set)
+    }
     case transport
     when :pusher
       pusher.trigger(Synchromesh.channel, message, data_hash)
     when :simple_poller
-      SimplePoller.write(message, data_hash)
+      SimplePoller.write(channel, message, data_hash)
     else
       transport_error
     end

@@ -1,4 +1,5 @@
 require_relative 'active_record_base'
+require 'set'
 if RUBY_ENGINE == 'opal'
   require_relative 'synchromesh/version'
   require_relative 'json/parse_patch'
