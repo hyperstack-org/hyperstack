@@ -55,35 +55,23 @@ module Synchromesh
   end
 
   def self.after_change(model)
-    run_policies('change', model)
-    #send_to_transport('change', model)
+    InternalPolicy.regulate_broadcast(model) do |data|
+      send_to_transport('change', message, data)
+    end
   end
 
   def self.after_destroy(model)
-    run_policies('destroy', model)
-    #send_to_transport('destroy', model)
+    InternalPolicy.regulate_broadcast(model) do |data|
+      send_to_transport('destroy', message, data)
+    end
   end
 
-  def self.filter(h, attribute_set)
-    h.delete_if { |key, _value| !attribute_set.member? key}
-  end
-
-  def self.filter_previous_changes(model, attribute_set)
-    model.previous_changes
-
-  def self.send_to_transport(channel, channels, message, model, attribute_set)
-    data_hash = {
-      channel: channel,
-      channels: channels,
-      klass: model.class.name,
-      record: filter(model.react_serializer, attribute_set),
-      previous_changes: filter(model.previous_changes, attribute_set)
-    }
+  def self.send_to_transport(data)
     case transport
     when :pusher
-      pusher.trigger(Synchromesh.channel, message, data_hash)
+      pusher.trigger("#{Synchromesh.channel}-#{data[:channel]}", message, data)
     when :simple_poller
-      SimplePoller.write(channel, message, data_hash)
+      SimplePoller.write(data[:channel], message, data)
     else
       transport_error
     end

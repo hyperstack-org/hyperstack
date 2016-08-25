@@ -3,7 +3,7 @@ module ReactiveRecord
   class SynchromeshController < ::ActionController::Base
 
     def subscribe
-      Synchromesh::SimplePoller.subscribe(session.id, acting_user, params[:channel])
+      Synchromesh::SimplePoller.subscribe(session.id, try(:acting_user), params[:channel])
     end
 
     def read

@@ -14,6 +14,7 @@ We can define all these policies by creating the following classes:
 
 ```ruby
 class UserPolicy # defines policies for the User class
+  include Synchromesh::PolicyMethods
   # The regulate_connection method enables the User class to be treated
   # as a channel.  
 
@@ -25,6 +26,7 @@ class UserPolicy # defines policies for the User class
 end
 
 class TeamPolicy # defines policies for the Team class  
+  include Synchromesh::PolicyMethods
   # Users can only connect to Team channels that they are the members of
   regulate_connection do |acting_user, channel_instance_id|
     Team.find(channel_instance_id).members.include? acting_user
@@ -32,6 +34,7 @@ class TeamPolicy # defines policies for the Team class
 end
 
 class AdminUserPolicy
+  include Synchromesh::PolicyMethods
   # All AdminUser's share the same connection so we do not check the
   # channel instance_id
   regulate_connection do |acting_user|
@@ -46,6 +49,7 @@ class AdminUserPolicy
 end
 
 class TodoPolicy
+  include Synchromesh::PolicyMethods
   # Policies can be established for models that are not channels as well.
 
   # The regulate_broadcast method will describe what attributes to send
@@ -61,6 +65,7 @@ class TodoPolicy
 end
 
 class MessagePolicy
+  include Synchromesh::PolicyMethods
   # Broadcast policies can be arbitrarily complex.  In this case we
   # want to broadcast the entire message to the sender and the
   # recipient's instance channels.  
@@ -77,7 +82,7 @@ end
 Before we begin using these channels and policies we need to first define the Reactive-Record `acting_user` method in our ApplicationController:
 
 ```ruby
-class ApplicationController < ActiveController::Base
+class ApplicationController < ActionController::Base
   def acting_user
     # The acting_user method should return nil, or some object that corresponds to a
     # logged in user.  Specifics will depend on your application and whatever other
@@ -146,6 +151,7 @@ If a policy class is defined for which there is no regulated class, the class wi
 ```ruby
 #app/policies/application.rb
 class ApplicationPolicy
+  include Synchromesh::PolicyMethods
   regulate_connection { true }
 end
 ```
@@ -163,10 +169,11 @@ class User < ActiveRecord::Base
 end
 ```
 
-Normally the policy methods are regulating the class they are called in, but you can override this by providing specific class names to the policy method.  This allows you to group several different class policies together, and to reuse policies:
+Normally the policy methods are regulating the class with the prefix as the policy, but you can override this by providing specific class names to the policy method.  This allows you to group several different class policies together, and to reuse policies:
 
 ```ruby
 class ApplicationPolicy
+  include Synchromesh::PolicyMethods
   regulate_connection { ... }  # Application is assumed
   regulate_connection(User) { ... }
   # regulate_connection and regulate_all_broadcasts can take

@@ -98,6 +98,15 @@ if RUBY_ENGINE != 'opal'
       Rails.cache.clear
     end
 
+    config.after(:each) do
+      ObjectSpace.each_object(Class).each do |klass|
+        if klass < Synchromesh::Regulation
+          klass.instance_variable_set("@blocks_to_channels", nil)
+          klass.instance_variable_set("@channels_to_blocks", nil)
+        end
+      end
+    end
+
     config.filter_run_including focus: true
     config.filter_run_excluding opal: true
     config.run_all_when_everything_filtered = true

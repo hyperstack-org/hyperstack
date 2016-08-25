@@ -25,6 +25,7 @@ else
   require 'reactive-record'
   require 'synchromesh/version'
   require 'synchromesh/synchromesh'
+  require 'synchromesh/policy'
   require 'synchromesh/simple_poller'
   require_relative 'reactive_record/synchromesh_controller'
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
