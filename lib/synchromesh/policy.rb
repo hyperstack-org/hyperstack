@@ -6,6 +6,8 @@ module Synchromesh
       @regulated_klass = regulated_klass
     end
 
+    EXPOSED_METHODS = [:regulate_connection, :regulate_all_broadcasts, :regulate_broadcast, :auto_connect, :disable_auto_connect]
+
     def regulate_connection(*channels, &block)
       regulate(channels, block, ConnectionRegulation)
     end
@@ -16,6 +18,14 @@ module Synchromesh
 
     def regulate_broadcast(*regulated_classes, &block)
       regulate(regulated_classes, block, InstanceBroadcastRegulation)
+    end
+
+    def auto_connect(*channels, &block)
+      regulate(channels, block, AutoConnect)
+    end
+
+    def disable_auto_connect(*channels)
+      regulate(channels, :disabled, AutoConnect)
     end
 
     def regulate(channels, block, regulation_klass)
@@ -33,6 +43,14 @@ module Synchromesh
       @blocks_to_channels ||= Hash.new { |hash, key| hash[key] = [] }
     end
 
+    def self.channels_to_blocks
+      @channels_to_blocks ||= Hash.new { |hash, key| hash[key] = [] }
+    end
+
+    def self.channels
+      @channels_to_blocks.keys
+    end
+
     def self.wrap_policy(policy, block)
       policy_klass = block.binding.receiver
       wrapped_policy = policy_klass.new(nil, nil)
@@ -45,10 +63,6 @@ module Synchromesh
         wrapped_policy = wrap_policy(policy, block)
         channels.each { |channel| yield block, channel, wrapped_policy }
       end
-    end
-
-    def self.channels_to_blocks
-      @channels_to_blocks ||= Hash.new { |hash, key| hash[key] = [] }
     end
 
     def initialize(channel, block)
@@ -69,6 +83,7 @@ module Synchromesh
         !regulation.call *params.first(regulation.arity)
       end
       raise "connection failed" if regs.empty? || failed
+      true
     end
 
     def self.applicable_regulations(channel, instance_id)
@@ -81,6 +96,42 @@ module Synchromesh
       end
     end
   end
+
+  class AutoConnect < Regulation
+    def self.channels(acting_user)
+      channels = []
+      ConnectionRegulation.channels.each do |channel|
+        next if disabled? channel
+        channels << channel if accepts?(channel, acting_user)
+        id = get_id(channel, acting_user)
+        channels << [channel, id] if id && accepts?(channel, acting_user, id)
+      end
+      channels
+    end
+
+    def self.disabled?(channel)
+      blocks_to_channels[:disabled].include? channel
+    end
+
+    def self.accepts?(channel, acting_user, instance_id = nil)
+      ConnectionRegulation.connect(channel, acting_user, instance_id)
+    rescue
+      nil
+    end
+
+    def self.get_id(channel, acting_user)
+      override = channels_to_blocks[channel].last
+      if override
+        override.call acting_user
+      elsif acting_user
+        acting_user.id
+      end
+    rescue
+      nil
+    end
+
+  end
+
 
   class ChannelBroadcastRegulation < Regulation
     def self.broadcast(policy)
@@ -234,7 +285,7 @@ module Synchromesh
     def synchromesh_internal_policy_object
       @synchromesh_internal_policy_object ||= InternalClassPolicy.new(name || self)
     end
-    InternalClassPolicy.instance_methods.grep(/^regulate/).each do |policy_method|
+    InternalClassPolicy::EXPOSED_METHODS.each do |policy_method|
       define_method policy_method do |*klasses, &block|
         synchromesh_internal_policy_object.send policy_method, *klasses, &block
       end unless respond_to? policy_method

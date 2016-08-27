@@ -14,7 +14,6 @@ We can define all these policies by creating the following classes:
 
 ```ruby
 class UserPolicy # defines policies for the User class
-  include Synchromesh::PolicyMethods
   # The regulate_connection method enables the User class to be treated
   # as a channel.  
 
@@ -26,7 +25,6 @@ class UserPolicy # defines policies for the User class
 end
 
 class TeamPolicy # defines policies for the Team class  
-  include Synchromesh::PolicyMethods
   # Users can only connect to Team channels that they are the members of
   regulate_connection do |acting_user, channel_instance_id|
     Team.find(channel_instance_id).members.include? acting_user
@@ -34,7 +32,6 @@ class TeamPolicy # defines policies for the Team class
 end
 
 class AdminUserPolicy
-  include Synchromesh::PolicyMethods
   # All AdminUser's share the same connection so we do not check the
   # channel instance_id
   regulate_connection do |acting_user|
@@ -49,7 +46,6 @@ class AdminUserPolicy
 end
 
 class TodoPolicy
-  include Synchromesh::PolicyMethods
   # Policies can be established for models that are not channels as well.
 
   # The regulate_broadcast method will describe what attributes to send
@@ -65,7 +61,6 @@ class TodoPolicy
 end
 
 class MessagePolicy
-  include Synchromesh::PolicyMethods
   # Broadcast policies can be arbitrarily complex.  In this case we
   # want to broadcast the entire message to the sender and the
   # recipient's instance channels.  
@@ -135,7 +130,7 @@ Broadcast policies can be associated with models.  As the model changes the broa
 
 Broadcast policies can also be associated with a channel and will regulate *all* model changes over specific channels.  In other words this is just a convenient way to associate a common policy with *all* models.
 
-Note that models can be associated with channels can also broadcast their changes of the same or different channels.
+Note that models that are associated with channels can also broadcast their changes on the same or different channels.
 
 #### Defining Policies and Policy Classes
 
@@ -151,7 +146,6 @@ If a policy class is defined for which there is no regulated class, the class wi
 ```ruby
 #app/policies/application.rb
 class ApplicationPolicy
-  include Synchromesh::PolicyMethods
   regulate_connection { true }
 end
 ```
@@ -173,7 +167,6 @@ Normally the policy methods are regulating the class with the prefix as the poli
 
 ```ruby
 class ApplicationPolicy
-  include Synchromesh::PolicyMethods
   regulate_connection { ... }  # Application is assumed
   regulate_connection(User) { ... }
   # regulate_connection and regulate_all_broadcasts can take
@@ -241,16 +234,67 @@ class ApplicationController < ActiveController::Base
 end
 ```
 
-### Connecting to Channels
+#### Automatic Connection
 
-Within your Reactrb code you connect to the channels using the `Synchromesh.connect` method.
+Connections to channels available to the current `acting_user` are automatically made on the initial page load.  This behavior can be turned off using the `disable_auto_connect` method.
+
+```ruby
+class ApplicationPolicy
+  # disable_auto_connect takes a list of channels
+  disable_auto_connect(AdminUser, User)
+  # if no channels are specified, the current regulated class is assumed
+  disable_auto_connect # Application channel assumed
+end
+```
+
+In order to establish connections to instance channels Synchromesh needs to determine the `id` of the channel.  By default if the `acting_user` object responds to `id` the value returned by `id` will be used.  If the instance id should be calculated another way use the auto_connect macro to specify the id explicitly:
+
+```ruby
+class GroupPolicy
+  # The Group instance channel is available to all users who are members
+  # of that Group (i.e. User.belongs_to :group).
+  regulation_connection { |acting_user, id| acting_user.group.id == id }
+  # So when auto connecting to the Group channel use the acting_user's group's id
+  auto_connect { |acting_user| acting_user.group.id } # or just acting_user.group
+end
+```
+
+The channel policy method can also
++ return a falsy value or raise an error which will disable the auto connect,
++ return an object that responds to `id`, which will be used to get the instance id,
++ return an enumeration of objects and/or ids, which will connect over all the channels indicated
+
+```ruby
+class TeamPolicy
+  # A user can be a member of multiple teams, and we allow a connection to all of them
+  regulate_connection do |acting_user, channel_instance_id|
+    Team.find(channel_instance_id).members.include? acting_user
+  end
+  # So we auto_connect to all the acting_user's teams:
+  auto_connect do { |acting_user| acting_user.teams }
+end
+```
+
+Like other channel policy methods `auto_connect` can take a list of channels.
+
+```ruby
+# use the name of the acting_user rather than id for User and AdminUsers
+auto_connect(User, AdminUser) do { |acting_user| acting_user.name }
+```
+
+### Manually Connecting to Channels
+
+Normally you will auto connect the client to the available channels when a page loads, but you can also
+manually connect on the client in response to some user action like logging in.
+
+To manually connect a client use the `Synchromesh.connect` method.  
 
 The `connect` method takes any number of arguments each of which is either a class, an object, a String or Array.
 
 If the argument is a class then the connection will be made to the matching class channel on the server.
 
 ```ruby
-# connect to the AdminUser class channel
+# connect the client to the AdminUser class channel
 Synchromesh.connect(AdminUser)
 # if the connection is successful the client will begin getting updates on the
 # AdminUser class channel
@@ -265,7 +309,7 @@ Synchromesh.connect(current_user)
 # server
 ```
 
-The argument can also be a string, which match the name of a class on the server
+The argument can also be a string, which matches the name of a class on the server
 
 ```ruby
 Synchromesh.connect('AdminUser')
@@ -286,24 +330,9 @@ Synchromesh.connect(AdminUser, current_user)
 
 Finally falsy values are ignored.
 
-Typically you are going to make connections in your top level application component when a page loads:
-
-```ruby
-module Components
-  class App < React::Component::Base
-    param :current_user, type: User
-    after_mount do
-      Synchromesh.connect(current_user)
-      Synchromesh.connect(AdminUser) if current_user && current_user.admin?
-    end
-    ...
-  end
-end
-```
-
 #### Connection Sequence
 
-1. Some place on the client `Synchromesh.connect` is called.
+1. The client calls `Synchromesh.connect`.
 2. Synchromesh sends the channel name and possibly object id to the server.
 3. Synchromesh has its own controller which will get the `acting_user`,
 4. and call the channel's `regulate_connection`.
@@ -316,7 +345,7 @@ Calling `Synchromesh.disconnect(channel)` will disconnect from the channel.
 
 #### Broadcasting and Broadcast Policies
 
-Broadcast policies can be defined for channels using the `regulate_all_broadcasts` method, and for individual objects (typically ActiveRecord models) using the `regulate_broadcast`.  A regulate_all_broadcasts is essentially an regulate_broadcast that will be run for every record that changes in the system.
+Broadcast policies can be defined for channels using the `regulate_all_broadcasts` method, and for individual objects (typically ActiveRecord models) using the `regulate_broadcast` method.  A `regulate_all_broadcasts` policy is essentially a `regulate_broadcast` that will be run for every record that changes in the system.
 
 After an ActiveRecord model change is committed, all active class channels run their channel broadcast policies, and then the instance broadcast policy associated with the changing model is run.  So for any change there may be multiple channel broadcast policies involved, but only one (at most) regulate_broadcast.  
 
@@ -388,7 +417,7 @@ policy.send_only(:baz).to(MyChannel)
 # MyChannel gets nothing
 ```
 
-Keep in mind that the broadcast policies are sent a copy of the policy object so you have define helper methods in your policies. Also you can add policy specific methods to your models using
+Keep in mind that the broadcast policies are sent a copy of the policy object so you can use helper methods in your policies. Also you can add policy specific methods to your models using
 `class_eval` thus keeping policy logic out of your models.
 
 So we could for example we can rewrite the above MessagePolicy like this:
