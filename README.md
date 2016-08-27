@@ -17,11 +17,48 @@ As soon as Opal is working on Rails 5, we will add ActionCable.
 
 Also near term we will have a simple mechanism to plug in your own transport.
 
-## Security [NOT IMPLEMENTED YET]
+## Authorization
 
-Synchromesh will build on top of ReactiveRecord's model-based permission mechanism:
+Each application defines a number of *channels* and authorization policies for those channels and the data sent over them.
 
-Each *user* or *user group* will get a private transport channel.  Before broadcasting an update to a user's channel Synchromesh will filter the data based on that user's permissions.
+Policies are defined with *Policy* classes.  These are similar and compatible with (Pundit)[https://github.com/elabs/pundit] but
+you do not need to use the pundit gem.
+
+Examples:
+
+```ruby
+class ApplicationPolicy
+  # define policies for the Application
+
+  # all clients can connect to the Application
+  regulate_connection { true }
+end
+
+class ProductionCenterPolicy
+  # define policies for the ProductionCenter model
+
+  # any time a ProductionCenter model is updated
+  # broadcast the total_jobs_shipped attribute over the
+  # application channel (i.e. this is public data anybody can see)
+  regulate_broadcast do |policy|
+    policy.send_only(:total_jobs_shipped).to(Application)
+  end
+end
+
+class UserPolicy
+  # define policies for the User channel and Model
+
+  # connect a channel for each logged user
+  regulate_connection { |acting_user, id| acting_user.id == id }
+
+  # users can see all but one field of their own data
+  regulate_broadcast do |policy|
+    policy.send_all_but(:gross_margin_contribution).to(self)
+  end
+end
+```
+
+For complete details see (Authorization Policies)[authorization-policies.md]
 
 ## Installation
 
@@ -50,6 +87,15 @@ Synchromesh.configuration do |config|
   config.opts = { ... transport specific options ...}
   config.channel_prefix = 'synchromesh'
   # config.client_logging = false                         # default is true
+end
+# for a minimal setup you will need to define at least one channel, which you can do
+# in the same file as your initializer - however normally you would put these
+# policies in the app/policies/ directory
+class ApplicationPolicy
+  # allow all clients to connect to the Application channel
+  regulate_connection { true }
+  # broadcast all model changes over the Application channel *DANGEROUS*
+  regulate_all_broadcasts { |policy| policy.send_all }
 end
 ```
 
