@@ -1,6 +1,6 @@
 # Synchromesh ![](logo.jpg?raw=true)
 
-Synchromesh provides multi-client synchronization for [reactive-record.](https://github.com/catprintlabs/reactive-record)
+[Synchromesh](https://en.wikipedia.org/wiki/Manual_transmission#Synchromesh) provides multi-client synchronization for [reactive-record.](https://github.com/catprintlabs/reactive-record)
 
 In other words browser 1 creates, updates, or destroys a model, and the changes are broadcast to all other clients.
 
@@ -19,9 +19,9 @@ Also near term we will have a simple mechanism to plug in your own transport.
 
 ## Authorization
 
-Each application defines a number of *channels* and authorization policies for those channels and the data sent over them.
+Each application defines a number of *channels* and *authorization policies* for those channels and the data sent over them.
 
-Policies are defined with *Policy* classes.  These are similar and compatible with (Pundit)[https://github.com/elabs/pundit] but
+Policies are defined with *Policy* classes.  These are similar and compatible with [Pundit](https://github.com/elabs/pundit) but
 you do not need to use the pundit gem.
 
 Examples:
@@ -48,7 +48,7 @@ end
 class UserPolicy
   # define policies for the User channel and Model
 
-  # connect a channel for each logged user
+  # connect a channel for each logged in user
   regulate_connection { |acting_user, id| acting_user.id == id }
 
   # users can see all but one field of their own data
@@ -58,7 +58,7 @@ class UserPolicy
 end
 ```
 
-For complete details see (Authorization Policies)[authorization-policies.md]
+For complete details see [Authorization Policies](authorization-policies.md)
 
 ## Installation
 
