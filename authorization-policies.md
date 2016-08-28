@@ -90,27 +90,12 @@ end
 
 Note that `acting_user` is also used by Reactive-Record's permission system.
 
-Finally on the client side we connect to our channels using the `Synchromesh.connect` method:
-
-```ruby
-# Assume we have logged in and there is a variable or method current_user
-# that returns the current_user User model.
-
-# Likewise there is a team method or variable that returns a team object
-# that the current_user belongs to.
-
-# connect to team's channel instance
-Synchromesh.connect(team)
-Synchromesh.connect(current_user)
-
-# connect to the AdminUser class channel if user is an admin
-Synchromesh.connect(AdminUser) if current_user.admin?
-```
+Finally when a client page loads that has any `reactrb` components, synchromesh will setup connections to the server based on the current logged user of that page.  
 
 Lets walk through what happens as the code runs:
 
-1. Client side code does a `Synchromesh.connect(team)`
-2. The server receives the request to connect to the Team channel with the id of the team instance.
+1. Client side code is configured (automatically) to connect to all channels available to the current user
+2. After the client loads the server receives the request to connect to the Team channel with the id of the team instance.
 3. The `Team` connection policy will be passed the current user, and the Team's id.
 4. Assuming the connection is allowed, the client will start receiving broadcasts on the team's instance channel.
 5. A `Todo` now changes
@@ -150,7 +135,7 @@ class ApplicationPolicy
 end
 ```
 
-Note that by convention policy classes go in the `app/policies` directory.
+Note that by default policy classes go in the `app/policies` directory.  Synchromesh will require all the files in this directory.
 
 If you wish, you can also add policies directly in your models by including the `Synchromesh::PolicyMethods` module in your model.  You can then use the `regulate_connection`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
 
@@ -462,3 +447,17 @@ class ProductionCenterPolicy < MyPolicyClass
   ...
 end
 ```  
+
+#### Setting the policy directory
+
+*Synchromesh auto-connect needs to know about all policies ahead of time so cannot rely on rails auto loading.  Sorry about that!*
+
+By default Synchromesh will load all the files in the `app/policies` directory.  To change the directory set the policy_directory in the synchromesh initializer.  
+
+```ruby
+Synchromesh.configuration do |config|
+  ...
+  config.policy_directory = File.join(Rails.root, 'app', 'synchromesh-authorization')
+  # can also be set to nil if you want to manually require your files
+end
+```
