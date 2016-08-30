@@ -13,7 +13,7 @@ Currently there are two transport mechanisms:
 + [Pusher](http://pusher.com) which gives you zero config websockets.  
 + Short cycle polling (for development)
 
-As soon as Opal is working on Rails 5, we will add ActionCable.   
+Hopefully very shortly we will also have an ActionCable transport.   
 
 Also near term we will have a simple mechanism to plug in your own transport.
 

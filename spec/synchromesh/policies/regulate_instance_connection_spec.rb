@@ -43,8 +43,25 @@ describe "regulate_instance_connections" do
     stub_const "Class2", Class.new(Application)
     ApplicationPolicy.regulate_instance_connections(Class1, Class2) { self }
     expect { Synchromesh::InternalPolicy.regulate_connection(Class1.find('baz'), "Class1-baz") }.not_to raise_error
-    expect { Synchromesh::InternalPolicy.regulate_connection(Class2.find('baz'), "Class2-baz") }.not_to raise_error
+    expect { Synchromesh::InternalPolicy.regulate_connection(Class2.find('baz-2'), "Class2-baz-2") }.not_to raise_error
     expect { Synchromesh::InternalPolicy.regulate_connection(Application.find('baz'), "Application-baz") }.to raise_error('connection failed')
   end
 
+  it "can return an array objects" do
+    ApplicationPolicy.regulate_instance_connections { [Application.find(1), Application.find(2)] }
+    expect { Synchromesh::InternalPolicy.regulate_connection("foo", "Application-1") }.not_to raise_error
+    expect { Synchromesh::InternalPolicy.regulate_connection("foo", "Application-2") }.not_to raise_error
+  end
+
+  it "can conditionally regulate the connection" do
+    ApplicationPolicy.regulate_instance_connections { id == '1' && self }
+    expect { Synchromesh::InternalPolicy.regulate_connection(Application.new(1), "Application-1") }.not_to raise_error
+    expect { Synchromesh::InternalPolicy.regulate_connection(Application.new(2), "Application-2") }.to raise_error('connection failed')
+  end
+
+  it "can regulate the connection by raising an error" do
+    ApplicationPolicy.regulate_instance_connections { raise "POW" unless id == '1'; self}
+    expect { Synchromesh::InternalPolicy.regulate_connection(Application.new(1), "Application-1") }.not_to raise_error
+    expect { Synchromesh::InternalPolicy.regulate_connection(Application.new(2), "Application-2") }.to raise_error('connection failed')
+  end
 end

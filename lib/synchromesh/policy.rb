@@ -11,28 +11,28 @@ module Synchromesh
       :regulate_all_broadcasts, :regulate_broadcast
     ]
 
-    def regulate_class_connection(*args, &block)
-      regulate(ClassConnectionRegulation, args, &block)
+    def regulate_class_connection(*args, &regulation)
+      regulate(ClassConnectionRegulation, args, &regulation)
     end
 
     def always_allow_connection(*args)
       regulate(ClassConnectionRegulation, args) { true }
     end
 
-    def regulate_instance_connections(*args, &block)
-      regulate(InstanceConnectionRegulation, args, &block)
+    def regulate_instance_connections(*args, &regulation)
+      regulate(InstanceConnectionRegulation, args, &regulation)
     end
 
-    def regulate_all_broadcasts(*args, &block)
-      regulate(ChannelBroadcastRegulation, args, &block)
+    def regulate_all_broadcasts(*args, &regulation)
+      regulate(ChannelBroadcastRegulation, args, &regulation)
     end
 
-    def regulate_broadcast(*args, &block)
-      regulate(InstanceBroadcastRegulation, args, &block)
+    def regulate_broadcast(*args, &regulation)
+      regulate(InstanceBroadcastRegulation, args, &regulation)
     end
 
-    def regulate(regulation_klass, args, &block)
-      raise "you must provide a block to the regulate_#{policy} method" unless block
+    def regulate(regulation_klass, args, &regulation)
+      raise "you must provide a block to the regulate_#{policy} method" unless regulation
       if args.last.is_a? Hash
         opts = args.last
         args = args[0..-2]
@@ -41,7 +41,7 @@ module Synchromesh
       end
       args = [@regulated_klass] if args.empty?
       args.each do |regulated_klass|
-        regulation_klass.add_regulation regulated_klass, opts, &block
+        regulation_klass.add_regulation regulated_klass, opts, &regulation
       end
     end
   end
@@ -50,27 +50,27 @@ module Synchromesh
 
     class << self
 
-      def add_regulation(channel, opts={}, &block)
-        channel = channels[channel]
-        channel.opts.merge! opts
-        channel.blocks << block
-        channel
+      def add_regulation(klass, opts={}, &regulation)
+        klass = regulations[klass]
+        klass.opts.merge! opts
+        klass.regulations << regulation
+        klass
       end
 
-      def channels
-        @channels ||= Hash.new do |hash, channel|
-          if channel.is_a? String
-            hash[channel] = new(channel)
-          elsif channel.is_a?(Class) && channel.name
-            hash[channel.name]
+      def regulations
+        @regulations ||= Hash.new do |hash, klass|
+          if klass.is_a? String
+            hash[klass] = new(klass)
+          elsif klass.is_a?(Class) && klass.name
+            hash[klass.name]
           else
-            hash[channel.class.name]
+            hash[klass.class.name]
           end
         end
       end
 
-      def wrap_policy(policy, block)
-        policy_klass = block.binding.receiver
+      def wrap_policy(policy, regulation)
+        policy_klass = regulation.binding.receiver
         wrapped_policy = policy_klass.new(nil, nil)
         wrapped_policy.synchromesh_internal_policy_object = policy
         wrapped_policy
@@ -84,14 +84,14 @@ module Synchromesh
       @opts ||= {}
     end
 
-    def blocks
-      @blocks ||= []
+    def regulations
+      @regulations ||= []
     end
 
     def regulate_for(acting_user)
-      @regulator ||= Enumerator.new do |y|
-        blocks.each do |block|
-          y << acting_user.instance_eval(&block)
+      Enumerator.new do |y|
+        regulations.each do |regulation|
+          y << acting_user.instance_eval(&regulation)
         end
       end
     end
@@ -105,18 +105,16 @@ module Synchromesh
   class ClassConnectionRegulation < Regulation
 
     def connectable?(acting_user)
-      connected = regulate_for(acting_user).all? unless blocks.empty?
-    ensure
-      connected
+      regulate_for(acting_user).all? unless regulations.empty? rescue nil
     end
 
-    def self.connect(klass, acting_user)
-      raise "connection failed" unless channels[klass].connectable?(acting_user)
+    def self.connect(channel, acting_user)
+      raise "connection failed" unless regulations[channel].connectable?(acting_user)
     end
 
     def self.auto_connections(acting_user)
-      channels.collect do |name, channel|
-        name unless channel.auto_connect_disabled? || !channel.connectable?(acting_user)
+      regulations.collect do |channel, regulation|
+        channel if !regulation.auto_connect_disabled? && regulation.connectable?(acting_user)
       end.compact
     end
 
@@ -129,20 +127,18 @@ module Synchromesh
   class InstanceConnectionRegulation < Regulation
 
     def connectable_to(acting_user)
-      regulate_for(acting_user).entries.compact.flatten(1)
-    rescue Exception
-      []
+      regulate_for(acting_user).entries.compact.flatten(1) rescue []
     end
 
     def self.connect(instance, acting_user)
-      unless channels[instance].connectable_to(acting_user).include? instance
+      unless regulations[instance].connectable_to(acting_user).include? instance
         raise "connection failed"
       end
     end
 
     def self.auto_connections(acting_user)
-      channels.collect do |connections, channel|
-        channel.connectable_to(acting_user).collect do |obj|
+      regulations.collect do |_channel, regulation|
+        regulation.connectable_to(acting_user).collect do |obj|
           [obj.class.name, obj.id]
         end
       end.flatten(1)
@@ -151,8 +147,8 @@ module Synchromesh
 
   class ChannelBroadcastRegulation < Regulation
     class << self
-      def add_regulation(channel, opts={}, &block)
-        blocks_to_channels[block] << super
+      def add_regulation(channel, opts={}, &regulation)
+        regulations_to_channels[regulation] << super
       end
 
       def broadcast(policy)
@@ -163,21 +159,21 @@ module Synchromesh
       end
 
       def each_channel_with_wrapped_policy(policy)
-        blocks_to_channels.each do |block, channels|
-          wrapped_policy = wrap_policy(policy, block)
-          channels.each { |channel| yield block, channel, wrapped_policy }
+        regulations_to_channels.each do |regulation, channels|
+          wrapped_policy = wrap_policy(policy, regulation)
+          channels.each { |channel| yield regulation, channel, wrapped_policy }
         end
       end
 
-      def blocks_to_channels
-        @blocks_to_channels ||= Hash.new { |hash, key| hash[key] = [] }
+      def regulations_to_channels
+        @regulations_to_channels ||= Hash.new { |hash, key| hash[key] = [] }
       end
     end
   end
 
   class InstanceBroadcastRegulation < Regulation
     def self.broadcast(instance, policy)
-      channels[instance].blocks.each do |regulation|
+      regulations[instance].regulations.each do |regulation|
         instance.instance_exec wrap_policy(policy, regulation), &regulation
       end
     end
@@ -212,9 +208,9 @@ module Synchromesh
 
     def self.regulate_connection(acting_user, channel_string)
       channel = channel_string.split("-")
-      id = channel[1]
-      if channel.length == 2
-        object = Object.const_get(channel[0]).find(channel[1])
+      if channel.length > 1
+        id = channel[1..-1].join("-")
+        object = Object.const_get(channel[0]).find(id)
         InstanceConnectionRegulation.connect(object, acting_user)
       else
         ClassConnectionRegulation.connect(channel[0], acting_user)
