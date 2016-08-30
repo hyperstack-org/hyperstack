@@ -31,7 +31,7 @@ class ApplicationPolicy
   # define policies for the Application
 
   # all clients can connect to the Application
-  regulate_connection { true }
+  always_allow_connection
 end
 
 class ProductionCenterPolicy
@@ -49,7 +49,7 @@ class UserPolicy
   # define policies for the User channel and Model
 
   # connect a channel for each logged in user
-  regulate_connection { |acting_user, id| acting_user.id == id }
+  regulate_instance_connection { self }
 
   # users can see all but one field of their own data
   regulate_broadcast do |policy|

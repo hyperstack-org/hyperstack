@@ -2,43 +2,42 @@
 
 Each time an ActiveRecord model changes, Synchromesh broadcasts the changed attributes over *channels*.
 
-An application can have several channels and each channel and each active record model can have different policies to determine which attributes are sent when a record changes.
+An application can have several channels and each channel and each active record model can have different *policies* to determine which attributes are sent when a record changes.
 
-For example a Todo application might have an *instance* of a channel for each specific logged in user, an instance of a channel for each specific team for any team that has one or more logged in users, and a general `AdminUser` channel shared by all administrators that are logged in.
+For example a Todo application might have an *instance* of a channel for each currently logged in user; an instance of a channel for each team if that team has one or more logged in users; and a general `AdminUser` channel shared by all administrators that are logged in.
 
 Lets say a specific `Todo` changes, which is part of team id 123's Todo list, and users 7 and 8 who are members of that team are currently logged in as well as two of the `AdminUsers`.  
 
-When the `Todo` changes we want all the attributes of the `Todo` broadcast on `Team` 123's channel, as well on the `AdminUser`'s channel.  Now lets say User 7 sends User 8 a private message, adding a new record to the `Message` model.  This update should only be sent to the user 7 and user 8's private channel, as well as to the AdminUser channel.
+When the `Todo` changes we want all the attributes of the `Todo` broadcast on team 123's channel, as well on the `AdminUser`'s channel.  Now lets say User 7 sends User 8 a private message, adding a new record to the `Message` model.  This update should only be sent to user 7 and user 8's private channels, as well as to the AdminUser channel.
 
 We can define all these policies by creating the following classes:
 
 ```ruby
 class UserPolicy # defines policies for the User class
-  # The regulate_connection method enables the User class to be treated
-  # as a channel.  
+  # The regulate_instance_connections method enables instances of the User
+  # class to be treated as a channel.  
 
-  # To establish the connection the acting_user's id must
-  # equal the instance id of the channel
-  regulate_connection do |acting_user, channel_instance_id|
-    acting_user.id == channel_instance_id
-  end
+  # The policy is defined by a block that is executed in the context of the
+  # current acting_user.
+
+  # For our User instance connection the policy is that there must be logged in
+  # user, and the connection is made to that user:
+  regulate_instance_connections { self }
+  # If there is no logged in user self will be nil, and no connection will be
+  # made.
 end
 
 class TeamPolicy # defines policies for the Team class  
-  # Users can only connect to Team channels that they are the members of
-  regulate_connection do |acting_user, channel_instance_id|
-    Team.find(channel_instance_id).members.include? acting_user
-  end
+  # Users can only connect to Teams that they belong to
+  regulate_instance_connections { teams }
 end
 
 class AdminUserPolicy
-  # All AdminUser's share the same connection so we do not check the
-  # channel instance_id
-  regulate_connection do |acting_user|
-    acting_user.admin?
-  end
+  # All AdminUsers share the same connection so we setup a class wide
+  # connection available to any users who are admins.
+  regulate_class_connection { admin? }
 
-  # For the AdminUser channel we want to receive all attributes
+  # The AdminUser channel will receive all attributes
   # of all records, unless the attribute is named :password
   regulate_all_broadcasts do |policy|
     policy.send_all_but(:password)
@@ -90,24 +89,13 @@ end
 
 Note that `acting_user` is also used by Reactive-Record's permission system.
 
-Finally when a client page loads that has any `reactrb` components, synchromesh will setup connections to the server based on the current logged user of that page.  
-
-Lets walk through what happens as the code runs:
-
-1. Client side code is configured (automatically) to connect to all channels available to the current user
-2. After the client loads the server receives the request to connect to the Team channel with the id of the team instance.
-3. The `Team` connection policy will be passed the current user, and the Team's id.
-4. Assuming the connection is allowed, the client will start receiving broadcasts on the team's instance channel.
-5. A `Todo` now changes
-6. All open channels will any `regulate_all_broadcasts` policies they have defined.  
-7. The `regulate_broadcast` policy for the Todo model is run.
-8. Each channel receives a (possibly) filtered version of the changed record as defined by the policies.
+Our entire set of policies is defined in 29 lines of code of which 8 actually execute the policies.  Our existing classes form the foundation, and we simply add synchromesh specific policy directives.  Pretty sweet huh?
 
 ### Details
 
 Synchromesh uses *Policies* to *regulate* what *connections* are opened between clients and the server and what data is distributed over those connections.
 
-Connections are made on *channels* of data flowing between the server and a number of clients.  Each channel is associated with either a class or an instance of a class.  Typically the class represents an entity that can be authenticated like a `User` or an `AdminUser`.  A channel associated with the class itself will broadcast data that is received by any member of that class.  A channel associated with an instance is for data that is available only to that specific instance.   
+Connections are made on *channels* of data flowing between the server and a number of clients.  Each channel is associated with either a class or an instance of a class.  Typically the channel class represents an entity (or is associated with an entity) that can be authenticated like a `User`, an  `AdminUser`, or a `Team` of users.  A channel associated with the class itself broadcasts data that is received by any member of that class.  A channel associated with an instance is for data that is available only to that specific instance.   
 
 As models on the server change (i.e. created, updated, or destroyed) the changes are broadcast over open channels.  What specific attributes are sent (if any) is determined by broadcast policies.
 
@@ -121,28 +109,32 @@ Note that models that are associated with channels can also broadcast their chan
 
 The best way to define policies is to use a *Policy Class*.  A policy class has the same class name as the class it is regulating, with `Policy` added to the end.  Policy classes are compatible with `Pundit`, and you can add regular pundit policies as well.
 
-Policies are defined using three methods:
-+ `regulate_connection` controls connections to the classes, or instances of classes,
+Policies are defined using four methods:
++ `regulate_class_connection` controls connections to the class channels,
++ `regulate_instance_connections` controls connections to instance channels,
 + `regulate_broadcast` controls what data will be sent when a model or object changes and,
 + `regulate_all_broadcasts` controls what data will be sent of some channels when any model changes.
 
-If a policy class is defined for which there is no regulated class, the class will be created for you.  This is useful for application wide connections, which are typically open even if no one is logged in:
+In addition `always_allow_connection` is short hand for `regulate_class_connection { true }`
+
+A policy class can be defined for which there is no regulated class.  This is useful for application wide connections, which are typically open even if no one is logged in:
 
 ```ruby
 #app/policies/application.rb
 class ApplicationPolicy
-  regulate_connection { true }
+  regulate_class_connection { true }
 end
 ```
 
 Note that by default policy classes go in the `app/policies` directory.  Synchromesh will require all the files in this directory.
 
-If you wish, you can also add policies directly in your models by including the `Synchromesh::PolicyMethods` module in your model.  You can then use the `regulate_connection`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
+If you wish, you can also add policies directly in your models by including the `Synchromesh::PolicyMethods` module in your model.  You can then use the `regulate_class_connection`, `regulate_instance_connections`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
 
 ```ruby
 class User < ActiveRecord::Base
   include Synchromesh::PolicyMethods
-  regulate_connection ...
+  regulate_class_connection ...
+  regulate_instance_connections ...
   regulate_all_broadcasts ...  
   regulate_broadcast ...
 end
@@ -153,9 +145,9 @@ Normally the policy methods are regulating the class with the prefix as the poli
 ```ruby
 class ApplicationPolicy
   regulate_connection { ... }  # Application is assumed
-  regulate_connection(User) { ... }
-  # regulate_connection and regulate_all_broadcasts can take
-  # a list of channels.
+  regulate_class_connection(User) { ... }
+  # regulate_class_connection, regulate_instance_connections and
+  # regulate_all_broadcasts can take a list of channels.
   regulate_all_broadcasts(User, Application)
   # regulate_broadcast takes a list of object classes which
   # may also be channels.
@@ -163,48 +155,54 @@ class ApplicationPolicy
 end
 ```
 
-#### Channels and the `regulate_connection` method
+#### Channels and the connection policies
 
 Any ruby class that has a connection policy is a synchromesh channel. The fully scoped name of the class becomes the root of the channel name.
 
 The purpose of having channels is to restrict what gets broadcast when models change, therefore typically channels represent *connections* to
 
 + the application, or some function within the application
-+ or some class which *logs in* like a User or Administrator,
-+ or instances of those classes.
++ or some class which *authenticated* like a User or Administrator,
++ instances of those classes,
++ or instances of related classes.
 
 So a channel that is connected to the User class would get information readable by any logged-in user, while a channel that is connected to a specific User instance would get information readable by that specific user.
 
-Whether a channel can represent a connection to the class, an instance or both is determined by the connection policy.  The first argument to the policy is the `acting_user`, and the second argument (if present) is the id of the instance being connected to, or nil if connecting to the class.
+The `regulate_class_connection` takes a block that will execute in the context of the current acting_user (which may be nil), and if the block returns any truthy value, the connection will be made.
 
-If the connection policy block takes only one or no arguments then clients can only connect to the class, and an attempt to connect to an instance will fail.
+The `regulate_instance_connections` likewise takes a block that is executed in the context of the current acting_user.  The block may do one of following:
 
-If the connection policy expects to connect to both an instance and the class then it needs to accept the second parameter, which will either be the id of the instance, or nil if it connecting to the class channel.
++ raise an error meaning the connection cannot be made,
++ return a falsy value also meaning the connection cannot be made,
++ return a single object meaning the connection can be made to that object,
++ return a enumerable of objects meaning the connection can made to any member of the enumerable.
 
-Keep in mind the connection policy is a safety check.  Your client code should not be attempting to
-connect on a channel that will fail.  Failed connections are treated as security violations and
-are not designed to be recoverable.  Therefore the connection policy can fail either by returning a falsy value or raising an error.
+Note that the object (or objects) returned are expected to be of the same class as the regulated policy.  
 
 ```ruby
-# create a class connection only if the acting_user is non-nil (i.e. logged in)
-regulate_connection { |acting_user| acting_user }
-# always open the connection
-regulate_connection { |acting_user| true }
-# which can be shortened to
-regulate_connection { true }
-# create a class level connection if the acting_user is an admin
-regulate_connection { |acting_user| acting_user.admin? }
-# create an instance connection for the current user
-regulate_connection { |acting_user, id| acting_user.id == id }
-# allow both instance and class connections
-regulate_connection { |acting_user, id| acting_user && (id.nil? || acting_user.id == id)}
+# Create a class connection only if the acting_user is non-nil (i.e. logged in:)
+regulate_class_connection { self }
+# Always open the connection:
+regulate_class_connection { true }
+# Which can be shortened to:
+always_allow_connection
+# Create a class level connection if the acting_user is an admin:
+regulate_class_connection { admin? }
+# Create an instance connection for the current user:
+regulate_instance_connections { self }
+# Create an instance connection for the current user if the user is an admin:
+regulate_instance_connections { self if admin? }
+# create an instance_connection to the users' group
+regulate_instance_connections { group }
+# create an instance connection for any team the user belongs to
+regulate_instance_connections { teams }
 ```
 
 #### Class Names, Instances and Ids
 
-While establishing connections, classes are represented as their fully scoped name, and instances are represented as the class name plus the result of calling 'id' on the instance.
+While establishing connections, classes are represented as their fully scoped name, and instances are represented as the class name plus the result of calling `id` on the instance.
 
-Typically connections are made to ActiveRecord models, and if those are in the `app/models/public` folder everything will work fine.  If necessary there are mechanisms on the client side to deal with special cases.
+Typically connections are made to ActiveRecord models, and if those are in the `app/models/public` folder everything will work fine.
 
 #### Acting User
 
@@ -221,56 +219,26 @@ end
 
 #### Automatic Connection
 
-Connections to channels available to the current `acting_user` are automatically made on the initial page load.  This behavior can be turned off using the `disable_auto_connect` method.
-
-```ruby
-class ApplicationPolicy
-  # disable_auto_connect takes a list of channels
-  disable_auto_connect(AdminUser, User)
-  # if no channels are specified, the current regulated class is assumed
-  disable_auto_connect # Application channel assumed
-end
-```
-
-In order to establish connections to instance channels Synchromesh needs to determine the `id` of the channel.  By default if the `acting_user` object responds to `id` the value returned by `id` will be used.  If the instance id should be calculated another way use the auto_connect macro to specify the id explicitly:
-
-```ruby
-class GroupPolicy
-  # The Group instance channel is available to all users who are members
-  # of that Group (i.e. User.belongs_to :group).
-  regulation_connection { |acting_user, id| acting_user.group.id == id }
-  # So when auto connecting to the Group channel use the acting_user's group's id
-  auto_connect { |acting_user| acting_user.group.id } # or just acting_user.group
-end
-```
-
-The channel policy method can also
-+ return a falsy value or raise an error which will disable the auto connect,
-+ return an object that responds to `id`, which will be used to get the instance id,
-+ return an enumeration of objects and/or ids, which will connect over all the channels indicated
+Connections to channels available to the current `acting_user` are automatically made on the initial page load.  This behavior can be turned off with the `auto_connect` option.
 
 ```ruby
 class TeamPolicy
-  # A user can be a member of multiple teams, and we allow a connection to all of them
-  regulate_connection do |acting_user, channel_instance_id|
-    Team.find(channel_instance_id).members.include? acting_user
-  end
-  # So we auto_connect to all the acting_user's teams:
-  auto_connect do { |acting_user| acting_user.teams }
+  # Allow current users to establish connections to any teams they are
+  # members of, but disable_auto_connect
+  regulate_instance_connections(auto_connect: false) { teams }
 end
 ```
 
-Like other channel policy methods `auto_connect` can take a list of channels.
-
-```ruby
-# use the name of the acting_user rather than id for User and AdminUsers
-auto_connect(User, AdminUser) do { |acting_user| acting_user.name }
-```
+Its important to consider turning off automatic connections for cases like the above where
+the user is likely to be a member of many teams.  Typically the client application will
+want to dynamically determine which specific teams to connect to given the current state of
+the application.
 
 ### Manually Connecting to Channels
 
-Normally you will auto connect the client to the available channels when a page loads, but you can also
-manually connect on the client in response to some user action like logging in.
+Normally the client will automatically connect to the available channels when a page loads, but you can also
+manually connect on the client in response to some user action like logging in, or the user deciding to
+display a specific team status on their dashboard.
 
 To manually connect a client use the `Synchromesh.connect` method.  
 
@@ -315,18 +283,37 @@ Synchromesh.connect(AdminUser, current_user)
 
 Finally falsy values are ignored.
 
-#### Connection Sequence
+You can also send `connect` directly to ActiveRecord models:
+
+```ruby
+AdminUser.connect!    # same as Synchromesh.connect(AdminUser)
+current_user.connect! # same as Synchromesh.connect(current_user)
+```
+
+#### Connection Sequence Summary
+
+For class connections:
 
 1. The client calls `Synchromesh.connect`.
-2. Synchromesh sends the channel name and possibly object id to the server.
-3. Synchromesh has its own controller which will get the `acting_user`,
-4. and call the channel's `regulate_connection`.
-5. If true is returned the channel is established,
+2. Synchromesh sends the channel name to the server.
+3. Synchromesh has its own controller which will determine the `acting_user`,
+4. and call the channel's `regulate_class_connection` method.
+5. If `regulate_class_connection` returns a truthy value then the connetion is made,
 6. otherwise a 500 error is returned.
+
+For instance connections:
+
+1. The process is the same but the channel name and id are sent to the server.  
+2. The Synchromesh controller will do a find of the id passed to get the instance,
+3. and if successful `regulate_instance_connections` is called,
+4. which must return an either the same instance, or an enumerable with that instance as a member.
+5. Otherwise a 500 error is returned.
+
+Note that the same sequence is used for auto connections and manually invoked connections.
 
 #### Disconnecting
 
-Calling `Synchromesh.disconnect(channel)` will disconnect from the channel.
+Calling `Synchromesh.disconnect(channel)` or `channel.disconnect!` will disconnect from the channel.
 
 #### Broadcasting and Broadcast Policies
 
@@ -340,7 +327,7 @@ The purpose of the policies then is to determine which channel sees what.  Each 
 
 + `send_all`: send all the attributes of the record.
 + `send_only`: send only the listed attributes of the record.
-+ `send_all_but`: send all the attributes execpt the ones listed.
++ `send_all_but`: send all the attributes except the ones listed.
 
 The result of the `send...` method is then directed to the set of channels using the `to` method:
 
@@ -369,7 +356,6 @@ The `to` method can take any number of arguments:
 The broadcast policy executes in the context of the model that has just changed, so the policy can use all the methods of that model, especially relationships.  For example:
 
 ```ruby
-
 class Message < ActiveRecord::Base
   belongs_to :sender, class: "User"
   belongs_to :recipient, class: "User"

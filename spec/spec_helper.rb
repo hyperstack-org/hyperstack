@@ -101,8 +101,7 @@ if RUBY_ENGINE != 'opal'
     config.after(:each) do
       ObjectSpace.each_object(Class).each do |klass|
         if klass < Synchromesh::Regulation
-          klass.instance_variable_set("@blocks_to_channels", nil)
-          klass.instance_variable_set("@channels_to_blocks", nil)
+          klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
         end
       end
     end

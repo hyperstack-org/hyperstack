@@ -10,8 +10,17 @@ describe "including Synchromesh::PolicyMethods" do
     end
   end
 
-  it "defines the regulate_connection method" do
-    expect(TestClass).to respond_to(:regulate_connection)
+  it "defines the regulate_class_connection method" do
+    expect(TestClass).to respond_to(:regulate_class_connection)
+  end
+
+
+  it "defines the regulate_instance_connections method" do
+    expect(TestClass).to respond_to(:regulate_instance_connections)
+  end
+
+  it "defines the always_allow_connection method" do
+    expect(TestClass).to respond_to(:always_allow_connection)
   end
 
   it "defines the regulate_all_broadcasts method" do
@@ -26,8 +35,17 @@ describe "including Synchromesh::PolicyMethods" do
     expect(TestClass.synchromesh_internal_policy_object.instance_variable_get("@regulated_klass")).to eq("TestClass")
   end
 
-  it "exposes the underlying regulate_connection method" do
-    expect(TestClass.synchromesh_internal_policy_object).to respond_to(:regulate_connection)
+  it "exposes the underlying regulate_class_connection method" do
+    expect(TestClass.synchromesh_internal_policy_object).to respond_to(:regulate_class_connection)
+  end
+
+
+  it "exposes the underlying regulate_instance_connections method" do
+    expect(TestClass.synchromesh_internal_policy_object).to respond_to(:regulate_instance_connections)
+  end
+
+  it "exposes the underlying always_allow_connection method" do
+    expect(TestClass.synchromesh_internal_policy_object).to respond_to(:always_allow_connection)
   end
 
   it "exposes the underlying regulate_all_broadcasts method" do
