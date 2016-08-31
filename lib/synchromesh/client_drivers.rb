@@ -11,6 +11,8 @@ module Synchromesh
       channels.each do |channel|
         if channel.is_a? Class
           IncomingBroadcast.connect_to(channel.name, nil)
+        elsif channel.is_a? String
+          IncomingBroadcast.connect_to(channel, nil)
         elsif channel.is_a? Array
           IncomingBroadcast.connect_to(*channel)
         elsif channel.id
@@ -38,16 +40,17 @@ module Synchromesh
       end
 
       def self.connect_to(channel_name, id)
-        channel_string = "#{channel}#{'-'+id if id}"
-        open_channels += channel_string
-        if options[:transport] == :pusher
+        channel_string = "#{channel_name}#{'-'+id if id}"
+        open_channels << channel_string
+        if ClientDrivers.opts[:transport] == :pusher
+          channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
-            var channel = pusher.subscribe(#{options[:channel]}-#{channel_string});
-            channel.bind('change', #{change});
-            channel.bind('destroy', #{destroy});
+            var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel});
+            channel.bind('change', #{ClientDrivers.opts[:change]});
+            channel.bind('destroy', #{ClientDrivers.opts[:destroy]});
           }
         else
-          HTTP.get(polling_path(:subscribe, channel_string))
+          HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
         end
       end
 
@@ -63,7 +66,7 @@ module Synchromesh
       end
 
       def receive(data, &block)
-        @channels ||= self.intersection data[:channels]
+        @channels ||= self.class.open_channels.intersection data[:channels]
         raise "synchromesh security violation" unless @channels.include? data[:channel]
         @received << data[:channel]
         @klass ||= data[:klass]
@@ -111,7 +114,7 @@ module Synchromesh
     # Before first mount, hook up callbacks depending on what kind of transport
     # we are using.
 
-    prerender_footer do
+    prerender_footer do |controller|
       config_hash = {
         transport: Synchromesh.transport,
         client_logging: Synchromesh.client_logging,
@@ -119,33 +122,37 @@ module Synchromesh
         key: Synchromesh.key,
         encrypted: Synchromesh.encrypted,
         channel: Synchromesh.channel,
-        seconds_between_poll: Synchromesh.seconds_between_poll
+        seconds_between_poll: Synchromesh.seconds_between_poll,
+        auto_connect: Synchromesh::AutoConnect.channels(controller.acting_user)
       }
       "<script type='text/javascript'>\n"\
       "window.SynchromeshOpts = #{config_hash.to_json}\n"\
       "</script>\n"
     end if RUBY_ENGINE != 'opal'
 
+    def self.opts
+      @opts ||= Hash.new(`window.SynchromeshOpts`)
+    end
+
     before_first_mount do
       if on_opal_client?
-        opts = Hash.new(`window.SynchromeshOpts`)
         if opts[:transport] == :pusher
 
-          change = lambda do |data|
+          opts[:change] = lambda do |data|
             sync_change Hash.new(data)
           end
 
-          destroy = lambda do |data|
+          opts[:destroy] = lambda do |data|
             sync_destroy Hash.new(data)
           end
 
           if opts[:client_logging] && `window.console && window.console.log`
             `Pusher.log = function(message) {window.console.log(message);}`
           end
-          if opts[:pusher_fake]
-            `var pusher = eval(#{opts[:pusher_fake]});`
+          opts[:pusher_api] = if opts[:pusher_fake]
+            `eval(#{opts[:pusher_fake]});`
           else
-            `var pusher = new Pusher(#{opts[:key]}, {encrypted: #{opts[:encrypted]}})`
+            `new Pusher(#{opts[:key]}, {encrypted: #{opts[:encrypted]}})`
           end
 
         elsif opts[:transport] == :simple_poller
@@ -158,6 +165,7 @@ module Synchromesh
             end
           end
         end
+        Synchromesh.connect(*opts[:auto_connect])
       end
     end
 

@@ -78,6 +78,7 @@ if RUBY_ENGINE != 'opal'
   end
   require 'rspec/rails'
   require 'timecop'
+  #require 'pusher-fake/support/base'
 
   Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
 
@@ -104,6 +105,7 @@ if RUBY_ENGINE != 'opal'
           klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
         end
       end
+      PusherFake::Channel.reset if defined? PusherFake
     end
 
     config.filter_run_including focus: true

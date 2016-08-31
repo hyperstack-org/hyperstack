@@ -15,7 +15,7 @@ module Synchromesh
       end
 
       def subscriptions
-        @subscriptions ||= []
+        @subscriptions ||= Hash.new { |h, k| h[k] = [] }
       end
 
       def subscribe(session_id, acting_user, channel)

@@ -218,17 +218,17 @@ module Synchromesh
     end
 
     def self.regulate_broadcast(model, &block)
-      internal_policy = InternalPolicy.new(model, model.attributes)
+      internal_policy = InternalPolicy.new(model, model.attribute_names)
       ChannelBroadcastRegulation.broadcast(internal_policy)
       InstanceBroadcastRegulation.broadcast(model, internal_policy)
       internal_policy.broadcast &block
     end
 
-    def initialize(obj, attributes)
+    def initialize(obj, attribute_names)
       @obj = obj
-      @attributes = attributes.map(&:to_sym).to_set
+      attribute_names = attribute_names.map(&:to_sym).to_set
       @unassigned_send_sets = []
-      @channel_sets = Hash.new { |hash, key| hash[key] = @attributes }
+      @channel_sets = Hash.new { |hash, key| hash[key] = attribute_names }
     end
 
     def id

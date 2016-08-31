@@ -10,11 +10,11 @@ describe "regulate_broadcast" do
       def react_serializer
         as_json # does not include type: xxx as per reactive-record
       end
-      def previous_changes
-        {}
-      end
-      def attributes
+      def attribute_names
         [:id, :attr1, :attr2, :attr3, :attr4, :attr5]
+      end
+      def previous_changes
+        Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
       attr_accessor :id, :attr1, :attr2, :attr3, :attr4, :attr5
     end
@@ -24,11 +24,11 @@ describe "regulate_broadcast" do
       def react_serializer
         as_json # does not include type: xxx as per reactive-record
       end
-      def previous_changes
-        {}
-      end
-      def attributes
+      def attribute_names
         [:id, :attrA, :attrB, :attrC, :attrD, :attrE]
+      end
+      def previous_changes
+        Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
       attr_accessor :id, :attrA, :attrB, :attrC, :attrD, :attrE
     end
@@ -50,7 +50,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -71,7 +71,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -79,7 +79,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -100,7 +100,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -108,7 +108,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -130,7 +130,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -138,7 +138,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1},
-        previous_changes: {}
+        previous_changes: {id: 1}
       }
     )
   end
@@ -163,7 +163,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -171,7 +171,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1', 'Application'],
         klass: 'TestModel1',
         record: {id: 1},
-        previous_changes: {}
+        previous_changes: {id: 1}
       }
     )
   end
@@ -195,7 +195,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr3: 3, attr4: 4, attr5: 5}
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
@@ -221,7 +221,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {id: 1, attr1: 1, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: 1, attr3: 3, attr4: 4, attr5: 5}
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
@@ -246,7 +246,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {attr1: 1},
-        previous_changes: {}
+        previous_changes: {attr1: 1}
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
@@ -268,7 +268,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-7'],
         klass: 'TestModel1',
         record: {id: 7},
-        previous_changes: {}
+        previous_changes: {id: 7}
       }
     )
     expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model2, &b) }.to yield_successive_args(
@@ -278,7 +278,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel2-8'],
         klass: 'TestModel2',
         record: {id: 8, attrA: 1},
-        previous_changes: {}
+        previous_changes: {id: 8, attrA: 1}
       }
     )
 
@@ -307,7 +307,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {id: 1, attr1: "send_all", attr2: "YES", attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: "send_all", attr2: "YES", attr3: 3, attr4: 4, attr5: 5}
       }
     )
     model = TestModel1.new(id: 1, attr1: "send_all_but", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
@@ -318,7 +318,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {id: 1, attr1: "send_all_but", attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {id: 1, attr1: "send_all_but", attr3: 3, attr4: 4, attr5: 5}
       }
     )
     model = TestModel1.new(id: 1, attr1: "send_only", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
@@ -329,7 +329,7 @@ describe "regulate_broadcast" do
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
         record: {attr2: "YES"},
-        previous_changes: {}
+        previous_changes: {attr2: "YES"}
       }
     )
   end

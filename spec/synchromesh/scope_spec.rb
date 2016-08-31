@@ -9,7 +9,7 @@ describe "synchronized scopes", js: true do
     Pusher.app_id = "MY_TEST_ID"
     Pusher.key =    "MY_TEST_KEY"
     Pusher.secret = "MY_TEST_SECRET"
-    require 'pusher-fake/support/rspec'
+    require "pusher-fake/support/base"
 
     Synchromesh.configuration do |config|
       config.transport = :pusher
@@ -43,6 +43,16 @@ describe "synchronized scopes", js: true do
           pretest_scope name, *args, &block
         end
       end
+    end
+  end
+
+  before(:each) do
+    # spec_helper resets the policy system after each test so we have to setup
+    # before each test
+    stub_const 'TestApplicationPolicy', Class.new
+    TestApplicationPolicy.class_eval do
+      always_allow_connection
+      regulate_all_broadcasts { |policy| policy.send_all }
     end
   end
 
@@ -278,7 +288,6 @@ describe "synchronized scopes", js: true do
           @render_count = @render_count + 1
         end
         render(:div) do
-          puts "rendering!"
           div { "rendered #{@render_count} times"}
           div { "quicker.count = #{TestModel.quicker.count}" }
         end
@@ -331,7 +340,6 @@ describe "synchronized scopes", js: true do
           @render_count = @render_count + 1
         end
         render(:div) do
-          puts "rendering!"
           div { "rendered #{@render_count} times"}
           div { "quickest.count = #{TestModel.quickest.all.count}" }
         end

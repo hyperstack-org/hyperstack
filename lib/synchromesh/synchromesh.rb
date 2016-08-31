@@ -56,17 +56,17 @@ module Synchromesh
 
   def self.after_change(model)
     InternalPolicy.regulate_broadcast(model) do |data|
-      send_to_transport('change', message, data)
+      send_to_transport('change', data)
     end
   end
 
   def self.after_destroy(model)
     InternalPolicy.regulate_broadcast(model) do |data|
-      send_to_transport('destroy', message, data)
+      send_to_transport('destroy', data)
     end
   end
 
-  def self.send_to_transport(data)
+  def self.send_to_transport(message, data)
     case transport
     when :pusher
       pusher.trigger("#{Synchromesh.channel}-#{data[:channel]}", message, data)

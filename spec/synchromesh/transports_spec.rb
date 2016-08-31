@@ -1,7 +1,6 @@
 require 'spec_helper'
 require 'synchromesh/test_components'
 
-
 SKIP_MESSAGE = 'Pusher credentials not specified. '\
  'To run set env variable PUSHER=xxxx-yyy-zzz (app id - key - secret)'
 
@@ -15,6 +14,16 @@ describe "Transport Tests", js: true do
 
   before(:each) do
     5.times { |i| FactoryGirl.create(:test_model, test_attribute: "I am item #{i}") }
+  end
+
+  before(:each) do
+    # spec_helper resets the policy system after each test so we have to setup
+    # before each test
+    stub_const 'TestApplicationPolicy', Class.new
+    TestApplicationPolicy.class_eval do
+      always_allow_connection
+      regulate_all_broadcasts { |policy| policy.send_all }
+    end
   end
 
   context "Simple Polling" do

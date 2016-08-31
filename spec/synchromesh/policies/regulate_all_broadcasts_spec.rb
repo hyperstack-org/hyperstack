@@ -11,9 +11,9 @@ describe "regulate_all_broadcasts" do
         as_json # does not include type: xxx as per reactive-record
       end
       def previous_changes
-        {}
+        Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
-      def attributes
+      def attribute_names
         [:attr1, :attr2, :attr3, :attr4, :attr5]
       end
       attr_accessor :attr1, :attr2, :attr3, :attr4, :attr5
@@ -25,9 +25,9 @@ describe "regulate_all_broadcasts" do
         as_json # does not include type: xxx as per reactive-record
       end
       def previous_changes
-        {}
+        Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
-      def attributes
+      def attribute_names
         [:attrA, :attrB, :attrC, :attrD, :attrE]
       end
       attr_accessor :attrA, :attrB, :attrC, :attrD, :attrE
@@ -50,7 +50,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application'],
         klass: 'TestModel1',
         record: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -76,7 +76,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application', 'AnotherApplication'],
         klass: 'TestModel1',
         record: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -84,7 +84,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application', 'AnotherApplication'],
         klass: 'TestModel1',
         record: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -110,7 +110,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application', 'AnotherApplication'],
         klass: 'TestModel1',
         record: {attr1: 1},
-        previous_changes: {}
+        previous_changes: {attr1: 1}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -118,7 +118,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application', 'AnotherApplication'],
         klass: 'TestModel1',
         record: {attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -146,7 +146,7 @@ describe "regulate_all_broadcasts" do
         channels: ['AnotherApplication', 'Application'],
         klass: 'TestModel1',
         record: {attr1: 1},
-        previous_changes: {}
+        previous_changes: {attr1: 1}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -154,7 +154,7 @@ describe "regulate_all_broadcasts" do
         channels: ['AnotherApplication', 'Application'],
         klass: 'TestModel1',
         record: {attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -182,7 +182,7 @@ describe "regulate_all_broadcasts" do
         channels: ['AnotherApplication', 'Application'],
         klass: 'TestModel1',
         record: {attr2: 2, attr3: 3},
-        previous_changes: {}
+        previous_changes: {attr2: 2, attr3: 3}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -190,7 +190,7 @@ describe "regulate_all_broadcasts" do
         channels: ['AnotherApplication', 'Application'],
         klass: 'TestModel1',
         record: {attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -219,7 +219,7 @@ describe "regulate_all_broadcasts" do
         channels: ['AnotherApplication', 'Application'],
         klass: 'TestModel1',
         record: {attr2: 2, attr3: 3},
-        previous_changes: {}
+        previous_changes: {attr2: 2, attr3: 3}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -227,7 +227,7 @@ describe "regulate_all_broadcasts" do
         channels: ['AnotherApplication', 'Application'],
         klass: 'TestModel1',
         record: {attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end
@@ -248,7 +248,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application'],
         klass: 'TestModel1',
         record: {attr2: 2},
-        previous_changes: {}
+        previous_changes: {attr2: 2}
       }
     )
   end
@@ -268,7 +268,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application'],
         klass: 'TestModel1',
         record: {attr1: 1},
-        previous_changes: {}
+        previous_changes: {attr1: 1}
       }
     )
     model = TestModel2.new(attrA: "A")
@@ -279,7 +279,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Application'],
         klass: 'TestModel2',
         record: {attrA: "A"},
-        previous_changes: {}
+        previous_changes: {attrA: "A"}
       }
     )
   end
@@ -300,7 +300,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Class1', 'Class2'],
         klass: 'TestModel1',
         record: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       },
       {
         broadcast_id: :unique_broadcast_id,
@@ -308,7 +308,7 @@ describe "regulate_all_broadcasts" do
         channels: ['Class1', 'Class2'],
         klass: 'TestModel1',
         record: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5},
-        previous_changes: {}
+        previous_changes: {attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5}
       }
     )
   end

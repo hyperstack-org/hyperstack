@@ -9,7 +9,7 @@ describe "Synchromesh", js: true do
     Pusher.app_id = "MY_TEST_ID"
     Pusher.key =    "MY_TEST_KEY"
     Pusher.secret = "MY_TEST_SECRET"
-    require 'pusher-fake/support/rspec'
+    require "pusher-fake/support/base"
 
     Synchromesh.configuration do |config|
       config.transport = :pusher
@@ -18,17 +18,22 @@ describe "Synchromesh", js: true do
     end
   end
 
+  before(:each) do
+    # spec_helper resets the policy system after each test so we have to setup
+    # before each test
+    stub_const 'TestApplicationPolicy', Class.new
+    TestApplicationPolicy.class_eval do
+      always_allow_connection
+      regulate_all_broadcasts { |policy| policy.send_all }
+    end
+  end
+
   it "will synchronize on an attribute update" do
     mount "TestComponent"
-    puts "mounted"
     FactoryGirl.create(:test_model, test_attribute: "hello")
-    puts "model built"
     page.should have_content("hello")
-    puts "testing for hello"
     TestModel.first.update_attribute(:test_attribute, 'goodby')
-    puts "updated attribute"
     page.should have_content("goodby")
-    puts "test complete"
   end
 
   describe "the .all method" do
