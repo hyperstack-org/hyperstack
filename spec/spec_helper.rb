@@ -138,7 +138,7 @@ if RUBY_ENGINE != 'opal'
     end
   end
 
-  Capybara.default_max_wait_time = 4
+  Capybara.default_max_wait_time = 4.seconds
 
   module WaitForAjax
 
@@ -316,8 +316,6 @@ if RUBY_ENGINE != 'opal'
     end
 
     Capybara.javascript_driver = :poltergeist
-
-    Capybara.default_max_wait_time = 2.seconds
 
     Capybara.register_driver :chrome do |app|
       Capybara::Selenium::Driver.new(app, :browser => :chrome)

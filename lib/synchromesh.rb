@@ -24,12 +24,12 @@ else
   end
   #require 'active_record/transactions'
   require 'reactive-record'
+  require 'reactive_record/synchromesh_controller'
   require 'synchromesh/version'
   require 'react/isomorphic_helpers_patches'
   require 'synchromesh/synchromesh'
   require 'synchromesh/policy'
   require 'synchromesh/simple_poller'
-  require_relative 'reactive_record/synchromesh_controller'
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end

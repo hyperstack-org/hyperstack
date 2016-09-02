@@ -232,7 +232,7 @@ describe "regulate_all_broadcasts" do
     )
   end
 
-  it "can have multiple policies without any to method" do
+  it "can have multiple policies without any to method and will intersect the results" do
     stub_const "ApplicationPolicy", Class.new
     ApplicationPolicy.class_eval do
       regulate_all_broadcasts do | policy |

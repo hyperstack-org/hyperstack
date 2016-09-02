@@ -55,6 +55,39 @@ describe "regulate_broadcast" do
     )
   end
 
+  it "will raise an error if the policy is not sent" do
+    stub_const "TestModel1Policy", Class.new
+    TestModel1Policy.class_eval do
+      regulate_broadcast do | policy |
+        policy.send_all
+      end
+    end
+    model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
+    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.
+    to raise_error("TestModel1 instance broadcast policy not sent to any channel")
+  end
+
+  it "will intersect all policies for the same channel" do
+    stub_const "TestModel1Policy", Class.new
+    TestModel1Policy.class_eval do
+      regulate_broadcast do | policy |
+        policy.send_only(:attr1, :attr2).to(self)
+        policy.send_only(:attr2, :attr3).to(self)
+      end
+    end
+    model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
+    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+      {
+        broadcast_id: :unique_broadcast_id,
+        channel: 'TestModel1-1',
+        channels: ['TestModel1-1'],
+        klass: 'TestModel1',
+        record: {attr2: 2},
+        previous_changes: {attr2: 2}
+      }
+    )
+  end
+
   it "will broadcast the instance policies for a model and on a class channel" do
     stub_const "TestModel1Policy", Class.new
     stub_const "Application", Class.new

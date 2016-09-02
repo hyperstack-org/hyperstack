@@ -176,6 +176,9 @@ module Synchromesh
       regulations[instance].regulations.each do |regulation|
         instance.instance_exec wrap_policy(policy, regulation), &regulation
       end
+      if policy.has_unassigned_sets?
+        raise "#{instance.class.name} instance broadcast policy not sent to any channel" 
+      end
     end
   end
 
@@ -235,8 +238,12 @@ module Synchromesh
       @id ||= "#{self.object_id}-#{Time.now.to_f}"
     end
 
+    def has_unassigned_sets?
+      !@unassigned_send_sets.empty?
+    end
+
     def send_unassigned_sets_to(channel)
-      unless @unassigned_send_sets.empty?
+      if has_unassigned_sets?
         @channel_sets[channel] = @unassigned_send_sets.inject(@channel_sets[channel]) do |set, send_set|
           send_set.merge(set)
         end

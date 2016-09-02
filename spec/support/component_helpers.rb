@@ -173,6 +173,12 @@ module ComponentTestHelpers
     on_client(&block)
   end
 
+  def evaluate_ruby(str="", opts={}, &block)
+    str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
+    js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
+    JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
+  end
+
   def on_client(&block)
     @client_code = "#{@client_code}#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}\n"
   end
@@ -255,4 +261,14 @@ module ComponentTestHelpers
     end
   end
 
+end
+
+RSpec.configure do |config|
+  config.before(:all) do
+    ActiveRecord::Base.class_eval do
+      def attributes_on_client(page)
+        page.evaluate_ruby("#{self.class.name}.find(#{id}).attributes", symbolize_names: true)
+      end
+    end
+  end
 end

@@ -40,7 +40,7 @@ module Synchromesh
       end
 
       def self.connect_to(channel_name, id)
-        channel_string = "#{channel_name}#{'-'+id if id}"
+        channel_string = "#{channel_name}#{'-'+id.to_s if id}"
         open_channels << channel_string
         if ClientDrivers.opts[:transport] == :pusher
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"

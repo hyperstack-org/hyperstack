@@ -27,13 +27,13 @@ module Synchromesh
       end
 
       def read(session_id)
-        subscriptions[session_id].inject({}) do |h, channel|
-          h[channel] = channel.update_store do |store|
+        subscriptions[session_id].collect do |channel|
+          channel.update_store do |store|
             data = store[session_id][:data] rescue []
             store[session_id] = { data: [], last_read_at: Time.now }
             data
           end
-        end
+        end.flatten(1)
       end
 
       def write(channel, event, data)
