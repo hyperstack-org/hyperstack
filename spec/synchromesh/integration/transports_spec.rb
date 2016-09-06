@@ -17,12 +17,73 @@ describe "Transport Tests", js: true do
   end
 
   before(:each) do
+    ApplicationController.acting_user = nil
     # spec_helper resets the policy system after each test so we have to setup
     # before each test
     stub_const 'TestApplicationPolicy', Class.new
     TestApplicationPolicy.class_eval do
-      always_allow_connection
+      regulate_class_connection { !self }
       regulate_all_broadcasts { |policy| policy.send_all }
+    end
+    size_window(:small, :portrait)
+    File.delete('synchromesh-simple-poller-store') if File.exists? 'synchromesh-simple-poller-store'
+    File.delete(Synchromesh::PusherChannels::STORE_ID) if File.exists? Synchromesh::PusherChannels::STORE_ID
+  end
+
+  after(:each) do
+    Timecop.return
+    wait_for_ajax
+  end
+
+  context "Pusher-Fake" do
+    before(:all) do
+
+      require 'pusher'
+      require 'pusher-fake'
+      Pusher.app_id = "MY_TEST_ID"
+      Pusher.key =    "MY_TEST_KEY"
+      Pusher.secret = "MY_TEST_SECRET"
+      require "pusher-fake/support/base"
+
+      Synchromesh.configuration do |config|
+        config.transport = :pusher
+        config.channel_prefix = "synchromesh"
+        config.opts = {
+          app_id: Pusher.app_id,
+          key: Pusher.key,
+          secret: Pusher.secret,
+          auth: {headers: {'X-CSRF-Token': "123"}},
+          authEndpoint: "rr/synchromesh-pusher-auth"
+        }.merge(PusherFake.configuration.web_options)
+      end
+    end
+
+    it "opens the connection" do
+      mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+    end
+
+    it "sees the connection going offline" do
+      mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      ApplicationController.acting_user = true
+      mount "TestComponent"
+      Timecop.travel(Time.now+Synchromesh::PusherChannels::POLL_INTERVAL)
+      wait_for { Synchromesh.open_connections.to_a }.to eq([])
+    end
+
+    it "receives change notifications" do
+      mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      TestModel.new(test_attribute: "I'm new here!").save
+      page.should have_content("6 items")
+    end
+
+    it "receives destroy notifications" do
+      mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      TestModel.first.destroy
+      page.should have_content("4 items")
     end
   end
 
@@ -36,15 +97,27 @@ describe "Transport Tests", js: true do
       end
     end
 
+    it "opens the connection" do
+      mount "TestComponent"
+      Synchromesh.open_connections.should =~ ['TestApplication']
+    end
+
+    it "sees the connection going offline" do
+      mount "TestComponent"
+      wait_for_ajax
+      ApplicationController.acting_user = true
+      mount "TestComponent"
+      Synchromesh.open_connections.should =~ ['TestApplication']
+      Timecop.travel(Time.now+Synchromesh.seconds_polled_data_will_be_retained)
+      wait(10.seconds).for { Synchromesh.open_connections }.to eq([])
+    end
+
     it "receives change notifications" do
       mount "TestComponent"
       TestModel.new(test_attribute: "I'm new here!").save
+      Synchromesh.open_connections.should =~ ['TestApplication']
       page.should have_content("6 items")
-      model1.attributes_on_client(page).should eq({
-        id: 1, test_attribute: 'george', type: nil,
-        created_at: model1.created_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ'),
-        updated_at: model1.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ')
-      })
+      Synchromesh.open_connections.should =~ ['TestApplication']
     end
 
     it "receives destroy notifications" do
@@ -59,7 +132,6 @@ describe "Transport Tests", js: true do
 
     before(:all) do
       require 'pusher'
-
       Object.send(:remove_const, :PusherFake) if defined?(PusherFake)
 
       Synchromesh.configuration do |config|
@@ -69,14 +141,30 @@ describe "Transport Tests", js: true do
       end
     end
 
+    it "opens the connection" do
+      mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+    end
+
+    it "sees the connection going offline" do
+      mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      ApplicationController.acting_user = true
+      mount "TestComponent"
+      Timecop.travel(Time.now+Synchromesh::PusherChannels::POLL_INTERVAL)
+      wait_for { Synchromesh.open_connections.to_a }.to eq([])
+    end
+
     it "receives change notifications" do
       mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
       TestModel.new(test_attribute: "I'm new here!").save
       page.should have_content("6 items")
     end
 
     it "receives destroy notifications" do
       mount "TestComponent"
+      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
       TestModel.first.destroy
       page.should have_content("4 items")
     end

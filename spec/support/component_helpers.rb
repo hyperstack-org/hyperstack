@@ -89,7 +89,7 @@ module ComponentTestHelpers
   def build_test_url_for(controller)
 
     unless controller
-      Object.const_set("ReactTestController", Class.new(ActionController::Base)) unless defined?(::ReactTestController)
+      Object.const_set("ReactTestController", Class.new(ApplicationController)) unless defined?(::ReactTestController)
       controller = ::ReactTestController
     end
 
@@ -123,13 +123,14 @@ module ComponentTestHelpers
             page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n"+page
           end
           if mock_time || (defined?(Timecop) && Timecop.top_stack_item)
-            unix_millis = ((mock_time || Time.now).to_f * 1000.0).to_i
-            page = "<%= javascript_include_tag 'spec/libs/lolex' %>\n"+
-            "<script type='text/javascript'>\n"+
-            "  window.original_setInterval = setInterval;\n"+
-            "  window.lolex_clock = lolex.install(#{unix_millis});\n"+
-            "  window.original_setInterval(function() {window.lolex_clock.tick(10)}, 10);\n"+
-            "</script>\n"+page
+            puts "********** WARNING LOLEX NOT AVAILABLE TIME ON CLIENT WILL NOT MATCH SERVER **********"
+            # unix_millis = ((mock_time || Time.now).to_f * 1000.0).to_i
+            # page = "<%= javascript_include_tag 'spec/libs/lolex' %>\n"+
+            # "<script type='text/javascript'>\n"+
+            # "  window.original_setInterval = setInterval;\n"+
+            # "  window.lolex_clock = lolex.install(#{unix_millis});\n"+
+            # "  window.original_setInterval(function() {window.lolex_clock.tick(10)}, 10);\n"+
+            # "</script>\n"+page
           end
           if !render_params[:layout] || style_sheet
             page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' rescue nil %>\n"+page
@@ -139,6 +140,10 @@ module ComponentTestHelpers
           else
             page = "<%= javascript_include_tag 'jquery' %>\n<%= javascript_include_tag 'jquery_ujs' %>\n#{page}"
           end
+          title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
+          title = "#{title}...continued." if ComponentTestHelpers.description_displayed
+          page = "<script type='text/javascript'>console.log(console.log('%c#{title}','color:green; font-weight:bold; font-size: 200%'))</script>\n#{page}"
+          ComponentTestHelpers.description_displayed = true
           render_params[:inline] = page
           render render_params
         end
@@ -188,6 +193,14 @@ module ComponentTestHelpers
     nil
   end
 
+  class << self
+    attr_accessor :current_example
+    attr_accessor :description_displayed
+    def display_example_description
+      "<script type='text/javascript'>console.log(console.log('%c#{current_example.description}','color:green; font-weight:bold; font-size: 200%'))</script>"
+    end
+  end
+
   def mount(component_name, params=nil, opts = {}, &block)
     unless params
       params = opts
@@ -214,7 +227,7 @@ module ComponentTestHelpers
     Rails.cache.write(test_url, [component_name, params, opts])
     visit test_url
     wait_for_ajax
-  end
+    end
 
   [:callback_history_for, :last_callback_for, :clear_callback_history_for, :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
     define_method(method) { |event_name| evaluate_script("Opal.React.TopLevelRailsComponent.$#{method}('#{event_name}')") }
@@ -264,6 +277,10 @@ module ComponentTestHelpers
 end
 
 RSpec.configure do |config|
+  config.before(:each) do |example|
+    ComponentTestHelpers.current_example = example
+    ComponentTestHelpers.description_displayed = false
+  end
   config.before(:all) do
     ActiveRecord::Base.class_eval do
       def attributes_on_client(page)

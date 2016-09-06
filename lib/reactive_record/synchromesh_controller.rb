@@ -6,26 +6,31 @@ module ReactiveRecord
 
       def subscribe
         session.delete 'synchromesh-dummy-init' unless session.id
-        puts "subscribe to #{params[:channel]} for acting_user = #{acting_user} session = #{session.id}"
         Synchromesh::SimplePoller.subscribe(session.id, try(:acting_user), params[:channel])
-        puts "success!"
         render :nothing => true
       rescue
-        puts "failed"
         render nothing: true, status: :unauthorized
       end
 
       def read
-        puts "read for acting_user = #{acting_user} session = #{session.id}"
         data = Synchromesh::SimplePoller.read(session.id)
-        puts "here is the data: #{data}"
         render json: data
-      rescue Exception => e
-        binding.pry
       end
+
+      def pusher_auth
+        channel = params[:channel_name].gsub(/^#{Regexp.quote(Synchromesh.channel)}\-/,'')
+        Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
+        response = Synchromesh.pusher.authenticate(params[:channel_name], params[:socket_id])
+        Synchromesh::PusherChannels.add_connection(channel)
+        render json: response
+      rescue Exception => e
+        render nothing: true, status: :unauthorized
+      end
+
     end unless defined? SynchromeshController
 
-    match 'synchromesh-subscribe/:channel', to: 'synchromesh#subscribe', via: :get
-    match 'synchromesh-read',               to: 'synchromesh#read',      via: :get
+    match 'synchromesh-subscribe/:channel', to: 'synchromesh#subscribe',   via: :get
+    match 'synchromesh-read',               to: 'synchromesh#read',        via: :get
+    match 'synchromesh-pusher-auth',        to: 'synchromesh#pusher_auth', via: :post
   end
 end

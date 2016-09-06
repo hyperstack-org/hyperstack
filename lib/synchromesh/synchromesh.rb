@@ -2,6 +2,8 @@ require 'synchromesh/configuration'
 # Provides the configuration and the two basic routines for the server
 # to indicate that records have changed: after_change and after_destroy
 module Synchromesh
+
+
   extend Configuration
 
   def self.config_reset
@@ -51,7 +53,7 @@ module Synchromesh
   end
 
   def self.channel
-    channel_prefix.to_s
+    "private-#{channel_prefix}"
   end
 
   def self.after_change(model)
@@ -82,4 +84,56 @@ module Synchromesh
       raise "Unknown transport #{Synchromesh.transport} - not supported"
     end
   end
+
+  def self.open_connections
+    case transport
+    when :pusher
+      PusherChannels.open_connections
+    when :simple_poller
+      SimplePoller.open_connections
+    else
+      transport_error
+    end
+  end
+
+  module PusherChannels
+    require 'pstore'
+
+    STORE_ID = "synchromesh-pusher-channel-store"
+    POLL_INTERVAL = 1.minute
+
+    class << self
+
+      def add_connection(channel)
+        PStore.new(STORE_ID).transaction do |store|
+          store[:last_update] ||= Time.now
+          (store[:connections] ||= Set.new) << channel
+        end
+      end
+
+      def open_connections
+        PStore.new(STORE_ID).transaction do |store|
+          store[:last_update] = update_connections(store[:last_update])
+          store[:connections] || []
+        end
+      end
+
+      def update_connections(last_update)
+        return last_update if last_update && last_update >= Time.now-POLL_INTERVAL
+        Thread.new do
+          Timeout::timeout(5) do
+            connections = Synchromesh.pusher.channels[:channels].collect do |channel|
+              channel.gsub(/^#{Regexp.quote(Synchromesh.channel)}/,'')
+            end.uniq
+            PStore.new(STORE_ID).transaction do |store|
+              store[:connections] = connections
+              store[:last_update] = Time.now
+            end
+          end
+        end
+        Time.now-POLL_INTERVAL+5
+      end
+    end
+  end
+
 end

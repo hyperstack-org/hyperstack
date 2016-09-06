@@ -33,6 +33,7 @@ describe "regulate_all_broadcasts" do
       attr_accessor :attrA, :attrB, :attrC, :attrD, :attrE
     end
     allow_any_instance_of(Synchromesh::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
+    allow(Synchromesh).to receive(:open_connections).and_return(['Application', 'AnotherApplication', 'Class1', 'Class2'])
   end
 
   it "will broadcast to a single channel" do

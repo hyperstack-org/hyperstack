@@ -11,4 +11,5 @@
 /spec/test_app/log/test.log
 /spec/test_app/log/development.log
 /synchromesh-simple-poller-store
+/synchromesh-pusher-channel-store
 /Gemfile.lock

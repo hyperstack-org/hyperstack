@@ -30,10 +30,16 @@ describe 'channel auto connect' do
     expect(Synchromesh::AutoConnect.channels(nil)).to eq(['Application', 'AnotherChannel'])
   end
 
-  it 'will not autoconnect if disabled' do
+  it 'will not autoconnect a class channel if disabled' do
     ApplicationPolicy.regulate_class_connection(auto_connect: false) { true }
     ApplicationPolicy.regulate_instance_connections(TestModel) { self }
     expect(Synchromesh::AutoConnect.channels(TestModel.find(1))).to eq([['TestModel',1]])
+  end
+
+  it 'will not autoconnect an instance channel if disabled' do
+    ApplicationPolicy.regulate_class_connection { true }
+    ApplicationPolicy.regulate_instance_connections(TestModel, auto_connect: false) { self }
+    expect(Synchromesh::AutoConnect.channels(TestModel.find(1))).to eq(['Application'])
   end
 
   it 'can autoconnect to an instance' do

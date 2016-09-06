@@ -111,17 +111,27 @@ module Synchromesh
       end
     end
 
-    # Before first mount, hook up callbacks depending on what kind of transport
-    # we are using.
+    # save the configuration info needed in window.SynchromeshOpts
 
     prerender_footer do |controller|
+      if defined?(PusherFake)
+        path = ::Rails.application.routes.routes.detect do |route|
+          route.app == ReactiveRecord::Engine ||
+            (route.app.respond_to?(:app) && route.app.app == ReactiveRecord::Engine)
+        end.path.spec
+        pusher_fake_js = PusherFake.javascript(
+          auth: {headers: {'X-CSRF-Token' => controller.send(:form_authenticity_token)}},
+          authEndpoint: "#{path}/synchromesh-pusher-auth"
+        )
+      end
       config_hash = {
         transport: Synchromesh.transport,
         client_logging: Synchromesh.client_logging,
-        pusher_fake: defined?(PusherFake) && PusherFake.javascript,
+        pusher_fake_js: pusher_fake_js,
         key: Synchromesh.key,
         encrypted: Synchromesh.encrypted,
         channel: Synchromesh.channel,
+        form_authenticity_token: controller.send(:form_authenticity_token),
         seconds_between_poll: Synchromesh.seconds_between_poll,
         auto_connect: Synchromesh::AutoConnect.channels(controller.acting_user)
       }
@@ -133,6 +143,9 @@ module Synchromesh
     def self.opts
       @opts ||= Hash.new(`window.SynchromeshOpts`)
     end
+
+    # Before first mount, hook up callbacks depending on what kind of transport
+    # we are using.
 
     before_first_mount do
       if on_opal_client?
@@ -149,12 +162,21 @@ module Synchromesh
           if opts[:client_logging] && `window.console && window.console.log`
             `Pusher.log = function(message) {window.console.log(message);}`
           end
-          opts[:pusher_api] = if opts[:pusher_fake]
-            `eval(#{opts[:pusher_fake]});`
+          if opts[:pusher_fake_js]
+            opts[:pusher_api] = `eval(#{opts[:pusher_fake_js]})`
           else
-            `new Pusher(#{opts[:key]}, {encrypted: #{opts[:encrypted]}})`
+            h = nil
+            pusher_api = nil
+            %x{
+              h = {
+                encrypted: #{opts[:encrypted]},
+                authEndpoint: window.ReactiveRecordEnginePath+'/synchromesh-pusher-auth',
+                auth: {headers: {'X-CSRF-Token': #{opts[:form_authenticity_token]}}}
+              };
+              pusher_api = new Pusher(#{opts[:key]}, h)
+            }
+            opts[:pusher_api] = pusher_api
           end
-
         elsif opts[:transport] == :simple_poller
 
           every(opts[:seconds_between_poll]) do

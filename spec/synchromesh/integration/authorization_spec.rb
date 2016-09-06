@@ -4,23 +4,23 @@ require 'synchromesh/integration/test_components'
 describe "authorization integration", js: true do
 
   before(:all) do
-    Synchromesh.configuration do |config|
-      config.transport = :simple_poller
-      # slow down the polling so wait_for_ajax works
-      config.opts = { seconds_between_poll: 2 }
-    end
-    # require 'pusher'
-    # require 'pusher-fake'
-    # Pusher.app_id = "MY_TEST_ID"
-    # Pusher.key =    "MY_TEST_KEY"
-    # Pusher.secret = "MY_TEST_SECRET"
-    # require "pusher-fake/support/base"
-    #
     # Synchromesh.configuration do |config|
-    #   config.transport = :pusher
-    #   config.channel_prefix = "synchromesh"
-    #   config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
+    #   config.transport = :simple_poller
+    #   # slow down the polling so wait_for_ajax works
+    #   config.opts = { seconds_between_poll: 2 }
     # end
+    require 'pusher'
+    require 'pusher-fake'
+    Pusher.app_id = "MY_TEST_ID"
+    Pusher.key =    "MY_TEST_KEY"
+    Pusher.secret = "MY_TEST_SECRET"
+    require "pusher-fake/support/base"
+
+    Synchromesh.configuration do |config|
+      config.transport = :pusher
+      config.channel_prefix = "synchromesh"
+      config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
+    end
 
   end
 

@@ -26,6 +26,14 @@ module Synchromesh
         subscriptions[session_id] << channels[channel]
       end
 
+      def open_connections
+        channels.collect do |channel, simple_poller|
+          simple_poller.update_store do |store|
+            channel unless store.empty?
+          end
+        end.compact
+      end
+
       def read(session_id)
         subscriptions[session_id].collect do |channel|
           channel.update_store do |store|
@@ -50,8 +58,9 @@ module Synchromesh
     end
 
     def update_store
-      store = PStore.new("synchromesh-simple-poller-store-#{@channel}")
-      store.transaction do
+      stores = PStore.new("synchromesh-simple-poller-store")
+      stores.transaction do
+        store = (stores[@channel] ||= {})
         data = store[:data] || {}
         data.delete_if do |_subscriber, subscriber_store|
           expired?(subscriber_store)

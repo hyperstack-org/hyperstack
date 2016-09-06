@@ -96,6 +96,10 @@ module Synchromesh
       end
     end
 
+    def auto_connect_disabled?
+      opts.has_key?(:auto_connect) && !opts[:auto_connect]
+    end
+
     def initialize(klass)
       @klass = klass
     end
@@ -112,21 +116,19 @@ module Synchromesh
       raise "connection failed" unless regulations[channel].connectable?(acting_user)
     end
 
-    def self.auto_connections(acting_user)
+    def self.connections_for(acting_user, auto_connections_only = true)
       regulations.collect do |channel, regulation|
-        channel if !regulation.auto_connect_disabled? && regulation.connectable?(acting_user)
+        next if auto_connections_only && regulation.auto_connect_disabled?
+        next if !regulation.connectable?(acting_user)
+        channel
       end.compact
     end
-
-    def auto_connect_disabled?
-      opts.has_key?(:auto_connect) && !opts[:auto_connect]
-    end
-
   end
 
   class InstanceConnectionRegulation < Regulation
 
-    def connectable_to(acting_user)
+    def connectable_to(acting_user, auto_connections_only = nil)
+      return [] if auto_connections_only && auto_connect_disabled?
       regulate_for(acting_user).entries.compact.flatten(1) rescue []
     end
 
@@ -136,9 +138,9 @@ module Synchromesh
       end
     end
 
-    def self.auto_connections(acting_user)
+    def self.connections_for(acting_user, auto_connections_only = nil)
       regulations.collect do |_channel, regulation|
-        regulation.connectable_to(acting_user).collect do |obj|
+        regulation.connectable_to(acting_user, true).collect do |obj|
           [obj.class.name, obj.id]
         end
       end.flatten(1)
@@ -152,16 +154,12 @@ module Synchromesh
       end
 
       def broadcast(policy)
-        each_channel_with_wrapped_policy(policy) do |regulation, channel, wrapped_policy|
-          regulation.call wrapped_policy
-          policy.send_unassigned_sets_to channel.klass
-        end
-      end
-
-      def each_channel_with_wrapped_policy(policy)
         regulations_to_channels.each do |regulation, channels|
           wrapped_policy = wrap_policy(policy, regulation)
-          channels.each { |channel| yield regulation, channel, wrapped_policy }
+          channels.each do |channel|
+            regulation.call wrapped_policy
+            policy.send_unassigned_sets_to channel.klass
+          end
         end
       end
 
@@ -177,15 +175,15 @@ module Synchromesh
         instance.instance_exec wrap_policy(policy, regulation), &regulation
       end
       if policy.has_unassigned_sets?
-        raise "#{instance.class.name} instance broadcast policy not sent to any channel" 
+        raise "#{instance.class.name} instance broadcast policy not sent to any channel"
       end
     end
   end
 
   module AutoConnect
     def self.channels(acting_user)
-      ClassConnectionRegulation.auto_connections(acting_user) +
-      InstanceConnectionRegulation.auto_connections(acting_user)
+      ClassConnectionRegulation.connections_for(acting_user, true) +
+      InstanceConnectionRegulation.connections_for(acting_user, true)
     end
   end
 
@@ -221,17 +219,24 @@ module Synchromesh
     end
 
     def self.regulate_broadcast(model, &block)
-      internal_policy = InternalPolicy.new(model, model.attribute_names)
+      internal_policy = InternalPolicy.new(
+        model, model.attribute_names, Synchromesh.open_connections
+      )
       ChannelBroadcastRegulation.broadcast(internal_policy)
       InstanceBroadcastRegulation.broadcast(model, internal_policy)
       internal_policy.broadcast &block
     end
 
-    def initialize(obj, attribute_names)
+    def initialize(obj, attribute_names, available_channels)
       @obj = obj
       attribute_names = attribute_names.map(&:to_sym).to_set
       @unassigned_send_sets = []
       @channel_sets = Hash.new { |hash, key| hash[key] = attribute_names }
+      @available_channels = available_channels
+    end
+
+    def channel_available?(channel)
+      channel && @available_channels.include?(channel_to_string(channel))
     end
 
     def id
@@ -243,12 +248,12 @@ module Synchromesh
     end
 
     def send_unassigned_sets_to(channel)
-      if has_unassigned_sets?
+      if channel_available?(channel) && has_unassigned_sets?
         @channel_sets[channel] = @unassigned_send_sets.inject(@channel_sets[channel]) do |set, send_set|
           send_set.merge(set)
         end
-        @unassigned_send_sets = []
       end
+      @unassigned_send_sets = []
     end
 
     def add_unassigned_send_set(send_set)
@@ -257,7 +262,7 @@ module Synchromesh
 
     def send_set_to(send_set, channels)
       channels.flatten(1).each do |channel|
-        merge_set(send_set, channel)
+        merge_set(send_set, channel) if channel_available? channel
         @unassigned_send_sets.delete(send_set)
       end
     end
@@ -273,7 +278,9 @@ module Synchromesh
     end
 
     def channel_to_string(channel)
-      if channel.is_a? String
+      if channel.is_a?(Class) && channel.name
+        channel.name
+      elsif channel.is_a? String
         channel
       else
         "#{channel.class.name}-#{channel.id}"

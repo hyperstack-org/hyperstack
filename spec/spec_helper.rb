@@ -78,6 +78,7 @@ if RUBY_ENGINE != 'opal'
   end
   require 'rspec/rails'
   require 'timecop'
+  require "rspec/wait"
   #require 'pusher-fake/support/base'
 
   Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
@@ -99,13 +100,15 @@ if RUBY_ENGINE != 'opal'
       Rails.cache.clear
     end
 
-    config.after(:each) do
-      ObjectSpace.each_object(Class).each do |klass|
-        if klass < Synchromesh::Regulation
-          klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
+    config.after(:each) do |example|
+      #unless example.exception
+        ObjectSpace.each_object(Class).each do |klass|
+          if klass < Synchromesh::Regulation
+            klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
+          end
         end
-      end
-      PusherFake::Channel.reset if defined? PusherFake
+        PusherFake::Channel.reset if defined? PusherFake
+      #end
     end
 
     config.filter_run_including focus: true
@@ -220,6 +223,10 @@ if RUBY_ENGINE != 'opal'
       DatabaseCleaner.strategy = :truncation
     end
 
+    config.before(:each, :js => true) do
+      size_window
+    end
+
     config.before(:each) do
       DatabaseCleaner.start
     end
@@ -269,13 +276,13 @@ if RUBY_ENGINE != 'opal'
       end
 
       def frame_position
-        @frame_position ||= 'bottom'
+        @frame_position ||= 'detached'
       end
 
       def frame_position=(position)
         @frame_position = ["left", "right", "top", "detached"].detect do |side|
           position && position[0].downcase == side[0]
-        end || "bottom"
+        end || "detached"
       end
 
       def enable_firebug(version = nil)
@@ -301,6 +308,7 @@ if RUBY_ENGINE != 'opal'
         # Closed by default, will open detached.
         self["extensions.firebug.framePosition"] = frame_position
         self["extensions.firebug.previousPlacement"] = 3
+        self["extensions.firebug.defaultPanelName"] = "console"
 
         # Disable native "Inspect Element" menu item.
         self["devtools.inspector.enabled"] = false
