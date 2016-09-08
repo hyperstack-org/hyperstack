@@ -1,7 +1,7 @@
 # Reactrb / Reactive-Ruby
 
 [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/reactrb/reactrb.svg)](https://travis-ci.org/reactrb/reactrb)
+[![Build Status](https://travis-ci.org/reactrb/reactrb.svg?branch=master)](https://travis-ci.org/reactrb/reactrb)
 [![Code Climate](https://codeclimate.com/github/reactrb/reactrb/badges/gpa.svg)](https://codeclimate.com/github/reactrb/reactrb)
 [![Gem Version](https://badge.fury.io/rb/reactrb.svg)](https://badge.fury.io/rb/reactrb)
 
