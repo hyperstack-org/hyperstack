@@ -26,8 +26,25 @@ describe "Transport Tests", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
     end
     size_window(:small, :portrait)
-    File.delete('synchromesh-simple-poller-store') if File.exists? 'synchromesh-simple-poller-store'
+    #File.delete('synchromesh-simple-poller-store') if File.exists? 'synchromesh-simple-poller-store'
     File.delete(Synchromesh::PusherChannels::STORE_ID) if File.exists? Synchromesh::PusherChannels::STORE_ID
+    File.delete(Synchromesh::PolledConnection::STORE_ID) if File.exists? Synchromesh::PolledConnection::STORE_ID
+
+    on_client do
+      # patch Synchromesh.connect so it doesn't execute until we say so
+      # this is NOT used by the polling connection FYI
+      module Synchromesh
+        class << self
+          alias old_connect connect
+          def go_ahead_and_connect
+            old_connect(*@connect_args)
+          end
+          def connect(*args)
+            @connect_args = args
+          end
+        end
+      end
+    end
   end
 
   after(:each) do
@@ -60,29 +77,57 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
       wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+    end
+
+    it "will not keep the temporary polled connection open" do
+      mount "TestComponent"
+      Synchromesh.open_connections.should =~ ['TestApplication']
+      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
+      wait_for { Synchromesh.open_connections.to_a }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
       wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
       Timecop.travel(Time.now+Synchromesh::PusherChannels::POLL_INTERVAL)
       wait_for { Synchromesh.open_connections.to_a }.to eq([])
     end
 
     it "receives change notifications" do
+      # one tricky thing about synchromesh is that we want to capture all
+      # changes to the database that might be made while the client connections
+      # is still being initialized.  To do this we establish a server side
+      # queue of all messages sent between the time the page begins rendering
+      # until the connection is established.
+
+      # mount our test component
       mount "TestComponent"
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      # add a model
       TestModel.new(test_attribute: "I'm new here!").save
+      # until we connect there should only be 5 items
+      page.should have_content("5 items")
+      # okay now we can go ahead and connect (this runs on the client)
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      # once we connect it should change to 6
       page.should have_content("6 items")
+      # now that we are connected the UI should keep updating
+      TestModel.new(test_attribute: "I'm also new here!").save
+      page.should have_content("7 items")
     end
 
     it "receives destroy notifications" do
       mount "TestComponent"
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
       TestModel.first.destroy
+      page.should have_content("5 items")
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
       page.should have_content("4 items")
     end
   end
@@ -130,7 +175,7 @@ describe "Transport Tests", js: true do
 
   context "Real Pusher Account", skip: (pusher_credentials ? false : SKIP_MESSAGE) do
 
-    before(:all) do
+    before(:each) do
       require 'pusher'
       Object.send(:remove_const, :PusherFake) if defined?(PusherFake)
 
@@ -143,29 +188,56 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
       wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+    end
+
+    it "will not keep the temporary polled connection open" do
+      mount "TestComponent"
+      Synchromesh.open_connections.should =~ ['TestApplication']
+      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
       wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
       Timecop.travel(Time.now+Synchromesh::PusherChannels::POLL_INTERVAL)
       wait_for { Synchromesh.open_connections.to_a }.to eq([])
     end
 
     it "receives change notifications" do
+      # one tricky thing about synchromesh is that we want to capture all
+      # changes to the database that might be made while the client connections
+      # is still being initialized.  To do this we establish a server side
+      # queue of all messages sent between the time the page begins rendering
+      # until the connection is established.
+
+      # mount our test component
       mount "TestComponent"
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      # add a model
       TestModel.new(test_attribute: "I'm new here!").save
+      # until we connect there should only be 5 items
+      page.should have_content("5 items")
+      # okay now we can go ahead and connect (this runs on the client)
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      # once we connect it should change to 6
       page.should have_content("6 items")
+      # now that we are connected the UI should keep updating
+      TestModel.new(test_attribute: "I'm also new here!").save
+      page.should have_content("7 items")
     end
 
     it "receives destroy notifications" do
       mount "TestComponent"
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
       TestModel.first.destroy
+      page.should have_content("5 items")
+      evaluate_ruby "Synchromesh.go_ahead_and_connect"
       page.should have_content("4 items")
     end
 

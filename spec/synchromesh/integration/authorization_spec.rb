@@ -49,12 +49,9 @@ describe "authorization integration", js: true do
     model1.attributes_on_client(page).should eq({id: 1})
     ApplicationController.acting_user = User.new(name: "fred")
     page.evaluate_ruby('Synchromesh.connect("TestApplication")')
-    puts "connected to TestApplication"
     wait_for_ajax
     model1.update_attribute(:test_attribute, 'george')
-    puts "updated test_attribute = 'george'"
     wait_for_ajax
-    sleep 5.seconds
     model1.attributes_on_client(page).should eq({
       id: 1,
       created_at: model1.created_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ'),
@@ -63,11 +60,7 @@ describe "authorization integration", js: true do
     ApplicationController.acting_user = User.new(name: "george")
     page.evaluate_ruby("Synchromesh.connect(['TestModel', #{model1.id}])")
     wait_for_ajax
-    sleep 5.seconds
-    puts "should be connected to model"
     model1.update_attribute(:completed, true)
-    sleep 5.seconds
-    puts "lets get the data"
     wait_for_ajax
     model1.attributes_on_client(page).should eq({
       id: 1, test_attribute: "george", completed: true,

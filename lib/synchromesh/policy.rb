@@ -181,9 +181,13 @@ module Synchromesh
   end
 
   module AutoConnect
-    def self.channels(acting_user)
-      ClassConnectionRegulation.connections_for(acting_user, true) +
-      InstanceConnectionRegulation.connections_for(acting_user, true)
+    def self.channels(session, acting_user)
+      channels = ClassConnectionRegulation.connections_for(acting_user, true) +
+        InstanceConnectionRegulation.connections_for(acting_user, true)
+      channels.each do |channel|
+        PolledConnection.new(session, channel)
+      end
+      channels
     end
   end
 
@@ -220,7 +224,7 @@ module Synchromesh
 
     def self.regulate_broadcast(model, &block)
       internal_policy = InternalPolicy.new(
-        model, model.attribute_names, Synchromesh.open_connections
+        model, model.attribute_names, x = Synchromesh.open_connections
       )
       ChannelBroadcastRegulation.broadcast(internal_policy)
       InstanceBroadcastRegulation.broadcast(model, internal_policy)
@@ -297,13 +301,12 @@ module Synchromesh
       record = filter(@obj.react_serializer, attribute_set)
       previous_changes = filter(@obj.previous_changes, attribute_set)
       return if record.empty? && previous_changes.empty?
-      yield(
-        header.merge(
-          channel: channel_to_string(channel),
-          record: record,
-          previous_changes: previous_changes
-        )
+      message = header.merge(
+        channel: channel_to_string(channel),
+        record: record,
+        previous_changes: previous_changes
       )
+      yield message
     end
 
     def broadcast(&block)

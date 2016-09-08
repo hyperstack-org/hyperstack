@@ -10,10 +10,8 @@ module Synchromesh
     def self.connect(*channels)
       channels.each do |channel|
         if channel.is_a? Class
-          IncomingBroadcast.connect_to(channel.name, nil)
-        elsif channel.is_a? String
-          IncomingBroadcast.connect_to(channel, nil)
-        elsif channel.is_a? Array
+          IncomingBroadcast.connect_to(channel.name)
+        elsif channel.is_a?(String) || channel.is_a?(Array)
           IncomingBroadcast.connect_to(*channel)
         elsif channel.id
           IncomingBroadcast.connect_to(channel.class.name, channel.id)
@@ -25,7 +23,7 @@ module Synchromesh
 
     class IncomingBroadcast
       def self.receive(data, &block)
-        in_transit[data[:broadcast]].receive(data, &block)
+        in_transit[data[:broadcast_id]].receive(data, &block)
       end
 
       def klass
@@ -39,15 +37,21 @@ module Synchromesh
         @open_channels ||= Set.new
       end
 
-      def self.connect_to(channel_name, id)
+      def self.add_connection(channel_name, id = nil)
         channel_string = "#{channel_name}#{'-'+id.to_s if id}"
         open_channels << channel_string
+        channel_string
+      end
+
+      def self.connect_to(channel_name, id = nil)
+        channel_string = add_connection(channel_name, id)
         if ClientDrivers.opts[:transport] == :pusher
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
             var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel});
             channel.bind('change', #{ClientDrivers.opts[:change]});
             channel.bind('destroy', #{ClientDrivers.opts[:destroy]});
+            channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("pusher-connect", channel_string)}})
           }
         else
           HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
@@ -92,9 +96,7 @@ module Synchromesh
         ReactiveRecord::Base.when_not_saving(broadcast.klass) do |klass|
           record = klass._react_param_conversion(broadcast.record)
           record.backing_record.previous_changes = broadcast.previous_changes
-          puts "sync_change receives record #{record}"
           record.backing_record.sync_scopes2
-          puts "scopes have been synced"
         end
       end
     end
@@ -113,6 +115,12 @@ module Synchromesh
 
     # save the configuration info needed in window.SynchromeshOpts
 
+    # we keep a list of all channels by session with connections in progress
+    # for each broadcast we check the list, and add the message to a queue for that
+    # session.  When the client is informed that the connection has completed
+    # we call the server,  this will return ALL the broadcasts (cool) and
+    # will remove the session from the list.
+
     prerender_footer do |controller|
       if defined?(PusherFake)
         path = ::Rails.application.routes.routes.detect do |route|
@@ -124,6 +132,7 @@ module Synchromesh
           authEndpoint: "#{path}/synchromesh-pusher-auth"
         )
       end
+      controller.session.delete 'synchromesh-dummy-init' unless controller.session.id
       config_hash = {
         transport: Synchromesh.transport,
         client_logging: Synchromesh.client_logging,
@@ -133,7 +142,7 @@ module Synchromesh
         channel: Synchromesh.channel,
         form_authenticity_token: controller.send(:form_authenticity_token),
         seconds_between_poll: Synchromesh.seconds_between_poll,
-        auto_connect: Synchromesh::AutoConnect.channels(controller.acting_user)
+        auto_connect: Synchromesh::AutoConnect.channels(controller.session.id, controller.acting_user)
       }
       "<script type='text/javascript'>\n"\
       "window.SynchromeshOpts = #{config_hash.to_json}\n"\
@@ -142,6 +151,14 @@ module Synchromesh
 
     def self.opts
       @opts ||= Hash.new(`window.SynchromeshOpts`)
+    end
+
+    def self.get_queued_data(operation, channel = nil)
+      HTTP.get(polling_path(operation, channel)).then do |response|
+        response.json.each do |update|
+          send "sync_#{update[0]}", update[1]
+        end
+      end
     end
 
     # Before first mount, hook up callbacks depending on what kind of transport
@@ -177,17 +194,11 @@ module Synchromesh
             }
             opts[:pusher_api] = pusher_api
           end
+          Synchromesh.connect(*opts[:auto_connect])
         elsif opts[:transport] == :simple_poller
-
-          every(opts[:seconds_between_poll]) do
-            HTTP.get(polling_path(:read)).then do |response|
-              response.json.each do |update|
-                send "sync_#{update[0]}", update[1]
-              end
-            end
-          end
+          opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection *channel }
+          every(opts[:seconds_between_poll]) { get_queued_data(:read) }
         end
-        Synchromesh.connect(*opts[:auto_connect])
       end
     end
 

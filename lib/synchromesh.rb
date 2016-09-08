@@ -26,10 +26,11 @@ else
   require 'reactive-record'
   require 'reactive_record/synchromesh_controller'
   require 'synchromesh/version'
+  require 'synchromesh/polled_connection'
   require 'react/isomorphic_helpers_patches'
   require 'synchromesh/synchromesh'
   require 'synchromesh/policy'
-  require 'synchromesh/simple_poller'
+  #require 'synchromesh/simple_poller'
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end

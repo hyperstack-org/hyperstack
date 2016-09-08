@@ -39,6 +39,10 @@ module Synchromesh
     opts[:seconds_between_poll] || 0.5
   end
 
+  def self.autoconnect_timeout
+    opts[:autoconnect_timeout] || 10.seconds
+  end
+
   def self.pusher
     unless @pusher
       unless channel_prefix
@@ -69,34 +73,32 @@ module Synchromesh
   end
 
   def self.send_to_transport(message, data)
+    PolledConnection.write [message, data]
     case transport
     when :pusher
       pusher.trigger("#{Synchromesh.channel}-#{data[:channel]}", message, data)
-    when :simple_poller
-      SimplePoller.write(data[:channel], message, data)
     else
       transport_error
     end
   end
 
   def self.transport_error
-    unless transport == :none
+    unless [:none, :simple_poller].include? transport
       raise "Unknown transport #{Synchromesh.transport} - not supported"
     end
+    []
   end
 
   def self.open_connections
     case transport
     when :pusher
       PusherChannels.open_connections
-    when :simple_poller
-      SimplePoller.open_connections
     else
       transport_error
-    end
+    end + PolledConnection.open_connections
   end
 
-  module PusherChannels
+  module XPusherChannels
     require 'pstore'
 
     STORE_ID = "synchromesh-pusher-channel-store"
@@ -132,6 +134,56 @@ module Synchromesh
           end
         end
         Time.now-POLL_INTERVAL+5
+      end
+    end
+  end
+
+  module PusherChannels
+
+    STORE_ID = "synchromesh-pusher-channel-store"
+    POLL_INTERVAL = 1.minute
+    TIME_OUT = 5.seconds
+
+    class << self
+
+      def add_connection(channel)
+        connections = read_connections
+        connections[channel] = Time.now
+        Rails.cache.write(STORE_ID, connections)
+      end
+
+      def open_connections
+        oldest_update = newest_update = Time.at(0)
+        connections = read_connections.collect do |connection, updated_at|
+          oldest_update = [oldest_update, updated_at].min
+          newest_update = [newest_update, updated_at].max
+          connection
+        end
+        update_connections_before(newest_update) if oldest_update < Time.now-POLL_INTERVAL
+        connections
+      end
+
+      def read_connections
+        Rails.cache.fetch(STORE_ID) do
+          {}
+        end
+      end
+
+      def current_channels(newest_update)
+        new_channels = Synchromesh.pusher.channels[:channels].collect do |channel|
+          channel.gsub(/^#{Regexp.quote(Synchromesh.channel)}/,'')
+        end.map { |channel| [channel, Time.now] }.to_h
+        read_connections.delete_if do |connection, updated_at|
+          updated_at <= newest_update
+        end.merge(new_channels)
+      end
+
+      def update_connections_before(newest_update)
+        Thread.new do
+          Timeout::timeout(TIME_OUT) do
+            Rails.cache.write(STORE_ID, current_channels(newest_update))
+          end
+        end
       end
     end
   end

@@ -4,16 +4,20 @@ module ReactiveRecord
 
     class SynchromeshController < ::ApplicationController
 
-      def subscribe
+      before_action do |controller|
         session.delete 'synchromesh-dummy-init' unless session.id
-        Synchromesh::SimplePoller.subscribe(session.id, try(:acting_user), params[:channel])
-        render :nothing => true
+      end
+
+      def subscribe
+        Synchromesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
+        Synchromesh::PolledConnection.new(session.id, params[:channel])
+        render nothing: true
       rescue
         render nothing: true, status: :unauthorized
       end
 
       def read
-        data = Synchromesh::SimplePoller.read(session.id)
+        data = Synchromesh::PolledConnection.read(session.id)
         render json: data
       end
 
@@ -21,16 +25,21 @@ module ReactiveRecord
         channel = params[:channel_name].gsub(/^#{Regexp.quote(Synchromesh.channel)}\-/,'')
         Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
         response = Synchromesh.pusher.authenticate(params[:channel_name], params[:socket_id])
-        Synchromesh::PusherChannels.add_connection(channel)
         render json: response
       rescue Exception => e
         render nothing: true, status: :unauthorized
       end
 
+      def pusher_connect
+        Synchromesh::PusherChannels.add_connection(params[:channel])
+        render json: Synchromesh::PolledConnection.disconnect(session.id, params[:channel])
+      end
+
     end unless defined? SynchromeshController
 
-    match 'synchromesh-subscribe/:channel', to: 'synchromesh#subscribe',   via: :get
-    match 'synchromesh-read',               to: 'synchromesh#read',        via: :get
-    match 'synchromesh-pusher-auth',        to: 'synchromesh#pusher_auth', via: :post
+    match 'synchromesh-subscribe/:channel',          to: 'synchromesh#subscribe',      via: :get
+    match 'synchromesh-read',                        to: 'synchromesh#read',           via: :get
+    match 'synchromesh-pusher-auth',                 to: 'synchromesh#pusher_auth',    via: :post
+    match 'synchromesh-pusher-connect/:channel',     to: 'synchromesh#pusher_connect', via: :get
   end
 end

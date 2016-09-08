@@ -24,6 +24,7 @@ module Synchromesh
           store[session_id] = { data: [], last_read_at: Time.now }
         end
         subscriptions[session_id] << channels[channel]
+        Synchromesh::AutoConnect::PendingConnection.connected(session_id, channel)
       end
 
       def open_connections
