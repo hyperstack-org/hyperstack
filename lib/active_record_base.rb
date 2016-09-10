@@ -8,7 +8,7 @@ module ActiveRecord
       after_commit :synchromesh_after_destroy, on: [:destroy]
 
       def synchromesh_after_change
-        Synchromesh.after_change self
+        Synchromesh.after_change self unless previous_changes.empty?
       end
 
       def synchromesh_after_destroy

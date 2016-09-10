@@ -40,6 +40,7 @@ describe "authorization integration", js: true do
       regulate_all_broadcasts { |policy| policy.send_all_but(:completed, :test_attribute) }
       regulate_broadcast(TestModel) { |policy| policy.send_all_but(:created_at).to(self) }
     end
+    size_window(:small, :portrait)
   end
 
   it "will only synchronize the connected channels" do

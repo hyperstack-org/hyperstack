@@ -26,10 +26,6 @@ describe "Transport Tests", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
     end
     size_window(:small, :portrait)
-    #File.delete('synchromesh-simple-poller-store') if File.exists? 'synchromesh-simple-poller-store'
-    File.delete(Synchromesh::PusherChannels::STORE_ID) if File.exists? Synchromesh::PusherChannels::STORE_ID
-    File.delete(Synchromesh::PolledConnection::STORE_ID) if File.exists? Synchromesh::PolledConnection::STORE_ID
-
     on_client do
       # patch Synchromesh.connect so it doesn't execute until we say so
       # this is NOT used by the polling connection FYI
@@ -78,27 +74,27 @@ describe "Transport Tests", js: true do
     it "opens the connection" do
       mount "TestComponent"
       evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
+      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Synchromesh.open_connections.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
-      wait_for { Synchromesh.open_connections.to_a }.to eq([])
+      Synchromesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
+      wait_for { Synchromesh::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
       evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
+      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::PusherChannels::POLL_INTERVAL)
-      wait_for { Synchromesh.open_connections.to_a }.to eq([])
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.refresh_channels_every)
+      wait_for { Synchromesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -144,7 +140,7 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      Synchromesh.open_connections.should =~ ['TestApplication']
+      Synchromesh::Connection.active.should =~ ['TestApplication']
     end
 
     it "sees the connection going offline" do
@@ -152,17 +148,17 @@ describe "Transport Tests", js: true do
       wait_for_ajax
       ApplicationController.acting_user = true
       mount "TestComponent"
-      Synchromesh.open_connections.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh.seconds_polled_data_will_be_retained)
-      wait(10.seconds).for { Synchromesh.open_connections }.to eq([])
+      Synchromesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+Synchromesh.expire_polled_connection_in)
+      wait(10.seconds).for { Synchromesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
       mount "TestComponent"
       TestModel.new(test_attribute: "I'm new here!").save
-      Synchromesh.open_connections.should =~ ['TestApplication']
+      Synchromesh::Connection.active.should =~ ['TestApplication']
       page.should have_content("6 items")
-      Synchromesh.open_connections.should =~ ['TestApplication']
+      Synchromesh::Connection.active.should =~ ['TestApplication']
     end
 
     it "receives destroy notifications" do
@@ -189,26 +185,27 @@ describe "Transport Tests", js: true do
     it "opens the connection" do
       mount "TestComponent"
       evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
+      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Synchromesh.open_connections.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
+      Synchromesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
+      wait_for { Synchromesh::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
       evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh.autoconnect_timeout)
-      wait_for { Synchromesh.open_connections.to_a }.to eq(['TestApplication'])
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
+      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::PusherChannels::POLL_INTERVAL)
-      wait_for { Synchromesh.open_connections.to_a }.to eq([])
+      Timecop.travel(Time.now+Synchromesh::Connection.transport.refresh_channels_every)
+      wait_for { Synchromesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do

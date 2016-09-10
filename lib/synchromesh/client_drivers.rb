@@ -51,7 +51,7 @@ module Synchromesh
             var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel});
             channel.bind('change', #{ClientDrivers.opts[:change]});
             channel.bind('destroy', #{ClientDrivers.opts[:destroy]});
-            channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("pusher-connect", channel_string)}})
+            channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }
         else
           HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))

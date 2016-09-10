@@ -10,14 +10,14 @@ module ReactiveRecord
 
       def subscribe
         Synchromesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
-        Synchromesh::PolledConnection.new(session.id, params[:channel])
+        Synchromesh::Connection.new(params[:channel], session.id)
         render nothing: true
       rescue
         render nothing: true, status: :unauthorized
       end
 
       def read
-        data = Synchromesh::PolledConnection.read(session.id)
+        data = Synchromesh::Connection.read(session.id)
         render json: data
       end
 
@@ -30,16 +30,15 @@ module ReactiveRecord
         render nothing: true, status: :unauthorized
       end
 
-      def pusher_connect
-        Synchromesh::PusherChannels.add_connection(params[:channel])
-        render json: Synchromesh::PolledConnection.disconnect(session.id, params[:channel])
+      def connect_to_transport
+        render json: Synchromesh::Connection.connect_to_transport(params[:channel], session.id)
       end
 
     end unless defined? SynchromeshController
 
-    match 'synchromesh-subscribe/:channel',          to: 'synchromesh#subscribe',      via: :get
-    match 'synchromesh-read',                        to: 'synchromesh#read',           via: :get
-    match 'synchromesh-pusher-auth',                 to: 'synchromesh#pusher_auth',    via: :post
-    match 'synchromesh-pusher-connect/:channel',     to: 'synchromesh#pusher_connect', via: :get
+    match 'synchromesh-subscribe/:channel',            to: 'synchromesh#subscribe',            via: :get
+    match 'synchromesh-read',                          to: 'synchromesh#read',                 via: :get
+    match 'synchromesh-pusher-auth',                   to: 'synchromesh#pusher_auth',          via: :post
+    match 'synchromesh-connect-to-transport/:channel', to: 'synchromesh#connect_to_transport', via: :get
   end
 end

@@ -54,6 +54,7 @@ describe "synchronized scopes", js: true do
       always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
     end
+    size_window(:small, :portrait)
   end
 
   it "will be updated only when needed" do
@@ -433,28 +434,83 @@ describe "synchronized scopes", js: true do
         end
       end
     end
+
+      TestModel.has_children_count.should eq(1)
+      TestModel.do_it_all_the_time_count.should eq(1)
+      TestModel.never_sync_it_count.should eq(1)
+
+    parent = FactoryGirl.create(:test_model) # need to save parent first to avoid
+    # race condition when both child and parent get saved at the same time.
+    # The timing of the pushed events from the server will result in either 1 or 2
+    # fetches of the 'do_it_all_the_time_count' scope.
+    # Final test in this example does it the normal way.
+    wait_for { TestModel.do_it_all_the_time_count }.to eq(2)
+    child = FactoryGirl.create(:child_model)
+    wait_for { TestModel.do_it_all_the_time_count }.to eq(3)
+    parent.child_models << child
+
+      page.should have_content('.count = 1')
+      TestModel.has_children_count.should eq(2)
+      TestModel.do_it_all_the_time_count.should eq(4)
+      TestModel.never_sync_it_count.should eq(1)
+
+    child.update_attribute(:child_attribute, 'WHAAA')
+
+      page.should have_content('.count = 1')
+      TestModel.has_children_count.should eq(2)
+      TestModel.do_it_all_the_time_count.should eq(5)
+      TestModel.never_sync_it_count.should eq(1)
+
+
+    child2 = FactoryGirl.create(:child_model, test_model: parent )
+
+      page.should have_content('.count = 1')
+      TestModel.has_children_count.should eq(3)
+      TestModel.do_it_all_the_time_count.should eq(6)
+      TestModel.never_sync_it_count.should eq(1)
+
+    p2 = FactoryGirl.create(:test_model)
+
+      page.should have_content('.count = 1')
+      TestModel.has_children_count.should eq(3)
+      TestModel.do_it_all_the_time_count.should eq(7)
+      TestModel.never_sync_it_count.should eq(1)
+
+    FactoryGirl.create(:child_model, test_model: p2)
+
+      page.should have_content('.count = 2')
+      TestModel.has_children_count.should eq(4)
+      TestModel.do_it_all_the_time_count.should eq(8)
+      TestModel.never_sync_it_count.should eq(1)
+
+    p2.destroy
+
+      page.should have_content('.count = 1')
+      TestModel.has_children_count.should eq(5)
+      TestModel.do_it_all_the_time_count.should eq(9)
+      TestModel.never_sync_it_count.should eq(1)
+
+    child.test_model = nil
+    child.save
+
+      page.should have_content('.count = 1')
+      TestModel.has_children_count.should eq(6)
+      TestModel.do_it_all_the_time_count.should eq(10)
+      TestModel.never_sync_it_count.should eq(1)
+
+    child2.destroy
+
+      page.should have_content('.count = 0')
+      TestModel.has_children_count.should eq(7)
+      TestModel.do_it_all_the_time_count.should eq(11)
+      TestModel.never_sync_it_count.should eq(1)
+
     parent = FactoryGirl.build(:test_model)
     parent.child_models << (child = FactoryGirl.create(:child_model))
     parent.save
-    page.should have_content('.count = 1')
-    child.update_attribute(:child_attribute, 'WHAAA')
-    page.should have_content('.count = 1')
-    child2 = FactoryGirl.create(:child_model, test_model: parent )
-    page.should have_content('.count = 1')
-    p2 = FactoryGirl.create(:test_model)
-    page.should have_content('.count = 1')
-    FactoryGirl.create(:child_model, test_model: p2)
-    page.should have_content('.count = 2')
-    p2.destroy
-    page.should have_content('.count = 1')
-    child.test_model = nil
-    child.save
-    page.should have_content('.count = 1')
-    child2.destroy
-    page.should have_content('.count = 0')
-    TestModel.has_children_count.should eq(7)
-    TestModel.do_it_all_the_time_count.should eq(9)
-    TestModel.never_sync_it_count.should eq(1)
+
+      page.should have_content('.count = 1')
+
   end
 
   it 'with no joins array only the model being scoped will be passed to the block' do
@@ -483,7 +539,7 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 1')
     FactoryGirl.create(:child_model, test_model: p2)
     page.should have_content('.count = 1')
-    parent.save
+    parent.update_attribute :test_attribute, 'hi'
     page.should have_content('.count = 2')
     p2.destroy
     page.should have_content('.count = 1')
@@ -492,7 +548,7 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 1')
     child2.destroy
     page.should have_content('.count = 1')
-    parent.save
+    parent.update_attribute :test_attribute, 'bye'
     page.should have_content('.count = 0')
     TestModel.has_children_count.should eq(6)
   end

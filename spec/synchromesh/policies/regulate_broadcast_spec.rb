@@ -32,7 +32,7 @@ describe "regulate_broadcast" do
       end
       attr_accessor :id, :attrA, :attrB, :attrC, :attrD, :attrE
     end
-    allow(Synchromesh).to receive(:open_connections).and_return(['Application', 'TestModel1-1', 'TestModel1-7', 'TestModel2-8'])
+    allow(Synchromesh::Connection).to receive(:active).and_return(['Application', 'TestModel1-1', 'TestModel1-7', 'TestModel2-8'])
     allow_any_instance_of(Synchromesh::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
   end
 

@@ -185,7 +185,7 @@ module Synchromesh
       channels = ClassConnectionRegulation.connections_for(acting_user, true) +
         InstanceConnectionRegulation.connections_for(acting_user, true)
       channels.each do |channel|
-        PolledConnection.new(session, channel)
+        Connection.new(channel, session)
       end
       channels
     end
@@ -224,7 +224,7 @@ module Synchromesh
 
     def self.regulate_broadcast(model, &block)
       internal_policy = InternalPolicy.new(
-        model, model.attribute_names, x = Synchromesh.open_connections
+        model, model.attribute_names, Connection.active
       )
       ChannelBroadcastRegulation.broadcast(internal_policy)
       InstanceBroadcastRegulation.broadcast(model, internal_policy)

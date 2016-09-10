@@ -26,6 +26,7 @@ describe "Synchromesh", js: true do
       always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
     end
+    size_window(:small, :portrait)
   end
 
   it "will synchronize on an attribute update" do

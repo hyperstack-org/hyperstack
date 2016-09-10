@@ -26,7 +26,7 @@ else
   require 'reactive-record'
   require 'reactive_record/synchromesh_controller'
   require 'synchromesh/version'
-  require 'synchromesh/polled_connection'
+  require 'synchromesh/connection'
   require 'react/isomorphic_helpers_patches'
   require 'synchromesh/synchromesh'
   require 'synchromesh/policy'
