@@ -104,7 +104,6 @@ module React
         params << create_native_react_class(type)
       elsif React::Component::Tags::HTML_TAGS.include?(type)
         params << type
-        html_tag = true
       elsif type.is_a? String
         return React::Element.new(type)
       else
@@ -112,7 +111,7 @@ module React
       end
 
       # Convert Passed in properties
-      properties = convert_props(properties, html_tag)
+      properties = convert_props(properties)
       params << properties.shallow_to_n
 
       # Children Nodes
@@ -128,18 +127,14 @@ module React
       @@component_classes = {}
     end
 
-    def self.convert_props(properties, html_tag)
+    def self.convert_props(properties)
       raise "Component parameters must be a hash. Instead you sent #{properties}" unless properties.is_a? Hash
       props = {}
-      updated = false
       properties.map do |key, value|
         if key == "class_name" && value.is_a?(Hash)
           props[lower_camelize(key)] = `React.addons.classSet(#{value.to_n})`
         elsif key == "class"
           props["className"] = value
-        elsif key == 'value' && value.nil? && html_tag
-          updated = true
-          props['value'] = ''
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
         elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)

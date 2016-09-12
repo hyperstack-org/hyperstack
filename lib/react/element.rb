@@ -36,7 +36,7 @@ module React
 
     def on(*event_names, &block)
       event_names.each { |event_name| merge_event_prop!(event_name, &block) }
-      @native = `React.cloneElement(#{to_n}, #{properties.to_n})`
+      @native = `React.cloneElement(#{to_n}, #{properties.shallow_to_n})`
       self
     end
 

@@ -56,19 +56,6 @@ describe 'the React DSL' do
     expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>hello</div>')
   end
 
-  it "will pass the empty string for the value attribute" do
-    stub_const 'Foo', Class.new
-    Foo.class_eval do
-      include React::Component
-      def render
-        INPUT(value: nil).on(:change) {}
-      end
-    end
-
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<input value=""/>')
-  end
-
-
   it "will pass converted props through event handlers" do
     stub_const 'Foo', Class.new
     Foo.class_eval do

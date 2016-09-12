@@ -19,6 +19,20 @@ describe React::Element do
     end
   end
 
+  describe "Event Subscription" do
+    it "keeps the original params" do
+      stub_const 'Foo', Class.new
+      Foo.class_eval do
+        include React::Component
+        def render
+          INPUT(value: nil, type: 'text').on(:change) {}
+        end
+      end
+
+      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<input type="text" value=""/>')
+    end
+  end
+
   describe 'Component Event Subscription' do
 
     it 'will subscribe to a component event param' do
