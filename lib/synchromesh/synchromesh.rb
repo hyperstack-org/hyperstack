@@ -3,17 +3,22 @@ require 'synchromesh/configuration'
 # to indicate that records have changed: after_change and after_destroy
 module Synchromesh
 
-  #.refresh_timeout
-  #.refresh (method)
-  #.refresh_in
-
   extend Configuration
 
   def self.config_reset
+    Object.const_get 'ApplicationPolicy' rescue nil
     @pusher = nil
   end
 
-  define_setting :transport, :none
+  define_setting(:transport, :none) do |transport|
+    if transport == :action_cable
+      require 'synchromesh/action_cable'
+      opts[:refresh_channels_every] = :never
+    elsif opts[:refresh_channels_every] == :never
+      opts[:refresh_channels_every] = nil
+    end
+  end
+
   define_setting :opts, {}
   define_setting :channel_prefix
   define_setting :client_logging, true
@@ -47,11 +52,11 @@ module Synchromesh
   end
 
   def self.refresh_channels_timeout
-    opts[:refresh_timeout] || 5.seconds
+    opts[:refresh_channels_timeout] || 5.seconds
   end
 
   def self.refresh_channels_every
-    opts[:refresh_every] || 2.minutes
+    opts[:refresh_channels_every] || 2.minutes
   end
 
   def self.refresh_channels
@@ -61,7 +66,11 @@ module Synchromesh
   end
 
   def self.send(channel, data)
-    pusher.trigger("#{Synchromesh.channel}-#{data[1][:channel]}", *data)
+    if transport == :pusher
+      pusher.trigger("#{Synchromesh.channel}-#{data[1][:channel]}", *data)
+    elsif transport == :action_cable
+      ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
+    end
   end
 
   def self.pusher
@@ -79,6 +88,13 @@ module Synchromesh
 
   def self.channel
     "private-#{channel_prefix}"
+  end
+
+  def self.authorization(salt, channel, session_id)
+    secret_key = Rails.application.secrets[:secret_key_base]
+    Digest::SHA1.hexdigest(
+      "salt: #{salt}, channel: #{channel}, session_id: #{session_id}, secret_key: #{secret_key}"
+    )
   end
 
   def self.after_change(model)

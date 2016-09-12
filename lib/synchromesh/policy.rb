@@ -367,6 +367,14 @@ module Synchromesh
 end
 
 class Class
+
+  alias pre_synchromesh_inherited inherited
+
+  def inherited(child_class)
+    const_get("#{child_class}Policy") if child_class.name rescue nil
+    pre_synchromesh_inherited(child_class)
+  end
+
   Synchromesh::ClassPolicyMethods.instance_methods.each do |method|
     define_method method do |*args, &block|
       if name =~ /Policy$/

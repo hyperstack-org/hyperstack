@@ -90,7 +90,7 @@ module Synchromesh
       end
 
       def disconnect(channel)
-        update_connections fetch_connections.delete_if { |c| c.is_fo?(channel, nil) }
+        update_connections fetch_connections.delete_if { |c| c.is_for?(channel, nil) }
       end
 
       # private
@@ -159,7 +159,7 @@ module Synchromesh
         @session = session
         @expires_at = Time.now + transport.expire_new_connection_in
         @messages = []
-      elsif transport.refresh_channels_every
+      elsif transport.refresh_channels_every != :never
         @refresh_at = Time.now + transport.refresh_channels_every
       end
     end

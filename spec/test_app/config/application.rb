@@ -11,6 +11,7 @@ require 'reactrb'
 
 module TestApp
   class Application < Rails::Application
+    config.action_cable.allowed_request_origins = [/http\:\/\/127\.0\.0\.1\:[0-9]*/]
     config.eager_load_paths += %W(#{config.root}/app/models/public)
     config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s

@@ -7,11 +7,13 @@ module Synchromesh
       yield self
     end
 
-    def define_setting(name, default = nil)
+    def define_setting(name, default = nil, &block)
       class_variable_set("@@#{name}", default)
 
       define_class_method "#{name}=" do |value|
         class_variable_set("@@#{name}", value)
+        block.call value if block
+        value
       end
 
       define_class_method name do

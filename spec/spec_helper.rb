@@ -142,6 +142,12 @@ if RUBY_ENGINE != 'opal'
   end
 
   Capybara.default_max_wait_time = 4.seconds
+  Capybara.server { |app, port|
+    require 'puma'
+    Puma::Server.new(app).tap do |s|
+      s.add_tcp_listener Capybara.server_host, port
+    end.run.join
+  }
 
   module WaitForAjax
 

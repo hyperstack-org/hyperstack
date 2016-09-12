@@ -1,3 +1,14 @@
+# module ApplicationCable
+#   class Connection < ActionCable::Connection::Base
+#     # we always create a connection, and use the session_id to identify it.
+#     #identified_by :session
+#
+#     # def connect
+#     #   #self.session = cookies.encrypted[Rails.application.config.session_options[:key]]
+#     # end
+#   end
+# end
+
 require_relative 'active_record_base'
 require 'set'
 if RUBY_ENGINE == 'opal'
@@ -30,7 +41,6 @@ else
   require 'react/isomorphic_helpers_patches'
   require 'synchromesh/synchromesh'
   require 'synchromesh/policy'
-  #require 'synchromesh/simple_poller'
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end

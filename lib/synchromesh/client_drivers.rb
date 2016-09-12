@@ -21,6 +21,10 @@ module Synchromesh
       end
     end
 
+    def self.action_cable_consumer
+      ClientDrivers.opts[:action_cable_consumer]
+    end
+
     class IncomingBroadcast
       def self.receive(data, &block)
         in_transit[data[:broadcast_id]].receive(data, &block)
@@ -53,6 +57,29 @@ module Synchromesh
             channel.bind('destroy', #{ClientDrivers.opts[:destroy]});
             channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }
+        elsif ClientDrivers.opts[:transport] == :action_cable
+          channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
+          HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel)).then do |response|
+            %x{
+              #{Synchromesh.action_cable_consumer}.subscriptions.create(
+                {
+                  channel: "Synchromesh::ActionCableChannel",
+                  synchromesh_channel: #{channel_string},
+                  authorization: #{response.json[:authorization]},
+                  salt: #{response.json[:salt]}
+                },
+                {
+                  connected: function() {
+                    #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
+                  },
+                  received: function(data) {
+                    #{ClientDrivers.send("sync_#{`data['message']`}", Hash.new(`data['data']`))}
+                    return true
+                  }
+                }
+              )
+            }
+          end
         else
           HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
         end
@@ -194,6 +221,10 @@ module Synchromesh
             }
             opts[:pusher_api] = pusher_api
           end
+          Synchromesh.connect(*opts[:auto_connect])
+        elsif opts[:transport] == :action_cable
+          opts[:action_cable_consumer] =
+            `ActionCable.createConsumer.apply(ActionCable, #{[*opts[:action_cable_consumer_url]]})`
           Synchromesh.connect(*opts[:auto_connect])
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection *channel }

@@ -30,6 +30,16 @@ module ReactiveRecord
         render nothing: true, status: :unauthorized
       end
 
+      def action_cable_auth
+        channel = params[:channel_name].gsub(/^#{Regexp.quote(Synchromesh.channel)}\-/,'')
+        Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
+        salt = SecureRandom.hex
+        authorization = Synchromesh.authorization(salt, channel, session.id)
+        render json: {authorization: authorization, salt: salt}
+      rescue Exception => e
+        render nothing: true, status: :unauthorized
+      end
+
       def connect_to_transport
         render json: Synchromesh::Connection.connect_to_transport(params[:channel], session.id)
       end
@@ -39,6 +49,7 @@ module ReactiveRecord
     match 'synchromesh-subscribe/:channel',            to: 'synchromesh#subscribe',            via: :get
     match 'synchromesh-read',                          to: 'synchromesh#read',                 via: :get
     match 'synchromesh-pusher-auth',                   to: 'synchromesh#pusher_auth',          via: :post
+    match 'synchromesh-action-cable-auth/:channel_name',             to: 'synchromesh#action_cable_auth',    via: :post
     match 'synchromesh-connect-to-transport/:channel', to: 'synchromesh#connect_to_transport', via: :get
   end
 end
