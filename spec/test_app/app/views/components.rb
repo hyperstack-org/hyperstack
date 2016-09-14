@@ -3,7 +3,7 @@ require 'react'
 require 'reactrb'
 if React::IsomorphicHelpers.on_opal_client?
   require 'opal-jquery'
-  require 'browser'
+  #require 'browser' # breaks poltergeist
   require 'browser/interval'
   require 'browser/delay'
   require 'synchromesh/pusher'

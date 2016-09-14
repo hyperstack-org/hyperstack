@@ -34,6 +34,7 @@ else
   rescue LoadError
   end
   #require 'active_record/transactions'
+  require 'reactive_record/permission_patches'
   require 'reactive-record'
   require 'reactive_record/synchromesh_controller'
   require 'synchromesh/version'

@@ -72,4 +72,14 @@ describe "including Synchromesh::PolicyMethods" do
     expect(TestClass.new).to respond_to(:obj)
   end
 
+  it "will automatically create an empty Application class if needed" do
+    expect(defined? Application).to be_falsy
+    stub_const 'ApplicationPolicy', Class.new
+    ApplicationPolicy.class_eval do
+      regulate_class_connection { true }
+    end
+    Synchromesh.configuration {}
+    expect(Application).to be_a(Class)
+  end
+
 end

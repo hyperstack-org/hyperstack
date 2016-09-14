@@ -83,8 +83,8 @@ describe "regulate_broadcast" do
         channel: 'TestModel1-1',
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
-        record: {attr2: 2},
-        previous_changes: {attr2: 2}
+        record: {id: 1, attr2: 2},
+        previous_changes: {id: 1, attr2: 2}
       }
     )
   end
@@ -279,8 +279,8 @@ describe "regulate_broadcast" do
         channel: 'TestModel1-1',
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
-        record: {attr1: 1},
-        previous_changes: {attr1: 1}
+        record: {id: 1, attr1: 1},
+        previous_changes: {id: 1, attr1: 1}
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
@@ -362,8 +362,8 @@ describe "regulate_broadcast" do
         channel: 'TestModel1-1',
         channels: ['TestModel1-1'],
         klass: 'TestModel1',
-        record: {attr2: "YES"},
-        previous_changes: {attr2: "YES"}
+        record: {id: 1, attr2: "YES"},
+        previous_changes: {id: 1, attr2: "YES"}
       }
     )
   end

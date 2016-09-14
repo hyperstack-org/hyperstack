@@ -6,7 +6,13 @@ module Synchromesh
   extend Configuration
 
   def self.config_reset
-    Object.const_get 'ApplicationPolicy' rescue nil
+    Object.send(:remove_const, :Application) if @fake_application_defined
+    policy = Object.const_get 'ApplicationPolicy' rescue nil
+    application = Object.const_get('Application') if policy rescue nil
+    if policy && !application
+      Object.const_set 'Application', Class.new
+      @fake_application_defined = true
+    end
     @pusher = nil
   end
 

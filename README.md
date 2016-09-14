@@ -99,6 +99,28 @@ class ApplicationPolicy
 end
 ```
 
+### Action Cable Configuration
+
+If you are on Rails 5, synchromesh you can use ActionCable out of the box.
+
+```ruby
+#config/initializers/synchromesh.rb
+Synchromesh.configuration do |config|
+  config.transport = :action_cable
+end
+```
+
+In addition make sure that you include the action_cable js file in your assets
+
+```javascript
+//application.js
+
+//= require action_cable
+
+```
+
+The rest of the setup will be handled by Synchromesh
+
 ### Pusher Configuration Specifics
 
 Add `gem 'pusher'` to your gem file, and add `require synchromesh/pusher` to the client only portion of your components manifest.
@@ -237,7 +259,7 @@ end
 Specs run in rspec/capybara/selenium. To run do:
 
 ```
-bundle exec rspec
+bundle exec rspec spec
 ```
 
 You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  You can add `SHOW_LOGS=true` if running in poltergeist (the default) to see what is going on, but ff is a lot better.

@@ -8,42 +8,97 @@ module Synchromesh
 
     EXPOSED_METHODS = [
       :regulate_class_connection, :always_allow_connection, :regulate_instance_connections,
-      :regulate_all_broadcasts, :regulate_broadcast
+      :regulate_all_broadcasts, :regulate_broadcast, :allow_change, :allow_create, :allow_read,
+      :allow_update, :allow_destroy
     ]
 
     def regulate_class_connection(*args, &regulation)
-      regulate(ClassConnectionRegulation, args, &regulation)
+      regulate(ClassConnectionRegulation, :class_connection, args, &regulation)
     end
 
     def always_allow_connection(*args)
-      regulate(ClassConnectionRegulation, args) { true }
+      regulate(ClassConnectionRegulation, nil, args) { true }
     end
 
     def regulate_instance_connections(*args, &regulation)
-      regulate(InstanceConnectionRegulation, args, &regulation)
+      regulate(InstanceConnectionRegulation, :instance_connections, args, &regulation)
     end
 
     def regulate_all_broadcasts(*args, &regulation)
-      regulate(ChannelBroadcastRegulation, args, &regulation)
+      regulate(ChannelBroadcastRegulation, :all_broadcasts, args, &regulation)
     end
 
     def regulate_broadcast(*args, &regulation)
-      regulate(InstanceBroadcastRegulation, args, &regulation)
+      regulate(InstanceBroadcastRegulation, :broadcast, args, &regulation)
     end
 
-    def regulate(regulation_klass, args, &regulation)
-      raise "you must provide a block to the regulate_#{policy} method" unless regulation
-      if args.last.is_a? Hash
-        opts = args.last
-        args = args[0..-2]
-      else
-        opts = {}
+
+    CHANGE_POLICIES = [:create, :update, :destroy]
+
+    def self.allow_policy(policy, method)
+      define_method "allow_#{policy}" do |*args, &regulation|
+        process_args(policy, args, regulation) do |model|
+          get_ar_model(model).class_eval { define_method("#{method}_permitted?", &regulation) }
+        end
       end
-      args = [@regulated_klass] if args.empty?
-      args.each do |regulated_klass|
+    end
+
+    CHANGE_POLICIES.each { |policy| allow_policy policy, policy }
+
+    allow_policy(:read, :view)
+
+    def allow_change(*args, &regulation)
+      process_args('change', args, regulation) do |model, opts|
+        model = get_ar_model(model)
+        opts[:on] ||= CHANGE_POLICIES
+        opts[:on].each do |policy|
+          check_valid_on_option policy
+          model.class_eval { define_method("#{policy}_permitted?", &regulation) }
+        end
+      end
+    end
+
+    def get_ar_model(str)
+      str.is_a?(Class) ? str : Object.const_get(str)
+    rescue
+      raise "#{str} is not a class"
+    end
+
+    def regulate(regulation_klass, policy, args, &regulation)
+      process_args(policy, args, regulation) do |regulated_klass, opts|
         regulation_klass.add_regulation regulated_klass, opts, &regulation
       end
     end
+
+    def process_args(policy, args, regulation)
+      raise "you must provide a block to the regulate_#{policy} method" unless regulation
+      *args, opts = args if args.last.is_a? Hash
+      opts ||= {}
+      args = process_to_opt(opts[:to], args)
+      args.each do |regulated_klass|
+        yield regulated_klass, opts
+      end
+    end
+
+    def process_to_opt(to, args)
+      if to
+        raise "option to: :#{to} is not recognized in allow_#{policy}" unless to == :all
+        raise "option to: :all cannot be used with other classes" unless args.empty?
+        [ActiveRecord::Base]
+      elsif args.empty?
+        [@regulated_klass]
+      else
+        args
+      end
+    end
+
+    def check_valid_on_option(policy)
+      unless CHANGE_POLICIES.include? policy
+        valid_policies = CHANGE_POLICIES.collect { |s| ":{s}" }.to_sentence
+        raise "only #{valid_policies} are allowed on the regulate_access :on option"
+      end
+    end
+
   end
 
   class Regulation
@@ -116,7 +171,7 @@ module Synchromesh
       raise "connection failed" unless regulations[channel].connectable?(acting_user)
     end
 
-    def self.connections_for(acting_user, auto_connections_only = true)
+    def self.connections_for(acting_user, auto_connections_only)
       regulations.collect do |channel, regulation|
         next if auto_connections_only && regulation.auto_connect_disabled?
         next if !regulation.connectable?(acting_user)
@@ -127,21 +182,26 @@ module Synchromesh
 
   class InstanceConnectionRegulation < Regulation
 
-    def connectable_to(acting_user, auto_connections_only = nil)
+    def connectable_to(acting_user, auto_connections_only)
       return [] if auto_connections_only && auto_connect_disabled?
       regulate_for(acting_user).entries.compact.flatten(1) rescue []
     end
 
     def self.connect(instance, acting_user)
-      unless regulations[instance].connectable_to(acting_user).include? instance
+      unless regulations[instance].connectable_to(acting_user, false).include? instance
         raise "connection failed"
       end
     end
 
-    def self.connections_for(acting_user, auto_connections_only = nil)
+    def self.connections_for(acting_user, auto_connections_only)
       regulations.collect do |_channel, regulation|
-        regulation.connectable_to(acting_user, true).collect do |obj|
-          [obj.class.name, obj.id]
+        # the following was bizarelly passing true for auto_connections_only????
+        regulation.connectable_to(acting_user, auto_connections_only).collect do |obj|
+          if auto_connections_only
+            [obj.class.name, obj.id]
+          else
+           InternalPolicy.channel_to_string obj
+         end
         end
       end.flatten(1)
     end
@@ -281,7 +341,7 @@ module Synchromesh
       @channel_sets.collect { |channel, _value| channel_to_string channel }
     end
 
-    def channel_to_string(channel)
+    def self.channel_to_string(channel)
       if channel.is_a?(Class) && channel.name
         channel.name
       elsif channel.is_a? String
@@ -291,9 +351,17 @@ module Synchromesh
       end
     end
 
+    def channel_to_string(channel)
+      self.class.channel_to_string(channel)
+    end
+
     def filter(h, attribute_set)
       r = {}
-      h.each { |key, value| r[key.to_sym] = value if attribute_set.member? key.to_sym}
+      h.each do |key, value|
+        r[key.to_sym] = value if attribute_set.member?(key.to_sym) || (key.to_sym == :id)
+      end unless attribute_set.empty?
+      #model_id = h[:id] || h["id"]
+      #r[:id] = model_id if model_id && !attribute_set.empty?
       r
     end
 

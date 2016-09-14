@@ -2,7 +2,7 @@
 
 require 'parser/current'
 require 'unparser'
-require 'pry'
+#require 'pry'
 
 module ComponentTestHelpers
 
@@ -183,6 +183,12 @@ module ComponentTestHelpers
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
   end
+
+  def ppr(str)
+    js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
+    execute_script("console.log(#{js})")
+  end
+
 
   def on_client(&block)
     @client_code = "#{@client_code}#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}\n"
