@@ -571,6 +571,22 @@ describe React::Component, type: :component do
 
       expect(element.refs.field.value).to eq('some_stuff')
     end
+
+    it "allows access the actual DOM node" do
+      Foo.class_eval do
+        after_mount do
+          dom = refs[:my_div].dom_node
+          `dom.innerHTML = 'Modified'`
+        end
+
+        def render
+          React.create_element('div', ref: :my_div) { "Original Content" }
+        end
+      end
+
+      instance = renderToDocument(Foo)
+      expect(`#{instance.dom_node}.innerHTML`).to eq('Modified')
+    end
   end
 
   describe '#render' do
