@@ -118,12 +118,14 @@ describe "synchronized scopes", js: true do
     TestModel.scope1_count.should eq(6)
     TestModel.scope2_count.should eq(4)  # will not change because nothing is viewing it
     m2.update_attribute(:completed, false)
+    page.should have_content('rendered 7 times')
+    TestModel.scope1_count.should eq(7)
     m1.update_attribute(:completed, false)
-    page.should have_content('rendered 8 times')
+    page.should have_content('rendered 9 times')
     page.should have_content('scope1 count = 1')
     page.should have_content('scope2 count = 1')
     page.should have_content('model 3')
-    TestModel.scope1_count.should eq(7)
+    TestModel.scope1_count.should eq(8)
     TestModel.scope2_count.should eq(5)
   end
 
@@ -387,26 +389,45 @@ describe "synchronized scopes", js: true do
         render { "TestModel.has_children.count = #{TestModel.has_children.count}" }
       end
     end
-    parent = FactoryGirl.build(:test_model)
-    parent.child_models << (child = FactoryGirl.create(:child_model))
-    parent.save
-    page.should have_content('.count = 1')
-    child.update_attribute(:child_attribute, 'WHAAA')
-    page.should have_content('.count = 1')
-    child2 = FactoryGirl.create(:child_model, test_model: parent )
-    page.should have_content('.count = 1')
-    p2 = FactoryGirl.create(:test_model)
-    page.should have_content('.count = 1')
-    FactoryGirl.create(:child_model, test_model: p2)
-    page.should have_content('.count = 2')
-    p2.destroy
-    page.should have_content('.count = 1')
-    child.test_model = nil
-    child.save
-    page.should have_content('.count = 1')
-    child2.destroy
-    page.should have_content('.count = 0')
-    TestModel.has_children_count.should eq(7)
+    # ChildModel
+    #   has_test_model
+    #     destroyed?
+    # a      test_model_id changed  +
+    # b      !test_model_id changed +
+    #     !destroyed?
+    # c      test_model_id changed +
+    # d      !test_model_id changed 0
+    #   !has_test_model
+    # e    test_model_id changed +
+    # f    !test_model_id changed 0
+    # !ChildModel
+    # g  destroyed +
+    # h  !destroyed 0
+
+    parent = FactoryGirl.create(:test_model) #h
+      wait_for { TestModel.has_children_count }.to eq(1)
+      page.should have_content('.count = 0')
+    child = FactoryGirl.create(:child_model) #f
+      wait_for { TestModel.has_children_count }.to eq(1)
+      page.should have_content('.count = 0')
+    child.update_attribute(:test_model, parent) #c
+      wait_for { TestModel.has_children_count }.to eq(2)
+      page.should have_content('.count = 1')
+    child.update_attribute(:child_attribute, 'WHAAA') #d
+      wait_for { TestModel.has_children_count }.to eq(2)
+      page.should have_content('.count = 1')
+    child.update_attribute(:test_model, nil) #e
+      wait_for { TestModel.has_children_count }.to eq(3)
+      page.should have_content('.count = 0')
+    child.update_attribute(:test_model, parent) #c
+      wait_for { TestModel.has_children_count }.to eq(3)
+      page.should have_content('.count = 1')
+    child.destroy #a/b
+      wait_for { TestModel.has_children_count }.to eq(4)
+      page.should have_content('.count = 0')
+    parent.destroy #g
+      wait_for { TestModel.has_children_count }.to eq(5)
+      page.should have_content('.count = 0')
   end
 
 
@@ -421,7 +442,7 @@ describe "synchronized scopes", js: true do
             record.destroyed?
           end
         end
-        scope(:do_it_all_the_time, :always_sync, lambda { all }) { true }
+        scope(:do_it_all_the_time, :always_sync, lambda { all }) { puts "&&&&&&&&&&&&& doitall the time &&&&&&"; true }
         scope :never_sync_it, :never_sync, lambda { all }
       end
     end
@@ -434,7 +455,7 @@ describe "synchronized scopes", js: true do
         end
       end
     end
-
+      #puts "*************** test 1 *********************"
       TestModel.has_children_count.should eq(1)
       TestModel.do_it_all_the_time_count.should eq(1)
       TestModel.never_sync_it_count.should eq(1)
@@ -449,60 +470,64 @@ describe "synchronized scopes", js: true do
     wait_for { TestModel.do_it_all_the_time_count }.to eq(3)
     parent.child_models << child
 
+      #puts "*************** test 2 *********************"
       page.should have_content('.count = 1')
       TestModel.has_children_count.should eq(2)
-      TestModel.do_it_all_the_time_count.should eq(4)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(4)
       TestModel.never_sync_it_count.should eq(1)
+
+      #puts "about to update the attribute now"
 
     child.update_attribute(:child_attribute, 'WHAAA')
 
+      #puts "*************** test 3 *********************"
       page.should have_content('.count = 1')
       TestModel.has_children_count.should eq(2)
-      TestModel.do_it_all_the_time_count.should eq(5)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(5)
       TestModel.never_sync_it_count.should eq(1)
 
 
     child2 = FactoryGirl.create(:child_model, test_model: parent )
 
       page.should have_content('.count = 1')
-      TestModel.has_children_count.should eq(3)
-      TestModel.do_it_all_the_time_count.should eq(6)
+      wait_for { TestModel.has_children_count }.to eq(3)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(6)
       TestModel.never_sync_it_count.should eq(1)
 
     p2 = FactoryGirl.create(:test_model)
 
       page.should have_content('.count = 1')
       TestModel.has_children_count.should eq(3)
-      TestModel.do_it_all_the_time_count.should eq(7)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(7)
       TestModel.never_sync_it_count.should eq(1)
 
     FactoryGirl.create(:child_model, test_model: p2)
 
       page.should have_content('.count = 2')
-      TestModel.has_children_count.should eq(4)
-      TestModel.do_it_all_the_time_count.should eq(8)
+      wait_for { TestModel.has_children_count }.to eq(4)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(8)
       TestModel.never_sync_it_count.should eq(1)
 
     p2.destroy
 
       page.should have_content('.count = 1')
-      TestModel.has_children_count.should eq(5)
-      TestModel.do_it_all_the_time_count.should eq(9)
+      wait_for { TestModel.has_children_count }.to eq(5)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(9)
       TestModel.never_sync_it_count.should eq(1)
 
     child.test_model = nil
     child.save
 
       page.should have_content('.count = 1')
-      TestModel.has_children_count.should eq(6)
-      TestModel.do_it_all_the_time_count.should eq(10)
+      wait_for { TestModel.has_children_count }.to eq(6)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(10)
       TestModel.never_sync_it_count.should eq(1)
 
     child2.destroy
 
       page.should have_content('.count = 0')
       TestModel.has_children_count.should eq(7)
-      TestModel.do_it_all_the_time_count.should eq(11)
+      wait_for { TestModel.do_it_all_the_time_count }.to eq(11)
       TestModel.never_sync_it_count.should eq(1)
 
     parent = FactoryGirl.build(:test_model)
@@ -527,17 +552,26 @@ describe "synchronized scopes", js: true do
         render { "TestModel.has_children.count = #{TestModel.has_children.count}" }
       end
     end
+    #puts "************************** starting ******************************"
     parent = FactoryGirl.build(:test_model)
     parent.child_models << (child = FactoryGirl.create(:child_model))
     parent.save
+    #puts "************************** test 1 ******************************"
     page.should have_content('.count = 1')
     child.update_attribute(:child_attribute, 'WHAAA')
+    #puts "************************** test 2 ******************************"
     page.should have_content('.count = 1')
     child2 = FactoryGirl.create(:child_model, test_model: parent )
+    #puts "************************** test 3 ******************************"
     page.should have_content('.count = 1')
-    p2 = FactoryGirl.create(:test_model)
+    p2 = FactoryGirl.create(:test_model)  # this save will cause the scope to be recalcuated!
+    # because even though this record does not have a child, some other record does!!!
+    #puts "************************** test 4 ******************************"
+    wait_for {TestModel.has_children_count}.to eq(3)
     page.should have_content('.count = 1')
     FactoryGirl.create(:child_model, test_model: p2)
+     # seems like we get into a deadlock if we dont' do this here
+    #puts "************************** test 5 ******************************"
     page.should have_content('.count = 1')
     parent.update_attribute :test_attribute, 'hi'
     page.should have_content('.count = 2')

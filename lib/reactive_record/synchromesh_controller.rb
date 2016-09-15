@@ -11,9 +11,9 @@ module ReactiveRecord
       def subscribe
         Synchromesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
         Synchromesh::Connection.new(params[:channel], session.id)
-        render nothing: true
-      rescue
-        render nothing: true, status: :unauthorized
+        head :ok
+      rescue Exception
+        head :unauthorized
       end
 
       def read
@@ -26,8 +26,8 @@ module ReactiveRecord
         Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
         response = Synchromesh.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response
-      rescue Exception => e
-        render nothing: true, status: :unauthorized
+      rescue Exception
+        head :unauthorized
       end
 
       def action_cable_auth
@@ -36,8 +36,8 @@ module ReactiveRecord
         salt = SecureRandom.hex
         authorization = Synchromesh.authorization(salt, channel, session.id)
         render json: {authorization: authorization, salt: salt}
-      rescue Exception => e
-        render nothing: true, status: :unauthorized
+      rescue Exception
+        head :unauthorized
       end
 
       def connect_to_transport

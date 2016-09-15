@@ -71,6 +71,7 @@ if RUBY_ENGINE == 'opal'
 end
 
 if RUBY_ENGINE != 'opal'
+  require 'pry'
   begin
     require File.expand_path('../test_app/config/environment', __FILE__)
   rescue LoadError
@@ -237,11 +238,13 @@ if RUBY_ENGINE != 'opal'
       DatabaseCleaner.start
     end
 
-    config.after(:each) do
-      # Clear session data
-      Capybara.reset_sessions!
-      # Rollback transaction
-      DatabaseCleaner.clean
+    config.after(:each) do |example|
+      unless example.exception
+        # Clear session data
+        Capybara.reset_sessions!
+        # Rollback transaction
+        DatabaseCleaner.clean
+      end
     end
 
     config.after(:all, :js => true) do

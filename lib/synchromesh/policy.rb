@@ -432,6 +432,24 @@ module Synchromesh
     define_method :initialize do |*args|
     end unless instance_methods(false).include?(:initialize)
   end
+
+  module PolicyAutoLoader
+    def self.load(name, value)
+      const_get("#{name}Policy") if name && !(name =~ /Policy$/) && value.is_a?(Class)
+    rescue Exception => e
+      raise e if e.is_a?(LoadError) && e.message =~ /Unable to autoload constant #{name}Policy/
+    end
+  end
+end
+
+class Module
+  alias pre_synchromesh_const_set const_set
+
+  def const_set(name, value)
+    pre_synchromesh_const_set(name, value).tap do
+      Synchromesh::PolicyAutoLoader.load(name, value)
+    end
+  end
 end
 
 class Class
@@ -439,8 +457,9 @@ class Class
   alias pre_synchromesh_inherited inherited
 
   def inherited(child_class)
-    const_get("#{child_class}Policy") if child_class.name rescue nil
-    pre_synchromesh_inherited(child_class)
+    pre_synchromesh_inherited(child_class).tap do
+      Synchromesh::PolicyAutoLoader.load(child_class.name, child_class)
+    end
   end
 
   Synchromesh::ClassPolicyMethods.instance_methods.each do |method|

@@ -82,15 +82,11 @@ Add an initializer like this:
 ```ruby
 # for rails this would go in: config/initializers/synchromesh.rb
 Synchromesh.configuration do |config|
-
-  config.transport = :pusher # set to :none to turn off, or to :simple_poller (see below)
-  config.opts = { ... transport specific options ...}
-  config.channel_prefix = 'synchromesh'
-  # config.client_logging = false                         # default is true
+  config.transport = :simple_poller # or :none, action_cable, :pusher - see below)
 end
 # for a minimal setup you will need to define at least one channel, which you can do
-# in the same file as your initializer - however normally you would put these
-# policies in the app/policies/ directory
+# in the same file as your initializer.
+# Normally you would put these policies in the app/policies/ directory
 class ApplicationPolicy
   # allow all clients to connect to the Application channel
   regulate_connection { true }
@@ -101,7 +97,7 @@ end
 
 ### Action Cable Configuration
 
-If you are on Rails 5, synchromesh you can use ActionCable out of the box.
+If you are on Rails 5 you can use ActionCable out of the box.
 
 ```ruby
 #config/initializers/synchromesh.rb
@@ -110,18 +106,20 @@ Synchromesh.configuration do |config|
 end
 ```
 
-In addition make sure that you include the action_cable js file in your assets
+In addition make sure that you include the `action_cable` js file in your assets
 
 ```javascript
 //application.js
-
+...
 //= require action_cable
-
+...
 ```
 
-The rest of the setup will be handled by Synchromesh
+The rest of the setup will be handled by Synchromesh.
 
-### Pusher Configuration Specifics
+Synchromesh will not interfere with any ActionCable connections and channels you may have already defined.  
+
+### Pusher Configuration
 
 Add `gem 'pusher'` to your gem file, and add `require synchromesh/pusher` to the client only portion of your components manifest.
 
@@ -168,7 +166,7 @@ Synchromesh.configuration do |config|
 end
 ```
 
-### Simple Poller
+### Simple Poller Details
 
 Setup your config like this:
 ```ruby
@@ -262,7 +260,7 @@ Specs run in rspec/capybara/selenium. To run do:
 bundle exec rspec spec
 ```
 
-You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  You can add `SHOW_LOGS=true` if running in poltergeist (the default) to see what is going on, but ff is a lot better.
+You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  You can add `SHOW_LOGS=true` if running in poltergeist (the default) to see what is going on, but ff is a lot better for debug.
 
 ## How it works
 

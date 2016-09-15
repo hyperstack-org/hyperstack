@@ -104,14 +104,18 @@ module Synchromesh
   end
 
   def self.after_change(model)
-    InternalPolicy.regulate_broadcast(model) do |data|
-      Connection.send(data[:channel], ['change', data])
+    Thread.new do
+      InternalPolicy.regulate_broadcast(model) do |data|
+        Connection.send(data[:channel], ['change', data])
+      end
     end
   end
 
   def self.after_destroy(model)
-    InternalPolicy.regulate_broadcast(model) do |data|
-      Connection.send(data[:channel], ['destroy', data])
+    Thread.new do
+      InternalPolicy.regulate_broadcast(model) do |data|
+        Connection.send(data[:channel], ['destroy', data])
+      end
     end
   end
 
