@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'therubyrhino'
     else
       s.add_development_dependency 'sqlite3', '1.3.10'
+      s.add_development_dependency 'mysql2' # for codeship
       s.add_development_dependency 'therubyracer', '0.12.2'
 
       # The following allow react code to be tested from the server side
