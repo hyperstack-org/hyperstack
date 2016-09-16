@@ -1,6 +1,7 @@
 # acting user is the acting user... okay
 
 class ActiveRecord::Base
+
   def view_permitted?(attribute)
     Synchromesh::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
   end

@@ -74,6 +74,7 @@ describe "regulate access allowed" do
       always_allow_connection
     end
     m = FactoryGirl.create(:test_model)
+    binding.pry
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :id) }.
     to raise_error(ReactiveRecord::AccessViolation)
   end
