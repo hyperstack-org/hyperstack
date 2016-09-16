@@ -134,7 +134,7 @@ module Synchromesh
     def self.sync_destroy(data)
       IncomingBroadcast.receive(data) do |broadcast|
         record = broadcast.klass._react_param_conversion(broadcast.record)
-        ReactiveRecord::Base.load_data { record.destroy }
+        record.backing_record.destroy_associations
         record.backing_record.destroyed = true
         record.backing_record.sync_scopes2
       end

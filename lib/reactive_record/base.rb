@@ -38,17 +38,17 @@ module ReactiveRecord
       @previous_changes ||= {}
     end
 
-    # def set_previous_changes(hash)
-    #   @previous_changes = {}
-    #   hash.each { |attr, new_value| @previous_changes[attr] = [@attributes[attr], new_value] }
-    # end
-    #
-    # alias pre_synchromesh_sync! sync!
-    #
-    # def sync!(hash={})
-    #   set_previous_changes(hash)
-    #   pre_synchromesh_sync!(hash)
-    # end
+    # once this method is integrated back into reactive-record, remove the duplicate
+    # code from within the destroy method (in file isomorphic_base)
+    def destroy_associations
+      model.reflect_on_all_associations.each do |association|
+        if association.collection?
+          attributes[association.attribute].replace([]) if attributes[association.attribute]
+        else
+          @ar_instance.send("#{association.attribute}=", nil)
+        end
+      end
+    end
 
   end
 end

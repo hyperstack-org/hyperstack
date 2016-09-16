@@ -121,7 +121,7 @@ Synchromesh will not interfere with any ActionCable connections and channels you
 
 ### Pusher Configuration
 
-Add `gem 'pusher'` to your gem file, and add `require synchromesh/pusher` to the client only portion of your components manifest.
+Add `gem 'pusher'` to your gem file, and add `//= require 'synchromesh/pusher'` to your application.js file.
 
 ```ruby
 # typically config/initializers/synchromesh.rb
@@ -153,7 +153,7 @@ Pusher.app_id = "MY_TEST_ID"      # you use the real or fake values
 Pusher.key =    "MY_TEST_KEY"
 Pusher.secret = "MY_TEST_SECRET"
 # The next line actually starts the pusher-fake server (see the Pusher-Fake readme for details.)
-require 'pusher-fake/support/rspec'
+require 'pusher-fake/support/base' # if using pusher with rspec change this to pusher-fake/support/rspec
 # now copy over the credentials, and merge with PusherFake's config details
 Synchromesh.configuration do |config|
   config.transport = :pusher
@@ -251,6 +251,19 @@ class Todo < ActiveRecord::Base
 
 end
 ```
+
+## Common Errors
+
+- no policy file
+- wrong version of pusher-fake  (pusher-fake/base vs. pusher-fake/rspec)
+- forgetting to add require pusher in components manifest  results in error like this:
+
+Exception raised while rendering #<TopLevelRailsComponent:0x53e>
+    ReferenceError: Pusher is not defined
+
+- no create/update/destroy policies
+you won't see much on the console: but if you look at the response from the server you will see success is false
+- using for: :all instead of to: :all (should fix this)
 
 ## Development
 

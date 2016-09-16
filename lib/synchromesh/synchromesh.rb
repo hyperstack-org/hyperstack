@@ -7,8 +7,16 @@ module Synchromesh
 
   def self.config_reset
     Object.send(:remove_const, :Application) if @fake_application_defined
-    policy = Object.const_get 'ApplicationPolicy' rescue nil
-    application = Object.const_get('Application') if policy rescue nil
+    policy = begin
+      Object.const_get 'ApplicationPolicy'
+    rescue Exception => e
+      raise e unless e.is_a?(NameError) && e.message == "uninitialized constant ApplicationPolicy"
+    end
+    application = begin
+      Object.const_get('Application')
+    rescue Exception => e
+      raise e unless e.is_a?(NameError) && e.message == "uninitialized constant Application"
+    end if policy
     if policy && !application
       Object.const_set 'Application', Class.new
       @fake_application_defined = true

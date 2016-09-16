@@ -1,5 +1,3 @@
-require 'pry' if RUBY_ENGINE != 'opal'
-
 class TestModel < ActiveRecord::Base
   has_many :child_models
   scope :completed, -> () { where(completed: true)  }
