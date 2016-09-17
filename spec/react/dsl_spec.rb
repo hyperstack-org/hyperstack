@@ -86,7 +86,7 @@ describe 'the React DSL' do
     Mod::Bar.class_eval do
       collect_other_params_as :attributes
       def render
-        "a man walks into a bar".span(attributes)
+        "a man walks into a bar".span(params.attributes)
       end
     end
     stub_const 'Foo', Class.new(React::Component::Base)
