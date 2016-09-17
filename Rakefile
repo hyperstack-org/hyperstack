@@ -6,8 +6,15 @@ Bundler::GemHelper.install_tasks
 require 'rspec/core/rake_task'
 require 'opal/rspec/rake_task'
 
+begin
+  require "react-rails"
+rescue NameError
+end
+
 RSpec::Core::RakeTask.new('ruby:rspec')
+
 Opal::RSpec::RakeTask.new('opal:rspec') do |s|
+  s.append_path React::Rails::AssetVariant.new(addons: true).react_directory
   s.append_path 'spec/vendor'
   s.index_path = 'spec/index.html.erb'
 end

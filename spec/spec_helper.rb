@@ -15,10 +15,11 @@ end
 
 if RUBY_ENGINE == 'opal'
   require File.expand_path('../vendor/jquery-2.2.4.min', __FILE__)
-  require 'react-latest'
+  require 'react.js'
+  require "react-server.js"
   require 'reactive-ruby'
   require 'react/test/rspec'
-  
+
   require File.expand_path('../support/react/spec_helpers', __FILE__)
 
   module Opal

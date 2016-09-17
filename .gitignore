@@ -31,3 +31,5 @@ node_modules
 
 spec/test_app
 Gemfile.lock
+
+/gemfiles/*.lock
