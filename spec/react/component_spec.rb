@@ -710,7 +710,7 @@ describe React::Component, type: :component do
       children = Foo.the_children
 
       expect(children).to be_a(React::Children)
-      expect(children.size).to eq(2)
+      expect(children.count).to eq(2)
       expect(children.map(&:element_type)).to eq(['a', 'li'])
     end
 
@@ -718,7 +718,7 @@ describe React::Component, type: :component do
       ele = React.create_element(Foo)
       renderElementToDocument(ele)
       nodes = Foo.the_children.each
-      expect(nodes.size).to eq(nil)
+      expect(nodes.size).to eq(0)
       expect(nodes.count).to eq(0)
     end
   end
