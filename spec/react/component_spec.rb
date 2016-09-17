@@ -356,39 +356,38 @@ describe React::Component, type: :component do
       end
     end
 
-    # deprecated as of React 14
-    # describe 'Props Updating' do
-    #   before do
-    #     stub_const 'Foo', Class.new
-    #     Foo.class_eval do
-    #       include React::Component
-    #     end
-    #   end
-    #
-    #   it 'supports original `setProps` as method `set_props`' do
-    #     Foo.class_eval do
-    #       def render
-    #         React.create_element('div') { params[:foo] }
-    #       end
-    #     end
-    #
-    #     element = renderToDocument(Foo, {foo: 10})
-    #     element.set_props(foo: 20)
-    #     expect(`#{element.dom_node}.innerHTML`).to eq('20')
-    #   end
-    #
-    #   it 'supports original `replaceProps` as method `set_props!`' do
-    #     Foo.class_eval do
-    #       def render
-    #         React.create_element('div') { params[:foo] ? 'exist' : 'null' }
-    #       end
-    #     end
-    #
-    #     element = renderToDocument(Foo, {foo: 10})
-    #     element.set_props!(bar: 20)
-    #     expect(element.getDOMNode.innerHTML).to eq('null')
-    #   end
-    # end
+    describe 'Props Updating', v13_only: true do
+      before do
+        stub_const 'Foo', Class.new
+        Foo.class_eval do
+          include React::Component
+        end
+      end
+
+      it 'supports original `setProps` as method `set_props`' do
+        Foo.class_eval do
+          def render
+            React.create_element('div') { params[:foo] }
+          end
+        end
+
+        element = renderToDocument(Foo, {foo: 10})
+        element.set_props(foo: 20)
+        expect(`#{element.dom_node}.innerHTML`).to eq('20')
+      end
+
+      it 'supports original `replaceProps` as method `set_props!`' do
+        Foo.class_eval do
+          def render
+            React.create_element('div') { params[:foo] ? 'exist' : 'null' }
+          end
+        end
+
+        element = renderToDocument(Foo, {foo: 10})
+        element.set_props!(bar: 20)
+        expect(element.getDOMNode.innerHTML).to eq('null')
+      end
+    end
 
     describe 'Prop validation' do
       before do

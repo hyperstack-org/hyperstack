@@ -142,13 +142,11 @@ RSpec.describe React, type: :component do
     end
 
     describe "class_name helpers (React.addons.classSet)" do
-
-      # deprecated as of React 14
-      # it "should transform Hash provided to `class_name` props as string" do
-      #   classes = {foo: true, bar: false, lorem: true}
-      #   element = React.create_element("div", class_name: classes)
-      #   expect(element.props.className).to eq("foo lorem")
-      # end
+      it "should transform Hash provided to `class_name` props as string", v13_only: true do
+        classes = {foo: true, bar: false, lorem: true}
+        element = React.create_element("div", class_name: classes)
+        expect(element.props.className).to eq("foo lorem")
+      end
 
       it "should not alter behavior when passing a string" do
         element = React.create_element("div", class_name: "foo bar")

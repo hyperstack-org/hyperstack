@@ -72,6 +72,9 @@ if RUBY_ENGINE == 'opal'
   RSpec.configure do |config|
     config.include React::SpecHelpers
     config.filter_run_excluding :ruby
+    if `(React.version.search(/^0\.13/) === -1)`
+      config.filter_run_excluding :v13_only
+    end
   end
 end
 
