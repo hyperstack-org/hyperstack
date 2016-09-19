@@ -27,6 +27,7 @@ module Synchromesh
   define_setting(:transport, :none) do |transport|
     if transport == :action_cable
       require 'synchromesh/action_cable'
+      Rails.application.config.cache_store = :memory_store if Rails.application.config.cache_store = :null_store
       opts[:refresh_channels_every] = :never
     elsif opts[:refresh_channels_every] == :never
       opts[:refresh_channels_every] = nil

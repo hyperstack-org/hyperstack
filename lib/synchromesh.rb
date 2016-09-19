@@ -12,6 +12,7 @@
 require_relative 'active_record_base'
 require 'set'
 if RUBY_ENGINE == 'opal'
+  #require 'reactive-record'
   require_relative 'synchromesh/version'
   require_relative 'json/parse_patch'
   require_relative 'opal/set_patches'

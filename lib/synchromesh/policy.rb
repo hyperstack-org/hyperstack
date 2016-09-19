@@ -37,7 +37,7 @@ module Synchromesh
 
     def self.allow_policy(policy, method)
       define_method "allow_#{policy}" do |*args, &regulation|
-        process_args(policy, args, regulation) do |model|
+        process_args(policy, [], args, regulation) do |model|
           get_ar_model(model).class_eval { define_method("#{method}_permitted?", &regulation) }
         end
       end
@@ -48,7 +48,7 @@ module Synchromesh
     allow_policy(:read, :view)
 
     def allow_change(*args, &regulation)
-      process_args('change', args, regulation) do |model, opts|
+      process_args('change', [:on], args, regulation) do |model, opts|
         model = get_ar_model(model)
         opts[:on] ||= CHANGE_POLICIES
         opts[:on].each do |policy|
@@ -65,23 +65,28 @@ module Synchromesh
     end
 
     def regulate(regulation_klass, policy, args, &regulation)
-      process_args(policy, args, regulation) do |regulated_klass, opts|
+      process_args(policy, regulation_klass.allowed_opts, args, regulation) do |regulated_klass, opts|
         regulation_klass.add_regulation regulated_klass, opts, &regulation
       end
     end
 
-    def process_args(policy, args, regulation)
+    def process_args(policy, allowed_opts, args, regulation)
       raise "you must provide a block to the regulate_#{policy} method" unless regulation
       *args, opts = args if args.last.is_a? Hash
       opts ||= {}
-      args = process_to_opt(opts[:to], args)
+      args = process_to_opt(allowed_opts, opts, args)
       args.each do |regulated_klass|
         yield regulated_klass, opts
       end
     end
 
-    def process_to_opt(to, args)
-      if to
+    def process_to_opt(allowed_opts, opts, args)
+      opts.each do |opt, value|
+        unless opt == :to || allowed_opts.include?(opt)
+          raise "Unknown ':#{opt} => #{value}' option in policy definition"
+        end
+      end
+      if (to = opts[:to])
         raise "option to: :#{to} is not recognized in allow_#{policy}" unless to == :all
         raise "option to: :all cannot be used with other classes" unless args.empty?
         [ActiveRecord::Base]
@@ -131,6 +136,10 @@ module Synchromesh
         wrapped_policy
       end
 
+      def allowed_opts
+        []
+      end
+
     end
 
     attr_reader :klass
@@ -178,6 +187,11 @@ module Synchromesh
         channel
       end.compact
     end
+
+    def self.allowed_opts
+      [:auto_connect]
+    end
+
   end
 
   class InstanceConnectionRegulation < Regulation
@@ -204,6 +218,10 @@ module Synchromesh
          end
         end
       end.flatten(1)
+    end
+
+    def self.allowed_opts
+      [:auto_connect]
     end
   end
 

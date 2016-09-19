@@ -37,6 +37,10 @@ module Synchromesh
       attr_reader :record
       attr_reader :previous_changes
 
+      def to_s
+        "klass: #{klass} record: #{record} previous_changes: #{previous_changes}"
+      end
+
       def self.open_channels
         @open_channels ||= Set.new
       end

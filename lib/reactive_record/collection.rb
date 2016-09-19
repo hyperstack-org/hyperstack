@@ -63,6 +63,7 @@ module ReactiveRecord
     end
 
     def observed
+      puts "observed #{self}  @out_of_date: #{!!@out_of_date}"
       reload_from_db if @out_of_date
       React::State.get_state(self, "collection") unless ReactiveRecord::Base.data_loading?
     end
@@ -75,6 +76,44 @@ module ReactiveRecord
         React::State.set_state(self, "collection", collection, true)
       end
       pre_synchromesh_instance_variable_set var, val
+    end
+
+    alias_method :pre_synchromesh_push, '<<'
+
+    def <<(item)
+      puts "pushing #{item} onto collection"
+      if collection
+        puts "has collection"
+        pre_synchromesh_push item
+      elsif !@count.nil?
+        puts "has count, updating"
+        if item.destroyed?
+          puts "destroyed, decrementing count"
+          @count -= 1
+          notify_of_change self
+        else #if item.backing_record.new_id?
+          puts "not destroyed incrementing count"
+          @count += 1
+          notify_of_change self
+        end
+      end
+    end
+
+    def update_collection_on_sync(ar_instance)
+      puts "update_collection_on_sync(#{ar_instance})"
+      if collection
+        puts "has collection"
+        self << ar_instance
+      elsif ar_instance.destroyed?
+        puts "destroyed"
+        @count -= 1
+        notify_of_change self
+        puts "notified"
+      elsif ar_instance.backing_record.new_id?
+        puts "new_id is true"
+        @count += 1
+        notify_of_change self
+      end
     end
   end
 end

@@ -6,23 +6,38 @@ In other words browser 1 creates, updates, or destroys a model, and the changes 
 
 Add the gem, setup your configuration, and synchromesh does the rest.
 
-## Transports
+## Quick Start Guides
 
-Currently there are two transport mechanisms:  
+Use one of the following guides if you are in a hurry to get going.
 
-+ [Pusher](http://pusher.com) which gives you zero config websockets.  
-+ Short cycle polling (for development)
+The easiest way to get setup is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
 
-Hopefully very shortly we will also have an ActionCable transport.   
+If you are already using Pusher follow this [guide.](docs/pusher_quickstart.md)
 
-Also near term we will have a simple mechanism to plug in your own transport.
+If you are on Rails 5 already, and want to try ActionCable use this [guide.](docs/action_cable_quickstart.md)
+
+All of the above use websockets.  For ultimate simplicity use Polling as explained [here.](docs/simple_poller_quickstart.md)
+
+## Overview
+
+Synchromesh is built on top of Reactrb and ReactiveRecord.
+
++ Reactrb is a ruby wrapper on Facebook's React.js library.  As data changes on the client (either from user interactions or external events) Reactrb re-draws whatever parts of the display is needed.
++ ReactiveRecord uses Reactrb to render and then dynamically update your ActiveRecord models on the client.
++ Synchromesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
+
+A minimal synchromesh configuration consists of a simple initializer file, and at least one *Policy* class that will *authorize* who gets to see what.
+
+The initializer file specifies what transport will be used.  Currently you can use [Pusher](http://pusher.com), ActionCable (if using Rails 5), Pusher-Fake (for development) or a Simple Poller for testing etc.
+
+Synchromesh also adds some features to the `ActiveRecord` `scope` method to optimize expensive scope updates.
 
 ## Authorization
 
 Each application defines a number of *channels* and *authorization policies* for those channels and the data sent over them.
 
 Policies are defined with *Policy* classes.  These are similar and compatible with [Pundit](https://github.com/elabs/pundit) but
-you do not need to use the pundit gem.
+you do not need to use the pundit gem (but can if you want.)
 
 Examples:
 
@@ -58,11 +73,13 @@ class UserPolicy
 end
 ```
 
-For complete details see [Authorization Policies](authorization-policies.md)
+For complete details see [Authorization Policies](docs/authorization-policies.md)
 
 ## Installation
 
-Add this line to your application's Gemfile:
+If you do not already have reactrb installed, then use the reactrb-rails-generator gem to setup reactrb, reactive-record and associated gems.
+
+Then add this line to your application's Gemfile:
 
 ```ruby
 gem 'synchromesh'
@@ -89,7 +106,7 @@ end
 # Normally you would put these policies in the app/policies/ directory
 class ApplicationPolicy
   # allow all clients to connect to the Application channel
-  regulate_connection { true }
+  regulate_connection { true } # or always_allow_connection for short
   # broadcast all model changes over the Application channel *DANGEROUS*
   regulate_all_broadcasts { |policy| policy.send_all }
 end
@@ -106,7 +123,7 @@ Synchromesh.configuration do |config|
 end
 ```
 
-In addition make sure that you include the `action_cable` js file in your assets
+If you have not yet setup action cable all you have to do is include the `action_cable` js file in your assets
 
 ```javascript
 //application.js
@@ -186,7 +203,7 @@ When the client receives notification that a record has changed Synchromesh find
 
 To give you control over this process Synchromesh adds some features to the ActiveRecord scope macro.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
 
-The `scope` macro now takes an optional third parameter and an optional block:
+Synchromesh `scope` adds an optional third parameter and an optional block:
 
 ```ruby
 
@@ -254,16 +271,22 @@ end
 
 ## Common Errors
 
-- no policy file
-- wrong version of pusher-fake  (pusher-fake/base vs. pusher-fake/rspec)
-- forgetting to add require pusher in components manifest  results in error like this:
-
+- No policy class:  
+If you don't define a policy file, nothing will happen because nothing will get connected.  
+By default synchromesh will look for a `ApplicationPolicy` class.
+- Wrong version of pusher-fake  (pusher-fake/base vs. pusher-fake/rspec)  
+See the Pusher-Fake gem repo for details.
+- Forgetting to add require pusher in application.js file  
+this results in an error like this:
+```text
 Exception raised while rendering #<TopLevelRailsComponent:0x53e>
     ReferenceError: Pusher is not defined
-
-- no create/update/destroy policies
-you won't see much on the console: but if you look at the response from the server you will see success is false
-- using for: :all instead of to: :all (should fix this)
+```  
+To resolve make sure you `require 'pusher'` in your application.js file if using pusher.
+- No create/update/destroy policies
+You must explicitly allow changes to the models to be made by the client. If you don't you will
+see 500 responses from the server when you try to update.  To open all access do this in
+your application policy: `allow_change(to: :all, on: [:create, :update, :destroy]) { true }`
 
 ## Development
 
@@ -274,16 +297,6 @@ bundle exec rspec spec
 ```
 
 You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  You can add `SHOW_LOGS=true` if running in poltergeist (the default) to see what is going on, but ff is a lot better for debug.
-
-## How it works
-
-The design goal is to push as much work onto the client side as possible.
-
-* `ActiveRecord` after_commit hooks are used to broadcast changes and deletions to all participating clients.
-* Each client then searches for any scopes currently being rendered that will need to be
-updated.
-* `Reactive-Record` then updates scopes, and notifies `React` of the state changes as it would for any other change.
-
 
 
 ## Contributing

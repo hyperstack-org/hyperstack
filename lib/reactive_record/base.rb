@@ -12,11 +12,14 @@ module ReactiveRecord
       # but yet not have a policy to get the syncronized updates.  This needs to be worked
       # probably by making all authorizations work through the same policy mechanisms, Instead
       # of having the distinct mechanism for synchromesh vs. reactive-record.
+      #sync_scopes2 if Synchromesh::ClientDrivers.opts[:transport] == :none
     end
 
     def sync_scopes2
+      puts "********** sync_scopes2 called on #{self} *************"
       Collection.sync_scopes(@ar_instance)
-      model.all << @ar_instance if ReactiveRecord::Base.class_scopes(model)[:all] # add this only if model.all has been fetched already
+      model.all << @ar_instance if ReactiveRecord::Base.class_scopes(model)[:all]
+      # collection.update_collection_on_sync(@ar_instance) if collection # update the collection only if it exists
     end
 
     def self.when_not_saving(model)
@@ -36,6 +39,10 @@ module ReactiveRecord
 
     def previous_changes
       @previous_changes ||= {}
+    end
+
+    def new_id?
+      previous_changes[:id] && `#{previous_changes[:id]}[0] == null`
     end
 
     # once this method is integrated back into reactive-record, remove the duplicate
