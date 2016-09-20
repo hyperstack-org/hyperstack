@@ -7,3 +7,7 @@ rvm:
 script:
   - bundle exec rake test_app
   - bundle exec rake
+gemfile:
+  - gemfiles/react_13.gemfile
+  - gemfiles/react_14.gemfile
+  - gemfiles/react_15.gemfile
