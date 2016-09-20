@@ -18,23 +18,36 @@ module ActiveRecord
 
     class << self
 
-      alias old_scope scope
+      alias pre_synchromesh_scope scope
 
       if RUBY_ENGINE != 'opal'
 
         def scope(name, body, opts = {}, &block)
-          old_scope(name, body, &block)
+          pre_synchromesh_scope(name, body, &block)
         end
 
       else
+
+        def unscoped
+          ReactiveRecord::Base.class_scopes(self)[:unscoped] ||= ReactiveRecord::Collection.new(self, nil, nil, self, "unscoped")
+        end
+
+        alias pre_synchromesh_method_missing method_missing
+
+        def method_missing(name, *args, &block)
+          if [].respond_to?(name)
+            all.send(name, *args, &block)
+          else
+            pre_synchromesh_method_missing(name, *args, &block)
+          end
+        end
 
         def reactive_record_scopes
           @rr_scopes ||= {}
         end
 
         def scope(name, body, opts = {}, &block)
-          sync = opts.has_key?(:sync) ? opts[:sync] : true
-          ReactiveRecord::Collection.add_scope(self, name, opts[:joins], sync)
+          ReactiveRecord::Collection.add_scope(self, name, opts)
           singleton_class.send(:define_method, name) do | *args |
             args = (args.count == 0) ? name : [name, *args]
             ReactiveRecord::Base.class_scopes(self)[args] ||=

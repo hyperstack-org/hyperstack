@@ -318,7 +318,7 @@ describe "synchronized scopes", js: true do
         end
         render(:div) do
           div { "rendered #{@render_count} times"}
-          div { "quickest.count = #{TestModel.quickest.all.count}" }
+          div { "quickest.count = #{TestModel.quickest.count}" }
         end
       end
     end

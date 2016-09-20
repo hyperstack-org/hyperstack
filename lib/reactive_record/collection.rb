@@ -6,12 +6,11 @@ module ReactiveRecord
     attr_reader :scope_description
 
     class << self
-      def add_scope(klass, name, joins_list, sync_proc)
-        scope_descriptions[klass][name] = ScopeDescription.new(name, klass, joins_list, sync_proc)
+      def add_scope(klass, name, opts)
+        scope_descriptions[klass][name] = ScopeDescription.new(name, klass, opts)
       end
 
       def add_scoped_collection(klass, scope, collection)
-        puts "add_scoped_collection(#{klass}, #{scope}, #{collection}) returns #{scope_descriptions[klass][scope]}"
         @scoped_collections ||= []
         @scoped_collections << collection
         scope_descriptions[klass][scope]
@@ -44,7 +43,7 @@ module ReactiveRecord
 
     def sync_scope(record)
       joined = @scope_description.joins_with?(record, self)
-      if joined 
+      if joined
         if React::State.has_observers?(self, "collection")
           reload_from_db
         else
@@ -60,11 +59,9 @@ module ReactiveRecord
     end
 
     def observed
-      puts "observed #{self}  @out_of_date: #{!!@out_of_date}"
       reload_from_db if @out_of_date
       React::State.get_state(self, "collection") unless ReactiveRecord::Base.data_loading?
     end
-
 
     alias pre_synchromesh_instance_variable_set instance_variable_set
 
@@ -78,38 +75,53 @@ module ReactiveRecord
     alias_method :pre_synchromesh_push, '<<'
 
     def <<(item)
-      puts "pushing #{item} onto collection"
       if collection
-        puts "has collection"
         pre_synchromesh_push item
       elsif !@count.nil?
-        puts "has count, updating"
-        if item.destroyed?
-          puts "destroyed, decrementing count"
-          @count -= 1
-          notify_of_change self
-        else #if item.backing_record.new_id?
-          puts "not destroyed incrementing count"
-          @count += 1
-          notify_of_change self
-        end
+        @count += item.destroyed? ? -1 : 1
+        notify_of_change self
       end
     end
 
-    def update_collection_on_sync(ar_instance)
-      puts "update_collection_on_sync(#{ar_instance})"
+    def delete(item)
+      notify_of_change(if @owner and @association and inverse_of = @association.inverse_of
+        if backing_record = item.backing_record and backing_record.attributes[inverse_of] == @owner
+          # the if prevents double update if delete is being called from << (see << above)
+          backing_record.update_attribute(inverse_of, nil)
+        end
+        delete_internal(item) { @owner.backing_record.update_attribute(@association.attribute) } # forces a check if association contents have changed from synced values
+      else
+        delete_internal(item)
+      end)
+    end
+
+    def delete_internal(item)
       if collection
-        puts "has collection"
-        self << ar_instance
-      elsif ar_instance.destroyed?
-        puts "destroyed"
+        all.delete(item)
+      elsif !@count.nil?
         @count -= 1
-        notify_of_change self
-        puts "notified"
-      elsif ar_instance.backing_record.new_id?
-        puts "new_id is true"
-        @count += 1
-        notify_of_change self
+      end
+      yield item if block_given?
+      item
+    end
+
+    def update_collection_on_sync(ar_instance, count, in_scope)
+      if count
+        if collection
+          if in_scope
+            self << ar_instance
+          else
+            self.delete(ar_instance)
+          end
+          if self.count != count
+            reload_from_db
+          end
+        elsif !@count.nil?
+          @count = count
+          notify_of_change self
+        end
+      else
+        self << ar_instance
       end
     end
   end

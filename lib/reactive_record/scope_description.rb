@@ -4,8 +4,9 @@ module ReactiveRecord
   # The main point is to provide knowledge of what models
   # the scope is joined with.
 
-    def initialize(name, model, joins_list, sync_proc)
-      puts "initializing scope description: #{model}, #{joins_list}, #{sync_proc}"
+    def initialize(name, model, opts)
+      joins_list = opts[:joins]
+      sync_proc = opts.has_key?(:sync) ? opts[:sync] : true
       @name = name
       @model = model
       @joins_list = if joins_list.nil?

@@ -57,8 +57,8 @@ describe "synchronizing relationships", js: true do
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         render(:div) do
-          div { "#{ChildModel.all.count} items" }
-          ul { ChildModel.all.each { |model| li { model.child_attribute }}}
+          div { "#{ChildModel.count} items" }
+          ul { ChildModel.each { |model| li { model.child_attribute }}}
         end
       end
     end
@@ -140,7 +140,7 @@ describe "synchronizing relationships", js: true do
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         render(:div) do
-          "Count of TestModel: #{TestModel.all.count}".span
+          "Count of TestModel: #{TestModel.count}".span
         end
       end
     end
@@ -158,8 +158,8 @@ describe "synchronizing relationships", js: true do
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         render(:div) do
-          puts "Count of TestModel: #{TestModel.all.collect { |i| i.id}.length}"
-          "Count of TestModel: #{TestModel.all.collect { |i| i.id}.length}".span
+          puts "Count of TestModel: #{TestModel.collect { |i| i.id}.length}"
+          "Count of TestModel: #{TestModel.collect { |i| i.id}.length}".span
         end
       end
     end

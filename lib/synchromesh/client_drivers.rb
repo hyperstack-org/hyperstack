@@ -36,9 +36,11 @@ module Synchromesh
 
       attr_reader :record
       attr_reader :previous_changes
+      attr_reader :currently_in_default_scope
+      attr_reader :current_default_scope_count
 
       def to_s
-        "klass: #{klass} record: #{record} previous_changes: #{previous_changes}"
+        "klass: #{klass} record: #{record} previous_changes: #{previous_changes}, in_default_scope: #{in_default_scope}"
       end
 
       def self.open_channels
@@ -107,6 +109,8 @@ module Synchromesh
         @klass ||= data[:klass]
         @record.merge! data[:record]
         @previous_changes.merge! data[:previous_changes]
+        @currently_in_default_scope = data[:currently_in_default_scope]
+        @current_default_scope_count = data[:current_default_scope_count]
         yield complete! if @channels == @received
       end
 
@@ -125,9 +129,11 @@ module Synchromesh
     def self.sync_change(data)
       IncomingBroadcast.receive(data) do |broadcast|
         ReactiveRecord::Base.when_not_saving(broadcast.klass) do |klass|
-          record = klass._react_param_conversion(broadcast.record)
-          record.backing_record.previous_changes = broadcast.previous_changes
-          record.backing_record.sync_scopes2
+          backing_record = klass._react_param_conversion(broadcast.record).backing_record
+          backing_record.previous_changes = broadcast.previous_changes
+          backing_record.currently_in_default_scope = broadcast.currently_in_default_scope
+          backing_record.current_default_scope_count = broadcast.current_default_scope_count
+          backing_record.sync_scopes2
         end
       end
     end
@@ -137,10 +143,12 @@ module Synchromesh
 
     def self.sync_destroy(data)
       IncomingBroadcast.receive(data) do |broadcast|
-        record = broadcast.klass._react_param_conversion(broadcast.record)
-        record.backing_record.destroy_associations
-        record.backing_record.destroyed = true
-        record.backing_record.sync_scopes2
+        backing_record = broadcast.klass._react_param_conversion(broadcast.record).backing_record
+        backing_record.destroy_associations
+        backing_record.destroyed = true
+        backing_record.currently_in_default_scope = broadcast.currently_in_default_scope
+        backing_record.current_default_scope_count = broadcast.current_default_scope_count
+        backing_record.sync_scopes2
       end
     end
 

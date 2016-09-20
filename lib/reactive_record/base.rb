@@ -15,11 +15,18 @@ module ReactiveRecord
       #sync_scopes2 if Synchromesh::ClientDrivers.opts[:transport] == :none
     end
 
+    attr_accessor :currently_in_default_scope
+    attr_accessor :current_default_scope_count
+
     def sync_scopes2
-      puts "********** sync_scopes2 called on #{self} *************"
       Collection.sync_scopes(@ar_instance)
-      model.all << @ar_instance if ReactiveRecord::Base.class_scopes(model)[:all]
-      # collection.update_collection_on_sync(@ar_instance) if collection # update the collection only if it exists
+      if ReactiveRecord::Base.class_scopes(model)[:unscoped]
+        model.unscoped << @ar_instance if new_id? || destroyed
+      end
+      if ReactiveRecord::Base.class_scopes(model)[:all]
+        model.all.update_collection_on_sync(
+          @ar_instance, current_default_scope_count, currently_in_default_scope)
+      end
     end
 
     def self.when_not_saving(model)
