@@ -22,25 +22,15 @@ describe "synchronized scopes", js: true do
     TestModel.class_eval do
       class << self
         alias pretest_scope scope
-        def scope(name, *args, &block)
-          if args[0].respond_to? :call
-            proc = args[0]
-          else
-            proc = args[1]
-          end
+        def scope(name, proc, opts = {}, &block)
           self.class.class_eval do
             attr_reader "#{name}_count".to_sym
           end
           instance_variable_set("@#{name}_count", 0)
-          wrapped_proc = lambda do |*args|
+          patched_proc = lambda do |*args|
             instance_variable_set("@#{name}_count", send("#{name}_count")+1); proc.call(*args, &block)
           end
-          if args[0].respond_to? :call
-            args[0] = wrapped_proc
-          else
-            args[1] = wrapped_proc
-          end
-          pretest_scope name, *args, &block
+          pretest_scope name, patched_proc, opts, &block
         end
       end
     end
@@ -60,8 +50,8 @@ describe "synchronized scopes", js: true do
   it "will be updated only when needed" do
     isomorphic do
       TestModel.class_eval do
-        scope :scope1, lambda { where(completed: true) }
-        scope :scope2, lambda { where(completed: true) }
+        scope :scope1, -> { where(completed: true) }
+        scope :scope2, -> { where(completed: true) }
       end
     end
     mount "TestComponent2" do
@@ -132,7 +122,7 @@ describe "synchronized scopes", js: true do
   it "can have params" do
     isomorphic do
       TestModel.class_eval do
-        scope :with_args, lambda { |match, match2| where(test_attribute: match) }
+        scope :with_args, ->(match, match2) { where(test_attribute: match) }
       end
     end
     m1 = FactoryGirl.create(:test_model, test_attribute: "123")
@@ -162,8 +152,8 @@ describe "synchronized scopes", js: true do
   it "scopes with params can be nested" do
     isomorphic do
       TestModel.class_eval do
-        scope :scope1, lambda { where(completed: true) }
-        scope :with_args, lambda { |match| where(test_attribute: match) }
+        scope :scope1, -> { where(completed: true) }
+        scope :with_args, -> (match) { where(test_attribute: match) }
       end
     end
     mount "TestComponent2" do
@@ -181,25 +171,9 @@ describe "synchronized scopes", js: true do
   it 'can have a joins array' do
     isomorphic do
       TestModel.class_eval do
-        scope :joined, [ChildModel], lambda { joins(:child_models).where("child_attribute = 'WHAAA'") }
-      end
-    end
-    mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
-        render { "TestModel.joined.count = #{TestModel.joined.count}" }
-      end
-    end
-    parent = FactoryGirl.create(:test_model)
-    child = FactoryGirl.create(:child_model, test_model: parent )
-    page.should have_content('.count = 0')
-    child.update_attribute(:child_attribute, 'WHAAA')
-    page.should have_content('.count = 1')
-  end
-
-  it 'can have a joins array as the third scope param' do
-    isomorphic do
-      TestModel.class_eval do
-        scope :joined, lambda { joins(:child_models).where("child_attribute = 'WHAAA'") }, [ChildModel]
+        scope :joined,
+              -> { joins(:child_models).where("child_attribute = 'WHAAA'") },
+              joins: ChildModel
       end
     end
     mount 'TestComponent2' do
@@ -217,7 +191,7 @@ describe "synchronized scopes", js: true do
   it 'can have a block to dynamically test if scope needs updating' do
     isomorphic do
       TestModel.class_eval do
-        scope(:quick, lambda { where(completed: true) }) do |record|
+        scope :quick, -> { where(completed: true) }, sync: -> (record) do
           (record.completed && record.destroyed?) || record.previous_changes[:completed]
         end
       end
@@ -263,7 +237,7 @@ describe "synchronized scopes", js: true do
 
     isomorphic do
       TestModel.class_eval do
-        scope(:quicker, lambda { where(completed: true) }) do |record, collection|
+        scope :quicker, -> { where(completed: true) }, sync: -> (record, collection) do
           if (record.completed && record.destroyed?) || (record.completed.nil? && record.previous_changes[:completed])
             ReactiveRecord.load do
               collection.all
@@ -323,7 +297,7 @@ describe "synchronized scopes", js: true do
 
     isomorphic do
       TestModel.class_eval do
-        scope(:quickest, lambda { where(completed: true) }) do |record, collection|
+        scope :quickest, -> { where(completed: true) }, sync: -> (record, collection) do
           if (record.completed && record.destroyed?) || (record.completed.nil? && record.previous_changes[:completed])
             collection.delete(record)
           elsif record.completed && record.previous_changes[:completed]
@@ -374,8 +348,10 @@ describe "synchronized scopes", js: true do
   it 'the joins array can be combined with the block' do
     isomorphic do
       TestModel.class_eval do
-        scope :has_children, [ChildModel],
-              lambda { joins(:child_models).distinct } do |record|
+        scope :has_children,
+              -> { joins(:child_models).distinct },
+              joins: [ChildModel],
+              sync: -> (record) do
           if record.is_a?(ChildModel)
             (record.test_model && record.destroyed?) || record.previous_changes[:test_model_id]
           else
@@ -389,20 +365,6 @@ describe "synchronized scopes", js: true do
         render { "TestModel.has_children.count = #{TestModel.has_children.count}" }
       end
     end
-    # ChildModel
-    #   has_test_model
-    #     destroyed?
-    # a      test_model_id changed  +
-    # b      !test_model_id changed +
-    #     !destroyed?
-    # c      test_model_id changed +
-    # d      !test_model_id changed 0
-    #   !has_test_model
-    # e    test_model_id changed +
-    # f    !test_model_id changed 0
-    # !ChildModel
-    # g  destroyed +
-    # h  !destroyed 0
 
     parent = FactoryGirl.create(:test_model) #h
       wait_for { TestModel.has_children_count }.to eq(1)
@@ -431,19 +393,21 @@ describe "synchronized scopes", js: true do
   end
 
 
-  it 'an empty joins array (or some symbol) will pass all changes to the block (if there is a block)' do
+  it 'the joins: :all option will join with all models' do
     isomorphic do
       TestModel.class_eval do
-        scope :has_children, [],
-              lambda { joins(:child_models).distinct } do |record|
+        scope :has_children,
+              -> { joins(:child_models).distinct },
+              joins: :all,
+              sync: -> (record) do
           if record.is_a?(ChildModel)
             (record.test_model && record.destroyed?) || record.previous_changes[:test_model_id]
           else
             record.destroyed?
           end
         end
-        scope(:do_it_all_the_time, :always_sync, lambda { all }) { puts "&&&&&&&&&&&&& doitall the time &&&&&&"; true }
-        scope :never_sync_it, :never_sync, lambda { all }
+        scope :do_it_all_the_time, -> { all }, joins: :all, sync: -> { puts "&&&&&&&&&&&&& doitall the time &&&&&&"; true }
+        scope :never_sync_it, -> { all }, sync: false
       end
     end
     mount 'TestComponent2' do
@@ -542,9 +506,8 @@ describe "synchronized scopes", js: true do
     isomorphic do
       TestModel.class_eval do
         scope :has_children,
-              lambda { joins(:child_models).distinct } do |record|
-          true
-        end
+              -> { joins(:child_models).distinct },
+              sync: -> () { true }
       end
     end
     mount 'TestComponent2' do

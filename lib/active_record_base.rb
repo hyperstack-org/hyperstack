@@ -22,9 +22,8 @@ module ActiveRecord
 
       if RUBY_ENGINE != 'opal'
 
-        def scope(name, server_side_arg, joins_list = [], &block)
-          server_side_arg = joins_list unless server_side_arg.respond_to? :call
-          old_scope(name, server_side_arg)
+        def scope(name, body, opts = {}, &block)
+          old_scope(name, body, &block)
         end
 
       else
@@ -33,8 +32,9 @@ module ActiveRecord
           @rr_scopes ||= {}
         end
 
-        def scope(name, server_side_arg, joins_list = nil, &block)
-          ReactiveRecord::Collection.add_scope(self, name, server_side_arg, joins_list, &block)
+        def scope(name, body, opts = {}, &block)
+          sync = opts.has_key?(:sync) ? opts[:sync] : true
+          ReactiveRecord::Collection.add_scope(self, name, opts[:joins], sync)
           singleton_class.send(:define_method, name) do | *args |
             args = (args.count == 0) ? name : [name, *args]
             ReactiveRecord::Base.class_scopes(self)[args] ||=

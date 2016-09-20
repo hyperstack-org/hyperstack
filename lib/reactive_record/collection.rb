@@ -6,8 +6,8 @@ module ReactiveRecord
     attr_reader :scope_description
 
     class << self
-      def add_scope(klass, name, server_side_arg, joins_list, &block)
-        scope_descriptions[klass][name] = ScopeDescription.new(klass, server_side_arg, joins_list, &block)
+      def add_scope(klass, name, joins_list, sync_proc)
+        scope_descriptions[klass][name] = ScopeDescription.new(name, klass, joins_list, sync_proc)
       end
 
       def add_scoped_collection(klass, scope, collection)
@@ -43,11 +43,8 @@ module ReactiveRecord
     end
 
     def sync_scope(record)
-      joined = nil
-      #ReactiveRecord::Base.load_data {}
       joined = @scope_description.joins_with?(record, self)
-      puts "syncing #{self}-#{@vector} has_observers? #{React::State.has_observers?(self, 'collection')} joins? #{joined}"
-      if joined #@scope_description.joins_with?(record, self)
+      if joined 
         if React::State.has_observers?(self, "collection")
           reload_from_db
         else

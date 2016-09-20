@@ -206,7 +206,6 @@ To give you control over this process Synchromesh adds some features to the Acti
 Synchromesh `scope` adds an optional third parameter and an optional block:
 
 ```ruby
-
 class Todo < ActiveRecord::Base
 
   # Standard ActiveRecord form:
@@ -217,16 +216,16 @@ class Todo < ActiveRecord::Base
   # being scoped changes, and if the scope is currently being used to render data.
 
   # If the scope joins with other data you will need to specify this by
-  # passing an array of the joined models:
+  # passing a single model or array of the joined models to the `joins` option.
   scope :with_recent_comments,
         -> () { joins(:comments).where('created_at >= ?', Time.now-1.week) },
-        [Comments]
+        joins: [Comments] # or joins: Comments
   # Now with_recent_comments will be re-evaluated whenever Comments or Todo records
   # change.  The array can be the second or third parameter.
 
-  # It is possible to optimize when the scope is re-evaluated by attaching a block to
-  # the scope.  If the block returns true, then the scope will be re-evaluated.
-  scope :active, -> () { where(completed: true) } do |record|
+  # It is possible to optimize when the scope is re-evaluated by providing a proc
+  # to the `sync` option.  If the proc returns true then the scope will be reevaluated.
+  scope :active, -> () { where(completed: true) }, sync: -> (record) do
     (record.completed.nil? && record.destroyed?) || record.previous_changes[:completed]
   end
   # In other words only reevaluate if an "uncompleted" record was destroyed or if
@@ -235,36 +234,31 @@ class Todo < ActiveRecord::Base
   # changes are made unless the record is destroyed.
 
   # For heavily used scopes you can even update the scope manually on the client
-  # using the second parameter passed to the block:
-  scope :active, -> () { where(completed: true) } do |record, collection|
-    if (record.completed.nil? && record.destroyed?) ||
-       (record.completed && record.previous_changes[:completed])
+  # using the second parameter passed to the sync proc:
+  scope :active, -> () { where(completed: true) }, sync: -> (record, collection) do
+    if record.completed
       collection.delete(record)
-    elsif record.completed && record.previous_changes[:completed]
+    else
       collection << record
     end
     nil # return nil so we don't resync the scope from the server
   end
 
-  # The 'joins-array' applies to the block as well.  in other words if no joins
+  # The 'joins-array' applies to the sync proc as well.  in other words if no joins
   # array is provided the block will only be called if records for scoped model
-  # change.  If an array is provided, then the additional models will be added
-  # to the join filter.  However if any empty array is provided all changes will
-  # passed.
-  scope :scope1, [AnotherModel], -> () {...} do |record|
+  # change.  If a joins array is provided, then the additional models will be added
+  # to the join filter.  
+  scope :scope1, -> () {...}, joins: [AnotherModel], sync: -> (record) do
     # record will be either a Todo, or AnotherModel
   end
 
-  scope :scope2, [], -> () { ... } do |record|
-    # any change to any model will be passed to the block
+  # The keyword :all means join all models:
+  scope :scope2, -> () { ... }, joins: :all, sync: -> (record) do
+    # any change to any model will be passed to the sync proc
   end
 
-  # The empty join array can also be used to prevent a scope from ever being
-  # updated:
-  scope :never_synced_scope, [], -> () { ... }
-
-  # Or if you prefer just pass any non-array value of your choice:
-  scope :never_synced_scope, :no_sync, -> () {...}
+  # Instead of a proc you can set sync to false
+  scope :never_synced_scope, -> () { ... }, sync: false
 
 end
 ```
