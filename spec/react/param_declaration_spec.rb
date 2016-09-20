@@ -88,7 +88,7 @@ describe 'the param macro', type: :component do
     renderToDocument(Foo2, bar: 10, lorem: Lorem.new)
     `window.console.warn = org_warn_console; window.console.error = org_error_console;`
 
-    expect(`log`).to eq(["Warning: Failed propType: In component `Foo2`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String"])
+    expect(`log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo2`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
   end
 
   it 'should not log anything if validation passes' do
@@ -134,7 +134,7 @@ describe 'the param macro', type: :component do
         param :bar, type: []
       end
       renderToDocument(Foo, foo: 10, bar: [10])
-      expect(`window.dummy_log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `foo` could not be converted to Array"])
+      expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to Array/)
     end
 
     it "can use the [xxx] notation for arrays of a specific type" do
@@ -143,7 +143,7 @@ describe 'the param macro', type: :component do
         param :bar, type: [String]
       end
       renderToDocument(Foo, foo: [10], bar: ["10"])
-      expect(`window.dummy_log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `foo`[0] could not be converted to String"])
+      expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo`\[0\] could not be converted to String/)
     end
 
     it "can convert a json hash to a type" do
@@ -168,7 +168,7 @@ describe 'the param macro', type: :component do
 
       params = { foo: "", bar: { bazwoggle: 1 }, baz: [{ bazwoggle: 2 }] }
       expect(Foo).to render('<span>1, 2</span>').with_params(params)
-      expect(`window.dummy_log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle"])
+      expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle/)
     end
 
     describe "converts params only once" do
