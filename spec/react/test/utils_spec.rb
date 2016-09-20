@@ -14,8 +14,8 @@ if opal?
             super(`React.addons.TestUtils.Simulate`)
           end
 
-          def click(element)
-            `#{@native}['click']`.call(`#{element.to_n}.getDOMNode()`, {})
+          def click(component_instance)
+            `#{@native}['click']`.call(component_instance.dom_node, {})
           end
         end
       end
