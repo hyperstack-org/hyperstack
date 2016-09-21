@@ -78,7 +78,8 @@ module Synchromesh
         messages
       end
 
-      def connect_to_transport(channel, session)
+      def connect_to_transport(channel, session, root_path)
+        self.root_path = root_path
         messages = []
         connections = fetch_connections.delete_if do |connection|
           if connection.is_for?(channel, session)
@@ -91,6 +92,18 @@ module Synchromesh
 
       def disconnect(channel)
         update_connections fetch_connections.delete_if { |c| c.is_for?(channel, nil) }
+      end
+
+      def root_path=(path)
+        if path
+          Rails.cache.write("#{STORE_ID}-root-path", path)
+        else
+          Rails.cache.delete("#{STORE_ID}-root-path")
+        end
+      end
+
+      def root_path
+        Rails.cache.fetch("#{STORE_ID}-root-path") { nil }
       end
 
       # private

@@ -11,6 +11,8 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
+  config.action_cable.allowed_request_origins = ['http://localhost:3000', 'http://localhost:4000', 'http://127.0.0.1:3000']
+
   # Show full error reports.
   config.consider_all_requests_local = true
 
@@ -23,7 +25,7 @@ Rails.application.configure do
   else
     config.action_controller.perform_caching = false
   end
-  config.cache_store = :memory_store
+  config.cache_store = :file_store, './rails_cache_dir'
 
 
   # Don't care if the mailer can't send.

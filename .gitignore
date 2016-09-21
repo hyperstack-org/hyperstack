@@ -13,3 +13,4 @@
 /synchromesh-simple-poller-store
 /synchromesh-pusher-channel-store
 /Gemfile.lock
+/examples/action-cable/rails_cache_dir/

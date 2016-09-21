@@ -5,6 +5,7 @@ module Synchromesh
     def configuration
       config_reset
       yield self
+      config_initialized
     end
 
     def define_setting(name, default = nil, &block)
@@ -23,6 +24,9 @@ module Synchromesh
 
     def config_reset
       raise "must implement"
+    end
+
+    def config_initialized
     end
 
     private

@@ -83,8 +83,30 @@ module Synchromesh
     if transport == :pusher
       pusher.trigger("#{Synchromesh.channel}-#{data[1][:channel]}", *data)
     elsif transport == :action_cable
-      ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
+      if on_console_with_async_action_cable
+        send_to_server(channel, data)
+      else
+        ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
+      end
     end
+  end
+
+  def self.on_console_with_async_action_cable
+    defined?(Rails::Console) &&
+      defined?(ActionCable::Server::Base) &&
+        ActionCable::Server::Base.config.cable["adapter"]=="async"
+  end
+
+  def self.send_to_server(channel, data)
+    salt = SecureRandom.hex
+    authorization = Synchromesh.authorization(salt, channel, data[1][:broadcast_id])
+    raise "no server running" unless Connection.root_path
+    uri = URI("#{Connection.root_path}action_cable_console_update")
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
+    request.body = {channel: channel, data: data, salt: salt, authorization: authorization}.to_json
+    http.request(request)
+    true
   end
 
   def self.pusher
@@ -112,19 +134,21 @@ module Synchromesh
   end
 
   def self.after_change(model)
-    Thread.new do
+    t = Thread.new do
       InternalPolicy.regulate_broadcast(model) do |data|
         Connection.send(data[:channel], ['change', data])
       end
     end
+    t.join if on_console_with_async_action_cable
   end
 
   def self.after_destroy(model)
-    Thread.new do
+    t = Thread.new do
       InternalPolicy.regulate_broadcast(model) do |data|
         Connection.send(data[:channel], ['destroy', data])
       end
     end
+    t.join if on_console_with_async_action_cable
   end
 
   Connection.transport = self
