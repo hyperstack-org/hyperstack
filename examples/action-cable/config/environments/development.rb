@@ -11,22 +11,11 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
-  config.action_cable.allowed_request_origins = ['http://localhost:3000', 'http://localhost:4000', 'http://127.0.0.1:3000']
-
   # Show full error reports.
   config.consider_all_requests_local = true
 
   # Enable/disable caching. By default caching is disabled.
-  if Rails.root.join('tmp/caching-dev.txt').exist?
-    config.action_controller.perform_caching = true
-    config.public_file_server.headers = {
-      'Cache-Control' => 'public, max-age=172800'
-    }
-  else
-    config.action_controller.perform_caching = false
-  end
-  config.cache_store = :file_store, './rails_cache_dir'
-
+  config.cache_store = :file_store, './rails_cache_dir2'
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false

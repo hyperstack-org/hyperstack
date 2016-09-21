@@ -56,14 +56,14 @@ Note:  If you are going to use the `redis` adapter with ActionCable you can use 
 
 #### 6 Define Your Policies
 
-To start just open everything up by adding a policy directory and defining a policy file like this:
+To start just open everything up by adding a policies directory and defining a policy file like this:
 
 ```ruby
-# app/policies/application_policy
+# app/policies/application_policy.rb
 class ApplicationPolicy
   always_allow_connection
   regulate_all_broadcasts &:send_all
-  allow_change(to: :all, for: [:create, :update, :destroy]) { true }
+  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
 end
 ```
 
@@ -81,7 +81,7 @@ Include the `action_cable` js file in your assets
 //app/assets/javascripts/application.js
 ...
 //= require action_cable
-...
+Opal.load('components');
 ```
 
 #### 7.2 Make sure you have a cable.yml file
@@ -114,24 +114,32 @@ end
 
 If you don't already have a model to play with,  add one now:
 
-`bundle exec rails generate model Article title:string text:text`
+`bundle exec rails generate model Word text:string`
+
 `bundle exec rake db:migrate`
 
-Whatever model(s) you will use need to moved to the `app/models/public` directory.  This allows reactive-record to build a client side proxy for the models.  Models not moved will be completely invisible on the client side.
+Whatever model(s) you will plan to access on the client need to moved to the `app/models/public` directory.  This allows reactive-record to build a client side proxy for the models.  Models not moved will be completely invisible on the client side.
 
 **Important** in rails 5 there is also a base `ApplicationRecord` class, that all other models are built from.  This class must be moved to the public directory as well.
 
-If you don't already have a simple component to play with,  make up one like this:
+If you don't already have a simple component to play with,  here is a simple one (make sure you add the Word model):
 
 ```ruby
 # app/views/components/app.rb
 class App < React::Component::Base
-  # change Article to whatever your model name is
+
+  def add_new_word
+    # for fun we will use this site to get random words!
+    HTTP.get("http://randomword.setgetgo.com/get.php").then do |response|
+      Word.new(text: response).save
+    end
+  end
+
   render do
     div do
-      "Count of MyModel: #{Article.all.count}".span
-      " last id = #{Article.all.last.id}".span unless Article.all.count == 0
-      button { "add another" }.on(:click) { Article.new.save }
+      "Count of Words: #{Word.all.count}".span
+      button { "add another" }.on(:click) { add_new_word }
+      Word.each { |word| word.text.br }
     end
   end
 end
@@ -148,7 +156,7 @@ class TestController < ApplicationController
 end
 ```
 
-Add add it to your routes file:
+Add the `test` route to your routes file:
 
 ```ruby
 #app/config/routes.rb

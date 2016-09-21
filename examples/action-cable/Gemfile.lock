@@ -143,20 +143,20 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (11.2.2)
+    rake (11.3.0)
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
-    react-rails (1.8.2)
+    react-rails (1.4.2)
       babel-transpiler (>= 0.7.0)
       coffee-script-source (~> 1.8)
       connection_pool
       execjs
-      railties (>= 3.2)
+      rails (>= 3.2)
       tilt
-    react-router-rails (0.13.3.1)
+    react-router-rails (0.13.3.2)
       rails (>= 3.1)
-      react-rails (>= 0.12)
+      react-rails (~> 1.4.0)
     reactive-record (0.8.3)
       opal-browser
       opal-rails

@@ -16,5 +16,3 @@
 //= require jquery_ujs
 //= require action_cable
 Opal.load('components');
-//= require turbolinks
-//= require_tree .
