@@ -10,12 +10,15 @@ module React
       end
 
       def instance
-        @instance ||= `#{native.to_n}._getOpalInstance.apply(#{native})`
+        unless @instance
+          @native = Native(`React.addons.TestUtils.renderIntoDocument(#{element.to_n})`)
+          @instance = `#{@native.to_n}._getOpalInstance()`
+        end
+        @instance
       end
 
       def native
-        @native ||= Native(
-          `React.addons.TestUtils.renderIntoDocument(#{element.to_n})`)
+        @native
       end
 
       def element
@@ -23,7 +26,10 @@ module React
       end
 
       def update_params(params)
-        native.set_props(params)
+        cloned_element = React::Element.new(`React.cloneElement(#{self.element.to_n}, #{params.to_n})`)
+        prev_container = `#{self.instance.dom_node}.parentNode`
+        React.render(cloned_element, prev_container)
+        nil
       end
 
       def force_update!
@@ -38,4 +44,3 @@ module React
     end
   end
 end
-
