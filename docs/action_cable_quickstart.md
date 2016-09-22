@@ -129,17 +129,17 @@ If you don't already have a simple component to play with,  here is a simple one
 class App < React::Component::Base
 
   def add_new_word
-    # for fun we will use this site to get random words!
-    HTTP.get("http://randomword.setgetgo.com/get.php").then do |response|
-      Word.new(text: response).save
+    # for fun we will use setgetgo.com to get random words!
+    HTTP.get("http://randomword.setgetgo.com/get.php", dataType: :jsonp) do |response|
+      Word.new(text: response.json[:Word]).save
     end
   end
 
-  render do
-    div do
-      "Count of Words: #{Word.all.count}".span
-      button { "add another" }.on(:click) { add_new_word }
-      Word.each { |word| word.text.br }
+  render(DIV) do
+    SPAN { "Count of Words: #{Word.count}" }
+    BUTTON { "add another" }.on(:click) { add_new_word }
+    UL do
+      Word.each { |word| LI { word.text } }
     end
   end
 end
@@ -167,4 +167,6 @@ Add the `test` route to your routes file:
 
 Fire up rails with `bundle exec rails s` and open your app in a couple of browsers.  As data changes you should see them all updating together.
 
-You can also fire up a rails console, and then for example do a `Article.new.save` and again see any browsers firing up.
+You can also fire up a rails console, and then for example do a `Word.new(text: "Hello").save` and again see any browsers updating.
+
+If you want to go into more details with example check out [words-example](/docs/words-example.md)

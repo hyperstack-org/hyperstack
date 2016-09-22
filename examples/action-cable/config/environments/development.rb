@@ -15,7 +15,7 @@ Rails.application.configure do
   config.consider_all_requests_local = true
 
   # Enable/disable caching. By default caching is disabled.
-  config.cache_store = :file_store, './rails_cache_dir2'
+  config.cache_store = :file_store, './rails_cache_dir'
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false

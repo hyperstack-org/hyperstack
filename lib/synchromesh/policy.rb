@@ -130,7 +130,11 @@ module Synchromesh
       end
 
       def wrap_policy(policy, regulation)
-        policy_klass = regulation.binding.receiver
+        begin
+          policy_klass = regulation.binding.receiver
+        rescue
+          raise "Could not determine the class when regulating.  This is probably caused by doing something like &:send_all"
+        end
         wrapped_policy = policy_klass.new(nil, nil)
         wrapped_policy.synchromesh_internal_policy_object = policy
         wrapped_policy
