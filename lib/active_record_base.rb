@@ -3,19 +3,6 @@ module ActiveRecord
   # 1 - Setup synchronization after commits
   # 2 - Update scope to accept different procs for server and client
   class Base
-    if RUBY_ENGINE != 'opal'
-      after_commit :synchromesh_after_change, on: [:create, :update]
-      after_commit :synchromesh_after_destroy, on: [:destroy]
-
-      def synchromesh_after_change
-        return if previous_changes.empty?
-        Synchromesh.after_change self
-      end
-
-      def synchromesh_after_destroy
-        Synchromesh.after_destroy self
-      end
-    end
 
     class << self
 
@@ -29,10 +16,6 @@ module ActiveRecord
 
       else
 
-        def unscoped
-          ReactiveRecord::Base.class_scopes(self)[:unscoped] ||= ReactiveRecord::Collection.new(self, nil, nil, self, "unscoped")
-        end
-
         alias pre_synchromesh_method_missing method_missing
 
         def method_missing(name, *args, &block)
@@ -41,6 +24,10 @@ module ActiveRecord
           else
             pre_synchromesh_method_missing(name, *args, &block)
           end
+        end
+
+        def create(*args, &block)
+          new(*args).save(&block)
         end
 
         def reactive_record_scopes
@@ -95,6 +82,48 @@ module ActiveRecord
         end
       end
 
+    end
+
+    if RUBY_ENGINE != 'opal'
+      after_commit :synchromesh_after_change, on: [:create, :update]
+      after_commit :synchromesh_after_destroy, on: [:destroy]
+
+      def synchromesh_after_change
+        return if previous_changes.empty?
+        Synchromesh.after_change self
+      end
+
+      def synchromesh_after_destroy
+        Synchromesh.after_destroy self
+      end
+    else
+      def update_attribute(attr, value, &block)
+        send("#{attr}=", value)
+        save(validate: false, &block)
+      end
+      def update(attrs = {}, &block)
+        attrs.each { |attr, value| send("#{attr}=", value)}
+        save &block
+      end
+      def <=>(b)
+        id <=> b.id
+      end
+      def self.inherited(model)
+        model.class_eval do
+          scope :all, nil, sync: ->(r, c) do
+            c.update_collection_on_sync(
+              r, r.backing_record.current_default_scope_count,
+              r.backing_record.currently_in_default_scope
+            )
+            false
+          end
+
+          scope :unscoped, nil, sync: ->(r, c) do
+            c << r if r.backing_record.new_id? || r.destroyed?
+            false
+          end
+        end
+      end
     end
   end
 end

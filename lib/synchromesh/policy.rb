@@ -271,7 +271,7 @@ module Synchromesh
       end
       channels
     end
-  end
+  end  
 
   class InternalPolicy
 

@@ -133,7 +133,7 @@ module Synchromesh
           backing_record.previous_changes = broadcast.previous_changes
           backing_record.currently_in_default_scope = broadcast.currently_in_default_scope
           backing_record.current_default_scope_count = broadcast.current_default_scope_count
-          backing_record.sync_scopes2
+          ReactiveRecord::Collection.sync_scopes backing_record
         end
       end
     end
@@ -146,9 +146,10 @@ module Synchromesh
         backing_record = broadcast.klass._react_param_conversion(broadcast.record).backing_record
         backing_record.destroy_associations
         backing_record.destroyed = true
+        backing_record.previous_changes = broadcast.previous_changes
         backing_record.currently_in_default_scope = broadcast.currently_in_default_scope
         backing_record.current_default_scope_count = broadcast.current_default_scope_count
-        backing_record.sync_scopes2
+        ReactiveRecord::Collection.sync_scopes backing_record
       end
     end
 

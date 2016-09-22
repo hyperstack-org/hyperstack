@@ -3,7 +3,7 @@ module ReactiveRecord
   class Collection
 
     attr_reader :vector
-    attr_reader :scope_description
+    attr_reader :scope_descriptiona
 
     class << self
       def add_scope(klass, name, opts)
@@ -16,8 +16,9 @@ module ReactiveRecord
         scope_descriptions[klass][scope]
       end
 
-      def sync_scopes(record)
+      def sync_scopes(backing_record)
         return unless @scoped_collections
+        record = backing_record.ar_instance
         @scoped_collections.each do | collection |
           collection.sync_scope(record)
         end
@@ -36,12 +37,13 @@ module ReactiveRecord
     def apply_scope(scope, *args)
       # The value returned is another ReactiveRecordCollection with the scope added to the vector
       # no additional action is taken
-      scope_vector = [scope, *args] if args.count > 0
+      scope_vector = args.count > 0 ? [scope, *args] : scope
       @scopes[scope_vector] ||=
         Collection.new(@target_klass, @owner, @association, *@vector, [scope_vector]).set_scope(scope)
     end
 
     def sync_scope(record)
+      delete(record) if new_items.delete?(record)
       joined = @scope_description.joins_with?(record, self)
       if joined
         if React::State.has_observers?(self, "collection")
@@ -74,13 +76,32 @@ module ReactiveRecord
 
     alias_method :pre_synchromesh_push, '<<'
 
-    def <<(item)
+    def new_items
+      @unsaved_items ||= Set.new
+    end
+
+    def push(item)
       if collection
         pre_synchromesh_push item
       elsif !@count.nil?
+        new_items << item if item.new?
         @count += item.destroyed? ? -1 : 1
         notify_of_change self
       end
+      self
+    end
+
+    alias_method '<<', :push
+
+    def sort!(*args, &block)
+      replace(sort(*args, &block))
+    end
+
+    alias pre_synchromesh_replace replace
+
+    def replace(new_array)
+      return self if new_array == @collection
+      pre_synchromesh_replace(new_array)
     end
 
     def delete(item)
@@ -123,6 +144,7 @@ module ReactiveRecord
       else
         self << ar_instance
       end
+      true
     end
   end
 end

@@ -10,9 +10,44 @@ module ReactiveRecord
 
       protect_from_forgery :except => [:action_cable_console_update]
 
-      def console
+      def channels(user = acting_user, session_id = session.id)
+        Synchromesh::AutoConnect.channels(session_id, user)
+      end
+
+      def can_connect?(channel, user = acting_user)
+        Synchromesh::InternalPolicy.regulate_connection(
+          user,
+          Synchromesh::InternalPolicy.channel_to_string(channel)
+        )
+        true
+      rescue
+        nil
+      end
+
+      def view_permitted?(model, attr, user = acting_user)
+        !!model.check_permission_with_acting_user(user, :view_permitted?, attr)
+      rescue
+        nil
+      end
+
+      def viewable_attributes(model, user = acting_user)
+        model.attributes.select { |attr| view_permitted?(model, attr, user) }
+      end
+
+      [:create, :update, :destroy].each do |op|
+        define_method "#{op}_permitted?" do |model, user = acting_user|
+          begin
+            !!model.check_permission_with_acting_user(user, "#{op}_permitted?".to_sym)
+          rescue
+            nil
+          end
+        end
+      end
+
+      def debug_console
         if Rails.env.development?
-          render inline: "<% console %>"
+          console
+          render inline: "additional helper methods: channels, can_connect? viewable_attributes, view_permitted?, create_permitted?, update_permitted? and destroy_permitted?"
         else
           head :unauthorized
         end
@@ -71,7 +106,7 @@ module ReactiveRecord
     match 'synchromesh-pusher-auth',                      to: 'synchromesh#pusher_auth',          via: :post
     match 'synchromesh-action-cable-auth/:channel_name',  to: 'synchromesh#action_cable_auth',    via: :post
     match 'synchromesh-connect-to-transport/:channel',    to: 'synchromesh#connect_to_transport', via: :get
-    match 'console',                                      to: 'synchromesh#console',              via: :get
+    match 'console',                                      to: 'synchromesh#debug_console',        via: :get
     match 'action_cable_console_update',                  to: 'synchromesh#action_cable_console_update',         via: :post
   end
 end
