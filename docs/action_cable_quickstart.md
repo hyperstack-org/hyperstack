@@ -62,7 +62,7 @@ To start just open everything up by adding a policies directory and defining a p
 # app/policies/application_policy.rb
 class ApplicationPolicy
   always_allow_connection
-  regulate_all_broadcasts &:send_all
+  regulate_all_broadcasts { |policy| policy.send_all }
   allow_change(to: :all, on: [:create, :update, :destroy]) { true }
 end
 ```
