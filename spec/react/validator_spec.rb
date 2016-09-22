@@ -57,8 +57,7 @@ describe React::Validator do
         validator = React::Validator.new.build do
           requires :foo, type: Array[Fixnum]
         end
-
-        message = "Provided prop `foo`[0] could not be converted to Numeric"
+        message = "Provided prop `foo`[0] could not be converted to #{Fixnum.name}"
         expect(validator.validate({foo: `[ { x: 1 } ]`})).to eq([message])
       end
 
