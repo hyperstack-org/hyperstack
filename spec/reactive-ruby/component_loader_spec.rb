@@ -6,6 +6,9 @@ RSpec.describe ReactiveRuby::ComponentLoader do
     var global = global || this;
     var self = self || this;
     var window = window || this;
+    var console = {
+      warn: function(s) {  }
+    };
   JS
 
   let(:js) { ::Rails.application.assets['components'].to_s }
