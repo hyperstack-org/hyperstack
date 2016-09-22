@@ -17,7 +17,8 @@ If you have not already installed the `reactrb` and `reactive-record` gems, then
 
 #### 3 Add the synchromesh gem
 
-- add `gem 'synchromesh'` to your gem file  
+- ~~add `gem 'synchromesh'` to your gem file~~  
+- add `gem 'synchromesh', git: 'https://github.com/reactrb/synchromesh', branch: 'authorization-policies'`
 - then `bundle install`  
 - and in `app/views/components.rb` add `require 'synchromesh'`  
  immediately below`require 'reactive-record'`
