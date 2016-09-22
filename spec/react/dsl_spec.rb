@@ -82,8 +82,9 @@ describe 'the React DSL' do
   end
 
   it "can add class names by the haml .class notation" do
-    stub_const 'Mod::Bar', Class.new(React::Component::Base)
+    stub_const 'Mod::Bar', Class.new
     Mod::Bar.class_eval do
+      include React::Component
       collect_other_params_as :attributes
       def render
         "a man walks into a bar".span(params.attributes)
