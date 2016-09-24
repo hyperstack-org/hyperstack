@@ -2,6 +2,9 @@ require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
 
+# Store the BUNDLE_GEMFILE env, since rake or rspec seems to clean it
+# while invoking task.
+ENV['REAL_BUNDLE_GEMFILE'] = ENV['BUNDLE_GEMFILE']
 
 require 'rspec/core/rake_task'
 require 'opal/rspec/rake_task'

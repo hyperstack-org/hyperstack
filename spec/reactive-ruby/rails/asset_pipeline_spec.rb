@@ -3,8 +3,8 @@ require 'spec_helper'
 if ruby?
 RSpec.describe 'test_app generator' do
   it "does not interfer with asset precompilation" do
-    env = { "BUNDLE_GEMFILE" => ENV['BUNDLE_GEMFILE'] }
-    expect(system(env, "cd spec/test_app; bundle exec rake assets:precompile")).to be_truthy
+    cmd = "cd spec/test_app; BUNDLE_GEMFILE=#{ENV['REAL_BUNDLE_GEMFILE']} bundle exec rake assets:precompile"
+    expect(system(cmd)).to be_truthy
   end
 end
 end
