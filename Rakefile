@@ -16,10 +16,11 @@ end
 
 RSpec::Core::RakeTask.new('ruby:rspec')
 
-Opal::RSpec::RakeTask.new('opal:rspec') do |s|
+Opal::RSpec::RakeTask.new('opal:rspec') do |s, task|
   s.append_path React::Rails::AssetVariant.new(addons: true).react_directory
   s.append_path 'spec/vendor'
   s.index_path = 'spec/index.html.erb'
+  task.timeout = 80000
 end
 
 task :test do
