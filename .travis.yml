@@ -14,3 +14,12 @@ gemfile:
   - gemfiles/opal_0.9_react_13.gemfile
   - gemfiles/opal_0.9_react_14.gemfile
   - gemfiles/opal_0.9_react_15.gemfile
+
+# These two setup seems to run indefinitely long
+# further investigation required.
+matrix:
+  exclude:
+  - rvm: jruby-19mode
+    gemfile: gemfiles/opal_0.9_react_14.gemfile
+  - rvm: jruby-19mode
+    gemfile: gemfiles/opal_0.9_react_15.gemfile
