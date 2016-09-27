@@ -3,6 +3,18 @@ require 'spec_helper'
 if opal?
 describe 'the React DSL' do
 
+  it "can define the render method with the render macro", only: true do
+    stub_const 'Foo', Class.new
+    Foo.class_eval do
+      include React::Component
+      render(:div, class: :foot) do
+        "hello"
+      end
+    end
+
+    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div class="foot">hello</div>')
+  end
+
   it "will turn the last string in a block into a element" do
     stub_const 'Foo', Class.new
     Foo.class_eval do

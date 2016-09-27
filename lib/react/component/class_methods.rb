@@ -27,6 +27,18 @@ module React
         end
       end
 
+      def render(*args, &block)
+        if args[0].is_a? Hash
+          define_method :render do
+            yield
+          end
+        else
+          define_method :render do
+            send *args, &block
+          end
+        end
+      end
+
       def validator
         @validator ||= Validator.new(props_wrapper)
       end
