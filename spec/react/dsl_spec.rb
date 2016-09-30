@@ -208,11 +208,10 @@ describe 'the React DSL' do
     stub_const 'X2', Class.new
     X2.class_eval do
       include React::Component
-      param :ele
       def render
         div do
-          ele.render
-          ele.render
+          params[:ele].render
+          params[:ele].render
         end
       end
     end
