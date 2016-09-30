@@ -31,7 +31,15 @@ module React
 
       HTML_TAGS.each do |tag|
         define_method(tag) do |*params, &children|
-          React::RenderingContext.render(tag, *params, &children)
+          if tag == 'p'
+            if children || params.count == 0 || (params.count == 1 && params.first.is_a?(Hash))
+              React::RenderingContext.render(tag, *params, &children)
+            else
+              Kernel.p(*params)
+            end
+          else
+            React::RenderingContext.render(tag, *params, &children)
+          end
         end
         # handle deprecated _as_node style
         define_method("#{tag}_as_node") do |*params, &children|
