@@ -51,7 +51,6 @@ module React
 
     def component_will_mount
       IsomorphicHelpers.load_context(true) if IsomorphicHelpers.on_opal_client?
-      @props_wrapper = self.class.props_wrapper.new(Hash.new(`#{@native}.props`))
       set_state! initial_state if initial_state
       State.initialize_states(self, initial_state)
       State.set_state_context_to(self) { self.run_callback(:before_mount) }
@@ -104,7 +103,6 @@ module React
 
     def component_will_update(next_props, next_state)
       State.set_state_context_to(self) { self.run_callback(:before_update, Hash.new(next_props), Hash.new(next_state)) }
-      @props_wrapper = self.class.props_wrapper.new(Hash.new(next_props), @props_wrapper)
     rescue Exception => e
       self.class.process_exception(e, self)
     end

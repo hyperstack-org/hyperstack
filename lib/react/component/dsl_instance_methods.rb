@@ -8,7 +8,7 @@ module React
       end
 
       def params
-        @props_wrapper
+        @params ||= self.class.props_wrapper.new(self)
       end
 
       def props
