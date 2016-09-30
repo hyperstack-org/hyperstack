@@ -134,6 +134,8 @@ module React
           props["className"] = value
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
+        elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
+          value.each { |k, v| props["#{key}-#{k.tr('_', '-')}"] = v.to_n }
         else
           props[React.html_attr?(lower_camelize(key)) ? lower_camelize(key) : key] = value
         end
