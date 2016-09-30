@@ -1,5 +1,6 @@
 require "native"
 require 'active_support'
+require 'react/component/tags'
 require 'react/component/base'
 
 module React
@@ -25,7 +26,7 @@ module React
                 viewBox x1 x2 x xlinkActuate xlinkArcrole xlinkHref xlinkRole
                 xlinkShow xlinkTitle xlinkType xmlBase xmlLang xmlSpace y1 y2 y)
   HASH_ATTRIBUTES = %w(data aria)
-
+  HTML_TAGS = React::Component::Tags::HTML_TAGS
 
   def self.html_tag?(name)
     tags = HTML_TAGS
