@@ -1,3 +1,15 @@
+# class HtmlTagWrapper
+#   def initialize(name)
+#     @name = name
+#   end
+#   def to_s
+#     @name
+#   end
+#   def method_missing(n)
+#
+# end
+
+
 module React
   module Component
     # contains the name of all HTML tags, and the mechanism to register a component
@@ -29,6 +41,9 @@ module React
 
       # define each predefined tag as an instance method
 
+
+
+
       HTML_TAGS.each do |tag|
         define_method(tag) do |*params, &children|
           if tag == 'p'
@@ -41,11 +56,24 @@ module React
             React::RenderingContext.render(tag, *params, &children)
           end
         end
-        alias_method tag.upcase, tag
-        const_set tag.upcase, tag
+        if tag != :div
+          alias_method tag.upcase, tag
+          const_set tag.upcase, tag
+        else
+          alias_method tag.upcase, tag
+          #const_set tag.upcase, React.create_element(tag)
+          #Object.const_set tag.upcase, Class.new(HtmlTagWrapper)
+        end
         # handle deprecated _as_node style
         define_method("#{tag}_as_node") do |*params, &children|
           React::RenderingContext.build_only(tag, *params, &children)
+        end
+      end
+
+      def self.html_tag_class_for(tag)
+        downcased_tag = tag.downcase
+        if tag =~ /[A-Z]+/ && HTML_TAGS.include?(downcased_tag)
+          Object.const_set tag, React.create_element(downcased_tag)
         end
       end
 
@@ -103,6 +131,8 @@ module React
 
       def lookup_const(name)
         return nil unless name =~ /^[A-Z]/
+        #html_tag = React::Component::Tags.html_tag_class(name)
+        #return html_tag if html_tag
         scopes = self.class.name.to_s.split('::').inject([Module]) do |nesting, next_const|
           nesting + [nesting.last.const_get(next_const)]
         end.reverse

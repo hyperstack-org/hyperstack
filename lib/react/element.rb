@@ -44,14 +44,14 @@ module React
     # Used for elements that are not yet in DOM, i.e. they are provided as children
     # or they have been explicitly removed from the rendering context using the delete method.
 
-    def render(props = {})
+    def render(props = {}, &new_block)
       if props.empty?
         React::RenderingContext.render(self)
       else
         props = API.convert_props(props)
         React::RenderingContext.render(
           Element.new(`React.cloneElement(#{to_n}, #{props.shallow_to_n})`,
-                      type, properties.merge(props), block)
+                      type, properties.merge(props), block),
         )
       end
     end
@@ -77,19 +77,33 @@ module React
     # params may be provide to each class (but typically only to the last for easy reading.)
 
     def method_missing(class_name, args = {}, &new_block)
-      class_name = class_name.gsub(/__|_/, '__' => '_', '_' => '-')
+      return dup.render.method_missing(class_name, args, &new_block) unless rendered?
+      React::RenderingContext.replace(
+        self,
+        RenderingContext.build do
+          RenderingContext.render(type, build_new_properties(class_name, args), &new_block)
+        end
+      )
+    end
+
+    def rendered?
+      React::RenderingContext.rendered? self
+    end
+
+    def self.haml_class_name(class_name)
+      class_name.gsub(/__|_/, '__' => '_', '_' => '-')
+    end
+
+    private
+
+    def build_new_properties(class_name, args)
+      class_name = self.class.haml_class_name(class_name)
       new_props = properties.dup
       new_props[:className] = "\
         #{class_name} #{new_props[:className]} #{args.delete(:class)} #{args.delete(:className)}\
       ".split(' ').uniq.join(' ')
       new_props.merge! args
-      React::RenderingContext.replace(
-        self,
-        RenderingContext.build { RenderingContext.render(type, new_props, &new_block) }
-      )
     end
-
-    private
 
     # built in events, events going to native components, and events going to reactrb
 

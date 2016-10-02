@@ -18,6 +18,17 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
+## [0.8.9] - Unreleased
+
+### Fixed
+
+- Gets rid of react warnings about updating state during render (#155)
+- Multiple HAML classes (i.e. div.foo.bar) was not working (regression introduced in 0.8.8)
+- Don't send nil (null) to form components as the value string (#157)
+- Process `params` (props) correctly when using `Element#on` or `Element#render` (#158)
+- Deprecate shallow param compare (#156)
+
+
 ## [0.8.8] - 2016-07-13
 
 ### Added

@@ -29,13 +29,24 @@ module React
       end
 
       def render(container = nil, params = {}, &block)
-        define_method :render do
-          if container
+        if container
+          container = container.type if container.is_a? React::Element
+          define_method :render do
             React::RenderingContext.render(container, params) { instance_eval(&block) if block }
-          else
-            instance_eval(&block)
           end
+        else
+          define_method(:render) { instance_eval(&block) }
         end
+      end
+
+      # method missing will assume the method is a class name, and will treat this a render of
+      # of the component, i.e. Foo::Bar.baz === Foo::Bar().baz
+
+      def method_missing(name, *args, &children)
+        Object.method_missing(name, *args, &children) unless args.empty?
+        React::RenderingContext.render(
+          self, class: React::Element.haml_class_name(name), &children
+        )
       end
 
       def validator
