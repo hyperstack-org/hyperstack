@@ -22,6 +22,8 @@ gemfile:
 matrix:
   exclude:
   - rvm: jruby-19mode
+    gemfile: gemfiles/opal_0.9_react_13.gemfile
+  - rvm: jruby-19mode
     gemfile: gemfiles/opal_0.9_react_14.gemfile
   - rvm: jruby-19mode
     gemfile: gemfiles/opal_0.9_react_15.gemfile
