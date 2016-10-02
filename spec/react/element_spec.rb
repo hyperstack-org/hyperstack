@@ -87,7 +87,8 @@ describe React::Element do
       }
       expect(React.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
       `window.console.warn = org_warn_console; window.console.error = org_error_console;`
-      expect(`log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `on_event` not specified in spec", "Warning: Deprecated feature used in React::Component. In future releases React::Element#on('event') will no longer respond to the '_onEvent' emitter.\nRename your emitter param to 'on_event' or use .on('<_onEvent>')"])
+      expect(`log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `on_event` not specified in spec/)
+      expect(`log[1]`).to eq("Warning: Deprecated feature used in React::Component. In future releases React::Element#on('event') will no longer respond to the '_onEvent' emitter.\nRename your emitter param to 'on_event' or use .on('<_onEvent>')")
     end
   end
 
