@@ -65,7 +65,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<input data-foo="12"/>')
+    expect(React.render_to_static_markup(React.create_element(Foo))).to match(/<input data-foo="12"(\/)?>/)
   end
 
   it "will turn the last string in a block into a element" do

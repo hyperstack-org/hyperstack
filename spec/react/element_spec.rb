@@ -29,7 +29,7 @@ describe React::Element do
         end
       end
 
-      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<input type="text" value=""/>')
+      expect(React.render_to_static_markup(React.create_element(Foo))).to match(/<input (type="text" value=""|value="" type="text")(\/)?>/)
     end
   end
 
