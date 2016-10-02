@@ -33,3 +33,4 @@ spec/test_app
 Gemfile.lock
 
 /gemfiles/*.lock
+/tmp
