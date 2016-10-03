@@ -81,12 +81,14 @@ describe 'the param macro', type: :component do
 
     %x{
       var log = [];
-      var org_warn_console = window.console.warn;
-      window.console.warn = function(str){log.push(str)}
+      var org_warn_console =  window.console.warn;
+      var org_error_console = window.console.error;
+      window.console.warn = window.console.error = function(str){log.push(str)}
     }
     renderToDocument(Foo2, bar: 10, lorem: Lorem.new)
-    `window.console.warn = org_warn_console;`
-    expect(`log`).to eq(["Warning: Failed propType: In component `Foo2`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String"])
+    `window.console.warn = org_warn_console; window.console.error = org_error_console;`
+
+    expect(`log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo2`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
   end
 
   it 'should not log anything if validation passes' do
@@ -102,11 +104,12 @@ describe 'the param macro', type: :component do
 
     %x{
       var log = [];
-      var org_warn_console = window.console.warn;
-      window.console.warn = function(str){log.push(str)}
+      var org_warn_console =  window.console.warn;
+      var org_error_console = window.console.error;
+      window.console.warn = window.console.error = function(str){log.push(str)}
     }
     renderToDocument(Foo, foo: 10, bar: '10', lorem: Lorem.new)
-    `window.console.warn = org_warn_console;`
+    `window.console.warn = org_warn_console; window.console.error = org_error_console;`
     expect(`log`).to eq([])
   end
 
@@ -115,13 +118,14 @@ describe 'the param macro', type: :component do
       %x{
         window.dummy_log = [];
         window.org_warn_console = window.console.warn;
-        window.console.warn = function(str){window.dummy_log.push(str)}
+        window.org_error_console = window.console.warn
+        window.console.warn = window.console.error = function(str){window.dummy_log.push(str)}
       }
       stub_const 'Foo', Class.new(React::Component::Base)
       Foo.class_eval { def render; ""; end }
     end
     after(:each) do
-      `window.console.warn = window.org_warn_console;`
+      `window.console.warn = window.org_warn_console; window.console.error = window.org_error_console`
     end
 
     it "can use the [] notation for arrays" do
@@ -130,7 +134,7 @@ describe 'the param macro', type: :component do
         param :bar, type: []
       end
       renderToDocument(Foo, foo: 10, bar: [10])
-      expect(`window.dummy_log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `foo` could not be converted to Array"])
+      expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to Array/)
     end
 
     it "can use the [xxx] notation for arrays of a specific type" do
@@ -139,7 +143,7 @@ describe 'the param macro', type: :component do
         param :bar, type: [String]
       end
       renderToDocument(Foo, foo: [10], bar: ["10"])
-      expect(`window.dummy_log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `foo`[0] could not be converted to String"])
+      expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo`\[0\] could not be converted to String/)
     end
 
     it "can convert a json hash to a type" do
@@ -164,7 +168,7 @@ describe 'the param macro', type: :component do
 
       params = { foo: "", bar: { bazwoggle: 1 }, baz: [{ bazwoggle: 2 }] }
       expect(Foo).to render('<span>1, 2</span>').with_params(params)
-      expect(`window.dummy_log`).to eq(["Warning: Failed propType: In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle"])
+      expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle/)
     end
 
     describe "converts params only once" do

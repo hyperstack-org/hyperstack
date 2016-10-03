@@ -2,6 +2,7 @@ ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
 require 'opal-rspec'
+require 'opal-jquery'
 
 def opal?
   RUBY_ENGINE == 'opal'
@@ -11,9 +12,14 @@ def ruby?
   !opal?
 end
 
+
 if RUBY_ENGINE == 'opal'
+  require File.expand_path('../vendor/jquery-2.2.4.min', __FILE__)
+  require 'react.js'
+  require "react-server.js"
   require 'reactive-ruby'
   require 'react/test/rspec'
+
   require File.expand_path('../support/react/spec_helpers', __FILE__)
 
   module Opal
@@ -67,6 +73,9 @@ if RUBY_ENGINE == 'opal'
   RSpec.configure do |config|
     config.include React::SpecHelpers
     config.filter_run_excluding :ruby
+    if `(React.version.search(/^0\.13/) === -1)`
+      config.filter_run_excluding :v13_only
+    end
   end
 end
 

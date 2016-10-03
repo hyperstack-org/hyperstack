@@ -1,7 +1,6 @@
 module React
   class Children
     include Enumerable
-    attr_reader :children
 
     def initialize(children)
       @children = children
@@ -12,7 +11,7 @@ module React
       return [] unless length > 0
       collection = []
       %x{
-        React.Children.forEach(#{children}, function(context){
+        React.Children.forEach(#{@children}, function(context){
           #{
             element = React::Element.new(`context`)
             block.call(element)
@@ -24,7 +23,7 @@ module React
     end
 
     def length
-      @length ||= `React.Children.count(#{children})`
+      @length ||= `React.Children.count(#{@children})`
     end
     alias_method :size, :length
   end

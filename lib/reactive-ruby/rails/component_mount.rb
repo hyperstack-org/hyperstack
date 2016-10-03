@@ -10,7 +10,9 @@ module ReactiveRuby
       def react_component(name, props = {}, options = {}, &block)
         options = context_initializer_options(options, name) if options[:prerender]
         props = serialized_props(props, name, controller)
-        super(top_level_name, props, options, &block) + footers
+        super(top_level_name, props, options, &block).gsub("\n","")
+          .gsub(/(<script>.*<\/script>)<\/div>$/,'</div>\1').html_safe +
+          footers
       end
 
       private

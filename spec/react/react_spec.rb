@@ -44,7 +44,7 @@ RSpec.describe React, type: :component do
           [React.create_element('span'), React.create_element('span'), React.create_element('span')]
         end
         instance = renderElementToDocument(element)
-        expect(instance.getDOMNode.childNodes.length).to eq(3)
+        expect(Element[instance].children.length).to eq(3)
       end
     end
 
@@ -142,10 +142,9 @@ RSpec.describe React, type: :component do
     end
 
     describe "class_name helpers (React.addons.classSet)" do
-      it "should transform Hash provided to `class_name` props as string" do
+      it "should transform Hash provided to `class_name` props as string", v13_only: true do
         classes = {foo: true, bar: false, lorem: true}
         element = React.create_element("div", class_name: classes)
-
         expect(element.props.className).to eq("foo lorem")
       end
 

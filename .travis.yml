@@ -4,6 +4,26 @@ rvm:
   - 2.0.0
   - 2.1
   - jruby-19mode
+before_script:
+  - phantomjs --version
 script:
   - bundle exec rake test_app
   - bundle exec rake
+gemfile:
+  - gemfiles/opal_0.8_react_13.gemfile
+  - gemfiles/opal_0.8_react_14.gemfile
+  - gemfiles/opal_0.8_react_15.gemfile
+  - gemfiles/opal_0.9_react_13.gemfile
+  - gemfiles/opal_0.9_react_14.gemfile
+  - gemfiles/opal_0.9_react_15.gemfile
+
+# These two setup seems to run indefinitely long
+# further investigation required.
+matrix:
+  exclude:
+  - rvm: jruby-19mode
+    gemfile: gemfiles/opal_0.9_react_13.gemfile
+  - rvm: jruby-19mode
+    gemfile: gemfiles/opal_0.9_react_14.gemfile
+  - rvm: jruby-19mode
+    gemfile: gemfiles/opal_0.9_react_15.gemfile

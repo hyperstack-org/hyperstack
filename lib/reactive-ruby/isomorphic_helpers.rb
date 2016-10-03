@@ -105,7 +105,7 @@ module React
         return unless @ctx
         args = [1] if args.length == 0
         ::ReactiveRuby::ComponentLoader.new(@ctx).load!
-        @ctx.eval("Opal.React.IsomorphicHelpers.$#{method}(#{args.collect { |arg| "'#{arg}'"}.join(', ')})")
+        @ctx.eval("Opal.React.$const_get('IsomorphicHelpers').$#{method}(#{args.collect { |arg| "'#{arg}'"}.join(', ')})")
       end
 
       def self.register_before_first_mount_block(&block)

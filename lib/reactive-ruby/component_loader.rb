@@ -34,7 +34,11 @@ module ReactiveRuby
     end
 
     def opal(file)
-      Opal::Processor.load_asset_code(assets, file)
+      if Opal::Processor.respond_to?(:load_asset_code)
+        Opal::Processor.load_asset_code(assets, file)
+      else
+        Opal::Sprockets.load_asset(file, assets)
+      end
     rescue # What exception is being caught here?
     end
 
