@@ -1,0 +1,11 @@
+Metrics/LineLength:
+  Max: 100
+
+Style/MutableConstant:
+  Enabled: false
+
+Lint/LiteralInCondition:
+  Enabled: false
+
+Style/CommandLiteral:
+  EnforcedStyle: mixed

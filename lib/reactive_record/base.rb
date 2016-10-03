@@ -18,6 +18,16 @@ module ReactiveRecord
     attr_accessor :currently_in_default_scope
     attr_accessor :current_default_scope_count
 
+    def self.get_class_scopes
+      @class_scopes
+    end
+
+    def self.all_class_scopes
+      Enumerator.new do |y|
+        @class_scopes.each_value { |scopes| scopes.each_value { |scope| y << scope }}
+      end
+    end
+
     def self.when_not_saving(model)
       if @records[model].detect(&:saving?)
         poller = every(0.1) do
@@ -31,6 +41,31 @@ module ReactiveRecord
       end
     end
 
+    class << self
+
+      class DbRequestMade < Exception; end
+
+      def catch_db_requests
+        @catch_db_requests = true
+        return_val = yield
+      rescue DbRequestMade
+        puts "got rescued what ya gonna do?"
+        return_val = false
+      ensure
+        puts "returning #{return_val} from catch_db_requests"
+        @catch_db_requests = false
+        return_val
+      end
+
+      alias pre_synchromesh_load_from_db load_from_db
+
+      def load_from_db(*args)
+        raise DbRequestMade if @catch_db_requests
+        pre_synchromesh_load_from_db *args
+      end
+
+    end
+
     attr_writer :previous_changes
 
     def previous_changes
@@ -38,7 +73,7 @@ module ReactiveRecord
     end
 
     def new_id?
-      previous_changes[:id] && `#{previous_changes[:id]}[0] == null`
+      previous_changes.key?(:id) && previous_changes[:id].first.nil? #{}`#{previous_changes[:id]}[0] == null`
     end
 
     # once this method is integrated back into reactive-record, remove the duplicate

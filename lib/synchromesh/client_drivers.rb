@@ -26,8 +26,8 @@ module Synchromesh
     end
 
     class IncomingBroadcast
-      def self.receive(data, &block)
-        in_transit[data[:broadcast_id]].receive(data, &block)
+      def self.receive(data, is_destroyed, &block)
+        in_transit[data[:broadcast_id]].receive(data, is_destroyed, &block)
       end
 
       def klass
@@ -38,6 +38,7 @@ module Synchromesh
       attr_reader :previous_changes
       attr_reader :currently_in_default_scope
       attr_reader :current_default_scope_count
+      attr_reader :destroyed
 
       def to_s
         "klass: #{klass} record: #{record} previous_changes: #{previous_changes}, in_default_scope: #{in_default_scope}"
@@ -102,14 +103,16 @@ module Synchromesh
         @previous_changes = {}
       end
 
-      def receive(data, &block)
+      def receive(data, is_destroyed)
+        puts "receiving... destroyed = #{is_destroyed}"
+        @destroyed = is_destroyed
         @channels ||= self.class.open_channels.intersection data[:channels]
         raise "synchromesh security violation" unless @channels.include? data[:channel]
         @received << data[:channel]
         @klass ||= data[:klass]
         @record.merge! data[:record]
         @previous_changes.merge! data[:previous_changes]
-        @currently_in_default_scope = data[:currently_in_default_scope]
+        @currently_in_default_scope = data[:current_default_scope_count].nil? || data[:currently_in_default_scope]
         @current_default_scope_count = data[:current_default_scope_count]
         yield complete! if @channels == @received
       end
@@ -117,9 +120,53 @@ module Synchromesh
       def complete!
         self.class.in_transit.delete @id
       end
+
+      def merge_current_values(br)
+        Hash[*previous_changes.collect do |attr, values|
+          value = attr == :id ? record[:id] : values.first
+          if br.attributes.key?(attr) && br.attributes[attr].to_s != value.to_s
+            puts "attributes have changed???? why oh why ????#{previous_changes} \n #{br.attributes}"
+            return nil
+          end
+          [attr, value]
+        end.compact.flatten].merge(br.attributes)
+      end
+
+      def record_with_current_values
+        ReactiveRecord::Base.load_data do
+          br = klass.find(record[:id]).backing_record
+          br.previous_changes = previous_changes
+          puts "record with current values: destroyed = #{destroyed}"
+          if destroyed
+            puts "hey I am destroyed!!!"
+            br.ar_instance
+          elsif (current_values = merge_current_values(br))
+            puts "not destroyed"
+            klass._react_param_conversion(current_values)
+          end
+        end
+      end
+
+      def record_with_new_values
+        ReactiveRecord::Base.load_data do
+          puts "about to do the param conversion of #{record}"
+          puts "current attributes = #{klass.find(record[:id]).backing_record.attributes}"
+          br = klass._react_param_conversion(record).backing_record
+          br.previous_changes = previous_changes
+          if destroyed
+            br.destroy_associations
+            br.destroyed = true
+          end
+          puts "record_with_new values: #{br.attributes} "
+          br.ar_instance
+        end
+      end
+
     end
 
   end
+
+
   class ClientDrivers
     include React::IsomorphicHelpers
 
@@ -127,13 +174,10 @@ module Synchromesh
     # hydrate the data (which will update any attributes) and sync the scopes.
 
     def self.sync_change(data)
-      IncomingBroadcast.receive(data) do |broadcast|
-        ReactiveRecord::Base.when_not_saving(broadcast.klass) do |klass|
-          backing_record = klass._react_param_conversion(broadcast.record).backing_record
-          backing_record.previous_changes = broadcast.previous_changes
-          backing_record.currently_in_default_scope = broadcast.currently_in_default_scope
-          backing_record.current_default_scope_count = broadcast.current_default_scope_count
-          ReactiveRecord::Collection.sync_scopes backing_record
+      puts "sync_change"
+      IncomingBroadcast.receive(data, false) do |broadcast|
+        ReactiveRecord::Base.when_not_saving(broadcast.klass) do
+          ReactiveRecord::Collection.sync_scopes broadcast
         end
       end
     end
@@ -142,14 +186,9 @@ module Synchromesh
     # and syncronize the scopes.
 
     def self.sync_destroy(data)
-      IncomingBroadcast.receive(data) do |broadcast|
-        backing_record = broadcast.klass._react_param_conversion(broadcast.record).backing_record
-        backing_record.destroy_associations
-        backing_record.destroyed = true
-        backing_record.previous_changes = broadcast.previous_changes
-        backing_record.currently_in_default_scope = broadcast.currently_in_default_scope
-        backing_record.current_default_scope_count = broadcast.current_default_scope_count
-        ReactiveRecord::Collection.sync_scopes backing_record
+      puts "sync_destroy"
+      IncomingBroadcast.receive(data, true) do |broadcast|
+        ReactiveRecord::Collection.sync_scopes broadcast
       end
     end
 
@@ -209,11 +248,11 @@ module Synchromesh
         if opts[:transport] == :pusher
 
           opts[:change] = lambda do |data|
-            sync_change Hash.new(data)
+            sync_change JSON.parse(`JSON.stringify(#{data})`)
           end
 
           opts[:destroy] = lambda do |data|
-            sync_destroy Hash.new(data)
+            sync_destroy JSON.parse(`JSON.stringify(#{data})`)
           end
 
           if opts[:client_logging] && `window.console && window.console.log`

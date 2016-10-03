@@ -17,7 +17,6 @@ describe 'component helpers', js: true do
         end
       end
     end
-
     page.evaluate_ruby("MyComponent.foo").should eq(12)
     page.evaluate_ruby("TestModel").should eq("TestModel")
   end

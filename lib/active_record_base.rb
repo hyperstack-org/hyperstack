@@ -3,15 +3,34 @@ module ActiveRecord
   # 1 - Setup synchronization after commits
   # 2 - Update scope to accept different procs for server and client
   class Base
-
     class << self
 
+      def _synchromesh_scope_args_check(args)
+        opts = if args.count == 2 && args[1].is_a?(Hash)
+                 args[1].merge(server: args[0])
+               elsif args[0].is_a? Hash
+                 args[0]
+               else
+                 { server: args[0] }
+               end
+        return opts if opts.is_a?(Hash) && opts[:server].respond_to?(:call)
+        raise 'must provide either a proc as the first arg or by the '\
+              '`:server` option to scope and default_scope methods'
+      end
+
       alias pre_synchromesh_scope scope
+      alias pre_synchromesh_default_scope default_scope
 
       if RUBY_ENGINE != 'opal'
 
-        def scope(name, body, opts = {}, &block)
-          pre_synchromesh_scope(name, body, &block)
+        def scope(name, *args, &block)
+          opts = _synchromesh_scope_args_check(args)
+          pre_synchromesh_scope(name, opts[:server], &block)
+        end
+
+        def default_scope(*args, &block)
+          opts = _synchromesh_scope_args_check(args)
+          pre_synchromesh_default_scope(opts[:server], &block)
         end
 
       else
@@ -30,20 +49,39 @@ module ActiveRecord
           new(*args).save(&block)
         end
 
-        def reactive_record_scopes
-          @rr_scopes ||= {}
+        def _synchromesh_scope_descriptions
+          @scope_descriptions ||= {}
         end
 
-        def scope(name, body, opts = {}, &block)
-          ReactiveRecord::Collection.add_scope(self, name, opts)
-          singleton_class.send(:define_method, name) do | *args |
-            args = (args.count == 0) ? name : [name, *args]
-            ReactiveRecord::Base.class_scopes(self)[args] ||=
-              ReactiveRecord::Collection.new(self, nil, nil, self, args).set_scope(name)
+        def scope(name, *args)
+          opts = _synchromesh_scope_args_check(args)
+          scope_description = ReactiveRecord::ScopeDescription.new(self, name, opts)
+          singleton_class.send(:define_method, name) do |*args|
+            # args = args.count.zero? ? name : [name, *args]
+            all.apply_scope2(scope_description, *name, *args)
           end
           singleton_class.send(:define_method, "#{name}=") do |collection|
-            ReactiveRecord::Base.class_scopes(self)[name] = collection
+            all.replace_scope(name, collection)
           end
+        end
+
+        def default_scope(*args)
+          opts = _synchromesh_scope_args_check(args)
+          all.apply_scope2(ReactiveRecord::ScopeDescription.new(self, :all, opts))
+        end
+
+        def all
+          @_default_scope ||=
+            ReactiveRecord::Collection
+            .new(self, nil, nil, self, 'all')
+            .extend(ReactiveRecord::UnscopedCollection)
+        end
+
+        def unscoped
+          @_unscoped ||=
+            ReactiveRecord::Collection
+            .new(self, nil, nil, self, 'unscoped')
+            .extend(ReactiveRecord::UnscopedCollection)
         end
 
         def _react_param_conversion(param, opt = nil)
@@ -67,7 +105,11 @@ module ActiveRecord
                   assoc.association_foreign_key == key
                 end
                 if assoc
-                  [assoc.attribute, {id: [value], type: [nil]}]
+                  if value
+                    [assoc.attribute, {id: [value], type: [nil]}]
+                  else
+                    [assoc.attribute, [nil]]
+                  end
                 else
                   [key, [value]]
                 end
@@ -81,10 +123,10 @@ module ActiveRecord
           result
         end
       end
-
     end
 
     if RUBY_ENGINE != 'opal'
+
       after_commit :synchromesh_after_change, on: [:create, :update]
       after_commit :synchromesh_after_destroy, on: [:destroy]
 
@@ -96,33 +138,21 @@ module ActiveRecord
       def synchromesh_after_destroy
         Synchromesh.after_destroy self
       end
+
     else
+
       def update_attribute(attr, value, &block)
         send("#{attr}=", value)
         save(validate: false, &block)
       end
-      def update(attrs = {}, &block)
-        attrs.each { |attr, value| send("#{attr}=", value)}
-        save &block
-      end
-      def <=>(b)
-        id <=> b.id
-      end
-      def self.inherited(model)
-        model.class_eval do
-          scope :all, nil, sync: ->(r, c) do
-            c.update_collection_on_sync(
-              r, r.backing_record.current_default_scope_count,
-              r.backing_record.currently_in_default_scope
-            )
-            false
-          end
 
-          scope :unscoped, nil, sync: ->(r, c) do
-            c << r if r.backing_record.new_id? || r.destroyed?
-            false
-          end
-        end
+      def update(attrs = {}, &block)
+        attrs.each { |attr, value| send("#{attr}=", value) }
+        save(&block)
+      end
+
+      def <=>(other)
+        id.to_i <=> other.id.to_i
       end
     end
   end
