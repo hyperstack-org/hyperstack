@@ -271,7 +271,7 @@ module Synchromesh
       end
       channels
     end
-  end  
+  end
 
   class InternalPolicy
 
@@ -402,10 +402,6 @@ module Synchromesh
     def broadcast(&block)
       klass = @obj.class
       header = {broadcast_id: id, channels: channel_list, klass: klass.name}
-      if (klass <= ActiveRecord::Base) && (default_scope = klass.send(:build_default_scope))
-        header[:currently_in_default_scope] = default_scope.exists?(@obj.id)
-        header[:current_default_scope_count] = default_scope.count
-      end
       @channel_sets.each do |channel, attribute_set|
         send_message header, channel, attribute_set, &block
       end

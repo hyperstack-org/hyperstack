@@ -6,6 +6,7 @@ module ActiveRecord
     class << self
 
       def _synchromesh_scope_args_check(args)
+        puts "_synchromesh_scope_args_check([#{args}]) (args.count = #{args.count})"
         opts = if args.count == 2 && args[1].is_a?(Hash)
                  args[1].merge(server: args[0])
                elsif args[0].is_a? Hash
@@ -29,6 +30,7 @@ module ActiveRecord
         end
 
         def default_scope(*args, &block)
+          puts "default_scope([#{args}])"
           opts = _synchromesh_scope_args_check(args)
           pre_synchromesh_default_scope(opts[:server], &block)
         end
@@ -38,11 +40,11 @@ module ActiveRecord
         alias pre_synchromesh_method_missing method_missing
 
         def method_missing(name, *args, &block)
-          if [].respond_to?(name)
-            all.send(name, *args, &block)
-          else
-            pre_synchromesh_method_missing(name, *args, &block)
+          return all.send(name, *args, &block) if [].respond_to?(name)
+          if name =~ /\!$/
+            return send(name.gsub(/\!$/,''), *args, &block).send(:reload_from_db) rescue nil
           end
+          pre_synchromesh_method_missing(name, *args, &block)
         end
 
         def create(*args, &block)

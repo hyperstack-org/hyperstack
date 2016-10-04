@@ -100,11 +100,13 @@ module ReactiveRecord
           :sync_scopes,
           record, record.destroyed?
         )
+        broadcast.klass.all << record
       end
 
       def apply_to_all_collections(method, record, dont_gather)
         puts "apply_to_all_collections(#{method}, #{record}, #{!!dont_gather})"
         related_records = Set.new if dont_gather
+        puts "all_class_scopes: #{Base.all_class_scopes.count}"
         Base.all_class_scopes.each do |collection|
           unless dont_gather
             related_records = collection.gather_related_records(record)
@@ -186,6 +188,7 @@ module ReactiveRecord
       else
         @out_of_date = true
       end
+      self
     end
 
     def observed

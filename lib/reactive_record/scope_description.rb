@@ -25,7 +25,7 @@ module ReactiveRecord
     end
 
     def build_joins(joins_list)
-      if !@filter_proc
+      if !@filter_proc || joins_list == []
         @joins = { all: [] }
       elsif joins_list.nil?
         @joins = { @model => [[]], all: [] }
@@ -66,8 +66,8 @@ module ReactiveRecord
     end
 
     def joins_with?(record)
-      @joins.detect do |klass, _vector|
-        klass != :all && (record.class == klass || record.class < klass)
+      @joins.detect do |klass, vector|
+        vector.any? && (klass == :all || record.class == klass || record.class < klass)
       end
     end
 

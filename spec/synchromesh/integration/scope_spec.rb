@@ -49,6 +49,21 @@ describe "synchronized scopes", js: true do
     size_window(:small, :portrait)
   end
 
+  it "can use the all scope" do
+    mount "TestComponent2" do
+      class TestComponent2 < React::Component::Base
+        render do
+          "count = #{TestModel.all.count}"
+        end
+      end
+    end
+    page.should have_content("count = 0")
+    m = FactoryGirl.create(:test_model)
+    page.should have_content("count = 1")
+    m.destroy
+    page.should have_content("count = 0")
+  end
+
   it "will be updated only when needed" do
     isomorphic do
       TestModel.class_eval do
@@ -119,7 +134,6 @@ describe "synchronized scopes", js: true do
     page.should have_content('model 3')
     TestModel.scope1_count.should eq(8)
     TestModel.scope2_count.should eq(5)
-    binding.pry
   end
 
   it "can have params" do
@@ -211,51 +225,6 @@ describe "synchronized scopes", js: true do
       child.update_attribute(:child_attribute, 'WHAAA')
       page.should have_content('.count = 1')
     end
-  end
-
-  xit 'can have a block to dynamically test if scope needs updating' do
-    isomorphic do
-      TestModel.class_eval do
-        scope :quick, -> { where(completed: true) }, client: -> (record) do
-          (record.completed && record.destroyed?) || record.previous_changes[:completed]
-        end
-      end
-    end
-    mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
-        before_mount do
-          @render_count = 1
-        end
-        before_update do
-          @render_count = @render_count + 1
-        end
-        render(:div) do
-          div { "rendered #{@render_count} times"}
-          div { "quick.count = #{TestModel.quick.count}" }
-        end
-      end
-    end
-    m1 = FactoryGirl.create(:test_model)
-    page.should have_content('.count = 0')
-    page.should have_content('rendered 2 times')
-    TestModel.quick_count.should eq(1)
-    m1.update_attribute(:test_attribute, 'new_value')
-    wait_for_ajax
-    page.should have_content('.count = 0')
-    page.should have_content('rendered 2 times')
-    TestModel.quick_count.should eq(1)
-    m1.update_attribute(:completed, true)
-    page.should have_content('.count = 1')
-    page.should have_content('rendered 3 times')
-    TestModel.quick_count.should eq(2)
-    m2 = FactoryGirl.create(:test_model, completed: true)
-    page.should have_content('.count = 2')
-    page.should have_content('rendered 4 times')
-    TestModel.quick_count.should eq(3)
-    m1.destroy
-    page.should have_content('.count = 1')
-    page.should have_content('rendered 5 times')
-    TestModel.quick_count.should eq(4)
   end
 
   it 'can have a client filter method' do
@@ -386,176 +355,111 @@ describe "synchronized scopes", js: true do
       end
     end
     TestModel.has_children_count.should eq(1)
-    parent = FactoryGirl.create(:test_model) #h
-      page.should have_content('.count = 0')
-    child = FactoryGirl.create(:child_model) #f
-      page.should have_content('.count = 0')
-    child.update_attribute(:test_model, parent) #c
-      page.should have_content('.count = 1')
-    child.update_attribute(:child_attribute, 'WHAAA') #d
-      page.should have_content('.count = 1')
-    child.update_attribute(:test_model, nil) #e
-      page.should have_content('.count = 0')
-    child.update_attribute(:test_model, parent) #c
-      page.should have_content('.count = 1')
-    child.destroy #a/b
-      page.should have_content('.count = 0')
-    parent.destroy #g
-      page.should have_content('.count = 0')
+    parent = FactoryGirl.create(:test_model)
+    page.should have_content('.count = 0')
+    child = FactoryGirl.create(:child_model)
+    page.should have_content('.count = 0')
+    child.update_attribute(:test_model, parent)
+    page.should have_content('.count = 1')
+    child.update_attribute(:child_attribute, 'WHAAA')
+    page.should have_content('.count = 1')
+    child.update_attribute(:test_model, nil)
+    page.should have_content('.count = 0')
+    child.update_attribute(:test_model, parent)
+    page.should have_content('.count = 1')
+    child.destroy
+    page.should have_content('.count = 0')
+    parent.destroy
+    page.should have_content('.count = 0')
     TestModel.has_children_count.should eq(1)
-
   end
 
-
-  xit 'the joins: :all option will join with all models' do
+  it 'the joins option can join with all or no models' do
     isomorphic do
       TestModel.class_eval do
-        scope :has_children,
-              server: -> { joins(:child_models).distinct },
+        scope :has_children_joins_all,
               joins: :all,
-              client: -> { child_models.any? }
-        scope :do_it_all_the_time,
-              server: -> { all }, joins: :all, sync: -> { puts "&&&&&&&&&&&&& doitall the time &&&&&&"; true }
-        scope :never_sync_it, -> { all }, sync: false
+              server: -> { joins(:child_models).distinct }
+        scope :has_children_no_joins,
+              joins: [],
+              server: -> { joins(:child_models).distinct }
+      end
+    end
+    mount 'TestComponent2' do
+      class TestComponent2 < React::Component::Base
+        render(DIV) do
+          DIV { "TestModel.has_children_joins_all.count = #{TestModel.has_children_joins_all.count}" }
+          DIV { "TestModel.has_children_no_joins.count = #{TestModel.has_children_no_joins.count}" }
+        end
+      end
+    end
+    TestModel.has_children_joins_all_count.should eq(1)
+    TestModel.has_children_no_joins_count.should eq(1)
+    parent = FactoryGirl.create(:test_model)
+    wait_for_ajax
+    TestModel.has_children_no_joins_count.should eq(1)
+    wait_for { TestModel.has_children_joins_all_count }.to eq(2)
+    child = FactoryGirl.create(:child_model)
+    wait_for { TestModel.has_children_joins_all_count }.to eq(3)
+    parent.child_models << child
+    wait_for { TestModel.has_children_joins_all_count }.to eq(4)
+    TestModel.has_children_no_joins_count.should eq(1)
+    page.should have_content('all.count = 1')
+    page.should have_content('joins.count = 0')
+    parent.update_attribute(:test_attribute, 'hello')
+    page.should have_content('joins.count = 0')
+    TestModel.has_children_no_joins_count.should eq(1)
+  end
+
+  it 'server side scopes can be procs returning arrays of elements' do
+    isomorphic do
+      TestModel.class_eval do
+        scope :rev,
+              server: -> { all.reverse }
       end
     end
     mount 'TestComponent2' do
       class TestComponent2 < React::Component::Base
         render do
-          TestModel.do_it_all_the_time.count
-          TestModel.never_sync_it.count
-          "TestModel.has_children.count = #{TestModel.has_children.count}"
+          "test attributes: #{TestModel.rev.collect { |r| r.test_attribute }.join(', ')}"
         end
       end
     end
-      #puts "*************** test 1 *********************"
-      TestModel.has_children_count.should eq(1)
-      TestModel.do_it_all_the_time_count.should eq(1)
-      TestModel.never_sync_it_count.should eq(1)
-
-    parent = FactoryGirl.create(:test_model) # need to save parent first to avoid
-    # race condition when both child and parent get saved at the same time.
-    # The timing of the pushed events from the server will result in either 1 or 2
-    # fetches of the 'do_it_all_the_time_count' scope.
-    # Final test in this example does it the normal way.
-    wait_for { TestModel.do_it_all_the_time_count }.to eq(2)
-    child = FactoryGirl.create(:child_model)
-    wait_for { TestModel.do_it_all_the_time_count }.to eq(3)
-    parent.child_models << child
-
-      #puts "*************** test 2 *********************"
-      page.should have_content('.count = 1')
-      TestModel.has_children_count.should eq(2)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(4)
-      TestModel.never_sync_it_count.should eq(1)
-
-      #puts "about to update the attribute now"
-
-    child.update_attribute(:child_attribute, 'WHAAA')
-
-      #puts "*************** test 3 *********************"
-      page.should have_content('.count = 1')
-      TestModel.has_children_count.should eq(2)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(5)
-      TestModel.never_sync_it_count.should eq(1)
-
-
-    child2 = FactoryGirl.create(:child_model, test_model: parent )
-
-      page.should have_content('.count = 1')
-      wait_for { TestModel.has_children_count }.to eq(3)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(6)
-      TestModel.never_sync_it_count.should eq(1)
-
-    p2 = FactoryGirl.create(:test_model)
-
-      page.should have_content('.count = 1')
-      TestModel.has_children_count.should eq(3)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(7)
-      TestModel.never_sync_it_count.should eq(1)
-
-    FactoryGirl.create(:child_model, test_model: p2)
-
-      page.should have_content('.count = 2')
-      wait_for { TestModel.has_children_count }.to eq(4)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(8)
-      TestModel.never_sync_it_count.should eq(1)
-
-    p2.destroy
-
-      page.should have_content('.count = 1')
-      wait_for { TestModel.has_children_count }.to eq(5)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(9)
-      TestModel.never_sync_it_count.should eq(1)
-
-    child.test_model = nil
-    child.save
-
-      page.should have_content('.count = 1')
-      wait_for { TestModel.has_children_count }.to eq(6)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(10)
-      TestModel.never_sync_it_count.should eq(1)
-
-    child2.destroy
-
-      page.should have_content('.count = 0')
-      TestModel.has_children_count.should eq(7)
-      wait_for { TestModel.do_it_all_the_time_count }.to eq(11)
-      TestModel.never_sync_it_count.should eq(1)
-
-    parent = FactoryGirl.build(:test_model)
-    parent.child_models << (child = FactoryGirl.create(:child_model))
-    parent.save
-
-      page.should have_content('.count = 1')
-
+    FactoryGirl.create(:test_model, test_attribute: 1)
+    page.should have_content('test attributes: 1')
+    FactoryGirl.create(:test_model, test_attribute: 2)
+    page.should have_content('test attributes: 2, 1')
   end
 
-  xit 'with no joins array only the model being scoped will be passed to the block' do
+  it 'can force reload using the ! suffix' do
     isomorphic do
       TestModel.class_eval do
-        scope :has_children,
-              -> { joins(:child_models).distinct },
-              sync: -> () { true }
+        scope :rev,
+              joins: [],
+              server: -> { all.reverse }
       end
     end
     mount 'TestComponent2' do
+
       class TestComponent2 < React::Component::Base
-        render { "TestModel.has_children.count = #{TestModel.has_children.count}" }
+        before_mount do
+          @reverse_collection = []
+        end
+        render do
+          if @current_count != TestModel.all.count # this forces a rerender...
+            puts "asking for reverse collection"
+            @reverse_collection = TestModel.rev!
+            @current_count = TestModel.all.count
+          end
+          puts "rendering #{@reverse_collection}"
+          "test attributes: #{@reverse_collection.collect { |r| r.test_attribute }.join(', ')}"
+        end
       end
     end
-    #puts "************************** starting ******************************"
-    parent = FactoryGirl.build(:test_model)
-    parent.child_models << (child = FactoryGirl.create(:child_model))
-    parent.save
-    #puts "************************** test 1 ******************************"
-    page.should have_content('.count = 1')
-    child.update_attribute(:child_attribute, 'WHAAA')
-    #puts "************************** test 2 ******************************"
-    page.should have_content('.count = 1')
-    child2 = FactoryGirl.create(:child_model, test_model: parent )
-    #puts "************************** test 3 ******************************"
-    page.should have_content('.count = 1')
-    p2 = FactoryGirl.create(:test_model)  # this save will cause the scope to be recalcuated!
-    # because even though this record does not have a child, some other record does!!!
-    #puts "************************** test 4 ******************************"
-    wait_for {TestModel.has_children_count}.to eq(3)
-    page.should have_content('.count = 1')
-    FactoryGirl.create(:child_model, test_model: p2)
-     # seems like we get into a deadlock if we dont' do this here
-    #puts "************************** test 5 ******************************"
-    page.should have_content('.count = 1')
-    parent.update_attribute :test_attribute, 'hi'
-    page.should have_content('.count = 2')
-    p2.destroy
-    page.should have_content('.count = 1')
-    child.test_model = nil
-    child.save
-    page.should have_content('.count = 1')
-    child2.destroy
-    page.should have_content('.count = 1')
-    parent.update_attribute :test_attribute, 'bye'
-    page.should have_content('.count = 0')
-    TestModel.has_children_count.should eq(6)
+    FactoryGirl.create(:test_model, test_attribute: 1)
+    page.should have_content('test attributes: 1')
+    FactoryGirl.create(:test_model, test_attribute: 2)
+    page.should have_content('test attributes: 2, 1')
   end
+
 end
