@@ -23,7 +23,7 @@ Install the gem, or load the js library
 + `gem install reactrb` or
 + install (or load via cdn) [reactrb-express.js](http://github.com/reactrb/reactrb-express)
 
-For gem installation it is highly recommended to read [the getting started section at reactrb.org](http://reactrb.org/docs/getting-started.html)
+For gem installation it is highly recommended to read the [getting started](http://ruby-hyperloop.io/get_started/) and [installation](http://ruby-hyperloop.io/installation/) guides at [ruby-hyperloop.io](http://ruby-hyperloop.io)
 
 ## Quick Overview
 
