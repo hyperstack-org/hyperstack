@@ -11,7 +11,7 @@
 It lets you write reactive UI components, with Ruby's elegance using the tried
 and true React.js engine. :heart:
 
-[**Visit reactrb.org For The Full Story**](http://reactrb.org)
+[**Visit ruby-hyperloop.io For The Full Story**](http://ruby-hyperloop.io)
 
 ### Important: `react.rb` and `reactive-ruby` gems are **deprecated.** Please [read this!](#upgrading-to-reactrb)
 
