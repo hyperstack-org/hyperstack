@@ -12,7 +12,7 @@ module ReactiveRecord
 
       ReactiveRecord::Base.catch_db_requests do
         @pre_sync_related_records = filter_records(related_records)
-        @scopes.each_value do |scope|
+        live_scopes.each do |scope|
           scope.set_pre_sync_related_records(@pre_sync_related_records)
         end
       end if filter?
@@ -31,7 +31,7 @@ module ReactiveRecord
         puts "reloading! filtering = #{!!filtering} joined = #{!!joins_with?(record)}"
         reload_from_db
       end
-      @scopes.each_value { |scope| scope.sync_scopes(related_records, record, filtering) }
+      live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
     ensure
       @pre_sync_related_records = nil
     end
@@ -49,6 +49,7 @@ module ReactiveRecord
     end
 
     def add_filtered_records_to_collection(before, after)
+      puts "add_filtered_records_to_collection([#{before.to_a}], [#{after.to_a}])"
       if (collection || !@count.nil?) && before != after
         if collection
           (after - before).each { |r| push r }
@@ -66,11 +67,11 @@ module ReactiveRecord
   module UnscopedCollection
     def set_pre_sync_related_records(related_records, _record = nil)
       @pre_sync_related_records = related_records
-      @scopes.each_value { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
+      live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
     def sync_scopes(related_records, record, filtering = true)
-      @scopes.each_value { |scope| scope.sync_scopes(related_records, record, filtering) }
+      live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
     ensure
       @pre_sync_related_records = nil
     end
@@ -78,7 +79,8 @@ module ReactiveRecord
 
   class Collection
     attr_reader   :vector
-    attr_accessor :scope_description
+    attr_writer   :scope_description
+    attr_writer   :parent
 
     class << self
 
@@ -100,7 +102,7 @@ module ReactiveRecord
           :sync_scopes,
           record, record.destroyed?
         )
-        broadcast.klass.all << record
+        broadcast.klass.unscoped << record if record.backing_record.new_id? || record.destroyed?
       end
 
       def apply_to_all_collections(method, record, dont_gather)
@@ -119,7 +121,7 @@ module ReactiveRecord
     def gather_related_records(record, related_records = Set.new)
       puts "gathering related records(#{record}, [#{related_records.to_a}])"
       merge_related_records(record, related_records)
-      @scopes.each_value do |collection|
+      live_scopes.each do |collection|
         collection.gather_related_records(record, related_records)
       end
       related_records.tap { |x| puts "related_records = #{related_records}"}
@@ -136,47 +138,63 @@ module ReactiveRecord
       false
     end
 
+    def collector?
+      false
+    end
+
+    def live_scopes
+      @live_scopes ||= Set.new
+    end
+
     def set_pre_sync_related_records(related_records, _record = nil)
-      @pre_sync_related_records = related_records.intersect(all)
-      @scopes.each_value { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
+      @pre_sync_related_records = related_records.intersection(all)
+      live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
     def sync_scopes(related_records, record, filtering = true)
-      related_records = related_records.intersect(all)
-      @scopes.each_value { |scope| scope.sync_scopes(related_records, record, filtering) }
+      related_records = related_records.intersection(all)
+      live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
     ensure
       @pre_sync_related_records = nil
     end
 
     def apply_scope(name, *vector)
-      apply_scope2(ScopeDescription.all[@target_klass][name], *name, *vector)
+      build_child_scope(ScopeDescription.all[@target_klass][name], *name, *vector)
     end
 
-    def apply_scope2(scope_description, *scope_vector)
-      # The value returned is another ReactiveRecordCollection with the scope added to the vector
-      # no additional action is taken
-      @scopes ||= {}
-      @scopes[scope_vector] ||= build_child_scope(scope_description, scope_vector)
+    def child_scopes
+      @child_scopes ||= {}
     end
 
-    def replace_scope(name, new_collection)
-      @scopes[name] = new_collection
+    def build_child_scope(scope_description, *scope_vector)
+      child_scopes[scope_vector] ||= begin
+        new_vector = @vector
+        new_vector += [scope_vector] unless scope_vector.empty?
+        child_scope = Collection.new(@target_klass, @owner, @association, *new_vector)
+        child_scope.scope_description = scope_description
+        #ReactiveRecord::Base.class_scopes(@target_klass)[self] ||= self if base_scope?
+        child_scope.parent = self
+        child_scope.extend ScopedCollection
+        #child_scope.all if child_scope.collector? # force fetch all so the collector can do its job
+        puts "built new child scope.  parent = #{self} child = #{child_scope} scope = #{scope_description} vector = #{scope_vector}"
+        child_scope
+      end
     end
 
-    def build_child_scope(scope_description, scope_vector)
-      new_vector = @vector
-      new_vector += [scope_vector] unless scope_vector.empty?
-      child_scope = Collection.new(@target_klass, @owner, @association, *new_vector)
-      child_scope.scope_description = scope_description
-      ReactiveRecord::Base.class_scopes(@target_klass)[self] ||= self if base_scope?
-      child_scope.extend ScopedCollection
-      child_scope.all if child_scope.collector? # force fetch all so the collector can do its job
-      puts "built new child scope.  parent = #{self} child = #{child_scope} scope = #{scope_description} vector = #{scope_vector}"
-      child_scope
+    def link_to_parent
+      return if @linked
+      @linked = true
+      all if collector? # force fetch all so the collector can do its job
+      if @parent
+        @parent.link_child self
+      else
+        ReactiveRecord::Base.class_scopes(@target_klass)[self] ||= self
+      end
     end
 
-    def base_scope?
-      !scope_description
+    def link_child(child)
+      live_scopes << child
+      link_to_parent
     end
 
     def reload_from_db(force = nil)
@@ -192,8 +210,15 @@ module ReactiveRecord
     end
 
     def observed
-      reload_from_db(true) if @out_of_date
-      React::State.get_state(self, :collection) unless ReactiveRecord::Base.data_loading?
+      return if @observing
+      begin
+        @observing = true
+        link_to_parent
+        reload_from_db(true) if @out_of_date
+        React::State.get_state(self, :collection) unless ReactiveRecord::Base.data_loading?
+      ensure
+        @observing = false
+      end
     end
 
     alias pre_synchromesh_instance_variable_set instance_variable_set

@@ -30,12 +30,18 @@ module ActiveRecord
         end
 
         def default_scope(*args, &block)
-          puts "default_scope([#{args}])"
           opts = _synchromesh_scope_args_check(args)
           pre_synchromesh_default_scope(opts[:server], &block)
         end
 
       else
+
+        include React::IsomorphicHelpers
+
+        before_first_mount do
+          @_default_scope = nil
+          @_unscoped = nil
+        end
 
         alias pre_synchromesh_method_missing method_missing
 
@@ -51,32 +57,38 @@ module ActiveRecord
           new(*args).save(&block)
         end
 
-        def _synchromesh_scope_descriptions
-          @scope_descriptions ||= {}
-        end
-
         def scope(name, *args)
           opts = _synchromesh_scope_args_check(args)
           scope_description = ReactiveRecord::ScopeDescription.new(self, name, opts)
-          singleton_class.send(:define_method, name) do |*args|
-            # args = args.count.zero? ? name : [name, *args]
-            all.apply_scope2(scope_description, *name, *args)
+          singleton_class.send(:define_method, name) do |*vargs|
+            all.build_child_scope(scope_description, *name, *vargs)
           end
-          singleton_class.send(:define_method, "#{name}=") do |collection|
-            all.replace_scope(name, collection)
+          singleton_class.send(:define_method, "#{name}=") do |_collection|
+            raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
+            # all.replace_child_scope(name, collection)
           end
         end
 
         def default_scope(*args)
           opts = _synchromesh_scope_args_check(args)
-          all.apply_scope2(ReactiveRecord::ScopeDescription.new(self, :all, opts))
+          @_default_scopes ||= []
+          @_default_scopes << opts
         end
 
         def all
           @_default_scope ||=
-            ReactiveRecord::Collection
-            .new(self, nil, nil, self, 'all')
-            .extend(ReactiveRecord::UnscopedCollection)
+            if @_default_scopes
+              root = ReactiveRecord::Collection
+                     .new(self, nil, nil, self, 'all')
+                     .extend(ReactiveRecord::UnscopedCollection)
+              @_default_scopes.inject(root) do |scope, opts|
+                scope.build_child_scope(ReactiveRecord::ScopeDescription.new(self, :all, opts))
+              end
+            end || unscoped
+        end
+
+        def all=(_collection)
+          raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
         end
 
         def unscoped

@@ -18,10 +18,6 @@ module ReactiveRecord
     attr_accessor :currently_in_default_scope
     attr_accessor :current_default_scope_count
 
-    def self.get_class_scopes
-      @class_scopes
-    end
-
     def self.all_class_scopes
       Enumerator.new do |y|
         @class_scopes.each_value { |scopes| scopes.each_value { |scope| y << scope }}
