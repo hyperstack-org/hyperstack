@@ -15,6 +15,10 @@ module ReactiveRecord
       #sync_scopes2 if Synchromesh::ClientDrivers.opts[:transport] == :none
     end
 
+    def self.exists?(model, id)
+      @records[model].detect { |record| record.attributes[model.primary_key] == id }
+    end
+
     attr_accessor :currently_in_default_scope
     attr_accessor :current_default_scope_count
 
@@ -60,16 +64,6 @@ module ReactiveRecord
         pre_synchromesh_load_from_db *args
       end
 
-    end
-
-    attr_writer :previous_changes
-
-    def previous_changes
-      @previous_changes ||= {}
-    end
-
-    def new_id?
-      previous_changes.key?(:id) && previous_changes[:id].first.nil? #{}`#{previous_changes[:id]}[0] == null`
     end
 
     # once this method is integrated back into reactive-record, remove the duplicate

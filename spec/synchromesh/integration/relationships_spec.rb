@@ -37,8 +37,8 @@ describe "synchronizing relationships", js: true do
       class TestComponent2 < React::Component::Base
         param :model, type: TestModel
         render(:div) do
-          puts "RENDERING! #{model.child_models.count} items"
-          div { "#{model.child_models.count} items" }
+          puts "RENDERING! #{params.model.child_models.count} items"
+          div { "#{params.model.child_models.count} items" }
           #ul { model.child_models.each { |model| li { model.child_attribute }}}
         end
       end

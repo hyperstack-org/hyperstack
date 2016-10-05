@@ -40,7 +40,7 @@ module ReactiveRecord
       puts "updating_collection([#{related_records.to_a}])"
       if collector?
         replace(filter_records(all + related_records.to_a))
-        related_records.intersection(all)
+        related_records.intersection([*@collection])
       else
         add_filtered_records_to_collection(
           @pre_sync_related_records, filter_records(related_records)
@@ -93,7 +93,7 @@ module ReactiveRecord
         puts "record attributes B4 = #{record.backing_record.attributes}"
         apply_to_all_collections(
           :set_pre_sync_related_records,
-          record, record.backing_record.new_id?
+          record, broadcast.new?
         ) if record
         puts "record attributes AFTER = #{record.backing_record.attributes}" if record
         record = broadcast.record_with_new_values
@@ -102,7 +102,7 @@ module ReactiveRecord
           :sync_scopes,
           record, record.destroyed?
         )
-        broadcast.klass.unscoped << record if record.backing_record.new_id? || record.destroyed?
+        broadcast.klass.unscoped << record if broadcast.new? || record.destroyed?
       end
 
       def apply_to_all_collections(method, record, dont_gather)
@@ -147,12 +147,12 @@ module ReactiveRecord
     end
 
     def set_pre_sync_related_records(related_records, _record = nil)
-      @pre_sync_related_records = related_records.intersection(all)
+      @pre_sync_related_records = related_records.intersection([*@collection])
       live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
     def sync_scopes(related_records, record, filtering = true)
-      related_records = related_records.intersection(all)
+      related_records = related_records.intersection([*@collection])
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
     ensure
       @pre_sync_related_records = nil
@@ -215,6 +215,7 @@ module ReactiveRecord
         @observing = true
         link_to_parent
         reload_from_db(true) if @out_of_date
+        puts "*******observing #{self} data_loading? #{ReactiveRecord::Base.data_loading?}"
         React::State.get_state(self, :collection) unless ReactiveRecord::Base.data_loading?
       ensure
         @observing = false
@@ -232,16 +233,12 @@ module ReactiveRecord
 
     alias_method :pre_synchromesh_push, '<<'
 
-    def new_items
-      @unsaved_items ||= Set.new
-    end
-
     def push(item)
       if collection
         pre_synchromesh_push item
       elsif !@count.nil?
-        new_items << item if item.new?
         @count += item.destroyed? ? -1 : 1
+        puts "*****notify_of_change #{self}"
         notify_of_change self
       end
       self

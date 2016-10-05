@@ -35,13 +35,14 @@ module Synchromesh
       end
 
       attr_reader :record
-      attr_reader :previous_changes
-      attr_reader :currently_in_default_scope
-      attr_reader :current_default_scope_count
       attr_reader :destroyed
 
+      def new?
+        !@backing_record
+      end
+
       def to_s
-        "klass: #{klass} record: #{record} previous_changes: #{previous_changes}, in_default_scope: #{in_default_scope}"
+        "klass: #{klass} record: #{record} new?: #{new?} destroyed?: #{destroyed}"
       end
 
       def self.open_channels
@@ -80,7 +81,8 @@ module Synchromesh
                     #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
                   },
                   received: function(data) {
-                    #{ClientDrivers.send("sync_#{`data['message']`}", Hash.new(`data['data']`))}
+                    var data = #{JSON.parse(`JSON.stringify(data)`)}
+                    #{ClientDrivers.send("sync_#{`data`['message']}", `data`['data'])}
                     return true
                   }
                 }
@@ -104,7 +106,7 @@ module Synchromesh
       end
 
       def receive(data, is_destroyed)
-        puts "receiving... destroyed = #{is_destroyed}"
+        puts "receiving(#{data}, #{is_destroyed}"
         @destroyed = is_destroyed
         @channels ||= self.class.open_channels.intersection data[:channels]
         raise "synchromesh security violation" unless @channels.include? data[:channel]
@@ -112,8 +114,7 @@ module Synchromesh
         @klass ||= data[:klass]
         @record.merge! data[:record]
         @previous_changes.merge! data[:previous_changes]
-        @currently_in_default_scope = data[:current_default_scope_count].nil? || data[:currently_in_default_scope]
-        @current_default_scope_count = data[:current_default_scope_count]
+        @backing_record = ReactiveRecord::Base.exists?(klass, record[:id])
         yield complete! if @channels == @received
       end
 
@@ -122,10 +123,10 @@ module Synchromesh
       end
 
       def merge_current_values(br)
-        Hash[*previous_changes.collect do |attr, values|
+        Hash[*@previous_changes.collect do |attr, values|
           value = attr == :id ? record[:id] : values.first
           if br.attributes.key?(attr) && br.attributes[attr].to_s != value.to_s
-            puts "attributes have changed???? why oh why ????#{previous_changes} \n #{br.attributes}"
+            puts "attributes have changed???? why oh why ????#{@previous_changes} \n #{br.attributes}"
             return nil
           end
           [attr, value]
@@ -134,13 +135,12 @@ module Synchromesh
 
       def record_with_current_values
         ReactiveRecord::Base.load_data do
-          br = klass.find(record[:id]).backing_record
-          br.previous_changes = previous_changes
+          backing_record = @backing_record || klass.find(record[:id]).backing_record
           puts "record with current values: destroyed = #{destroyed}"
           if destroyed
             puts "hey I am destroyed!!!"
-            br.ar_instance
-          elsif (current_values = merge_current_values(br))
+            backing_record.ar_instance
+          elsif (current_values = merge_current_values(backing_record))
             puts "not destroyed"
             klass._react_param_conversion(current_values)
           end
@@ -148,18 +148,15 @@ module Synchromesh
       end
 
       def record_with_new_values
-        ReactiveRecord::Base.load_data do
-          puts "about to do the param conversion of #{record}"
-          puts "current attributes = #{klass.find(record[:id]).backing_record.attributes}"
-          br = klass._react_param_conversion(record).backing_record
-          br.previous_changes = previous_changes
-          if destroyed
-            br.destroy_associations
-            br.destroyed = true
-          end
-          puts "record_with_new values: #{br.attributes} "
-          br.ar_instance
+        puts "about to do the param conversion of #{record}"
+        puts "current attributes = #{klass.find(record[:id]).backing_record.attributes}"
+        backing_record = klass._react_param_conversion(record).backing_record
+        if destroyed
+          backing_record.destroy_associations
+          backing_record.destroyed = true
         end
+        puts "record_with_new values: #{br.attributes} "
+        backing_record.ar_instance
       end
 
     end
