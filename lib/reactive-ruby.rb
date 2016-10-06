@@ -37,7 +37,6 @@ if RUBY_ENGINE == 'opal'
 
 else
   require 'opal'
-  require 'opal-browser'
   begin
     require 'opal-jquery'
   rescue LoadError

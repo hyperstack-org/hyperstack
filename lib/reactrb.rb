@@ -36,7 +36,6 @@ if RUBY_ENGINE == 'opal'
 
 else
   require 'opal'
-  require 'opal-browser'
   # rubocop:disable Lint/HandleExceptions
   begin
     require 'opal-jquery'
