@@ -18,7 +18,11 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
-## [0.8.9] - Unreleased
+## [0.9.0] - Unreleased
+
+### Removed
+
+- `opal-browser` is removed from runtime dependency. (#133)
 
 ### Fixed
 
