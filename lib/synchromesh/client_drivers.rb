@@ -26,29 +26,6 @@ module Synchromesh
     end
 
     class IncomingBroadcast
-      def self.receive(data, is_destroyed, &block)
-        in_transit[data[:broadcast_id]].receive(data, is_destroyed, &block)
-      end
-
-      def klass
-        Object.const_get(@klass)
-      end
-
-      attr_reader :record
-      attr_reader :destroyed
-
-      def new?
-        !@backing_record
-      end
-
-      def to_s
-        "klass: #{klass} record: #{record} new?: #{new?} destroyed?: #{destroyed}"
-      end
-
-      def self.open_channels
-        @open_channels ||= Set.new
-      end
-
       def self.add_connection(channel_name, id = nil)
         channel_string = "#{channel_name}#{'-'+id.to_s if id}"
         open_channels << channel_string
@@ -61,6 +38,7 @@ module Synchromesh
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
             var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel});
+            channel.bind('create', #{ClientDrivers.opts[:create]});
             channel.bind('change', #{ClientDrivers.opts[:change]});
             channel.bind('destroy', #{ClientDrivers.opts[:destroy]});
             channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
@@ -94,6 +72,56 @@ module Synchromesh
         end
       end
 
+      def self.receive(data, operation, &block)
+        in_transit[data[:broadcast_id]].receive(data, operation, &block)
+      end
+
+      def record_with_current_values
+        ReactiveRecord::Base.load_data do
+          backing_record = @backing_record || klass.find(record[:id]).backing_record
+          if destroyed?
+            backing_record.ar_instance
+          else
+            merge_current_values(backing_record)
+          end
+        end
+      end
+
+      def record_with_new_values
+        klass._react_param_conversion(record).tap do |ar_instance|
+          if destroyed?
+            ar_instance.backing_record.destroy_associations
+            ar_instance.backing_record.destroyed = true
+          elsif new?
+            initialize_collections ar_instance
+          end
+        end
+      end
+
+      def new?
+        @is_new
+      end
+
+      def destroyed?
+        @destroyed
+      end
+
+      def klass
+        Object.const_get(@klass)
+      end
+
+      def to_s
+        "klass: #{klass} record: #{record} new?: #{new?} destroyed?: #{destroyed?}"
+      end
+
+      # private
+
+      attr_reader :record
+
+      def self.open_channels
+        @open_channels ||= Set.new
+      end
+
       def self.in_transit
         @in_transit ||= Hash.new { |h, k| h[k] = new(k) }
       end
@@ -105,11 +133,11 @@ module Synchromesh
         @previous_changes = {}
       end
 
-      def receive(data, is_destroyed)
-        puts "receiving(#{data}, #{is_destroyed}"
-        @destroyed = is_destroyed
+      def receive(data, operation)
+        @destroyed = operation == :destroy
+        @is_new = operation == :create
         @channels ||= self.class.open_channels.intersection data[:channels]
-        raise "synchromesh security violation" unless @channels.include? data[:channel]
+        raise 'synchromesh security violation' unless @channels.include? data[:channel]
         @received << data[:channel]
         @klass ||= data[:klass]
         @record.merge! data[:record]
@@ -123,46 +151,29 @@ module Synchromesh
       end
 
       def merge_current_values(br)
-        Hash[*@previous_changes.collect do |attr, values|
+        current_values = Hash[*@previous_changes.collect do |attr, values|
           value = attr == :id ? record[:id] : values.first
-          if br.attributes.key?(attr) && br.attributes[attr].to_s != value.to_s
-            puts "attributes have changed???? why oh why ????#{@previous_changes} \n #{br.attributes}"
+          if br.attributes.key?(attr) &&
+             br.attributes[attr].to_s != value.to_s &&
+             br.attributes[attr].to_s != values.last.to_s
+            puts "warning the #{attr} has changed locally - will force a reload.\n"\
+                 "local value: #{br.attributes[attr]} remote value: #{value}->#{values.last}"
             return nil
           end
           [attr, value]
         end.compact.flatten].merge(br.attributes)
+        klass._react_param_conversion(current_values)
       end
 
-      def record_with_current_values
-        ReactiveRecord::Base.load_data do
-          backing_record = @backing_record || klass.find(record[:id]).backing_record
-          puts "record with current values: destroyed = #{destroyed}"
-          if destroyed
-            puts "hey I am destroyed!!!"
-            backing_record.ar_instance
-          elsif (current_values = merge_current_values(backing_record))
-            puts "not destroyed"
-            klass._react_param_conversion(current_values)
+      def initialize_collections(record)
+        klass.reflect_on_all_associations.each do |assoc|
+          if assoc.collection? && record.backing_record.attributes[assoc.attribute].nil?
+            record.send("#{assoc.attribute}=", [])
           end
         end
       end
-
-      def record_with_new_values
-        puts "about to do the param conversion of #{record}"
-        puts "current attributes = #{klass.find(record[:id]).backing_record.attributes}"
-        backing_record = klass._react_param_conversion(record).backing_record
-        if destroyed
-          backing_record.destroy_associations
-          backing_record.destroyed = true
-        end
-        puts "record_with_new values: #{br.attributes} "
-        backing_record.ar_instance
-      end
-
     end
-
   end
-
 
   class ClientDrivers
     include React::IsomorphicHelpers
@@ -170,9 +181,16 @@ module Synchromesh
     # sync_changes: Wait till we are done with any concurrent model saves, then
     # hydrate the data (which will update any attributes) and sync the scopes.
 
+    def self.sync_create(data)
+      IncomingBroadcast.receive(data, :create) do |broadcast|
+        ReactiveRecord::Base.when_not_saving(broadcast.klass) do
+          ReactiveRecord::Collection.sync_scopes broadcast
+        end
+      end
+    end
+
     def self.sync_change(data)
-      puts "sync_change"
-      IncomingBroadcast.receive(data, false) do |broadcast|
+      IncomingBroadcast.receive(data, :change) do |broadcast|
         ReactiveRecord::Base.when_not_saving(broadcast.klass) do
           ReactiveRecord::Collection.sync_scopes broadcast
         end
@@ -183,8 +201,7 @@ module Synchromesh
     # and syncronize the scopes.
 
     def self.sync_destroy(data)
-      puts "sync_destroy"
-      IncomingBroadcast.receive(data, true) do |broadcast|
+      IncomingBroadcast.receive(data, :destroy) do |broadcast|
         ReactiveRecord::Collection.sync_scopes broadcast
       end
     end
@@ -204,7 +221,7 @@ module Synchromesh
             (route.app.respond_to?(:app) && route.app.app == ReactiveRecord::Engine)
         end.path.spec
         pusher_fake_js = PusherFake.javascript(
-          auth: {headers: {'X-CSRF-Token' => controller.send(:form_authenticity_token)}},
+          auth: { headers: { 'X-CSRF-Token' => controller.send(:form_authenticity_token) } },
           authEndpoint: "#{path}/synchromesh-pusher-auth"
         )
       end
@@ -243,6 +260,10 @@ module Synchromesh
     before_first_mount do
       if on_opal_client?
         if opts[:transport] == :pusher
+
+          opts[:create] = lambda do |data|
+            sync_create JSON.parse(`JSON.stringify(#{data})`)
+          end
 
           opts[:change] = lambda do |data|
             sync_change JSON.parse(`JSON.stringify(#{data})`)

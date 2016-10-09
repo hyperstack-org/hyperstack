@@ -37,6 +37,7 @@ else
   require 'reactive-record'
   require 'reactive_record/permission_patches'
   require 'reactive_record/synchromesh_controller'
+  require 'reactive_record/base_patches'
   require 'synchromesh/version'
   require 'synchromesh/connection'
   require 'react/isomorphic_helpers_patches'

@@ -6,7 +6,6 @@ module ActiveRecord
     class << self
 
       def _synchromesh_scope_args_check(args)
-        puts "_synchromesh_scope_args_check([#{args}]) (args.count = #{args.count})"
         opts = if args.count == 2 && args[1].is_a?(Hash)
                  args[1].merge(server: args[0])
                elsif args[0].is_a? Hash
@@ -30,7 +29,7 @@ module ActiveRecord
         end
 
         def default_scope(*args, &block)
-          opts = _synchromesh_scope_args_check(args)
+          opts = _synchromesh_scope_args_check([*block, *args])
           pre_synchromesh_default_scope(opts[:server], &block)
         end
 
@@ -69,8 +68,8 @@ module ActiveRecord
           end
         end
 
-        def default_scope(*args)
-          opts = _synchromesh_scope_args_check(args)
+        def default_scope(*args, &block)
+          opts = _synchromesh_scope_args_check([*block, *args])
           @_default_scopes ||= []
           @_default_scopes << opts
         end
@@ -140,21 +139,24 @@ module ActiveRecord
     end
 
     if RUBY_ENGINE != 'opal'
-
-      after_commit :synchromesh_after_change, on: [:create, :update]
+      after_commit :synchromesh_after_create,  on: [:create]
+      after_commit :synchromesh_after_change,  on: [:update]
       after_commit :synchromesh_after_destroy, on: [:destroy]
+
+      def synchromesh_after_create
+        return if previous_changes.empty?
+        Synchromesh.after_commit :create, self
+      end
 
       def synchromesh_after_change
         return if previous_changes.empty?
-        Synchromesh.after_change self
+        Synchromesh.after_commit :change, self
       end
 
       def synchromesh_after_destroy
-        Synchromesh.after_destroy self
+        Synchromesh.after_commit :destroy, self
       end
-
     else
-
       def update_attribute(attr, value, &block)
         send("#{attr}=", value)
         save(validate: false, &block)

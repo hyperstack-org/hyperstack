@@ -140,6 +140,7 @@ module ComponentTestHelpers
           else
             page = "<%= javascript_include_tag 'jquery' %>\n<%= javascript_include_tag 'jquery_ujs' %>\n#{page}"
           end
+          page = "<script type='text/javascript'>go = function() {window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
           title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
           title = "#{title}...continued." if ComponentTestHelpers.description_displayed
           page = "<script type='text/javascript'>console.log(console.log('%c#{title}','color:green; font-weight:bold; font-size: 200%'))</script>\n#{page}"
@@ -232,7 +233,7 @@ module ComponentTestHelpers
     end
     Rails.cache.write(test_url, [component_name, params, opts])
     visit test_url
-    wait_for_ajax
+    wait_for_ajax unless opts[:no_wait]
     end
 
   [:callback_history_for, :last_callback_for, :clear_callback_history_for, :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
@@ -252,6 +253,26 @@ module ComponentTestHelpers
     end
     while true
       sleep 1.hour
+    end
+  end
+
+  def pause
+    begin
+      page.evaluate_script("window.hyper_spec_waiting_for_go = true")
+      sleep 0.25
+    end until go_message_received?
+  end
+
+  def waiting_for_go?
+    page.evaluate_script("window.hyper_spec_waiting_for_go")
+  rescue Exception => e
+    puts "pause failed while testing state of hyper_spec_waiting_for_go: #{e}"
+  end
+
+  def go_message_received?
+    unless waiting_for_go?
+      sleep 0.25
+      !waiting_for_go?
     end
   end
 

@@ -346,7 +346,7 @@ describe "synchronized scopes", js: true do
         scope :has_children,
               joins: 'child_models',
               server: -> { joins(:child_models).distinct },
-              client: -> { child_models.any? }
+              client: -> { puts "about to call child_models.count"; (child_models.count > 0).tap { |x| puts !!x} }
       end
     end
     mount 'TestComponent2' do

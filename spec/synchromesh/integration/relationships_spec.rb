@@ -90,7 +90,7 @@ describe "synchronizing relationships", js: true do
     expect(TestModel.first.child_models.count).to eq(1)
   end
 
-  it "adding child to a new model on client" do
+  it "adding child to a new model on client after render" do
     # Synchromesh.configuration do |config|
     #   #config.transport = :none
     # end
@@ -115,24 +115,6 @@ describe "synchronizing relationships", js: true do
     m.child_models << FactoryGirl.create(:child_model)
     evaluate_ruby("TestComponent2.add_child")
     page.should have_content("parent has 3 children")
-  end
-
-  it "adding child to a new model on client" do
-    mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
-        before_mount do
-          @parent = TestModel.new
-        end
-        after_mount do
-          @parent.child_models << ChildModel.new
-          @parent.save
-        end
-        render(:div) do
-          "parent has #{@parent.child_models.count} children".tap { |s| puts s}
-        end
-      end
-    end
-    page.should have_content("parent has 1 children")
   end
 
   it "will re-render the count after an item is added or removed from a model" do

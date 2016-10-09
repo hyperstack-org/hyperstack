@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -18,11 +17,35 @@ ActiveRecord::Schema.define(version: 20160731182106) do
     t.integer "test_model_id"
   end
 
+  create_table "comments", force: :cascade do |t|
+    t.text     "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "todo_id"
+    t.integer  "author_id"
+  end
+
   create_table "test_models", force: :cascade do |t|
     t.string   "test_attribute"
     t.boolean  "completed"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+  end
+
+  create_table "todos", force: :cascade do |t|
+    t.string   "title"
+    t.text     "description"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.boolean  "completed",     default: false, null: false
+    t.integer  "created_by_id"
+    t.integer  "owner_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string  "role"
+    t.string  "name"
+    t.integer "manager_id"
   end
 
 end

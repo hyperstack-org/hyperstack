@@ -133,19 +133,10 @@ module Synchromesh
     )
   end
 
-  def self.after_change(model)
+  def self.after_commit(operation, model)
     t = Thread.new do
       InternalPolicy.regulate_broadcast(model) do |data|
-        Connection.send(data[:channel], ['change', data])
-      end
-    end
-    t.join if on_console_with_async_action_cable
-  end
-
-  def self.after_destroy(model)
-    t = Thread.new do
-      InternalPolicy.regulate_broadcast(model) do |data|
-        Connection.send(data[:channel], ['destroy', data])
+        Connection.send(data[:channel], [operation, data])
       end
     end
     t.join if on_console_with_async_action_cable

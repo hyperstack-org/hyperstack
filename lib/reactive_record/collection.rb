@@ -8,7 +8,7 @@ module ReactiveRecord
     end
 
     def set_pre_sync_related_records(related_records, _record = nil)
-      puts "scoped: #{self}.set_pre_sync_related_records(#{related_records.to_a}) filter? #{filter?}"
+      puts "scoped: #{self}.set_pre_sync_related_records([#{related_records.to_a}]) filter? #{filter?}"
 
       ReactiveRecord::Base.catch_db_requests do
         @pre_sync_related_records = filter_records(related_records)
@@ -16,15 +16,15 @@ module ReactiveRecord
           scope.set_pre_sync_related_records(@pre_sync_related_records)
         end
       end if filter?
-      puts "scoped: #{self} @pre_sync_related_records: #{@pre_sync_related_records}"
+      puts "scoped: #{self} @pre_sync_related_records: [#{@pre_sync_related_records.to_a}]"
     end
 
     def sync_scopes(related_records, record, filtering = true)
-      puts "going to sync#{self}... filtering: #{!!filtering} presync_related: #{@pre_sync_related_records.to_a}, related_records: #{related_records.to_a}"
+      puts "going to sync#{self}... filtering: #{!!filtering} presync_related: [#{@pre_sync_related_records.to_a}], related_records: #{related_records.to_a}"
       filtering =
         @pre_sync_related_records && filtering &&
         ReactiveRecord::Base.catch_db_requests do
-          puts "about the update_colletion: #{related_records.to_a}"
+          puts "about the update_collection: [#{related_records.to_a}]"
           related_records = update_collection(related_records)
         end.tap { |x| puts "returned #{x} from update_collection" }
       if !filtering && joins_with?(record)
@@ -90,19 +90,16 @@ module ReactiveRecord
         # not running set_pre_sync_related_records will cause sync scopes
         # to refresh all related scopes
         record = broadcast.record_with_current_values
-        puts "record attributes B4 = #{record.backing_record.attributes}"
         apply_to_all_collections(
           :set_pre_sync_related_records,
           record, broadcast.new?
         ) if record
-        puts "record attributes AFTER = #{record.backing_record.attributes}" if record
         record = broadcast.record_with_new_values
-        puts "record attributes new values = #{record.backing_record.attributes}"
         apply_to_all_collections(
           :sync_scopes,
           record, record.destroyed?
         )
-        broadcast.klass.unscoped << record if broadcast.new? || record.destroyed?
+        record.backing_record.sync_unscoped_collection! if record.destroyed? || broadcast.new?
       end
 
       def apply_to_all_collections(method, record, dont_gather)
@@ -124,14 +121,14 @@ module ReactiveRecord
       live_scopes.each do |collection|
         collection.gather_related_records(record, related_records)
       end
-      related_records.tap { |x| puts "related_records = #{related_records}"}
+      related_records.tap { |x| puts "related_records = [#{related_records.to_a}]"}
     end
 
     def merge_related_records(record, related_records)
       if filter? && joins_with?(record)
         related_records.merge(related_records_for(record))
       end
-      related_records.tap { |x| puts "merge_related_records returns #{x}"}
+      related_records.tap { |x| puts "merge_related_records returns [#{x.to_a}]"}
     end
 
     def filter?
@@ -234,17 +231,23 @@ module ReactiveRecord
     alias_method :pre_synchromesh_push, '<<'
 
     def push(item)
+      puts "***************** #{self}.push(#{item})"
       if collection
+        puts "has a collection using old method"
         pre_synchromesh_push item
       elsif !@count.nil?
         @count += item.destroyed? ? -1 : 1
         puts "*****notify_of_change #{self}"
         notify_of_change self
+      else
+        puts "***************** no collection ignoring ********************"
       end
+      puts "all done"
       self
     end
 
     alias_method '<<', :push
+    #alias_method :push, '<<'
 
     def sort!(*args, &block)
       replace(sort(*args, &block))
@@ -253,6 +256,7 @@ module ReactiveRecord
     alias pre_synchromesh_replace replace
 
     def replace(new_array)
+      puts "************#{self}.replace([#{new_array}])"
       new_array = new_array.to_a
       return self if new_array == @collection
       Base.load_data { pre_synchromesh_replace(new_array) }

@@ -72,5 +72,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'parser'
       s.add_development_dependency 'unparser'
       s.add_development_dependency 'jquery-rails'
+      s.add_development_dependency 'pry-byebug'
     end
 end

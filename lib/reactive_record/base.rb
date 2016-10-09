@@ -13,18 +13,32 @@ module ReactiveRecord
       # probably by making all authorizations work through the same policy mechanisms, Instead
       # of having the distinct mechanism for synchromesh vs. reactive-record.
       #sync_scopes2 if Synchromesh::ClientDrivers.opts[:transport] == :none
+      sync_unscoped_collection!
+    end
+
+    def sync_unscoped_collection!
+      if destroyed
+        return if @destroy_sync
+        @destroy_sync = true
+      else
+        return if @create_sync
+        @create_sync = true
+      end
+      puts "pushing #{ar_instance} onto #{model}.unscoped (#{model.unscoped}) "
+      model.unscoped << ar_instance
+      @synced_with_unscoped = !@synced_with_unscoped
     end
 
     def self.exists?(model, id)
-      @records[model].detect { |record| record.attributes[model.primary_key] == id }
+      exists = @records[model].detect { |record| record.attributes[model.primary_key] == id }
     end
 
     attr_accessor :currently_in_default_scope
     attr_accessor :current_default_scope_count
 
-    def self.all_class_scopes
+    def self.all_class_scopes  #UNDUP THESE... JUST FOR DEBUG>>>>>
       Enumerator.new do |y|
-        @class_scopes.each_value { |scopes| scopes.each_value { |scope| y << scope }}
+        @class_scopes.dup.each_value { |scopes| scopes.dup.each_value { |scope| y << scope }}
       end
     end
 
@@ -45,23 +59,21 @@ module ReactiveRecord
 
       class DbRequestMade < Exception; end
 
-      def catch_db_requests
+      def catch_db_requests(return_val = nil)
         @catch_db_requests = true
         return_val = yield
-      rescue DbRequestMade
-        puts "got rescued what ya gonna do?"
-        return_val = false
+      rescue DbRequestMade => e
+        puts "Warning request for server side data during scope evaluation: #{e.message}"
       ensure
-        puts "returning #{return_val} from catch_db_requests"
         @catch_db_requests = false
-        return_val
+        return return_val
       end
 
       alias pre_synchromesh_load_from_db load_from_db
 
       def load_from_db(*args)
-        raise DbRequestMade if @catch_db_requests
-        pre_synchromesh_load_from_db *args
+        raise DbRequestMade.new(args) if @catch_db_requests
+        pre_synchromesh_load_from_db(*args)
       end
 
     end

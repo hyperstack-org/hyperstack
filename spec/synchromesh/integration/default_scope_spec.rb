@@ -37,11 +37,11 @@ describe "default_scope" do
       TestModel.default_scopes = []
     end
 
-    it "a default scope can be added server side" do
+    it "a default scope can be added server side using either a block or proc" do
       isomorphic do
         TestModel.class_eval do
           default_scope -> { where(completed: true) }
-          default_scope -> { where(test_attribute: 'foo') }
+          default_scope { where(test_attribute: 'foo') }
         end
       end
       mount "TestComponent2" do
