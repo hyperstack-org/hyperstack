@@ -9,8 +9,6 @@ ENV['REAL_BUNDLE_GEMFILE'] = ENV['BUNDLE_GEMFILE']
 require 'rspec/core/rake_task'
 require 'opal/rspec/rake_task'
 
-require 'react/react-source'
-
 RSpec::Core::RakeTask.new('ruby:rspec')
 
 Opal::RSpec::RakeTask.new('opal:rspec') do |s, task|

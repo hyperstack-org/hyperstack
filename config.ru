@@ -4,8 +4,6 @@ Bundler.require
 require "opal/rspec"
 require "opal-jquery"
 
-require 'react/react-source'
-
 if Opal::RSpec.const_defined?("SprocketsEnvironment")
   sprockets_env = Opal::RSpec::SprocketsEnvironment.new
   sprockets_env.cache = Sprockets::Cache::FileStore.new("tmp")
