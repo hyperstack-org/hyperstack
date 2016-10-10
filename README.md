@@ -22,7 +22,7 @@ All of the above use websockets.  For ultimate simplicity use Polling as explain
 
 Synchromesh is built on top of Reactrb and ReactiveRecord.
 
-+ Reactrb is a ruby wrapper on Facebook's React.js library.  As data changes on the client (either from user interactions or external events) Reactrb re-draws whatever parts of the display is needed.
++ Reactrb is a ruby wrapper on Facebook's React.js library.  As data changes on the client (either from user interactions or external events) Reactrb re-draws whatever parts of the display as needed.
 + ReactiveRecord uses Reactrb to render and then dynamically update your ActiveRecord models on the client.
 + Synchromesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
 
@@ -30,11 +30,11 @@ A minimal synchromesh configuration consists of a simple initializer file, and a
 
 The initializer file specifies what transport will be used.  Currently you can use [Pusher](http://pusher.com), ActionCable (if using Rails 5), Pusher-Fake (for development) or a Simple Poller for testing etc.
 
-Synchromesh also adds some features to the `ActiveRecord` `scope` method to optimize expensive scope updates.
+Synchromesh also adds some features to the `ActiveRecord` `scope` method to manage scopes updates.  Details [here.](docs/client_side_scoping.md)  
 
 ## Authorization
 
-Each application defines a number of *channels* and *authorization policies* for those channels and the data sent over them.
+Each application defines a number of *channels* and *authorization policies* for those channels and the data sent over the channels.
 
 Policies are defined with *Policy* classes.  These are similar and compatible with [Pundit](https://github.com/elabs/pundit) but
 you do not need to use the pundit gem (but can if you want.)
@@ -194,72 +194,6 @@ Synchromesh.configuration do |config|
     seconds_between_poll = 5, # default is 0.5 you may need to increase if testing with Selenium
     seconds_polled_data_will_be_retained = 1.hour  # clears channel data after this time, default is 5 minutes
   }
-end
-```
-
-## ActiveRecord Scope Enhancement
-
-When the client receives notification that a record has changed Synchromesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
-
-To give you control over this process Synchromesh adds some features to the ActiveRecord scope macro.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
-
-Synchromesh `scope` adds an optional third parameter and an optional block:
-
-```ruby
-class Todo < ActiveRecord::Base
-
-  # Standard ActiveRecord form:
-  # the proc will be evaluated as normal on the server, and as needed updates
-  # will be requested from the clients
-  scope :active, -> () { where(completed: true) }
-  # In the simple form the scope will be reevaluated if the model that is
-  # being scoped changes, and if the scope is currently being used to render data.
-
-  # If the scope joins with other data you will need to specify this by
-  # passing a single model or array of the joined models to the `joins` option.
-  scope :with_recent_comments,
-        -> () { joins(:comments).where('created_at >= ?', Time.now-1.week) },
-        joins: [Comments] # or joins: Comments
-  # Now with_recent_comments will be re-evaluated whenever Comments or Todo records
-  # change.  The array can be the second or third parameter.
-
-  # It is possible to optimize when the scope is re-evaluated by providing a proc
-  # to the `sync` option.  If the proc returns true then the scope will be reevaluated.
-  scope :active, -> () { where(completed: true) }, sync: -> (record) do
-    (record.completed.nil? && record.destroyed?) || record.previous_changes[:completed]
-  end
-  # In other words only reevaluate if an "uncompleted" record was destroyed or if
-  # the completed attribute has changed.  Note the use of the ActiveRecord
-  # previous_changes method.  Also note that the attributes in record are "after"
-  # changes are made unless the record is destroyed.
-
-  # For heavily used scopes you can even update the scope manually on the client
-  # using the second parameter passed to the sync proc:
-  scope :active, -> () { where(completed: true) }, sync: -> (record, collection) do
-    if record.completed
-      collection.delete(record)
-    else
-      collection << record
-    end
-    nil # return nil so we don't resync the scope from the server
-  end
-
-  # The 'joins-array' applies to the sync proc as well.  in other words if no joins
-  # array is provided the block will only be called if records for scoped model
-  # change.  If a joins array is provided, then the additional models will be added
-  # to the join filter.  
-  scope :scope1, -> () {...}, joins: [AnotherModel], sync: -> (record) do
-    # record will be either a Todo, or AnotherModel
-  end
-
-  # The keyword :all means join all models:
-  scope :scope2, -> () { ... }, joins: :all, sync: -> (record) do
-    # any change to any model will be passed to the sync proc
-  end
-
-  # Instead of a proc you can set sync to false
-  scope :never_synced_scope, -> () { ... }, sync: false
-
 end
 ```
 

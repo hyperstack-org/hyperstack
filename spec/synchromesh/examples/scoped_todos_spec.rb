@@ -31,7 +31,7 @@ describe "example scopes", js: true do
       Todo.class_eval do
       scope :with_managers_comments,
             -> { joins(owner: :manager, comments: :author).where('managers_users.id = authors_comments.id').distinct },
-            joins: ['comments.author', 'owner', 'comments'],
+            joins: ['comments.author', 'owner'],
             client: -> { comments.detect { |comment| comment.author == owner.manager } }
       end
       Comment.class_eval do

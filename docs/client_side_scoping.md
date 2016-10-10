@@ -2,9 +2,13 @@
 
 When the client receives notification that a record has changed Synchromesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-To give you control over this process Synchromesh adds some features to the ActiveRecord scope macro.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
+To give you control over this process Synchromesh adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
 
-Synchromesh `scope` adds an optional third parameter and an optional block:
+The additional features are accessed via the `:joins` and `:client` options.
+
+The `:joins` option tells the synchromesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base joins operations in it, otherwise if a joined model changes, synchromesh will not know to update the scope*
+
+The `:client` option provides a client side way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization an is not required for things to work.
 
 ```ruby
 class Todo < ActiveRecord::Base
@@ -12,56 +16,86 @@ class Todo < ActiveRecord::Base
   # Standard ActiveRecord form:
   # the proc will be evaluated as normal on the server, and as needed updates
   # will be requested from the clients
+
   scope :active, -> () { where(completed: true) }
+
   # In the simple form the scope will be reevaluated if the model that is
   # being scoped changes, and if the scope is currently being used to render data.
 
   # If the scope joins with other data you will need to specify this by
-  # passing a single model or array of the joined models to the `joins` option.
+  # passing a relationship or array of relationships to the `joins` option.
+
   scope :with_recent_comments,
-        -> () { joins(:comments).where('created_at >= ?', Time.now-1.week) },
-        joins: [Comments] # or joins: Comments
-  # Now with_recent_comments will be re-evaluated whenever Comments or Todo records
-  # change.  The array can be the second or third parameter.
+        -> { joins(:comments).where('comment.created_at >= ?', Time.now-1.week) },
+        joins: ['comments'] # or joins: 'comments'
 
-  # It is possible to optimize when the scope is re-evaluated by providing a proc
-  # to the `sync` option.  If the proc returns true then the scope will be reevaluated.
-  scope :active, -> () { where(completed: true) }, sync: -> (record) do
-    (record.completed.nil? && record.destroyed?) || record.previous_changes[:completed]
-  end
-  # In other words only reevaluate if an "uncompleted" record was destroyed or if
-  # the completed attribute has changed.  Note the use of the ActiveRecord
-  # previous_changes method.  Also note that the attributes in record are "after"
-  # changes are made unless the record is destroyed.
+  # Now with_recent_comments will be re-evaluated whenever a Todo record, or a Comment
+  # joined with a Todo change.
 
-  # For heavily used scopes you can even update the scope manually on the client
-  # using the second parameter passed to the sync proc:
-  scope :active, -> () { where(completed: true) }, sync: -> (record, collection) do
-    if record.completed
-      collection.delete(record)
-    else
-      collection << record
-    end
-    nil # return nil so we don't resync the scope from the server
-  end
+  # Normally whenever synchromesh detects that a scope may be effected by a changed
+  # model, it will request the scope be re-evaluated on the server.  To offload this
+  # computation to the client provide a client side scope method:
 
-  # The 'joins-array' applies to the sync proc as well.  in other words if no joins
-  # array is provided the block will only be called if records for scoped model
-  # change.  If a joins array is provided, then the additional models will be added
-  # to the join filter.  
-  scope :scope1, -> () {...}, joins: [AnotherModel], sync: -> (record) do
-    # record will be either a Todo, or AnotherModel
-  end
+  scope :with_recent_comments,
+        -> { joins(:comments).where('comment.created_at >= ?', Time.now-1.week) },
+        joins: ['comments']
+        client: -> { comments.detect { |comment| comment.created_at >= Time.now-1.week }
 
-  # The keyword :all means join all models:
-  scope :scope2, -> () { ... }, joins: :all, sync: -> (record) do
-    # any change to any model will be passed to the sync proc
-  end
+  # The client proc is executed on each candidate record, and if it returns true the record
+  # will be added to the scope.
 
-  # Instead of a proc you can set sync to false
-  scope :never_synced_scope, -> () { ... }, sync: false
+  # The client proc can take a single argument, and if present, the proc will receive the
+  # the entire proposed new scope, which can then be filtered or sorted as needed.
+
+  scope :sort_by_created_at,
+        -> { order('created_at DESC') }
+        client: -> (collection) { collection.sort { |a, b| b.created_at <=> a.created_at }}
+
+  # To keep things tidy you can specify the server scope proc with the :server option
+
+  scope :completed,
+        server: -> { where(complete: true) }
+        client: -> { complete }
+
+  # The expressions in the joins array can be arbitrary sequences of relationships and
+  # scopes such as 'comments.author'.  
+
+  scope :with_managers_comments,
+        server: -> { ... }
+        joins: ['comments.author', 'owner']
+        client: -> { comments.detect { |comment| comment.author == owner.manager }}}
+
+  # You can also use the client, server, and joins option with the default_scope macro
+
+  default_scope server: -> { where(deleted: false).order('updated_at DESC') }
+                client: ->(c) { c.select { |r| !r.deleted }.sort { |a, b| b <=> a }
+
+  # NOTE: it is highly recommend to provide a client proc with default_scopes.  Otherwise
+  # every change is going to require a server interaction regardless of what other client procs
+  # you provide.
 
 end
 ```
 
-**Limitation**  currently you can chain scopes synced on the client.  This limitation will be lifted soon!
+#### How it works
+
+Consider this scope on the Todo model
+
+```ruby
+scope :with_managers_comments,
+      server: -> -> { joins(owner: :manager, comments: :author).where('managers_users.id = authors_comments.id').distinct },
+      client: -> { comments.detect { |comment| comment.author == owner.manager }}
+      joins: ['comments.author', 'owner']
+```
+
+The joins 'comments.author' relationship is inverted so that we have User 'has_many' Comments which 'belongs_to' Todos.
+
+Thus we now know that whenever a User or a Comment changes this may effect our with_managers_comments scope
+
+Likewise 'owner' becomes User 'has_many' Todos.
+
+Lets say that a user changes teams and now has a new manager.  This means according to the relationships that the
+User model will change (i.e. there will be a new manager_id in the User model) and thus all Todos belonging to that
+User are subject to evaluation.
+
+While the server side proc efficiently delivers all the objects in the scope, the client side proc just needs to incrementally update the scope.
