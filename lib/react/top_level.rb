@@ -119,10 +119,14 @@ Element.instance_eval do
   end
 
   define_method :render do |container = nil, params = {}, &block|
-    klass = Class.new(React::Component::Base)
+    if `#{self.to_n}._reactrb_component_class === undefined`
+      `#{self.to_n}._reactrb_component_class = #{Class.new(React::Component::Base)}`
+    end
+    klass = `#{self.to_n}._reactrb_component_class`
     klass.class_eval do
       render(container, params, &block)
     end
-    React.render(React.create_element(klass), self)
+    
+    React.render(React.create_element(`#{self.to_n}._reactrb_component_class`), self)
   end
 end if Object.const_defined?('Element')

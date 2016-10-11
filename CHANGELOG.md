@@ -26,6 +26,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `Element#render` trigger unnecessary re-mounts when called multiple times. (#170)
 - Gets rid of react warnings about updating state during render (#155)
 - Multiple HAML classes (i.e. div.foo.bar) was not working (regression introduced in 0.8.8)
 - Don't send nil (null) to form components as the value string (#157)
