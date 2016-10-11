@@ -56,5 +56,11 @@ describe 'Element' do
 
     expect(Element[renderToDocument(Foo)].html).to eq('hello')
   end
+
+  it "accepts plain js object as selector" do
+    expect {
+      Element[`window`]
+    }.not_to raise_error
+  end
 end
 end

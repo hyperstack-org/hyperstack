@@ -110,7 +110,7 @@ Element.instance_eval do
       selector.dom_node
     rescue
       selector
-    end if selector.respond_to? :dom_node
+    end if `#{selector}.$dom_node !== undefined`
     `$(#{selector})`
   end
 
@@ -126,7 +126,7 @@ Element.instance_eval do
     klass.class_eval do
       render(container, params, &block)
     end
-    
+
     React.render(React.create_element(`#{self.to_n}._reactrb_component_class`), self)
   end
 end if Object.const_defined?('Element')
