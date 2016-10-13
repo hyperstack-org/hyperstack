@@ -72,13 +72,10 @@ It is very unlikely that there will be any more releases of the `reactive-ruby` 
 There are no syntactic or semantic breaking changes between `reactrb` v 0.8.x and
 previous versions, however the `reactrb` gem does *not* include the react-js source as previous versions did.  This allows you to pick the react js source compatible with other gems and react js components you may be using.
 
-To upgrade, replace `reactive-ruby` with `reactrb`, both in your Gemfile, and in any `requires` in your code.   You will also need to require react-js as this is no longer included in the gem.  
+Follow these steps to upgrade:
 
-If you are using react-rails then simply find anyplace where you `require 'reactrb'` and immediately before this do a `require 'react'` which will load the compatible react js file.
-
-If you are using webpack then add `react` to your manifest.
-
-If you are not using react-rails then find where you `require 'reactrb'` and immediately before this do a `require 'react-latest'` (or 'react-v13', 'react-v14' or 'react-v15')
+1. Replace `reactive-ruby` with `reactrb` both in **Gemfile** and any `require`s in your code.
+2. To include the React.js source, the suggested way is to add `require 'react/source'` before `require 'reactrb'`. This will use the copy of React.js source from `react-rails` gem.
 
 # Roadmap
 
