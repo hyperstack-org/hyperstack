@@ -11,16 +11,28 @@ module  React
         object_needs_notification = object.respond_to? :update_react_js_state
         observers_by_name[object][name].dup.each do |observer|
           updates[observer] += [object, name, value]
-          #observer.update_react_js_state(object, name, value)
           object_needs_notification = false if object == observer
         end
-        #object.update_react_js_state(nil, name, value) if object_needs_notification
         updates[object] += [nil, name, value] if object_needs_notification
       end
 
+      def bulk_update
+        saved_bulk_update_flag = @bulk_update_flag
+        @bulk_update_flag = true
+        yield
+      ensure
+        @bulk_update_flag = saved_bulk_update_flag
+      end
+
+      # alias pre_synchromesh_set_state set_state
+      #
+      # def set_state(object, name, value, delay = nil)
+      #   pre_synchromesh_set_state(object, name, value, delay || @delay_all)
+      # end
+
       def set_state(object, name, value, delay=nil)
         states[object][name] = value
-        if delay
+        if delay || @bulk_update_flag
           @delayed_updates ||= []
           @delayed_updates << [object, name, value]
           @delayed_updater ||= after(0.001) do

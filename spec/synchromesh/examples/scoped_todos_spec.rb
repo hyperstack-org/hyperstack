@@ -32,7 +32,7 @@ describe "example scopes", js: true do
       scope :with_managers_comments,
             -> { joins(owner: :manager, comments: :author).where('managers_users.id = authors_comments.id').distinct },
             joins: ['comments.author', 'owner'],
-            client: -> { comments.detect { |comment| comment.author == owner.manager } }
+            client: -> { puts "filtering #{self}"; comments.detect { |comment| puts "checking #{comment} vs #{owner} (#{comment.author} == #{owner.manager} is #{comment.author == owner.manager})"; comment.author == owner.manager } }
       end
       Comment.class_eval do
         scope :by_manager,
@@ -72,7 +72,7 @@ describe "example scopes", js: true do
                     todo.title.span
                     UL do
                       todo.comments.by_manager.each do |comment|
-                        LI { comment.comment }
+                        LI { "MANAGER SAYS: #{comment.comment}" }
                       end
                     end unless todo.comments.by_manager.empty?
                   end
@@ -84,8 +84,8 @@ describe "example scopes", js: true do
       end
       class ManagerComments < React::Component::Base
         render(DIV) do
-          puts "managers have made comments: #{Todo.with_managers_comments.any?}"
-          #if Todo.with_managers_comments.any?
+          puts "managers have made comments: #{!!Todo.with_managers_comments.any?}"
+          if Todo.with_managers_comments.any?
             DIV { "managers comments" }
             UL do
               Todo.with_managers_comments.each do |todo|
@@ -93,52 +93,71 @@ describe "example scopes", js: true do
                   "#{todo.owner.name} - #{todo.title}".span
                   UL do
                     todo.comments.each do |comment|
-                      LI { comment.comment } if comment.author == todo.owner.manager
+                      LI { "BOSS SAYS: #{comment.comment}" } if comment.author == todo.owner.manager
                     end
                   end
                 end
               end
             end
-          #else
-          #  DIV { "no manager comments" }
-          #end
+          else
+            DIV { "no manager comments" }
+          end
         end
       end
       class TestComponent3 < React::Component::Base
         def render
+          puts "RENDERING TESTCOMPONENT3"
           div do
-            #UserTodos {}
+            UserTodos {}
             ManagerComments {}
           end
         end
       end
     end
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    #pause "about to add the boss"
     boss = FactoryGirl.create(:user, name: :boss)
+    #pause "about to add the employee"
     employee = FactoryGirl.create(:user, name: :joe, manager: boss)
+    #pause "about to add the todo"
     todo = FactoryGirl.create(:todo, title: "joe's todo", owner: employee)
     wait_for_ajax
-    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    #pause "adding a comment from the boss"
     comment = FactoryGirl.create(:comment, comment: "The Boss Speaks", author: boss, todo: todo)
     page.should have_content('The Boss Speaks')
+    #pause "added the boss speaks"
+    fred = FactoryGirl.create(:user, role: :employee, name: :fred)
+    #pause "fred added"
+    fred.assigned_todos << FactoryGirl.create(:todo, title: 'fred todo')
+    #pause "added another todo to fred"
+    evaluate_ruby do
+      mitch = User.new(name: :mitch)
+      mitch.assigned_todos << Todo.new(title: 'mitch todo')
+      mitch.save
+    end
+    wait_for_ajax
+    #pause "mitch added"
+    user1 = FactoryGirl.create(:user, role: :employee, name: :frank)
+    user2 = FactoryGirl.create(:user, role: :employee, name: :bob)
+    mgr   = FactoryGirl.create(:user, role: :manager, name: :sally)
+    #pause "frank, bob, and sally added"
+    user1.assigned_todos << FactoryGirl.create(:todo, title: 'frank todo 1')
+    user1.assigned_todos << FactoryGirl.create(:todo, title: 'frank todo 2')
+    user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 1')
+    user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 2')
+    user1.comments << FactoryGirl.create(:comment, comment: "frank made this comment", todo: user2.assigned_todos.first)
+    user2.comments << FactoryGirl.create(:comment, comment: "bob made this comment", todo: user1.assigned_todos.first)
+    mgr.comments << FactoryGirl.create(:comment, comment: "Me BOSS", todo: user1.assigned_todos.last)
+    page.should have_content('MANAGER SAYS: The Boss Speaks')
+    page.should have_content('BOSS SAYS: The Boss Speaks')
+    wait_for_ajax
+    page.should_not have_content('MANAGER SAYS: Me BOSS', wait: 0)
+    page.should_not have_content('BOSS SAYS: Me BOSS', wait: 0)
+    user1.update_attribute(:manager, mgr)
+    #puts evaluate_ruby "User.find(#{user1.id}).update_attribute(:manager, #{mgr.id})"
+    page.should have_content('MANAGER SAYS: Me BOSS')
+    page.should have_content('BOSS SAYS: Me BOSS')
     evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
-    # fred = FactoryGirl.create(:user, role: :employee, name: :fred)
-    # fred.assigned_todos << FactoryGirl.create(:todo, title: 'fred todo')
-    # evaluate_ruby do
-    #   mitch = User.new(name: :mitch)
-    #   mitch.assigned_todos << Todo.new(title: 'mitch todo')
-    #   mitch.save
-    # end
-    # user1 = FactoryGirl.create(:user, role: :employee, name: :frank)
-    # user2 = FactoryGirl.create(:user, role: :employee, name: :bob)
-    # mgr   = FactoryGirl.create(:user, role: :manager, name: :sally)
-    # user1.manager = mgr
-    # user1.assigned_todos << FactoryGirl.create(:todo, title: 'frank todo 1')
-    # user1.assigned_todos << FactoryGirl.create(:todo, title: 'frank todo 2')
-    # user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 1')
-    # user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 2')
-    # pause
-    # user1.comments << FactoryGirl.create(:comment, comment: "frank made this comment", todo: user2.assigned_todos.first)
-    # user2.comments << FactoryGirl.create(:comment, comment: "bob made this comment", todo: user1.assigned_todos.first)
-    # mgr.comments << FactoryGirl.create(:comment, comment: "Me BOSS", todo: user1.assigned_todos.last)
   end
 end

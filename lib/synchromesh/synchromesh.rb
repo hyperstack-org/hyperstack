@@ -94,19 +94,20 @@ module Synchromesh
   def self.on_console_with_async_action_cable
     defined?(Rails::Console) &&
       defined?(ActionCable::Server::Base) &&
-        ActionCable::Server::Base.config.cable["adapter"]=="async"
+      ActionCable::Server::Base.config.cable['adapter'] == 'async'
   end
 
   def self.send_to_server(channel, data)
     salt = SecureRandom.hex
     authorization = Synchromesh.authorization(salt, channel, data[1][:broadcast_id])
-    raise "no server running" unless Connection.root_path
+    raise 'no server running' unless Connection.root_path
     uri = URI("#{Connection.root_path}action_cable_console_update")
     http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-    request.body = {channel: channel, data: data, salt: salt, authorization: authorization}.to_json
+    request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
+    request.body = {
+      channel: channel, data: data, salt: salt, authorization: authorization
+    }.to_json
     http.request(request)
-    true
   end
 
   def self.pusher
@@ -133,15 +134,22 @@ module Synchromesh
     )
   end
 
-  def self.after_commit(operation, model)
-    t = Thread.new do
-      InternalPolicy.regulate_broadcast(model) do |data|
-        Connection.send(data[:channel], [operation, data])
-      end
+  def self.run_after_commit(operation, model)
+    InternalPolicy.regulate_broadcast(model) do |data|
+      Connection.send(data[:channel], [operation, data])
     end
-    t.join if on_console_with_async_action_cable
+  end
+
+  @queue = Queue.new
+  Thread.new { loop { run_after_commit(*@queue.pop) rescue nil } }
+
+  def self.after_commit(*args)
+    if on_console_with_async_action_cable
+      run_after_commit(*args)
+    else
+      @queue.push args
+    end
   end
 
   Connection.transport = self
-
 end

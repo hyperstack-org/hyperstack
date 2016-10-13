@@ -4,6 +4,12 @@ module ReactiveRecord
   # Currently there is no easy way to do this without polling.
   class Base
 
+    class DummyValue < NilClass
+      def zero?
+        false
+      end
+    end
+
     def self.find_record(model, id, vector, save)
       if !save
         found = vector[1..-1].inject(vector[0]) do |object, method|

@@ -256,23 +256,15 @@ module ComponentTestHelpers
     end
   end
 
-  def pause
-    begin
-      page.evaluate_script("window.hyper_spec_waiting_for_go = true")
+  def pause(message = nil)
+    if message
+      puts message
+      page.evaluate_ruby "puts #{message.inspect} + ' (type go() to continue)'"
+    end
+    page.evaluate_script("window.hyper_spec_waiting_for_go = true")
+    loop do
       sleep 0.25
-    end until go_message_received?
-  end
-
-  def waiting_for_go?
-    page.evaluate_script("window.hyper_spec_waiting_for_go")
-  rescue Exception => e
-    puts "pause failed while testing state of hyper_spec_waiting_for_go: #{e}"
-  end
-
-  def go_message_received?
-    unless waiting_for_go?
-      sleep 0.25
-      !waiting_for_go?
+      break unless page.evaluate_script("window.hyper_spec_waiting_for_go")
     end
   end
 

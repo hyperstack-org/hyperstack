@@ -1,4 +1,4 @@
-## ActiveRecord Scope Enhancement (DO NOT USE API SUBJECT TO CHANGE AT ANY TIME)
+## ActiveRecord Scope Enhancement
 
 When the client receives notification that a record has changed Synchromesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
@@ -6,9 +6,9 @@ To give you control over this process Synchromesh adds some features to the Acti
 
 The additional features are accessed via the `:joins` and `:client` options.
 
-The `:joins` option tells the synchromesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base joins operations in it, otherwise if a joined model changes, synchromesh will not know to update the scope*
+The `:joins` option tells the synchromesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, synchromesh will not know to update the scope.*
 
-The `:client` option provides a client side way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization an is not required for things to work.
+The `:client` option provides the client a way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization and is not required for scopes to work.
 
 ```ruby
 class Todo < ActiveRecord::Base

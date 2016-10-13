@@ -93,7 +93,7 @@ module Synchromesh
             ar_instance.backing_record.destroy_associations
             ar_instance.backing_record.destroyed = true
           elsif new?
-            initialize_collections ar_instance
+            ar_instance.backing_record.initialize_collections
           end
         end
       end
@@ -163,14 +163,6 @@ module Synchromesh
           [attr, value]
         end.compact.flatten].merge(br.attributes)
         klass._react_param_conversion(current_values)
-      end
-
-      def initialize_collections(record)
-        klass.reflect_on_all_associations.each do |assoc|
-          if assoc.collection? && record.backing_record.attributes[assoc.attribute].nil?
-            record.send("#{assoc.attribute}=", [])
-          end
-        end
       end
     end
   end

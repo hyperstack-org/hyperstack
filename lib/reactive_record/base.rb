@@ -2,6 +2,7 @@ module ReactiveRecord
   # Add the when_not_saving method to reactive-record.
   # This will wait until reactive-record is not saving a model.
   # Currently there is no easy way to do this without polling.
+
   class Base
 
     def sync_scopes
@@ -14,6 +15,33 @@ module ReactiveRecord
       # of having the distinct mechanism for synchromesh vs. reactive-record.
       #sync_scopes2 if Synchromesh::ClientDrivers.opts[:transport] == :none
       sync_unscoped_collection!
+    end
+
+    def initialize_collections
+      puts "initialize_collections(#{ar_instance})"
+      if (!vector || vector.empty?) && id && id != ''
+        @vector = [@model, ["find_by_#{@model.primary_key}", id]]
+      end
+      @model.reflect_on_all_associations.each do |assoc|
+        if assoc.collection? && attributes[assoc.attribute].nil?
+          puts "initializing #{ar_instance}.#{assoc.attribute}= []"
+          ar_instance.send("#{assoc.attribute}=", [])
+        elsif assoc.collection?
+          puts "*** initializing #{ar_instance}.#{assoc.attribute} NOT = NIL #{attributes[assoc.attribute]}"
+        end
+      end
+    end
+
+    def sync!(hash = {})  # does NOT notify (see saved! for notification)
+      @attributes.merge! hash
+      @synced_attributes = {}
+      @synced_attributes.each { |attribute, value| sync_attribute(key, value) }
+      @changed_attributes = []
+      @saving = false
+      @errors = nil
+      # set the vector and clear collections - this only happens when a new record is saved
+      initialize_collections if (!vector || vector.empty?) && id && id != ''
+      self
     end
 
     def sync_unscoped_collection!
@@ -36,10 +64,48 @@ module ReactiveRecord
     attr_accessor :currently_in_default_scope
     attr_accessor :current_default_scope_count
 
-    def self.all_class_scopes  #UNDUP THESE... JUST FOR DEBUG>>>>>
-      Enumerator.new do |y|
-        @class_scopes.dup.each_value { |scopes| scopes.dup.each_value { |scope| y << scope }}
-      end
+    before_first_mount do |context|
+      @outer_scopes = Set.new if RUBY_ENGINE == 'opal'
+    end
+
+    def self.outer_scopes
+      @outer_scopes
+      # Enumerator.new do |y|
+      #   puts "outer_scopes enumerator running"
+      #   @new_outer_scopes = Set.new
+      #   puts "initial outerscopes has #{@outer_scopes.count} collections"
+      #   @outer_scopes.each { |i| puts "outer scope enumerator: #{i}"; y << i }
+      #   while @new_outer_scopes.any?
+      #     puts "got some more outer scopes: #{@new_outer_scopes.count}"
+      #     current_outer_scopes = @new_outer_scopes
+      #     @new_outer_scopes = Set.new
+      #     @outer_scopes.merge(current_outer_scopes)
+      #     current_outer_scopes.each { |i| puts "continuing outer scope enumerator: #{i}"; y << i }
+      #   end
+      #   puts "no more outer scopes!"
+      #   @new_outer_scopes = nil
+      #   puts "outer_scopes enumerator done"
+      # end
+    end
+
+    def self.add_to_outer_scopes(item)
+      @outer_scopes << item
+      # puts "add_to_outer_scopes(#{item})"
+      # if @new_outer_scopes
+      #   unless @outer_scopes.include? item
+      #     puts "adding to new_outer_scopes"
+      #     @new_outer_scopes << item
+      #   else
+      #     puts "already in outer_scopes"
+      #   end
+      # else
+      #   puts "adding directly to outer_scopes"
+      #   @outer_scopes << item
+      # end
+    end
+
+    class << self
+      attr_reader :outer_scopes
     end
 
     def self.when_not_saving(model)
@@ -61,12 +127,11 @@ module ReactiveRecord
 
       def catch_db_requests(return_val = nil)
         @catch_db_requests = true
-        return_val = yield
+        yield
       rescue DbRequestMade => e
         puts "Warning request for server side data during scope evaluation: #{e.message}"
       ensure
         @catch_db_requests = false
-        return return_val
       end
 
       alias pre_synchromesh_load_from_db load_from_db

@@ -157,6 +157,10 @@ module ActiveRecord
         Synchromesh.after_commit :destroy, self
       end
     else
+      # def to_s
+      #   "<#{self.class.name}:#{object_id.to_s(16)} #{backing_record.attributes.collect { |k, v| "#{k}: #{v}"}}>"
+      # end
+
       def update_attribute(attr, value, &block)
         send("#{attr}=", value)
         save(validate: false, &block)

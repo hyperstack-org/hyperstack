@@ -69,10 +69,10 @@ module ReactiveRecord
     end
 
     def map_joins_path(paths)
-      @joins = Hash.new { |h, k| h[k] = [] }.merge(@model => [[]])
+      @joins = Hash.new { |h, k| h[k] = Array.new }.merge(@model => [[]])
       paths.each do |path|
         vector = []
-        paths.first.split('.').inject(@model) do |model, attribute|
+        path.split('.').inject(@model) do |model, attribute|
           association = model.reflect_on_association(attribute)
           raise build_error(path, model, attribute) unless association
           vector = [association.inverse_of, *vector]
@@ -88,9 +88,11 @@ module ReactiveRecord
     end
 
     def crawl(item, method = nil, *vector)
-      if !method
+      if !method && item.is_a?(Collection)
+        item.all
+      elsif !method
         item
-      elsif item.respond_to? :each
+      elsif item.respond_to? :collect
         item.collect { |record| crawl(record.send(method), *vector) }
       else
         crawl(item.send(method), *vector)
