@@ -1,4 +1,4 @@
-# Reactrb / Reactive-Ruby 
+# Reactrb / Reactive-Ruby
 
 [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/reactrb/reactrb.svg?branch=master)](https://travis-ci.org/reactrb/reactrb)
@@ -75,7 +75,7 @@ previous versions, however the `reactrb` gem does *not* include the react-js sou
 Follow these steps to upgrade:
 
 1. Replace `reactive-ruby` with `reactrb` both in **Gemfile** and any `require`s in your code.
-2. To include the React.js source, the suggested way is to add `require 'react/source'` before `require 'reactrb'`. This will use the copy of React.js source from `react-rails` gem.
+2. To include the React.js source, the suggested way is to add `require 'react/react-source'` before `require 'reactrb'`. This will use the copy of React.js source from `react-rails` gem.
 
 # Roadmap
 
