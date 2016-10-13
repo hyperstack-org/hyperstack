@@ -3,7 +3,7 @@ module ReactiveRecord
   # The base collection class works with relationships
   # methods for scoped collections
   module ScopedCollection
-    [:filter?, :collector?, :joins_with?, :filter_records, :related_records_for].each do |method|
+    [:filter?, :collector?, :joins_with?, :related_records_for].each do |method|
       define_method(method) { |*args| @scope_description.send method, *args }
     end
 
@@ -31,16 +31,22 @@ module ReactiveRecord
 
     def update_collection(related_records)
       if collector?
-        replace(filter_records(all + related_records.to_a))
-        related_records.intersection([*@collection])
+        update_collector_scope(related_records)
       else
-        add_filtered_records_to_collection(
-          @pre_sync_related_records, filter_records(related_records)
-        )
+        related_records = filter_records(related_records)
+        update_filter_scope(@pre_sync_related_records, related_records)
       end
     end
 
-    def add_filtered_records_to_collection(before, after)
+    def update_collector_scope(related_records)
+      current = Set.new([*@collection])
+      (related_records - @pre_sync_related_records).each { |r| current << r }
+      (@pre_sync_related_records - related_records).each { |r| current.delete(r) }
+      replace(filter_records(current))
+      Set.new([*@collection])
+    end
+
+    def update_filter_scope(before, after)
       if (collection || !@count.nil?) && before != after
         if collection
           (after - before).each { |r| push r }
@@ -132,6 +138,12 @@ module ReactiveRecord
 
     def collector?
       false
+    end
+
+    def filter_records(related_records)
+      scope_args = @vector.last.is_a?(Array) ? @vector.last[1..-1] : []
+      puts "filter_records for #{self} #{@vector} #{scope_args}"
+      @scope_description.filter_records(related_records, scope_args)
     end
 
     def live_scopes

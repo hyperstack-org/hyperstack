@@ -278,7 +278,7 @@ describe "synchronized scopes", js: true do
       TestModel.class_eval do
         def <=>(other); self.test_attribute <=> other.test_attribute; end
         scope :filter_and_sort, -> { where(completed: true).order('test_attribute ASC') },
-              client: -> (c) { c.select { |r| r.completed }.sort }
+              select: -> { select { |r| r.completed }.sort }
       end
     end
 
@@ -340,13 +340,102 @@ describe "synchronized scopes", js: true do
     TestModel.filter_and_sort_count.should eq(2)
   end
 
+  it 'client side scoping methods can take args' do
+
+    isomorphic do
+      TestModel.class_eval do
+        def to_s
+          "<TestModel id: #{id} test_attribute: #{test_attribute}>"
+        end
+        def <=>(other)
+          (test_attribute || '') <=> (other.test_attribute || '')
+        end
+        scope :matches, -> (s) { where(['test_attribute LIKE ?', "%#{s}%"])},
+              client: -> (s) { puts "test_attribute =~ /#{s}/ is #{!!(test_attribute =~ /#{s}/)}"; test_attribute =~ /#{s}/ }
+        scope :sorted, -> (dir) { order("test_attribute #{dir==:asc ? 'ASC' : 'DESC'}") },
+              select: -> (dir) { sort { |a, b| dir == :asc ? a <=> b : b <=> a }.tap {|r| puts "sorted(#{dir==:asc}) as [#{r}]"} }
+      end
+    end
+
+    mount 'TestComponent2' do
+      class TestComponent2 < React::Component::Base
+        export_state pat: :foo
+        export_state dir: :asc
+        before_mount do
+          @render_count = 1
+        end
+        before_update do
+          @render_count = @render_count + 1
+        end
+        def scoped
+          puts "scoping: #{TestComponent2.pat}, #{TestComponent2.dir}"
+          TestModel.matches(TestComponent2.pat).sorted(TestComponent2.dir)
+        end
+        render(:div) do
+          div { "rendered #{@render_count} times"}
+          div { "matches(#{TestComponent2.pat}).count = #{TestModel.matches(TestComponent2.pat).count}" }
+          if scoped.any?
+            div { "test attributes: #{scoped.collect { |r| r.test_attribute[0] }.join(', ')}" }
+          else
+            div { "no test attributes" }
+          end
+        end
+      end
+    end
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    m1 = FactoryGirl.create(:test_model)
+    page.should have_content('.count = 0')
+    page.should have_content('rendered 2 times')
+    page.should have_content('no test attributes')
+    m1.update_attribute(:test_attribute, 'N')
+    page.should have_content('rendered 2 times')
+    page.should have_content('.count = 0')
+    page.should have_content('no test attributes')
+    m1.update_attribute(:test_attribute, 'N - foobar')
+    page.should have_content('.count = 1')
+    page.should have_content('rendered 3 times')
+    page.should have_content('test attributes: N')
+    m2 = FactoryGirl.create(:test_model, test_attribute: 'A - is a foo')
+    page.should have_content('.count = 2')
+    page.should have_content('rendered 4 times')
+    page.should have_content('test attributes: A, N')
+    m3 = FactoryGirl.create(:test_model, test_attribute: 'Z - is also a foo')
+    page.should have_content('.count = 3')
+    page.should have_content('rendered 5 times')
+    page.should have_content('test attributes: A, N, Z')
+    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby("TestComponent2.dir! :desc")
+    page.should have_content('test attributes: Z, N, A')
+    page.should have_content('rendered 7 times')
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    m1.destroy
+    page.should have_content('.count = 2')
+    page.should have_content('rendered 8 times')
+    page.should have_content('test attributes: Z, A')
+    m3.update_attribute(:test_attribute, 'Z - is a bar')
+    page.should have_content('.count = 1')
+    page.should have_content('rendered 9 times')
+    page.should have_content('test attributes: A')
+    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby('TestComponent2.pat! :bar')
+    page.should have_content('.count = 1')
+    page.should have_content('test attributes: Z')
+    page.should have_content('rendered 11 times')
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    m2.update_attribute(:test_attribute, 'A is also a bar')
+    page.should have_content('.count = 2')
+    page.should have_content('rendered 12 times')
+    page.should have_content('test attributes: Z, A')
+    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+  end
+
   it 'the joins array can be combined with the client proc' do
     isomorphic do
       TestModel.class_eval do
         scope :has_children,
               joins: 'child_models',
               server: -> { joins(:child_models).distinct },
-              client: -> { puts "about to call child_models.count"; (child_models.count > 0).tap { |x| puts !!x} }
+              client: -> { child_models.count > 0 }
       end
     end
     mount 'TestComponent2' do

@@ -2,9 +2,11 @@
 
 When the client receives notification that a record has changed Synchromesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-To give you control over this process Synchromesh adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
+On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated on the client.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way synchromesh keeps the data requested by the browser limited to a reasonable amount.  
 
-The additional features are accessed via the `:joins` and `:client` options.
+To make scopes work efficiently on the client Synchromesh adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with Synchromesh.
+
+The additional features are accessed via the `:joins`, `:client`, and `:select` options.
 
 The `:joins` option tells the synchromesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, synchromesh will not know to update the scope.*
 
@@ -44,12 +46,12 @@ class Todo < ActiveRecord::Base
   # The client proc is executed on each candidate record, and if it returns true the record
   # will be added to the scope.
 
-  # The client proc can take a single argument, and if present, the proc will receive the
-  # the entire proposed new scope, which can then be filtered or sorted as needed.
+  # Instead of a client proc you can provide a select proc, which will receive the entire,
+  # collection which can then be filtered and sorted.
 
   scope :sort_by_created_at,
         -> { order('created_at DESC') }
-        client: -> (collection) { collection.sort { |a, b| b.created_at <=> a.created_at }}
+        select: -> { sort { |a, b| b.created_at <=> a.created_at }}
 
   # To keep things tidy you can specify the server scope proc with the :server option
 
@@ -65,10 +67,10 @@ class Todo < ActiveRecord::Base
         joins: ['comments.author', 'owner']
         client: -> { comments.detect { |comment| comment.author == owner.manager }}}
 
-  # You can also use the client, server, and joins option with the default_scope macro
+  # You can also use the client, select, server, and joins option with the default_scope macro
 
   default_scope server: -> { where(deleted: false).order('updated_at DESC') }
-                client: ->(c) { c.select { |r| !r.deleted }.sort { |a, b| b <=> a }
+                select: -> { select { |r| !r.deleted }.sort { |a, b| b <=> a } }
 
   # NOTE: it is highly recommend to provide a client proc with default_scopes.  Otherwise
   # every change is going to require a server interaction regardless of what other client procs
@@ -83,7 +85,7 @@ Consider this scope on the Todo model
 
 ```ruby
 scope :with_managers_comments,
-      server: -> -> { joins(owner: :manager, comments: :author).where('managers_users.id = authors_comments.id').distinct },
+      server: -> { joins(owner: :manager, comments: :author).where('managers_users.id = authors_comments.id').distinct },
       client: -> { comments.detect { |comment| comment.author == owner.manager }}
       joins: ['comments.author', 'owner']
 ```

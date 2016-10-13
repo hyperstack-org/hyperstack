@@ -21,7 +21,7 @@ module ReactiveRecord
     end
 
     def collector?
-      filter? && @filter_proc.arity == 1
+      @is_collector
     end
 
     def joins_with?(record)
@@ -38,21 +38,22 @@ module ReactiveRecord
       end
     end
 
-    def filter_records(related_records)
+    def filter_records(related_records, args)
       if collector?
-        Set.new(@filter_proc.call(related_records))
+        Set.new(related_records.to_a.instance_exec(*args, &@filter_proc))
       else
-        Set.new(related_records.select { |r| r.instance_eval(&@filter_proc) })
+        Set.new(related_records.select { |r| r.instance_exec(*args, &@filter_proc) })
       end
     end
 
     # private methods
 
     def filter_proc(opts)
-      return true unless opts.key?(:client)
-      client_opt = opts[:client]
+      return true unless opts.key?(:client) || opts.key?(:select)
+      client_opt = opts[:client] || opts[:select]
+      @is_collector = opts.key?(:select)
       return client_opt if !client_opt || client_opt.respond_to?(:call)
-      raise 'Scope option :sync must be a proc, false, or nil'
+      raise 'Scope option :client or :select must be a proc, false, or nil'
     end
 
     def build_joins(joins_list)
