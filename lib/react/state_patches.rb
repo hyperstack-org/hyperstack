@@ -1,4 +1,7 @@
 module  React
+  # add has_observers? and bulk_update methods, and patch set_state so that
+  # delayed updates are grouped together and sent at once to update_react_js_state
+  # see the component_patches.rb file for how that works
   class State
     class << self
       def has_observers?(object, name)
@@ -24,12 +27,6 @@ module  React
         @bulk_update_flag = saved_bulk_update_flag
       end
 
-      # alias pre_synchromesh_set_state set_state
-      #
-      # def set_state(object, name, value, delay = nil)
-      #   pre_synchromesh_set_state(object, name, value, delay || @delay_all)
-      # end
-
       def set_state(object, name, value, delay=nil)
         states[object][name] = value
         if delay || @bulk_update_flag
@@ -51,8 +48,6 @@ module  React
           updates.each { |observer, args| observer.update_react_js_state(*args) }
         end
         value
-      rescue Exception => e
-        puts "set_state(object, name, value, delay) failed #{e}"
       end
     end
   end

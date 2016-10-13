@@ -1,28 +1,30 @@
 module ReactiveRecord
-  # Add the when_not_saving method to reactive-record.
-  # This will wait until reactive-record is not saving a model.
-  # Currently there is no easy way to do this without polling.
+  # Patches to DummyValue and find_record method
   class Base
-
+    # make zero? of a DummyValue return false,
+    # when reactive-record begins using the schema
+    # keep in mind this behavior is for the dummy value of
+    # collections
     class DummyValue < NilClass
       def zero?
         false
       end
     end
-
+    # check to make sure that the object is not nil which can happen
+    # now if you do something like Todo.scope1.scope2
     def self.find_record(model, id, vector, save)
       if !save
         found = vector[1..-1].inject(vector[0]) do |object, method|
           if object.nil? # happens if you try to do an all on empty scope followed by more scopes
             object
           elsif method.is_a? Array
-            if method[0] == "new"
+            if method[0] == 'new'
               object.new
             else
               object.send(*method)
             end
-          elsif method.is_a? String and method[0] == "*"
-            object[method.gsub(/^\*/,"").to_i]
+          elsif method.is_a? String and method[0] == '*'
+            object[method.gsub(/^\*/,'').to_i]
           else
             object.send(method)
           end
