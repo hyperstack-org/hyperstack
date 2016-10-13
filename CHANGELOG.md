@@ -20,6 +20,14 @@ Whitespace conventions:
 
 ## [0.9.0] - Unreleased
 
+### Added
+
+- `react/react-source` is the suggested way to include ReactJS sources now. Simply require `react/react-source` immediately before the `require "reactrb"` in your Opal code will make it work.
+
+### Deprecated
+
+- `react-latest` & `react-v1x` is deprecated. Use `react/react-source` instead.
+
 ### Removed
 
 - `opal-browser` is removed from runtime dependency. (#133)

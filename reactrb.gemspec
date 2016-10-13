@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'opal', '>= 0.8.0'
   s.add_dependency 'opal-activesupport', '>= 0.2.0'
+  s.add_dependency 'react-rails'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec-rails', '3.3.3'
   s.add_development_dependency 'timecop'
@@ -30,7 +31,6 @@ Gem::Specification.new do |s|
   # For Test Rails App
   s.add_development_dependency 'rails', '4.2.4'
   s.add_development_dependency 'mime-types', '< 3'
-  s.add_development_dependency 'react-rails', '~> 1.3.0'
   s.add_development_dependency 'opal-rails'
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'jdbc-sqlite3'
