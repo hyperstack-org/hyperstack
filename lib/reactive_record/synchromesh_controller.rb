@@ -13,26 +13,32 @@ module ReactiveRecord
     module ::Rails
       module Rack
         class Logger < ActiveSupport::LogSubscriber
-          alias pre_synchromesh_call call
-          def call(env)
-            if !Synchromesh.opts[:noisy] && env['HTTP_X_SYNCHROMESH_SILENT_REQUEST']
-              Rails.logger.silence do
+          unless method_defined? :pre_synchromesh_call
+            alias pre_synchromesh_call call
+            def call(env)
+              if !Synchromesh.opts[:noisy] && env['HTTP_X_SYNCHROMESH_SILENT_REQUEST']
+                Rails.logger.silence do
+                  pre_synchromesh_call(env)
+                end
+              else
                 pre_synchromesh_call(env)
               end
-            else
-              pre_synchromesh_call(env)
             end
           end
         end
       end
-    end if defined? ::Rails::Rack::Logger
+    end if defined?(::Rails::Rack::Logger)
 
     class SynchromeshController < ::ApplicationController
+      protect_from_forgery except: [:console_update]
+
       def client_id
         params[:client_id]
       end
 
-      protect_from_forgery except: [:console_update]
+      before_action do
+        session.delete 'synchromesh-dummy-init' unless session.id
+      end
 
       def channels(user = acting_user, session_id = session.id)
         Synchromesh::AutoConnect.channels(session_id, user)
@@ -100,7 +106,6 @@ module ReactiveRecord
         response = Synchromesh.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response
       rescue Exception => e
-        byebug
         head :unauthorized
       end
 
@@ -125,7 +130,6 @@ module ReactiveRecord
         Synchromesh::Connection.send(params[:channel], params[:data])
         head :no_content
       rescue
-        byebug
         head :unauthorized
       end
 

@@ -75,13 +75,7 @@ describe "example scopes", js: true do
                         LI { "MANAGER SAYS: #{comment.comment}" }
                       end
                     end unless todo.comments.by_manager.empty?
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
+                  end; end; end; end; end; end; end
       class ManagerComments < React::Component::Base
         render(DIV) do
           puts "managers have made comments: #{!!Todo.with_managers_comments.any?}"
@@ -94,26 +88,17 @@ describe "example scopes", js: true do
                   UL do
                     todo.comments.each do |comment|
                       LI { "BOSS SAYS: #{comment.comment}" } if comment.author == todo.owner.manager
-                    end
-                  end
-                end
-              end
-            end
+                    end; end; end; end; end
           else
             DIV { "no manager comments" }
-          end
-        end
-      end
+          end; end; end
       class TestComponent3 < React::Component::Base
         def render
           puts "RENDERING TESTCOMPONENT3"
           div do
             UserTodos {}
             ManagerComments {}
-          end
-        end
-      end
-    end
+          end; end; end; end
     starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
     #pause "about to add the boss"
     boss = FactoryGirl.create(:user, name: :boss)
