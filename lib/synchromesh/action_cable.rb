@@ -22,8 +22,9 @@ module Synchromesh
     end
 
     def subscribed
-      session_id = connection.send(:cookies)
-      .encrypted[Rails.application.config.session_options[:key]]["session_id"]
+      session_id = params["client_id"]
+      # session_id = connection.send(:cookies)
+      # .encrypted[Rails.application.config.session_options[:key]]["session_id"]
       authorization = Synchromesh.authorization(params["salt"], params["synchromesh_channel"], session_id)
       if params["authorization"] == authorization
         inc_subscription

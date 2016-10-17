@@ -117,7 +117,7 @@ module Synchromesh
       end
 
       def refresh
-        return if @refreshing
+        return if @refreshing || Synchromesh.on_console?
         @refreshing = true
         Thread.new do
           begin
@@ -155,7 +155,6 @@ module Synchromesh
         end
         connection
       end
-
     end
 
     attr_accessor :channel
@@ -165,7 +164,8 @@ module Synchromesh
     attr_accessor :refresh_at
     attr_accessor :messages
 
-    def initialize(channel, session)
+    def initialize(channel, session, root_path = nil)
+      Connection.root_path = root_path if root_path
       @updated_at = Time.now
       @channel = channel
       if session

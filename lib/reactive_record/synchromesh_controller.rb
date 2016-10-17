@@ -1,14 +1,38 @@
 module ReactiveRecord
-
   Engine.routes.append do
 
-    class SynchromeshController < ::ApplicationController
+    module ::WebConsole
+      class Middleware
+      private
+        def acceptable_content_type?(headers)
+          Mime::Type.parse(headers['Content-Type'] || '').first == Mime[:html]
+        end
+      end
+    end if defined? ::WebConsole::Middleware
 
-      before_action do |controller|
-        session.delete 'synchromesh-dummy-init' unless session.id
+    module ::Rails
+      module Rack
+        class Logger < ActiveSupport::LogSubscriber
+          alias pre_synchromesh_call call
+          def call(env)
+            if !Synchromesh.opts[:noisy] && env['HTTP_X_SYNCHROMESH_SILENT_REQUEST']
+              Rails.logger.silence do
+                pre_synchromesh_call(env)
+              end
+            else
+              pre_synchromesh_call(env)
+            end
+          end
+        end
+      end
+    end if defined? ::Rails::Rack::Logger
+
+    class SynchromeshController < ::ApplicationController
+      def client_id
+        params[:client_id]
       end
 
-      protect_from_forgery :except => [:action_cable_console_update]
+      protect_from_forgery except: [:console_update]
 
       def channels(user = acting_user, session_id = session.id)
         Synchromesh::AutoConnect.channels(session_id, user)
@@ -46,8 +70,11 @@ module ReactiveRecord
 
       def debug_console
         if Rails.env.development?
+          render inline: "<style>div#console {height: 100% !important;}</style>\n".html_safe
+          #  "<div>additional helper methods: channels, can_connect? "\
+          #  "viewable_attributes, view_permitted?, create_permitted?, "\
+          #  "update_permitted? and destroy_permitted?</div>\n".html_safe
           console
-          render inline: "additional helper methods: channels, can_connect? viewable_attributes, view_permitted?, create_permitted?, update_permitted? and destroy_permitted?"
         else
           head :unauthorized
         end
@@ -55,14 +82,15 @@ module ReactiveRecord
 
       def subscribe
         Synchromesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
-        Synchromesh::Connection.new(params[:channel], session.id)
+        root_path = request.original_url.gsub(/synchromesh-subscribe.*$/, '')
+        Synchromesh::Connection.new(params[:channel], client_id, root_path)
         head :ok
       rescue Exception
         head :unauthorized
       end
 
       def read
-        data = Synchromesh::Connection.read(session.id)
+        data = Synchromesh::Connection.read(client_id)
         render json: data
       end
 
@@ -71,7 +99,8 @@ module ReactiveRecord
         Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
         response = Synchromesh.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response
-      rescue Exception
+      rescue Exception => e
+        byebug
         head :unauthorized
       end
 
@@ -79,34 +108,42 @@ module ReactiveRecord
         channel = params[:channel_name].gsub(/^#{Regexp.quote(Synchromesh.channel)}\-/,'')
         Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
         salt = SecureRandom.hex
-        authorization = Synchromesh.authorization(salt, channel, session.id)
+        authorization = Synchromesh.authorization(salt, channel, client_id)
         render json: {authorization: authorization, salt: salt}
       rescue Exception
         head :unauthorized
       end
 
       def connect_to_transport
-        root_path = request.original_url.gsub(/synchromesh-connect-to-transport.*$/,'')
-        render json: Synchromesh::Connection.connect_to_transport(params[:channel], session.id, root_path)
+        root_path = request.original_url.gsub(/synchromesh-connect-to-transport.*$/, '')
+        render json: Synchromesh::Connection.connect_to_transport(params[:channel], client_id, root_path)
       end
 
-      def action_cable_console_update
+      def console_update
         authorization = Synchromesh.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
         return head :unauthorized if authorization != params[:authorization]
-        ActionCable.server.broadcast("synchromesh-#{params[:channel]}", message: params[:data][0], data: params[:data][1])
+        Synchromesh::Connection.send(params[:channel], params[:data])
         head :no_content
       rescue
+        byebug
         head :unauthorized
       end
 
     end unless defined? SynchromeshController
 
-    match 'synchromesh-subscribe/:channel',               to: 'synchromesh#subscribe',            via: :get
-    match 'synchromesh-read',                             to: 'synchromesh#read',                 via: :get
-    match 'synchromesh-pusher-auth',                      to: 'synchromesh#pusher_auth',          via: :post
-    match 'synchromesh-action-cable-auth/:channel_name',  to: 'synchromesh#action_cable_auth',    via: :post
-    match 'synchromesh-connect-to-transport/:channel',    to: 'synchromesh#connect_to_transport', via: :get
-    match 'console',                                      to: 'synchromesh#debug_console',        via: :get
-    match 'action_cable_console_update',                  to: 'synchromesh#action_cable_console_update',         via: :post
+    match 'synchromesh-subscribe/:client_id/:channel',
+          to: 'synchromesh#subscribe', via: :get
+    match 'synchromesh-read/:client_id',
+          to: 'synchromesh#read', via: :get
+    match 'synchromesh-pusher-auth',
+          to: 'synchromesh#pusher_auth', via: :post
+    match 'synchromesh-action-cable-auth/:client_id/:channel_name',
+          to: 'synchromesh#action_cable_auth', via: :post
+    match 'synchromesh-connect-to-transport/:client_id/:channel',
+          to: 'synchromesh#connect_to_transport', via: :get
+    match 'console',
+          to: 'synchromesh#debug_console', via: :get
+    match 'console_update',
+          to: 'synchromesh#console_update', via: :post
   end
 end

@@ -6,6 +6,9 @@ module Synchromesh
   extend Configuration
 
   def self.config_reset
+    if Rails.application.config.cache_store == :null_store
+      raise 'Cannot Run Synchromesh with cache_store == :null_store'
+    end
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
       Object.const_get 'ApplicationPolicy'
@@ -28,8 +31,9 @@ module Synchromesh
     if transport == :action_cable
       require 'synchromesh/action_cable'
       opts[:refresh_channels_every] = :never
-    elsif opts[:refresh_channels_every] == :never
-      opts[:refresh_channels_every] = nil
+    else
+      require 'pusher' if transport == :pusher
+      opts[:refresh_channels_every] = nil if opts[:refresh_channels_every] == :never
     end
   end
 
@@ -80,28 +84,26 @@ module Synchromesh
   end
 
   def self.send(channel, data)
-    if transport == :pusher
+    if on_console?
+      send_to_server(channel, data)
+    elsif transport == :pusher
       pusher.trigger("#{Synchromesh.channel}-#{data[1][:channel]}", *data)
     elsif transport == :action_cable
-      if on_console_with_async_action_cable
-        send_to_server(channel, data)
-      else
-        ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
-      end
+      ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
     end
   end
 
-  def self.on_console_with_async_action_cable
-    defined?(Rails::Console) &&
-      defined?(ActionCable::Server::Base) &&
-      ActionCable::Server::Base.config.cable['adapter'] == 'async'
+  def self.on_console?
+    defined?(Rails::Console) #&& transport == :action_cable &&
+      #defined?(ActionCable::Server::Base) &&
+      #ActionCable::Server::Base.config.cable['adapter'] == 'async'
   end
 
   def self.send_to_server(channel, data)
     salt = SecureRandom.hex
     authorization = Synchromesh.authorization(salt, channel, data[1][:broadcast_id])
     raise 'no server running' unless Connection.root_path
-    uri = URI("#{Connection.root_path}action_cable_console_update")
+    uri = URI("#{Connection.root_path}console_update")
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
     request.body = {
@@ -136,15 +138,23 @@ module Synchromesh
 
   def self.run_after_commit(operation, model)
     InternalPolicy.regulate_broadcast(model) do |data|
-      Connection.send(data[:channel], [operation, data])
+      if Synchromesh.on_console? && Connection.root_path
+        Synchromesh.send_to_server(data[:channel], [operation, data])
+      else
+        Connection.send(data[:channel], [operation, data])
+      end
     end
   end
 
   @queue = Queue.new
-  Thread.new { loop { run_after_commit(*@queue.pop) rescue nil } }
+  Thread.new do
+    loop do
+      run_after_commit(*@queue.pop)
+    end
+  end
 
   def self.after_commit(*args)
-    if on_console_with_async_action_cable
+    if true || on_console?
       run_after_commit(*args)
     else
       @queue.push args

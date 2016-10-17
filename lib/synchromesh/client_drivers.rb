@@ -50,6 +50,7 @@ module Synchromesh
               #{Synchromesh.action_cable_consumer}.subscriptions.create(
                 {
                   channel: "Synchromesh::ActionCableChannel",
+                  client_id: #{ClientDrivers.opts[:id]},
                   synchromesh_channel: #{channel_string},
                   authorization: #{response.json[:authorization]},
                   salt: #{response.json[:salt]}
@@ -218,8 +219,10 @@ module Synchromesh
         )
       end
       controller.session.delete 'synchromesh-dummy-init' unless controller.session.id
+      id = "#{SecureRandom.uuid}-#{controller.session.id}"
       config_hash = {
         transport: Synchromesh.transport,
+        id: id,
         client_logging: Synchromesh.client_logging,
         pusher_fake_js: pusher_fake_js,
         key: Synchromesh.key,
@@ -227,7 +230,7 @@ module Synchromesh
         channel: Synchromesh.channel,
         form_authenticity_token: controller.send(:form_authenticity_token),
         seconds_between_poll: Synchromesh.seconds_between_poll,
-        auto_connect: Synchromesh::AutoConnect.channels(controller.session.id, controller.acting_user)
+        auto_connect: Synchromesh::AutoConnect.channels(id, controller.acting_user)
       }
       "<script type='text/javascript'>\n"\
       "window.SynchromeshOpts = #{config_hash.to_json}\n"\
@@ -238,8 +241,8 @@ module Synchromesh
       @opts ||= Hash.new(`window.SynchromeshOpts`)
     end
 
-    def self.get_queued_data(operation, channel = nil)
-      HTTP.get(polling_path(operation, channel)).then do |response|
+    def self.get_queued_data(operation, channel = nil, opts = {})
+      HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |update|
           send "sync_#{update[0]}", update[1]
         end
@@ -290,13 +293,17 @@ module Synchromesh
           Synchromesh.connect(*opts[:auto_connect])
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection *channel }
-          every(opts[:seconds_between_poll]) { get_queued_data(:read) }
+          every(opts[:seconds_between_poll]) do
+            get_queued_data(:read, nil, headers: {'X-SYNCHROMESH-SILENT-REQUEST': true })
+          end
         end
       end
     end
 
     def self.polling_path(to, id = nil)
-      "#{`window.ReactiveRecordEnginePath`}/synchromesh-#{to}/#{id}"
+      s = "#{`window.ReactiveRecordEnginePath`}/synchromesh-#{to}/#{opts[:id]}"
+      s = "#{s}/#{id}" if id
+      s
     end
   end
 end

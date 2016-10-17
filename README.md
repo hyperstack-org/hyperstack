@@ -191,9 +191,27 @@ Synchromesh.configuration do |config|
   config.transport = :simple_poller
   config.channel_prefix = "synchromesh"
   config.opts = {
-    seconds_between_poll = 5, # default is 0.5 you may need to increase if testing with Selenium
-    seconds_polled_data_will_be_retained = 1.hour  # clears channel data after this time, default is 5 minutes
+    seconds_between_poll: 5, # default is 0.5 you may need to increase if testing with Selenium
+    seconds_polled_data_will_be_retained: 1.hour  # clears channel data after this time, default is 5 minutes
   }
+end
+```
+
+## The Cache store
+
+Synchromesh uses the rails cache to keep track of what connections are alive in a transport independent fashion.  Rails 5 by default will have caching off in development mode.
+
+Check in `config/development.rb` and make sure that `cache_store` is never being set to `:null_store`.  
+
+If you would like to be able to interact via
+the `rails console` you should set the store to be something like this:
+
+```ruby
+# config/development.rb
+Rails.application.configure do
+  ...
+  config.cache_store = :file_store, './rails_cache_dir'
+  ...
 end
 ```
 
@@ -215,7 +233,18 @@ To resolve make sure you `require 'pusher'` in your application.js file if using
 You must explicitly allow changes to the models to be made by the client. If you don't you will
 see 500 responses from the server when you try to update.  To open all access do this in
 your application policy: `allow_change(to: :all, on: [:create, :update, :destroy]) { true }`
-- Using the :null cache
+- `Cannot Run Synchromesh with cache_store == :null_store`  
+You will get this error on boot if you are trying to use the :null cache.  
+See notes above on why you cannot use the :null cache store.
+- Cannot connect to real pusher account:  
+If you are trying to use a real pusher account (not pusher-fake) but see errors like this  
+```text
+pusher.self.js?body=1:62 WebSocket connection to
+'wss://127.0.0.1/app/PUSHER_API_KEY?protocol=7&client=js&version=3.0.0&flash=false'
+failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
+```
+Check to see if you are including the pusher-fake gem.  
+Synchromesh will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/reactrb/synchromesh/issues/5) for more details.
 
 ## Debugging
 

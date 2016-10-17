@@ -63,7 +63,7 @@ module ActiveRecord
             all.build_child_scope(scope_description, *name, *vargs)
           end
           singleton_class.send(:define_method, "#{name}=") do |_collection|
-            raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
+            raise 'NO LONGER IMPLEMENTED - DOESNT PLAY WELL WITH SYNCHROMESH'
             # all.replace_child_scope(name, collection)
           end
         end
@@ -144,23 +144,20 @@ module ActiveRecord
       after_commit :synchromesh_after_destroy, on: [:destroy]
 
       def synchromesh_after_create
-        return if previous_changes.empty?
+        return if self.class.table_name == 'moneta' || previous_changes.empty?
         Synchromesh.after_commit :create, self
       end
 
       def synchromesh_after_change
-        return if previous_changes.empty?
+        return if self.class.table_name == 'moneta' || previous_changes.empty?
         Synchromesh.after_commit :change, self
       end
 
       def synchromesh_after_destroy
+        return if self.class.table_name == 'moneta'
         Synchromesh.after_commit :destroy, self
       end
     else
-      # def to_s
-      #   "<#{self.class.name}:#{object_id.to_s(16)} #{backing_record.attributes.collect { |k, v| "#{k}: #{v}"}}>"
-      # end
-
       def update_attribute(attr, value, &block)
         send("#{attr}=", value)
         save(validate: false, &block)
