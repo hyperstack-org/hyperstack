@@ -30,7 +30,7 @@ Whitespace conventions:
 
 ### Removed
 
-- `opal-browser` is removed from runtime dependency. (#133)
+- `opal-browser` is removed from runtime dependency. (#133)  You will have to add `gem 'opal-browser'` to your gemfile (recommended) or remove all references to opal-browser from your manifest files.
 
 ### Fixed
 
