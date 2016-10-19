@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   # For Test Rails App
   s.add_development_dependency 'rails', '4.2.4'
   s.add_development_dependency 'react-rails', '1.3.1'
-  s.add_development_dependency 'opal-rails', '0.8.1'
+  s.add_development_dependency 'opal-rails', '0.9.0'
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'jdbc-sqlite3'
@@ -51,7 +51,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'rspec-collection_matchers'
     s.add_development_dependency 'database_cleaner'
     s.add_development_dependency 'capybara'
-    s.add_development_dependency 'selenium-webdriver'
+    s.add_development_dependency 'selenium-webdriver', '~> 2.0'
     s.add_development_dependency 'poltergeist'
     s.add_development_dependency 'spring-commands-rspec'
     s.add_development_dependency 'chromedriver-helper'

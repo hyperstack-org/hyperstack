@@ -8,6 +8,7 @@ if RUBY_ENGINE == 'opal'
   require 'react/router/dsl/route'
   require 'react/router/dsl/index'
   require 'react/router/dsl/transition_context'
+  require 'patches/react'
 else
   require 'opal'
   require 'reactrb'
