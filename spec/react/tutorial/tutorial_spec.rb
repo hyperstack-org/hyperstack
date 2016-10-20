@@ -28,8 +28,9 @@ describe 'Adding state to a component (second tutorial example)', type: :compone
   end
 
   it 'renders to the document' do
-    React.render(React.create_element(HelloMessage2), `document.getElementById('render_here')`)
-    expect(`document.getElementById('render_here').innerHTML`) =~ 'Hello @catmando'
+    ele = `document.createElement('div')`
+    React.render(React.create_element(HelloMessage2), ele)
+    expect(`#{ele}.innerHTML`) =~ 'Hello @catmando'
   end
 end
 end
