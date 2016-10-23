@@ -31,6 +31,32 @@ describe "React::NativeLibrary" do
     Object.send :remove_const, :NativeComponent
   end
 
+  describe "functional stateless component (supported in reactjs v14+ only)" do
+    it "is not detected as native React.js component by `native_react_component?`", v13_only: true do
+      expect(React::API.native_react_component?(`function C(){ return null }`)).to be_falsy
+    end
+
+    it "is detected as native React.js component by `native_react_component?`", v13_exclude: true do
+      expect(React::API.native_react_component?(`function C(){ return null }`)).to be_truthy
+    end
+
+    it "imports a React.js functional stateless component", v13_exclude: true do
+      %x{
+        window.NativeLibrary = {
+          FunctionalComponent: function HelloMessage(props){
+            return React.createElement("div", null, "Hello ", props.name);
+          }
+        }
+      }
+      stub_const 'Foo', Class.new(React::Component::Base)
+      Foo.class_eval do
+        imports "NativeLibrary.FunctionalComponent"
+      end
+      expect(React.render_to_static_markup(
+        React.create_element(Foo, name: "There"))).to eq('<div>Hello There</div>')
+    end
+  end
+
   it "can use native_react_component? to detect a native React.js component" do
     %x{
       window.NativeComponent = React.createClass({

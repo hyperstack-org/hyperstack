@@ -23,8 +23,12 @@ module React
     def self.eval_native_react_component(name)
       component = `eval(name)`
       raise "#{name} is not defined" if `#{component} === undefined`
-      unless `#{component}.prototype !== undefined` &&
-             (`!!#{component}.prototype.isReactComponent` || `!!#{component}.prototype.render`)
+      is_component_class = `#{component}.prototype !== undefined` &&
+                            (`!!#{component}.prototype.isReactComponent` ||
+                             `!!#{component}.prototype.render`)
+      is_functional_component = `typeof #{component} === "function"`
+      is_not_using_react_v13 = `!window.React.version.match(/0\.13/)`
+      unless is_component_class || (is_not_using_react_v13 && is_functional_component)
         raise 'does not appear to be a native react component'
       end
       component

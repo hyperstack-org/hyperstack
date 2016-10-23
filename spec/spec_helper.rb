@@ -74,6 +74,8 @@ if RUBY_ENGINE == 'opal'
     config.filter_run_excluding :ruby
     if `(React.version.search(/^0\.13/) === -1)`
       config.filter_run_excluding :v13_only
+    else
+      config.filter_run_excluding :v13_exclude
     end
   end
 end

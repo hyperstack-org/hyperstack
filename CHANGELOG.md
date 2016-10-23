@@ -18,7 +18,13 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
-## [0.9.0]
+## [0.9.1] - Unreleased
+
+### Fixed
+
+- ReactJS functional stateless component could not be imported from `NativeLibrary`. Note that functional component is only supported in React v14+.  (#162)
+
+## [0.9.0] - 2016-10-19
 
 ### Added
 
