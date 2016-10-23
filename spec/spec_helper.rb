@@ -2,7 +2,6 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
-#require 'opal-rspec'
 
 def opal?
   RUBY_ENGINE == 'opal'

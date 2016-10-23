@@ -73,5 +73,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'unparser'
       s.add_development_dependency 'jquery-rails'
       s.add_development_dependency 'pry-byebug'
+      #s.add_development_dependency 'hyper-trace'
     end
 end

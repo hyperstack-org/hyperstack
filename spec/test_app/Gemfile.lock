@@ -70,6 +70,7 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hike (1.2.3)
+    hyper-trace (0.1.0)
     i18n (0.7.0)
     jbuilder (2.6.0)
       activesupport (>= 3.0.0, < 5.1)
@@ -227,6 +228,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
+  hyper-trace
   jbuilder (~> 2.0)
   jquery-rails
   jquery-ui-rails

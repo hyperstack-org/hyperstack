@@ -36,11 +36,13 @@ describe 'component helpers', js: true do
           n == 1 ? n : fact(n-1) * n
         end
       end
-      SomeClass.hyper_trace do
+      SomeClass.hypertrace do
         instrument :all
-        break_on_exit?(:fact) { |r, n| puts "self = #{self}"; n == 1 }
+        break_on_exit? :fact do |_r, n|
+          puts "self = #{self}"; n == 1
+        end
       end
-      MyComponent.hyper_trace instrument: :all, break_on_exit: [:some_method, :render]
+      MyComponent.hypertrace instrument: :all, break_on_exit: [:some_method, :render]
     end
     pause
   end

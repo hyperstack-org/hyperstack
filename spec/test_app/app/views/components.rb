@@ -7,6 +7,7 @@ if React::IsomorphicHelpers.on_opal_client?
   require 'browser/interval'
   require 'browser/delay'
   require 'synchromesh/pusher'
+  require 'hyper-trace'
 end
 require 'reactive-record'
 require 'synchromesh'
