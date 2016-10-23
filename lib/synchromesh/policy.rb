@@ -267,7 +267,7 @@ module Synchromesh
       channels = ClassConnectionRegulation.connections_for(acting_user, true) +
         InstanceConnectionRegulation.connections_for(acting_user, true)
       channels.each do |channel|
-        Connection.new(channel, session)
+        Connection.open(channel, session)
       end
       channels
     end

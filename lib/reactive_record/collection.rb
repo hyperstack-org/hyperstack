@@ -142,7 +142,6 @@ module ReactiveRecord
 
     def filter_records(related_records)
       scope_args = @vector.last.is_a?(Array) ? @vector.last[1..-1] : []
-      puts "filter_records for #{self} #{@vector} #{scope_args}"
       @scope_description.filter_records(related_records, scope_args)
     end
 
@@ -174,7 +173,7 @@ module ReactiveRecord
       child_scopes[scope_vector] ||= begin
         new_vector = @vector
         new_vector += [scope_vector] unless scope_vector.empty?
-        child_scope = Collection.new(@target_klass, @owner, @association, *new_vector)
+        child_scope = Collection.new(@target_klass, nil, nil, *new_vector)
         child_scope.scope_description = scope_description
         child_scope.parent = self
         child_scope.extend ScopedCollection

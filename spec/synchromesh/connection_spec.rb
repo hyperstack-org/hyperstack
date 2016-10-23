@@ -2,27 +2,51 @@ require 'spec_helper'
 
 describe Synchromesh::Connection do
 
+  before(:all) do
+    Synchromesh.configuration do |config|
+    end
+  end
+
   before(:each) do
     Timecop.return
   end
 
+  it 'creates the tables' do
+    ActiveRecord::Base.connection.tables.should include('synchromesh_connections')
+    ActiveRecord::Base.connection.tables.should include('synchromesh_queued_messages')
+    described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
+  end
+
+  it 'creates the messages queue' do
+    channel = described_class.new
+    channel.messages << Synchromesh::Connection::QueuedMessage.new
+    channel.save
+    channel.reload
+    channel.messages.should eq(Synchromesh::Connection::QueuedMessage.all)
+  end
+
+  it 'can set the root path' do
+    described_class.root_path = 'foobar'
+    expect(described_class.root_path).to eq('foobar')
+  end
+
   it 'adding new connection' do
-    described_class.new('TestChannel', 0)
+    described_class.open('TestChannel', 0)
     expect(described_class.active).to eq(['TestChannel'])
   end
 
   it 'new connections expire' do
-    described_class.new('TestChannel', 0)
+    described_class.open('TestChannel', 0)
     expect(described_class.active).to eq(['TestChannel'])
     Timecop.travel(Time.now+described_class.transport.expire_new_connection_in)
     expect(described_class.active).to eq([])
   end
 
   it 'can send and read data from a channel' do
-    described_class.new('TestChannel', 0)
-    described_class.new('TestChannel', 1)
-    described_class.new('AnotherChannel', 0)
-    described_class.send('TestChannel', 'data')
+    described_class.open('TestChannel', 0)
+    described_class.open('TestChannel', 1)
+    described_class.open('AnotherChannel', 0)
+    described_class.send_to_channel('TestChannel', 'data')
     expect(described_class.read(0)).to eq(['data'])
     expect(described_class.read(0)).to eq([])
     expect(described_class.read(1)).to eq(['data'])
@@ -31,16 +55,16 @@ describe Synchromesh::Connection do
   end
 
   it 'will update the expiration time after reading' do
-    described_class.new('TestChannel', 0)
-    described_class.send('TestChannel', 'data')
+    described_class.open('TestChannel', 0)
+    described_class.send_to_channel('TestChannel', 'data')
     described_class.read(0)
     Timecop.travel(Time.now+described_class.transport.expire_new_connection_in)
     expect(described_class.active).to eq(['TestChannel'])
   end
 
   it 'will expire a polled connection' do
-    described_class.new('TestChannel', 0)
-    described_class.send('TestChannel', 'data')
+    described_class.open('TestChannel', 0)
+    described_class.send_to_channel('TestChannel', 'data')
     described_class.read(0)
     Timecop.travel(Time.now+described_class.transport.expire_polled_connection_in)
     expect(described_class.active).to eq([])
@@ -48,9 +72,9 @@ describe Synchromesh::Connection do
 
   context 'after connecting to the transport' do
     before(:each) do
-      described_class.new('TestChannel', 0)
-      described_class.new('TestChannel', 1)
-      described_class.send('TestChannel', 'data')
+      described_class.open('TestChannel', 0)
+      described_class.open('TestChannel', 1)
+      described_class.send_to_channel('TestChannel', 'data')
     end
 
     it "will pass any pending data back" do
@@ -74,20 +98,18 @@ describe Synchromesh::Connection do
     end
 
     it "will begin refreshing the channel list" do
-      allow(Synchromesh).to receive(:refresh_channels) {sleep 0.2; ['AnotherChannel']}
-      described_class.new('AnotherChannel', 0)
+      allow(Synchromesh).to receive(:refresh_channels) {['AnotherChannel']}
+      described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.connect_to_transport('AnotherChannel', 0, nil)
       expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every)
-      described_class.active
-      sleep(0.5)
       expect(described_class.active).to eq(['AnotherChannel'])
     end
 
     it "refreshing will not effect channels not connected to the transport" do
-      allow(Synchromesh).to receive(:refresh_channels) {sleep 0.2; ['AnotherChannel']}
-      described_class.new('AnotherChannel', 0)
+      allow(Synchromesh).to receive(:refresh_channels) {['AnotherChannel']}
+      described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every-1)
       described_class.read(1)
@@ -95,26 +117,27 @@ describe Synchromesh::Connection do
       expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
       Timecop.travel(Time.now+1)
       described_class.active
-      sleep(0.5)
       expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
     end
 
-    it "refreshing will not effect channels recently added" do
-      allow(Synchromesh).to receive(:refresh_channels) {sleep 0.2; ['AnotherChannel']}
-      described_class.new('AnotherChannel', 0)
-      described_class.connect_to_transport('TestChannel', 0, nil)
+    it "refreshing will not effect channels added during the refresh" do
+      allow(Synchromesh).to receive(:refresh_channels) do
+        described_class.connect_to_transport('TestChannel', 0, nil)
+        ['AnotherChannel']
+      end
+      described_class.open('AnotherChannel', 0)
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every)
+      described_class.read(0)
       described_class.connect_to_transport('AnotherChannel', 0, nil)
       expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
-      described_class.new('TestChannel', 2)
-      sleep(0.5)
-      expect(described_class.active).to eq(['AnotherChannel', 'TestChannel'])
+      described_class.open('TestChannel', 2)
+      expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
     end
 
     it "sends messages to the transport as well as open channels" do
       expect(Synchromesh).to receive(:send).with('TestChannel', 'data2')
       described_class.connect_to_transport('TestChannel', 0, nil)
-      described_class.send('TestChannel', 'data2')
+      described_class.send_to_channel('TestChannel', 'data2')
       expect(described_class.read(1)).to eq(['data', 'data2'])
     end
   end

@@ -44,6 +44,8 @@ module ReactiveRecord
       else
         Set.new(related_records.select { |r| r.instance_exec(*args, &@filter_proc) })
       end
+    rescue Exception => e
+      raise "Client side scope #{@model}.#{@name} raised error: #{e.message}"
     end
 
     # private methods

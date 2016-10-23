@@ -32,7 +32,7 @@ describe "example scopes", js: true do
       scope :with_managers_comments,
             -> { joins(owner: :manager, comments: :author).where('managers_users.id = authors_comments.id').distinct },
             joins: ['comments.author', 'owner'],
-            client: -> { puts "filtering #{self}"; comments.detect { |comment| puts "checking #{comment} vs #{owner} (#{comment.author} == #{owner.manager} is #{comment.author == owner.manager})"; comment.author == owner.manager } }
+            client: -> { comments.detect { |comment| comment.author == owner.manager } }
       end
       Comment.class_eval do
         scope :by_manager,
@@ -133,16 +133,36 @@ describe "example scopes", js: true do
     user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 2')
     user1.comments << FactoryGirl.create(:comment, comment: "frank made this comment", todo: user2.assigned_todos.first)
     user2.comments << FactoryGirl.create(:comment, comment: "bob made this comment", todo: user1.assigned_todos.first)
+    # evaluate_ruby do
+    #   Synchromesh::IncomingBroadcast.hypertrace do
+    #     #instrument :merge_current_values
+    #     break_on_exit?(:merge_current_values) { Todo.find(5).comments.last.todo.nil? rescue nil }
+    #   end
+    #   ReactiveRecord::ScopeDescription.hypertrace do
+    #     break_on_enter?(:filter_records) { Todo.find(5).comments.last.todo.nil? rescue nil }
+    #   end
+    #   ReactiveRecord::Collection.hypertrace do
+    #     break_on_enter?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
+    #     break_on_exit?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
+    #   end
+    # end
     mgr.comments << FactoryGirl.create(:comment, comment: "Me BOSS", todo: user1.assigned_todos.last)
     page.should have_content('MANAGER SAYS: The Boss Speaks')
     page.should have_content('BOSS SAYS: The Boss Speaks')
     wait_for_ajax
     page.should_not have_content('MANAGER SAYS: Me BOSS', wait: 0)
     page.should_not have_content('BOSS SAYS: Me BOSS', wait: 0)
+    #pause
+    # evaluate_ruby do
+    #   ReactiveRecord::Collection.hypertrace(instrument: :all)
+    # end
+    #pause
+    #puts "here we go!!!!!!!!!!"
     user1.update_attribute(:manager, mgr)
     #puts evaluate_ruby "User.find(#{user1.id}).update_attribute(:manager, #{mgr.id})"
     page.should have_content('MANAGER SAYS: Me BOSS')
     page.should have_content('BOSS SAYS: Me BOSS')
     evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    #pause
   end
 end

@@ -21,6 +21,14 @@ module ActiveRecord
       alias pre_synchromesh_scope scope
       alias pre_synchromesh_default_scope default_scope
 
+      def do_not_synchronize
+        @do_not_synchronize = true
+      end
+
+      def do_not_synchronize?
+        @do_not_synchronize
+      end
+
       if RUBY_ENGINE != 'opal'
 
         def scope(name, *args, &block)
@@ -139,22 +147,27 @@ module ActiveRecord
     end
 
     if RUBY_ENGINE != 'opal'
+
+      def do_not_synchronize?
+        self.class.do_not_synchronize?
+      end
+
       after_commit :synchromesh_after_create,  on: [:create]
       after_commit :synchromesh_after_change,  on: [:update]
       after_commit :synchromesh_after_destroy, on: [:destroy]
 
       def synchromesh_after_create
-        return if self.class.table_name == 'moneta' || previous_changes.empty?
+        return if do_not_synchronize? || previous_changes.empty?
         Synchromesh.after_commit :create, self
       end
 
       def synchromesh_after_change
-        return if self.class.table_name == 'moneta' || previous_changes.empty?
+        return if do_not_synchronize? || previous_changes.empty?
         Synchromesh.after_commit :change, self
       end
 
       def synchromesh_after_destroy
-        return if self.class.table_name == 'moneta'
+        return if do_not_synchronize?
         Synchromesh.after_commit :destroy, self
       end
     else
@@ -173,4 +186,7 @@ module ActiveRecord
       end
     end
   end
+
+  InternalMetadata.do_not_synchronize if defined? InternalMetadata
+
 end

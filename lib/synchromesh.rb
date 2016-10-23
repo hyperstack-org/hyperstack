@@ -23,6 +23,7 @@ if RUBY_ENGINE == 'opal'
   require_relative 'reactive_record/while_loading'
   require_relative 'reactive_record/scope_description'
   require_relative 'reactive_record/sync_wrapper'
+  require_relative 'hyper_trace'
 else
   require 'opal'
   # This is temporarily needed so that the todo-tutorial

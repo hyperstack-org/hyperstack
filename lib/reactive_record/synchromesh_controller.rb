@@ -89,7 +89,7 @@ module ReactiveRecord
       def subscribe
         Synchromesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
         root_path = request.original_url.gsub(/synchromesh-subscribe.*$/, '')
-        Synchromesh::Connection.new(params[:channel], client_id, root_path)
+        Synchromesh::Connection.open(params[:channel], client_id, root_path)
         head :ok
       rescue Exception
         head :unauthorized

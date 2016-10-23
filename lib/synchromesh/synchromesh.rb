@@ -25,6 +25,7 @@ module Synchromesh
       @fake_application_defined = true
     end
     @pusher = nil
+    Connection.build_tables
   end
 
   define_setting(:transport, :none) do |transport|
@@ -141,7 +142,7 @@ module Synchromesh
       if Synchromesh.on_console? && Connection.root_path
         Synchromesh.send_to_server(data[:channel], [operation, data])
       else
-        Connection.send(data[:channel], [operation, data])
+        Connection.send_to_channel(data[:channel], [operation, data])
       end
     end
   end
