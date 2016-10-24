@@ -11,7 +11,6 @@ module React
     end
   end
 end
-
 module ReactiveRuby
   module Rails
     # pass controller to the prerender_footers method
