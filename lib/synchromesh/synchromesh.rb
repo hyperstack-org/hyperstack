@@ -137,28 +137,13 @@ module Synchromesh
     )
   end
 
-  def self.run_after_commit(operation, model)
+  def self.after_commit(operation, model)
     InternalPolicy.regulate_broadcast(model) do |data|
       if Synchromesh.on_console? && Connection.root_path
         Synchromesh.send_to_server(data[:channel], [operation, data])
       else
         Connection.send_to_channel(data[:channel], [operation, data])
       end
-    end
-  end
-
-  @queue = Queue.new
-  Thread.new do
-    loop do
-      run_after_commit(*@queue.pop)
-    end
-  end
-
-  def self.after_commit(*args)
-    if true || on_console?
-      run_after_commit(*args)
-    else
-      @queue.push args
     end
   end
 

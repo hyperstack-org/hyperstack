@@ -96,7 +96,8 @@ module ReactiveRecord
       end
 
       def read
-        data = Synchromesh::Connection.read(client_id)
+        root_path = request.original_url.gsub(/synchromesh-read.*$/, '')
+        data = Synchromesh::Connection.read(client_id, root_path)
         render json: data
       end
 
@@ -127,7 +128,7 @@ module ReactiveRecord
       def console_update
         authorization = Synchromesh.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
         return head :unauthorized if authorization != params[:authorization]
-        Synchromesh::Connection.send(params[:channel], params[:data])
+        Synchromesh::Connection.send_to_channel(params[:channel], params[:data])
         head :no_content
       rescue
         head :unauthorized

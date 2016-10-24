@@ -222,7 +222,7 @@ module ReactiveRecord
     end
 
     def observed
-      return if @observing
+      return if @observing || ReactiveRecord::Base.data_loading?
       begin
         @observing = true
         link_to_parent

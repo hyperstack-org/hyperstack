@@ -135,7 +135,6 @@ describe "example scopes", js: true do
     user2.comments << FactoryGirl.create(:comment, comment: "bob made this comment", todo: user1.assigned_todos.first)
     # evaluate_ruby do
     #   Synchromesh::IncomingBroadcast.hypertrace do
-    #     #instrument :merge_current_values
     #     break_on_exit?(:merge_current_values) { Todo.find(5).comments.last.todo.nil? rescue nil }
     #   end
     #   ReactiveRecord::ScopeDescription.hypertrace do
@@ -152,17 +151,9 @@ describe "example scopes", js: true do
     wait_for_ajax
     page.should_not have_content('MANAGER SAYS: Me BOSS', wait: 0)
     page.should_not have_content('BOSS SAYS: Me BOSS', wait: 0)
-    #pause
-    # evaluate_ruby do
-    #   ReactiveRecord::Collection.hypertrace(instrument: :all)
-    # end
-    #pause
-    #puts "here we go!!!!!!!!!!"
     user1.update_attribute(:manager, mgr)
-    #puts evaluate_ruby "User.find(#{user1.id}).update_attribute(:manager, #{mgr.id})"
     page.should have_content('MANAGER SAYS: Me BOSS')
     page.should have_content('BOSS SAYS: Me BOSS')
     evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
-    #pause
   end
 end

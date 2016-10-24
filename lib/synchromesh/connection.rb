@@ -97,7 +97,8 @@ module Synchromesh
         transport.send(channel, data) if exists?(channel: channel, session: nil)
       end
 
-      def read(session)
+      def read(session, root_path)
+        self.root_path = root_path
         where(session: session)
           .update_all(expires_at: Time.now + transport.expire_polled_connection_in)
         QueuedMessage.for_session(session).destroy_all.pluck(:data)

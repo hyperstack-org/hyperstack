@@ -63,6 +63,14 @@ module ReactiveRecord
     class << self
       attr_reader :outer_scopes
 
+      def default_scope
+        @class_scopes[:default_scope]
+      end
+
+      def unscoped
+        @class_scopes[:unscoped]
+      end
+
       def add_to_outer_scopes(item)
         @outer_scopes << item
       end

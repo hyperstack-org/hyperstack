@@ -3,6 +3,7 @@ module ActiveRecord
   # 1 - Setup synchronization after commits
   # 2 - Update scope to accept different procs for server and client
   class Base
+
     class << self
 
       def _synchromesh_scope_args_check(args)
@@ -43,13 +44,6 @@ module ActiveRecord
 
       else
 
-        include React::IsomorphicHelpers
-
-        before_first_mount do
-          @_default_scope = nil
-          @_unscoped = nil
-        end
-
         alias pre_synchromesh_method_missing method_missing
 
         def method_missing(name, *args, &block)
@@ -83,7 +77,7 @@ module ActiveRecord
         end
 
         def all
-          @_default_scope ||=
+          ReactiveRecord::Base.default_scope[self] ||=
             if @_default_scopes
               root = ReactiveRecord::Collection
                      .new(self, nil, nil, self, 'all')
@@ -99,7 +93,7 @@ module ActiveRecord
         end
 
         def unscoped
-          @_unscoped ||=
+          ReactiveRecord::Base.unscoped[self] ||=
             ReactiveRecord::Collection
             .new(self, nil, nil, self, 'unscoped')
             .extend(ReactiveRecord::UnscopedCollection)

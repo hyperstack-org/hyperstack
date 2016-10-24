@@ -292,7 +292,7 @@ module Synchromesh
             `ActionCable.createConsumer.apply(ActionCable, #{[*opts[:action_cable_consumer_url]]})`
           Synchromesh.connect(*opts[:auto_connect])
         elsif opts[:transport] == :simple_poller
-          opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection *channel }
+          opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection(*channel) }
           every(opts[:seconds_between_poll]) do
             get_queued_data(:read, nil, headers: {'X-SYNCHROMESH-SILENT-REQUEST': true })
           end
