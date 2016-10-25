@@ -1,0 +1,17 @@
+source "http://rubygems.org"
+gem "rails"
+gem 'sqlite3'
+gem 'react-rails' #, "1.3.3"
+gem 'opal', '~> 0.9.0'
+gem 'reactrb' #, git: "https://github.com/reactrb/reactrb.git", branch: "0-8-stable" # path: "../../../reactrb"
+gem 'opal-rails'#, git: "https://github.com/reactrb/opal-rails.git"
+gem 'reactive-record', path: "../.."
+gem 'therubyracer'
+gem 'jquery-cookie-rails'
+gem 'byebug'
+gem 'pry-rails'
+gem 'pry-rescue'
+gem 'opal-rspec-rails', github: 'opal/opal-rspec-rails'
+gem 'synchromesh', path: "../../.."
+gem 'web-console'
+#gem 'opal-rspec-rails', git: 'https://github.com/reactrb/opal-rspec-rails.git'

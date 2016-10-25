@@ -1,4 +1,4 @@
-require 'reactive-record'
+require 'synchromesh'
 
 Rails.application.routes.draw do
   mount ReactiveRecord::Engine => "/rr"

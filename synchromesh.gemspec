@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
     s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
     s.require_paths  = ['lib']
     s.add_dependency 'activerecord', '>= 0.3.0'
-    s.add_dependency 'reactive-record', '>= 0.7.43'
+    s.add_dependency 'reactrb'
 
     s.add_development_dependency 'bundler', '~> 1.8'
     s.add_development_dependency 'rake', '~> 10.0'

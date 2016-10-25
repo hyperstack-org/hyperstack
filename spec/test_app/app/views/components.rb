@@ -9,7 +9,7 @@ if React::IsomorphicHelpers.on_opal_client?
   require 'synchromesh/pusher'
   require 'hyper-trace'
 end
-require 'reactive-record'
+#require 'reactive-record'
 require 'synchromesh'
 require '_react_public_models'
 require_tree './components'
