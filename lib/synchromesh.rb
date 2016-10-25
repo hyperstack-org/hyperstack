@@ -9,10 +9,10 @@
 #   end
 # end
 
-require_relative 'active_record_base'
 require 'set'
 if RUBY_ENGINE == 'opal'
-  #require 'reactive-record'
+  require 'reactive-record'
+  require_relative 'active_record_base'
   require_relative 'react/reset_prerender_history'
   require_relative 'synchromesh/version'
   require_relative 'json/parse_patch'
@@ -36,7 +36,8 @@ else
   end
   #require 'active_record/transactions'
   require 'reactive-record'
-  require 'reactive_record/permission_patches'
+  require_relative 'active_record_base'
+  #require 'reactive_record/permission_patches'
   require 'reactive_record/synchromesh_controller'
   require 'reactive_record/base_patches'
   require 'synchromesh/version'

@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
 
     s.add_development_dependency 'pusher'
     s.add_development_dependency 'pusher-fake'
+    s.add_development_dependency 'opal-browser'
 
     if RUBY_PLATFORM == 'java'
       s.add_development_dependency 'jdbc-sqlite3'

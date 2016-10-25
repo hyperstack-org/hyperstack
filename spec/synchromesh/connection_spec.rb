@@ -47,17 +47,17 @@ describe Synchromesh::Connection do
     described_class.open('TestChannel', 1)
     described_class.open('AnotherChannel', 0)
     described_class.send_to_channel('TestChannel', 'data')
-    expect(described_class.read(0)).to eq(['data'])
-    expect(described_class.read(0)).to eq([])
-    expect(described_class.read(1)).to eq(['data'])
-    expect(described_class.read(1)).to eq([])
-    expect(described_class.read(0)).to eq([])
+    expect(described_class.read(0, 'path')).to eq(['data'])
+    expect(described_class.read(0, 'path')).to eq([])
+    expect(described_class.read(1, 'path')).to eq(['data'])
+    expect(described_class.read(1, 'path')).to eq([])
+    expect(described_class.read(0, 'path')).to eq([])
   end
 
   it 'will update the expiration time after reading' do
     described_class.open('TestChannel', 0)
     described_class.send_to_channel('TestChannel', 'data')
-    described_class.read(0)
+    described_class.read(0, 'path')
     Timecop.travel(Time.now+described_class.transport.expire_new_connection_in)
     expect(described_class.active).to eq(['TestChannel'])
   end
@@ -65,7 +65,7 @@ describe Synchromesh::Connection do
   it 'will expire a polled connection' do
     described_class.open('TestChannel', 0)
     described_class.send_to_channel('TestChannel', 'data')
-    described_class.read(0)
+    described_class.read(0, 'path')
     Timecop.travel(Time.now+described_class.transport.expire_polled_connection_in)
     expect(described_class.active).to eq([])
   end
@@ -94,7 +94,7 @@ describe Synchromesh::Connection do
 
     it "will only effect the session being connected" do
       described_class.connect_to_transport('TestChannel', 0, nil)
-      expect(described_class.read(1)).to eq(['data'])
+      expect(described_class.read(1, 'path')).to eq(['data'])
     end
 
     it "will begin refreshing the channel list" do
@@ -112,7 +112,7 @@ describe Synchromesh::Connection do
       described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every-1)
-      described_class.read(1)
+      described_class.read(1, 'path')
       described_class.connect_to_transport('AnotherChannel', 0, nil)
       expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
       Timecop.travel(Time.now+1)
@@ -127,7 +127,7 @@ describe Synchromesh::Connection do
       end
       described_class.open('AnotherChannel', 0)
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every)
-      described_class.read(0)
+      described_class.read(0, 'path')
       described_class.connect_to_transport('AnotherChannel', 0, nil)
       expect(described_class.active).to eq(['TestChannel', 'AnotherChannel'])
       described_class.open('TestChannel', 2)
@@ -138,7 +138,7 @@ describe Synchromesh::Connection do
       expect(Synchromesh).to receive(:send).with('TestChannel', 'data2')
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.send_to_channel('TestChannel', 'data2')
-      expect(described_class.read(1)).to eq(['data', 'data2'])
+      expect(described_class.read(1, 'path')).to eq(['data', 'data2'])
     end
   end
 end

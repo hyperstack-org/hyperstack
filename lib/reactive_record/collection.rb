@@ -227,7 +227,7 @@ module ReactiveRecord
         @observing = true
         link_to_parent
         reload_from_db(true) if @out_of_date
-        React::State.get_state(self, :collection) unless ReactiveRecord::Base.data_loading?
+        React::State.get_state(self, :collection)
       ensure
         @observing = false
       end
@@ -236,7 +236,7 @@ module ReactiveRecord
     alias pre_synchromesh_instance_variable_set instance_variable_set
 
     def instance_variable_set(var, val)
-      if var == :@count && !ReactiveRecord::WhileLoading.has_observers?
+      if var == :@count && !ReactiveRecord::WhileLoading.has_observers?# && !ReactiveRecord::Base.data_loading? # !ReactiveRecord::WhileLoading.has_observers?
         React::State.set_state(self, :collection, collection, true)
       end
       pre_synchromesh_instance_variable_set var, val

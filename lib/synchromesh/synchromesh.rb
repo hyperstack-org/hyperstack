@@ -6,9 +6,7 @@ module Synchromesh
   extend Configuration
 
   def self.config_reset
-    if Rails.application.config.cache_store == :null_store
-      raise 'Cannot Run Synchromesh with cache_store == :null_store'
-    end
+    require File.join(File.dirname(__FILE__), '..', 'reactive_record', 'permission_patches')
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
       Object.const_get 'ApplicationPolicy'

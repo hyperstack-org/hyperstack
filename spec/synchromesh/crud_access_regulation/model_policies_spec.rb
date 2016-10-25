@@ -3,6 +3,12 @@ require 'synchromesh/integration/test_components'
 
 describe "regulate access allowed" do
 
+  before(:all) do
+    Synchromesh.configuration do |config|
+      config.transport = :none
+    end
+  end
+
   before(:each) do
     stub_const 'DummyModel', Class.new(ActiveRecord::Base)
     DummyModel.class_eval do
