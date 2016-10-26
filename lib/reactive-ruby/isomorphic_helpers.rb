@@ -73,10 +73,10 @@ module React
       self.class.on_opal_client?
     end
 
-    def self.prerender_footers
-      footer = Context.prerender_footer_blocks.collect { |block| block.call }.join("\n")
+    def self.prerender_footers(controller = nil)
+      footer = Context.prerender_footer_blocks.collect { |block| block.call controller }.join("\n")
       if RUBY_ENGINE != 'opal'
-        footer = (footer + "#{@context.send_to_opal(:prerender_footers)}") if @context
+        footer = (footer + @context.send_to_opal(:prerender_footers).to_s) if @context
         footer = footer.html_safe
       end
       footer

@@ -39,7 +39,7 @@ module ReactiveRuby
       end
 
       def footers
-        React::IsomorphicHelpers.prerender_footers #if options[:prerender]
+        React::IsomorphicHelpers.prerender_footers(controller)
       end
     end
   end
