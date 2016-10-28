@@ -2,7 +2,7 @@ module Synchromesh
   # Client side handling of synchronization messages
   # When a synchronization message comes in, the client will call
   # either the sync_change or sync_destroy methods.
-  # Everything is setup during reactrb before_first_mount callback
+  # Everything is setup during hyper-react before_first_mount callback
   # We use ERB to determine the configuration and implement the appropriate
   # client interface to sync_change or sync_destroy
 

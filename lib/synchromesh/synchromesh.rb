@@ -143,6 +143,8 @@ module Synchromesh
         Connection.send_to_channel(data[:channel], [operation, data])
       end
     end
+  rescue Exception
+    nil  # this is because during db migration we have problems... should investigate more...
   end
 
   Connection.transport = self

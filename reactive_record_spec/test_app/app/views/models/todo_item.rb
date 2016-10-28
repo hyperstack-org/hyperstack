@@ -18,16 +18,16 @@ class TodoItem < ActiveRecord::Base
   scope :find_string, ->(s) { where("title LIKE ? OR description LIKE ?", "%#{s}%", "%#{s}%") }
 
   scope :active, -> { where("title LIKE '%mitch%' OR description LIKE '%mitch%'")}
-  to_sync :active do |scope, record|
-    if record.title =~ /mitch/ || record.description =~ /mitch/
-      scope << record
-    else
-      scope.delete(record)
-    end
-  end
+  # to_sync :active do |scope, record|
+  #   if record.title =~ /mitch/ || record.description =~ /mitch/
+  #     scope << record
+  #   else
+  #     scope.delete(record)
+  #   end
+  # end
 
   scope :important, -> { where("title LIKE '%another%' OR description LIKE '%another%'")}
-  to_sync(:important) {title =~ /another/ || description =~ /another/ }
+  # to_sync(:important) {title =~ /another/ || description =~ /another/ }
 
   def virtual_user_first_name
     user.first_name

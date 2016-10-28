@@ -3,7 +3,7 @@ require File.expand_path('../boot', __FILE__)
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
-require "reactive-record"
+require "synchromesh"
 
 module Dummy
   class Application < Rails::Application
@@ -50,18 +50,20 @@ module Dummy
 
     # Enable the asset pipeline
     config.assets.enabled = true
-    
+
     config.autoload_paths += %W(#{config.root}/app/views/models)
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
-    
+    config.assets.debug = false
+
     # These are the available opal-rspec options with their default value:
     config.opal.method_missing      = true
     config.opal.optimized_operators = true
     config.opal.arity_check         = false
     config.opal.const_missing       = true
     config.opal.dynamic_require_severity = :ignore
+    config.opal.source_map_enabled = false
 
     # Enable/disable /opal_specs route
     config.opal.enable_specs        = true
@@ -69,4 +71,3 @@ module Dummy
     config.opal.spec_location = 'spec-opal'
   end
 end
-

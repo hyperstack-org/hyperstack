@@ -1,13 +1,13 @@
 require 'opal'
 require 'react'
-require 'reactrb'
+require 'hyper-trace'
+require 'hyper-react'
 if React::IsomorphicHelpers.on_opal_client?
   require 'opal-jquery'
   #require 'browser' # breaks poltergeist
   require 'browser/interval'
   require 'browser/delay'
   require 'synchromesh/pusher'
-  require 'hyper-trace'
 end
 #require 'reactive-record'
 require 'synchromesh'

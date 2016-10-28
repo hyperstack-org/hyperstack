@@ -19,6 +19,9 @@ Dummy::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
+  config.assets.debug = false #true
+  Opal::Processor.source_map_enabled = false
+
 
   # Defaults to nil and saved in location specified by config.assets.prefix
   # config.assets.manifest = YOUR_PATH

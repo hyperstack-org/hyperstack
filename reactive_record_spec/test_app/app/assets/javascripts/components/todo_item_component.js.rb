@@ -1,4 +1,4 @@
-require 'reactrb'
+require 'hyper-react'
 
 class TodoItemComponent
 

@@ -1,6 +1,6 @@
-# Synchromesh ![](logo.jpg?raw=true)
+# Hyper-mesh ![](https://avatars3.githubusercontent.com/u/15810526?v=3&s=200&raw=true)
 
-[Synchromesh](https://en.wikipedia.org/wiki/Manual_transmission#Synchromesh) provides multi-client synchronization for [reactive-record.](https://github.com/catprintlabs/reactive-record)
+Hyper-mesh] provides multi-client synchronization for [reactive-record.](https://github.com/catprintlabs/reactive-record)
 
 In other words browser 1 creates, updates, or destroys a model, and the changes are broadcast to all other clients.
 
@@ -77,7 +77,7 @@ For complete details see [Authorization Policies](docs/authorization-policies.md
 
 ## Installation
 
-If you do not already have reactrb installed, then use the reactrb-rails-generator gem to setup reactrb, reactive-record and associated gems.
+If you do not already have hyper-react installed, then use the reactrb-rails-generator gem to setup hyper-react, reactive-record and associated gems.
 
 Then add this line to your application's Gemfile:
 
@@ -244,7 +244,7 @@ pusher.self.js?body=1:62 WebSocket connection to
 failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
 ```
 Check to see if you are including the pusher-fake gem.  
-Synchromesh will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/reactrb/synchromesh/issues/5) for more details.
+Synchromesh will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/hyper-react/synchromesh/issues/5) for more details.
 
 ## Debugging
 

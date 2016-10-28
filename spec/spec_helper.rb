@@ -12,7 +12,7 @@ def ruby?
 end
 
 if RUBY_ENGINE == 'opal'
-  require 'reactrb'
+  require 'hyper-react'
   require File.expand_path('../support/react/spec_helpers', __FILE__)
 
   module Opal
@@ -251,9 +251,9 @@ if RUBY_ENGINE != 'opal'
     end
 
     config.after(:each, :js => true) do
-      #sleep(3)
-    end if ENV['DRIVER'] == 'ff'
-
+      page.instance_variable_set("@hyper_spec_mounted", false)
+    end
+    
     config.include Capybara::DSL
 
     Capybara.register_driver :chrome do |app|

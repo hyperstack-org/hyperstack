@@ -12,7 +12,7 @@
 require 'set'
 if RUBY_ENGINE == 'opal'
   #require 'reactive-record'
-    require "reactrb"
+    require "hyper-react"
     #require "json_parse_patch"
     require "reactive_record/active_record/error"
     require "reactive_record/server_data_cache"
@@ -29,12 +29,12 @@ if RUBY_ENGINE == 'opal'
     require "reactive_record/interval"
   #end requires from reactive-record
   require_relative 'active_record_base'
-  require_relative 'react/reset_prerender_history'
+  #require_relative 'react/reset_prerender_history'
   require_relative 'synchromesh/version'
   require_relative 'json/parse_patch'
   require_relative 'opal/set_patches'
-  require_relative 'react/component_patches'
-  require_relative 'react/state_patches'
+  #require_relative 'react/component_patches'
+  #require_relative 'react/state_patches'
   require_relative 'reactive_record_patches/base'
   require_relative 'reactive_record_patches/collection'
   require_relative 'reactive_record_patches/while_loading'
@@ -45,9 +45,9 @@ else
   # This is temporarily needed so that the todo-tutorial
   # which is still using reactive-ruby, will work.  Once
   # the todo-tutorial is updated, this can be a straight
-  # require of reactrb.
+  # require of hyper-react.
   begin
-    require 'reactrb'
+    require 'hyper-react'
   rescue LoadError
     puts "**************************** load error ********************"
   end

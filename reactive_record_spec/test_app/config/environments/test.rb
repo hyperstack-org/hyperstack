@@ -34,4 +34,8 @@ Dummy::Application.configure do
 
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
+
+  config.assets.debug = false #true
+  Opal::Processor.source_map_enabled = false
+
 end

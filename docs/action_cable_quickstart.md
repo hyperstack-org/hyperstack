@@ -8,24 +8,24 @@ You need to be on rails 5 to use ActionCable.  Make sure you upgrade to rails 5 
 
 #### 2 Add ReactRb
 
-If you have not already installed the `reactrb` and `reactive-record` gems, then do so now using the [reactrb-rails-generator](https://github.com/reactrb/reactrb-rails-generator) gem.
+If you have not already installed the `hyper-react` and `reactive-record` gems, then do so now using the [reactrb-rails-generator](https://github.com/hyper-react/reactrb-rails-generator) gem.
 
 - add `gem 'reactrb-rails-generator'` to your gem file (in the development section)
 - run `bundle install`
-- run `rails g reactrb:install --all` (make sure to use the --all option)
+- run `rails g hyper-react:install --all` (make sure to use the --all option)
 - run `bundle update`
 
 #### 3 Add the synchromesh gem
 
 - ~~add `gem 'synchromesh'` to your gem file~~  
-- add `gem 'synchromesh', git: 'https://github.com/reactrb/synchromesh', branch: 'authorization-policies'`
+- add `gem 'synchromesh', git: 'https://github.com/hyper-react/synchromesh', branch: 'authorization-policies'`
 - then `bundle install`  
 - and in `app/views/components.rb` add `require 'synchromesh'`  
  immediately below`require 'reactive-record'`
 
 #### 4 Set the transport
 
-Once you have reactrb installed then add this initializer:
+Once you have hyper-react installed then add this initializer:
 ```ruby
 #config/initializers/synchromesh.rb
 Synchromesh.configuration do |config|

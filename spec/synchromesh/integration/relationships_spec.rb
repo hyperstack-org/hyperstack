@@ -42,7 +42,9 @@ describe "synchronizing relationships", js: true do
           #ul { model.child_models.each { |model| li { model.child_attribute }}}
         end
       end
+      ReactiveRecord::Collection.hypertrace instrument: :all
     end
+
     page.should have_content("0 items")
     FactoryGirl.create(:child_model, test_model: parent, child_attribute: "first child")
     page.should have_content("1 items")

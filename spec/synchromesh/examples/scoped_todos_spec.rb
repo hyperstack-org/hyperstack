@@ -36,9 +36,9 @@ describe "example scopes", js: true do
       end
       Comment.class_eval do
         scope :by_manager,
-              -> { joins(todo: { owner: :manager }).where('managers_users.id = author_id').distinct},
-              joins: ['todo.owner.manager', 'author'],
-              client: -> { todo.owner.manager == author }
+              -> { joins(todoz: { owner: :manager }).where('managers_users.id = author_id').distinct},
+              joins: ['todoz.owner.manager', 'author'],
+              client: -> { todoz.owner.manager == author }
       end
     end
     size_window(:small, :portrait)
@@ -47,12 +47,12 @@ describe "example scopes", js: true do
   it "runs the server side scopes okay" do
     expect(Todo.with_managers_comments).to be_empty
     expect(Comment.by_manager).to be_empty
-    boss = FactoryGirl.create(:user, name: :boss)
-    employee = FactoryGirl.create(:user, name: :fred, manager: boss)
+    boss = FactoryGirl.create(:user, first_name: :boss)
+    employee = FactoryGirl.create(:user, first_name: :fred, manager: boss)
     todo = FactoryGirl.create(:todo, owner: employee)
-    comment = FactoryGirl.create(:comment, author: boss, todo: todo)
-    FactoryGirl.create(:comment, author: employee, todo: todo)
-    FactoryGirl.create(:comment, author: employee, todo: FactoryGirl.create(:todo, owner: employee))
+    comment = FactoryGirl.create(:comment, author: boss, todoz: todo)
+    FactoryGirl.create(:comment, author: employee, todoz: todo)
+    FactoryGirl.create(:comment, author: employee, todoz: FactoryGirl.create(:todo, owner: employee))
     expect(Todo.with_managers_comments).to match_array [todo]
     expect(Comment.by_manager).to match_array [comment]
   end
@@ -65,7 +65,7 @@ describe "example scopes", js: true do
           div { "todos by user with comments" }
           User.each do |user|
             DIV do
-              DIV { "#{user.name}'s Todos'" }
+              DIV { "#{user.first_name}'s Todos'" }
               UL do
                 user.assigned_todos.each do |todo|
                   LI do
@@ -84,7 +84,7 @@ describe "example scopes", js: true do
             UL do
               Todo.with_managers_comments.each do |todo|
                 DIV do
-                  "#{todo.owner.name} - #{todo.title}".span
+                  "#{todo.owner.first_name} - #{todo.title}".span
                   UL do
                     todo.comments.each do |comment|
                       LI { "BOSS SAYS: #{comment.comment}" } if comment.author == todo.owner.manager
@@ -101,38 +101,38 @@ describe "example scopes", js: true do
           end; end; end; end
     starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
     #pause "about to add the boss"
-    boss = FactoryGirl.create(:user, name: :boss)
+    boss = FactoryGirl.create(:user, first_name: :boss)
     #pause "about to add the employee"
-    employee = FactoryGirl.create(:user, name: :joe, manager: boss)
+    employee = FactoryGirl.create(:user, first_name: :joe, manager: boss)
     #pause "about to add the todo"
     todo = FactoryGirl.create(:todo, title: "joe's todo", owner: employee)
     wait_for_ajax
     evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
     #pause "adding a comment from the boss"
-    comment = FactoryGirl.create(:comment, comment: "The Boss Speaks", author: boss, todo: todo)
+    comment = FactoryGirl.create(:comment, comment: "The Boss Speaks", author: boss, todoz: todo)
     page.should have_content('The Boss Speaks')
     #pause "added the boss speaks"
-    fred = FactoryGirl.create(:user, role: :employee, name: :fred)
+    fred = FactoryGirl.create(:user, role: :employee, first_name: :fred)
     #pause "fred added"
     fred.assigned_todos << FactoryGirl.create(:todo, title: 'fred todo')
     #pause "added another todo to fred"
     evaluate_ruby do
-      mitch = User.new(name: :mitch)
+      mitch = User.new(first_name: :mitch)
       mitch.assigned_todos << Todo.new(title: 'mitch todo')
       mitch.save
     end
     wait_for_ajax
     #pause "mitch added"
-    user1 = FactoryGirl.create(:user, role: :employee, name: :frank)
-    user2 = FactoryGirl.create(:user, role: :employee, name: :bob)
-    mgr   = FactoryGirl.create(:user, role: :manager, name: :sally)
+    user1 = FactoryGirl.create(:user, role: :employee, first_name: :frank)
+    user2 = FactoryGirl.create(:user, role: :employee, first_name: :bob)
+    mgr   = FactoryGirl.create(:user, role: :manager, first_name: :sally)
     #pause "frank, bob, and sally added"
     user1.assigned_todos << FactoryGirl.create(:todo, title: 'frank todo 1')
     user1.assigned_todos << FactoryGirl.create(:todo, title: 'frank todo 2')
     user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 1')
     user2.assigned_todos << FactoryGirl.create(:todo, title: 'bob todo 2')
-    user1.comments << FactoryGirl.create(:comment, comment: "frank made this comment", todo: user2.assigned_todos.first)
-    user2.comments << FactoryGirl.create(:comment, comment: "bob made this comment", todo: user1.assigned_todos.first)
+    user1.commentz << FactoryGirl.create(:comment, comment: "frank made this comment", todoz: user2.assigned_todos.first)
+    user2.commentz << FactoryGirl.create(:comment, comment: "bob made this comment", todoz: user1.assigned_todos.first)
     # evaluate_ruby do
     #   Synchromesh::IncomingBroadcast.hypertrace do
     #     break_on_exit?(:merge_current_values) { Todo.find(5).comments.last.todo.nil? rescue nil }
@@ -145,7 +145,7 @@ describe "example scopes", js: true do
     #     break_on_exit?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
     #   end
     # end
-    mgr.comments << FactoryGirl.create(:comment, comment: "Me BOSS", todo: user1.assigned_todos.last)
+    mgr.commentz << FactoryGirl.create(:comment, comment: "Me BOSS", todoz: user1.assigned_todos.last)
     page.should have_content('MANAGER SAYS: The Boss Speaks')
     page.should have_content('BOSS SAYS: The Boss Speaks')
     wait_for_ajax

@@ -341,14 +341,6 @@ module ReactiveRecord
           end
           load_from_json(value, new_target) if new_target
         end
-        #target.save if target.respond_to? :save
-rescue Exception => e
-  `debugger`
-  nil
       end
-
-
     end
-
-
   end

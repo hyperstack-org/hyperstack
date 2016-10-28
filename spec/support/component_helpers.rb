@@ -108,8 +108,8 @@ module ComponentTestHelpers
           style_sheet = render_params.delete(:style_sheet)
           javascript = render_params.delete(:javascript)
           code = render_params.delete(:code)
-          page = "<%= react_component @component_name, @component_params, { prerender: false } %>" # false should be:  "#{render_on != :client_only} } %>" but its not working in the gem testing harness
-          page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n"+page
+          page = "<%= react_component @component_name, @component_params, { prerender: false } %>"  # false should be:  "#{render_on != :client_only} } %>" but its not working in the gem testing harness
+          page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
 
           if code
             page = "<script type='text/javascript'>\n#{code}\n</script>\n"+page
@@ -185,6 +185,25 @@ module ComponentTestHelpers
     JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
   end
 
+  def expect_promise(str="", opts={}, &block)
+    insure_mount
+    # big assumption here is that we are going to follow this with a .to
+    # hence .children.first followed by .children.last
+    # probably should do some kind of "search" to make this work nicely
+    str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.first.children.last}" if block
+    str = "#{str}.then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
+    js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
+    page.evaluate_script("window.hyper_spec_promise_result = false")
+    page.execute_script(js)
+    Timeout.timeout(Capybara.default_max_wait_time) do
+      loop do
+        sleep 0.25
+        break if page.evaluate_script("!!window.hyper_spec_promise_result")
+      end
+    end
+    expect(JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first)
+  end
+
   def ppr(str)
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     execute_script("console.log(#{js})")
@@ -208,13 +227,17 @@ module ComponentTestHelpers
     end
   end
 
-  def mount(component_name, params=nil, opts = {}, &block)
+  def insure_mount
+    mount unless page.instance_variable_get("@hyper_spec_mounted")
+  end
+
+  def mount(component_name = nil, params = nil, opts = {}, &block)
     unless params
       params = opts
       opts = {}
     end
     test_url = build_test_url_for(opts.delete(:controller))
-    if block || @client_code
+    if block || @client_code || component_name.nil?
       block_with_helpers = <<-code
         module ComponentHelpers
           def self.js_eval(s)
@@ -226,14 +249,19 @@ module ComponentTestHelpers
             `$(\#{s}).appendTo("head");`
           end
         end
+        class React::Component::HyperTestDummy < React::Component::Base
+          def render; end
+        end
         #{@client_code}
         #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
       code
       opts[:code] = Opal.compile(block_with_helpers)
     end
+    component_name ||= 'React::Component::HyperTestDummy'
     Rails.cache.write(test_url, [component_name, params, opts])
     visit test_url
     wait_for_ajax unless opts[:no_wait]
+    page.instance_variable_set("@hyper_spec_mounted", true)
     end
 
   [:callback_history_for, :last_callback_for, :clear_callback_history_for, :event_history_for, :last_event_for, :clear_event_history_for].each do |method|

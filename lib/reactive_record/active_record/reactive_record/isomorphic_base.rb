@@ -283,7 +283,7 @@ module ReactiveRecord
           record.attributes.each do |attribute, value|
             if association = record.model.reflect_on_association(attribute)
               if association.collection?
-                value.each do |assoc|
+                [*value.all, *value.unsaved_children].each do |assoc|
                   add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of) or assoc.new?
                 end
               elsif record.new? || record.changed?(attribute) || (record == record_being_saved && force)

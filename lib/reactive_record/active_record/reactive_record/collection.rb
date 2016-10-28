@@ -2,6 +2,30 @@ module ReactiveRecord
 
   class Collection
 
+    class DummySet
+      def new
+        @master ||= super
+      end
+      def method_missing(*args)
+      end
+    end
+
+    def unsaved_children
+      old_uc_already_being_called = @uc_already_being_called
+      if @owner && @association
+        @unsaved_children ||= Set.new
+        unless @uc_already_being_called
+          @uc_already_being_called = true
+          #@owner.backing_record.update_attribute(@association.attribute)
+        end
+      else
+        @unsaved_children ||= DummySet.new
+      end
+      @unsaved_children
+    ensure
+      @uc_already_being_called = old_uc_already_being_called
+    end
+
     def initialize(target_klass, owner = nil, association = nil, *vector)
       @owner = owner  # can be nil if this is an outer most scope
       @association = association
@@ -59,9 +83,14 @@ module ReactiveRecord
       observed
       return !@collection unless other_collection.is_a? Collection
       other_collection.observed
-      my_collection = (@collection || []).select { |target| target != @dummy_record }
-      other_collection = (other_collection ? (other_collection.collection || []) : []).select { |target| target != other_collection.dummy_record }
-      my_collection == other_collection
+      my_children = (@collection || []).select { |target| target != @dummy_record }
+      if other_collection
+        other_children = (other_collection.collection || []).select { |target| target != other_collection.dummy_record }
+        return false unless my_children == other_children
+        unsaved_children.to_a == other_collection.unsaved_children.to_a
+      else
+        my_children.empty? && unsaved_children.empty?
+      end
     end
 
     def apply_scope(scope, *args)
@@ -93,6 +122,8 @@ module ReactiveRecord
       @target_klass
     end
 
+    attr_reader :client_collection
+
     def <<(item)
       return delete(item) if item.destroyed? # pushing a destroyed item is the same as removing it
       backing_record = item.backing_record
@@ -106,7 +137,9 @@ module ReactiveRecord
       end
       if item.id and @dummy_record
         @dummy_record.id = item.id
-        @collection.delete(@dummy_record)
+        # we cant use == because that just means the objects are referencing
+        # the same backing record.
+        @collection.reject { |i| i.object_id == @dummy_record.object_id }
         @dummy_record = @collection.detect { |r| r.backing_record.vector.last =~ /^\*[0-9]+$/ }
         @dummy_collection = nil
       end
@@ -150,17 +183,17 @@ module ReactiveRecord
       notify_of_change new_array
     end
 
-    def delete(item)
-      notify_of_change(if @owner and @association and inverse_of = @association.inverse_of
-        if backing_record = item.backing_record and backing_record.attributes[inverse_of] == @owner
-          # the if prevents double update if delete is being called from << (see << above)
-          backing_record.update_attribute(inverse_of, nil)
-        end
-        all.delete(item).tap { @owner.backing_record.update_attribute(@association.attribute) } # forces a check if association contents have changed from synced values
-      else
-        all.delete(item)
-      end)
-    end
+    # def delete(item)
+    #   notify_of_change(if @owner and @association and inverse_of = @association.inverse_of
+    #     if backing_record = item.backing_record and backing_record.attributes[inverse_of] == @owner
+    #       # the if prevents double update if delete is being called from << (see << above)
+    #       backing_record.update_attribute(inverse_of, nil)
+    #     end
+    #     all.delete(item).tap { @owner.backing_record.update_attribute(@association.attribute) } # forces a check if association contents have changed from synced values
+    #   else
+    #     all.delete(item)
+    #   end)
+    # end
 
     def loading?
       all # need to force initialization at this point

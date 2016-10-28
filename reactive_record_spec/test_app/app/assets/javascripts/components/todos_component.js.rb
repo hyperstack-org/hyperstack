@@ -1,6 +1,6 @@
-require 'reactrb'
+require 'hyper-react'
 require 'user'
-require 'reactive-record'
+require 'synchromesh'
 
 class TodosComponent
 

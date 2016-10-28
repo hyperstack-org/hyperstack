@@ -49,7 +49,7 @@ when either channel terminates, that will get resent to the other channel
 8) the console window will close
 
 1-4 + 7 are in a class RubyCon
-5-6 + 8 use reactrb-express in SAP
+5-6 + 8 use hyper-react-express in SAP
 
 
 

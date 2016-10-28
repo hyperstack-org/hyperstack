@@ -246,14 +246,23 @@ module ReactiveRecord
       all.collect(*args, &block)
     end
 
-    alias_method :pre_synchromesh_push, '<<'
+    def each_known_child
+      [*collection, *client_pushes].each { |i| yield i }
+    end
+
+
+    alias_method :force_push, '<<'
 
     def push(item)
       if collection
-        pre_synchromesh_push item
-      elsif !@count.nil?
-        @count += item.destroyed? ? -1 : 1
-        notify_of_change self
+        self.force_push item
+      else
+        unsaved_children << item
+        @owner.backing_record.update_attribute(@association.attribute) if @owner && @association
+        if !@count.nil?
+          @count += item.destroyed? ? -1 : 1
+          notify_of_change self
+        end
       end
       self
     end
@@ -267,6 +276,7 @@ module ReactiveRecord
     alias pre_synchromesh_replace replace
 
     def replace(new_array)
+      unsaved_children.clear
       new_array = new_array.to_a
       return self if new_array == @collection
       Base.load_data { pre_synchromesh_replace(new_array) }
@@ -274,6 +284,7 @@ module ReactiveRecord
     end
 
     def delete(item)
+      unsaved_children.delete(item)
       notify_of_change(
         if @owner && @association && (inverse_of = @association.inverse_of)
           if (backing_record = item.backing_record) && backing_record.attributes[inverse_of] == @owner
