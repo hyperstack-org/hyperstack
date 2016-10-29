@@ -82,6 +82,13 @@ module ActiveRecord
       end
     end
 
+    def itself
+      # this is useful when you just want to get a handle on record instance
+      # in the ReactiveRecord.load method
+      id # force load of id...
+      self
+    end
+
     def load(*attributes, &block)
       first_time = true
       ReactiveRecord.load do

@@ -217,7 +217,9 @@ module ReactiveRecord
                 value.attributes[inverse_of] << @ar_instance
               else
                 value.attributes[inverse_of] = Collection.new(@model, value, inverse_association)
-                value.attributes[inverse_of].replace [@ar_instance]
+                # value.attributes[inverse_of].replace [@ar_instance]
+                # why was the above not just the below???? fixed 10/28/2016
+                value.attributes[inverse_of] << @ar_instance
               end
             elsif !value.nil?
               attributes[attribute].attributes[inverse_of] = nil unless attributes[attribute].nil?
@@ -344,9 +346,9 @@ module ReactiveRecord
     end
 
     def revert
-      @changed_attributes.each do |attribute|
+      @changed_attributes.dup.each do |attribute|
         @ar_instance.send("#{attribute}=", @synced_attributes[attribute])
-        @attributes.delete(attribute) unless @synced_attributes.has_key?(attribute)
+        @attributes.delete(attribute) unless @synced_attributes.key?(attribute)
       end
       @changed_attributes = []
       @errors = nil

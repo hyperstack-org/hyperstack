@@ -141,13 +141,18 @@ if RUBY_ENGINE != 'opal'
     end
   end
 
-  Capybara.default_max_wait_time = 4.seconds
-  Capybara.server { |app, port|
-    require 'puma'
-    Puma::Server.new(app).tap do |s|
-      s.add_tcp_listener Capybara.server_host, port
-    end.run.join
-  }
+  #Capybara.default_max_wait_time = 4.seconds
+
+  Capybara.server = :puma
+
+  # The following is deprecated and replaced by the above... just make sure it works
+  # before removing
+  # Capybara.server { |app, port|
+  #   require 'puma'
+  #   Puma::Server.new(app).tap do |s|
+  #     s.add_tcp_listener Capybara.server_host, port
+  #   end.run.join
+  # }
 
   module WaitForAjax
 
@@ -253,7 +258,7 @@ if RUBY_ENGINE != 'opal'
     config.after(:each, :js => true) do
       page.instance_variable_set("@hyper_spec_mounted", false)
     end
-    
+
     config.include Capybara::DSL
 
     Capybara.register_driver :chrome do |app|

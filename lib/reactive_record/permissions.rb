@@ -66,18 +66,18 @@ class ActiveRecord::Base
         (@reactive_record_association_keys ||= []) << attr_name
         send "#{macro}_without_reactive_record_add_changed_method".to_sym, attr_name, *args, &block
       end
-      alias_method_chain macro, :reactive_record_add_changed_method
+      alias_method "#{macro}_without_reactive_record_add_changed_method".to_sym, macro
+      alias_method macro, "#{macro}_with_reactive_record_add_changed_method".to_sym
     end
 
-    def belongs_to_with_reactive_record_add_is_method(attr_name, scope = nil, options = {})
+    alias belongs_to_without_reactive_record_add_is_method belongs_to
+
+    def belongs_to(attr_name, scope = nil, options = {})
       define_method "#{attr_name}_is?".to_sym do |model|
         send(options[:foreign_key] || "#{attr_name}_id") == model.id
       end
       belongs_to_without_reactive_record_add_is_method(attr_name, scope, options)
     end
-
-    alias_method_chain :belongs_to, :reactive_record_add_is_method
-
   end
 
 

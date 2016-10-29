@@ -42,7 +42,6 @@ describe "synchronizing relationships", js: true do
           #ul { model.child_models.each { |model| li { model.child_attribute }}}
         end
       end
-      ReactiveRecord::Collection.hypertrace instrument: :all
     end
 
     page.should have_content("0 items")
@@ -76,19 +75,23 @@ describe "synchronizing relationships", js: true do
   it "adding child to a new model on client" do
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
+        define_state :foo
         before_mount do
           @parent = TestModel.new
+          @child = ChildModel.new
         end
         after_mount do
-          @parent.child_models << ChildModel.new
-          @parent.save
+          after(0) do # simulate external event updating system
+            @parent.child_models << @child
+            @parent.save
+          end
         end
         render(:div) do
-          "parent has #{@parent.child_models.count} children".tap { |s| puts s}
+          "parent has #{@parent.child_models.count} children"
         end
       end
     end
-    page.should have_content("parent has 1 children")
+    page.should have_content("parent has 1 children", wait: 1)
     expect(TestModel.first.child_models.count).to eq(1)
   end
 

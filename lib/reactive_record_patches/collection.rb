@@ -258,6 +258,7 @@ module ReactiveRecord
         self.force_push item
       else
         unsaved_children << item
+        update_child(item)
         @owner.backing_record.update_attribute(@association.attribute) if @owner && @association
         if !@count.nil?
           @count += item.destroyed? ? -1 : 1

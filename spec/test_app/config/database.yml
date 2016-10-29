@@ -5,21 +5,43 @@
 #   gem 'sqlite3'
 #
 default: &default
-  adapter: sqlite3
+  adapter: mysql2
+  encoding: utf8
+  username: root
+  password:
+  host: 127.0.0.1
+  port: 3306
   pool: 5
   timeout: 10000
 
 development:
   <<: *default
-  database: db/development.sqlite3
+  database: development_db_name
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: db/test.sqlite3
+  database: test_db_name
 
 production:
   <<: *default
-  database: db/production.sqlite3
+  database: production_db_name
+
+# default: &default
+#   adapter: sqlite3
+#   pool: 5
+#   timeout: 10000
+#
+# development:
+#   <<: *default
+#   database: db/development.sqlite3
+#
+# # Warning: The database defined as "test" will be erased and
+# # re-generated from your development database when you run "rake".
+# # Do not set this db to the same as development or production.
+# test:
+#   <<: *default
+#   database: db/test.sqlite3
+#
+# production:
+#   <<: *default
+#   database: db/production.sqlite3

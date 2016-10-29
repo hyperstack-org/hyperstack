@@ -292,7 +292,23 @@ You can of course simulate server side changes to your models through this conso
 
 ## Development
 
-Specs run in rspec/capybara/selenium. To run do:
+The original `ReactiveRecord` specs were written in opal-rspec.  These are being migrated to
+use server rspec with isomorphic helpers.  There are about 150 of the original tests left and to run
+these you
+
+1. cd to `reactive_record_spec/test_app`
+2. do a bundle install/update as needed,
+3. rake db:reset db:test:prepare,
+4. start the server: `bundle exec rails s`,
+5. then visit localhost/spec-opal.
+
+If you want to help **PLEASE** consider spending an hour and migrate a spec file to the new format.  You can
+find examples by looking in the `spec/reactive_record/` directory and matching to the original file in
+`reactive_record_test_app/spec_dont_run/moved_to_main_spec_dir`
+
+The remaining tests are run in the more traditional `bundle exec rake`
+
+or
 
 ```
 bundle exec rspec spec

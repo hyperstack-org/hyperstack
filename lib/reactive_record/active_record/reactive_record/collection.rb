@@ -124,10 +124,8 @@ module ReactiveRecord
 
     attr_reader :client_collection
 
-    def <<(item)
-      return delete(item) if item.destroyed? # pushing a destroyed item is the same as removing it
+    def update_child(item)
       backing_record = item.backing_record
-      all << item unless all.include? item # does this use == if so we are okay...
       if backing_record and @owner and @association and inverse_of = @association.inverse_of and item.attributes[inverse_of] != @owner
         current_association = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
@@ -135,6 +133,12 @@ module ReactiveRecord
         current_association.attributes[@association.attribute].delete(item) if current_association and current_association.attributes[@association.attribute]
         @owner.backing_record.update_attribute(@association.attribute) # forces a check if association contents have changed from synced values
       end
+    end
+
+    def <<(item)
+      return delete(item) if item.destroyed? # pushing a destroyed item is the same as removing it
+      all << item unless all.include? item # does this use == if so we are okay...
+      update_child(item)
       if item.id and @dummy_record
         @dummy_record.id = item.id
         # we cant use == because that just means the objects are referencing

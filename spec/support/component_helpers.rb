@@ -185,12 +185,23 @@ module ComponentTestHelpers
     JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
   end
 
-  def expect_promise(str="", opts={}, &block)
+  def expect_evaluate_ruby(str = '', opts = {}, &block)
     insure_mount
+    expect(evaluate_ruby(add_opal_block(str, block), opts))
+  end
+
+  def add_opal_block(str, block)
     # big assumption here is that we are going to follow this with a .to
     # hence .children.first followed by .children.last
     # probably should do some kind of "search" to make this work nicely
-    str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.first.children.last}" if block
+    return str unless block
+    "#{str}\n"\
+    "#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.first.children.last}"
+  end
+
+  def expect_promise(str = '', opts = {}, &block)
+    insure_mount
+    str = add_opal_block(str, block)
     str = "#{str}.then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     page.evaluate_script("window.hyper_spec_promise_result = false")
