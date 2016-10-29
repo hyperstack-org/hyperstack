@@ -10,6 +10,9 @@ describe React::Component, type: :component do
     stub_const 'Foo', Class.new
     Foo.class_eval do
       include React::Component
+      def initialize(native = nil)
+      end
+
       def render
         React.create_element('div')
       end
@@ -766,7 +769,7 @@ describe React::Component, type: :component do
       Foo.define_method :needs_update? do |next_params, next_state|
         next_params.changed?
       end
-      @foo = Foo.new
+      @foo = Foo.new(nil)
     end
 
     it "returns false if new and old params are the same" do
@@ -794,7 +797,7 @@ describe React::Component, type: :component do
       Foo.define_method :needs_update? do |next_params, next_state|
         next_state.changed?
       end
-      @foo = Foo.new
+      @foo = Foo.new(nil)
     end
 
     it "returns false if both new and old states are empty" do
