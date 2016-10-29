@@ -35,11 +35,11 @@ module React
           define_method("#{name}") do
             fetch_from_cache(name) do
               if param_type.respond_to? :_react_param_conversion
-                param_type._react_param_conversion props[name]
+                param_type._react_param_conversion props[name], nil
               elsif param_type.is_a?(Array) &&
                 param_type[0].respond_to?(:_react_param_conversion)
                 props[name].collect do |param|
-                  param_type[0]._react_param_conversion param
+                  param_type[0]._react_param_conversion param, nil
                 end
               else
                 props[name]
