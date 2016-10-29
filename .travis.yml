@@ -40,9 +40,12 @@ matrix:
   - rvm: jruby-19mode
     gemfile: gemfiles/opal_0.9_react_15.gemfile
   include:
-  - env: PHANTOMJS_VERSION=2.1.1
+  - rvm: 2.1
+    env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_0.10_react_13.gemfile
-  - env: PHANTOMJS_VERSION=2.1.1
+  - rvm: 2.1
+    env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_0.10_react_14.gemfile
-  - env: PHANTOMJS_VERSION=2.1.1
+  - rvm: 2.1
+    env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_0.10_react_15.gemfile
