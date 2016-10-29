@@ -20,9 +20,8 @@ rails_cache_dir/
 .bundle/
 log/*.log
 pkg/
-reactive_record_spec/test_app/db/*.sqlite3
-reactive_record_spec/test_app/log/
-reactive_record_spec/test_app/tmp/
-reactive_record_spec/test_app/.sass-cache
+reactive_record_test_app/db/*.sqlite3
+reactive_record_test_app/log/
+reactive_record_test_app/tmp/
+reactive_record_test_app/.sass-cache
 .DS_Store
-reactive_record_spec/test_app/tmp/
