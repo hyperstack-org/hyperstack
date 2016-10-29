@@ -34,7 +34,8 @@ module React
       component
     end
 
-    def self.native_react_component?(name)
+    def self.native_react_component?(name = nil)
+      return false unless name
       eval_native_react_component(name)
     rescue
       nil
