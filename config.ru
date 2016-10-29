@@ -4,6 +4,8 @@ Bundler.require
 require "opal/rspec"
 require "opal-jquery"
 
+Opal::Config.arity_check_enabled = true
+
 if Opal::RSpec.const_defined?("SprocketsEnvironment")
   sprockets_env = Opal::RSpec::SprocketsEnvironment.new
   sprockets_env.cache = Sprockets::Cache::FileStore.new("tmp")
