@@ -25,7 +25,7 @@ module React
 
     attr_accessor :waiting_on_resources
 
-    def initialize(native_element, type, properties, block)
+    def initialize(native_element, type = nil, properties = {}, block = nil)
       @type = type
       @properties = (`typeof #{properties} === 'undefined'` ? nil : properties) || {}
       @block = block
