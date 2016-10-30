@@ -96,7 +96,7 @@ module React
             end
             updates.each { |observer, args| observer.update_react_js_state(*args) }
           end
-        else
+        elsif @rendering_level == 0
           updates = Hash.new { |hash, key| hash[key] = Array.new }
           set_state2(object, name, value, updates)
           updates.each { |observer, args| observer.update_react_js_state(*args) }
