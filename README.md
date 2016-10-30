@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/ruby-hyperloop/reactrb.svg?branch=master)](https://travis-ci.org/reactrb/reactrb)
 [![Code Climate](https://codeclimate.com/github/reactrb/reactrb/badges/gpa.svg)](https://codeclimate.com/github/reactrb/reactrb)
-[![Gem Version](https://badge.fury.io/rb/reactrb.svg)](https://badge.fury.io/rb/reactrb)
+[![Gem Version](https://badge.fury.io/rb/hyper-react.svg)](https://badge.fury.io/rb/hyper-react)
 
 **hyper-react is an [Opal Ruby](http://opalrb.org) wrapper of
 [React.js library](https://facebook.github.io/react)**.
