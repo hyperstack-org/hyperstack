@@ -5,10 +5,10 @@ if RUBY_ENGINE == 'opal'
     raise [
       "No React.js Available",
       "",
-      "A global `React` must be defined before requiring 'reactrb'",
+      "A global `React` must be defined before requiring 'hyper-react'",
       "",
       "To USE THE BUILT-IN SOURCE: ",
-      "   add 'require \"react/react-source\"' immediately before the 'require \"reactrb\" directive.",
+      "   add 'require \"react/react-source\"' immediately before the 'require \"hyper-react\" directive.",
       "IF USING WEBPACK:",
       "   add 'react' to your webpack manifest."
     ].join("\n")
