@@ -147,6 +147,10 @@ module ReactiveRecord
           other_value.object_id == self.object_id
         end
 
+        def zero?
+          false
+        end
+
         def to_s
           notify
           ""
@@ -348,7 +352,7 @@ module ReactiveRecord
                 end
 
                 response.json[:saved_models].each do | item |
-                  backing_records[item[0]].sync_scopes
+                  backing_records[item[0]].sync_unscoped_collection!
                   backing_records[item[0]].errors! item[3]
                 end
 
@@ -381,14 +385,16 @@ module ReactiveRecord
       def self.find_record(model, id, vector, save)
         if !save
           found = vector[1..-1].inject(vector[0]) do |object, method|
-            if method.is_a? Array
-              if method[0] == "new"
+            if object.nil? # happens if you try to do an all on empty scope followed by more scopes
+              object
+            elsif method.is_a? Array
+              if method[0] == 'new'
                 object.new
               else
                 object.send(*method)
               end
-            elsif method.is_a? String and method[0] == "*"
-              object[method.gsub(/^\*/,"").to_i]
+            elsif method.is_a? String and method[0] == '*'
+              object[method.gsub(/^\*/,'').to_i]
             else
               object.send(method)
             end
@@ -403,6 +409,7 @@ module ReactiveRecord
           model.new
         end
       end
+
 
       def self.is_enum?(record, key)
         record.class.respond_to?(:defined_enums) && record.class.defined_enums[key]
@@ -588,7 +595,7 @@ module ReactiveRecord
               }.to_json
             }
           ).then do |response|
-            sync_scopes
+            sync_unscoped_collection!
             yield response.json[:success], response.json[:message] if block
             promise.resolve response.json
           end

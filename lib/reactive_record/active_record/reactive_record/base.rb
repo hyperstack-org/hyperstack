@@ -65,27 +65,11 @@ module ReactiveRecord
       @class_scopes[model.base_class]
     end
 
-    def self.sync_blocks
-      # @sync_blocks[watch_model][sync_model][scope_name][...array of blocks...]
-      @sync_blocks ||= Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = [] } } }
-    end
+    # def self.sync_blocks
+    #   # @sync_blocks[watch_model][sync_model][scope_name][...array of blocks...]
+    #   @sync_blocks ||= Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = [] } } }
+    # end
 
-    def sync_scopes
-      self.class.sync_blocks[self.model].each do |watching_class, scopes|
-        scopes.each do |scope_name, blocks|
-          blocks.each do |block|
-            if block.arity > 0
-              block.call watching_class.send(scope_name), @ar_instance
-            elsif @ar_instance.instance_eval &block
-              watching_class.send(scope_name) << @ar_instance
-            else
-              watching_class.send(scope_name).delete(@ar_instance)
-            end
-          end
-        end
-      end
-      model.all << @ar_instance if ReactiveRecord::Base.class_scopes(model)[:all] # add this only if model.all has been fetched already
-    end
 
     def self.find(model, attribute, value)
       # will return the unique record with this attribute-value pair

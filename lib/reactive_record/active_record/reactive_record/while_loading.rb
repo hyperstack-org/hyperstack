@@ -85,6 +85,10 @@ module ReactiveRecord
       @css_to_preload << css << "\n"
     end
 
+    def self.has_observers?
+      React::State.has_observers?(self, :loaded_at)
+    end
+
     prerender_footer do
       "<style>\n#{@css_to_preload}\n</style>".tap { @css_to_preload = ""}
     end

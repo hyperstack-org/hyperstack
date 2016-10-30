@@ -2,9 +2,9 @@ module ReactiveRecord
   # patches and new methods
   class Base
     # replacement for sync_scopes
-    def sync_scopes
-      sync_unscoped_collection!
-    end
+    # def sync_scopes
+    #   sync_unscoped_collection!
+    # end
 
     # called when we have a newly created record, to initialize
     # any nil collections to empty arrays.  We can do this because
