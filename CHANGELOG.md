@@ -18,11 +18,16 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
-## [0.9.1] - Unreleased
+## [0.10.0] - 2016-10-30
+
+### Changed
+
+- This gem is now renamed to `hyper-react`, see [UPGRADING](UPGRADING.md) for details.
 
 ### Fixed
 
 - ReactJS functional stateless component could not be imported from `NativeLibrary`. Note that functional component is only supported in React v14+.  (#162)
+- Prerender log got accumulated between reqeusts. (#176)
 
 ## [0.9.0] - 2016-10-19
 

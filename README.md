@@ -13,7 +13,7 @@ and true React.js engine. :heart:
 
 Visit [ruby-hyperloop.io](http://ruby-hyperloop.io) for the full story.
 
-### Important: `react.rb`, `reactive-ruby` and `reactrb` gems are **deprecated.**. See [**UPGRADING**](UPGRADING.md) for details.
+### Important: `react.rb`, `reactive-ruby` and `reactrb` gems are **deprecated**. See [**UPGRADING**](UPGRADING.md) for details.
 
 ## Installation
 
