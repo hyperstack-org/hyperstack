@@ -136,25 +136,18 @@ describe "integration with react" do
   end
 
   rendering("an aggregation") do
-    puts "***************** an aggregation ************************"
     User.find_by_email("mitch@catprint.com").address.city
   end.should_generate do
     html == "Rochester"
   end
 
   rendering("a record that is updated multiple times") do
-    puts "************** multiple times **********************"
-    begin
     unless @record
       @record = User.new
       @record.attributes[:all_done] = false
       @record.attributes[:test_done] = false
       @record.attributes[:counter] = 0
     end
-  rescue Exception => e
-    puts "POW #{e}"
-  end
-    puts "rendering #{@record} #{@record.attributes[:counter]}"
     after(0.1) do
       puts "update counter timer expired, @record.test_done = #{!!@record.test_done}"
       @record.counter = @record.counter + 1 unless @record.test_done

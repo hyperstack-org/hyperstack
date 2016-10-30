@@ -20,6 +20,8 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/associations"
   require "reactive_record/active_record/reactive_record/base"
   require "reactive_record/active_record/reactive_record/collection"
+  require "reactive_record/active_record/reactive_record/scoped_collection"
+  require "reactive_record/active_record/reactive_record/unscoped_collection"
   require "reactive_record/active_record/class_methods"
   require "reactive_record/active_record/instance_methods"
   require "reactive_record/active_record/base"

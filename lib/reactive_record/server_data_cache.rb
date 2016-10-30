@@ -310,7 +310,7 @@ module ReactiveRecord
           elsif !target
             load_from_json(value, Object.const_get(method))
           elsif method == "*count"
-            target.instance_variable_set(:@count, value.first)
+            target.set_count_state(value.first)
           elsif method.is_a? Integer or method =~ /^[0-9]+$/
             target << (new_target = target.proxy_association.klass.find(method))
           elsif method.is_a? Array

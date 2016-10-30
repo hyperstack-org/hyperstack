@@ -8,13 +8,17 @@ Its Isomorphic Ruby in action.
 In other words browser 1 creates, updates, or destroys a model, and the changes persisted in
 active record models and are broadcast to all other clients.
 
-Add the gem, setup your configuration, and HyperMesh does the rest.
-
 ## Quick Start Guides
 
 Use one of the following guides if you are in a hurry to get going.
 
-The easiest way to get setup is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
+If you don't care about synchronizing clients (i.e you just want a simple single client CRUD type application) use this
+[guide.](docs/no_synchronization_quickstart.md)
+
+Otherwise you will need to choose a data push transports.  The following guides add the additional configuration
+information needed to get 2 way push communications back to the clients.
+
+The easiest way to setup client push is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
 
 If you are already using Pusher follow this [guide.](docs/pusher_quickstart.md)
 
@@ -26,8 +30,8 @@ All of the above use websockets.  For ultimate simplicity use Polling as explain
 
 HyperMesh is built on top of HyperReact.
 
-+ HyperReact is a ruby wrapper on Facebook's React.js library.  As data changes on the client (either from user interactions or external events) HyperReact re-draws whatever parts of the display as needed.
-+ HyperMesh provides a [flux dispatcher and data store](https://facebook.github.io/flux/docs/overview.html) backing_record by [Rails Active Record models](http://guides.rubyonrails.org/active_record_basics.html). HyperReact to render and then dynamically update your ActiveRecord models on the client.
++ HyperReact is a ruby DSL (Domain Specific Language) to build [React.js](https://facebook.github.io/react/) UI components in Ruby.  As data changes on the client (either from user interactions or external events) HyperReact re-draws whatever parts of the display is needed.
++ HyperMesh provides a [flux dispatcher and data store](https://facebook.github.io/flux/docs/overview.html) backed by [Rails Active Record models](http://guides.rubyonrails.org/active_record_basics.html). You access your model data in your HyperReact components just like you would on the server or in an ERB or HAML view file.
 + HyperMesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
 
 A minimal HyperMesh configuration consists of a simple initializer file, and at least one *Policy* class that will *authorize* who gets to see what.
