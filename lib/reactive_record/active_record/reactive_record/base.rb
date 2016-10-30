@@ -297,16 +297,47 @@ module ReactiveRecord
       @errors ||= ActiveModel::Error.new
     end
 
-    def sync!(hash = {})  # does NOT notify (see saved! for notification)
+    # called when we have a newly created record, to initialize
+    # any nil collections to empty arrays.  We can do this because
+    # if its a brand new record, then any collections that are still
+    # nil must not have any children.
+    def initialize_collections
+      if (!vector || vector.empty?) && id && id != ''
+        @vector = [@model, ["find_by_#{@model.primary_key}", id]]
+      end
+      @model.reflect_on_all_associations.each do |assoc|
+        if assoc.collection? && attributes[assoc.attribute].nil?
+          ar_instance.send("#{assoc.attribute}=", [])
+        end
+      end
+    end
+
+    # sync! now will also initialize any nil collections
+    def sync!(hash = {}) # does NOT notify (see saved! for notification)
       @attributes.merge! hash
       @synced_attributes = {}
       @synced_attributes.each { |attribute, value| sync_attribute(key, value) }
       @changed_attributes = []
       @saving = false
       @errors = nil
-      # set the vector - this only happens when a new record is saved
-      @vector = [@model, ["find_by_#{@model.primary_key}", id]] if (!vector or vector.empty?) and id and id != ""
+      # set the vector and clear collections - this only happens when a new record is saved
+      initialize_collections if (!vector || vector.empty?) && id && id != ''
       self
+    end
+
+    # this keeps the unscoped collection up to date.
+    # @destroy_sync and @create_sync prevent multiple insertions
+    # to collections that just have a count
+    def sync_unscoped_collection!
+      if destroyed
+        return if @destroy_sync
+        @destroy_sync = true
+      else
+        return if @create_sync
+        @create_sync = true
+      end
+      model.unscoped << ar_instance
+      @synced_with_unscoped = !@synced_with_unscoped
     end
 
     def sync_attribute(attribute, value)
@@ -327,6 +358,12 @@ module ReactiveRecord
 
       @changed_attributes.delete(attribute)
       value
+    end
+
+    # helper so we can tell if model exists.  We need this so we can detect
+    # if a record has local changes that are out of sync.
+    def self.exists?(model, id)
+      @records[model].detect { |record| record.attributes[model.primary_key] == id }
     end
 
     def revert

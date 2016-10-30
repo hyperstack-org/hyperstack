@@ -10,6 +10,7 @@ module ReactiveRecord
       if RUBY_ENGINE != 'opal'
         @server_data_cache = ReactiveRecord::ServerDataCache.new(context.controller.acting_user, {})
       else
+        @outer_scopes = Set.new
         @fetch_scheduled = nil
         @records = Hash.new { |hash, key| hash[key] = [] }
         @class_scopes = Hash.new { |hash, key| hash[key] = {} }
