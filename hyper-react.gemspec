@@ -4,12 +4,12 @@ $:.push File.expand_path('../lib/', __FILE__)
 require 'reactive-ruby/version'
 
 Gem::Specification.new do |s|
-  s.name         = 'reactrb'
+  s.name         = 'hyper-react'
   s.version      = React::VERSION
 
   s.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn']
   s.email        = 'reactrb@catprint.com'
-  s.homepage     = 'http://reactrb.org'
+  s.homepage     = 'http://ruby-hyperloop.io/gems/reactrb/'
   s.summary      = 'Opal Ruby wrapper of React.js library.'
   s.license      = 'MIT'
   s.description  = "Write React UI components in pure Ruby."

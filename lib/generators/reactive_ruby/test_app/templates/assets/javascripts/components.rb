@@ -1,4 +1,4 @@
 require 'opal'
 require 'react/react-source'
-require 'reactrb'
+require 'hyper-react'
 require_tree './components'

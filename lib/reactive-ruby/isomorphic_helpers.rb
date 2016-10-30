@@ -6,12 +6,20 @@ module React
 
     if RUBY_ENGINE != 'opal'
       def self.load_context(ctx, controller, name = nil)
+        puts "************************** React Server Context Initialized #{name} *********************************************"
         @context = Context.new("#{controller.object_id}-#{Time.now.to_i}", ctx, controller, name)
       end
     else
       def self.load_context(unique_id = nil, name = nil)
         # can be called on the client to force re-initialization for testing purposes
         if !unique_id || !@context || @context.unique_id != unique_id
+          if on_opal_server?
+           `console.history = []` rescue nil
+            message = "************************ React Prerendering Context Initialized #{name} ***********************"
+          else
+            message = "************************ React Browser Context Initialized ****************************"
+          end
+          log(message)
           @context = Context.new(unique_id)
         end
         @context
@@ -65,10 +73,10 @@ module React
       self.class.on_opal_client?
     end
 
-    def self.prerender_footers
-      footer = Context.prerender_footer_blocks.collect { |block| block.call }.join("\n")
+    def self.prerender_footers(controller = nil)
+      footer = Context.prerender_footer_blocks.collect { |block| block.call controller }.join("\n")
       if RUBY_ENGINE != 'opal'
-        footer = (footer + "#{@context.send_to_opal(:prerender_footers)}") if @context
+        footer = (footer + @context.send_to_opal(:prerender_footers).to_s) if @context
         footer = footer.html_safe
       end
       footer
