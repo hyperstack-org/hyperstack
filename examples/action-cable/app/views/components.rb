@@ -12,6 +12,6 @@ end
 require 'reactrb-router'
 require 'react_router'
 require 'reactive-record'
-require 'synchromesh'
+require 'hyper-mesh'
 require 'models'
 require_tree './components'

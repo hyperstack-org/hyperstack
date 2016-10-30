@@ -7,9 +7,9 @@ if React::IsomorphicHelpers.on_opal_client?
   #require 'browser' # breaks poltergeist
   require 'browser/interval'
   require 'browser/delay'
-  require 'synchromesh/pusher'
+  require 'hyper-mesh/pusher'
 end
 #require 'reactive-record'
-require 'synchromesh'
+require 'hyper-mesh'
 require '_react_public_models'
 require_tree './components'

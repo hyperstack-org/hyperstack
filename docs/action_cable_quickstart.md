@@ -20,7 +20,7 @@ If you have not already installed the `hyper-react` and `reactive-record` gems, 
 - ~~add `gem 'synchromesh'` to your gem file~~  
 - add `gem 'synchromesh', git: 'https://github.com/hyper-react/synchromesh', branch: 'authorization-policies'`
 - then `bundle install`  
-- and in `app/views/components.rb` add `require 'synchromesh'`  
+- and in `app/views/components.rb` add `require 'hyper-mesh'`  
  immediately below`require 'reactive-record'`
 
 #### 4 Set the transport

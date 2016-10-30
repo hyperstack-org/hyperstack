@@ -1,5 +1,4 @@
 require 'opal'
-require 'synchromesh'
-#require 'synchromesh'
+require 'hyper-mesh'
 require 'models'
 require_tree './components'

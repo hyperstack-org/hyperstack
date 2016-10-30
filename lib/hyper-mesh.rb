@@ -25,7 +25,7 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/base"
   require "reactive_record/interval"
   require_relative 'active_record_base'
-  require_relative 'synchromesh/version'
+  require_relative 'hypermesh/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'
   #require_relative 'reactive_record_patches/base'
@@ -42,7 +42,7 @@ else
   require "reactive_record/pry"
   require_relative 'active_record_base'
   require 'synchromesh/synchromesh_controller'
-  require 'synchromesh/version'
+  require 'hypermesh/version'
   require 'synchromesh/connection'
   require 'synchromesh/synchromesh'
   require 'synchromesh/policy'

@@ -1,6 +1,5 @@
-require 'hyper-react'
 require 'user'
-require 'synchromesh'
+require 'hyper-mesh'
 
 class TodosComponent
 

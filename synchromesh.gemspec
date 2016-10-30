@@ -1,18 +1,21 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
 
-require 'synchromesh/version'
+require 'hypermesh/version'
 
 Gem::Specification.new do |s|
 
-    s.name          = "synchromesh"
-    s.version       = Synchromesh::VERSION
+    s.name          = "hyper-mesh"
+    s.version       = Hypermesh::VERSION
     s.authors       = ["Mitch VanDuyn"]
     s.email         = ["mitch@catprint.com"]
 
-    s.summary       = "Synchronization of active record models across multiple clients using Pusher, ActionCable, or Polling"
-    s.description   = "Work in progress"
-    s.homepage      = "https://github.com/reactive-ruby/synchromesh"
+    s.summary       = "React based CRUD access and Synchronization of active record models across multiple clients"
+    s.description   = "Hyper-mesh is a policy based CRUD system which wraps ActiveRecord models on the server and extends "\
+                      "them to the client. Furthermore it implements push notifications (via a number of possible "\
+                      "technologies) so changes to records in use by clients are pushed to those clients if authorised. "\
+                      "Its Isomorphic Ruby in action."
+    s.homepage      = "https://github.com/reactive-ruby/hyper-mesh"
     s.license       = "MIT"
 
     s.files          = `git ls-files`.split("\n")
@@ -20,23 +23,21 @@ Gem::Specification.new do |s|
     s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
     s.require_paths  = ['lib']
     s.add_dependency 'activerecord', '>= 0.3.0'
-    s.add_dependency 'hyper-react'
+    s.add_dependency 'hyper-react', '>= 0.10.0'
 
     s.add_development_dependency 'bundler', '~> 1.8'
     s.add_development_dependency 'rake', '~> 10.0'
-    s.add_development_dependency 'rspec-rails'#, '3.3.3'
+    s.add_development_dependency 'rspec-rails'
     s.add_development_dependency 'timecop'
-    #s.add_development_dependency 'opal-rspec'#, '0.4.3'
 
     # For Test Rails App
     s.add_development_dependency 'rails', '~>5.0.0' #'4.2.4'
-    s.add_development_dependency 'react-rails'#, '1.3.1'
-    s.add_development_dependency 'opal-rails'#, '0.8.1'
+    s.add_development_dependency 'react-rails'
+    s.add_development_dependency 'opal-rails'
     s.add_development_dependency 'factory_girl_rails'
     s.add_development_dependency 'reactrb-rails-generator'
     s.add_development_dependency 'rspec-wait'
     s.add_development_dependency 'puma'
-    #s.add_development_dependency 'thin'
 
     s.add_development_dependency 'pusher'
     s.add_development_dependency 'pusher-fake'

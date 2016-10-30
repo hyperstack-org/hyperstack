@@ -1,18 +1,4 @@
 PATH
-  remote: ../../../hyper-trace
-  specs:
-    hyper-trace (0.3.1)
-      opal
-
-PATH
-  remote: ../../../reactrb
-  specs:
-    hyper-react (0.9.0)
-      opal (>= 0.8.0)
-      opal-activesupport (>= 0.2.0)
-      react-rails
-
-PATH
   remote: ../..
   specs:
     synchromesh (0.4.0)
@@ -84,6 +70,11 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hike (1.2.3)
+    hyper-react (0.10.0)
+      opal (>= 0.8.0)
+      opal-activesupport (>= 0.2.0)
+      react-rails
+    hyper-trace (0.3.0)
     i18n (0.7.0)
     jbuilder (2.6.0)
       activesupport (>= 3.0.0, < 5.1)
@@ -234,8 +225,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
-  hyper-react!
-  hyper-trace!
+  hyper-trace
   jbuilder (~> 2.0)
   jquery-rails
   jquery-ui-rails

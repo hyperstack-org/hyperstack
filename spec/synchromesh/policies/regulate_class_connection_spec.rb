@@ -1,5 +1,4 @@
 require 'spec_helper'
-#require 'synchromesh/test_components'
 
 describe "regulate class connections" do
 

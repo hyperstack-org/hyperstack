@@ -1,4 +1,4 @@
-require 'synchromesh'
+require 'hyper-mesh'
 
 Rails.application.routes.draw do
   mount ReactiveRecord::Engine => "/rr"
