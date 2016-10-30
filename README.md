@@ -1,7 +1,7 @@
 # hyper-react
 
 [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/reactrb/reactrb.svg?branch=master)](https://travis-ci.org/reactrb/reactrb)
+[![Build Status](https://travis-ci.org/ruby-hyperloop/reactrb.svg?branch=master)](https://travis-ci.org/reactrb/reactrb)
 [![Code Climate](https://codeclimate.com/github/reactrb/reactrb/badges/gpa.svg)](https://codeclimate.com/github/reactrb/reactrb)
 [![Gem Version](https://badge.fury.io/rb/reactrb.svg)](https://badge.fury.io/rb/reactrb)
 
@@ -11,7 +11,7 @@
 It lets you write reactive UI components, with Ruby's elegance using the tried
 and true React.js engine. :heart:
 
-Visit [** ruby-hyperloop.io**](http://ruby-hyperloop.io) for the full story.
+Visit [ruby-hyperloop.io](http://ruby-hyperloop.io) for the full story.
 
 ### Important: `react.rb`, `reactive-ruby` and `reactrb` gems are **deprecated.**. See [**UPGRADING**](UPGRADING.md) for details.
 
@@ -21,7 +21,7 @@ Install the gem, or load the js library
 
 1. Add `gem 'hyper-react'` to your **Gemfile**
 2. Or `gem install hyper-react`
-3. Or install (or load via cdn) from [reactrb-express.js](http://github.com/reactrb/reactrb-express)
+3. Or install (or load via cdn) from [reactrb-express.js](http://github.com/ruby-hyperloop/reactrb-express)
 
 For gem installation it is highly recommended to read the [getting started](http://ruby-hyperloop.io/get_started/) and [installation](http://ruby-hyperloop.io/installation/) guides at [ruby-hyperloop.io.](http://ruby-hyperloop.io)
 
@@ -99,7 +99,7 @@ Please let us know either at [Gitter.im](https://gitter.im/reactrb/chat) or [via
 
 `git clone` the project.
 
-To play with some live examples, refer to https://github.com/reactrb/reactrb-examples.
+To play with some live examples, refer to https://github.com/ruby-hyperloop/reactrb-examples.
 
 Note that these are very simple examples, for the purpose of showing how to configure the gem in various server environments.  For more examples and information see [ruby-hyperloop.io.](http://ruby-hyperloop.io)
 
