@@ -576,13 +576,7 @@ module ReactiveRecord
 
         return if @destroyed
 
-        model.reflect_on_all_associations.each do |association|
-          if association.collection?
-            attributes[association.attribute].replace([]) if attributes[association.attribute]
-          else
-            @ar_instance.send("#{association.attribute}=", nil)
-          end
-        end
+        destroy_associations
 
         promise = Promise.new
 

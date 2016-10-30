@@ -28,7 +28,7 @@ if RUBY_ENGINE == 'opal'
   require_relative 'synchromesh/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'
-  require_relative 'reactive_record_patches/base'
+  #require_relative 'reactive_record_patches/base'
   require_relative 'reactive_record_patches/collection'
   require_relative 'reactive_record/scope_description'
 else
