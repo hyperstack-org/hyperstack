@@ -14,7 +14,7 @@ module React
         # can be called on the client to force re-initialization for testing purposes
         if !unique_id || !@context || @context.unique_id != unique_id
           if on_opal_server?
-           `console.history = []` rescue nil  # <<<<<<<<<<----- add this line
+           `console.history = []` rescue nil
             message = "************************ React Prerendering Context Initialized #{name} ***********************"
           else
             message = "************************ React Browser Context Initialized ****************************"
