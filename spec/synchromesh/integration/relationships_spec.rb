@@ -159,6 +159,96 @@ describe "synchronizing relationships", js: true do
     page.should have_content("Count of TestModel: 0")
   end
 
+  context "updating a client scoped method when applied to a collection" do
+
+    before(:each) do
+
+      isomorphic do
+        ChildModel.class_eval do
+          scope :boo_ha, -> { all }, client: -> { true }
+        end
+      end
+
+      m = FactoryGirl.create(:test_model, test_attribute: 'hello')
+      FactoryGirl.create(:child_model, test_model: m)
+
+      mount "TestComponent3" do
+        class TestComponent3 < React::Component::Base
+          render(OL) do
+            TestModel.all[0].child_models.boo_ha.each do |child|
+              LI { "child id = #{child.id} "}
+            end
+          end
+        end
+      end
+      page.should have_content('child id = 1')
+    end
+
+    it "will update when sent from the server" do
+      ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
+      page.should have_content('child id = 2')
+    end
+
+    it "will update when sent from the client" do
+      evaluate_ruby do
+        ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
+      end
+      page.should have_content('child id = 2')
+      evaluate_ruby do
+        ReactiveRecord::Collection.hypertrace instrument: :all
+        ReactiveRecord::Collection.hypertrace :class, instrument: :all
+        ReactiveRecord::Base.hypertrace instrument: :sync_unscoped_collection!
+        ReactiveRecord::ScopeDescription.hypertrace instrument: :all
+
+        ChildModel.find(1).destroy
+      end
+      page.should_not have_content('child id = 1', wait: 1)
+    end
+
+  end
+
+  context "updating a has_many relationship" do
+
+    before(:each) do
+
+      m = FactoryGirl.create(:test_model, test_attribute: 'hello')
+      FactoryGirl.create(:child_model, test_model: m)
+
+      mount "TestComponent3" do
+        class TestComponent3 < React::Component::Base
+          render(OL) do
+            TestModel.all[0].child_models.each do |child|
+              LI { "child id = #{child.id} "}
+            end
+          end
+        end
+      end
+      page.should have_content('child id = 1')
+    end
+
+    it "will update when sent from the server" do
+      ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
+      page.should have_content('child id = 2')
+    end
+
+    it "will update when sent from the client" do
+      # ReactiveRecord::Collection.hypertrace instrument: :all
+      # ReactiveRecord::Collection.hypertrace :class, instrument: :all
+      # ReactiveRecord::Base.hypertrace instrument: :sync_unscoped_collection!
+      # ReactiveRecord::ScopeDescription.hypertrace instrument: :all
+
+      evaluate_ruby do
+        ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
+      end
+      page.should have_content('child id = 2')
+      evaluate_ruby do
+        ChildModel.find(1).destroy
+      end
+      page.should_not have_content('child id = 1', wait: 1)
+    end
+
+  end
+
   it "composed_of"
 
 end

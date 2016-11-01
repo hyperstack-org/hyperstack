@@ -5,15 +5,18 @@ module ReactiveRecord
   # filter proc
   class ScopeDescription
     def initialize(model, name, opts)
-      ScopeDescription.all[model][name] = self
+      sself = self
+      model.singleton_class.send(:define_method, "_#{name}_synchromesh_scope_description_") do
+        sself
+      end
       @filter_proc = filter_proc(opts)
       @name = name
       @model = model
       build_joins opts[:joins]
     end
 
-    def self.all
-      @all ||= Hash.new { |h, k| h[k] = {} }
+    def self.find(target_model, name)
+      target_model.send "_#{name}_synchromesh_scope_description_"
     end
 
     def filter?

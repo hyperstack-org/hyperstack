@@ -30,9 +30,56 @@ All of the above use websockets.  For ultimate simplicity use Polling as explain
 
 HyperMesh is built on top of HyperReact.
 
-+ HyperReact is a ruby DSL (Domain Specific Language) to build [React.js](https://facebook.github.io/react/) UI components in Ruby.  As data changes on the client (either from user interactions or external events) HyperReact re-draws whatever parts of the display is needed.
++ HyperReact is a Ruby DSL (Domain Specific Language) to build [React.js](https://facebook.github.io/react/) UI components in Ruby.  As data changes on the client (either from user interactions or external events) HyperReact re-draws whatever parts of the display is needed.
 + HyperMesh provides a [flux dispatcher and data store](https://facebook.github.io/flux/docs/overview.html) backed by [Rails Active Record models](http://guides.rubyonrails.org/active_record_basics.html). You access your model data in your HyperReact components just like you would on the server or in an ERB or HAML view file.
-+ HyperMesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
++ If a push transport is connected HyperMesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
+
+For example consider a simple model called `Dictionary` which might be part of Wiktionary type app.
+
+```ruby
+class Dictionary < ActiveRecord::Base
+
+  # attributes
+  #   word: string
+  #   definition: text
+  #   pronunciation: string
+
+  scope :defined, -> { 'definition IS NOT NULL AND pronunciation IS NOT NULL' }
+end
+```
+
+Here would be very simple component that shows a random word from the dictionary:
+
+```ruby
+class WordOfTheDay < React::Component::Base
+
+  # The current word is stored in the
+  # entry state variable.   We use a state
+  # variable so that the display will refresh
+  # when the user chooses a new word
+
+  define_state :entry
+
+  def pick_entry!  
+    # pick a random word and assign the selected record to entry
+    # the ! will notify react that the state is changing.
+    state.entry! Dictionary.defined.all[rand(Dictionary.defined.length)]
+  end
+
+  # before we mount our component pick an entry
+
+  before_mount :pick_entry
+
+  render(DIV) do
+    DIV { "total definitions: #{Word.defined.count}" }
+    DIV do
+      DIV { state.entry.word }
+      DIV { state.entry.pronunciation }
+      DIV { state.entry.definition }
+      BUTTON { 'pick another' }.on(:click) { pick_entry! }
+    end
+  end
+```    
 
 A minimal HyperMesh configuration consists of a simple initializer file, and at least one *Policy* class that will *authorize* who gets to see what.
 

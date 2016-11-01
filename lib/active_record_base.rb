@@ -47,6 +47,7 @@ module ActiveRecord
         alias pre_synchromesh_method_missing method_missing
 
         def method_missing(name, *args, &block)
+          #return get_by_index(*args).first if name == "[]"
           return all.send(name, *args, &block) if [].respond_to?(name)
           if name =~ /\!$/
             return send(name.gsub(/\!$/,''), *args, &block).send(:reload_from_db) rescue nil
@@ -165,6 +166,10 @@ module ActiveRecord
         Synchromesh.after_commit :destroy, self
       end
     else
+
+      scope :limit, ->() {}
+      scope :offset, ->() {}
+
       def update_attribute(attr, value, &block)
         send("#{attr}=", value)
         save(validate: false, &block)

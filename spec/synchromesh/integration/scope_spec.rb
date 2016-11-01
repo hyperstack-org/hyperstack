@@ -550,5 +550,4 @@ describe "synchronized scopes", js: true do
     FactoryGirl.create(:test_model, test_attribute: 2)
     page.should have_content('test attributes: 2, 1')
   end
-
 end

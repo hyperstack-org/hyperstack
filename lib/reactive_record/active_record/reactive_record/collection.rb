@@ -150,7 +150,20 @@ module ReactiveRecord
     end
 
     def filter?
-      false
+      true # was false but... actually its true
+    end
+
+    def joins_with?(record) # did not exist because filter? was returning false
+      record.class == @target_klass
+    end
+
+    def related_records_for(record) # did not exist because? filter was always false
+      return [] if !@association || record.backing_record.attributes[@association.inverse_of] != @owner
+      [record]
+    end
+
+    def filter_records(parent_collection)
+      raise "we should never get here...."
     end
 
     def collector?
@@ -167,19 +180,28 @@ module ReactiveRecord
     end
 
     def set_pre_sync_related_records(related_records, _record = nil)
-      @pre_sync_related_records = related_records.intersection([*@collection])
+      #related_records = related_records.intersection([*@collection])
+      @pre_sync_related_records = in_this_collection related_records
       live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
     def sync_scopes(related_records, record, filtering = true)
-      related_records = related_records.intersection([*@collection])
+      #related_records = related_records.intersection([*@collection])
+      related_records = in_this_collection related_records
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
+      notify_of_change unless related_records.empty?
     ensure
       @pre_sync_related_records = nil
     end
 
+    def in_this_collection(related_records)
+      related_records.delete_if do |r|
+        r.backing_record.attributes[@association.inverse_of] != @owner
+      end
+    end
+
     def apply_scope(name, *vector)
-      build_child_scope(ScopeDescription.all[@target_klass][name], *name, *vector)
+      build_child_scope(ScopeDescription.find(@target_klass, name), *name, *vector)
     end
 
     def child_scopes
@@ -260,7 +282,6 @@ module ReactiveRecord
     end
 
     def count
-      puts "&&&&&&&&&&&& #{self}.count &&&&&&&&&&&&&&"
       observed
       if @collection
         @collection.count
