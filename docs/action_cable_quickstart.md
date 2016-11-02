@@ -18,8 +18,8 @@ If you have not already installed the `reactrb` and `reactive-record` gems, then
 #### 3 Reactrb and ReactiveRecord is replaced with HyperMesh
 
 - replace the `'reactive-record'` and `'reactrb'` gems with  
-`gem 'hyper-mesh', git: 'https://github.com/ruby-hyperloop/synchromesh'
-**note: you must remove 'reactive-record'**
+`gem 'hyper-mesh', git: 'https://github.com/ruby-hyperloop/hyper-mesh'`  
+**note:** you must remove `gem 'reactive-record'`
 - then `bundle install`  
 - and in `app/views/components.rb` replace `require 'reactive-record'` with `require 'hyper-mesh'`  
 
