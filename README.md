@@ -2,10 +2,11 @@
 
 HyperMesh is a policy based CRUD system which wraps ActiveRecord models on the server and extends
 them to the client. Furthermore it implements push notifications (via a number of possible
-technologies) so changes to records in use by clients are pushed to those clients if authorised.
+technologies) so changes to records on the server are pushed to all authorised clients.
+
 Its Isomorphic Ruby in action.
 
-In other words browser 1 creates, updates, or destroys a model, and the changes persisted in
+In other words browser 1 creates, updates, or destroys a model, and the changes are persisted in
 active record models and are broadcast to all other clients.
 
 ## Quick Start Guides
@@ -15,8 +16,8 @@ Use one of the following guides if you are in a hurry to get going.
 If you don't care about synchronizing clients (i.e you just want a simple single client CRUD type application) use this
 [guide.](docs/no_synchronization_quickstart.md)
 
-Otherwise you will need to choose a data push transports.  The following guides add the additional configuration
-information needed to get 2 way push communications back to the clients.
+Otherwise you will need to choose a data push transport.  The following guides add the additional configuration
+information needed to get two way push communications back to the clients.
 
 The easiest way to setup client push is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
 
@@ -276,8 +277,10 @@ end
 - No policy class:  
 If you don't define a policy file, nothing will happen because nothing will get connected.  
 By default HyperMesh will look for a `ApplicationPolicy` class.
+
 - Wrong version of pusher-fake  (pusher-fake/base vs. pusher-fake/rspec)  
 See the Pusher-Fake gem repo for details.
+
 - Forgetting to add require pusher in application.js file  
 this results in an error like this:
 ```text
@@ -285,13 +288,16 @@ Exception raised while rendering #<TopLevelRailsComponent:0x53e>
     ReferenceError: Pusher is not defined
 ```  
 To resolve make sure you `require 'pusher'` in your application.js file if using pusher.
+
 - No create/update/destroy policies
 You must explicitly allow changes to the models to be made by the client. If you don't you will
 see 500 responses from the server when you try to update.  To open all access do this in
 your application policy: `allow_change(to: :all, on: [:create, :update, :destroy]) { true }`
+
 - `Cannot Run HyperMesh with cache_store == :null_store`  
 You will get this error on boot if you are trying to use the :null cache.  
 See notes above on why you cannot use the :null cache store.
+
 - Cannot connect to real pusher account:  
 If you are trying to use a real pusher account (not pusher-fake) but see errors like this  
 ```text
@@ -301,6 +307,8 @@ failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
 ```
 Check to see if you are including the pusher-fake gem.  
 HyperMesh will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/hyper-react/HyperMesh/issues/5) for more details.
+
+- Cannot connect with ActionCable.  Make sure that `config.action_cable.allowed_request_origins` includes the url you use for development (including the port) and that you are useing `Puma`.
 
 ## Debugging
 

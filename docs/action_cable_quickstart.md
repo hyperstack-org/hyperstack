@@ -28,7 +28,6 @@ If you have not already installed the `reactrb` and `reactive-record` gems, then
 Once you have HyperMesh installed then add this initializer:
 ```ruby
 #config/initializers/hyper_mesh.rb
-# note name is still HyperMesh
 HyperMesh.configuration do |config|
   config.transport = :action_cable
 end

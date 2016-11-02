@@ -1,7 +1,8 @@
 require 'opal'
 require 'react'
 require 'hyper-trace'
-require 'hyper-react'
+require 'hyper-mesh'
+
 if React::IsomorphicHelpers.on_opal_client?
   require 'opal-jquery'
   #require 'browser' # breaks poltergeist
@@ -9,7 +10,5 @@ if React::IsomorphicHelpers.on_opal_client?
   require 'browser/delay'
   require 'hyper-mesh/pusher'
 end
-#require 'reactive-record'
-require 'hyper-mesh'
 require '_react_public_models'
 require_tree './components'
