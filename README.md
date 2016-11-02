@@ -180,8 +180,7 @@ just like `redirect` without the first arg: `index_redirect(to: ... query: ...)`
 A router is defined as a subclass of `React::Router` which is itself a `React::Component::Base`.
 
 ```ruby
-class Router < React::Router
-
+class Components::Router < React::Router
   def routes # define your routes (there is no render method)
     route("/", mounts: About, index: Home) do
       route("about")
@@ -192,12 +191,52 @@ class Router < React::Router
         route("messages/:id")
       end
     end
-  end
+  end  
+end
+```
+#### Mounting your Router
+You will mount this component the usual way (i.e. via `render_component`, `Element#render`, `react_render`, etc) or even by mounting it within a higher level application component.
 
+```ruby
+class Components::App < React::Component::Base
+  render(DIV) do
+    Application::Nav()
+    MAIN do
+      Router()
+    end
+  end
 end
 ```
 
-You will mount this component the usual way (i.e. via `render_component`, `Element#render`, `react_render`, etc) or even by mounting it within a higher level application component.
+#### navigating
+
+Create links to your routes with `Router::Link`
+```ruby
+#Application::Nav
+  LI.nav_link { TestRouter::Link("/") { "Home" } }
+  LI.nav_link { TestRouter::Link("/about") { "About" } }
+  params.messsages.each do |msg|
+    LI.nav_link { TestRouter::Link("/inbox/messages/#{msg.id}") { msg.title } }
+  end
+```
+
+Additionally, you can manipulate the history with by passing JS as so
+```ruby
+# app/views/components/app_links.rb
+class Components::AppLinks
+  class << self
+    if RUBY_ENGINE == 'opal'
+      def inbox
+        `window.ReactRouter.browserHistory.push('/inbox');`
+      end
+      def message(id)
+        `window.ReactRouter.browserHistory.push('/messages/#{id}');`
+      end
+    end
+  end
+end
+```
+
 
 #### Other router hooks:
 
