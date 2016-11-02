@@ -99,6 +99,10 @@ describe "example scopes", js: true do
             UserTodos {}
             ManagerComments {}
           end; end; end; end
+    # evaluate_ruby do
+    #   ReactiveRecord::Collection.hypertrace instrument: :all
+    #   UserTodos.hypertrace instrument: :all
+    # end
     starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
     #pause "about to add the boss"
     boss = FactoryGirl.create(:user, first_name: :boss)
@@ -115,8 +119,11 @@ describe "example scopes", js: true do
     fred = FactoryGirl.create(:user, role: :employee, first_name: :fred)
     #pause "fred added"
     fred.assigned_todos << FactoryGirl.create(:todo, title: 'fred todo')
-    #pause "added another todo to fred"
+    #pause "added another todo to fred" # HAPPENS AFTER HERE.....
     evaluate_ruby do
+      #   ReactiveRecord::Collection.hypertrace instrument: :all
+      #   UserTodos.hypertrace instrument: :all
+
       mitch = User.new(first_name: :mitch)
       mitch.assigned_todos << Todo.new(title: 'mitch todo')
       mitch.save
@@ -145,6 +152,7 @@ describe "example scopes", js: true do
     #     break_on_exit?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
     #   end
     # end
+
     mgr.commentz << FactoryGirl.create(:comment, comment: "Me BOSS", todoz: user1.assigned_todos.last)
     page.should have_content('MANAGER SAYS: The Boss Speaks')
     page.should have_content('BOSS SAYS: The Boss Speaks')

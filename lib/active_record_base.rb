@@ -99,45 +99,6 @@ module ActiveRecord
             .new(self, nil, nil, self, 'unscoped')
             .extend(ReactiveRecord::UnscopedCollection)
         end
-
-        def _react_param_conversion(param, opt = nil)
-          param = Native(param)
-          param = JSON.from_object(param.to_n) if param.is_a? Native::Object
-          result = if param.is_a? self
-            param
-          elsif param.is_a? Hash
-            if opt == :validate_only
-              klass = ReactiveRecord::Base.infer_type_from_hash(self, param)
-              klass == self or klass < self
-            else
-              if param[primary_key]
-                target = find(param[primary_key])
-              else
-                target = new
-              end
-              associations = reflect_on_all_associations
-              param = param.collect do |key, value|
-                assoc = reflect_on_all_associations.detect do |assoc|
-                  assoc.association_foreign_key == key
-                end
-                if assoc
-                  if value
-                    [assoc.attribute, {id: [value], type: [nil]}]
-                  else
-                    [assoc.attribute, [nil]]
-                  end
-                else
-                  [key, [value]]
-                end
-              end
-              ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
-              target
-            end
-          else
-            nil
-          end
-          result
-        end
       end
     end
 

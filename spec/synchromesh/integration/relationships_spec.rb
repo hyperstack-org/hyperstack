@@ -187,19 +187,21 @@ describe "synchronizing relationships", js: true do
     it "will update when sent from the server" do
       ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       page.should have_content('child id = 2')
+      ChildModel.find(1).destroy
+      page.should_not have_content('child id = 1', wait: 1)
     end
 
     it "will update when sent from the client" do
       evaluate_ruby do
+        # ReactiveRecord::Collection.hypertrace instrument: :all
+        # ReactiveRecord::Collection.hypertrace :class, instrument: :all
+        # ReactiveRecord::Base.hypertrace instrument: :sync_unscoped_collection!
+        # ReactiveRecord::ScopeDescription.hypertrace instrument: :all
+
         ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       end
       page.should have_content('child id = 2')
       evaluate_ruby do
-        ReactiveRecord::Collection.hypertrace instrument: :all
-        ReactiveRecord::Collection.hypertrace :class, instrument: :all
-        ReactiveRecord::Base.hypertrace instrument: :sync_unscoped_collection!
-        ReactiveRecord::ScopeDescription.hypertrace instrument: :all
-
         ChildModel.find(1).destroy
       end
       page.should_not have_content('child id = 1', wait: 1)
@@ -229,19 +231,22 @@ describe "synchronizing relationships", js: true do
     it "will update when sent from the server" do
       ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       page.should have_content('child id = 2')
+      ChildModel.find(1).destroy
+      page.should_not have_content('child id = 1', wait: 1)
     end
 
     it "will update when sent from the client" do
-      # ReactiveRecord::Collection.hypertrace instrument: :all
-      # ReactiveRecord::Collection.hypertrace :class, instrument: :all
-      # ReactiveRecord::Base.hypertrace instrument: :sync_unscoped_collection!
-      # ReactiveRecord::ScopeDescription.hypertrace instrument: :all
 
       evaluate_ruby do
         ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       end
       page.should have_content('child id = 2')
       evaluate_ruby do
+        # ReactiveRecord::Collection.hypertrace instrument: :all
+        # ReactiveRecord::Collection.hypertrace :class, instrument: :all
+        # ReactiveRecord::Base.hypertrace instrument: :sync_unscoped_collection!
+        # ReactiveRecord::ScopeDescription.hypertrace instrument: :all
+
         ChildModel.find(1).destroy
       end
       page.should_not have_content('child id = 1', wait: 1)

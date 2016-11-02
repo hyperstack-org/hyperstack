@@ -92,7 +92,6 @@ module Synchromesh
         klass._react_param_conversion(record).tap do |ar_instance|
           if destroyed?
             ar_instance.backing_record.destroy_associations
-            ar_instance.backing_record.destroyed = true
           elsif new?
             ar_instance.backing_record.initialize_collections
           end
@@ -134,6 +133,23 @@ module Synchromesh
         @previous_changes = {}
       end
 
+      def local(operation, record, data)
+        @destroyed = operation == :destroy
+        @is_new = operation == :create
+        @klass = record.class.name
+        @record = data
+        record.backing_record.destroyed = false
+        @record.merge!(id: record.id) if record.id
+        record.backing_record.destroyed = @destroyed
+        @backing_record = record.backing_record
+        attributes = record.backing_record.attributes
+        data.each do |k, v|
+          next if klass.reflect_on_association(k) || attributes[k] == v
+          @previous_changes[k] = [attributes[k], v]
+        end
+        self
+      end
+
       def receive(data, operation)
         @destroyed = operation == :destroy
         @is_new = operation == :create
@@ -165,6 +181,15 @@ module Synchromesh
         end.compact.flatten].merge(br.attributes)
         klass._react_param_conversion(current_values)
       end
+    end
+  end
+
+  class LocalSync
+    def self.after_save(record, data = {})
+      operation = record.new? ? :create : (record.destroyed? ? :destroy : :change)
+      dummy_broadcast = IncomingBroadcast.new.local(operation, record, data)
+      record.backing_record.sync! data unless operation == :destroy
+      ReactiveRecord::Collection.sync_scopes dummy_broadcast
     end
   end
 

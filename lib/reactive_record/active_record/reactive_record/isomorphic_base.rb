@@ -344,7 +344,10 @@ module ReactiveRecord
                 end
 
                 if response.json[:success]
-                  response.json[:saved_models].each { | item | backing_records[item[0]].sync!(item[2]) }
+                  response.json[:saved_models].each do | item |
+                    # was backing_records[item[0]].sync!(item[2])
+                    Synchromesh::LocalSync.after_save backing_records[item[0]].ar_instance, item[2]
+                  end
                 else
                   log("Reactive Record Save Failed: #{response.json[:message]}", :error)
                   response.json[:saved_models].each do | item |
@@ -576,7 +579,7 @@ module ReactiveRecord
 
         return if @destroyed
 
-        destroy_associations
+        #destroy_associations
 
         promise = Promise.new
 
@@ -590,11 +593,14 @@ module ReactiveRecord
               }.to_json
             }
           ).then do |response|
-            sync_unscoped_collection!
+            #sync_unscoped_collection!
+            Synchromesh::LocalSync.after_save ar_instance
             yield response.json[:success], response.json[:message] if block
             promise.resolve response.json
           end
         else
+          destroy_associations
+          # sync_unscoped_collection! # ? should we do this here was NOT being done before hypermesh integration
           yield true, nil if block
           promise.resolve({success: true})
         end

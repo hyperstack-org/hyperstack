@@ -539,6 +539,7 @@ module ReactiveRecord
     end
 
     def destroy_associations
+      @destroyed = false
       model.reflect_on_all_associations.each do |association|
         if association.collection?
           attributes[association.attribute].replace([]) if attributes[association.attribute]
@@ -546,6 +547,7 @@ module ReactiveRecord
           @ar_instance.send("#{association.attribute}=", nil)
         end
       end
+      @destroyed = true
     end
 
   end

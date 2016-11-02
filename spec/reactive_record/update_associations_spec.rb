@@ -138,6 +138,7 @@ RSpec::Steps.steps "updating associations", js: true do
       ReactiveRecord.load do
         User.find_by_first_name("Jan").todo_items.collect { |item| item.itself }.first
       end.then do | first |
+        ReactiveRecord::Collection.hypertrace instrument: :all
         first.destroy.then do |response|
           User.find_by_first_name("Jan").todo_items.all
         end

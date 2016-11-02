@@ -211,7 +211,7 @@ module ReactiveRecord
     def build_child_scope(scope_description, *scope_vector)
       child_scopes[scope_vector] ||= begin
         new_vector = @vector
-        new_vector += [scope_vector] unless scope_vector.empty?
+        new_vector += [scope_vector] unless new_vector.nil? || scope_vector.empty?
         child_scope = Collection.new(@target_klass, nil, nil, *new_vector)
         child_scope.scope_description = scope_description
         child_scope.parent = self
@@ -310,6 +310,26 @@ module ReactiveRecord
 
     def klass
       @target_klass
+    end
+
+    def push_and_update_belongs_to(id)
+      # example collection vector: TestModel.find(1).child_models.harrybarry
+      # harrybarry << child means that
+      # child.test_model = 1
+      # so... we go back starting at this collection and look for the first
+      # collection with an owner... that is our guy
+      child = proxy_association.klass.find(id)
+      push child
+      set_belongs_to child
+    end
+
+    def set_belongs_to(child)
+      if @owner
+        child.send("#{@association.inverse_of}=", @owner) if @association
+      elsif @parent
+        @parent.set_belongs_to(child)
+      end
+      child
     end
 
     attr_reader :client_collection
