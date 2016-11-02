@@ -188,7 +188,8 @@ describe "synchronizing relationships", js: true do
       ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       page.should have_content('child id = 2')
       ChildModel.find(1).destroy
-      page.should_not have_content('child id = 1', wait: 1)
+      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      page.should_not have_content('child id = 1', wait: 2)
     end
 
     it "will update when sent from the client" do
@@ -204,7 +205,8 @@ describe "synchronizing relationships", js: true do
       evaluate_ruby do
         ChildModel.find(1).destroy
       end
-      page.should_not have_content('child id = 1', wait: 1)
+      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      page.should_not have_content('child id = 1', wait: 2)
     end
 
   end
@@ -232,7 +234,8 @@ describe "synchronizing relationships", js: true do
       ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       page.should have_content('child id = 2')
       ChildModel.find(1).destroy
-      page.should_not have_content('child id = 1', wait: 1)
+      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      page.should_not have_content('child id = 1', wait: 2)
     end
 
     it "will update when sent from the client" do
@@ -249,7 +252,8 @@ describe "synchronizing relationships", js: true do
 
         ChildModel.find(1).destroy
       end
-      page.should_not have_content('child id = 1', wait: 1)
+      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      page.should_not have_content('child id = 1', wait: 2)
     end
 
   end
