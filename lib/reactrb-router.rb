@@ -10,7 +10,7 @@ if RUBY_ENGINE == 'opal'
   require 'react/router/dsl/transition_context'
 else
   require 'opal'
-  require 'reactrb'
+  require 'hyper-react'
   require 'react/router/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
