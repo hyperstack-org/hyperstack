@@ -16,7 +16,7 @@ module ReactiveRecord
           unless method_defined? :pre_synchromesh_call
             alias pre_synchromesh_call call
             def call(env)
-              if !Synchromesh.opts[:noisy] && env['HTTP_X_SYNCHROMESH_SILENT_REQUEST']
+              if !HyperMesh.opts[:noisy] && env['HTTP_X_SYNCHROMESH_SILENT_REQUEST']
                 Rails.logger.silence do
                   pre_synchromesh_call(env)
                 end
@@ -29,7 +29,7 @@ module ReactiveRecord
       end
     end if defined?(::Rails::Rack::Logger)
 
-    class SynchromeshController < ::ApplicationController
+    class HyperMeshController < ::ApplicationController
       protect_from_forgery except: [:console_update]
 
       def client_id
@@ -41,13 +41,13 @@ module ReactiveRecord
       end
 
       def channels(user = acting_user, session_id = session.id)
-        Synchromesh::AutoConnect.channels(session_id, user)
+        HyperMesh::AutoConnect.channels(session_id, user)
       end
 
       def can_connect?(channel, user = acting_user)
-        Synchromesh::InternalPolicy.regulate_connection(
+        HyperMesh::InternalPolicy.regulate_connection(
           user,
-          Synchromesh::InternalPolicy.channel_to_string(channel)
+          HyperMesh::InternalPolicy.channel_to_string(channel)
         )
         true
       rescue
@@ -87,9 +87,9 @@ module ReactiveRecord
       end
 
       def subscribe
-        Synchromesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
+        HyperMesh::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
         root_path = request.original_url.gsub(/synchromesh-subscribe.*$/, '')
-        Synchromesh::Connection.open(params[:channel], client_id, root_path)
+        HyperMesh::Connection.open(params[:channel], client_id, root_path)
         head :ok
       rescue Exception
         head :unauthorized
@@ -97,24 +97,24 @@ module ReactiveRecord
 
       def read
         root_path = request.original_url.gsub(/synchromesh-read.*$/, '')
-        data = Synchromesh::Connection.read(client_id, root_path)
+        data = HyperMesh::Connection.read(client_id, root_path)
         render json: data
       end
 
       def pusher_auth
-        channel = params[:channel_name].gsub(/^#{Regexp.quote(Synchromesh.channel)}\-/,'')
-        Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
-        response = Synchromesh.pusher.authenticate(params[:channel_name], params[:socket_id])
+        channel = params[:channel_name].gsub(/^#{Regexp.quote(HyperMesh.channel)}\-/,'')
+        HyperMesh::InternalPolicy.regulate_connection(acting_user, channel)
+        response = HyperMesh.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response
       rescue Exception => e
         head :unauthorized
       end
 
       def action_cable_auth
-        channel = params[:channel_name].gsub(/^#{Regexp.quote(Synchromesh.channel)}\-/,'')
-        Synchromesh::InternalPolicy.regulate_connection(acting_user, channel)
+        channel = params[:channel_name].gsub(/^#{Regexp.quote(HyperMesh.channel)}\-/,'')
+        HyperMesh::InternalPolicy.regulate_connection(acting_user, channel)
         salt = SecureRandom.hex
-        authorization = Synchromesh.authorization(salt, channel, client_id)
+        authorization = HyperMesh.authorization(salt, channel, client_id)
         render json: {authorization: authorization, salt: salt}
       rescue Exception
         head :unauthorized
@@ -122,33 +122,33 @@ module ReactiveRecord
 
       def connect_to_transport
         root_path = request.original_url.gsub(/synchromesh-connect-to-transport.*$/, '')
-        render json: Synchromesh::Connection.connect_to_transport(params[:channel], client_id, root_path)
+        render json: HyperMesh::Connection.connect_to_transport(params[:channel], client_id, root_path)
       end
 
       def console_update
-        authorization = Synchromesh.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
+        authorization = HyperMesh.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
         return head :unauthorized if authorization != params[:authorization]
-        Synchromesh::Connection.send_to_channel(params[:channel], params[:data])
+        HyperMesh::Connection.send_to_channel(params[:channel], params[:data])
         head :no_content
       rescue
         head :unauthorized
       end
 
-    end unless defined? SynchromeshController
+    end unless defined? HyperMeshController
 
     match 'synchromesh-subscribe/:client_id/:channel',
-          to: 'synchromesh#subscribe', via: :get
+          to: 'hyper_mesh#subscribe', via: :get
     match 'synchromesh-read/:client_id',
-          to: 'synchromesh#read', via: :get
+          to: 'hyper_mesh#read', via: :get
     match 'synchromesh-pusher-auth',
-          to: 'synchromesh#pusher_auth', via: :post
+          to: 'hyper_mesh#pusher_auth', via: :post
     match 'synchromesh-action-cable-auth/:client_id/:channel_name',
-          to: 'synchromesh#action_cable_auth', via: :post
+          to: 'hyper_mesh#action_cable_auth', via: :post
     match 'synchromesh-connect-to-transport/:client_id/:channel',
-          to: 'synchromesh#connect_to_transport', via: :get
+          to: 'hyper_mesh#connect_to_transport', via: :get
     match 'console',
-          to: 'synchromesh#debug_console', via: :get
+          to: 'hyper_mesh#debug_console', via: :get
     match 'console_update',
-          to: 'synchromesh#console_update', via: :post
+          to: 'hyper_mesh#console_update', via: :post
   end
 end

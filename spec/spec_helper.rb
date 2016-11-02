@@ -103,7 +103,7 @@ if RUBY_ENGINE != 'opal'
     config.after(:each) do |example|
       unless example.exception
         ObjectSpace.each_object(Class).each do |klass|
-          if klass < Synchromesh::Regulation
+          if klass < HyperMesh::Regulation
             klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
           end
         end

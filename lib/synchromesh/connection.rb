@@ -1,4 +1,4 @@
-module Synchromesh
+module HyperMesh
   class Connection < ActiveRecord::Base
     class QueuedMessage < ActiveRecord::Base
       self.table_name = 'synchromesh_queued_messages'
@@ -8,7 +8,7 @@ module Synchromesh
       serialize :data
 
       belongs_to :synchromesh_connection,
-                 class_name: 'Synchromesh::Connection',
+                 class_name: 'HyperMesh::Connection',
                  foreign_key: 'connection_id'
 
       scope :for_session,
@@ -51,7 +51,7 @@ module Synchromesh
 
     has_many :messages,
              foreign_key: 'connection_id',
-             class_name: 'Synchromesh::Connection::QueuedMessage',
+             class_name: 'HyperMesh::Connection::QueuedMessage',
              dependent: :destroy
     scope :expired,
           -> { where('expires_at IS NOT NULL AND expires_at < ?', Time.zone.now) }
@@ -258,7 +258,7 @@ end
 #       end
 #
 #       def refresh
-#         return if @refreshing || Synchromesh.on_console?
+#         return if @refreshing || HyperMesh.on_console?
 #         @refreshing = true
 #         Thread.new do
 #           begin
@@ -349,8 +349,8 @@ end
 #   #   end
 #   # end
 #
-# # unless Synchromesh::Connection.connection.tables.include? 'synchromesh_connections'
-# #   Synchromesh::Connection.connection.create_table(:synchromesh_connections) do |t|
+# # unless HyperMesh::Connection.connection.tables.include? 'synchromesh_connections'
+# #   HyperMesh::Connection.connection.create_table(:synchromesh_connections) do |t|
 # #     t.string :channel
 # #     t.string :session
 # #     t.datetime :updated_at

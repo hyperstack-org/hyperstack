@@ -27,9 +27,9 @@ describe "Transport Tests", js: true do
     end
     size_window(:small, :portrait)
     on_client do
-      # patch Synchromesh.connect so it doesn't execute until we say so
+      # patch HyperMesh.connect so it doesn't execute until we say so
       # this is NOT used by the polling connection FYI
-      module Synchromesh
+      module HyperMesh
         class << self
           alias old_connect connect
           def go_ahead_and_connect
@@ -58,7 +58,7 @@ describe "Transport Tests", js: true do
       Pusher.secret = "MY_TEST_SECRET"
       require "pusher-fake/support/base"
 
-      Synchromesh.configuration do |config|
+      HyperMesh.configuration do |config|
         config.transport = :pusher
         config.channel_prefix = "synchromesh"
         config.opts = {
@@ -73,28 +73,28 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq(['TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Synchromesh::Connection.active.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq([])
+      HyperMesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.refresh_channels_every)
-      wait_for { Synchromesh::Connection.active }.to eq([])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.refresh_channels_every)
+      wait_for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -111,7 +111,7 @@ describe "Transport Tests", js: true do
       # until we connect there should only be 5 items
       page.should have_content("5 items")
       # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
       # once we connect it should change to 6
       page.should have_content("6 items")
       # now that we are connected the UI should keep updating
@@ -123,7 +123,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       TestModel.first.destroy
       page.should have_content("5 items")
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
       page.should have_content("4 items")
     end
   end
@@ -131,7 +131,7 @@ describe "Transport Tests", js: true do
   context "Simple Polling" do
 
     before(:all) do
-      Synchromesh.configuration do |config|
+      HyperMesh.configuration do |config|
         config.transport = :simple_poller
         # slow down the polling so wait_for_ajax works
         config.opts = { seconds_between_poll: 2 }
@@ -140,7 +140,7 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      Synchromesh::Connection.active.should =~ ['TestApplication']
+      HyperMesh::Connection.active.should =~ ['TestApplication']
     end
 
     it "sees the connection going offline" do
@@ -148,17 +148,17 @@ describe "Transport Tests", js: true do
       wait_for_ajax
       ApplicationController.acting_user = true
       mount "TestComponent"
-      Synchromesh::Connection.active.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh.expire_polled_connection_in)
-      wait(10.seconds).for { Synchromesh::Connection.active }.to eq([])
+      HyperMesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+HyperMesh.expire_polled_connection_in)
+      wait(10.seconds).for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
       mount "TestComponent"
       TestModel.new(test_attribute: "I'm new here!").save
-      Synchromesh::Connection.active.should =~ ['TestApplication']
+      HyperMesh::Connection.active.should =~ ['TestApplication']
       page.should have_content("6 items")
-      Synchromesh::Connection.active.should =~ ['TestApplication']
+      HyperMesh::Connection.active.should =~ ['TestApplication']
     end
 
     it "receives destroy notifications" do
@@ -175,7 +175,7 @@ describe "Transport Tests", js: true do
       require 'pusher'
       Object.send(:remove_const, :PusherFake) if defined?(PusherFake)
 
-      Synchromesh.configuration do |config|
+      HyperMesh.configuration do |config|
         config.transport = :pusher
         config.channel_prefix = "synchromesh"
         config.opts = pusher_credentials
@@ -184,28 +184,28 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq(['TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Synchromesh::Connection.active.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq([])
+      HyperMesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.refresh_channels_every)
-      wait_for { Synchromesh::Connection.active }.to eq([])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.refresh_channels_every)
+      wait_for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -222,7 +222,7 @@ describe "Transport Tests", js: true do
       # until we connect there should only be 5 items
       page.should have_content("5 items")
       # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
       # once we connect it should change to 6
       page.should have_content("6 items")
       # now that we are connected the UI should keep updating
@@ -234,7 +234,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       TestModel.first.destroy
       page.should have_content("5 items")
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
       page.should have_content("4 items")
     end
 
@@ -243,7 +243,7 @@ describe "Transport Tests", js: true do
   context "Action Cable" do
 
     before(:each) do
-      Synchromesh.configuration do |config|
+      HyperMesh.configuration do |config|
         config.transport = :action_cable
         config.channel_prefix = "synchromesh"
       end
@@ -251,27 +251,27 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq(['TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Synchromesh::Connection.active.should =~ ['TestApplication']
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq([])
+      HyperMesh::Connection.active.should =~ ['TestApplication']
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      Timecop.travel(Time.now+Synchromesh::Connection.transport.expire_new_connection_in)
-      wait_for { Synchromesh::Connection.active }.to eq(['TestApplication'])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      Timecop.travel(Time.now+HyperMesh::Connection.transport.expire_new_connection_in)
+      wait_for { HyperMesh::Connection.active }.to eq(['TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
-      wait_for { Synchromesh::Connection.active }.to eq([])
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
+      wait_for { HyperMesh::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -288,7 +288,7 @@ describe "Transport Tests", js: true do
       # until we connect there should only be 5 items
       page.should have_content("5 items")
       # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
       # once we connect it should change to 6
       page.should have_content("6 items")
       # now that we are connected the UI should keep updating
@@ -300,7 +300,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       TestModel.first.destroy
       page.should have_content("5 items")
-      evaluate_ruby "Synchromesh.go_ahead_and_connect"
+      evaluate_ruby "HyperMesh.go_ahead_and_connect"
       page.should have_content("4 items")
     end
 

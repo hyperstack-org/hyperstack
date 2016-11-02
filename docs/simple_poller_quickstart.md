@@ -27,14 +27,14 @@ If you have not already installed the `hyper-react` and `reactive-record` gems, 
 Once you have hyper-react installed then add this initializer:
 ```ruby
 #config/initializers/synchromesh.rb
-Synchromesh.configuration do |config|
+HyperMesh.configuration do |config|
   config.transport = :simple_poller
 end
 ```
 
 #### 5 Make sure caching is enabled
 
-Synchromesh uses the rails cache to keep track of what connections are alive in a transport independent fashion.  Rails 5 by default will have caching off in development mode.
+HyperMesh uses the rails cache to keep track of what connections are alive in a transport independent fashion.  Rails 5 by default will have caching off in development mode.
 
 Check in `config/development.rb` and make sure that `cache_store` is never being set to `:null_store`.  
 

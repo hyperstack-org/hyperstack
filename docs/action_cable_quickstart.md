@@ -1,6 +1,6 @@
 ### Action Cable Quickstart
 
-Action Cable has the most complicated underlying setup, but once you get through the configuration you will have a production ready transport.
+Action Cable is production ready transport built into Rails 5.
 
 #### 1 Get Rails 5
 
@@ -15,10 +15,11 @@ If you have not already installed the `reactrb` and `reactive-record` gems, then
 - run `rails g hyper-react:install --all` (make sure to use the --all option)
 - run `bundle update`
 
-#### 3 HyperMesh replaces Reactrb and ReactiveRecord
+#### 3 Reactrb and ReactiveRecord is replaced with HyperMesh
 
-- add `gem 'hyper-mesh', git: 'https://github.com/ruby-hyperloop/synchromesh', branch: 'reactive-record-merge'`
-- you can remove references to `'reactrb'` and `'reactive-record'` if you wish
+- replace the `'reactive-record'` and `'reactrb'` gems with  
+`gem 'hyper-mesh', git: 'https://github.com/ruby-hyperloop/synchromesh', branch: 'reactive-record-merge'`  
+**note: you must remove 'reactive-record'**
 - then `bundle install`  
 - and in `app/views/components.rb` replace `require 'reactive-record'` with `require 'hyper-mesh'`  
 
@@ -27,13 +28,13 @@ If you have not already installed the `reactrb` and `reactive-record` gems, then
 Once you have HyperMesh installed then add this initializer:
 ```ruby
 #config/initializers/hyper_mesh.rb
-# note name is still Synchromesh
-Synchromesh.configuration do |config|
+# note name is still HyperMesh
+HyperMesh.configuration do |config|
   config.transport = :action_cable
 end
 ```
 
-#### 6 Define Your Policies
+#### 5 Define Your Policies
 
 To start just open everything up by adding a policies directory and defining a policy file like this:
 
@@ -46,13 +47,13 @@ class ApplicationPolicy
 end
 ```
 
-#### 7 Setup ActionCable
+#### 6 Setup ActionCable
 
-If you are already using ActionCable in your app that is fine, as Synchromesh will not interfere with your existing connections.
+If you are already using ActionCable in your app that is fine, as HyperMesh will not interfere with your existing connections.
 
 Otherwise go through the following steps to setup ActionCable.
 
-##### 7.1 Add the action_cable.js file
+##### 6.1 Add the action_cable.js file
 
 Include the `action_cable` js file in your assets
 
@@ -63,7 +64,7 @@ Include the `action_cable` js file in your assets
 Opal.load('components');
 ```
 
-#### 7.2 Make sure you have a cable.yml file
+##### 6.2 Make sure you have a cable.yml file
 
 ```yml
 # config/cable.yml
@@ -78,7 +79,7 @@ production:
   url: redis://localhost:6379/1
 ```
 
-#### 7.3 Set allowed request origins (optional)
+##### 6.3 Set allowed request origins (optional)
 
 By default action cable will only allow connections from localhost:3000 in development.  If you are going to something other than localhost:3000 you need to add something like this to your config:
 
@@ -89,7 +90,7 @@ Rails.application.configure do
 end
 ```
 
-#### 8 Try It Out  
+#### 7 Try It Out  
 
 If you don't already have a model to play with,  add one now:
 

@@ -1,12 +1,12 @@
 require 'spec_helper'
 #require 'synchromesh/test_components'
 
-describe "including Synchromesh::PolicyMethods" do
+describe "including HyperMesh::PolicyMethods" do
 
   before(:each) do
     stub_const "TestClass", Class.new
     TestClass.class_eval do
-      include Synchromesh::PolicyMethods
+      include HyperMesh::PolicyMethods
     end
   end
 
@@ -78,7 +78,7 @@ describe "including Synchromesh::PolicyMethods" do
     ApplicationPolicy.class_eval do
       regulate_class_connection { true }
     end
-    Synchromesh.configuration {}
+    HyperMesh.configuration {}
     expect(Application).to be_a(Class)
   end
 

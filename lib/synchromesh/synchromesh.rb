@@ -1,7 +1,7 @@
 require 'synchromesh/configuration'
 # Provides the configuration and the two basic routines for the server
 # to indicate that records have changed: after_change and after_destroy
-module Synchromesh
+module HyperMesh
 
   extend Configuration
 
@@ -78,7 +78,7 @@ module Synchromesh
 
   def self.refresh_channels
     new_channels = pusher.channels[:channels].collect do |channel|
-      channel.gsub(/^#{Regexp.quote(Synchromesh.channel)}/,'')
+      channel.gsub(/^#{Regexp.quote(HyperMesh.channel)}/,'')
     end
   end
 
@@ -86,7 +86,7 @@ module Synchromesh
     if on_console?
       send_to_server(channel, data)
     elsif transport == :pusher
-      pusher.trigger("#{Synchromesh.channel}-#{data[1][:channel]}", *data)
+      pusher.trigger("#{HyperMesh.channel}-#{data[1][:channel]}", *data)
     elsif transport == :action_cable
       ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
     end
@@ -100,7 +100,7 @@ module Synchromesh
 
   def self.send_to_server(channel, data)
     salt = SecureRandom.hex
-    authorization = Synchromesh.authorization(salt, channel, data[1][:broadcast_id])
+    authorization = HyperMesh.authorization(salt, channel, data[1][:broadcast_id])
     raise 'no server running' unless Connection.root_path
     uri = URI("#{Connection.root_path}console_update")
     http = Net::HTTP.new(uri.host, uri.port)
@@ -137,8 +137,8 @@ module Synchromesh
 
   def self.after_commit(operation, model)
     InternalPolicy.regulate_broadcast(model) do |data|
-      if Synchromesh.on_console? && Connection.root_path
-        Synchromesh.send_to_server(data[:channel], [operation, data])
+      if HyperMesh.on_console? && Connection.root_path
+        HyperMesh.send_to_server(data[:channel], [operation, data])
       else
         Connection.send_to_channel(data[:channel], [operation, data])
       end

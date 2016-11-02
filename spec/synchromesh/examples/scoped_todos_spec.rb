@@ -11,7 +11,7 @@ describe "example scopes", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Synchromesh.configuration do |config|
+    HyperMesh.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -141,7 +141,7 @@ describe "example scopes", js: true do
     user1.commentz << FactoryGirl.create(:comment, comment: "frank made this comment", todoz: user2.assigned_todos.first)
     user2.commentz << FactoryGirl.create(:comment, comment: "bob made this comment", todoz: user1.assigned_todos.first)
     # evaluate_ruby do
-    #   Synchromesh::IncomingBroadcast.hypertrace do
+    #   HyperMesh::IncomingBroadcast.hypertrace do
     #     break_on_exit?(:merge_current_values) { Todo.find(5).comments.last.todo.nil? rescue nil }
     #   end
     #   ReactiveRecord::ScopeDescription.hypertrace do

@@ -3,7 +3,7 @@ module ApplicationCable
   class Connection < ActionCable::Connection::Base; end
 end
 
-module Synchromesh
+module HyperMesh
   class ActionCableChannel < ApplicationCable::Channel
     class << self
       def subscriptions
@@ -23,7 +23,7 @@ module Synchromesh
 
     def subscribed
       session_id = params["client_id"]
-      authorization = Synchromesh.authorization(params["salt"], params["synchromesh_channel"], session_id)
+      authorization = HyperMesh.authorization(params["salt"], params["synchromesh_channel"], session_id)
       if params["authorization"] == authorization
         inc_subscription
         stream_from "synchromesh-#{params[:synchromesh_channel]}"
@@ -33,7 +33,7 @@ module Synchromesh
     end
 
     def unsubscribed
-      Synchromesh::Connection.disconnect(params[:synchromesh_channel]) if dec_subscription == 0
+      HyperMesh::Connection.disconnect(params[:synchromesh_channel]) if dec_subscription == 0
     end
   end
 end

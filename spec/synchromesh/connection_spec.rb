@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Synchromesh::Connection do
+describe HyperMesh::Connection do
 
   before(:all) do
-    Synchromesh.configuration do |config|
+    HyperMesh.configuration do |config|
     end
   end
 
@@ -19,10 +19,10 @@ describe Synchromesh::Connection do
 
   it 'creates the messages queue' do
     channel = described_class.new
-    channel.messages << Synchromesh::Connection::QueuedMessage.new
+    channel.messages << HyperMesh::Connection::QueuedMessage.new
     channel.save
     channel.reload
-    channel.messages.should eq(Synchromesh::Connection::QueuedMessage.all)
+    channel.messages.should eq(HyperMesh::Connection::QueuedMessage.all)
   end
 
   it 'can set the root path' do
@@ -83,7 +83,7 @@ describe Synchromesh::Connection do
 
     it "will have the root path set for console access" do
       described_class.connect_to_transport('TestChannel', 0, "some_path")
-      expect(Synchromesh::Connection.root_path).to eq("some_path")
+      expect(HyperMesh::Connection.root_path).to eq("some_path")
     end
 
     it "the channel will still be active even after initial connection time is expired" do
@@ -98,7 +98,7 @@ describe Synchromesh::Connection do
     end
 
     it "will begin refreshing the channel list" do
-      allow(Synchromesh).to receive(:refresh_channels) {['AnotherChannel']}
+      allow(HyperMesh).to receive(:refresh_channels) {['AnotherChannel']}
       described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.connect_to_transport('AnotherChannel', 0, nil)
@@ -108,7 +108,7 @@ describe Synchromesh::Connection do
     end
 
     it "refreshing will not effect channels not connected to the transport" do
-      allow(Synchromesh).to receive(:refresh_channels) {['AnotherChannel']}
+      allow(HyperMesh).to receive(:refresh_channels) {['AnotherChannel']}
       described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every-1)
@@ -121,7 +121,7 @@ describe Synchromesh::Connection do
     end
 
     it "refreshing will not effect channels added during the refresh" do
-      allow(Synchromesh).to receive(:refresh_channels) do
+      allow(HyperMesh).to receive(:refresh_channels) do
         described_class.connect_to_transport('TestChannel', 0, nil)
         ['AnotherChannel']
       end
@@ -135,7 +135,7 @@ describe Synchromesh::Connection do
     end
 
     it "sends messages to the transport as well as open channels" do
-      expect(Synchromesh).to receive(:send).with('TestChannel', 'data2')
+      expect(HyperMesh).to receive(:send).with('TestChannel', 'data2')
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.send_to_channel('TestChannel', 'data2')
       expect(described_class.read(1, 'path')).to eq(['data', 'data2'])

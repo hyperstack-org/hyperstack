@@ -1,4 +1,4 @@
-module Synchromesh
+module HyperMesh
   # Client side handling of synchronization messages
   # When a synchronization message comes in, the client will call
   # either the sync_change or sync_destroy methods.
@@ -47,9 +47,9 @@ module Synchromesh
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel)).then do |response|
             %x{
-              #{Synchromesh.action_cable_consumer}.subscriptions.create(
+              #{HyperMesh.action_cable_consumer}.subscriptions.create(
                 {
-                  channel: "Synchromesh::ActionCableChannel",
+                  channel: "HyperMesh::ActionCableChannel",
                   client_id: #{ClientDrivers.opts[:id]},
                   synchromesh_channel: #{channel_string},
                   authorization: #{response.json[:authorization]},
@@ -224,7 +224,7 @@ module Synchromesh
       end
     end
 
-    # save the configuration info needed in window.SynchromeshOpts
+    # save the configuration info needed in window.HyperMeshOpts
 
     # we keep a list of all channels by session with connections in progress
     # for each broadcast we check the list, and add the message to a queue for that
@@ -246,24 +246,24 @@ module Synchromesh
       controller.session.delete 'synchromesh-dummy-init' unless controller.session.id
       id = "#{SecureRandom.uuid}-#{controller.session.id}"
       config_hash = {
-        transport: Synchromesh.transport,
+        transport: HyperMesh.transport,
         id: id,
-        client_logging: Synchromesh.client_logging,
+        client_logging: HyperMesh.client_logging,
         pusher_fake_js: pusher_fake_js,
-        key: Synchromesh.key,
-        encrypted: Synchromesh.encrypted,
-        channel: Synchromesh.channel,
+        key: HyperMesh.key,
+        encrypted: HyperMesh.encrypted,
+        channel: HyperMesh.channel,
         form_authenticity_token: controller.send(:form_authenticity_token),
-        seconds_between_poll: Synchromesh.seconds_between_poll,
-        auto_connect: Synchromesh::AutoConnect.channels(id, controller.acting_user)
+        seconds_between_poll: HyperMesh.seconds_between_poll,
+        auto_connect: HyperMesh::AutoConnect.channels(id, controller.acting_user)
       }
       "<script type='text/javascript'>\n"\
-      "window.SynchromeshOpts = #{config_hash.to_json}\n"\
+      "window.HyperMeshOpts = #{config_hash.to_json}\n"\
       "</script>\n"
     end if RUBY_ENGINE != 'opal'
 
     def self.opts
-      @opts ||= Hash.new(`window.SynchromeshOpts`)
+      @opts ||= Hash.new(`window.HyperMeshOpts`)
     end
 
     def self.get_queued_data(operation, channel = nil, opts = {})
@@ -311,11 +311,11 @@ module Synchromesh
             }
             opts[:pusher_api] = pusher_api
           end
-          Synchromesh.connect(*opts[:auto_connect])
+          HyperMesh.connect(*opts[:auto_connect])
         elsif opts[:transport] == :action_cable
           opts[:action_cable_consumer] =
             `ActionCable.createConsumer.apply(ActionCable, #{[*opts[:action_cable_consumer_url]]})`
-          Synchromesh.connect(*opts[:auto_connect])
+          HyperMesh.connect(*opts[:auto_connect])
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection(*channel) }
           every(opts[:seconds_between_poll]) do

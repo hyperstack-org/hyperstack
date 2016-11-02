@@ -1,4 +1,4 @@
-module Synchromesh
+module HyperMesh
 
   class InternalClassPolicy
 
@@ -470,7 +470,7 @@ class Module
 
   def const_set(name, value)
     pre_synchromesh_const_set(name, value).tap do
-      Synchromesh::PolicyAutoLoader.load(name, value)
+      HyperMesh::PolicyAutoLoader.load(name, value)
     end
   end
 end
@@ -481,19 +481,19 @@ class Class
 
   def inherited(child_class)
     pre_synchromesh_inherited(child_class).tap do
-      Synchromesh::PolicyAutoLoader.load(child_class.name, child_class)
+      HyperMesh::PolicyAutoLoader.load(child_class.name, child_class)
     end
   end
 
-  Synchromesh::ClassPolicyMethods.instance_methods.each do |method|
+  HyperMesh::ClassPolicyMethods.instance_methods.each do |method|
     define_method method do |*args, &block|
       if name =~ /Policy$/
-        @synchromesh_internal_policy_object = Synchromesh::InternalClassPolicy.new(name.gsub(/Policy$/,""))
-        include Synchromesh::PolicyMethods
+        @synchromesh_internal_policy_object = HyperMesh::InternalClassPolicy.new(name.gsub(/Policy$/,""))
+        include HyperMesh::PolicyMethods
         send method, *args, &block
       else
         class << self
-          Synchromesh::ClassPolicyMethods.instance_methods.each do |method|
+          HyperMesh::ClassPolicyMethods.instance_methods.each do |method|
             undef_method method
           end
         end

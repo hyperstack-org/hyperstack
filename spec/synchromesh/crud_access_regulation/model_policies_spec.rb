@@ -4,7 +4,7 @@ require 'synchromesh/integration/test_components'
 describe "regulate access allowed" do
 
   before(:all) do
-    Synchromesh.configuration do |config|
+    HyperMesh.configuration do |config|
       config.transport = :none
     end
   end
@@ -20,7 +20,7 @@ describe "regulate access allowed" do
     load 'lib/reactive_record/permission_patches.rb'
   end
 
-  Synchromesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+  HyperMesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
 
     it "will define a basic allow_#{policy} policy" do
       stub_const 'DummyModelPolicy', Class.new
@@ -58,7 +58,7 @@ describe "regulate access allowed" do
     DummyModelPolicy.class_eval do
       send("allow_change") { "called change" }
     end
-    Synchromesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+    HyperMesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
       DummyModel.new.send("#{policy}_permitted?").should eq("called change")
     end
   end
@@ -68,7 +68,7 @@ describe "regulate access allowed" do
     ApplicationPolicy.class_eval do
       send("allow_change", DummyModel) { "called change" }
     end
-    Synchromesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+    HyperMesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
       DummyModel.new.send("#{policy}_permitted?").should eq("called change")
     end
   end
@@ -82,7 +82,7 @@ describe "regulate access allowed" do
     FooModel.class_eval do
       self.table_name = 'test_models'
     end
-    Synchromesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+    HyperMesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
       DummyModel.new.send("#{policy}_permitted?").should eq("called change on DummyModel")
       FooModel.new.send("#{policy}_permitted?").should eq("called change on FooModel")
     end

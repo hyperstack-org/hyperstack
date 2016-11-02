@@ -11,7 +11,7 @@ describe "synchronizing relationships", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Synchromesh.configuration do |config|
+    HyperMesh.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -96,7 +96,7 @@ describe "synchronizing relationships", js: true do
   end
 
   it "adding child to a new model on client after render" do
-    # Synchromesh.configuration do |config|
+    # HyperMesh.configuration do |config|
     #   #config.transport = :none
     # end
     m = FactoryGirl.create(:test_model)

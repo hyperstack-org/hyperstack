@@ -3,7 +3,7 @@
 class ActiveRecord::Base
 
   def view_permitted?(attribute)
-    Synchromesh::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
+    HyperMesh::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
   end
 
   def create_permitted?
@@ -19,7 +19,7 @@ class ActiveRecord::Base
   end
 end
 
-module Synchromesh
+module HyperMesh
   class InternalPolicy
 
     def self.accessible_attributes_for(model, acting_user)

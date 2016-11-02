@@ -346,7 +346,7 @@ module ReactiveRecord
                 if response.json[:success]
                   response.json[:saved_models].each do | item |
                     # was backing_records[item[0]].sync!(item[2])
-                    Synchromesh::LocalSync.after_save backing_records[item[0]].ar_instance, item[2]
+                    HyperMesh::LocalSync.after_save backing_records[item[0]].ar_instance, item[2]
                   end
                 else
                   log("Reactive Record Save Failed: #{response.json[:message]}", :error)
@@ -594,7 +594,7 @@ module ReactiveRecord
             }
           ).then do |response|
             #sync_unscoped_collection!
-            Synchromesh::LocalSync.after_save ar_instance
+            HyperMesh::LocalSync.after_save ar_instance
             yield response.json[:success], response.json[:message] if block
             promise.resolve response.json
           end

@@ -4,7 +4,7 @@ require 'synchromesh/integration/test_components'
 describe "regulate access allowed" do
 
   before(:all) do
-    Synchromesh.configuration do |config|
+    HyperMesh.configuration do |config|
       config.transport = :none
     end
   end

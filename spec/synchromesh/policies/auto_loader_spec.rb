@@ -10,7 +10,7 @@ describe 'rails autoloader' do
 
     it 'will find the policy class file if available' do
       stub_const "AutoLoaderTestClassa", Class.new
-      expect(Synchromesh::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassa"])
+      expect(HyperMesh::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassa"])
     end
 
     it 'will raise a load error if file does not define the class' do
@@ -23,7 +23,7 @@ describe 'rails autoloader' do
     it 'will find the policy class if available' do
       class AutoLoaderTestClassb
       end
-      expect(Synchromesh::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassb"])
+      expect(HyperMesh::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassb"])
     end
 
     it 'will raise a load error if file does not define the class' do

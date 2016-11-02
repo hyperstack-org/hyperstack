@@ -1,6 +1,6 @@
-### Synchromesh Authorization Policies
+### HyperMesh Authorization Policies
 
-Each time an ActiveRecord model changes, Synchromesh broadcasts the changed attributes over *channels*.
+Each time an ActiveRecord model changes, HyperMesh broadcasts the changed attributes over *channels*.
 
 An application can have several channels and each channel and each active record model can have different *policies* to determine which attributes are sent when a record changes.
 
@@ -93,7 +93,7 @@ Our entire set of policies is defined in 29 lines of code of which 8 actually ex
 
 ### Details
 
-Synchromesh uses *Policies* to *regulate* what *connections* are opened between clients and the server and what data is distributed over those connections.
+HyperMesh uses *Policies* to *regulate* what *connections* are opened between clients and the server and what data is distributed over those connections.
 
 Connections are made on *channels* of data flowing between the server and a number of clients.  Each channel is associated with either a class or an instance of a class.  Typically the channel class represents an entity (or is associated with an entity) that can be authenticated like a `User`, an  `AdminUser`, or a `Team` of users.  A channel associated with the class itself broadcasts data that is received by any member of that class.  A channel associated with an instance is for data that is available only to that specific instance.   
 
@@ -126,13 +126,13 @@ class ApplicationPolicy
 end
 ```
 
-Note that by default policy classes go in the `app/policies` directory.  Synchromesh will require all the files in this directory.
+Note that by default policy classes go in the `app/policies` directory.  HyperMesh will require all the files in this directory.
 
-If you wish, you can also add policies directly in your models by including the `Synchromesh::PolicyMethods` module in your model.  You can then use the `regulate_class_connection`, `regulate_instance_connections`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
+If you wish, you can also add policies directly in your models by including the `HyperMesh::PolicyMethods` module in your model.  You can then use the `regulate_class_connection`, `regulate_instance_connections`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
 
 ```ruby
 class User < ActiveRecord::Base
-  include Synchromesh::PolicyMethods
+  include HyperMesh::PolicyMethods
   regulate_class_connection ...
   regulate_instance_connections ...
   regulate_all_broadcasts ...  
@@ -206,7 +206,7 @@ Typically connections are made to ActiveRecord models, and if those are in the `
 
 #### Acting User
 
-Synchromesh uses the same `acting_user` method that reactive-record permissions uses.  This method is typically defined in the ApplicationController and would normally pick up the current session user, and return an appropriate object.
+HyperMesh uses the same `acting_user` method that reactive-record permissions uses.  This method is typically defined in the ApplicationController and would normally pick up the current session user, and return an appropriate object.
 
 ```ruby
 class ApplicationController < ActiveController::Base
@@ -240,7 +240,7 @@ Normally the client will automatically connect to the available channels when a 
 manually connect on the client in response to some user action like logging in, or the user deciding to
 display a specific team status on their dashboard.
 
-To manually connect a client use the `Synchromesh.connect` method.  
+To manually connect a client use the `HyperMesh.connect` method.  
 
 The `connect` method takes any number of arguments each of which is either a class, an object, a String or Array.
 
@@ -248,7 +248,7 @@ If the argument is a class then the connection will be made to the matching clas
 
 ```ruby
 # connect the client to the AdminUser class channel
-Synchromesh.connect(AdminUser)
+HyperMesh.connect(AdminUser)
 # if the connection is successful the client will begin getting updates on the
 # AdminUser class channel
 ```
@@ -257,7 +257,7 @@ If the argument is an object then a connection will be made to the matching obje
 
 ```ruby
 # assume current_user is an instance of class User
-Synchromesh.connect(current_user)
+HyperMesh.connect(current_user)
 # current_user.id is used to establish which User instance to connect to on the
 # server
 ```
@@ -265,20 +265,20 @@ Synchromesh.connect(current_user)
 The argument can also be a string, which matches the name of a class on the server
 
 ```ruby
-Synchromesh.connect('AdminUser')
+HyperMesh.connect('AdminUser')
 # same as AdminUser class
 ```
 
 or the argument can be an array with a string and the id:
 
 ```ruby
-Synchromesh.connect(['User', current_user.id])
+HyperMesh.connect(['User', current_user.id])
 # same as saying current_user
 ```
 
 You can make several connections at once as well:
 ```ruby
-Synchromesh.connect(AdminUser, current_user)
+HyperMesh.connect(AdminUser, current_user)
 ```
 
 Finally falsy values are ignored.
@@ -286,17 +286,17 @@ Finally falsy values are ignored.
 You can also send `connect` directly to ActiveRecord models:
 
 ```ruby
-AdminUser.connect!    # same as Synchromesh.connect(AdminUser)
-current_user.connect! # same as Synchromesh.connect(current_user)
+AdminUser.connect!    # same as HyperMesh.connect(AdminUser)
+current_user.connect! # same as HyperMesh.connect(current_user)
 ```
 
 #### Connection Sequence Summary
 
 For class connections:
 
-1. The client calls `Synchromesh.connect`.
-2. Synchromesh sends the channel name to the server.
-3. Synchromesh has its own controller which will determine the `acting_user`,
+1. The client calls `HyperMesh.connect`.
+2. HyperMesh sends the channel name to the server.
+3. HyperMesh has its own controller which will determine the `acting_user`,
 4. and call the channel's `regulate_class_connection` method.
 5. If `regulate_class_connection` returns a truthy value then the connetion is made,
 6. otherwise a 500 error is returned.
@@ -304,7 +304,7 @@ For class connections:
 For instance connections:
 
 1. The process is the same but the channel name and id are sent to the server.  
-2. The Synchromesh controller will do a find of the id passed to get the instance,
+2. The HyperMesh controller will do a find of the id passed to get the instance,
 3. and if successful `regulate_instance_connections` is called,
 4. which must return an either the same instance, or an enumerable with that instance as a member.
 5. Otherwise a 500 error is returned.
@@ -313,7 +313,7 @@ Note that the same sequence is used for auto connections and manually invoked co
 
 #### Disconnecting
 
-Calling `Synchromesh.disconnect(channel)` or `channel.disconnect!` will disconnect from the channel.
+Calling `HyperMesh.disconnect(channel)` or `channel.disconnect!` will disconnect from the channel.
 
 #### Broadcasting and Broadcast Policies
 
@@ -407,7 +407,7 @@ end
 
 #### Method Summary and Name Space Conflicts
 
-Policy classes (and the Synchromesh::PolicyMethods module) define the following class methods:
+Policy classes (and the HyperMesh::PolicyMethods module) define the following class methods:
 
 + `regulate_connection`
 + `regulate_all_broadcasts`
@@ -419,7 +419,7 @@ As well as the following instance methods:
 + `send_only`
 + `obj`
 
-To avoid name space conflicts with your classes, synchromesh policy classes (and the Synchromesh::PolicyMethods module) maintain class and instance `attr_accessor`s named `synchromesh_internal_policy_object`.   The above methods call methods of the same name in the appropriate internal policy object.
+To avoid name space conflicts with your classes, synchromesh policy classes (and the HyperMesh::PolicyMethods module) maintain class and instance `attr_accessor`s named `synchromesh_internal_policy_object`.   The above methods call methods of the same name in the appropriate internal policy object.
 
 You may thus freely redefine of the class and instance methods if you have name space conflicts
 
@@ -436,12 +436,12 @@ end
 
 #### Setting the policy directory
 
-*Synchromesh auto-connect needs to know about all policies ahead of time so cannot rely on rails auto loading.  Sorry about that!*
+*HyperMesh auto-connect needs to know about all policies ahead of time so cannot rely on rails auto loading.  Sorry about that!*
 
-By default Synchromesh will load all the files in the `app/policies` directory.  To change the directory set the policy_directory in the synchromesh initializer.  
+By default HyperMesh will load all the files in the `app/policies` directory.  To change the directory set the policy_directory in the synchromesh initializer.  
 
 ```ruby
-Synchromesh.configuration do |config|
+HyperMesh.configuration do |config|
   ...
   config.policy_directory = File.join(Rails.root, 'app', 'synchromesh-authorization')
   # can also be set to nil if you want to manually require your files

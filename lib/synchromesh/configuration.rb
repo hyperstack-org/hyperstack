@@ -1,4 +1,4 @@
-module Synchromesh
+module HyperMesh
   # configuration utility
   module Configuration
 

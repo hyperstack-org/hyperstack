@@ -32,8 +32,8 @@ describe "regulate_broadcast" do
       end
       attr_accessor :id, :attrA, :attrB, :attrC, :attrD, :attrE
     end
-    allow(Synchromesh::Connection).to receive(:active).and_return(['Application', 'TestModel1-1', 'TestModel1-7', 'TestModel2-8'])
-    allow_any_instance_of(Synchromesh::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
+    allow(HyperMesh::Connection).to receive(:active).and_return(['Application', 'TestModel1-1', 'TestModel1-7', 'TestModel2-8'])
+    allow_any_instance_of(HyperMesh::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
   end
 
   it "will broadcast the instance policies for a model" do
@@ -44,7 +44,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -64,7 +64,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.
     to raise_error("TestModel1 instance broadcast policy not sent to any channel")
   end
 
@@ -77,7 +77,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -98,7 +98,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -127,7 +127,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -157,7 +157,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -190,7 +190,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -222,7 +222,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -233,7 +233,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
   end
 
   it "will adds the obj method to the policy which points back to the model being broadcast" do
@@ -248,7 +248,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -259,7 +259,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
   end
   it "will not broadcast an empty record" do
     stub_const "TestModel1Policy", Class.new
@@ -273,7 +273,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -284,7 +284,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
   end
   it "will apply the same policy to several models" do
     stub_const "ApplicationPolicy", Class.new
@@ -295,7 +295,7 @@ describe "regulate_broadcast" do
     end
     model1 = TestModel1.new(id: 7, attr1: 1)
     model2 = TestModel2.new(id: 8, attrA: 1)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model1, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model1, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-7',
@@ -305,7 +305,7 @@ describe "regulate_broadcast" do
         previous_changes: {id: 7}
       }
     )
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model2, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model2, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel2-8',
@@ -334,7 +334,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: "send_all", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -345,7 +345,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: "send_all_but", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -356,7 +356,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: "send_only", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Synchromesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| HyperMesh::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',

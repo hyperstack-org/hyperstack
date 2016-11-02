@@ -1,10 +1,10 @@
 
-Synchromesh.configuration do |config|
+HyperMesh.configuration do |config|
   config.transport = :simple_poller
   #config.opts[:noisy] = true
 end
 
-# Synchromesh.configuration do |config|
+# HyperMesh.configuration do |config|
 #   config.transport = :pusher
 #   config.channel_prefix = "synchromesh"
 #   config.opts = {
