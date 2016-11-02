@@ -8,52 +8,30 @@ You need to be on rails 5 to use ActionCable.  Make sure you upgrade to rails 5 
 
 #### 2 Add ReactRb
 
-If you have not already installed the `hyper-react` and `reactive-record` gems, then do so now using the [reactrb-rails-generator](https://github.com/hyper-react/reactrb-rails-generator) gem.
+If you have not already installed the `reactrb` and `reactive-record` gems, then do so now using the [reactrb-rails-generator](https://github.com/hyper-react/reactrb-rails-generator) gem.
 
 - add `gem 'reactrb-rails-generator'` to your gem file (in the development section)
 - run `bundle install`
 - run `rails g hyper-react:install --all` (make sure to use the --all option)
 - run `bundle update`
 
-#### 3 Add the synchromesh gem
+#### 3 HyperMesh replaces Reactrb and ReactiveRecord
 
-- ~~add `gem 'synchromesh'` to your gem file~~  
-- add `gem 'synchromesh', git: 'https://github.com/hyper-react/synchromesh', branch: 'authorization-policies'`
+- add `gem 'hyper-mesh', git: 'https://github.com/ruby-hyperloop/synchromesh', branch: 'reactive-record-merge'`
+- you can remove references to `'reactrb'` and `'reactive-record'` if you wish
 - then `bundle install`  
-- and in `app/views/components.rb` add `require 'hyper-mesh'`  
- immediately below`require 'reactive-record'`
+- and in `app/views/components.rb` replace `require 'reactive-record'` with `require 'hyper-mesh'`  
 
 #### 4 Set the transport
 
-Once you have hyper-react installed then add this initializer:
+Once you have HyperMesh installed then add this initializer:
 ```ruby
-#config/initializers/synchromesh.rb
+#config/initializers/hyper_mesh.rb
+# note name is still Synchromesh
 Synchromesh.configuration do |config|
   config.transport = :action_cable
 end
 ```
-
-#### 5 Make sure caching is enabled
-
-Synchromesh uses the rails cache to keep track of what connections are alive in a transport independent fashion.  Rails 5 by default will have caching off in development mode.
-
-Check in `config/development.rb` and make sure that `cache_store` is never being set to `:null_store`.  
-
-If you would like to be able to interact via
-the `rails console` you should set the store to be something like this:
-
-```ruby
-# config/development.rb
-Rails.application.configure do
-  config.cache_store = :file_store, './rails_cache_dir'
-end
-```
-
-ActionCable in `async` mode can only broadcast from the server.  If you change the database from a rails console, the console app will prepare the broadcast data, and then using an HTTP request will ship it the currently running server, which will then broadcast it.  In order to do this the console has to be able to access all the connection information, hence the need for a persistent cache like `file_store`.
-
-Note:  If you are going to use the `redis` adapter with ActionCable you can use any non-null store.
-
-[See this article for more details.](http://blog.bigbinary.com/2016/01/25/caching-in-development-environment-in-rails5.html)
 
 #### 6 Define Your Policies
 
