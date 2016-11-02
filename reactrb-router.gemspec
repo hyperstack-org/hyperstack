@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   # s.add_dependency 'opal-rails'
   # s.add_dependency 'react-rails'
-  s.add_dependency 'reactrb'
+  s.add_dependency 'hyper-react'
   s.add_dependency 'opal-browser'
 
   s.add_development_dependency 'bundler', '~> 1.8'
