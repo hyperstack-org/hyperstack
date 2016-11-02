@@ -145,7 +145,7 @@ describe 'Router class', js: true do
     run_on_client { TestRouter.promise.resolve('BOGUS') }
     page.should have_content('Rendering App: No Children')
     event_history_for('Error').flatten.should eq(['Rejected: This is never going to work',
-                                                  'uninitialized constant Object::BOGUS'])
+                                                  'uninitialized constant BOGUS'])
   end
 
   it 'can have a #on_update hook' do
