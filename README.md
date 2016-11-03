@@ -1,13 +1,13 @@
-## Reactrb-Router
+## HyperRouter
 
-ReactrbRouter allows you write and use the React Router in Ruby through Opal.
+HyperRouter allows you write and use the React Router in Ruby through Opal.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'reactrb-router', git: 'https://github.com/reactrb/reactrb-router.git', branch: 'v2-4-0'
+gem 'hyper-router'
 ```
 
 And then execute:
@@ -382,11 +382,11 @@ The subset of `params.params` that were directly specified in this component's r
 
 ## Development
 
-
+`bundle exec rake` runs test suite
 
 ## Contributing
 
-1. Fork it ( https://github.com/catprintlabs/reactor-router/fork )
+1. Fork it ( https://github.com/ruby-hyperloop/reactrb-router/tree/hyper-router/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
