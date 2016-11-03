@@ -4,17 +4,17 @@ $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require 'react/router/version'
 
 Gem::Specification.new do |s|
-  s.name          = 'reactrb-router'
-  s.version       = ReactrbRouter::VERSION
+  s.name          = 'hyper-router'
+  s.version       = HyperRouter::VERSION
   s.authors       = ['Adam George']
   s.email         = ['adamgeorge.31@gmail.com']
-  s.summary       = 'react-router for Opal, part of the reactrb gem family'
+  s.summary       = 'react-router for Opal, part of the hyperloop gem family'
   s.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   s.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
 
   # s.add_dependency 'opal-rails'
   # s.add_dependency 'react-rails'
-  s.add_dependency 'reactrb'
+  s.add_dependency 'hyper-react'
   s.add_dependency 'opal-browser'
 
   s.add_development_dependency 'bundler', '~> 1.8'

@@ -14,7 +14,7 @@ describe "ReactrbRouter::link", js: true do
           div do
             TestRouter::Link("/", id: "link-4", only_active_on_index: true, active_style: {border: "thin solid", color: :red}) { "Home"}
             (1..3).each { |i| div(style: {float: :left, "margin-right" => 20}) { TestRouter::Link("/#{i}", id: "link-#{i}", active_class: :active) { "Link-#{i}"}}}
-            div(style: {clear: :both}) { children.first.render } unless children.empty?
+            div(style: {clear: :both}) { children.first.render } unless children.count == 0
           end
         end
       end

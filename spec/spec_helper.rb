@@ -13,7 +13,7 @@ def ruby?
 end
 
 if RUBY_ENGINE == 'opal'
-  require 'reactrb'
+  require 'hyper-react'
   require File.expand_path('../support/react/spec_helpers', __FILE__)
 
   module Opal

@@ -31,15 +31,15 @@ module ComponentTestHelpers
           end
 
           def event_history_for(event_name)
-            event_history["_on#{event_name.event_camelize}"]
+            event_history["on_#{event_name}"]
           end
 
           def last_event_for(event_name)
-            event_history["_on#{event_name.event_camelize}"].last
+            event_history["on_#{event_name}"].last
           end
 
           def clear_event_history_for(event_name)
-            event_history["_on#{event_name.event_camelize}"] = []
+            event_history["on_#{event_name}"] = []
           end
 
         end
@@ -71,16 +71,17 @@ module ComponentTestHelpers
 
         before_mount do
           TopLevelRailsComponent.event_history = Hash.new {|h,k| h[k] = [] }
+          @render_params = params.render_params.dup
           component.validator.rules.each do |name, rules|
             if rules[:type] == Proc
               TopLevelRailsComponent.event_history[name] = []
-              params.render_params[name] = lambda { |*args|  TopLevelRailsComponent.event_history[name] << args.collect { |arg| Native(arg).to_n } }
+              @render_params[name] = lambda { |*args| TopLevelRailsComponent.event_history[name] << args.collect { |arg| Native(arg).to_n } }
             end
           end
         end
 
         def render
-          present component, params.render_params
+          present component, @render_params
         end
       end
     end
@@ -116,7 +117,7 @@ module ComponentTestHelpers
           end
 
           #TODO figure out how to auto insert this line????  something like:
-          page = "<%= javascript_include_tag 'reactrb-router' %>\n#{page}"
+          page = "<%= javascript_include_tag 'hyper-router' %>\n#{page}"
 
           if (render_on != :server_only && !render_params[:layout]) || javascript
             page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n"+page

@@ -1,5 +1,6 @@
 if RUBY_ENGINE == 'opal'
   # require 'reactrb' # how to require this conditionally????
+  require 'hyper-react'
   require 'promise'
   require 'promise_extras'
   require 'react/router/react-router'
@@ -11,7 +12,7 @@ if RUBY_ENGINE == 'opal'
   require 'patches/react'
 else
   require 'opal'
-  require 'reactrb'
+  require 'hyper-react'
   require 'react/router/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint

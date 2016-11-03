@@ -19,10 +19,10 @@ describe 'Router class', js: true do
   it 'can have a #create_element hook' do
     mount 'TestRouter' do
       class TestRouter < React::Router
-        param :_onCreateElement, type: Proc
+        param :on_create_element, type: Proc
 
         def create_element(component, component_params)
-          params._onCreateElement(component.name)
+          params.on_create_element(component.name)
           if component.name == 'App'
             React.create_element(component, component_params.merge(optional_param: 'I am the App'))
           elsif component.name == 'Child1'
@@ -50,17 +50,17 @@ describe 'Router class', js: true do
     page.should have_content('I am also a Child')
     page.evaluate_script('window.ReactRouter.hashHistory.push("child3")')
     page.should have_content('Child3 got routed')
-    event_history_for('CreateElement')
+    event_history_for('create_element')
       .flatten.should eq(%w(App Child1 App Child2 App Child3 App))
   end
 
   it 'can have a #stringify_query hook' do
-    mount 'TestRouter' do
+    mount 'TestRouter', foo: :bar do
       class TestRouter < React::Router
-        param :_onStringifyQuery, type: Proc
+        param :on_stringify_query, type: Proc
 
         def stringify_query(query)
-          params._onStringifyQuery(query)
+          params.on_stringify_query(query)
           query[:foo] = 14 if query[:foo]
           query.to_a.map { |x| "#{x[0]}=#{x[1]}" }.join('&')
         end
@@ -76,16 +76,16 @@ describe 'Router class', js: true do
     page.evaluate_script('window.ReactRouter.hashHistory.push({pathname: "link"})')
     click_link 'child1'
     page.evaluate_script('window.location.href').scan('foo=14').should_not be_empty
-    event_history_for('StringifyQuery').flatten.should eq([{ 'foo' => 12 }, { 'foo' => 14 }])
+    event_history_for('stringify_query').flatten.should eq([{ 'foo' => 12 }, { 'foo' => 14 }])
   end
 
   it 'can have a #parse_query_string hook' do
     mount 'TestRouter' do
       class TestRouter < React::Router
-        param :_onParseQueryString, type: Proc
+        param :on_parse_query_string, type: Proc
 
         def parse_query_string(query_string)
-          params._onParseQueryString(query_string)
+          params.on_parse_query_string(query_string)
           hash = Hash.new(0)
           query_string.split('&').each do |param|
             hash[param.split('=')[0]] = param.split('=')[1]
@@ -105,16 +105,16 @@ describe 'Router class', js: true do
 
     page.evaluate_script('window.ReactRouter.hashHistory.push("query?foo=12")')
     page.should have_content('query props = {"foo"=>14}')
-    event_history_for('ParseQueryString').flatten.should eq(['', 'foo=12'])
+    event_history_for('parse_query_string').flatten.should eq(['', 'foo=12'])
   end
 
   it 'can have a #on_error hook' do
     mount 'TestRouter' do
       class TestRouter < React::Router
-        param :_onError, type: Proc
+        param :on_error, type: Proc
 
         def on_error(message)
-          params._onError(message.to_s)
+          params.on_error(message.to_s)
         end
 
         def routes
@@ -144,17 +144,17 @@ describe 'Router class', js: true do
     page.evaluate_script('window.ReactRouter.hashHistory.push({pathname: "test2"})')
     run_on_client { TestRouter.promise.resolve('BOGUS') }
     page.should have_content('Rendering App: No Children')
-    event_history_for('Error').flatten.should eq(['Rejected: This is never going to work',
+    event_history_for('error').flatten.should eq(['Rejected: This is never going to work',
                                                   'uninitialized constant BOGUS'])
   end
 
   it 'can have a #on_update hook' do
     mount 'TestRouter' do
       class TestRouter < React::Router
-        param :_onUpdate, type: Proc
+        param :on_update, type: Proc
 
         def on_update(_props, state)
-          params._onUpdate(state[:location][:pathname])
+          params.on_update(state[:location][:pathname])
         end
 
         def routes
@@ -166,16 +166,16 @@ describe 'Router class', js: true do
     end
 
     page.evaluate_script('window.ReactRouter.hashHistory.push("child1")')
-    event_history_for('Update').flatten.should eq(['/child1'])
+    event_history_for('update').flatten.should eq(['/child1'])
   end
 
   it 'can redefine the #render method' do
     mount 'TestRouter' do
       class TestRouter < React::Router
-        param :_onRender, type: Proc
+        param :on_render, type: Proc
 
         def render
-          params._onRender('rendered')
+          params.on_render('rendered')
           super
         end
 
@@ -186,6 +186,6 @@ describe 'Router class', js: true do
     end
 
     page.should have_content('Rendering App: No Children')
-    event_history_for('Render').flatten.should eq(['rendered'])
+    event_history_for('render').flatten.should eq(['rendered'])
   end
 end
