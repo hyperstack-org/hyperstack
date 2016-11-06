@@ -18,6 +18,17 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
+## [0.11.0] - Unreleased
+
+### Changed
+
+- The whole opal-activesuppport is not loaded by default now. If your code rely on any of the module which is not required by hyper-react, you need to require it yourself. (#135)
+
+### Fixed
+
+- Arity checking failed for `_react_param_conversion` & `React::Element#initialize` (#167)
+
+
 ## [0.10.0] - 2016-10-30
 
 ### Changed
