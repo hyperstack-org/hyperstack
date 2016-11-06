@@ -269,7 +269,7 @@ describe React::Component, type: :component do
       end
 
       element = renderToDocument(Foo)
-      expect(Element[element].text).to eq('10')
+      expect(`#{element.dom_node}.textContent`).to eq('10')
     end
 
     it 'supports original `setState` as `set_state` method' do
@@ -344,7 +344,7 @@ describe React::Component, type: :component do
         end
 
         element = renderToDocument(Foo, prop: 'foobar')
-        expect(Element[element].text).to eq('foobar')
+        expect(`#{element.dom_node}.textContent`).to eq('foobar')
       end
 
       it 'accesses nested params as orignal Ruby object' do
@@ -355,7 +355,7 @@ describe React::Component, type: :component do
         end
 
         element = renderToDocument(Foo, prop: [{foo: 10}])
-        expect(Element[element].text).to eq('10')
+        expect(`#{element.dom_node}.textContent`).to eq('10')
       end
     end
 

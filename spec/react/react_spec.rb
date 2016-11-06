@@ -44,7 +44,7 @@ RSpec.describe React, type: :component do
           [React.create_element('span'), React.create_element('span'), React.create_element('span')]
         end
         instance = renderElementToDocument(element)
-        expect(Element[instance].children.length).to eq(3)
+        expect(`#{instance.dom_node}.children.length`).to eq(3)
       end
     end
 
