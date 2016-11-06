@@ -25,8 +25,8 @@ RSpec.describe React::Component::Base, type: :component do
         @instance_data.join(" ")
       end
     end
-    expect(Foo).to render("<span>working</span>")
-    expect(Bar).to render("<span>working well</span>")
+    expect(Foo).to render_static_html("<span>working</span>")
+    expect(Bar).to render_static_html("<span>working well</span>")
   end
 end
 end

@@ -10,7 +10,7 @@ end
 
 describe 'An Example from the react.rb doc', type: :component do
   it 'produces the correct result' do
-    expect(HelloMessage).to render('<div>Hello World!</div>')
+    expect(HelloMessage).to render_static_html('<div>Hello World!</div>')
   end
 end
 
@@ -24,7 +24,7 @@ end
 
 describe 'Adding state to a component (second tutorial example)', type: :component do
   it "produces the correct result" do
-    expect(HelloMessage2).to render('<div>Hello @catmando</div>')
+    expect(HelloMessage2).to render_static_html('<div>Hello @catmando</div>')
   end
 
   it 'renders to the document' do

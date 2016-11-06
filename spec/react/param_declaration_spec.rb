@@ -12,7 +12,7 @@ describe 'the param macro', type: :component do
       end
     end
 
-    expect(Foo).to render('<div>biz</div>').with_params(bar: 'biz')
+    expect(Foo).to render_static_html('<div>biz</div>').with_params(bar: 'biz')
   end
 
   it "can create and access a required param" do
@@ -25,7 +25,7 @@ describe 'the param macro', type: :component do
       end
     end
 
-    expect(Foo).to render('<div>bar</div>').with_params(foo: :bar)
+    expect(Foo).to render_static_html('<div>bar</div>').with_params(foo: :bar)
   end
 
   it "can create and access an optional params" do
@@ -42,7 +42,7 @@ describe 'the param macro', type: :component do
       end
     end
 
-    expect(Foo).to render('<div>bar1-no_bar2-bar3-no_bar4</div>').with_params(foo1: :bar1, foo3: :bar3)
+    expect(Foo).to render_static_html('<div>bar1-no_bar2-bar3-no_bar4</div>').with_params(foo1: :bar1, foo3: :bar3)
   end
 
   it 'can specify validation rules with the type option' do
@@ -66,7 +66,7 @@ describe 'the param macro', type: :component do
       end
     end
 
-    expect(Foo).to render('<div>12-string</div>').with_params(foo1: 12, foo2: "string")
+    expect(Foo).to render_static_html('<div>12-string</div>').with_params(foo1: 12, foo2: "string")
   end
 
   it 'logs error in warning if validation failed' do
@@ -167,7 +167,7 @@ describe 'the param macro', type: :component do
       end
 
       params = { foo: "", bar: { bazwoggle: 1 }, baz: [{ bazwoggle: 2 }] }
-      expect(Foo).to render('<span>1, 2</span>').with_params(params)
+      expect(Foo).to render_static_html('<span>1, 2</span>').with_params(params)
       expect(`window.dummy_log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle/)
     end
 
@@ -235,7 +235,7 @@ describe 'the param macro', type: :component do
           params.foo
         end
       end
-      expect(Foo).to render('<span>works!</span>').with_params(foo: lambda { 'works!' })
+      expect(Foo).to render_static_html('<span>works!</span>').with_params(foo: lambda { 'works!' })
     end
 
     it "will create a 'bang' (i.e. update) method if the type is React::Observable" do
@@ -250,7 +250,7 @@ describe 'the param macro', type: :component do
       end
       current_state = ""
       observer = React::Observable.new(current_state) { |new_state| current_state = new_state }
-      expect(Foo).to render('<span>ha!</span>').with_params(foo: observer)
+      expect(Foo).to render_static_html('<span>ha!</span>').with_params(foo: observer)
       expect(current_state).to eq("ha!")
     end
   end

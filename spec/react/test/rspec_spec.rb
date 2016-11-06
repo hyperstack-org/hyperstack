@@ -23,7 +23,7 @@ if opal?
     end
 
     it 'includes rspec matchers' do
-      expect(Greeter).to render(
+      expect(Greeter).to render_static_html(
         '<span>Hello world</span>'
       ).with_params(message: 'world')
     end

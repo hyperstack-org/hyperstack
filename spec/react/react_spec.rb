@@ -102,7 +102,7 @@ RSpec.describe React, type: :component do
           end
         end
 
-        expect(Foo).to render("<div>20</div>")
+        expect(Foo).to render_static_html("<div>20</div>")
       end
 
       it "should match the instance cycle to ReactComponent life cycle" do

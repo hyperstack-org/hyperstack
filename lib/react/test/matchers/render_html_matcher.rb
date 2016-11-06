@@ -41,7 +41,12 @@ module React
         end
       end
 
+      def render_static_html(*args)
+        RenderHTMLMatcher.new(*args)
+      end
+
       def render(*args)
+        %x{ console.error("Warning: `render` matcher is deprecated in favor of `render_static_html`."); }
         RenderHTMLMatcher.new(*args)
       end
     end
