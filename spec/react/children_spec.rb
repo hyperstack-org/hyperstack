@@ -15,7 +15,7 @@ describe React::Children do
   let(:children) { described_class.new(`#{element.to_n}.props.children`) }
 
   before(:each) do
-    renderElementToDocument(element)
+    React::Test::Utils.render_into_document(element)
   end
 
   it 'is enumerable' do

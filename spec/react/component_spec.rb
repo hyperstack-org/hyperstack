@@ -34,6 +34,8 @@ describe React::Component, type: :component do
   end
 
   describe 'Life Cycle' do
+    let(:element_to_render) { React.create_element(Foo) }
+
     before(:each) do
       stub_const 'Foo', Class.new
       Foo.class_eval do
@@ -54,7 +56,7 @@ describe React::Component, type: :component do
       expect_any_instance_of(Foo).to receive(:bar)
       expect_any_instance_of(Foo).to receive(:bar2)
 
-      renderToDocument(Foo)
+      React::Test::Utils.render_into_document(element_to_render)
     end
 
     it 'invokes `after_mount` registered methods when `componentDidMount()`' do
@@ -67,7 +69,7 @@ describe React::Component, type: :component do
       expect_any_instance_of(Foo).to receive(:bar3)
       expect_any_instance_of(Foo).to receive(:bar4)
 
-      renderToDocument(Foo)
+      React::Test::Utils.render_into_document(element_to_render)
     end
 
     it 'allows multiple class declared life cycle hooker' do
@@ -88,7 +90,7 @@ describe React::Component, type: :component do
 
       expect_any_instance_of(Foo).to receive(:bar)
 
-      renderToDocument(Foo)
+      React::Test::Utils.render_into_document(element_to_render)
     end
 
     it 'allows block for life cycle callback' do
@@ -169,6 +171,8 @@ describe React::Component, type: :component do
   end
 
   describe 'State setter & getter' do
+    let(:element_to_render) { React.create_element(Foo) }
+
     before(:each) do
       stub_const 'Foo', Class.new
       Foo.class_eval do
@@ -188,8 +192,8 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be('bar')
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.foo).to be('bar')
     end
 
     it 'defines init state by passing a block to `define_state`' do
@@ -197,8 +201,8 @@ describe React::Component, type: :component do
         define_state(:foo) { 10 }
       end
 
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be(10)
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.foo).to be(10)
     end
 
     it 'defines getter using `define_state`' do
@@ -210,8 +214,8 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be(30)
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.foo).to be(30)
     end
 
     it 'defines multiple state accessors by passing array to `define_state`' do
@@ -224,9 +228,9 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be(10)
-      expect(element.state.foo2).to be(20)
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.foo).to be(10)
+      expect(instance.state.foo2).to be(20)
     end
 
     it 'invokes `define_state` multiple times to define states' do
@@ -235,29 +239,30 @@ describe React::Component, type: :component do
         define_state(:foo2) { 40 }
       end
 
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be(30)
-      expect(element.state.foo2).to be(40)
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.foo).to be(30)
+      expect(instance.state.foo2).to be(40)
     end
 
     it 'can initialize multiple state variables with a block' do
       Foo.class_eval do
         define_state(:foo, :foo2) { 30 }
       end
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be(30)
-      expect(element.state.foo2).to be(30)
+
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.foo).to be(30)
+      expect(instance.state.foo2).to be(30)
     end
 
     it 'can mix multiple state variables with initializers and a block' do
       Foo.class_eval do
         define_state(:x, :y, foo: 1, bar: 2) {3}
       end
-      element = renderToDocument(Foo)
-      expect(element.state.x).to be(3)
-      expect(element.state.y).to be(3)
-      expect(element.state.foo).to be(1)
-      expect(element.state.bar).to be(2)
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state.x).to be(3)
+      expect(instance.state.y).to be(3)
+      expect(instance.state.foo).to be(1)
+      expect(instance.state.bar).to be(2)
     end
 
     it 'gets state in render method' do
@@ -268,8 +273,8 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(`#{element.dom_node}.textContent`).to eq('10')
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(`#{instance.dom_node}.textContent`).to eq('10')
     end
 
     it 'supports original `setState` as `set_state` method' do

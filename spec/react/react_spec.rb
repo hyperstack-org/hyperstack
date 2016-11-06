@@ -43,8 +43,9 @@ RSpec.describe React, type: :component do
         element = React.create_element('div') do
           [React.create_element('span'), React.create_element('span'), React.create_element('span')]
         end
-        instance = renderElementToDocument(element)
-        expect(`#{instance.dom_node}.children.length`).to eq(3)
+        dom_node = React::Test::Utils.render_into_document(element)
+
+        expect(`#{dom_node}.children.length`).to eq(3)
       end
     end
 
@@ -117,8 +118,8 @@ RSpec.describe React, type: :component do
           end
         end
 
-        renderToDocument(Foo)
-        renderToDocument(Foo)
+        React::Test::Utils.render_into_document(React.create_element(Foo))
+        React::Test::Utils.render_into_document(React.create_element(Foo))
 
         expect(`count`).to eq(2)
       end
