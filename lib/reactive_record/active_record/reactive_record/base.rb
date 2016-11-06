@@ -185,58 +185,18 @@ module ReactiveRecord
 
     def reactive_set!(attribute, value)
       @virgin = false unless data_loading?
-      unless @destroyed or (!(attributes[attribute].is_a? DummyValue) and attributes.has_key?(attribute) and attributes[attribute] == value)
-        if association = @model.reflect_on_association(attribute)
-          if association.collection?
-            collection = Collection.new(association.klass, @ar_instance, association)
-            collection.replace(value || [])
-            value = collection
-          else
-            inverse_of = association.inverse_of
-            inverse_association = association.klass.reflect_on_association(inverse_of)
-            if inverse_association.collection?
-              if value.nil?
-                attributes[attribute].attributes[inverse_of].delete(@ar_instance) unless attributes[attribute].nil?
-              elsif value.attributes[inverse_of]
-                value.attributes[inverse_of] << @ar_instance
-              else
-                value.attributes[inverse_of] = Collection.new(@model, value, inverse_association)
-                # value.attributes[inverse_of].replace [@ar_instance]
-                # why was the above not just the below???? fixed 10/28/2016
-                value.attributes[inverse_of] << @ar_instance
-              end
-            elsif !value.nil?
-              attributes[attribute].attributes[inverse_of] = nil unless attributes[attribute].nil?
-              value.attributes[inverse_of] = @ar_instance
-              React::State.set_state(value.backing_record, inverse_of, @ar_instance) unless data_loading?
-            elsif attributes[attribute]
-              attributes[attribute].attributes[inverse_of] = nil
-            end
-          end
-        elsif aggregation = @model.reflect_on_aggregation(attribute) and (aggregation.klass < ActiveRecord::Base)
-
-          if new?
-            attributes[attribute] ||= aggregation.klass.new
-          elsif !attributes[attribute]
-            raise "uninitialized aggregate attribute - should never happen"
-          end
-
-          aggregate_record = attributes[attribute].backing_record
-          aggregate_record.virgin = false
-
-          if value
-            value_attributes = value.backing_record.attributes
-            aggregation.mapped_attributes.each { |mapped_attribute| aggregate_record.update_attribute(mapped_attribute, value_attributes[mapped_attribute])}
-          else
-            aggregation.mapped_attributes.each { |mapped_attribute| aggregate_record.update_attribute(mapped_attribute, nil) }
-          end
-
-          return attributes[attribute]
-
-        end
-        update_attribute(attribute, value)
-      end
+      return value if @destroyed || dont_update_attribute?(attribute, value)
+      return attributes[attribute] if update_aggregate(attribute, value)
+      value = update_relationships(attribute, value)
+      update_attribute(attribute, value)
       value
+    end
+
+    def dont_update_attribute?(attribute, value)
+      return false if attributes[attribute].is_a?(DummyValue)
+      return false unless attributes.key?(attribute)
+      return false if attributes[attribute] != value
+      true
     end
 
     def update_attribute(attribute, *args)

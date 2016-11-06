@@ -18,6 +18,7 @@ module ReactiveRecord
     @loads_pending = @load_stack.pop
     promise
   rescue Exception => e
+    debugger
     React::IsomorphicHelpers.log "ReactiveRecord.load exception raised during initial load: #{e}", :error
   end
 
