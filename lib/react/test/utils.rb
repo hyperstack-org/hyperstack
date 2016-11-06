@@ -9,6 +9,8 @@ module React
 
         if `#{native_instance}._getOpalInstance !== undefined`
           `#{native_instance}._getOpalInstance()`
+        elsif `ReactTestUtils.isDOMComponent(#{native_instance}) && React.findDOMNode !== undefined` 
+          `React.findDOMNode(#{native_instance})`
         else
           native_instance
         end
