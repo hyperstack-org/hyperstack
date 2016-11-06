@@ -3,7 +3,7 @@ require "spec_helper"
 if opal?
 # require 'reactrb/new-event-name-convention' # this require will get rid of any error messages but
 # the on method will no longer attach to the param prefixed with _on
-describe React::Element do
+describe React::Element, type: :component do
   it 'bridges `type` of native React.Element attributes' do
     element = React.create_element('div')
     expect(element.element_type).to eq("div")

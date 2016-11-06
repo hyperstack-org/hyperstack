@@ -190,7 +190,7 @@ describe 'the param macro', type: :component do
             "#{params.foo.kind}"
           end
         end
-        expect(React.render_to_static_markup(React.create_element(Foo, foo: {bazwoggle: 1}))).to eq('<span>2</span>')
+        expect(Foo).to render_static_html('<span>2</span>').with_params(foo: {bazwoggle: 1})
       end
 
       it "even if contains an embedded native object" do

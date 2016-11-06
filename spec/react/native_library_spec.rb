@@ -17,7 +17,7 @@ module NativeLibraryTestModule
   end
 end
 
-describe "React::NativeLibrary" do
+describe "React::NativeLibrary", type: :component do
 
   after(:each) do
     %x{
@@ -52,8 +52,7 @@ describe "React::NativeLibrary" do
       Foo.class_eval do
         imports "NativeLibrary.FunctionalComponent"
       end
-      expect(React.render_to_static_markup(
-        React.create_element(Foo, name: "There"))).to eq('<div>Hello There</div>')
+      expect(Foo).to render_static_html('<div>Hello There</div>').with_params(name: "There")
     end
   end
 
@@ -87,8 +86,8 @@ describe "React::NativeLibrary" do
     Foo.class_eval do
       imports "NativeLibrary"
     end
-    expect(React.render_to_static_markup(
-      React.create_element(Foo::NativeComponent, name: "There"))).to eq('<div>Hello There</div>')
+    expect(Foo::NativeComponent)
+      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
   end
 
   it "will import a nested React.js library into the Ruby name space" do
@@ -107,8 +106,8 @@ describe "React::NativeLibrary" do
     Foo.class_eval do
       imports "NativeLibrary"
     end
-    expect(React.render_to_static_markup(
-      React.create_element(Foo::NestedLibrary::NativeComponent, name: "There"))).to eq('<div>Hello There</div>')
+    expect(Foo::NestedLibrary::NativeComponent)
+      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
   end
 
   it "will rename an imported a React.js component" do
@@ -127,8 +126,8 @@ describe "React::NativeLibrary" do
       imports "NativeLibrary"
       rename "NativeComponent" => "Bar"
     end
-    expect(React.render_to_static_markup(
-      React.create_element(Foo::Bar, name: "There"))).to eq('<div>Hello There</div>')
+    expect(Foo::Bar)
+      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
   end
 
   it "will give a reasonable error when failing to import a renamed component" do
@@ -164,8 +163,8 @@ describe "React::NativeLibrary" do
     Foo.class_eval do
       imports "NativeComponent"
     end
-    expect(React.render_to_static_markup(
-      React.create_element(Foo, name: "There"))).to eq('<div>Hello There</div>')
+    expect(Foo)
+      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
 
   end
 
@@ -184,8 +183,8 @@ describe "React::NativeLibrary" do
     Foo.class_eval do
       imports "NativeLibrary.NativeComponent"
     end
-    expect(React.render_to_static_markup(
-      React.create_element(Foo, name: "There"))).to eq('<div>Hello There</div>')
+    expect(Foo)
+      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
 
   end
 
@@ -234,8 +233,7 @@ describe "React::NativeLibrary" do
           }
         })
       }
-      expect(React.render_to_static_markup(
-        React.create_element(Foo))).to eq('<div>Hello There</div>')
+      expect(Foo).to render_static_html('<div>Hello There</div>')
     end
 
     it 'will automatically import a React.js component when referenced in another component with the _as_node suffix' do
@@ -254,8 +252,7 @@ describe "React::NativeLibrary" do
           }
         })
       }
-      expect(React.render_to_static_markup(
-        React.create_element(Foo))).to eq('<div><div>Hello There</div><div>Hello There</div></div>')
+      expect(Foo).to render_static_html('<div><div>Hello There</div><div>Hello There</div></div>')
     end
 
     it "will automatically import a React.js component in a library when referenced in another component with the _as_node suffix" do
@@ -276,8 +273,7 @@ describe "React::NativeLibrary" do
           })
         }
       }
-      expect(React.render_to_static_markup(
-        React.create_element(Foo))).to eq('<div><div>Hello There</div><div>Hello There</div></div>')
+      expect(Foo).to render_static_html('<div><div>Hello There</div><div>Hello There</div></div>')
     end
 
     it "will automatically import a React.js component when referenced as a constant" do
@@ -289,8 +285,8 @@ describe "React::NativeLibrary" do
           }
         })
       }
-      expect(React.render_to_static_markup(
-        React.create_element(NativeComponent, name: "There"))).to eq('<div>Hello There</div>')
+      expect(NativeComponent)
+        .to render_static_html('<div>Hello There</div>').with_params(name: "There")
     end
 
     it "will automatically import a native library containing a React.js component" do
@@ -322,8 +318,8 @@ describe "React::NativeLibrary" do
           })
         }
       }
-      expect(React.render_to_static_markup(
-        React.create_element(NativeLibrary::NativeComponent, name: "There"))).to eq('<div>Hello There</div>')
+      expect(NativeLibrary::NativeComponent)
+        .to render_static_html('<div>Hello There</div>').with_params(name: "There")
     end
 
     it "will produce a sensible error if the component is not in the library" do

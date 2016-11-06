@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 if opal?
-describe 'the React DSL' do
+describe 'the React DSL', type: :component do
 
   context "render macro" do
 
@@ -14,7 +14,7 @@ describe 'the React DSL' do
         end
       end
 
-      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div class="foo">hello</div>')
+      expect(Foo).to render_static_html('<div class="foo">hello</div>')
     end
 
     it "can define the render method with the render macro without a container" do
@@ -26,7 +26,7 @@ describe 'the React DSL' do
         end
       end
 
-      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>hello</span>')
+      expect(Foo).to render_static_html('<span>hello</span>')
     end
 
     it "can define the render method with the render macro with a application defined container" do
@@ -40,7 +40,7 @@ describe 'the React DSL' do
         render Bar, p1: "fred"
       end
 
-      expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>hello fred</span>')
+      expect(Foo).to render_static_html('<span>hello fred</span>')
     end
   end
 
@@ -53,7 +53,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>hello</div>')
+    expect(Foo).to render_static_html('<div>hello</div>')
   end
 
   it "will pass converted props through event handlers" do
@@ -77,7 +77,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>hello</div>')
+    expect(Foo).to render_static_html('<div>hello</div>')
   end
 
   it "has a .span short hand String method" do
@@ -89,7 +89,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div><span>hello</span><span>goodby</span></div>')
+    expect(Foo).to render_static_html('<div><span>hello</span><span>goodby</span></div>')
   end
 
   it "has a .br short hand String method" do
@@ -113,7 +113,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<table><tr><td>hello</td></tr></table>')
+    expect(Foo).to render_static_html('<table><tr><td>hello</td></tr></table>')
   end
 
   it "has a .para short hand String method" do
@@ -125,7 +125,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div><p>hello</p></div>')
+    expect(Foo).to render_static_html('<div><p>hello</p></div>')
   end
 
   it 'can do a method call on a class name that is not a direct sibling' do
@@ -141,8 +141,8 @@ describe 'the React DSL' do
         Comp()
       end
     end
-    expect(React.render_to_static_markup(React.create_element(Mod::NestedMod::NestedComp)))
-      .to eq('<span>Mod::Comp</span>')
+    expect(Mod::NestedMod::NestedComp)
+      .to render_static_html('<span>Mod::Comp</span>')
   end
 
   it 'raises a meaningful error if a Constant Name is not actually a component' do
@@ -187,7 +187,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span>a man walks into a bar</span>')
+    expect(Foo).to render_static_html('<span>a man walks into a bar</span>')
   end
 
   it "can add class names by the haml .class notation" do
@@ -206,7 +206,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span class="other-class the-class">a man walks into a bar</span>')
+    expect(Foo).to render_static_html('<span class="other-class the-class">a man walks into a bar</span>')
   end
 
   it "can use the 'class' keyword for classes" do
@@ -218,7 +218,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span class="the-class">hello</span>')
+    expect(Foo).to render_static_html('<span class="the-class">hello</span>')
   end
 
   it "can generate a unrendered node using the .as_node method" do          # div { "hello" }.as_node
@@ -230,7 +230,8 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<span data-size="12">React::Element</span>')
+    expect(Foo)
+    .to render_static_html('<span data-size="12">React::Element</span>')
   end
 
   it "can use the dangerously_set_inner_HTML param" do
@@ -242,7 +243,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to eq('<div>Hello&nbsp;&nbsp;Goodby</div>')
+    expect(Foo).to render_static_html('<div>Hello&nbsp;&nbsp;Goodby</div>')
   end
 
   it 'should convert a hash param to hyphenated html attributes if in React::HASH_ATTRIBUTES' do
@@ -254,8 +255,8 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo)))
-      .to eq('<div data-foo="bar" aria-foo-bar="foo"></div>')
+    expect(Foo)
+      .to render_static_html('<div data-foo="bar" aria-foo-bar="foo"></div>')
   end
 
   it 'should not convert a hash param to hyphenated html attributes if not in React::HASH_ATTRIBUTES' do
@@ -267,8 +268,10 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo)))
-      .to eq('<div title="{&quot;bar&quot;=&gt;&quot;foo&quot;}"></div>')
+    expect(Foo)
+      .to render_static_html(
+        '<div title="{&quot;bar&quot;=&gt;&quot;foo&quot;}"></div>'
+      )
   end
 
   it "will remove all elements passed as params from the rendering buffer" do
@@ -290,7 +293,7 @@ describe 'the React DSL' do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Test))).to eq('<div><b>hello</b><b>hello</b></div>')
+    expect(Test).to render_static_html('<div><b>hello</b><b>hello</b></div>')
   end
 end
 end

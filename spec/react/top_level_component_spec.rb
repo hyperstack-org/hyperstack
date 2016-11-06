@@ -39,8 +39,13 @@ class Component1
 end
 
 def render_top_level(controller, component_name)
-  render_to_html(React::TopLevelRailsComponent, controller: controller,
-                 component_name: component_name, render_params: {})
+  params = {
+    controller: controller,
+    component_name: component_name,
+    render_params: {}
+  }
+  element = React.create_element(React::TopLevelRailsComponent, params)
+  React.render_to_static_markup(element)
 end
 
 describe React::TopLevelRailsComponent do
