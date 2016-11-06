@@ -105,6 +105,10 @@ module HyperMesh
     uri = URI("#{Connection.root_path}console_update")
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
+    if uri.scheme = 'https'
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    end
     request.body = {
       channel: channel, data: data, salt: salt, authorization: authorization
     }.to_json

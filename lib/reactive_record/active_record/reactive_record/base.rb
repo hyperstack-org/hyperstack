@@ -382,7 +382,7 @@ module ReactiveRecord
         instance_backing_record_attributes[inverse_of].replace [@ar_instance]
       else
         instance_backing_record_attributes[inverse_of] = @ar_instance
-      end if inverse_of and !instance_backing_record_attributes.has_key?(inverse_of)
+      end unless association.through_association? || instance_backing_record_attributes.key?(inverse_of)
       instance
     end
 

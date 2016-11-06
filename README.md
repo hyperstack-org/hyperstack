@@ -1,4 +1,4 @@
-# HyperMesh ![](https://avatars3.githubusercontent.com/u/15810526?v=3&s=200&raw=true)
+#  ![](https://avatars3.githubusercontent.com/u/15810526?v=3&s=40&raw=true)HyperMesh
 
 HyperMesh is a policy based CRUD system which wraps ActiveRecord models on the server and extends
 them to the client. Furthermore it implements push notifications (via a number of possible

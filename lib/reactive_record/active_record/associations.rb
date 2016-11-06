@@ -26,33 +26,70 @@ module ActiveRecord
       attr_reader :attribute
       attr_reader :macro
       attr_reader :owner_class
+      attr_reader :source
 
       def initialize(owner_class, macro, name, options = {})
         owner_class.reflect_on_all_associations << self
         @owner_class = owner_class
         @macro =       macro
         @options =     options
-        @klass_name =  options[:class_name] || (collection? && name.camelize.gsub(/s$/,"")) || name.camelize
+        @klass_name =  options[:class_name] || (collection? && name.camelize.gsub(/s$/, '')) || name.camelize
         if @klass_name < ActiveRecord::Base
           @klass = @klass_name
           @klass_name = @klass_name.name
         end rescue nil
         @association_foreign_key = options[:foreign_key] || (macro == :belongs_to && "#{name}_id") || "#{@owner_class.name.underscore}_id"
-        @attribute =   name
+        @source = options[:source] || @klass_name.underscore if options[:through]
+        @attribute = name
       end
 
-      def inverse_of
-        inverse.attribute if inverse
+      def through_association
+        return unless @options[:through]
+        @through_association ||= @owner_class.reflect_on_all_associations.detect do |association|
+          association.attribute == @options[:through]
+        end
+        raise "Through association #{@options[:through]} for "\
+              "#{@owner_class}.#{attribute} not found." unless @through_association
+        @through_association
+      end
+
+      alias through_association? through_association
+
+      def through_associations
+        # find all associations that use the inverse association as the through association
+        @through_associations ||= klass.reflect_on_all_associations.select do |assoc|
+          assoc.through_association && assoc.inverse == self
+        end
+      end
+
+      def source_associations
+        # find all associations that use this association as the source
+        @source_associations ||= owner_class.reflect_on_all_associations.collect do |sibling|
+          sibling.klass.reflect_on_all_associations.select do |assoc|
+            assoc.source == attribute
+          end
+        end.flatten
       end
 
       def inverse
-        unless @options[:through] || @inverse
-          @inverse = klass.reflect_on_all_associations.detect do | association |
-            association.association_foreign_key == @association_foreign_key and association.klass == @owner_class and association.attribute != attribute and klass == association.owner_class
-          end
-          raise "Association #{@owner_class}.#{attribute} (foreign_key: #{@association_foreign_key}) has no inverse in #{@klass_name}" unless @inverse
+        @inverse ||=
+          through_association ? through_association.inverse : find_inverse
+      end
+
+      def inverse_of
+        @inverse_of ||= inverse.attribute
+      end
+
+      def find_inverse
+        klass.reflect_on_all_associations.each do |association|
+          next if association.association_foreign_key != @association_foreign_key
+          next if association.klass != @owner_class
+          next if association.attribute == attribute
+          return association if klass == association.owner_class
         end
-        @inverse
+        raise "Association #{@owner_class}.#{attribute} "\
+              "(foreign_key: #{@association_foreign_key}) "\
+              "has no inverse in #{@klass_name}"
       end
 
       def klass

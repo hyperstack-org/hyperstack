@@ -72,7 +72,7 @@ module ReactiveRecord
       if (@collection || all).length <= index and @dummy_collection
         (@collection.length..index).each do |i|
           new_dummy_record = ReactiveRecord::Base.new_from_vector(@target_klass, nil, *@vector, "*#{i}")
-          new_dummy_record.backing_record.attributes[@association.inverse_of] = @owner if @association and @association.inverse_of
+          new_dummy_record.backing_record.attributes[@association.inverse_of] = @owner if @association && !@association.through_association?
           @collection << new_dummy_record
         end
       end
@@ -150,20 +150,30 @@ module ReactiveRecord
     end
 
     def filter?
-      true # was false but... actually its true
+      true
     end
 
-    def joins_with?(record) # did not exist because filter? was returning false
-      record.class == @target_klass
+    # is it necessary to check @association in the next 2 methods???
+
+    def joins_with?(record)
+      if @association && @association.through_association
+        @association.through_association.klass == record.class
+      else
+        @target_klass == record.class
+      end
     end
 
-    def related_records_for(record) # did not exist because? filter was always false
-      return [] if !@association || record.backing_record.attributes[@association.inverse_of] != @owner
-      [record]
-    end
-
-    def filter_records(parent_collection)
-      raise "we should never get here...."
+    def related_records_for(record)
+      return [] unless @association
+      attrs = record.backing_record.attributes
+      return [] unless attrs[@association.inverse_of] == @owner
+      if !@association.through_association
+        [record]
+      elsif (source = attrs[@association.source])
+        [source]
+      else
+        []
+      end
     end
 
     def collector?
@@ -171,6 +181,7 @@ module ReactiveRecord
     end
 
     def filter_records(related_records)
+      # possibly we should never get here???
       scope_args = @vector.last.is_a?(Array) ? @vector.last[1..-1] : []
       @scope_description.filter_records(related_records, scope_args)
     end
@@ -180,25 +191,29 @@ module ReactiveRecord
     end
 
     def set_pre_sync_related_records(related_records, _record = nil)
-      #related_records = related_records.intersection([*@collection])
-      @pre_sync_related_records = in_this_collection related_records
+      #related_records = related_records.intersection([*@collection]) <- deleting this works
+      @pre_sync_related_records = related_records #in_this_collection related_records <- not sure if this works
       live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
     def sync_scopes(related_records, record, filtering = true)
       #related_records = related_records.intersection([*@collection])
-      related_records = in_this_collection related_records
+      #related_records = in_this_collection related_records
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
       notify_of_change unless related_records.empty?
     ensure
       @pre_sync_related_records = nil
     end
 
-    def in_this_collection(related_records)
-      related_records.delete_if do |r|
-        r.backing_record.attributes[@association.inverse_of] != @owner
-      end
-    end
+    # def in_this_collection(related_records)
+    #   related_records.delete_if do |r|
+    #     # BELOW IS WRONG... its more complicated isn't it...
+    #     if @association.through_association
+    #
+    #     else
+    #       r.backing_record.attributes[@association.inverse_of] != @owner
+    #   end
+    # end
 
     def apply_scope(name, *vector)
       build_child_scope(ScopeDescription.find(@target_klass, name), *name, *vector)
@@ -334,9 +349,15 @@ module ReactiveRecord
 
     attr_reader :client_collection
 
+    # appointment.doctor = doctor_value (i.e. through association is changing)
+    # means appointment.doctor_value.patients << appointment.patient
+    # and we have to appointment.doctor(current value).patients.delete(appointment.patient)
+
+
     def update_child(item)
       backing_record = item.backing_record
-      if backing_record and @owner and @association and inverse_of = @association.inverse_of and item.attributes[inverse_of] != @owner
+      if backing_record && @owner && @association && !@association.through_association? && item.attributes[@association.inverse_of] != @owner
+        inverse_of = @association.inverse_of
         current_association = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
         backing_record.update_attribute(inverse_of, @owner)
@@ -429,7 +450,8 @@ module ReactiveRecord
     def delete(item)
       unsaved_children.delete(item)
       notify_of_change(
-        if @owner && @association && (inverse_of = @association.inverse_of)
+        if @owner && @association && !@association.through_association?
+          inverse_of = @association.inverse_of
           if (backing_record = item.backing_record) && backing_record.attributes[inverse_of] == @owner
             # the if prevents double update if delete is being called from << (see << above)
             backing_record.update_attribute(inverse_of, nil)
