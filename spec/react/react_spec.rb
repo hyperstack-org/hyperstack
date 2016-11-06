@@ -109,7 +109,7 @@ RSpec.describe React, type: :component do
         `var count = 0;`
 
         Foo.class_eval do
-          def initialize
+          def initialize(native)
             `count = count + 1;`
           end
           def render

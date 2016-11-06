@@ -69,7 +69,7 @@ describe "React::NativeLibrary" do
     expect(React::API.native_react_component?(`window.NativeComponent`)).to be_truthy
     expect(React::API.native_react_component?(`{render: function render() {}}`)).to be_falsy
     expect(React::API.native_react_component?(`window.DoesntExist`)).to be_falsy
-    expect(React::API.native_react_component?(``)).to be_falsy
+    expect(React::API.native_react_component?()).to be_falsy
   end
 
   it "will import a React.js library into the Ruby name space" do

@@ -1,4 +1,4 @@
-opal_versions = ['0.8', '0.9']
+opal_versions = ['0.8', '0.9', '0.10']
 react_versions_map = {
   '13' => '~> 1.3.3',
   '14' => '~> 1.6.2',
@@ -7,6 +7,7 @@ react_versions_map = {
 opal_rails_versions_map = {
   '0.8' => '~> 0.8.1',
   '0.9' => '~> 0.9.0',
+  '0.10' => '~> 0.9.0',
 }
 
 opal_versions.each do |opal_v|
