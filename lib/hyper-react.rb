@@ -28,6 +28,7 @@ if RUBY_ENGINE == 'opal'
   require 'react/rendering_context'
   require 'react/state'
   require 'react/object'
+  require "react/ext/opal-jquery/element"
   require 'reactive-ruby/isomorphic_helpers'
   require 'rails-helpers/top_level_rails_component'
   require 'reactive-ruby/version'

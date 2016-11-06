@@ -2,7 +2,6 @@ require 'bundler'
 Bundler.require
 
 require "opal/rspec"
-require "opal-jquery"
 
 Opal::Config.arity_check_enabled = true
 
