@@ -51,4 +51,5 @@ else
   Opal.append_path File.expand_path('../', __FILE__).untaint
   Opal.append_path File.expand_path('../../vendor', __FILE__).untaint
 end
+require 'enumerable/pluck'
 require_relative 'synchromesh/client_drivers'

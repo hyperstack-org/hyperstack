@@ -57,6 +57,7 @@ module ReactiveRecord
       # either update update the inverse has_many collection or individual belongs_to
       # inverse values
       if association.inverse.collection?
+        update_has_many_through_associations(association, value)
         update_inverse_collections(association, value)
       else
         update_inverse_attribute(association, value)
@@ -87,7 +88,6 @@ module ReactiveRecord
       else
         value.backing_record.push_onto_collection(association.inverse, @ar_instance)
       end
-      update_has_many_through_associations(association, value)
     end
 
     def push_onto_collection(association, ar_instance)
@@ -96,42 +96,39 @@ module ReactiveRecord
     end
 
     def update_has_many_through_associations(association, value)
-      # association.through_associations.each { |ta| update_through_association(ta, attr, value) }
-      # association.source_associations.each { |sa| update_source_association(sa, attr, value) }
+      association.through_associations.each { |ta| update_through_association(ta, value) }
+      association.source_associations.each { |sa| update_source_association(sa, value) }
     end
 
-    # # appointment.doctor = doctor_value (i.e. through association is changing)
-    # # means appointment.doctor_value.patients << appointment.patient
-    # # and we have to appointment.doctor(current value).patients.delete(appointment.patient)
-    # def update_through_association(ta, attr, value)
-    #   if attributes[ta.source]
-    #     unless attributes[attr].nil? || attributes[attr].attributes[ta.attribute].nil?
-    #       attributes[attr].attributes[ta.attribute].delete(attributes[ta.source])
-    #     end
-    #     unless value.attributes[ta.attribute]
-    #       value.attributes[ta.attribute] = Collection.new(ta.klass, value, ta.attribute)
-    #     end
-    #     value.attributes[ta.attribute] << attributes[ta.source]
-    #   end
-    # end
-    # # appointment.patient = patient_value (i.e. source is changing)
-    # # means appointment.doctor.patients.delete(appointment.patient) <- handled by collection when we push... buts always going to be the same collection that we are deleting from
-    # # means appointment.doctor.patients << patient_value
-    # def update_source_association(ta, attr, value)
-    #   if value.nil?
-    #     unless attributes[sa.inverse_of].nil? || attributes[sa.inverse_of].attributes[sa.attribute].nil? || attributes[sa.source].nil?
-    #       attributes[sa.inverse_of].attributes[sa.attribute].delete(attributes[sa.source])
-    #     end
-    #   else
-    #     if !attributes[sa.inverse_of].nil?
-    #       attributes[sa.inverse_of].attributes[sa.attribute] =
-    #         Collection.new(sa.klass, attributes[sa.inverse_of], ta.attribute)
-    #     elsif !attributes[sa.inverse_of].attributes[sa.attribute].nil?
-    #       attributes[sa.inverse_of].attributes[sa.attribute].delete(attributes[sa.source])
-    #     end
-    #     attributes[sa.inverse_of].attributes[sa.attribute] << value
-    #   end
-    # end
+    def update_through_association(ta, new_belongs_to_value)
+      # appointment.doctor = doctor_new_value (i.e. through association is changing)
+      # means appointment.doctor_new_value.patients << appointment.patient
+      # and we have to appointment.doctor_current_value.patients.delete(appointment.patient)
+      source_value = attributes[ta.source]
+      current_belongs_to_value = attributes[ta.inverse.attribute]
+      return unless source_value
+      unless current_belongs_to_value.nil? || current_belongs_to_value.attributes[ta.attribute].nil?
+        current_belongs_to_value.attributes[ta.attribute].delete(source_value)
+      end
+      return unless new_belongs_to_value
+      new_belongs_to_value.attributes[ta.attribute] ||= Collection.new(ta.klass, new_belongs_to_value, ta)
+      new_belongs_to_value.attributes[ta.attribute] << source_value
+    end
+
+    def update_source_association(sa, new_source_value)
+      # appointment.patient = patient_value (i.e. source is changing)
+      # means appointment.doctor.patients.delete(appointment.patient)
+      # means appointment.doctor.patients << patient_value
+      belongs_to_value = attributes[sa.inverse.attribute]
+      current_source_value = attributes[sa.source]
+      return unless belongs_to_value
+      unless belongs_to_value.attributes[sa.attribute].nil? || current_source_value.nil?
+        belongs_to_value.attributes[sa.attribute].delete(current_source_value)
+      end
+      return unless new_source_value
+      belongs_to_value.attributes[sa.attribute] ||= Collection.new(sa.klass, belongs_to_value, sa)
+      belongs_to_value.attributes[sa.attribute] << new_source_value
+    end
   end
 end
 

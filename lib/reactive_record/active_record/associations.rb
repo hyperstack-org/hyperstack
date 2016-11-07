@@ -57,6 +57,7 @@ module ActiveRecord
 
       def through_associations
         # find all associations that use the inverse association as the through association
+        # that is find all associations that are using this association in a through relationship
         @through_associations ||= klass.reflect_on_all_associations.select do |assoc|
           assoc.through_association && assoc.inverse == self
         end
@@ -64,6 +65,8 @@ module ActiveRecord
 
       def source_associations
         # find all associations that use this association as the source
+        # that is final all associations that are using this association as the source in a
+        # through relationship
         @source_associations ||= owner_class.reflect_on_all_associations.collect do |sibling|
           sibling.klass.reflect_on_all_associations.select do |assoc|
             assoc.source == attribute
