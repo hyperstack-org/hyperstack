@@ -24,6 +24,10 @@ Whitespace conventions:
 
 - The whole opal-activesuppport is not loaded by default now. If your code rely on any of the module which is not required by hyper-react, you need to require it yourself. (#135)
 
+### Deprecated
+
+- `expect(component).to render('<div />')` is now deprecated in favor of `expect(component).to render_static_html('<div />')`, which is much clearer.
+
 ### Fixed
 
 - Arity checking failed for `_react_param_conversion` & `React::Element#initialize` (#167)
