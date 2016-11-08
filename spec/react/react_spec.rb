@@ -6,28 +6,28 @@ RSpec.describe React, type: :component do
     React::API.clear_component_class_cache
   end
 
-  describe "is_valid_element" do
+  describe "is_valid_element?" do
     it "should return true if passed a valid element" do
       element = React::Element.new(`React.createElement('div')`)
-      expect(React.is_valid_element(element)).to eq(true)
+      expect(React.is_valid_element?(element)).to eq(true)
     end
 
     it "should return false is passed a non React element" do
       element = React::Element.new(`{}`)
-      expect(React.is_valid_element(element)).to eq(false)
+      expect(React.is_valid_element?(element)).to eq(false)
     end
   end
 
   describe "create_element" do
     it "should create a valid element with only tag" do
       element = React.create_element('div')
-      expect(React.is_valid_element(element)).to eq(true)
+      expect(React.is_valid_element?(element)).to eq(true)
     end
 
     context "with block" do
       it "should create a valid element with text as only child when block yield String" do
         element = React.create_element('div') { "lorem ipsum" }
-        expect(React.is_valid_element(element)).to eq(true)
+        expect(React.is_valid_element?(element)).to eq(true)
         expect(element.props.children).to eq("lorem ipsum")
       end
 
@@ -35,7 +35,7 @@ RSpec.describe React, type: :component do
         element = React.create_element('div') do
           [React.create_element('span'), React.create_element('span'), React.create_element('span')]
         end
-        expect(React.is_valid_element(element)).to eq(true)
+        expect(React.is_valid_element?(element)).to eq(true)
         expect(element.props.children.length).to eq(3)
       end
 
@@ -75,7 +75,7 @@ RSpec.describe React, type: :component do
 
       it "should create a valid element provided class defined `render`" do
         element = React.create_element(Foo)
-        expect(React.is_valid_element(element)).to eq(true)
+        expect(React.is_valid_element?(element)).to eq(true)
       end
 
       it "should allow creating with properties" do

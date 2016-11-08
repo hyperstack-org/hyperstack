@@ -69,6 +69,11 @@ module React
   end
 
   def self.is_valid_element(element)
+    %x{ console.error("Warning: `is_valid_element` is deprecated in favor of `is_valid_element?`."); }
+    element.kind_of?(React::Element) && `React.isValidElement(#{element.to_n})`
+  end
+
+  def self.is_valid_element?(element)
     element.kind_of?(React::Element) && `React.isValidElement(#{element.to_n})`
   end
 
