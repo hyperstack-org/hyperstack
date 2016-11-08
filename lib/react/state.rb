@@ -15,15 +15,16 @@ module React
 
     def method_missing(method, *args)
       if match = method.match(/^(.+)\!$/)
+        key_name = $1
         if args.count > 0
           current_value = State.get_state(@from, match[1])
-          State.set_state(@from, $1, args[0])
+          State.set_state(@from, key_name, args[0])
           current_value
         else
           current_state = State.get_state(@from, match[1])
-          State.set_state(@from, $1, current_state)
+          State.set_state(@from, key_name, current_state)
           Observable.new(current_state) do |update|
-            State.set_state(@from, $1, update)
+            State.set_state(@from, key_name, update)
           end
         end
       else
