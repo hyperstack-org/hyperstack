@@ -31,6 +31,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- State might not be updated using `React::Observable` from a param. (#175)
 - Arity checking failed for `_react_param_conversion` & `React::Element#initialize` (#167)
 
 
@@ -42,7 +43,6 @@ Whitespace conventions:
 
 ### Fixed
 
-- State might not be updated using `React::Observable` from a param. (#175)
 - ReactJS functional stateless component could not be imported from `NativeLibrary`. Note that functional component is only supported in React v14+.  (#162)
 - Prerender log got accumulated between reqeusts. (#176)
 
