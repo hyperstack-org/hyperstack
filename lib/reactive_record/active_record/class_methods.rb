@@ -120,6 +120,10 @@ module ActiveRecord
       []  # it would be great to figure out how to get this information on the client!  For now we just return an empty array
     end
 
+    def columns_hash
+      HyperMesh::ClientDrivers.public_columns_hash[name] || {}
+    end
+
     [
       "table_name=", "before_validation", "with_options", "validates_presence_of", "validates_format_of",
       "accepts_nested_attributes_for", "before_create", "after_create", "before_save", "after_save", "before_destroy", "where", "validate",

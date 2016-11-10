@@ -79,6 +79,7 @@ module HyperMesh
 
       def record_with_current_values
         ReactiveRecord::Base.load_data do
+
           backing_record = @backing_record || klass.find(record[:id]).backing_record
           if destroyed?
             backing_record.ar_instance
@@ -170,16 +171,24 @@ module HyperMesh
       def merge_current_values(br)
         current_values = Hash[*@previous_changes.collect do |attr, values|
           value = attr == :id ? record[:id] : values.first
+          begin
           if br.attributes.key?(attr) &&
-             br.attributes[attr].to_s != value.to_s &&
-             br.attributes[attr].to_s != values.last.to_s
-            puts "warning the #{attr} has changed locally - will force a reload.\n"\
-                 "local value: #{br.attributes[attr]} remote value: #{value}->#{values.last}"
+             br.attributes[attr] != br.convert(attr, value) &&
+             br.attributes[attr] != br.convert(attr, values.last)
+            puts "warning #{attr} has changed locally - will force a reload.\n"\
+                 "local value: #{br.attributes[attr]} remote value: #{br.convert(attr, value)}->#{br.convert(attr, values.last)}"
             return nil
+          end
+          rescue Exception => e
+            debugger
+            nil
           end
           [attr, value]
         end.compact.flatten].merge(br.attributes)
         klass._react_param_conversion(current_values)
+      rescue Exception => e
+        debugger
+        nil
       end
     end
   end
@@ -246,6 +255,7 @@ module HyperMesh
       controller.session.delete 'synchromesh-dummy-init' unless controller.session.id
       id = "#{SecureRandom.uuid}-#{controller.session.id}"
       config_hash = {
+        public_columns_hash: ActiveRecord::Base.public_columns_hash,
         transport: HyperMesh.transport,
         id: id,
         client_logging: HyperMesh.client_logging,
@@ -266,6 +276,18 @@ module HyperMesh
       @opts ||= Hash.new(`window.HyperMeshOpts`)
     end
 
+    isomorphic_method(:get_public_columns_hash) do |f|
+      f.when_on_client { @opts[:public_columns_hash] || {} }
+      f.send_to_server
+      f.when_on_server { ActiveRecord::Base.public_columns_hash }
+    end
+
+    def self.public_columns_hash
+      # return {} unless @opts && @opts[:public_columns_hash]
+      # @opts[:public_columns_hash]
+      @public_columns_hash ||= get_public_columns_hash
+    end
+
     def self.get_queued_data(operation, channel = nil, opts = {})
       HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |update|
@@ -279,6 +301,7 @@ module HyperMesh
 
     before_first_mount do
       if on_opal_client?
+
         if opts[:transport] == :pusher
 
           opts[:create] = lambda do |data|

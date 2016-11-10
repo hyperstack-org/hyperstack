@@ -3,6 +3,40 @@ require 'synchromesh/integration/test_components'
 
 describe "random examples", js: true do
 
+  it "can pass an array subclass as a param" do
+    mount "Tester" do
+      class SubArray < Array
+      end
+
+      class HelloWorld < React::Component::Base
+        param :array, type: SubArray
+        render do
+          i = 10
+          div {
+            div { "params.array.is_a? #{params.array.class}" }
+            params.array.each {|i| h1 {i.to_s}}
+          }
+        end
+      end
+
+      class Tester < React::Component::Base
+        def render
+          normal_array = [1, 2]
+          sub_array = SubArray.new
+          sub_array << 1; sub_array << 2
+          DIV do
+            # this works
+            HelloWorld(array: normal_array)
+            # this doesn't
+            DIV { "out here a sub_array is a #{sub_array.class}" }
+            HelloWorld(array: sub_array)
+          end
+        end
+      end
+    end
+    pause
+  end
+
   it "can destroy on the fly" do
 
     5.times do |i|

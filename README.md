@@ -1,13 +1,13 @@
 #  ![](https://avatars3.githubusercontent.com/u/15810526?v=3&s=40&raw=true)HyperMesh
 
-HyperMesh is a policy based CRUD system which wraps ActiveRecord models on the server and extends
-them to the client. Furthermore it implements push notifications (via a number of possible
-technologies) so changes to records on the server are pushed to all authorised clients.
+HyperMesh gives your HyperReact components CRUD access to your ActiveRecord models on the client, using the the standard ActiveRecord API.
+Furthermore HyperMesh implements push notifications (via a number of possible
+technologies) so changes to records on the server are dynamically pushed to all authorised clients.
 
-Its Isomorphic Ruby in action.
+*Its Isomorphic Ruby in action.*
 
 In other words browser 1 creates, updates, or destroys a model, and the changes are persisted in
-active record models and are broadcast to all other clients.
+active record models and then broadcast to all other authorised clients.
 
 ## Quick Start Guides
 
@@ -29,8 +29,7 @@ All of the above use websockets.  For ultimate simplicity use Polling as explain
 
 ## Overview
 
-HyperMesh is built on top of HyperReact.
-
++ HyperMesh is built on top of HyperReact.
 + HyperReact is a Ruby DSL (Domain Specific Language) to build [React.js](https://facebook.github.io/react/) UI components in Ruby.  As data changes on the client (either from user interactions or external events) HyperReact re-draws whatever parts of the display is needed.
 + HyperMesh provides a [flux dispatcher and data store](https://facebook.github.io/flux/docs/overview.html) backed by [Rails Active Record models](http://guides.rubyonrails.org/active_record_basics.html). You access your model data in your HyperReact components just like you would on the server or in an ERB or HAML view file.
 + If a push transport is connected HyperMesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
@@ -49,38 +48,41 @@ class Dictionary < ActiveRecord::Base
 end
 ```
 
-Here would be very simple component that shows a random word from the dictionary:
+Here is a very simple HyperReact component that shows a random word from the dictionary:
 
 ```ruby
 class WordOfTheDay < React::Component::Base
 
-  # The current word is stored in the
-  # entry state variable.   We use a state
-  # variable so that the display will refresh
-  # when the user chooses a new word
-
-  define_state :entry
-
   def pick_entry!  
     # pick a random word and assign the selected record to entry
-    # the ! will notify react that the state is changing.
-    state.entry! Dictionary.defined.all[rand(Dictionary.defined.length)]
+
+    @entry = Dictionary.defined.all[rand(Dictionary.defined.count)]
+    force_update! # redraw our component when the word changes
+
+    # Notice that we use standard ActiveRecord constructs to select our
+    # random entry value
   end
 
-  # before we mount our component pick an entry
+  # before we mount (draw the first time) our component pick an entry...
 
   before_mount :pick_entry
 
+  # Again in our render block we use the standard ActiveRecord API, such
+  # as the 'defined' scope, and the 'word', 'pronunciation', & 'definition'
+  # attribute getters.  
+
   render(DIV) do
-    DIV { "total definitions: #{Word.defined.count}" }
+    DIV { "total definitions: #{Dictionary.defined.count}" }
     DIV do
-      DIV { state.entry.word }
-      DIV { state.entry.pronunciation }
-      DIV { state.entry.definition }
+      DIV { @entry.word }
+      DIV { @entry.pronunciation }
+      DIV { @entry.definition }
       BUTTON { 'pick another' }.on(:click) { pick_entry! }
     end
   end
 ```    
+
+
 
 A minimal HyperMesh configuration consists of a simple initializer file, and at least one *Policy* class that will *authorize* who gets to see what.
 

@@ -57,5 +57,5 @@ gem 'opal-rails', '>= 0.8.1'
 gem 'therubyracer', platforms: :ruby
 gem 'react-router-rails', '~> 0.13.3'
 gem 'reactrb-router'
-gem 'synchromesh', path: '../..'
+gem 'hyper-mesh', path: '../..'
 gem 'opal-browser'

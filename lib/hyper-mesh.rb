@@ -12,10 +12,15 @@
 require 'set'
 if RUBY_ENGINE == 'opal'
   require "hyper-react"
+  require 'active_support'
+  require 'time'
+  require 'date'
   require "reactive_record/active_record/error"
   require "reactive_record/server_data_cache"
   require "reactive_record/active_record/reactive_record/while_loading"
   require "reactive_record/active_record/reactive_record/isomorphic_base"
+  require 'reactive_record/active_record/reactive_record/dummy_value'
+  require 'reactive_record/active_record/reactive_record/column_types'
   require "reactive_record/active_record/aggregations"
   require "reactive_record/active_record/associations"
   require "reactive_record/active_record/reactive_record/base"
@@ -32,6 +37,7 @@ if RUBY_ENGINE == 'opal'
   require_relative 'hypermesh/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'
+  require_relative 'opal/equality_patches'
 else
   require 'opal'
   require 'hyper-react'
@@ -39,6 +45,7 @@ else
   require "reactive_record/engine"
   require "reactive_record/server_data_cache"
   require "reactive_record/active_record/reactive_record/isomorphic_base"
+  require "reactive_record/active_record/public_columns_hash"
   require "reactive_record/serializers"
   require "reactive_record/pry"
   require_relative 'active_record_base'

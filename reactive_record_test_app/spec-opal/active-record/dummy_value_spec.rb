@@ -21,7 +21,7 @@ describe "dummy values" do
   end
 
   xit "can do string things as well" do # can't because of the way strings work in opal
-    expect("id: "+ User.find_by_email("mitch@catprint.com").id).to eq("id: ")
+    expect("id: " + User.find_by_email("mitch@catprint.com").id).to eq("id: ")
   end
 
 end

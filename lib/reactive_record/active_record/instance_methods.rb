@@ -20,7 +20,7 @@ module ActiveRecord
           self.class.load_data do
             hash.each do |attribute, value|
               unless attribute == primary_key
-                reactive_set!(attribute, value)
+                reactive_set!(attribute, convert(attribute, value))
                 changed_attributes << attribute
               end
             end
@@ -72,8 +72,8 @@ module ActiveRecord
         @backing_record.changed?(name.gsub(/_changed\?$/,""))
       elsif args.count == 1 && name =~ /=$/ && !block
         attribute_name = name.gsub(/=$/,"")
-        @backing_record.reactive_set!(attribute_name, args[0])
-      elsif args.count == 0 && !block
+        @backing_record.reactive_set!(attribute_name, backing_record.convert(attribute_name, args[0]))
+      elsif args.count.zero? && !block
         @backing_record.reactive_get!(name, force_update)
       elsif !block
         @backing_record.reactive_get!([[name]+args], force_update)

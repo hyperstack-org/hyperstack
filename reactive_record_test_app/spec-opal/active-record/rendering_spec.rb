@@ -198,17 +198,24 @@ describe "integration with react" do
 
   rendering("a server side value dynamically changed after first fetch from server") do
     puts "rendering"
-    @update ||= after(1) do
+    @render_times ||= 0
+    @render_times += 1
+    after(1) do
       puts "async update"
       mitch = User.find_by_email("mitch@catprint.com")
       mitch.first_name = "Robert"
+      puts "mitch.detailed_name BEFORE = #{mitch.detailed_name}"
       mitch.detailed_name!
+      puts "mitch.detailed_name AFTER = #{mitch.detailed_name}"
       puts "updated"
-    end
+    end if @render_times == 2
     User.find_by_email("mitch@catprint.com").detailed_name
   end.should_generate do
     puts "html = #{html}"
-    html == "R. VanDuyn - mitch@catprint.com (2 todos)"
+    if html == "R. VanDuyn - mitch@catprint.com (2 todos)"
+      debugger
+      true
+    end
   end
 
 end

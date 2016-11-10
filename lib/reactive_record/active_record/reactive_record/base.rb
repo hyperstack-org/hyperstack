@@ -274,7 +274,9 @@ module ReactiveRecord
 
     # sync! now will also initialize any nil collections
     def sync!(hash = {}) # does NOT notify (see saved! for notification)
-      @attributes.merge! hash
+      hash.each do |attr, value|
+        @attributes[attr] = convert(attr, value)
+      end
       @synced_attributes = {}
       @synced_attributes.each { |attribute, value| sync_attribute(key, value) }
       @changed_attributes = []
@@ -403,7 +405,7 @@ module ReactiveRecord
           end
         elsif aggregation = @model.reflect_on_aggregation(method) and (aggregation.klass < ActiveRecord::Base)
           new_from_vector(aggregation.klass, self, *vector, method)
-        elsif id and id != ""
+        elsif id and id != ''
           self.class.fetch_from_db([@model, [:find, id], *method]) || self.class.load_from_db(self, *(vector ? vector : [nil]), method)
         else  # its a attribute in an aggregate or we are on the client and don't know the id
           self.class.fetch_from_db([*vector, *method]) || self.class.load_from_db(self, *(vector ? vector : [nil]), method)
@@ -419,11 +421,11 @@ module ReactiveRecord
           backing_record.aggregate_attribute = method
         end
       elsif !aggregation and method != model.primary_key
-        unless @attributes.has_key?(method)
+        unless @attributes.key?(method)
           log("Warning: reading from new #{model.name}.#{method} before assignment.  Will fetch value from server.  This may not be what you expected!!", :warning)
         end
         new_value = self.class.load_from_db(self, *(vector ? vector : [nil]), method)
-        new_value = @attributes[method] if new_value.is_a? DummyValue and @attributes.has_key?(method)
+        new_value = @attributes[method] if new_value.is_a?(DummyValue) && @attributes.key?(method)
         sync_attribute(method, new_value)
       end
     end

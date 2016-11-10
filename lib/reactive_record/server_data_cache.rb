@@ -322,7 +322,7 @@ module ReactiveRecord
               # value is an array if scope returns nil, so we destroy the bogus record
               new_target.destroy and new_target = nil if value.is_a? Array
             else
-              target.backing_record.update_attribute([method], value.first)
+              target.backing_record.update_attribute([method], target.backing_record.convert(method, value.first))
             end
           elsif target.class.respond_to?(:reflect_on_aggregation) and aggregation = target.class.reflect_on_aggregation(method) and
           !(aggregation.klass < ActiveRecord::Base)

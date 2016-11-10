@@ -87,116 +87,7 @@ module ReactiveRecord
         @pending_records << record if record
         schedule_fetch
       end
-      DummyValue.new
-    end
-
-    if RUBY_ENGINE == 'opal'
-      class ::Object
-
-        def loaded?
-          !loading?
-        end
-
-        def loading?
-          false
-        end
-
-        def present?
-          !!self
-        end
-
-      end
-
-      class DummyValue < NilClass
-
-        def notify
-          unless ReactiveRecord::Base.data_loading?
-            ReactiveRecord.loads_pending!           #loads
-            ReactiveRecord::WhileLoading.loading!   #loads
-          end
-        end
-
-        def initialize()
-          notify
-        end
-
-        def method_missing(method, *args, &block)
-          if 0.respond_to? method
-            notify
-            0.send(method, *args, &block)
-          elsif "".respond_to? method
-            notify
-            "".send(method, *args, &block)
-          else
-            super
-          end
-        end
-
-        def loading?
-          true
-        end
-
-        def present?
-          false
-        end
-
-        def coerce(s)
-          [self.send("to_#{s.class.name.downcase}"), s]
-        end
-
-        def ==(other_value)
-          other_value.object_id == self.object_id
-        end
-
-        def zero?
-          false
-        end
-
-        def to_s
-          notify
-          ""
-        end
-
-        def to_f
-          notify
-          0.0
-        end
-
-        def to_i
-          notify
-          0
-        end
-
-        def to_numeric
-          notify
-          0
-        end
-
-        def to_number
-          notify
-          0
-        end
-
-        def to_date
-          notify
-          "2001-01-01T00:00:00.000-00:00".to_date
-        end
-
-        def acts_as_string?
-          true
-        end
-
-        def try(*args, &b)
-          if args.empty? && block_given?
-            yield self
-          else
-            send(*args, &b)
-          end
-        rescue
-          nil
-        end
-
-      end
+      DummyValue.new(record && record.model.columns_hash[vector.last])
     end
 
     class << self
@@ -282,7 +173,7 @@ module ReactiveRecord
           if record.id.loading? and record_being_saved
             raise "Attempt to save a model while it or an associated model is still loading: model being saved: #{record_being_saved.model}:#{record_being_saved.id}#{', associated model: '+record.model.to_s if record != record_being_saved}"
           end
-          output_attributes = {record.model.primary_key => record.id}
+          output_attributes = {record.model.primary_key => record.id.loading? ? nil : record.id}
           vector = record.vector || [record.model.model_name, ["new", record.object_id]]
           models << {id: record.object_id, model: record.model.model_name, attributes: output_attributes, vector: vector}
           record.attributes.each do |attribute, value|

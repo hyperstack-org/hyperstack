@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'rails', '~>5.0.0' #'4.2.4'
     s.add_development_dependency 'react-rails'
     s.add_development_dependency 'opal-rails'
+    s.add_development_dependency 'opal-activesupport'
     s.add_development_dependency 'factory_girl_rails'
     s.add_development_dependency 'reactrb-rails-generator'
     s.add_development_dependency 'rspec-wait'
