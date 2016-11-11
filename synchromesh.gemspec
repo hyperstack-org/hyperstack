@@ -11,10 +11,11 @@ Gem::Specification.new do |s|
     s.email         = ["mitch@catprint.com"]
 
     s.summary       = "React based CRUD access and Synchronization of active record models across multiple clients"
-    s.description   = "Hyper-mesh is a policy based CRUD system which wraps ActiveRecord models on the server and extends "\
-                      "them to the client. Furthermore it implements push notifications (via a number of possible "\
-                      "technologies) so changes to records in use by clients are pushed to those clients if authorised. "\
-                      "Its Isomorphic Ruby in action."
+    s.description   = "HyperMesh gives your HyperReact components CRUD access to your "\
+                      "ActiveRecord models on the client, using the the standard ActiveRecord "\
+                      "API. HyperMesh also implements push notifications (via a number of "\
+                      "possible technologies) so changes to records on the server are "\
+                      "dynamically updated on all authorised clients."
     s.homepage      = "https://github.com/reactive-ruby/hyper-mesh"
     s.license       = "MIT"
 
