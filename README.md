@@ -1,5 +1,9 @@
 #  ![](https://avatars3.githubusercontent.com/u/15810526?v=3&s=40&raw=true)HyperMesh
 
+
+[![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gem Version](https://badge.fury.io/rb/hyper-mesh.svg)](https://badge.fury.io/rb/hyper-mesh)
+
 HyperMesh gives your HyperReact components CRUD access to your ActiveRecord models on the client, using the the standard ActiveRecord API.
 Furthermore HyperMesh implements push notifications (via a number of possible
 technologies) so changes to records on the server are dynamically pushed to all authorised clients.
