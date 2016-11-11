@@ -13,7 +13,7 @@ technologies) so changes to records on the server are dynamically pushed to all 
 In other words browser 1 creates, updates, or destroys a model, and the changes are persisted in
 active record models and then broadcast to all other authorised clients.
 
-# ![]() WARNING DOCUMENTATION IS BEING REWRITTEN  MANY LINKS MAY BE BROKEN  STAY TUNED OR CHECK IN AT [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) FOR MORE INFO
+# ![](/work-in-progress-drinking.png) WARNING DOCUMENTATION IS BEING REWRITTEN  MANY LINKS MAY BE BROKEN  STAY TUNED OR CHECK IN AT [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) FOR MORE INFO
 
 ## Quick Start Guides
 
