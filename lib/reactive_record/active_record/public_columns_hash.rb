@@ -6,10 +6,12 @@ module ActiveRecord
   class Base
     def self.public_columns_hash
       return @public_columns_hash if @public_columns_hash
+      Dir.glob(Rails.root.join('app/models/public/*.rb')).each do |file|
+        require_dependency(file) rescue nil
+      end
       @public_columns_hash = {}
       descendants.each do |model|
         @public_columns_hash[model.name] = model.columns_hash
-        #model.columns_hash.each { |k, v| hash[k] = v.type }
       end
       @public_columns_hash
     end

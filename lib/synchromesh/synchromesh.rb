@@ -6,7 +6,7 @@ module HyperMesh
   extend Configuration
 
   def self.config_reset
-    require File.join(File.dirname(__FILE__), '..', 'reactive_record', 'permission_patches')
+    load File.join(File.dirname(__FILE__), 'reactive_record', 'permission_patches.rb')
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
       Object.const_get 'ApplicationPolicy'

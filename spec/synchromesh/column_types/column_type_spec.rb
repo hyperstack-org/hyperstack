@@ -5,7 +5,8 @@ require 'rspec-steps'
 describe "column types on client", js: true do
 
   before(:all) do
-
+    # TimeXternal - lets us easily get back time values
+    # that will look like client json strings.
     class Timex
 
       def initialize(time = nil)
@@ -92,12 +93,6 @@ describe "column types on client", js: true do
         end
       end
     end
-  end
-
-  before(:each) do
-
-    TypeTest.build_tables rescue nil
-    DefaultTest.build_tables rescue nil
 
     isomorphic do
       class TypeTest < ActiveRecord::Base
@@ -106,6 +101,14 @@ describe "column types on client", js: true do
       end
     end
 
+    TypeTest.build_tables rescue nil
+    DefaultTest.build_tables rescue nil
+
+    ActiveRecord::Base.instance_variable_set(:@public_columns_hash, nil)
+
+  end
+
+  before(:each) do
     stub_const 'ApplicationPolicy', Class.new
     ApplicationPolicy.class_eval do
       always_allow_connection
@@ -285,13 +288,15 @@ describe "column types on client", js: true do
     end.to eq("I'm a string!")
   end
 
-  it 'uses the default value if specified when initializing a new record - can be saved' do
+  it 'uses the default value when initializing a new record & can be saved' do
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
     expect_promise do
       record = DefaultTest.new
       record.string = record.string.reverse
       record.save
     end.to be_truthy
     expect(DefaultTest.find(1).string).to eq("!gnirts a m'I")
+    expect_evaluate_ruby("ReactiveRecord::Base.last_fetch_at").to eq(starting_fetch_time)
   end
 
 end

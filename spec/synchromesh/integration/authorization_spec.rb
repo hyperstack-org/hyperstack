@@ -9,6 +9,7 @@ describe "authorization integration", js: true do
     #   # slow down the polling so wait_for_ajax works
     #   config.opts = { seconds_between_poll: 2 }
     # end
+
     require 'pusher'
     require 'pusher-fake'
     Pusher.app_id = "MY_TEST_ID"
@@ -22,6 +23,24 @@ describe "authorization integration", js: true do
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
     end
 
+  end
+
+  after(:all) do
+    ApplicationController.acting_user = nil
+    ActiveRecord::Base.class_eval do
+      def create_permitted?
+        true
+      end
+      def update_permitted?
+        true
+      end
+      def destroy_permitted?
+        true
+      end
+      def view_permitted?(attribute)
+        true
+      end
+    end
   end
 
   before(:each) do
@@ -55,8 +74,8 @@ describe "authorization integration", js: true do
     wait_for_ajax
     model1.attributes_on_client(page).should eq({
       id: 1,
-      created_at: model1.created_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ'),
-      updated_at: model1.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ')
+      created_at: model1.created_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z'),
+      updated_at: model1.updated_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z')
     })
     ApplicationController.acting_user = User.new(name: "george")
     page.evaluate_ruby("HyperMesh.connect(['TestModel', #{model1.id}])")
@@ -65,8 +84,8 @@ describe "authorization integration", js: true do
     wait_for_ajax
     model1.attributes_on_client(page).should eq({
       id: 1, test_attribute: "george", completed: true,
-      created_at: model1.created_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ'),
-      updated_at: model1.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%LZ')
+      created_at: model1.created_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z'),
+      updated_at: model1.updated_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z')
     })
   end
 

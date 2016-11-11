@@ -312,6 +312,9 @@ HyperMesh will always try to use pusher-fake if it sees the gem included.  Remov
 
 - Cannot connect with ActionCable.  Make sure that `config.action_cable.allowed_request_origins` includes the url you use for development (including the port) and that you are useing `Puma`.
 
+- Attributes are not being converted from strings, or do not have their default values  
+Eager loading is probably turned off.  HyperMesh needs to eager load `models/public` so it can find all the column information for all public models.
+
 ## Debugging
 
 Sometimes you need to figure out what connections are available, or what attributes are readable etc.

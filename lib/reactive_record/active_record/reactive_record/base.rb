@@ -421,11 +421,15 @@ module ReactiveRecord
           backing_record.aggregate_attribute = method
         end
       elsif !aggregation and method != model.primary_key
-        unless @attributes.key?(method)
-          log("Warning: reading from new #{model.name}.#{method} before assignment.  Will fetch value from server.  This may not be what you expected!!", :warning)
+        if model.columns_hash[method]
+          new_value = convert(method, model.columns_hash[method][:default])
+        else
+          unless @attributes.key?(method)
+            log("Warning: reading from new #{model.name}.#{method} before assignment.  Will fetch value from server.  This may not be what you expected!!", :warning)
+          end
+          new_value = self.class.load_from_db(self, *(vector ? vector : [nil]), method)
+          new_value = @attributes[method] if new_value.is_a?(DummyValue) && @attributes.key?(method)
         end
-        new_value = self.class.load_from_db(self, *(vector ? vector : [nil]), method)
-        new_value = @attributes[method] if new_value.is_a?(DummyValue) && @attributes.key?(method)
         sync_attribute(method, new_value)
       end
     end

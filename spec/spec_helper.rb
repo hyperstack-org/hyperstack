@@ -102,6 +102,7 @@ if RUBY_ENGINE != 'opal'
 
     config.after(:each) do |example|
       unless example.exception
+        #Object.send(:remove_const, :Application) rescue nil
         ObjectSpace.each_object(Class).each do |klass|
           if klass < HyperMesh::Regulation
             klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }

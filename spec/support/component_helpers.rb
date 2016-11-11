@@ -180,6 +180,7 @@ module ComponentTestHelpers
   end
 
   def evaluate_ruby(str="", opts={}, &block)
+    insure_mount
     str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
@@ -239,7 +240,8 @@ module ComponentTestHelpers
   end
 
   def insure_mount
-    mount unless page.instance_variable_get("@hyper_spec_mounted")
+    # rescue in case page is not defined...
+    mount unless page.instance_variable_get("@hyper_spec_mounted") rescue nil
   end
 
   def mount(component_name = nil, params = nil, opts = {}, &block)

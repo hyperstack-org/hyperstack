@@ -19,8 +19,6 @@ module ReactiveRecord
       else
         Time.parse(val)
       end
-    rescue Exception => e
-      puts "problem converting #{val} to a datetime"
     end
 
     alias convert_time convert_datetime
@@ -34,8 +32,6 @@ module ReactiveRecord
       else
         Date.parse(val)
       end
-    rescue Exception => e
-      puts "problem converting #{val} to a date"
     end
 
     def convert_boolean(val)

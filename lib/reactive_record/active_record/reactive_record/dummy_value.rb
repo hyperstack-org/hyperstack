@@ -41,7 +41,7 @@ module ReactiveRecord
 
       def build_default_value_for_datetime
         if @column_hash[:default]
-          Time.parse(@column_hash[:default].gsub(' ','T')+'+0000')
+          Time.parse(@column_hash[:default].gsub(' ','T')+'+00:00')
         else
           ::ReactiveRecord::Base::DummyValue.dummy_time
         end

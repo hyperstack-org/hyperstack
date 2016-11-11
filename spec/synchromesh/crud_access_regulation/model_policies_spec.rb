@@ -17,7 +17,7 @@ describe "regulate access allowed" do
   end
 
   after(:each) do
-    load 'lib/reactive_record/permission_patches.rb'
+    load 'lib/synchromesh/reactive_record/permission_patches.rb'
   end
 
   HyperMesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|

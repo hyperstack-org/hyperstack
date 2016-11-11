@@ -28,7 +28,7 @@ module HyperMesh
       internal_policy = InternalPolicy.new(model, model.attribute_names, user_channels)
       ChannelBroadcastRegulation.broadcast(internal_policy)
       InstanceBroadcastRegulation.broadcast(model, internal_policy)
-      internal_policy.accessible_attributes_for #(user_channels)
+      internal_policy.accessible_attributes_for
     end
 
     def accessible_attributes_for
