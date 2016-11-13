@@ -88,8 +88,6 @@ module HyperMesh
       def open(channel, session = nil, root_path = nil)
         self.root_path = root_path
         find_or_create_by(channel: channel, session: session)
-      rescue Exception => e
-        binding.pry
       end
 
       def send_to_channel(channel, data)

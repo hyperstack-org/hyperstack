@@ -1,6 +1,4 @@
-#require 'rails'
-
-module ReactiveRecord
+module HyperMesh
   class Engine < ::Rails::Engine
     isolate_namespace ReactiveRecord
     config.generators do |g|

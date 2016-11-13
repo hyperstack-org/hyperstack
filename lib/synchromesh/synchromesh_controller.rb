@@ -1,5 +1,5 @@
 module ReactiveRecord
-  Engine.routes.append do
+  ::HyperMesh::Engine.routes.append do
 
     module ::WebConsole
       class Middleware
@@ -30,6 +30,7 @@ module ReactiveRecord
     end if defined?(::Rails::Rack::Logger)
 
     class HyperMeshController < ::ApplicationController
+
       protect_from_forgery except: [:console_update]
 
       def client_id

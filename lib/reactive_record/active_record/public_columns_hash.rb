@@ -7,11 +7,11 @@ module ActiveRecord
     def self.public_columns_hash
       return @public_columns_hash if @public_columns_hash
       Dir.glob(Rails.root.join('app/models/public/*.rb')).each do |file|
-        require_dependency(file) rescue nil
+        require_dependency(file)
       end
       @public_columns_hash = {}
       descendants.each do |model|
-        @public_columns_hash[model.name] = model.columns_hash
+        @public_columns_hash[model.name] = model.columns_hash rescue nil
       end
       @public_columns_hash
     end

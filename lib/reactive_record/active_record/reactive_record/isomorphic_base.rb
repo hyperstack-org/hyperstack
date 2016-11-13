@@ -55,7 +55,7 @@ module ReactiveRecord
       end
       path = ::Rails.application.routes.routes.detect do |route|
         # not sure why the second check is needed.  It happens in the test app
-        route.app == ReactiveRecord::Engine or (route.app.respond_to?(:app) and route.app.app == ReactiveRecord::Engine)
+        route.app == HyperMesh::Engine or (route.app.respond_to?(:app) and route.app.app == HyperMesh::Engine)
       end.path.spec
       "<script type='text/javascript'>\n"+
         "window.ReactiveRecordEnginePath = '#{path}';\n"+

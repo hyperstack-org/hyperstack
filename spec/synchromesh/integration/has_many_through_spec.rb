@@ -158,10 +158,6 @@ RSpec::Steps.steps "has_many through relationships", js: true do
   end
 
   it "can destroy an existing relationship from the server" do
-    evaluate_ruby do
-      PhysicianSchedule.hypertrace instrument: :all
-      ReactiveRecord::Base.hypertrace instrument: :all
-    end
     @a1.destroy
     page.should have_content("Dr. Stop has a total of 1 appointments with: B. Legg")
     page.should have_content("Dr. Faith has no appointments.")

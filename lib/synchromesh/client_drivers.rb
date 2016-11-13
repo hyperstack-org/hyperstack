@@ -244,8 +244,8 @@ module HyperMesh
     prerender_footer do |controller|
       if defined?(PusherFake)
         path = ::Rails.application.routes.routes.detect do |route|
-          route.app == ReactiveRecord::Engine ||
-            (route.app.respond_to?(:app) && route.app.app == ReactiveRecord::Engine)
+          route.app == HyperMesh::Engine ||
+            (route.app.respond_to?(:app) && route.app.app == HyperMesh::Engine)
         end.path.spec
         pusher_fake_js = PusherFake.javascript(
           auth: { headers: { 'X-CSRF-Token' => controller.send(:form_authenticity_token) } },
@@ -277,14 +277,12 @@ module HyperMesh
     end
 
     isomorphic_method(:get_public_columns_hash) do |f|
-      f.when_on_client { @opts[:public_columns_hash] || {} }
+      f.when_on_client { opts[:public_columns_hash] || {} }
       f.send_to_server
       f.when_on_server { ActiveRecord::Base.public_columns_hash }
     end
 
     def self.public_columns_hash
-      # return {} unless @opts && @opts[:public_columns_hash]
-      # @opts[:public_columns_hash]
       @public_columns_hash ||= get_public_columns_hash
     end
 

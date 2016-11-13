@@ -49,11 +49,12 @@ else
   require "reactive_record/serializers"
   require "reactive_record/pry"
   require_relative 'active_record_base'
-  require 'synchromesh/synchromesh_controller'
   require 'hypermesh/version'
   require 'synchromesh/connection'
   require 'synchromesh/synchromesh'
   require 'synchromesh/policy'
+  require 'synchromesh/synchromesh_controller'
+
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
   Opal.append_path File.expand_path('../../vendor', __FILE__).untaint

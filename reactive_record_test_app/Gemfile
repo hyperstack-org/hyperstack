@@ -10,6 +10,7 @@ gem 'byebug'
 gem 'pry-rails'
 gem 'pry-rescue'
 gem 'opal-rspec-rails', github: 'opal/opal-rspec-rails'
-gem 'hyper-mesh', path: "../.."
+gem 'hyper-mesh', path: "../"
 gem 'web-console'
 gem 'hyper-trace'
+gem 'pry'
