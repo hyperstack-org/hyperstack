@@ -1,29 +1,21 @@
 ### Action Cable Quickstart
 
-Action Cable is production ready transport built into Rails 5.
+Action Cable is a production ready transport built into Rails 5.
 
 #### 1 Get Rails 5
 
 You need to be on rails 5 to use ActionCable.  Make sure you upgrade to rails 5 first.
 
-#### 2 Add ReactRb
+#### 2 Add HyperLoop gems
 
-If you have not already installed the `reactrb` and `reactive-record` gems, then do so now using the [reactrb-rails-generator](https://github.com/hyper-react/reactrb-rails-generator) gem.
+If you have not already installed the `hyper-react` and `hyper-mesh` gems, then do so now using the [hyper-rails](https://github.com/ruby-hyperloop/hyper-rails) gem.
 
-- add `gem 'reactrb-rails-generator'` to your gem file (in the development section)
+- add `gem 'hyper-rails'` to your gem file (in the development section)
 - run `bundle install`
-- run `rails g hyper-react:install --all` (make sure to use the --all option)
+- run `rails g hyperloop:install --all` (make sure to use the --all option)
 - run `bundle update`
 
-#### 3 Reactrb and ReactiveRecord is replaced with HyperMesh
-
-- replace the `'reactive-record'` and `'reactrb'` gems with  
-`gem 'hyper-mesh', git: 'https://github.com/ruby-hyperloop/hyper-mesh'`  
-**note:** you must remove `gem 'reactive-record'`
-- then `bundle install`  
-- and in `app/views/components.rb` replace `require 'reactive-record'` with `require 'hyper-mesh'`  
-
-#### 4 Set the transport
+#### 3 Set the transport
 
 Once you have HyperMesh installed then add this initializer:
 ```ruby
@@ -33,28 +25,13 @@ HyperMesh.configuration do |config|
 end
 ```
 
-#### 5 Define Your Policies
-
-To start just open everything up by adding a policies directory and defining a policy file like this:
-
-```ruby
-# app/policies/application_policy.rb
-class ApplicationPolicy
-  always_allow_connection
-  regulate_all_broadcasts { |policy| policy.send_all }
-  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
-end
-```
-
-#### 6 Setup ActionCable
+#### 4 Setup ActionCable
 
 If you are already using ActionCable in your app that is fine, as HyperMesh will not interfere with your existing connections.
 
 Otherwise go through the following steps to setup ActionCable.
 
-##### 6.1 Add the action_cable.js file
-
-Include the `action_cable` js file in your assets
+##### Make sure the `action_cable` js file in your assets
 
 ```javascript
 //app/assets/javascripts/application.js
@@ -63,7 +40,7 @@ Include the `action_cable` js file in your assets
 Opal.load('components');
 ```
 
-##### 6.2 Make sure you have a cable.yml file
+##### Make sure you have a cable.yml file
 
 ```yml
 # config/cable.yml
@@ -78,7 +55,7 @@ production:
   url: redis://localhost:6379/1
 ```
 
-##### 6.3 Set allowed request origins (optional)
+##### Set allowed request origins (optional)
 
 By default action cable will only allow connections from localhost:3000 in development.  If you are going to something other than localhost:3000 you need to add something like this to your config:
 
@@ -89,7 +66,7 @@ Rails.application.configure do
 end
 ```
 
-#### 7 Try It Out  
+#### 5 Try It Out  
 
 If you don't already have a model to play with,  add one now:
 
@@ -101,7 +78,7 @@ Whatever model(s) you will plan to access on the client need to moved to the `ap
 
 **Important** in rails 5 there is also a base `ApplicationRecord` class, that all other models are built from.  This class must be moved to the public directory as well.
 
-If you don't already have a simple component to play with,  here is a simple one (make sure you add the Word model):
+If you don't already have a simple component to play with,  here is a simple one (make sure you added the Word model):
 
 ```ruby
 # app/views/components/app.rb
@@ -148,4 +125,4 @@ Fire up rails with `bundle exec rails s` and open your app in a couple of browse
 
 You can also fire up a rails console, and then for example do a `Word.new(text: "Hello").save` and again see any browsers updating.
 
-If you want to go into more details with example check out [words-example](/docs/words-example.md)
+If you want to go into more details with the example check out [words-example](/docs/words-example.md)
