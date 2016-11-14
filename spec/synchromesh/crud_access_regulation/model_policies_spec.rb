@@ -3,11 +3,6 @@ require 'synchromesh/integration/test_components'
 
 describe "regulate access allowed" do
 
-  before(:all) do
-    HyperMesh.configuration do |config|
-      config.transport = :none
-    end
-  end
 
   before(:each) do
     stub_const 'DummyModel', Class.new(ActiveRecord::Base)
@@ -17,7 +12,14 @@ describe "regulate access allowed" do
   end
 
   after(:each) do
-    load 'lib/synchromesh/reactive_record/permission_patches.rb'
+    class ActiveRecord::Base
+      def view_permitted?(attribute)
+        HyperMesh::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
+      end
+      [:create, :update, :destroy].each do |access|
+        define_method("#{access}_permitted?".to_sym) { false }
+      end
+    end
   end
 
   HyperMesh::InternalClassPolicy::CHANGE_POLICIES.each do |policy|

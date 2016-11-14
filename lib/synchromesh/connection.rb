@@ -1,6 +1,30 @@
 module HyperMesh
+  module AutoCreate
+    def needs_init?
+      return true unless connection.tables.include?(table_name)
+      return false if HyperMesh.on_console?
+      return true if defined?(Rails::Server)
+      return true unless Connection.root_path
+      uri = URI("#{Connection.root_path}server_up")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Get.new(uri.path)
+      if uri.scheme == 'https'
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+      http.request(request) && return rescue true
+    end
+
+    def create_table(*args, &block)
+      connection.create_table(table_name, *args, &block) if needs_init?
+    end
+  end
+
   class Connection < ActiveRecord::Base
     class QueuedMessage < ActiveRecord::Base
+
+      extend AutoCreate
+
       self.table_name = 'synchromesh_queued_messages'
 
       do_not_synchronize
@@ -29,17 +53,17 @@ module HyperMesh
       end
     end
 
+    extend AutoCreate
+
     def self.build_tables
-      # unless connection.tables.include? 'synchromesh_connections'
-      connection.create_table(:synchromesh_connections, force: true) do |t|
+      create_table(force: true) do |t|
         t.string   :channel
         t.string   :session
         t.datetime :created_at
         t.datetime :expires_at
         t.datetime :refresh_at
       end
-      # unless connection.tables.include? 'synchromesh_queued_messages'
-      connection.create_table(:synchromesh_queued_messages, force: true) do |t|
+      QueuedMessage.create_table(force: true) do |t|
         t.text    :data
         t.integer :connection_id
       end
@@ -80,8 +104,10 @@ module HyperMesh
       attr_accessor :transport
 
       def active
-        expired.delete_all
-        refresh_connections if needs_refresh?
+        unless HyperMesh.on_console?
+          expired.delete_all
+          refresh_connections if needs_refresh?
+        end
         all.pluck(:channel).uniq
       end
 
@@ -126,6 +152,8 @@ module HyperMesh
 
       def root_path
         QueuedMessage.root_path
+      rescue
+        nil
       end
 
       def refresh_connections

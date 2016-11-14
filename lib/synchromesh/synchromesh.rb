@@ -5,18 +5,24 @@ module HyperMesh
 
   extend Configuration
 
+  def self.initialize_policies
+    config_reset unless @config_reset_called
+  end
+
   def self.config_reset
-    load File.join(File.dirname(__FILE__), 'reactive_record', 'permission_patches.rb')
+    @config_reset_called = true
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
       Object.const_get 'ApplicationPolicy'
     rescue Exception => e
-      raise e unless e.is_a?(NameError) && e.message == "uninitialized constant ApplicationPolicy"
+      #raise e unless e.is_a?(NameError) && e.message == "uninitialized constant ApplicationPolicy"
+    rescue LoadError
     end
     application = begin
       Object.const_get('Application')
+    rescue LoadError
     rescue Exception => e
-      raise e unless e.is_a?(NameError) && e.message == "uninitialized constant Application"
+      #raise e unless e.is_a?(NameError) && e.message == "uninitialized constant Application"
     end if policy
     if policy && !application
       Object.const_set 'Application', Class.new
@@ -93,9 +99,7 @@ module HyperMesh
   end
 
   def self.on_console?
-    defined?(Rails::Console) #&& transport == :action_cable &&
-      #defined?(ActionCable::Server::Base) &&
-      #ActionCable::Server::Base.config.cable['adapter'] == 'async'
+    defined?(Rails::Console)
   end
 
   def self.send_to_server(channel, data)
@@ -105,7 +109,7 @@ module HyperMesh
     uri = URI("#{Connection.root_path}console_update")
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
-    if uri.scheme = 'https'
+    if uri.scheme == 'https'
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end

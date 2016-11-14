@@ -1,5 +1,6 @@
 module ReactiveRecord
   ::HyperMesh::Engine.routes.append do
+    HyperMesh.initialize_policies
 
     module ::WebConsole
       class Middleware
@@ -135,6 +136,10 @@ module ReactiveRecord
         head :unauthorized
       end
 
+      def server_up
+        head :no_content
+      end
+
     end unless defined? HyperMeshController
 
     match 'synchromesh-subscribe/:client_id/:channel',
@@ -151,5 +156,7 @@ module ReactiveRecord
           to: 'hyper_mesh#debug_console', via: :get
     match 'console_update',
           to: 'hyper_mesh#console_update', via: :post
+    match 'server_up',
+          to: 'hyper_mesh#server_up', via: :get
   end
 end
