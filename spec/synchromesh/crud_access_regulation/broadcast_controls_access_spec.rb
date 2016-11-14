@@ -3,12 +3,6 @@ require 'synchromesh/integration/test_components'
 
 describe "regulate access allowed" do
 
-  before(:all) do
-    HyperMesh.configuration do |config|
-      config.transport = :none
-    end
-  end
-
   context "basic tests" do
     before(:each) do
       # spec_helper resets the policy system after each test so we have to setup

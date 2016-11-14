@@ -4,39 +4,22 @@
 [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/hyper-mesh.svg)](https://badge.fury.io/rb/hyper-mesh)
 
-HyperMesh gives your HyperReact components CRUD access to your ActiveRecord models on the client, using the the standard ActiveRecord API.
-Furthermore HyperMesh implements push notifications (via a number of possible
+HyperMesh gives your HyperReact components CRUD access to your server side ActiveRecord models, using the the standard ActiveRecord API.
+In addition HyperMesh implements push notifications (via a number of possible
 technologies) so changes to records on the server are dynamically pushed to all authorised clients.
 
 *Its Isomorphic Ruby in action.*
 
-In other words browser 1 creates, updates, or destroys a model, and the changes are persisted in
+In other words one browser creates, updates, or destroys a model, and the changes are persisted in
 active record models and then broadcast to all other authorised clients.
-
-## Quick Start Guides
-
-Use one of the following guides if you are in a hurry to get going.
-
-If you don't care about synchronizing clients (i.e you just want a simple single client CRUD type application) use this
-[guide.](docs/no_synchronization_quickstart.md)
-
-Otherwise you will need to choose a data push transport.  The following guides add the additional configuration
-information needed to get two way push communications back to the clients.
-
-The easiest way to setup client push is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
-
-If you are already using Pusher follow this [guide.](docs/pusher_quickstart.md)
-
-If you are on Rails 5 already, and want to try ActionCable use this [guide.](docs/action_cable_quickstart.md)
-
-All of the above use websockets.  For ultimate simplicity use Polling as explained [here.](docs/simple_poller_quickstart.md)
 
 ## Overview
 
 + HyperMesh is built on top of HyperReact.
 + HyperReact is a Ruby DSL (Domain Specific Language) to build [React.js](https://facebook.github.io/react/) UI components in Ruby.  As data changes on the client (either from user interactions or external events) HyperReact re-draws whatever parts of the display is needed.
-+ HyperMesh provides a [flux dispatcher and data store](https://facebook.github.io/flux/docs/overview.html) backed by [Rails Active Record models](http://guides.rubyonrails.org/active_record_basics.html). You access your model data in your HyperReact components just like you would on the server or in an ERB or HAML view file.
-+ If a push transport is connected HyperMesh broadcasts any changes to your ActiveRecord models as they are persisted on the server.
++ HyperMesh provides a [flux dispatcher and data store](https://facebook.github.io/flux/docs/overview.html) backed by [Rails Active Record models](http://guides.rubyonrails.org/active_record_basics.html).  
+You access your model data in your HyperReact components just like you would on the server or in an ERB or HAML view file.
++ If an optional push transport is connected HyperMesh broadcasts any changes made to your ActiveRecord models as they are persisted on the server.
 
 For example consider a simple model called `Dictionary` which might be part of Wiktionary type app.
 
@@ -59,22 +42,18 @@ class WordOfTheDay < React::Component::Base
 
   def pick_entry!  
     # pick a random word and assign the selected record to entry
-
     @entry = Dictionary.defined.all[rand(Dictionary.defined.count)]
     force_update! # redraw our component when the word changes
-
     # Notice that we use standard ActiveRecord constructs to select our
     # random entry value
   end
 
-  # before we mount (draw the first time) our component pick an entry...
-
+  # pick an initial entry before we mount our component...
   before_mount :pick_entry
 
   # Again in our render block we use the standard ActiveRecord API, such
-  # as the 'defined' scope, and the 'word', 'pronunciation', & 'definition'
-  # attribute getters.  
-
+  # as the 'defined' scope, and the 'word', 'pronunciation', and
+  # 'definition' attribute getters.  
   render(DIV) do
     DIV { "total definitions: #{Dictionary.defined.count}" }
     DIV do
@@ -86,34 +65,57 @@ class WordOfTheDay < React::Component::Base
   end
 ```    
 
+## Basic Installation and Setup
+
+The easiest way to install is to use the `hyper-rails` gem.
+
+1. Add `gem 'hyper-rails'` to your Rails `Gemfile` development section.
+2. Install the Gem: `bundle install`
+3. Run the generator: `bundle exec rails g hyperloop:install --hyper-mesh` (or use `--all` to install all hyperloop gems)
+4. Update the bundle: `bundle update`
+
+You will find a `public` folder has been added to the `app/models` folder.  To access a model on the client, move it into the public directory.  If you are on Rails 5, you will also need to move the `application_record.rb` into the public directory.
+
+You will also find an `app/policies` folder with a simple access policy suited for development.  Policies are how you will provide detailed access control to to your public models.  More details [here](/docs/authorization-policies.md).
+
+Once you have run the hyperloop installer you can move models to the `app/models/public` directory and they will be accessible on both the server and client.
+
+## Setting up the Push Transport
+
+To have changes to your models on the server  broadcast to authorized clients, add a HyperMesh initializer file and specify a transport.  For example to setup a simple polled transport add this file:
+
+```ruby
+# config/initializers/hyper_mesh.rb
+HyperMesh.configuration |config|
+  config.transport = :simple_poller
+end
+```
+
+After restarting, and reloading your browsers you will see changes broadcast to the clients.  You can also play with this by firing up a rails console, and creating, changing or destroying models at the console.
+
+For setting up the other possible transports following one of these guides:
+
+The easiest way to setup a true push transport is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
+
+or if you are already using Pusher follow this [guide.](docs/pusher_quickstart.md)
+
+or if you are on Rails 5, and want to use ActionCable follow this [guide.](docs/action_cable_quickstart.md)
+
 ## Basic Configuration
 
-Assuming you are up and running with Hyper-React on Rails:
+For complete details on configuration settings go [here](/docs/configuration_details.md)
 
-1. **Add the gem**  
-add `gem 'hyper-mesh'`, and bundle install
-6. **Add the models directory to asset path**   
-```ruby
-# application.rb
-    config.assets.paths << ::Rails.root.join('app', 'models').to_s
-```
+## ActiveRecord API
 
-2. **Require HyperMesh instead of HyperReact**  
-replace `require 'hyper-react'` with `require 'hyper-mesh'` in the components manifest (`app/views/components.rb`.)
-3. **Require your models on the client_side_scoping**  
-add `require 'models'` to the bottom of the components manifest
-4. add a models manifest in the models directory:  
-```ruby
-# app/models/models.rb
-require_tree './public'
-```
-5. create a `public` directory in your models directory and move any models that you want access to on the client into this directory.  Access to these models will be protected by *Policies* you will be creating later.
+HyperMesh uses a large subset of the ActiveRecord API modified only when necessary to accommodate the asynchronous nature of the client.
 
-A minimal HyperMesh configuration consists of a simple initializer file, and at least one *Policy* class that will *authorize* who gets to see what.
+See this [guide](/docs/activerecord_api.md) for details.
 
-The initializer file specifies what transport will be used.  Currently you can use [Pusher](http://pusher.com), ActionCable (if using Rails 5), Pusher-Fake (for development) or a Simple Poller for testing etc.
+**Warning** currently the `attributes` method is supported, but please do not use it as some details of the semantics will be changing in an upcoming release.  Instead of `foo.attributes[:xyz]` use `foo.send('xyz')` for now.
 
-HyperMesh also adds some features to the `ActiveRecord` `scope` method to manage scopes updates.  Details [here.](docs/client_side_scoping.md)  
+## Client Side Scoping
+
+By default scopes will be recalculated on the server.  To offload this to the client HyperMesh adds some features to the `ActiveRecord` `scope` method.  Details [here.](docs/client_side_scoping.md)  
 
 ## Authorization
 
@@ -122,182 +124,7 @@ Each application defines a number of *channels* and *authorization policies* for
 Policies are defined with *Policy* classes.  These are similar and compatible with [Pundit](https://github.com/elabs/pundit) but
 you do not need to use the pundit gem (but can if you want.)
 
-Examples:
-
-```ruby
-class ApplicationPolicy
-  # define policies for the Application
-
-  # all clients can connect to the Application
-  always_allow_connection
-end
-
-class ProductionCenterPolicy
-  # define policies for the ProductionCenter model
-
-  # any time a ProductionCenter model is updated
-  # broadcast the total_jobs_shipped attribute over the
-  # application channel (i.e. this is public data anybody can see)
-  regulate_broadcast do |policy|
-    policy.send_only(:total_jobs_shipped).to(Application)
-  end
-end
-
-class UserPolicy
-  # define policies for the User channel and Model
-
-  # connect a channel for each logged in user
-  regulate_instance_connection { self }
-
-  # users can see all but one field of their own data
-  regulate_broadcast do |policy|
-    policy.send_all_but(:gross_margin_contribution).to(self)
-  end
-end
-```
-
 For complete details see [Authorization Policies](docs/authorization-policies.md)
-
-## Installation
-
-If you do not already have hyper-react installed, then use the reactrb-rails-generator gem to setup hyper-react, reactive-record and associated gems.
-
-Then add this line to your application's Gemfile:
-
-```ruby
-gem 'HyperMesh'
-```
-
-And then execute:
-
-    $ bundle install
-
-Also you must `require 'hyper-tracemesh'` from your client side code.  The easiest way is to
-find the `require 'reactive-record'` line (typically in `components.rb`) and replace it with
- `require 'HyperMesh'`.  
-
-## Configuration
-
-Add an initializer like this:
-
-```ruby
-# for rails this would go in: config/initializers/HyperMesh.rb
-HyperMesh.configuration do |config|
-  config.transport = :simple_poller # or :none, action_cable, :pusher - see below)
-end
-# for a minimal setup you will need to define at least one channel, which you can do
-# in the same file as your initializer.
-# Normally you would put these policies in the app/policies/ directory
-class ApplicationPolicy
-  # allow all clients to connect to the Application channel
-  regulate_connection { true } # or always_allow_connection for short
-  # broadcast all model changes over the Application channel *DANGEROUS*
-  regulate_all_broadcasts { |policy| policy.send_all }
-end
-```
-
-### Action Cable Configuration
-
-If you are on Rails 5 you can use ActionCable out of the box.
-
-```ruby
-#config/initializers/HyperMesh.rb
-HyperMesh.configuration do |config|
-  config.transport = :action_cable
-end
-```
-
-If you have not yet setup action cable all you have to do is include the `action_cable` js file in your assets
-
-```javascript
-//application.js
-...
-//= require action_cable
-...
-```
-
-The rest of the setup will be handled by HyperMesh.
-
-HyperMesh will not interfere with any ActionCable connections and channels you may have already defined.  
-
-### Pusher Configuration
-
-Add `gem 'pusher'` to your gem file, and add `//= require 'HyperMesh/pusher'` to your application.js file.
-
-```ruby
-# typically config/initializers/HyperMesh.rb
-HyperMesh.configuration do |config|
-  config.transport = :pusher
-  config.opts = {
-    app_id: '2xxxx2',
-    key:    'dxxxxxxxxxxxxxxxxxx9',
-    secret: '2xxxxxxxxxxxxxxxxxx2',
-    encrypted: false # optional defaults to true
-  }
-  config.channel_prefix = 'syncromesh' # or any other string you want
-end
-```
-
-### Pusher-Fake
-
-You can also use the [Pusher-Fake](https://github.com/tristandunn/pusher-fake) gem while in development.  Setup is a little tricky.  First
-add `gem 'pusher-fake'` to the development and/or test section of your gem file. Then setup your config file:
-
-```ruby
-# typically config/initializers/HyperMesh.rb
-# or you can do a similar setup in your tests (see this gem's specs)
-require 'pusher'
-require 'pusher-fake'
-# The app_id, key, and secret need to be assigned directly to Pusher
-# so PusherFake will work.
-Pusher.app_id = "MY_TEST_ID"      # you use the real or fake values
-Pusher.key =    "MY_TEST_KEY"
-Pusher.secret = "MY_TEST_SECRET"
-# The next line actually starts the pusher-fake server (see the Pusher-Fake readme for details.)
-require 'pusher-fake/support/base' # if using pusher with rspec change this to pusher-fake/support/rspec
-# now copy over the credentials, and merge with PusherFake's config details
-HyperMesh.configuration do |config|
-  config.transport = :pusher
-  config.channel_prefix = "HyperMesh"
-  config.opts = {
-    app_id: Pusher.app_id,
-    key: Pusher.key,
-    secret: Pusher.secret
-  }.merge(PusherFake.configuration.web_options)
-end
-```
-
-### Simple Poller Details
-
-Setup your config like this:
-```ruby
-HyperMesh.configuration do |config|
-  config.transport = :simple_poller
-  config.channel_prefix = "HyperMesh"
-  config.opts = {
-    seconds_between_poll: 5, # default is 0.5 you may need to increase if testing with Selenium
-    seconds_polled_data_will_be_retained: 1.hour  # clears channel data after this time, default is 5 minutes
-  }
-end
-```
-
-## The Cache store
-
-HyperMesh uses the rails cache to keep track of what connections are alive in a transport independent fashion.  Rails 5 by default will have caching off in development mode.
-
-Check in `config/development.rb` and make sure that `cache_store` is never being set to `:null_store`.  
-
-If you would like to be able to interact via
-the `rails console` you should set the store to be something like this:
-
-```ruby
-# config/development.rb
-Rails.application.configure do
-  ...
-  config.cache_store = :file_store, './rails_cache_dir'
-  ...
-end
-```
 
 ## Common Errors
 
@@ -308,7 +135,7 @@ By default HyperMesh will look for a `ApplicationPolicy` class.
 - Wrong version of pusher-fake  (pusher-fake/base vs. pusher-fake/rspec)  
 See the Pusher-Fake gem repo for details.
 
-- Forgetting to add require pusher in application.js file  
+- Forgetting to add `require pusher` in application.js file  
 this results in an error like this:
 ```text
 Exception raised while rendering #<TopLevelRailsComponent:0x53e>
@@ -320,10 +147,6 @@ To resolve make sure you `require 'pusher'` in your application.js file if using
 You must explicitly allow changes to the models to be made by the client. If you don't you will
 see 500 responses from the server when you try to update.  To open all access do this in
 your application policy: `allow_change(to: :all, on: [:create, :update, :destroy]) { true }`
-
-- `Cannot Run HyperMesh with cache_store == :null_store`  
-You will get this error on boot if you are trying to use the :null cache.  
-See notes above on why you cannot use the :null cache store.
 
 - Cannot connect to real pusher account:  
 If you are trying to use a real pusher account (not pusher-fake) but see errors like this  
@@ -397,14 +220,13 @@ You can of course simulate server side changes to your models through this conso
 ## Development
 
 The original `ReactiveRecord` specs were written in opal-rspec.  These are being migrated to
-use server rspec with isomorphic helpers.  There are about 150 of the original tests left and to run
-these you
+use server rspec with isomorphic helpers.  There are about 170 of the original tests left and to run these you
 
 1. cd to `reactive_record_spec/test_app`
 2. do a bundle install/update as needed,
-3. rake db:reset db:test:prepare,
+3. `rake db:reset db:test:prepare`,
 4. start the server: `bundle exec rails s`,
-5. then visit localhost/spec-opal.
+5. then visit `localhost:3000/spec-opal`.
 
 If you want to help **PLEASE** consider spending an hour and migrate a spec file to the new format.  You can
 find examples by looking in the `spec/reactive_record/` directory and matching to the original file in
@@ -420,11 +242,9 @@ bundle exec rspec spec
 
 You can run the specs in firefox by adding `DRIVER=ff` (best for debugging.)  You can add `SHOW_LOGS=true` if running in poltergeist (the default) to see what is going on, but ff is a lot better for debug.
 
-
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/reactive-ruby/HyperMesh. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
-
 
 ## License
 

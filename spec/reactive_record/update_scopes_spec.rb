@@ -15,6 +15,7 @@ RSpec::Steps.steps "updating scopes", js: true do
     stub_const 'TestApplication', Class.new
     stub_const 'TestApplicationPolicy', Class.new
     TestApplicationPolicy.class_eval do
+      always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
