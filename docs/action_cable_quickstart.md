@@ -33,12 +33,9 @@ Otherwise go through the following steps to setup ActionCable.
 
 ##### Make sure the `action_cable` js file is required in your assets
 
-```javascript
-//app/assets/javascripts/application.js
-...
-//= require action_cable
-Opal.load('components');
-```
+Typically `app/assets/javascripts/application.js` will finish with a `require_tree .` and this will pull in the `cable.js` file which will pull in `action_cable.js`
+
+However at a minimum if `application.js` simply does a `require action_cable` that will be sufficient for HyperMesh.
 
 ##### Make sure you have a cable.yml file
 
@@ -73,6 +70,11 @@ If you don't already have a model to play with,  add one now:
 `bundle exec rails generate model Word text:string`
 
 `bundle exec rake db:migrate`
+
+Move `app/models/word.rb` to `app/models/public/word.rb` and move
+`app/models/application_record.rb` to `app/models/public/application_record.rb`
+
+**Leave** `app/models/model.rb` where it is.  This is your models client side manifest file.
 
 Whatever model(s) you will plan to access on the client need to moved to the `app/models/public` directory.  This allows reactive-record to build a client side proxy for the models.  Models not moved will be completely invisible on the client side.
 
