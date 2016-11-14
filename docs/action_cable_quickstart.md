@@ -31,7 +31,7 @@ If you are already using ActionCable in your app that is fine, as HyperMesh will
 
 Otherwise go through the following steps to setup ActionCable.
 
-##### Make sure the `action_cable` js file in your assets
+##### Make sure the `action_cable` js file is required in your assets
 
 ```javascript
 //app/assets/javascripts/application.js

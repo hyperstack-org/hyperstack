@@ -1,3 +1,11 @@
+# HyperMesh Configuration
+
+There are XXX parts to the HyperMesh configuration:
+
+1. Model classes
+2. Policies
+3. Push Transport
+
 ## Installation
 
 If you do not already have hyper-react installed, then use the reactrb-rails-generator gem to setup hyper-react, reactive-record and associated gems.
