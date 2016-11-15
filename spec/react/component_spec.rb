@@ -95,15 +95,13 @@ describe React::Component, type: :component do
 
     it 'allows block for life cycle callback' do
       Foo.class_eval do
-        export_state(:foo)
-
         before_mount do
-          foo! 'bar'
+          set_state({ foo: "bar" })
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(Foo.foo).to be('bar')
+      instance = React::Test::Utils.render_into_document(element_to_render)
+      expect(instance.state[:foo]).to be('bar')
     end
   end
 
