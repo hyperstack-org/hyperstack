@@ -41,18 +41,11 @@ if opal?
       end
     end
 
-    describe '#element' do
-      it 'returns the React::Element for the mounted component' do
-        subject.mount(Greeter)
-        expect(subject.element).to be_a(React::Element)
-      end
-    end
-
     describe '#native' do
       it 'returns the React native instance of the component' do
         instance = subject.mount(Greeter)
         native = instance.instance_variable_get('@native')
-        expect(subject.native).to eq(native)
+        expect(`#{subject.native} === #{native}`).to eq(true)
       end
     end
 
@@ -89,11 +82,11 @@ if opal?
       end
     end
 
-    describe '#force_update' do
+    describe 'instance#force_update!' do
       it 'causes the component to render' do
         instance = subject.mount(Greeter)
         expect(instance).to receive(:render)
-        subject.force_update!
+        subject.instance.force_update!
       end
     end
   end
