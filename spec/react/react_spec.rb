@@ -53,24 +53,32 @@ RSpec.describe React, type: :component do
       before do
         stub_const 'Foo', Class.new
         Foo.class_eval do
+          def initialize(native)
+            @native = native
+          end
+
           def render
             React.create_element("div") { "lorem" }
+          end
+
+          def props
+            Hash.new(`#@native.props`)
           end
         end
       end
 
       it "should render element with only one children correctly" do
         element = React.create_element(Foo) { React.create_element('span') }
-        instance = renderElementToDocument(element)
-        expect(instance.props.children).not_to be_a(Array)
-        expect(instance.props.children.type).to eq("span")
+        instance = React::Test::Utils.render_into_document(element)
+        expect(instance.props[:children]).not_to be_a(Array)
+        expect(instance.props[:children][:type]).to eq("span")
       end
 
       it "should render element with more than one children correctly" do
         element = React.create_element(Foo) { [React.create_element('span'), React.create_element('span')] }
-        instance = renderElementToDocument(element)
-        expect(instance.props.children).to be_a(Array)
-        expect(instance.props.children.length).to eq(2)
+        instance = React::Test::Utils.render_into_document(element)
+        expect(instance.props[:children]).to be_a(Array)
+        expect(instance.props[:children].length).to eq(2)
       end
 
       it "should create a valid element provided class defined `render`" do
