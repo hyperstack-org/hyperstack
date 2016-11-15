@@ -22,7 +22,7 @@ Whitespace conventions:
 
 ### Changed
 
-- The whole opal-activesuppport is not loaded by default now. If your code rely on any of the module which is not required by hyper-react, you need to require it yourself. (#135)
+- The whole opal-activesuppport is not loaded by default now. This gave us about 18% size reduction on the built file. If your code rely on any of the module which is not required by hyper-react, you need to require it yourself. (#135)
 
 ### Deprecated
 
