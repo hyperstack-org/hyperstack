@@ -2,8 +2,6 @@
 
 The easiest push transport is the built-in simple poller.  This is great for demos or trying out HyperMesh but because it is constantly polling it is not suitable for production systems or any kind of real debug or test activities.
 
-Once you have hyper-react installed then add this initializer:
-
 #### 1 Add the HyperLoop gems to your Rails app
 
 If you have not already installed the `hyper-react` and `hyper-mesh` gems, then do so now using the [hyper-rails](https://github.com/ruby-hyperloop/hyper-rails) gem.
