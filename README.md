@@ -65,6 +65,13 @@ class WordOfTheDay < React::Component::Base
   end
 ```
 
+For a more complete examples with *push* updates checkout any of the apps in the `examples` directory, or build your own in 5 minutes following one of the quickstart guides:
+
++ [Rails 5 with ActionCable](/docs/action_cable_quickstart.md)
++ [Using Pusher.com](/docs/pusher_quickstart.md)
++ [Using Pusher-Faker](/docs/pusher_quickstart.md)
++ [Using Simple Polling](/docs/simple_poller.md)
+
 # ![](/work-in-progress-drinking.png) WARNING DOCS AND EXAMPLES ARE BEING REWRITTEN  MANY LINKS MAY BE BROKEN  STAY TUNED OR CHECK IN AT [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) FOR MORE INFO   
 
 ## Basic Installation and Setup
@@ -97,19 +104,18 @@ After restarting, and reloading your browsers you will see changes broadcast to 
 
 For setting up the other possible transports following one of these guides:
 
-The easiest way to setup a true push transport is to use the Pusher-Fake gem.  Get started with this [guide.](docs/pusher_faker_quickstart.md)
++ [Rails 5 with ActionCable](/docs/action_cable_quickstart.md)
++ [Using Pusher.com](/docs/pusher_quickstart.md)
++ [Using Pusher-Faker](/docs/pusher_quickstart.md)
++ [Using Simple Polling](/docs/simple_poller.md)
 
-or if you are already using Pusher follow this [guide.](docs/pusher_quickstart.md)
+## Advanced Configuration
 
-or if you are on Rails 5, and want to use ActionCable follow this [guide.](docs/action_cable_quickstart.md)
-
-## Basic Configuration
-
-For complete details on configuration settings go [here](/docs/configuration_details.md)
+The above guides will work in most cases, but for complete details on configuration settings go [here](/docs/configuration_details.md)
 
 ## ActiveRecord API
 
-HyperMesh uses a large subset of the ActiveRecord API modified only when necessary to accommodate the asynchronous nature of the client.
+HyperMesh uses a large subset of the ActiveRecord API modified only when necessary to accommodate the asynchronous nature of the client.  You can access your ActiveRecord models just like you would in models, controllers, or in ERB or HAML view templates.
 
 See this [guide](/docs/activerecord_api.md) for details.
 
@@ -117,7 +123,7 @@ See this [guide](/docs/activerecord_api.md) for details.
 
 ## Client Side Scoping
 
-By default scopes will be recalculated on the server.  To offload this to the client HyperMesh adds some features to the `ActiveRecord` `scope` method.  Details [here.](docs/client_side_scoping.md)  
+By default scopes will be recalculated on the server.  In some cases you may want to offload this to the client. To support this HyperMesh adds some features to the `ActiveRecord` `scope` method.  Details [here.](docs/client_side_scoping.md)  
 
 ## Authorization
 
@@ -143,7 +149,7 @@ this results in an error like this:
 Exception raised while rendering #<TopLevelRailsComponent:0x53e>
     ReferenceError: Pusher is not defined
 ```  
-To resolve make sure you `require 'pusher'` in your application.js file if using pusher.
+To resolve make sure you `require 'pusher'` in your application.js file if using pusher.  **DO NOT** require pusher from your components manifest as this will cause prerendering to fail.
 
 - No create/update/destroy policies
 You must explicitly allow changes to the models to be made by the client. If you don't you will
@@ -179,11 +185,11 @@ You are still referencing the old reactive-ruby or reactrb gems either directly 
 
 Sometimes you need to figure out what connections are available, or what attributes are readable etc.
 
-Its all to do with your policies, but perhaps you just need a little investigation.
+Its usually all to do with your policies, but perhaps you just need a little investigation.
 
 You can bring up a console within the controller context by browsing `localhost:3000/rr/console`
 
-*Note:  change `rr` to wherever you are mounting reactive record in your routes file.*
+*Note:  change `rr` to wherever you are mounting HyperMesh in your routes file.*
 
 *Note: in rails 4, you will need to add the gem 'web-console' to your development section*
 
@@ -220,6 +226,8 @@ You can of course simulate server side changes to your models through this conso
 `Todo.new.save` will broadcast the changes to the Todo model to any authorized channels.
 
 ## Development
+
+HyperMesh is the merger of `reactive-record` and `synchromesh` gems.  As such a lot of the internal names are still using either ReactiveRecord or Synchromesh module names.
 
 The original `ReactiveRecord` specs were written in opal-rspec.  These are being migrated to
 use server rspec with isomorphic helpers.  There are about 170 of the original tests left and to run these you

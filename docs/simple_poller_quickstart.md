@@ -1,82 +1,50 @@
 ### Simple Poller Quickstart
 
-The easiest way to get started is to use the built-in simple polling transport.
-
-#### 1 Get yourself a rails app
-
-Either take an existing rails app, or create a new one the usual way.
-
-#### 2 Add ReactRb
-
-If you have not already installed the `hyper-react` and `reactive-record` gems, then do so now using the [reactrb-rails-generator](https://github.com/hyper-react/reactrb-rails-generator) gem.
-
-- add `gem 'reactrb-rails-generator'` to your gem file (in the development section)
-- run `bundle install`
-- run `bundle exec rails g hyper-react:install --all` (make sure to use the --all option)
-- run `bundle update`
-
-#### 3 Add the synchromesh gem
-
-- add `gem 'synchromesh', git: 'https://github.com/hyper-react/synchromesh', branch: 'authorization-policies'`
-- then `bundle install`  
-- and in `app/views/components.rb` add `require 'hyper-mesh'`  
- immediately below`require 'reactive-record'`
-
-#### 4 Set the transport
+The easiest push transport is the built-in simple poller.  This is great for demos or trying out HyperMesh but because it is constantly polling it is not suitable for production systems or any kind of real debug or test activities.
 
 Once you have hyper-react installed then add this initializer:
+
+#### 1 Add the HyperLoop gems to your Rails app
+
+If you have not already installed the `hyper-react` and `hyper-mesh` gems, then do so now using the [hyper-rails](https://github.com/ruby-hyperloop/hyper-rails) gem.
+
+- add `gem 'hyper-rails'` to your gem file (in the development section)
+- run `bundle install`
+- run `rails g hyperloop:install --all` (make sure to use the --all option)
+- run `bundle update`
+
+#### 2 Set the transport
+
+Once you have HyperMesh installed then add this initializer:
 ```ruby
 #config/initializers/synchromesh.rb
 HyperMesh.configuration do |config|
   config.transport = :simple_poller
   # options
-  config.opts = {
-    seconds_between_poll: 5, # default is 0.5 you may need to increase if testing with Selenium
-    seconds_polled_data_will_be_retained: 1.hour  # clears channel data after this time, default is 5 minutes
-  }
+  # config.opts = {
+  #   seconds_between_poll: 5, # default is 0.5 you may need to increase if testing with Selenium
+  #   seconds_polled_data_will_be_retained: 1.hour  # clears channel data after this time, default is 5 minutes
+  # }
 end
 ```
 
-#### 5 Make sure caching is enabled
+#### 3 Try It Out  
 
-HyperMesh uses the rails cache to keep track of what connections are alive in a transport independent fashion.  Rails 5 by default will have caching off in development mode.
-
-Check in `config/development.rb` and make sure that `cache_store` is never being set to `:null_store`.  
-
-If you would like to be able to interact via
-the `rails console` you should set the store to be something like this:
-
-```ruby
-# config/development.rb
-Rails.application.configure do
-  config.cache_store = :file_store, './rails_cache_dir'
-end
-```
-
-#### 6 Define Your Policies
-
-To start just open everything up by adding a policies directory and defining a policy file like this:
-
-```ruby
-# app/policies/application_policy.rb
-class ApplicationPolicy
-  always_allow_connection
-  regulate_all_broadcasts { |policy| policy.send_all }
-  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
-end
-```
-
-#### 8 Try It Out  
-
-If you don't already have a model to play with,  add one now:
+If you don't already have a model to play with add one now:
 
 `bundle exec rails generate model Word text:string`
 
 `bundle exec rake db:migrate`
 
+Move `app/models/word.rb` to `app/models/public/word.rb`
+
+**Leave** `app/models/model.rb` where it is.  This is your models client side manifest file.
+
 Whatever model(s) you will plan to access on the client need to moved to the `app/models/public` directory.  This allows reactive-record to build a client side proxy for the models.  Models not moved will be completely invisible on the client side.
 
-If you don't already have a simple component to play with,  here is a simple one (make sure you add the Word model):
+**Important** in rails 5 there is also a base `ApplicationRecord` class, that all other models are built from.  This class must be moved to the public directory as well.
+
+If you don't already have a component to play with,  here is a simple one (make sure you added the Word model):
 
 ```ruby
 # app/views/components/app.rb
@@ -123,4 +91,4 @@ Fire up rails with `bundle exec rails s` and open your app in a couple of browse
 
 You can also fire up a rails console, and then for example do a `Word.new(text: "Hello").save` and again see any browsers updating.
 
-If you want to go into more details with example check out [words-example](/docs/words-example.md)
+If you want to go into more details with the example check out [words-example](/docs/words-example.md)

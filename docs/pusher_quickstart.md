@@ -1,6 +1,6 @@
 ### PusherQuickstart
 
-[Pusher.com](https://pusher.com/) provides a ready to go push infrastructure for you App.  You can combine this with [Pusher-Fake](/docs/pusher_faker_quickstart.md) for local testing as well.
+[Pusher.com](https://pusher.com/) provides a production ready push transport for your App.  You can combine this with [Pusher-Fake](/docs/pusher_faker_quickstart.md) for local testing as well.  You can get a free pusher account and API keys at [https://pusher.com](https://pusher.com)
 
 #### 1 Add the Pusher and HyperLoop gems to your Rails app
 
@@ -25,24 +25,16 @@ Opal.load('components');
 
 #### 3 Set the transport
 
-Once you have HyperMesh, and pusher installed then add this initializer:
+Once you have HyperMesh and pusher installed then add this initializer:
 ```ruby
-# typically app/config/initializers/HyperMesh.rb
-# or you can do a similar setup in your tests (see this gem's specs)
-require 'pusher'
-# Assign any values to the Pusher app_id, key, and secret config values.
-# These can be fake values or the real values for your pusher account.
-Pusher.app_id = "MY_TEST_ID"      # you use the real or fake values
-Pusher.key =    "MY_TEST_KEY"
-Pusher.secret = "MY_TEST_SECRET"
-# now copy over the credentials, and merge with PusherFake's config details
+# config/initializers/HyperMesh.rb
 HyperMesh.configuration do |config|
   config.transport = :pusher
   config.channel_prefix = "HyperMesh"
   config.opts = {
-    app_id: Pusher.app_id,
-    key: Pusher.key,
-    secret: Pusher.secret
+    app_id: "2....9",
+    key: "f.....g",
+    secret: "1.......3"
   }
 end
 ```
@@ -55,8 +47,7 @@ If you don't already have a model to play with,  add one now:
 
 `bundle exec rake db:migrate`
 
-Move `app/models/word.rb` to `app/models/public/word.rb` and move
-`app/models/application_record.rb` to `app/models/public/application_record.rb`
+Move `app/models/word.rb` to `app/models/public/word.rb`
 
 **Leave** `app/models/model.rb` where it is.  This is your models client side manifest file.
 
@@ -64,7 +55,7 @@ Whatever model(s) you will plan to access on the client need to moved to the `ap
 
 **Important** in rails 5 there is also a base `ApplicationRecord` class, that all other models are built from.  This class must be moved to the public directory as well.
 
-If you don't already have a simple component to play with,  here is a simple one (make sure you added the Word model):
+If you don't already have a component to play with,  here is a simple one (make sure you added the Word model):
 
 ```ruby
 # app/views/components/app.rb
