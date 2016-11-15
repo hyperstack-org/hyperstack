@@ -65,14 +65,12 @@ class WordOfTheDay < React::Component::Base
   end
 ```
 
-For a more complete examples with *push* updates checkout any of the apps in the `examples` directory, or build your own in 5 minutes following one of the quickstart guides:
+For more complete examples with *push* updates checkout any of the apps in the `examples` directory, or build your own in 5 minutes following one of the quickstart guides:
 
 + [Rails 5 with ActionCable](/docs/action_cable_quickstart.md)
 + [Using Pusher.com](/docs/pusher_quickstart.md)
 + [Using Pusher-Faker](/docs/pusher_quickstart.md)
-+ [Using Simple Polling](/docs/simple_poller.md)
-
-# ![](/work-in-progress-drinking.png) WARNING DOCS AND EXAMPLES ARE BEING REWRITTEN  MANY LINKS MAY BE BROKEN  STAY TUNED OR CHECK IN AT [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) FOR MORE INFO   
++ [Using Simple Polling](/docs/simple_poller_quickstart.md)  
 
 ## Basic Installation and Setup
 
@@ -107,7 +105,7 @@ For setting up the other possible transports following one of these guides:
 + [Rails 5 with ActionCable](/docs/action_cable_quickstart.md)
 + [Using Pusher.com](/docs/pusher_quickstart.md)
 + [Using Pusher-Faker](/docs/pusher_quickstart.md)
-+ [Using Simple Polling](/docs/simple_poller.md)
++ [Using Simple Polling](/docs/simple_poller_quickstart.md)
 
 ## Advanced Configuration
 
@@ -123,7 +121,7 @@ See this [guide](/docs/activerecord_api.md) for details.
 
 ## Client Side Scoping
 
-By default scopes will be recalculated on the server.  In some cases you may want to offload this to the client. To support this HyperMesh adds some features to the `ActiveRecord` `scope` method.  Details [here.](docs/client_side_scoping.md)  
+By default scopes will be recalculated on the server.  For simple scopes that do not use joins or includes no additional action needs to be taken to make scopes work with HyperMesh.  For scopes that do use joins, or if you want to offload the scoping computation from the server to the client read more [here.](docs/client_side_scoping.md)  
 
 ## Authorization
 

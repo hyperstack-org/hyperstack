@@ -1,3 +1,5 @@
+# ![](/work-in-progress-drinking.png) WARNING DOCS AND EXAMPLES ARE BEING REWRITTEN  MANY LINKS MAY BE BROKEN  STAY TUNED OR CHECK IN AT [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) FOR MORE INFO 
+
 Lets look at part of a very simple Todo application with one model:
 
 ```ruby

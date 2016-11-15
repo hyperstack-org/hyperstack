@@ -2,15 +2,15 @@
 
 When the client receives notification that a record has changed HyperMesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated on the client.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way synchromesh keeps the data requested by the browser limited to a reasonable amount.  
+On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated on the client.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way HyperMesh keeps the data requested by the browser limited to a reasonable amount.  
 
 To make scopes work efficiently on the client HyperMesh adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with HyperMesh.
 
 The additional features are accessed via the `:joins`, `:client`, and `:select` options.
 
-The `:joins` option tells the synchromesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, synchromesh will not know to update the scope.*
+The `:joins` option tells the HyperMesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, HyperMesh will not know to update the scope.*
 
-The `:client` option provides the client a way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization and is not required for scopes to work.
+The `:client` and `:select` options provide the client a way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization and is not required for scopes to work.
 
 ```ruby
 class Todo < ActiveRecord::Base
@@ -34,7 +34,7 @@ class Todo < ActiveRecord::Base
   # Now with_recent_comments will be re-evaluated whenever a Todo record, or a Comment
   # joined with a Todo change.
 
-  # Normally whenever synchromesh detects that a scope may be effected by a changed
+  # Normally whenever HyperMesh detects that a scope may be effected by a changed
   # model, it will request the scope be re-evaluated on the server.  To offload this
   # computation to the client provide a client side scope method:
 
@@ -46,7 +46,7 @@ class Todo < ActiveRecord::Base
   # The client proc is executed on each candidate record, and if it returns true the record
   # will be added to the scope.
 
-  # Instead of a client proc you can provide a select proc, which will receive the entire,
+  # Instead of a client proc you can provide a select proc, which will receive the entire
   # collection which can then be filtered and sorted.
 
   scope :sort_by_created_at,
