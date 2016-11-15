@@ -595,7 +595,7 @@ describe React::Component, type: :component do
 
       expect { |b|
         element = React.create_element(Foo).on(:foo_submit, &b)
-        renderElementToDocument(element)
+        React::Test::Utils.render_into_document(element)
       }.to yield_with_args('bar')
     end
 
@@ -614,7 +614,7 @@ describe React::Component, type: :component do
 
       expect { |b|
         element = React.create_element(Foo).on(:foo_invoked, &b)
-        renderElementToDocument(element)
+        React::Test::Utils.render_into_document(element)
       }.to yield_with_args([1,2,3], 'bar')
     end
   end
@@ -845,10 +845,6 @@ describe React::Component, type: :component do
       stub_const 'Foo', Class.new
       Foo.class_eval do
         include React::Component
-        export_state :the_children
-        before_mount do
-          the_children! children
-        end
         def render
           React.create_element('div') { 'lorem' }
         end
@@ -859,9 +855,9 @@ describe React::Component, type: :component do
       ele = React.create_element(Foo) {
         [React.create_element('a'), React.create_element('li')]
       }
-      renderElementToDocument(ele)
+      instance = React::Test::Utils.render_into_document(ele)
 
-      children = Foo.the_children
+      children = instance.children
 
       expect(children).to be_a(React::Children)
       expect(children.count).to eq(2)
@@ -870,8 +866,8 @@ describe React::Component, type: :component do
 
     it 'returns an empty Enumerator if there are no children' do
       ele = React.create_element(Foo)
-      renderElementToDocument(ele)
-      nodes = Foo.the_children.each
+      instance = React::Test::Utils.render_into_document(ele)
+      nodes = instance.children.each
       expect(nodes.size).to eq(0)
       expect(nodes.count).to eq(0)
     end
