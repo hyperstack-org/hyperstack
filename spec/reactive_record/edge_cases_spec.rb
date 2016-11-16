@@ -21,7 +21,7 @@ describe "reactive-record edge cases", js: true do
       FactoryGirl.create(:todo, title: "User #{i}'s todo", owner: user)
     end
     expect_promise do
-      ReactiveRecord.load do
+      HyperMesh.load do
         Todo.all.collect do |todo|
           todo.owner && todo.owner.first_name
         end.compact

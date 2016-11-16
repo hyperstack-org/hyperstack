@@ -1,3 +1,9 @@
+module HyperMesh
+  def self.load(&block)
+    ReactiveRecord.load &block
+  end
+end
+    
 module ReactiveRecord
 
   # will repeatedly execute the block until it is loaded
