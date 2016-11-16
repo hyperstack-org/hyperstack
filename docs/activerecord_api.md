@@ -1,64 +1,35 @@
 ## ActiveRecord API
 
-HyperMesh uses a subset of the standard ActiveRecord API to give your client side HyperReact components access to your server side models.
+HyperMesh uses a subset of the standard ActiveRecord API to give your client side HyperReact components access to your server side models.  As much as possible HyperMesh follows the syntax as semantics of ActiveRecord.  
 
 ### Interfacing to React
 
+HyperMesh uses the React to deliver your model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
+
+HyperMesh automatically creates state objects that will be updated as server side data is loaded, or changes.  
+
+A brief overview of how this works will help you understand the how HyperMesh gets the job done.
+
 #### Rendering Cycle
 
-Typically you will access models in order to display data.
+On the UI you will be reading models in order to display data.
 
-If during the rendering of the display the model data is not yet loaded placeholder values (the default values from the `columns_hash`) will be returned.  
+If during the rendering of the display the model data is not yet loaded placeholder values (the default values from the `columns_hash`) will be returned by HyperMesh.  
 
-HyperMesh keeps track of where these placeholders (or `DummyValue`s) are displayed, and when the do get loaded, those parts of the display will re-render.
+HyperMesh then keeps track of where these placeholders (or `DummyValue`s) are displayed, and when they do get loaded, those parts of the display will re-render.
 
-You normally do not have to be aware of this.  Just access your models using the normal scopes, and finders, and display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
+If later the data changes (either due to local user actions, or receiving push updates) then again any parts of the display that were dependent on the current values will be re-rendered.
 
-If you want to put up an please wait message, spinner, etc, you can use the `loaded?` or `loading?` method on any object (even ones not loaded from the server).  If that object is a *real* loaded value then `loaded?` will return true.
+You normally do not have to be aware of this.  Just access your models using the normal scopes and finders, to compute values and  display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
+
 
 #### Prerendering
 
-During server-side prerendering, we do know all the values immediately so on initial page load all the values will be loaded and present.  
+During server-side pre-rendering, we do know all the values immediately so on initial page load all the values will be loaded and present.  
 
-#### The `HyperMesh.load` Method
+#### Load Cycle Methods
 
-Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `HyperMesh.load` method:
-
-```ruby
-HyperMesh.load do
-  x = my_model.some_attribute
-  OtherModel.find(x+12).other_attribute
-  # code in here can be arbitrarily complex and load
-  # will re-execute it until all values are loaded
-  # the final expression is passed to the promise
-end.then |result|
-  puts result
-end
-```
-
-#### Force Loading Attributes
-
-Like
-
-Normally you will simply display attributes as part of the render method, and when the values are loaded from the server the component will re-render.
-
-Sometimes outside of the render method you may need to insure an attribute (or a server side method) is loaded before proceeding.  This is typically when you are building some kind of higher level store.  
-
-The `load` takes a list of attributes (symbols) and will insure these are loaded.  Load returns a promise that is resolved when the load completes, or can be passed a block that will execute when the load completes.
-
-```ruby
-before_mount do
-  Todo.find(1).load(:name).then do |name|
-    @name = name;
-    state.loaded! true
-  end
-end
-```
-
-Think hard about how you are using this, as HyperMesh already acts as flux store, and is managing state for you.
-
-
-
+There are a number of methods that allow you to interact with this load cycle when needed.  These are documented [below].
 
 
 ### Class Methods
@@ -235,3 +206,48 @@ After the destroy completes the records `destroyed?` method will return true.
 `..._changed?` (i.e. name_changed?) returns true if the specific attribute has changed.
 
 `itself` returns the record, but will also force a load of at least the model's id.
+
+#### Other Methods for Interacting with the Load & Render Cycle
+
+#### `loading?` and `loaded?`
+
+All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.
+
+#### The `HyperMesh.load` Method
+
+Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `HyperMesh.load` method:
+
+```ruby
+HyperMesh.load do
+  x = my_model.some_attribute
+  OtherModel.find(x+12).other_attribute
+  # code in here can be arbitrarily complex and load
+  # will re-execute it until all values are loaded
+  # the final expression is passed to the promise
+end.then |result|
+  puts result
+end
+```
+
+
+
+#### Force Loading Attributes
+
+Like
+
+Normally you will simply display attributes as part of the render method, and when the values are loaded from the server the component will re-render.
+
+Sometimes outside of the render method you may need to insure an attribute (or a server side method) is loaded before proceeding.  This is typically when you are building some kind of higher level store.  
+
+The `load` takes a list of attributes (symbols) and will insure these are loaded.  Load returns a promise that is resolved when the load completes, or can be passed a block that will execute when the load completes.
+
+```ruby
+before_mount do
+  Todo.find(1).load(:name).then do |name|
+    @name = name;
+    state.loaded! true
+  end
+end
+```
+
+Think hard about how you are using this, as HyperMesh already acts as flux store, and is managing state for you.
