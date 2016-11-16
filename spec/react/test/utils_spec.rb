@@ -7,19 +7,14 @@ if opal?
       Foo.class_eval do
         include React::Component
 
-        def hello
-          @hello
-        end
-
         def render
-          @hello = 'hello'
           div { 'Click Me' }.on(:click) { |e| click(e) }
         end
       end
 
-      instance = renderToDocument(Foo)
-      expect_any_instance_of(Foo).to receive(:click)
-      described_class.simulate(:click, instance)
+      instance = React::Test::Utils.render_into_document(React.create_element(Foo))
+      expect(instance).to receive(:click)
+      described_class.simulate(:click, instance.dom_node)
     end
 
     describe "render_into_document" do

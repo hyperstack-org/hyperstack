@@ -16,19 +16,9 @@ module React
         end
       end
 
-      def self.simulate(event, element)
-        Simulate.new.click(element)
-      end
-
-      class Simulate
-        include Native
-        def initialize
-          super(`ReactTestUtils.Simulate`)
-        end
-
-        def click(component_instance)
-          `#{@native}['click']`.call(component_instance.dom_node, {})
-        end
+      def self.simulate(event, element, params = {})
+        simulator = Native(`ReactTestUtils.Simulate`)
+        simulator[event.to_s].call(`element.$dom_node === undefined` ? element : element.dom_node, params)
       end
     end
   end

@@ -110,20 +110,20 @@ describe React::Element, type: :component do
     it 'is subscribable through `on(:event_name)` method' do
       expect { |b|
         element = React.create_element("div").on(:click, &b)
-        instance = renderElementToDocument(element)
-        simulateEvent(:click, instance)
+        dom_node = React::Test::Utils.render_into_document(element)
+        React::Test::Utils.simulate(:click, dom_node)
       }.to yield_with_args(React::Event)
 
       expect { |b|
         element = React.create_element("div").on(:key_down, &b)
-        instance = renderElementToDocument(element)
-        simulateEvent(:keyDown, instance, {key: "Enter"})
+        dom_node = React::Test::Utils.render_into_document(element)
+        React::Test::Utils.simulate(:keyDown, dom_node, {key: "Enter"})
       }.to yield_control
 
       expect { |b|
         element = React.create_element("form").on(:submit, &b)
-        instance = renderElementToDocument(element)
-        simulateEvent(:submit, instance, {})
+        dom_node = React::Test::Utils.render_into_document(element)
+        React::Test::Utils.simulate(:submit, dom_node)
       }.to yield_control
     end
 

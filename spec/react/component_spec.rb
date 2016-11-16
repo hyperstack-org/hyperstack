@@ -573,8 +573,8 @@ describe React::Component, type: :component do
       end
 
       element = React.create_element(Foo)
-      instance = renderElementToDocument(element)
-      simulateEvent(:click, instance)
+      instance = React::Test::Utils.render_into_document(element)
+      React::Test::Utils.simulate(:click, instance)
       expect(instance.state.clicked).to eq(true)
     end
 
@@ -645,10 +645,9 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      simulateEvent(:click, element)
-
-      expect(element.refs.field.value).to eq('some_stuff')
+      instance = React::Test::Utils.render_into_document(React.create_element(Foo))
+      React::Test::Utils.simulate(:click, instance)
+      expect(instance.refs[:field].value).to eq('some_stuff')
     end
 
     it "allows access the actual DOM node" do

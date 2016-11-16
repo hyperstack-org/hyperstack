@@ -3,21 +3,11 @@ module React
   module SpecHelpers
     `var ReactTestUtils = React.addons.TestUtils`
 
-
     def renderToDocument(type, options = {})
       element = React.create_element(type, options)
-      renderElementToDocument(element)
-    end
-
-    def renderElementToDocument(element)
       instance = Native(`ReactTestUtils.renderIntoDocument(#{element.to_n})`)
       instance.class.include(React::Component::API)
       instance
-    end
-
-    def simulateEvent(event, element, params = {})
-      simulator = Native(`ReactTestUtils.Simulate`)
-      simulator[event.to_s].call(element.dom_node, params)
     end
 
     def isElementOfType(element, type)
