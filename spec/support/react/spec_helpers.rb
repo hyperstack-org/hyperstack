@@ -5,9 +5,7 @@ module React
 
     def renderToDocument(type, options = {})
       element = React.create_element(type, options)
-      instance = Native(`ReactTestUtils.renderIntoDocument(#{element.to_n})`)
-      instance.class.include(React::Component::API)
-      instance
+      React::Test::Utils.render_into_document(element)
     end
 
     def isElementOfType(element, type)

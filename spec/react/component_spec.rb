@@ -282,8 +282,8 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(element.state.foo).to be('bar')
+      instance = renderToDocument(Foo)
+      expect(instance.state[:foo]).to be('bar')
     end
 
     it 'supports original `replaceState` as `set_state!` method' do
@@ -295,8 +295,8 @@ describe React::Component, type: :component do
       end
 
       element = renderToDocument(Foo)
-      expect(element.state.foo).to be_nil
-      expect(element.state.bar).to eq('lorem')
+      expect(element.state[:foo]).to be_nil
+      expect(element.state[:bar]).to eq('lorem')
     end
 
     it 'supports original `state` method' do
@@ -389,9 +389,9 @@ describe React::Component, type: :component do
           end
         end
 
-        element = renderToDocument(Foo, {foo: 10})
-        element.set_props!(bar: 20)
-        expect(element.getDOMNode.innerHTML).to eq('null')
+        instance = renderToDocument(Foo, {foo: 10})
+        instance.set_props!(bar: 20)
+        expect(`#{instance.dom_node}.innerHTML`).to eq('null')
       end
     end
 
@@ -632,8 +632,8 @@ describe React::Component, type: :component do
         end
       end
 
-      element = renderToDocument(Foo)
-      expect(element.refs.field).not_to be_nil
+      instance = renderToDocument(Foo)
+      expect(instance.refs[:field]).not_to be_nil
     end
 
     it 'accesses refs through `refs` method' do
@@ -650,10 +650,10 @@ describe React::Component, type: :component do
       expect(instance.refs[:field].value).to eq('some_stuff')
     end
 
-    it "allows access the actual DOM node" do
+    it "allows access the actual DOM node", v13_exclude: true do
       Foo.class_eval do
         after_mount do
-          dom = refs[:my_div].dom_node
+          dom = refs[:my_div].to_n
           `dom.innerHTML = 'Modified'`
         end
 
