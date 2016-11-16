@@ -7,6 +7,7 @@ module ReactiveRecord
     include React::IsomorphicHelpers
 
     before_first_mount do |context|
+      HyperMesh::ClientDrivers.on_first_mount
       if RUBY_ENGINE != 'opal'
         @server_data_cache = ReactiveRecord::ServerDataCache.new(context.controller.acting_user, {})
       else
@@ -26,6 +27,19 @@ module ReactiveRecord
           end
         end
       end
+    end
+
+    def self.deprecation_warning(model, message)
+      @deprecation_messages ||= []
+      message = "Warning: Deprecated feature used in #{model}. #{message}"
+      unless @deprecation_messages.include? message
+        @deprecation_messages << message
+        log message, :warning
+      end
+    end
+
+    def deprecation_warning(message)
+      self.class.deprecation_warning(model, message)
     end
 
     def records
@@ -87,8 +101,15 @@ module ReactiveRecord
         @pending_records << record if record
         schedule_fetch
       end
-      DummyValue.new(record && record.model.columns_hash[vector.last])
+      DummyValue.new(record && record.get_columns_info_for_vector(vector))
     end
+
+    def get_columns_info_for_vector(vector)
+      method_name = vector.last
+      method_name = method_name.first if method_name.is_a? Array
+      model.columns_hash[method_name] || model.server_methods[method_name]
+    end
+
 
     class << self
 

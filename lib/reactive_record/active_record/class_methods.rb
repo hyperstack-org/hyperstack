@@ -107,6 +107,10 @@ module ActiveRecord
     [:belongs_to, :has_many, :has_one].each do |macro|
       define_method(macro) do |*args| # is this a bug in opal?  saying name, scope=nil, opts={} does not work!
         name = args.first
+        define_method(name) { @backing_record.reactive_get!(name, nil) }
+        define_method("#{name}=") do |val|
+          @backing_record.reactive_set!(name, backing_record.convert(name, val))
+        end
         opts = (args.count > 1 and args.last.is_a? Hash) ? args.last : {}
         Associations::AssociationReflection.new(self, macro, name, opts)
       end
@@ -114,14 +118,46 @@ module ActiveRecord
 
     def composed_of(name, opts = {})
       Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
+      define_method(name) { @backing_record.reactive_get!(name, nil) }
+      define_method("#{name}=") do |val|
+        @backing_record.reactive_set!(name, backing_record.convert(name, val))
+      end
     end
 
     def column_names
-      []  # it would be great to figure out how to get this information on the client!  For now we just return an empty array
+      HyperMesh::ClientDrivers.public_columns_hash.keys
     end
 
     def columns_hash
       HyperMesh::ClientDrivers.public_columns_hash[name] || {}
+    end
+
+    def server_methods
+      @server_methods ||= {}
+    end
+
+    def server_method(name, default: nil)
+      server_methods[name] = { default: default }
+      define_method(name) do |*args|
+        vector = args.count.zero? ? name : [[name]+args]
+        @backing_record.reactive_get!(vector, nil)
+      end
+      define_method("#{name}!") do |*args|
+        vector = args.count.zero? ? name : [[name]+args]
+        @backing_record.reactive_get!(vector, true)
+      end
+    end
+
+    def define_attribute_methods
+      columns_hash.keys.each do |name|
+        next if name == :id
+        define_method(name) { @backing_record.reactive_get!(name, nil) }
+        define_method("#{name}!") { @backing_record.reactive_get!(name, true) }
+        define_method("#{name}=") do |val|
+          @backing_record.reactive_set!(name, backing_record.convert(name, val))
+        end
+        define_method("#{name}_changed?") { @backing_record.changed?(name) }
+      end
     end
 
     [

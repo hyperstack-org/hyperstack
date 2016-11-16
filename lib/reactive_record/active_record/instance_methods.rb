@@ -34,6 +34,14 @@ module ActiveRecord
       self.class.primary_key
     end
 
+    def type
+      @backing_record.reactive_get!(:type, nil)
+    end
+
+    def type=(val)
+      @backing_record.reactive_set!(:type, backing_record.convert(:type, val))
+    end
+
     def id
       @backing_record.reactive_get!(primary_key)
     end
@@ -63,7 +71,12 @@ module ActiveRecord
       @backing_record == ar_instance.instance_eval { @backing_record }
     end
 
+    def method_missing_warning(name)
+      @backing_record.deprecation_warning("Server side method #{name} must be defined using the 'server_method' macro.")
+    end
+
     def method_missing(name, *args, &block)
+      method_missing_warning("#{name}(#{args})")
       if name =~ /\!$/
         name = name.gsub(/\!$/,"")
         force_update = true

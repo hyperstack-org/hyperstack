@@ -36,7 +36,7 @@ module ReactiveRecord
       end
 
       def build_default_value_for_nil
-        nil
+        @column_hash[:default] || nil
       end
 
       def build_default_value_for_datetime

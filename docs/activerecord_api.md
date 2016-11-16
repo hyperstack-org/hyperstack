@@ -2,7 +2,76 @@
 
 HyperMesh uses a subset of the standard ActiveRecord API to give your client side HyperReact components access to your server side models.
 
+### Interfacing to React
+
+#### Rendering Cycle
+
+Typically you will access models in order to display data.
+
+If during the rendering of the display the model data is not yet loaded placeholder values (the default values from the `columns_hash`) will be returned.  
+
+HyperMesh keeps track of where these placeholders (or `DummyValue`s) are displayed, and when the do get loaded, those parts of the display will re-render.
+
+You normally do not have to be aware of this.  Just access your models using the normal scopes, and finders, and display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
+
+If you want to put up an please wait message, spinner, etc, you can use the `loaded?` or `loading?` method on any object (even ones not loaded from the server).  If that object is a *real* loaded value then `loaded?` will return true.
+
+#### Prerendering
+
+During server-side prerendering, we do know all the values immediately so on initial page load all the values will be loaded and present.  
+
+#### The `HyperMesh.load` Method
+
+Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `HyperMesh.load` method:
+
+```ruby
+HyperMesh.load do
+  x = my_model.some_attribute
+  OtherModel.find(x+12).other_attribute
+  # code in here can be arbitrarily complex and load
+  # will re-execute it until all values are loaded
+  # the final expression is passed to the promise
+end.then |result|
+  puts result
+end
+```
+
+#### Force Loading Attributes
+
+Like
+
+Normally you will simply display attributes as part of the render method, and when the values are loaded from the server the component will re-render.
+
+Sometimes outside of the render method you may need to insure an attribute (or a server side method) is loaded before proceeding.  This is typically when you are building some kind of higher level store.  
+
+The `load` takes a list of attributes (symbols) and will insure these are loaded.  Load returns a promise that is resolved when the load completes, or can be passed a block that will execute when the load completes.
+
+```ruby
+before_mount do
+  Todo.find(1).load(:name).then do |name|
+    @name = name;
+    state.loaded! true
+  end
+end
+```
+
+Think hard about how you are using this, as HyperMesh already acts as flux store, and is managing state for you.
+
+
+
+
+
 ### Class Methods
+
+#### New and Create
+
+`new`: Takes a hash of attributes and initializes a new unsaved record.  The values of any attributes not specified in the hash will be taken from the models default values specified in the `columns_hash`.
+
+If new is passed a native javascript object it will be treated as a hash and converted accordingly.
+
+`create`: Short hand for `new(...).save`.  See the `save` instance method for details on how saving is done.
+
+#### Scoping and Finding
 
 `scope` and `default_scope`:  HyperMesh adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the othe options.  See the [Client Side Scoping](/docs/client_side_scoping.md) page for more details.
 
@@ -30,32 +99,6 @@ scope :completed,
 Word.all.each { |word| LI { word.text }}
 ```
 
-`belongs_to, has_many, has_one`:  These all work as on the server.  However it is important that you fully specify both sides of the relationship.  This is not always necessary on the server because ActiveRecord uses the table schema to work things out.
-
-```ruby
-class Todo < ActiveRecord::Base
-  belongs_to :assigned_to, class_name: 'User'
-end
-
-class User < ActiveRecord::Base
-  has_many :todos, foreign_key: 'assigned_to_id'
-end
-```
-
-`composed_of`: You can create aggregate models like ActiveRecord.
-
-`column_names`: returns a list of the database columns.
-
-`columns_hash`: returns the details of the columns specification.  Note that on the server `columns_hash` returns a hash of objects specifying column information.  On the client the entire structure is just one big hash of hashes.
-
-`abstract_class=`, `abstract_class?`, `primary_key`, `primary_key=`, `inheritance_column`, `inheritance_column=`, `model_name`: All work as on the server.  See ActiveRecord documentation for more info.
-
-`new`: Takes a hash of attributes and initializes a new unsaved record.  The values of any attributes not specified in the hash will be taken from the models default values specified in the `columns_hash`.
-
-If new is passed a native javascript object it will be treated as a hash and converted accordingly.
-
-`create`: Short hand for `new(...).save`.  See the `save` instance method for details on how saving is done.
-
 `limit` and `offset`: These builtin scopes behave as they do on the server:
 
 ```ruby
@@ -71,3 +114,124 @@ Word.offset(500).limit(20) # get words 500-519
 ```ruby
 Word.find_by_text('hello') # short for Word.find_by(text: 'hello')
 ```
+
+#### Relationships and Aggregations
+
+`belongs_to, has_many, has_one`:  These all work as on the server.  However it is important that you fully specify both sides of the relationship.  This is not always necessary on the server because ActiveRecord uses the table schema to work things out.
+
+```ruby
+class Todo < ActiveRecord::Base
+  belongs_to :assigned_to, class_name: 'User'
+end
+
+class User < ActiveRecord::Base
+  has_many :todos, foreign_key: 'assigned_to_id'
+end
+```
+
+`composed_of`: You can create aggregate models like ActiveRecord.
+
+#### Defining server methods
+
+Normally an application defined instance method will run on the client and the server:
+
+```ruby
+class User < ActiveRecord::Base
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+end
+```
+
+Sometimes it is desirable to only run method on the server.  This can be done using the `server_method` macro:
+
+```ruby
+class User < ActiveRecord::Base
+  server_method :full_name, default: '' do
+    "#{first_name} #{last_name}"
+  end
+end
+```
+
+When the method is first called on the client the default value will be returned, and there will be a reactive update when the true value is  returned from the server.
+
+To force the value to be recomputed at the server append a  `!` to the end of the name, otherwise the last value returned from the server will continue to be returned.
+
+#### Model Information
+
+`column_names`: returns a list of the database columns.
+
+`columns_hash`: returns the details of the columns specification.  Note that on the server `columns_hash` returns a hash of objects specifying column information.  On the client the entire structure is just one big hash of hashes.
+
+`abstract_class=`, `abstract_class?`, `primary_key`, `primary_key=`, `inheritance_column`, `inheritance_column=`, `model_name`:  All work as on the server.  See ActiveRecord documentation for more info.
+
+### Instance Methods
+
+#### Attribute and Relationship Getter and Setters
+
+All attributes have an associated getter and setter. All relationships have a getter.  All belongs_to relationships have a setter.  `has_many` relationships can be updated using the push (`<<`) operator or using the `delete` method.
+
+```ruby
+  puts my_todo.name
+  my_todo.name = "neuname"
+  my_todo.comments << a_new_comment
+  a_new_comment.todo == my_todo # true!
+```
+
+In addition if the attribute getter ends with a bang (!) then this will force a fetch of the attribute from the server.  This is typically not necessary if push updates are configured.
+
+#### Saving
+
+The `save` method works like ActiveRecord save, *except* it returns a promise that is resolved when the save completes (or fails.)
+
+```ruby
+my_todo.save(validate: false).then do |result|
+  # result is a hash with {success: ..., message: , models: ....}
+end
+```
+
+After saving the models will have an `errors` hash with any validation problems.
+
+During the save operation the method `saving?` will return `true`.  This can be used to instead of (or with) the promise to update the screen:
+
+```ruby
+render do
+  ...
+  if some_model.saving?
+    ... display please wait ...
+  elsif some_model.errors.any?
+    ... highlight the errors ...
+  else
+    ... display data ...
+  end
+  ...
+end
+```
+
+#### Destroy
+
+Like `save` destroy returns a promise that is resolved when the destroy completes.
+
+After the destroy completes the records `destroyed?` method will return true.
+
+#### Other Instance Methods
+
+`new?` returns true if the model is new and not yet saved.
+
+`primary_key` returns the primary key for the model
+
+`id` returns the value of the primary key for this instance
+
+`model_name` returns the model_name.
+
+`revert` Undoes any unsaved changes to the instance.
+
+`changed?` returns true if any attributes have changed (always true for a new model)
+
+`dup` duplicate the instance.
+
+`==` two instances are the same if they reference the same underlying table row.  
+
+`..._changed?` (i.e. name_changed?) returns true if the specific attribute has changed.
+
+`itself` returns the record, but will also force a load of at least the model's id.

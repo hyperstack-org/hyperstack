@@ -42,6 +42,10 @@ module ActiveRecord
           pre_synchromesh_default_scope(opts[:server], &block)
         end
 
+        def server_method(name, opts = {}, &block)
+          define_method name, &block
+        end
+
       else
 
         alias pre_synchromesh_method_missing method_missing

@@ -272,18 +272,15 @@ module HyperMesh
       "</script>\n"
     end if RUBY_ENGINE != 'opal'
 
-    def self.opts
-      @opts ||= Hash.new(`window.HyperMeshOpts`)
+    class << self
+      attr_reader :opts
+      attr_reader :public_columns_hash
     end
 
     isomorphic_method(:get_public_columns_hash) do |f|
       f.when_on_client { opts[:public_columns_hash] || {} }
       f.send_to_server
       f.when_on_server { ActiveRecord::Base.public_columns_hash }
-    end
-
-    def self.public_columns_hash
-      @public_columns_hash ||= get_public_columns_hash
     end
 
     def self.get_queued_data(operation, channel = nil, opts = {})
@@ -294,10 +291,23 @@ module HyperMesh
       end
     end
 
-    # Before first mount, hook up callbacks depending on what kind of transport
-    # we are using.
+    def self.define_attribute_methods
+      public_columns_hash.keys.each do |model|
+        Object.const_get(model).define_attribute_methods rescue nil
+      end
+    end
 
-    before_first_mount do
+    # called from ReactiveRecord::Base before_first_mount hook
+    # to insure this is done first.
+
+    def self.on_first_mount
+
+      if RUBY_ENGINE == 'opal'
+        @opts = Hash.new(`window.HyperMeshOpts`)
+        @public_columns_hash = get_public_columns_hash
+        define_attribute_methods
+      end
+
       if on_opal_client?
 
         if opts[:transport] == :pusher

@@ -96,6 +96,9 @@ describe "column types on client", js: true do
 
     isomorphic do
       class TypeTest < ActiveRecord::Base
+        server_method :a_server_method, default: "hello" do |s|
+          s.reverse
+        end
       end
       class DefaultTest < ActiveRecord::Base
       end
@@ -123,6 +126,19 @@ describe "column types on client", js: true do
     expect_evaluate_ruby do
       TypeTest.columns_hash
     end.to eq(TypeTest.columns_hash.as_json)
+  end
+
+  it 'defines the server method with a default value' do
+    expect_evaluate_ruby do
+      TypeTest.new.a_server_method('foo')
+    end.to eq('hello')
+  end
+
+  it 'loads the server method' do
+    TypeTest.create
+    expect_promise do
+      ReactiveRecord.load { TypeTest.find(1).a_server_method('hello') }
+    end.to eq('olleh')
   end
 
   it 'creates a dummy value of the appropriate type' do

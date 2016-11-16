@@ -5,6 +5,10 @@ module HyperMesh
 
   extend Configuration
 
+  def self.load(*args, &block)
+    ReactiveRecord.load(*args, &block)
+  end
+
   def self.initialize_policies
     config_reset unless @config_reset_called
   end
