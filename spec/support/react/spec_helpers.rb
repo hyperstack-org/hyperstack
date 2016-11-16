@@ -8,10 +8,6 @@ module React
       React::Test::Utils.render_into_document(element)
     end
 
-    def isElementOfType(element, type)
-      `React.addons.TestUtils.isElementOfType(#{element.to_n}, #{type.cached_component_class})`
-    end
-
     def build_element(type, options)
       component = React.create_element(type, options)
       element = `ReactTestUtils.renderIntoDocument(#{component.to_n})`
