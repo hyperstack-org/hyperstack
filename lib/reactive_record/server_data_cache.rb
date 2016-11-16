@@ -106,6 +106,7 @@ module ReactiveRecord
         end
 
         def self.[](models, associations, vectors, acting_user)
+          ActiveRecord::Base.public_columns_hash
           result = nil
           ActiveRecord::Base.transaction do
             cache = new(acting_user, ReactiveRecord::Base.save_records(models, associations, acting_user, false, false))

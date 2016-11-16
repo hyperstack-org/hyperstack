@@ -117,7 +117,7 @@ module ActiveRecord
       after_commit :synchromesh_after_destroy, on: [:destroy]
 
       def synchromesh_after_create
-        return if do_not_synchronize? || previous_changes.empty?
+        return if do_not_synchronize? #|| previous_changes.empty?
         HyperMesh.after_commit :create, self
       end
 

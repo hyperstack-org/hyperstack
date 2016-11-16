@@ -50,7 +50,7 @@ module Dummy
     # Enable the asset pipeline
     config.assets.enabled = true
 
-    #config.autoload_paths += %W(#{config.root}/app/views/models)
+    #config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s
 
     # Version of your assets, change this if you want to expire all your assets
