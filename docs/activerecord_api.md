@@ -1,12 +1,12 @@
 ## ActiveRecord API
 
-HyperMesh uses a subset of the standard ActiveRecord API to give your client side HyperReact components access to your server side models.  As much as possible HyperMesh follows the syntax as semantics of ActiveRecord.  
+HyperMesh uses a subset of the standard ActiveRecord API to give your client side HyperReact components access to your server side models.  As much as possible HyperMesh follows the syntax and semantics of ActiveRecord.  
 
 ### Interfacing to React
 
 HyperMesh integrates with React to deliver your model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
 
-HyperMesh automatically creates react state objects that will be updated as server side data is loaded, or changes.  When these states change the associated parts of the display will be updated.
+HyperMesh automatically creates react state objects that will be updated as server side data is loaded or changes.  When these states change the associated parts of the display will be updated.
 
 A brief overview of how this works will help you understand the how HyperMesh gets the job done.
 
@@ -24,7 +24,7 @@ You normally do not have to be aware of this.  Just access your models using the
 
 #### Prerendering
 
-During server-side pre-rendering, HyperMesh as direct access to the server so on initial page load all the values will be loaded and present.  
+During server-side pre-rendering, HyperMesh has direct access to the server so on initial page load all the values will be loaded and present.  
 
 #### Lazy Loading
 
@@ -160,11 +160,11 @@ To force the value to be recomputed at the server append a  `!` to the end of th
 
 #### Attribute and Relationship Getter and Setters
 
-All attributes have an associated getter and setter. All relationships have a getter.  All belongs_to relationships also have a setter.  `has_many` relationships can be updated using the push (`<<`) operator or using the `delete` method.
+All attributes have an associated getter and setter. All relationships have a getter.  All `belongs_to` relationships also have a setter.  `has_many` relationships can be updated using the push (`<<`) operator or using the `delete` method.
 
 ```ruby
-  puts my_todo.name
-  my_todo.name = "neuname"
+  puts my_todo.title
+  my_todo.title = "neutitle"
   my_todo.comments << a_new_comment
   a_new_comment.todo == my_todo # true!
 ```
@@ -181,7 +181,7 @@ my_todo.save(validate: false).then do |result|
 end
 ```
 
-After saving the models will have an `errors` hash (just like on the server) with any validation problems.
+After a save operation completes the models will have an `errors` hash (just like on the server) with any validation problems.
 
 During the save operation the method `saving?` will return `true`.  This can be used to instead of (or with) the promise to update the screen:
 
@@ -221,7 +221,7 @@ After the destroy completes the record's `destroyed?` method will return true.
 
 `dup` duplicate the instance.
 
-`==` two instances are the same if they reference the same underlying table row.  
+`==` two instances are the same if it is known that they reference the same underlying table row.  
 
 `..._changed?` (i.e. name_changed?) returns true if the specific attribute has changed.
 
@@ -231,7 +231,7 @@ After the destroy completes the record's `destroyed?` method will return true.
 
 #### `loading?` and `loaded?`
 
-All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.  Any value for which `loaded?` returns `false` (or `loading?` returns true) will eventually load and cause a re-render
+All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.  Any value for which `loaded?` returns `false` (or `loading?` returns `true`) will eventually load and cause a re-render
 
 #### The `HyperMesh.load` Method
 
@@ -255,7 +255,7 @@ Normally you will simply display attributes as part of the render method, and wh
 
 Sometimes outside of the render method you may need to insure an attribute (or a server side method) is loaded before proceeding.  This is typically when you are building some kind of higher level store.  
 
-The `load` takes a list of attributes (symbols) and will insure these are loaded.  Load returns a promise that is resolved when the load completes, or can be passed a block that will execute when the load completes.
+The `load` method takes a list of attributes (symbols) and will insure these are loaded.  Load returns a promise that is resolved when the load completes, or can be passed a block that will execute when the load completes.
 
 ```ruby
 before_mount do
