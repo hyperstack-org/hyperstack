@@ -4,9 +4,9 @@ HyperMesh uses a subset of the standard ActiveRecord API to give your client sid
 
 ### Interfacing to React
 
-HyperMesh uses the React to deliver your model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
+HyperMesh integrates with React to deliver your model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
 
-HyperMesh automatically creates state objects that will be updated as server side data is loaded, or changes.  
+HyperMesh automatically creates react state objects that will be updated as server side data is loaded, or changes.  When these states change the associated parts of the display will be updated.
 
 A brief overview of how this works will help you understand the how HyperMesh gets the job done.
 
@@ -14,23 +14,27 @@ A brief overview of how this works will help you understand the how HyperMesh ge
 
 On the UI you will be reading models in order to display data.
 
-If during the rendering of the display the model data is not yet loaded placeholder values (the default values from the `columns_hash`) will be returned by HyperMesh.  
+If during the rendering of the display the model data is not yet loaded, placeholder values (the default values from the `columns_hash`) will be returned by HyperMesh.  
 
 HyperMesh then keeps track of where these placeholders (or `DummyValue`s) are displayed, and when they do get loaded, those parts of the display will re-render.
 
 If later the data changes (either due to local user actions, or receiving push updates) then again any parts of the display that were dependent on the current values will be re-rendered.
 
-You normally do not have to be aware of this.  Just access your models using the normal scopes and finders, to compute values and  display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
-
+You normally do not have to be aware of this.  Just access your models using the normal scopes and finders, then compute values and display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
 
 #### Prerendering
 
-During server-side pre-rendering, we do know all the values immediately so on initial page load all the values will be loaded and present.  
+During server-side pre-rendering, HyperMesh as direct access to the server so on initial page load all the values will be loaded and present.  
+
+#### Lazy Loading
+
+HyperMesh lazy loads values, and does not load any thing until an explicit displayable value is requested.  For example `Todo.all` will have no action, but `Todo.all.pluck[:title]` will return an array of titles.
+
+At the end of the rendering cycle the set of all values requested will be merged into a tree structure and sent to the server, returning the minimum amount of data needed.
 
 #### Load Cycle Methods
 
-There are a number of methods that allow you to interact with this load cycle when needed.  These are documented [below].
-
+There are a number of methods that allow you to interact with this load cycle when needed.  These are documented [below](#other-methods-for-interacting-with-the-load-and-render-cycle).
 
 ### Class Methods
 
@@ -38,16 +42,16 @@ There are a number of methods that allow you to interact with this load cycle wh
 
 `new`: Takes a hash of attributes and initializes a new unsaved record.  The values of any attributes not specified in the hash will be taken from the models default values specified in the `columns_hash`.
 
-If new is passed a native javascript object it will be treated as a hash and converted accordingly.
+If `new` is passed a native javascript object it will be treated as a hash and converted accordingly.
 
 `create`: Short hand for `new(...).save`.  See the `save` instance method for details on how saving is done.
 
 #### Scoping and Finding
 
-`scope` and `default_scope`:  HyperMesh adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the othe options.  See the [Client Side Scoping](/docs/client_side_scoping.md) page for more details.
+`scope` and `default_scope`:  HyperMesh adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the other options.  See the [Client Side Scoping](/docs/client_side_scoping.md) page for more details.
 
 ```ruby
-# the scope proc is executed on the server
+# the active scope proc is executed on the server
 scope :active, -> () { where(completed: true) }
 
 # if the scope does a join (or include) this must be indicated
@@ -61,7 +65,7 @@ scope :with_recent_comments,
 # locally at the client
 scope :completed,
       server: -> { where(complete: true) }
-      client: -> { complete }
+      client: -> { complete } # return true if the record should be included
 ```
 
 `unscoped` and `all`: These builtin scopes work just like standard ActiveRecord.
@@ -70,25 +74,27 @@ scope :completed,
 Word.all.each { |word| LI { word.text }}
 ```
 
+BTW: to save typing you can skip the `all`:  Models will respond like enumerators
+
+`find`: takes an id and delivers the corresponding record.
+
+`find_by`: takes a single item hash indicating an attribute value pair to find.
+
+`find_by_...`: i.e. `find_by_first_name` these methods will find the first record with a matching attribute.
+
+```ruby
+Word.find_by_text('hello') # short for Word.find_by(text: 'hello')
+```
+
 `limit` and `offset`: These builtin scopes behave as they do on the server:
 
 ```ruby
 Word.offset(500).limit(20) # get words 500-519
 ```
 
-`find`: takes an id and returns the corresponding record.
-
-`find_by`: takes single item hash indicating an attribute value pair to find.
-
-`find_by_...`: i.e. `find_by_first_name` these will find the first record with a matching attribute.
-
-```ruby
-Word.find_by_text('hello') # short for Word.find_by(text: 'hello')
-```
-
 #### Relationships and Aggregations
 
-`belongs_to, has_many, has_one`:  These all work as on the server.  However it is important that you fully specify both sides of the relationship.  This is not always necessary on the server because ActiveRecord uses the table schema to work things out.
+`belongs_to, has_many, has_one`:  These all work as on the server.  However it is important that you fully specify both sides of the relationship.  
 
 ```ruby
 class Todo < ActiveRecord::Base
@@ -100,7 +106,21 @@ class User < ActiveRecord::Base
 end
 ```
 
+Note that on the client the linkages between relationships are live and direct.  In the above example this works:
+
+```ruby
+Todo.create(assigned_to: some_user)
+```
+
+but this may not:
+
+```ruby
+Todo.create(assigned_to_id: some_user.id)
+```
+
 `composed_of`: You can create aggregate models like ActiveRecord.
+
+Similar to the linkages in relationships, aggregate records are represented on the client as actual independent objects.
 
 #### Defining server methods
 
@@ -114,7 +134,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-Sometimes it is desirable to only run method on the server.  This can be done using the `server_method` macro:
+Sometimes it is desirable to only run the method on the server.  This can be done using the `server_method` macro:
 
 ```ruby
 class User < ActiveRecord::Base
@@ -124,7 +144,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-When the method is first called on the client the default value will be returned, and there will be a reactive update when the true value is  returned from the server.
+When the method is first called on the client the default value will be returned, and there will be a reactive update when the true value is returned from the server.
 
 To force the value to be recomputed at the server append a  `!` to the end of the name, otherwise the last value returned from the server will continue to be returned.
 
@@ -140,7 +160,7 @@ To force the value to be recomputed at the server append a  `!` to the end of th
 
 #### Attribute and Relationship Getter and Setters
 
-All attributes have an associated getter and setter. All relationships have a getter.  All belongs_to relationships have a setter.  `has_many` relationships can be updated using the push (`<<`) operator or using the `delete` method.
+All attributes have an associated getter and setter. All relationships have a getter.  All belongs_to relationships also have a setter.  `has_many` relationships can be updated using the push (`<<`) operator or using the `delete` method.
 
 ```ruby
   puts my_todo.name
@@ -161,7 +181,7 @@ my_todo.save(validate: false).then do |result|
 end
 ```
 
-After saving the models will have an `errors` hash with any validation problems.
+After saving the models will have an `errors` hash (just like on the server) with any validation problems.
 
 During the save operation the method `saving?` will return `true`.  This can be used to instead of (or with) the promise to update the screen:
 
@@ -183,7 +203,7 @@ end
 
 Like `save` destroy returns a promise that is resolved when the destroy completes.
 
-After the destroy completes the records `destroyed?` method will return true.
+After the destroy completes the record's `destroyed?` method will return true.
 
 #### Other Instance Methods
 
@@ -205,13 +225,13 @@ After the destroy completes the records `destroyed?` method will return true.
 
 `..._changed?` (i.e. name_changed?) returns true if the specific attribute has changed.
 
-`itself` returns the record, but will also force a load of at least the model's id.
+`itself` returns the record, but will override lazy loading and force a load of at least the model's id.
 
-#### Other Methods for Interacting with the Load & Render Cycle
+### Other Methods for Interacting with the Load and Render Cycle
 
 #### `loading?` and `loaded?`
 
-All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.
+All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.  Any value for which `loaded?` returns `false` (or `loading?` returns true) will eventually load and cause a re-render
 
 #### The `HyperMesh.load` Method
 
@@ -229,11 +249,7 @@ end.then |result|
 end
 ```
 
-
-
 #### Force Loading Attributes
-
-Like
 
 Normally you will simply display attributes as part of the render method, and when the values are loaded from the server the component will re-render.
 
@@ -250,4 +266,4 @@ before_mount do
 end
 ```
 
-Think hard about how you are using this, as HyperMesh already acts as flux store, and is managing state for you.
+Think hard about how you are using this, as HyperMesh already acts as flux store, and is managing state for you.  It may be you are just creating a redundant store!

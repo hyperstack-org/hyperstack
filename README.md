@@ -1,10 +1,9 @@
 #  ![](https://avatars3.githubusercontent.com/u/15810526?v=3&s=40&raw=true)HyperMesh
 
-
 [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Gem Version](https://badge.fury.io/rb/hyper-mesh.svg)](https://badge.fury.io/rb/hyper-mesh)
 
-HyperMesh gives your HyperReact components CRUD access to your server side ActiveRecord models, using the the standard ActiveRecord API.
+HyperMesh gives your HyperReact components CRUD access to your server side ActiveRecord models, using the standard ActiveRecord API.
 In addition HyperMesh implements push notifications (via a number of possible
 technologies) so changes to records on the server are dynamically pushed to all authorised clients.
 
@@ -27,7 +26,7 @@ For example consider a simple model called `Dictionary` which might be part of W
 class Dictionary < ActiveRecord::Base
 
   # attributes
-  #   word: string
+  #   word: string   
   #   definition: text
   #   pronunciation: string
 
@@ -142,29 +141,29 @@ By default HyperMesh will look for a `ApplicationPolicy` class.
 See the Pusher-Fake gem repo for details.
 
 - Forgetting to add `require pusher` in application.js file  
-this results in an error like this:
+this results in an error like this:   
 ```text
 Exception raised while rendering #<TopLevelRailsComponent:0x53e>
     ReferenceError: Pusher is not defined
 ```  
 To resolve make sure you `require 'pusher'` in your application.js file if using pusher.  **DO NOT** require pusher from your components manifest as this will cause prerendering to fail.
 
-- No create/update/destroy policies
+- No create/update/destroy policies   
 You must explicitly allow changes to the models to be made by the client. If you don't you will
 see 500 responses from the server when you try to update.  To open all access do this in
 your application policy: `allow_change(to: :all, on: [:create, :update, :destroy]) { true }`
 
 - Cannot connect to real pusher account:  
 If you are trying to use a real pusher account (not pusher-fake) but see errors like this  
-```text
+```text   
 pusher.self.js?body=1:62 WebSocket connection to
 'wss://127.0.0.1/app/PUSHER_API_KEY?protocol=7&client=js&version=3.0.0&flash=false'
 failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
-```
+```   
 Check to see if you are including the pusher-fake gem.  
 HyperMesh will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/hyper-react/HyperMesh/issues/5) for more details.
 
-- Cannot connect with ActionCable.  Make sure that `config.action_cable.allowed_request_origins` includes the url you use for development (including the port) and that you are useing `Puma`.
+- Cannot connect with ActionCable.  Make sure that `config.action_cable.allowed_request_origins` includes the url you use for development (including the port) and that you are using `Puma`.
 
 - Attributes are not being converted from strings, or do not have their default values  
 Eager loading is probably turned off.  HyperMesh needs to eager load `models/public` so it can find all the column information for all public models.
