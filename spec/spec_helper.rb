@@ -19,6 +19,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-react'
   require 'react/test/rspec'
   require 'react/test/utils'
+  require 'react/top_level_render'
 
   require File.expand_path('../support/react/spec_helpers', __FILE__)
 

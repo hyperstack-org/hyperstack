@@ -181,19 +181,23 @@ RSpec.describe React, type: :component do
       React.render(React.create_element('span') { "lorem" }, div)
     end
 
-    it "should return a React::Component::API compatible object" do
-      div = `document.createElement("div")`
-      component = React.render(React.create_element('span') { "lorem" }, div)
-      React::Component::API.public_instance_methods(true).each do |method_name|
-        expect(component).to respond_to(method_name)
+    it "returns the actual ruby instance" do
+      stub_const 'Foo', Class.new
+      Foo.class_eval do
+        def render
+          React.create_element("div") { "lorem" }
+        end
       end
+
+      div = `document.createElement("div")`
+      instance = React.render(React.create_element(Foo), div)
+      expect(instance).to be_a(Foo)
     end
 
-    pending "should return nil to prevent abstraction leakage" do
+    it "returns the actual DOM node" do
       div = `document.createElement("div")`
-      expect {
-        React.render(React.create_element('span') { "lorem" }, div)
-      }.to be_nil
+      node = React.render(React.create_element('span') { "lorem" }, div)
+      expect(`#{node}.nodeType`).to eq(1)
     end
   end
 

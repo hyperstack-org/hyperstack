@@ -55,6 +55,12 @@ module React
   end
 
   def self.render(element, container)
+    %x{
+        console.error(
+          "Warning: Using deprecated behavior of `React.render`,",
+          "require \"react/top_level_render\" to get the correct behavior."
+        );
+    }
     container = `container.$$class ? container[0] : container`
     if !(`typeof ReactDOM === 'undefined'`)
       component = Native(`ReactDOM.render(#{element.to_n}, container, function(){#{yield if block_given?}})`) # v0.15+
