@@ -107,7 +107,7 @@ Note that these are very simple examples, for the purpose of showing how to conf
 
 1. Run `bundle exec rake test_app` to generate a dummy test app.
 2. `bundle exec appraisal install` to generate separate gemfiles for different environments.
-2. `bundle exec appraisal opal-0.9-react-15 rake` to run test for opal-0.9 & react-v0.15.
+2. `bundle exec appraisal opal-0.10-react-15 rake` to run test for opal-0.10 & react-v0.15.
 
 ## Contributions
 
