@@ -1,8 +1,12 @@
 ### HyperMesh Authorization Policies
 
-Each time an ActiveRecord model changes, HyperMesh broadcasts the changed attributes over *channels*.
+Access to your models is controlled by *Policies* that describe how the current *acting_user* and *channels* may access your models.
 
-An application can have several channels and each channel and each active record model can have different *policies* to determine which attributes are sent when a record changes.
+Each browser session has an *acting_user* (which may be nil) and you will define `create`, `update`, and `destroy` policies giving (or denying) the `acting_user` the ability to do these operations.
+
+Read and *broadcast* access is defined based on *channels* which are connected based again on the current `acting_user`.  Read access is initiated when a specific browser tries to read a record attribute, and broadcasts are initiated whenever a model changes.
+
+An application can have several channels and each channel and each active record model can have different policies to determine which attributes are sent when a record changes.
 
 For example a Todo application might have an *instance* of a channel for each currently logged in user; an instance of a channel for each team if that team has one or more logged in users; and a general `AdminUser` channel shared by all administrators that are logged in.
 
@@ -206,7 +210,7 @@ Typically connections are made to ActiveRecord models, and if those are in the `
 
 #### Acting User
 
-HyperMesh uses the same `acting_user` method that reactive-record permissions uses.  This method is typically defined in the ApplicationController and would normally pick up the current session user, and return an appropriate object.
+HyperMesh looks for an `acting_user` method typically defined in the ApplicationController and would normally pick up the current session user, and return an appropriate object.
 
 ```ruby
 class ApplicationController < ActiveController::Base
@@ -405,6 +409,59 @@ class MessagePolicy
 end
 ```
 
+#### Browser Initiated Change policies
+
+To allow code in the browser to create, update or destroy a model, there must be a change access policy defined for that operation.
+
+Each change access policy executes a block in the context of the record that will be accessed.  The current value of `acting_user` is also defined for the life of the block.
+
+If the block returns a truthy value access will be allowed, otherwise if the block returns a falsy value or raises an exception, access will be denied.
+
+In the below examples we assume that your user model responds to `admin?` but this is not built into HyperMesh.
+
+```ruby
+class TodoPolicy
+  # allow creation to any logged in user
+  allow_create { acting_user }
+  # only allow the owner, author any any admin to update a todo
+  allow_update { acting_user == owner || acting_user == author || acting_user.admin? }
+  # don't allow Todo's to be destroyed
+  # this is the default behavior so its not actually needed
+  allow_destroy { false }
+end
+```
+
+There are several variants of the access policy method:
+
+```ruby
+class ConfigDataPolicy
+  allow_change(on: [:create, :update, :destroy]) { acting_user.admin? }
+  # which can be shortened to:
+  allow_change { acting_user.admin? }
+end
+```
+
+```ruby
+class ApplicationPolicy
+  # do any thing to all models unless we are in production!  Be careful!
+  allow_change(to: :all) { true } unless Rails.env.production?
+  # and always allow admins to destroy models globally:
+  allow_change(to: :all, on: :destroy) { acting_user.admin? }
+  # which is the same as saying:
+  allow_destroy(to: :all) { acting_user.admin? }
+  # you can create model specific policies in the Application Policy as well.
+  # Here we allow the author of a message to destroy the message within 5
+  # minutes of creation.
+  allow_destroy(to: Message) do
+    return true if acting_user == author && created_at > 5.minutes.ago
+    return true if acting_user.admin?
+  end
+end
+```
+
+Note that there is no `allow_read` method.  Read access is granted if this browser would have the attribute broadcast to it.  
+
+
 #### Method Summary and Name Space Conflicts
 
 Policy classes (and the HyperMesh::PolicyMethods module) define the following class methods:
@@ -433,17 +490,3 @@ class ProductionCenterPolicy < MyPolicyClass
   ...
 end
 ```  
-
-#### Setting the policy directory
-
-*HyperMesh auto-connect needs to know about all policies ahead of time so cannot rely on rails auto loading.  Sorry about that!*
-
-By default HyperMesh will load all the files in the `app/policies` directory.  To change the directory set the policy_directory in the synchromesh initializer.  
-
-```ruby
-HyperMesh.configuration do |config|
-  ...
-  config.policy_directory = File.join(Rails.root, 'app', 'synchromesh-authorization')
-  # can also be set to nil if you want to manually require your files
-end
-```

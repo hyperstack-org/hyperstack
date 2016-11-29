@@ -2,7 +2,7 @@
 
 When the client receives notification that a record has changed HyperMesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated on the client.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way HyperMesh keeps the data requested by the browser limited to a reasonable amount.  
+On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated in the browser.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way HyperMesh keeps the data requested by the browser limited to a reasonable amount.  
 
 To make scopes work efficiently on the client HyperMesh adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with HyperMesh.
 
