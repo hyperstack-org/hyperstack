@@ -1,4 +1,4 @@
-## Reactrb Router
+#  ![](https://github.com/Serzhenka/hyper-loop-logos/blob/master/hyper-router_150.png)Hyper-router (Reactrb Router)
 
 Reactrb Router allows you write and use the React Router in Ruby through Opal.
 
