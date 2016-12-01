@@ -68,7 +68,7 @@ For more complete examples with *push* updates checkout any of the apps in the `
 
 + [Rails 5 with ActionCable](/docs/action_cable_quickstart.md)
 + [Using Pusher.com](/docs/pusher_quickstart.md)
-+ [Using Pusher-Faker](/docs/pusher_quickstart.md)
++ [Using Pusher-Faker](/docs/pusher_faker_quickstart.md)
 + [Using Simple Polling](/docs/simple_poller_quickstart.md)  
 
 ## Basic Installation and Setup
@@ -103,7 +103,7 @@ For setting up the other possible transports following one of these guides:
 
 + [Rails 5 with ActionCable](/docs/action_cable_quickstart.md)
 + [Using Pusher.com](/docs/pusher_quickstart.md)
-+ [Using Pusher-Faker](/docs/pusher_quickstart.md)
++ [Using Pusher-Faker](/docs/pusher_faker_quickstart.md)
 + [Using Simple Polling](/docs/simple_poller_quickstart.md)
 
 ## Advanced Configuration

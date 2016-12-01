@@ -24,8 +24,8 @@ class UserPolicy # defines policies for the User class
   # The policy is defined by a block that is executed in the context of the
   # current acting_user.
 
-  # For our User instance connection the policy is that there must be logged in
-  # user, and the connection is made to that user:
+  # For our User instance connection the policy is that there must be a
+  # logged-in user, and the connection is made to that user:
   regulate_instance_connections { self }
   # If there is no logged in user self will be nil, and no connection will be
   # made.
