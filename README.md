@@ -92,7 +92,7 @@ To have changes to your models on the server  broadcast to authorized clients, a
 
 ```ruby
 # config/initializers/hyper_mesh.rb
-HyperMesh.configuration |config|
+HyperMesh.configuration do |config|
   config.transport = :simple_poller
 end
 ```
