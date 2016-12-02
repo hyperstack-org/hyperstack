@@ -186,9 +186,6 @@ module HyperMesh
           [attr, value]
         end.compact.flatten].merge(br.attributes)
         klass._react_param_conversion(current_values)
-      rescue Exception => e
-        debugger
-        nil
       end
     end
   end

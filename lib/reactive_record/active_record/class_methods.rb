@@ -109,7 +109,7 @@ module ActiveRecord
         name = args.first
         define_method(name) { @backing_record.reactive_get!(name, nil) }
         define_method("#{name}=") do |val|
-          @backing_record.reactive_set!(name, backing_record.convert(name, val))
+          @backing_record.reactive_set!(name, backing_record.convert(name, val).itself)
         end
         opts = (args.count > 1 and args.last.is_a? Hash) ? args.last : {}
         Associations::AssociationReflection.new(self, macro, name, opts)

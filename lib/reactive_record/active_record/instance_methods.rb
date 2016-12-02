@@ -17,10 +17,12 @@ module ActiveRecord
         # we have to build the backing record first then initialize it so associations work correctly
         @backing_record = ReactiveRecord::Base.new(self.class, {}, self)
         @backing_record.instance_eval do
+          h = Hash.new
+          hash.each { |a, v| h[a] = convert(a, v).itself }
           self.class.load_data do
-            hash.each do |attribute, value|
+            h.each do |attribute, value|
               unless attribute == primary_key
-                reactive_set!(attribute, convert(attribute, value))
+                reactive_set!(attribute, value)
                 changed_attributes << attribute
               end
             end

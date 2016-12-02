@@ -226,74 +226,74 @@ module ReactiveRecord
       end
 
       def save(validate, force, &block)
-
         if data_loading?
-
           sync!
-
         elsif force or changed?
-
-          begin
-
-            models, associations, backing_records = self.class.gather_records([self], force, self)
-
-            backing_records.each { |id, record| record.saving! }
-
-            promise = Promise.new
-
-            HTTP.post(`window.ReactiveRecordEnginePath`+"/save",
-              payload: {
-                json: {
-                  models:       models,
-                  associations: associations,
-                  validate:     validate
-                }.to_json
-              }
-            ).then do |response|
-              begin
-                response.json[:models] = response.json[:saved_models].collect do |item|
-                  backing_records[item[0]].ar_instance
-                end
-
-                if response.json[:success]
-                  response.json[:saved_models].each do | item |
-                    # was backing_records[item[0]].sync!(item[2])
-                    HyperMesh::LocalSync.after_save backing_records[item[0]].ar_instance, item[2]
-                  end
-                else
-                  log("Reactive Record Save Failed: #{response.json[:message]}", :error)
-                  response.json[:saved_models].each do | item |
-                    log("  Model: #{item[1]}[#{item[0]}]  Attributes: #{item[2]}  Errors: #{item[3]}", :error) if item[3]
-                  end
-                end
-
-                response.json[:saved_models].each do | item |
-                  backing_records[item[0]].sync_unscoped_collection!
-                  backing_records[item[0]].errors! item[3]
-                end
-
-                yield response.json[:success], response.json[:message], response.json[:models]  if block
-                promise.resolve response.json
-
-                backing_records.each { |id, record| record.saved! }
-
-              rescue Exception => e
-                log("Exception raised while saving - #{e}", :error)
-              end
-            end
-            promise
-          rescue Exception => e
-            log("Exception raised while saving - #{e}", :error)
-            yield false, e.message, [] if block
-            promise.resolve({success: false, message: e.message, models: []})
-            promise
-          end
+          HyperMesh.load do
+            ReactiveRecord.loads_pending! unless self.class.pending_fetches.empty?
+          end.then { save_to_server(validate, force, &block) }
+          #save_to_server(validate, force, &block)
         else
           promise = Promise.new
           yield true, nil, [] if block
           promise.resolve({success: true})
           promise
         end
+      end
+
+      def save_to_server(validate, force, &block)
+        models, associations, backing_records = self.class.gather_records([self], force, self)
+
+        backing_records.each { |id, record| record.saving! }
+
+        promise = Promise.new
+
+        HTTP.post(`window.ReactiveRecordEnginePath`+"/save",
+          payload: {
+            json: {
+              models:       models,
+              associations: associations,
+              validate:     validate
+            }.to_json
+          }
+        ).then do |response|
+          begin
+            response.json[:models] = response.json[:saved_models].collect do |item|
+              backing_records[item[0]].ar_instance
+            end
+
+            if response.json[:success]
+              response.json[:saved_models].each do | item |
+                # was backing_records[item[0]].sync!(item[2])
+                HyperMesh::LocalSync.after_save backing_records[item[0]].ar_instance, item[2]
+              end
+            else
+              log("Reactive Record Save Failed: #{response.json[:message]}", :error)
+              response.json[:saved_models].each do | item |
+                log("  Model: #{item[1]}[#{item[0]}]  Attributes: #{item[2]}  Errors: #{item[3]}", :error) if item[3]
+              end
+            end
+
+            response.json[:saved_models].each do | item |
+              backing_records[item[0]].sync_unscoped_collection!
+              backing_records[item[0]].errors! item[3]
+            end
+
+            yield response.json[:success], response.json[:message], response.json[:models]  if block
+            promise.resolve response.json
+
+            backing_records.each { |id, record| record.saved! }
+
+          rescue Exception => e
+            log("Exception raised while saving - #{e}", :error)
+          end
+        end
+        promise
+      rescue Exception => e
+        log("Exception raised while saving - #{e}", :error)
+        yield false, e.message, [] if block
+        promise.resolve({success: false, message: e.message, models: []})
+        promise
       end
 
     else

@@ -367,6 +367,7 @@ module ReactiveRecord
     end
 
     def push(item)
+      item.itself # force get of at least the id
       if collection
         self.force_push item
       else
