@@ -44,7 +44,7 @@ RSpec::Steps.steps "updating scopes", js: true do
     while count > 0
       expect(page).to have_content("TodoItem.count = #{count}")
       evaluate_ruby do
-        ReactiveRecord.load { TodoItem.last.itself }.then { |todo| todo.destroy }
+        ReactiveRecord.load { TodoItem.last }.then { |todo| todo.destroy }
       end
       count -= 1
     end

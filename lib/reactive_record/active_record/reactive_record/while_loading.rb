@@ -14,7 +14,7 @@ module ReactiveRecord
     @load_stack ||= []
     @load_stack << @loads_pending
     @loads_pending = nil
-    result = block.call
+    result = block.call.itself
     if @loads_pending
       @blocks_to_load ||= []
       @blocks_to_load << [Base.last_fetch_at, promise, block]
