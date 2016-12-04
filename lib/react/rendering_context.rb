@@ -65,7 +65,10 @@ module React
 
       def remove_nodes_from_args(args)
         args[0].each do |key, value|
-          value.as_node if value.is_a?(Element) rescue nil
+          begin
+            value.as_node if value.is_a?(Element)
+          rescue Exception
+          end
         end if args[0] && args[0].is_a?(Hash)
       end
 
