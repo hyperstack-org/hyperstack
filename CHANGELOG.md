@@ -26,6 +26,7 @@ Whitespace conventions:
 
 ### Deprecated
 
+- Current `React.render` behavior is deprecated. Require `"react/top_level_render"` to get the updated behavior. (#187)
 - `React.is_valid_element` is deprecated in favor of `React.is_valid_element?`.
 - `expect(component).to render('<div />')` is now deprecated in favor of `expect(component).to render_static_html('<div />')`, which is much clearer.
 
