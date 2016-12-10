@@ -41,24 +41,19 @@ if opal?
       end
     end
 
-    describe '#native' do
-      it 'returns the React native instance of the component' do
-        instance = subject.mount(Greeter)
-        native = instance.instance_variable_get('@native')
-        expect(`#{subject.native} === #{native}`).to eq(true)
-      end
-    end
-
     describe '#html' do
       it 'returns the component rendered to static html' do
         subject.mount(Greeter, message: 'world')
         expect(subject.html).to eq('<span>Hello world</span>')
       end
 
-      it 'returns the updated static html' do
+      async 'returns the updated static html' do
         subject.mount(Greeter)
-        subject.update_params(message: 'moon')
-        expect(subject.html).to eq('<span>Hello moon</span>')
+        subject.update_params(message: 'moon') do
+          run_async {
+            expect(subject.html).to eq('<span>Hello moon</span>')
+          }
+        end
       end
     end
 
