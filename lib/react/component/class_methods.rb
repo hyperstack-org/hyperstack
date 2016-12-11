@@ -181,8 +181,8 @@ module React
       def export_component(opts = {})
         export_name = (opts[:as] || name).split('::')
         first_name = export_name.first
-        Native(`window`)[first_name] = add_item_to_tree(
-          Native(`window`)[first_name],
+        Native(`Opal.global`)[first_name] = add_item_to_tree(
+          Native(`Opal.global`)[first_name],
           [React::API.create_native_react_class(self)] + export_name[1..-1].reverse
         ).to_n
       end

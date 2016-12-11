@@ -53,7 +53,7 @@ module React
       end
     else
       def self.on_opal_server?
-        `typeof window.document === 'undefined'`
+        `typeof Opal.global.document === 'undefined'`
       end
 
       def self.on_opal_client?
@@ -143,7 +143,7 @@ module React
       def send_to_server(*args)
         if IsomorphicHelpers.on_opal_server?
           args_as_json = args.to_json
-          @result = [JSON.parse(`window.ServerSideIsomorphicMethods[#{@name}](#{args_as_json})`)]
+          @result = [JSON.parse(`Opal.global.ServerSideIsomorphicMethods[#{@name}](#{args_as_json})`)]
         end
       end
 

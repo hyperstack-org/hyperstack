@@ -1,7 +1,7 @@
 
 
 if RUBY_ENGINE == 'opal'
-  if `window.React === undefined || window.React.version === undefined`
+  if `Opal.global.React === undefined || Opal.global.React.version === undefined`
     raise [
       "No React.js Available",
       "",
