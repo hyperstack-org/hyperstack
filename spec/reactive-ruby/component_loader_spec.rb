@@ -5,7 +5,6 @@ RSpec.describe ReactiveRuby::ComponentLoader do
   GLOBAL_WRAPPER = <<-JS
     var global = global || this;
     var self = self || this;
-    var window = window || this;
     var console = {
       warn: function(s) {  }
     };
