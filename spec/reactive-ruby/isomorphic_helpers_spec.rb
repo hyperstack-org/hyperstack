@@ -77,7 +77,12 @@ if ruby?
     end
 
     def react_context
-      test_context('components')
+      if ::Rails.application.assets['react-server.js'] &&
+         !::Rails.application.assets['react-server.js'].to_s.start_with?("// A placeholder file")
+        test_context(['components', 'react-server.js'])
+      else
+        test_context(['components', 'react.js'])
+      end
     end
 
     let(:v8_context) { TestV8Context.new }

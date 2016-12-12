@@ -3,14 +3,21 @@ require 'spec_helper'
 if ruby?
 RSpec.describe ReactiveRuby::ComponentLoader do
   GLOBAL_WRAPPER = <<-JS
-    var global = global || this;
-    var self = self || this;
+    #{React::ServerRendering::ExecJSRenderer::GLOBAL_WRAPPER}
     var console = {
       warn: function(s) {  }
     };
   JS
 
-  let(:js) { ::Rails.application.assets['components'].to_s }
+  let(:js) do
+    if ::Rails.application.assets['react-server.js'] &&
+       !::Rails.application.assets['react-server.js'].to_s.start_with?("// A placeholder file")
+      react_source = ::Rails.application.assets['react-server.js']
+    else
+      react_source = ::Rails.application.assets['react.js']
+    end
+    ::Rails.application.assets['components'].to_s + react_source.to_s
+  end
   let(:context) { ExecJS.compile(GLOBAL_WRAPPER + js) }
   let(:v8_context) { ReactiveRuby::ServerRendering.context_instance_for(context) }
 
