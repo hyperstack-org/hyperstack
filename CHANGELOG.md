@@ -18,7 +18,7 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
-## [0.11.0] - Unreleased
+## [0.11.0] - 2016-12-13
 
 ### Changed
 
@@ -32,6 +32,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- `ReferenceError: window is not defined` error in prerender context with react-rails v1.10.0. (#196)
 - State might not be updated using `React::Observable` from a param. (#175)
 - Arity checking failed for `_react_param_conversion` & `React::Element#initialize` (#167)
 
