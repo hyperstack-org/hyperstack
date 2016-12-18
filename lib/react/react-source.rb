@@ -1,4 +1,11 @@
 if RUBY_ENGINE == 'opal'
+  %x{
+    var ms = [
+      "Warning: `react/react-source` is deprecated, ",
+      "use `react/react-source-browser` or `react/react-source-server` instead."
+    ]
+    console.error(ms.join("")); 
+  }
   require 'react.js'
   require "react-server.js"
 else

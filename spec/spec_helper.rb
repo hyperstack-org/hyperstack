@@ -15,7 +15,8 @@ end
 
 if RUBY_ENGINE == 'opal'
   require File.expand_path('../vendor/jquery-2.2.4.min', __FILE__)
-  require 'react/react-source'
+  require 'react/react-source-browser'
+  require 'react/react-source-server'
   require 'hyper-react'
   require 'react/test/rspec'
   require 'react/test/utils'
