@@ -45,7 +45,7 @@ describe 'React::State' do
       var org_error_console = window.console.error;
       window.console.warn = window.console.error = function(str){log.push(str)}
     }
-    markup = React.render_to_static_markup(React.create_element(StateTest))
+    markup = React::Server.render_to_static_markup(React.create_element(StateTest))
     `window.console.warn = org_warn_console; window.console.error = org_error_console;`
     expect(markup).to eq('<span>Boom</span>')
     expect(StateTest.boom).to be_falsy

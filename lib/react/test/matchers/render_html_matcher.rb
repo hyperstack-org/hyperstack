@@ -30,7 +30,7 @@ module React
 
         def render_to_html
           element = React.create_element(@component, @params)
-          React.render_to_static_markup(element)
+          React::Server.render_to_static_markup(element)
         end
 
         def failure_string(negative = false)

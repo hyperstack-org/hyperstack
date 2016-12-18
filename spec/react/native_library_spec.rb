@@ -216,7 +216,7 @@ describe "React::NativeLibrary", type: :component do
           }
         })
       }
-      expect(React.render_to_static_markup(
+      expect(React::Server.render_to_static_markup(
         React.create_element(NativeLibraryTestModule::Component, time_stamp: Time.now))).to match(/<div>Hello There.*<\/div>/)
     end
 
@@ -303,7 +303,7 @@ describe "React::NativeLibrary", type: :component do
         }
       }
 
-      expect(React.render_to_static_markup(
+      expect(React::Server.render_to_static_markup(
         React.create_element(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now))).to match(/<div>Hello There.*<\/div>/)
     end
 
@@ -330,7 +330,7 @@ describe "React::NativeLibrary", type: :component do
         }
       }
       expect do
-        React.render_to_static_markup(React.create_element(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now))
+        React::Server.render_to_static_markup(React.create_element(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now))
       end.to raise_error("could not import a react component named: NativeLibrary.NativeNestedLibrary.NativeComponent")
 
     end

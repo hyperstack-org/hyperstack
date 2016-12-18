@@ -65,7 +65,7 @@ describe 'the React DSL', type: :component do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo))).to match(/<input data-foo="12"(\/)?>/)
+    expect(React::Server.render_to_static_markup(React.create_element(Foo))).to match(/<input data-foo="12"(\/)?>/)
   end
 
   it "will turn the last string in a block into a element" do
@@ -101,7 +101,7 @@ describe 'the React DSL', type: :component do
       end
     end
 
-    expect(React.render_to_static_markup(React.create_element(Foo)).gsub("<br/>", "<br>")).to eq('<div><span>hello<br></span></div>')
+    expect(React::Server.render_to_static_markup(React.create_element(Foo)).gsub("<br/>", "<br>")).to eq('<div><span>hello<br></span></div>')
   end
 
   it "has a .td short hand String method" do
@@ -156,7 +156,7 @@ describe 'the React DSL', type: :component do
         Comp()
       end
     end
-    expect { React.render_to_static_markup(React.create_element(Mod::NestedMod::NestedComp)) }
+    expect { React::Server.render_to_static_markup(React.create_element(Mod::NestedMod::NestedComp)) }
       .to raise_error('Comp does not appear to be a react component.')
   end
 

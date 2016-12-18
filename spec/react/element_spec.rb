@@ -29,7 +29,7 @@ describe React::Element, type: :component do
         end
       end
 
-      expect(React.render_to_static_markup(React.create_element(Foo))).to match(/<input (type="text" value=""|value="" type="text")(\/)?>/)
+      expect(React::Server.render_to_static_markup(React.create_element(Foo))).to match(/<input (type="text" value=""|value="" type="text")(\/)?>/)
     end
   end
 
@@ -43,7 +43,7 @@ describe React::Element, type: :component do
           params.on_event
         end
       end
-      expect(React.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
+      expect(React::Server.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
     end
 
     it 'will subscribe to multiple component event params' do
@@ -55,7 +55,7 @@ describe React::Element, type: :component do
           params.on_event1+params.on_event2
         end
       end
-      expect(React.render_to_static_markup(React.create_element(Foo).on(:event1, :event2) {'works!'})).to eq('<span>works!works!</span>')
+      expect(React::Server.render_to_static_markup(React.create_element(Foo).on(:event1, :event2) {'works!'})).to eq('<span>works!works!</span>')
     end
 
     it 'will subscribe to a native components event param' do
@@ -71,7 +71,7 @@ describe React::Element, type: :component do
       Foo.class_eval do
         imports "NativeComponent"
       end
-      expect(React.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
+      expect(React::Server.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
     end
 
     it 'will subscribe to a component event param with a non-default name' do
@@ -82,7 +82,7 @@ describe React::Element, type: :component do
           params.my_event
         end
       end
-      expect(React.render_to_static_markup(React.create_element(Foo).on("<my_event>") {'works!'})).to eq('<span>works!</span>')
+      expect(React::Server.render_to_static_markup(React.create_element(Foo).on("<my_event>") {'works!'})).to eq('<span>works!</span>')
     end
 
     it 'will subscribe to a component event param using the deprecated naming convention and generate a message' do
@@ -99,7 +99,7 @@ describe React::Element, type: :component do
         var org_error_console = window.console.error;
         window.console.warn = window.console.error = function(str){log.push(str)}
       }
-      expect(React.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
+      expect(React::Server.render_to_static_markup(React.create_element(Foo).on(:event) {'works!'})).to eq('<span>works!</span>')
       `window.console.warn = org_warn_console; window.console.error = org_error_console;`
       expect(`log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `on_event` not specified in spec/)
       expect(`log[1]`).to eq("Warning: Deprecated feature used in React::Component. In future releases React::Element#on('event') will no longer respond to the '_onEvent' emitter.\nRename your emitter param to 'on_event' or use .on('<_onEvent>')")

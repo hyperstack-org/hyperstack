@@ -45,7 +45,7 @@ def render_top_level(controller, component_name)
     render_params: {}
   }
   element = React.create_element(React::TopLevelRailsComponent, params)
-  React.render_to_static_markup(element)
+  React::Server.render_to_static_markup(element)
 end
 
 describe React::TopLevelRailsComponent do

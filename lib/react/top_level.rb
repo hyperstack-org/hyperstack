@@ -84,6 +84,7 @@ module React
   end
 
   def self.render_to_string(element)
+    %x{ console.error("Warning: `React.render_to_string` is deprecated in favor of `React::Server.render_to_string`."); }
     if !(`typeof ReactDOMServer === 'undefined'`)
       React::RenderingContext.build { `ReactDOMServer.renderToString(#{element.to_n})` } # v0.15+
     elsif !(`typeof React.renderToString === 'undefined'`)
@@ -94,6 +95,7 @@ module React
   end
 
   def self.render_to_static_markup(element)
+    %x{ console.error("Warning: `React.render_to_static_markup` is deprecated in favor of `React::Server.render_to_static_markup`."); }
     if !(`typeof ReactDOMServer === 'undefined'`)
       React::RenderingContext.build { `ReactDOMServer.renderToStaticMarkup(#{element.to_n})` } # v0.15+
     elsif !(`typeof React.renderToString === 'undefined'`)
