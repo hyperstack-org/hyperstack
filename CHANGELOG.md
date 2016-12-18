@@ -18,6 +18,18 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
+## [0.12.0] - Unreleased
+
+### Added
+
+- `React::Server` is provided as a module wrapping the original `ReactDOMServer` API, require `react/server` to use it. (#186)
+
+### Deprecated
+
+- `React.render_to_string` & `React.render_to_static_markup` is deprecated, use `React::Server.render_to_string` & `React::Server.render_to_static_markup` instead. (#186)
+- `react/react-source` is deprecated, use `react/react-source-browser` or `react/react-source-server` instead. For most usecase, `react/react-source-browser` is sufficient. If you are using the built-in server side rendering feature, the actual `ReactDOMServer` is already provided by the `react-rails` gem. Therefore, unless you are building a custom server side rendering mechanism, it's not suggested to use `react/react-source-server` in browser code. (#186)
+
+
 ## [0.11.0] - 2016-12-13
 
 ### Changed
