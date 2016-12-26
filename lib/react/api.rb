@@ -142,6 +142,16 @@ module React
           props["className"] = value
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
+        elsif key == 'ref' && value.is_a?(Proc)
+          unless React.const_defined?(:RefsCallbackExtension)
+            %x{
+                console.error(
+                  "Warning: Using deprecated behavior of ref callback,",
+                  "require \"react/ref_callback\" to get the correct behavior."
+                );
+            }
+          end
+          props[key] = value
         elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
           value.each { |k, v| props["#{key}-#{k.tr('_', '-')}"] = v.to_n }
         else
