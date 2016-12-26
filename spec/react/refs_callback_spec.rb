@@ -20,7 +20,9 @@ describe 'Refs callback' do
     end
 
     Foo.class_eval do
-      attr_accessor :my_bar
+      def my_bar=(bar)
+        $bar = bar
+      end
 
       def render
         React.create_element(Bar, ref: method(:my_bar=).to_proc)
@@ -28,13 +30,16 @@ describe 'Refs callback' do
     end
 
     element = React.create_element(Foo)
-    instance = React::Test::Utils.render_into_document(element)
-    expect(instance.my_bar).to be_a(Bar)
+    React::Test::Utils.render_into_document(element)
+    expect($bar).to be_a(Bar)
+    $bar = nil
   end
 
   it "is invoked with the actual DOM node" do
     Foo.class_eval do
-      attr_accessor :my_div
+      def my_div=(div)
+        $div = div
+      end
 
       def render
         React.create_element('div', ref: method(:my_div=).to_proc)
@@ -42,8 +47,9 @@ describe 'Refs callback' do
     end
 
     element = React.create_element(Foo)
-    instance = React::Test::Utils.render_into_document(element)
-    expect(`#{instance.my_div}.nodeType`).to eq(1)
+    React::Test::Utils.render_into_document(element)
+    expect(`#{$div}.nodeType`).to eq(1)
+    $div = nil
   end
 end
 
