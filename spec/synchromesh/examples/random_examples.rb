@@ -37,6 +37,39 @@ describe "random examples", js: true do
     pause
   end
 
+  it "pass a native hash as a param" do
+    mount "Tester" do
+
+      class React::RenderingContext
+        def self.remove_nodes_from_args(args)
+          args[0].each do |key, value|
+            begin
+              value.as_node if value.is_a?(Element)
+            rescue Exception
+            end
+          end if args[0] && args[0].is_a?(Hash)
+        end
+      end
+
+      class HelloWorld < React::Component::Base
+        param :hash
+        render do
+          debugger
+          "hash[key] = #{`#{params.hash['key']}`}"
+        end
+      end
+
+      class Tester < React::Component::Base
+        def render
+          HelloWorld(hash: `{key: 'the key'}`)
+        end
+      end
+    end
+    page.should have_content("hash[key] = 'the key'")
+    pause
+  end
+
+
   it "can destroy on the fly" do
 
     5.times do |i|

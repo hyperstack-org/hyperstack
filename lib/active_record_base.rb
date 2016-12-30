@@ -20,7 +20,6 @@ module ActiveRecord
       end
 
       alias pre_synchromesh_scope scope
-      alias pre_synchromesh_default_scope default_scope
 
       def do_not_synchronize
         @do_not_synchronize = true
@@ -31,6 +30,8 @@ module ActiveRecord
       end
 
       if RUBY_ENGINE != 'opal'
+
+        alias pre_synchromesh_default_scope default_scope
 
         def scope(name, *args, &block)
           opts = _synchromesh_scope_args_check(args)
@@ -44,6 +45,15 @@ module ActiveRecord
 
         def server_method(name, opts = {}, &block)
           define_method name, &block
+        end
+
+        def finder_method(name, &block)
+          singleton_class.send(:define_method, "_#{name}") do |*args|
+            [block.call(*args)]
+          end
+          singleton_class.send(:define_method, name) do |*args|
+            block.call(*args)
+          end
         end
 
       else
@@ -102,6 +112,15 @@ module ActiveRecord
             ReactiveRecord::Collection
             .new(self, nil, nil, self, 'unscoped')
             .extend(ReactiveRecord::UnscopedCollection)
+        end
+
+        def finder_method(name)
+          ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
+          [name, "#{name}!"].each do |method|
+            singleton_class.send(:define_method, method) do |*vargs|
+              all.apply_scope("_#{method}", *vargs).first
+            end
+          end
         end
       end
     end

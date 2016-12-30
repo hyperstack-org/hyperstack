@@ -205,18 +205,11 @@ module ReactiveRecord
       @pre_sync_related_records = nil
     end
 
-    # def in_this_collection(related_records)
-    #   related_records.delete_if do |r|
-    #     # BELOW IS WRONG... its more complicated isn't it...
-    #     if @association.through_association
-    #
-    #     else
-    #       r.backing_record.attributes[@association.inverse_of] != @owner
-    #   end
-    # end
-
     def apply_scope(name, *vector)
-      build_child_scope(ScopeDescription.find(@target_klass, name), *name, *vector)
+      description = ScopeDescription.find(@target_klass, name)
+      collection = build_child_scope(description, *description.name, *vector)
+      collection.reload_from_db if name == "#{description.name}!"
+      collection
     end
 
     def child_scopes
@@ -487,8 +480,11 @@ module ReactiveRecord
     def method_missing(method, *args, &block)
       if [].respond_to? method
         all.send(method, *args, &block)
-      elsif @target_klass.respond_to?(method) or (args.count == 1 && method =~ /^find_by_/)
+      elsif ScopeDescription.find(@target_klass, method) || (args.count == 1 && method =~ /^find_by_/)
         apply_scope(method, *args)
+      elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
+        puts "here we are..."
+        apply_scope("_#{method}", *args).first
       else
         super
       end

@@ -6,17 +6,22 @@ module ReactiveRecord
   class ScopeDescription
     def initialize(model, name, opts)
       sself = self
-      model.singleton_class.send(:define_method, "_#{name}_synchromesh_scope_description_") do
-        sself
-      end
       @filter_proc = filter_proc(opts)
       @name = name
+      model.singleton_class.send(:define_method, "_#{@name}_synchromesh_scope_description_") do
+        sself
+      end
       @model = model
       build_joins opts[:joins]
     end
 
+    attr_reader :name
+
     def self.find(target_model, name)
+      name = name.gsub(/!$/,'')
       target_model.send "_#{name}_synchromesh_scope_description_"
+    rescue
+      nil
     end
 
     def filter?

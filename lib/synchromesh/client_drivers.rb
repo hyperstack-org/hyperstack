@@ -170,7 +170,7 @@ module HyperMesh
 
       def merge_current_values(br)
         current_values = Hash[*@previous_changes.collect do |attr, values|
-          value = attr == :id ? record[:id] : values.first
+          value = attr == :id ? record[:id] : (values.length == 1 ? nil : values.first)
           begin
           if br.attributes.key?(attr) &&
              br.attributes[attr] != br.convert(attr, value) &&
