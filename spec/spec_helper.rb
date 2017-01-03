@@ -228,6 +228,11 @@ if RUBY_ENGINE != 'opal'
     end
 
     config.before(:each) do |x|
+      HyperMesh.class_eval do
+        def self.on_server?
+          true
+        end
+      end
       #puts "            RUNNING #{x.full_description}"
     end
 

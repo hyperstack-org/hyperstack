@@ -2,7 +2,7 @@ module HyperMesh
   module AutoCreate
     def needs_init?
       return true unless connection.tables.include?(table_name)
-      return false if HyperMesh.on_console?
+      return false unless HyperMesh.on_server?
       return true if defined?(Rails::Server)
       return true unless Connection.root_path
       uri = URI("#{Connection.root_path}server_up")
@@ -104,7 +104,7 @@ module HyperMesh
       attr_accessor :transport
 
       def active
-        unless HyperMesh.on_console?
+        if HyperMesh.on_server?
           expired.delete_all
           refresh_connections if needs_refresh?
         end

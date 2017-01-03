@@ -89,18 +89,13 @@ module HyperMesh
   end
 
   def self.send(channel, data)
-    if on_console?
+    if !on_server?
       send_to_server(channel, data)
     elsif transport == :pusher
       pusher.trigger("#{HyperMesh.channel}-#{data[1][:channel]}", *data)
     elsif transport == :action_cable
       ActionCable.server.broadcast("synchromesh-#{channel}", message: data[0], data: data[1])
     end
-  end
-
-  def self.on_console?
-    !Rails.const_defined?('Server')
-    #defined?(Rails::Console)
   end
 
   def self.on_server?
@@ -150,7 +145,7 @@ module HyperMesh
 
   def self.after_commit(operation, model)
     InternalPolicy.regulate_broadcast(model) do |data|
-      if HyperMesh.on_console? && Connection.root_path
+      if !HyperMesh.on_server? && Connection.root_path
         HyperMesh.send_to_server(data[:channel], [operation, data])
       else
         Connection.send_to_channel(data[:channel], [operation, data])
