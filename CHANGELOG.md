@@ -18,7 +18,7 @@ Whitespace conventions:
 - 1 spaces before normal text
  -->
 
-## [0.8.4] - 2017-01-03
+## [0.5.3] - 2017-01-03
 
 
 ### Added
