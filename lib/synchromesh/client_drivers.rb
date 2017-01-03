@@ -170,18 +170,13 @@ module HyperMesh
 
       def merge_current_values(br)
         current_values = Hash[*@previous_changes.collect do |attr, values|
-          value = attr == :id ? record[:id] : (values.length == 1 ? nil : values.first)
-          begin
+          value = attr == :id ? record[:id] : values.first
           if br.attributes.key?(attr) &&
              br.attributes[attr] != br.convert(attr, value) &&
              br.attributes[attr] != br.convert(attr, values.last)
             puts "warning #{attr} has changed locally - will force a reload.\n"\
                  "local value: #{br.attributes[attr]} remote value: #{br.convert(attr, value)}->#{br.convert(attr, values.last)}"
             return nil
-          end
-          rescue Exception => e
-            debugger
-            nil
           end
           [attr, value]
         end.compact.flatten].merge(br.attributes)
@@ -347,7 +342,7 @@ module HyperMesh
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection(*channel) }
           every(opts[:seconds_between_poll]) do
-            get_queued_data(:read, nil, headers: {'X-SYNCHROMESH-SILENT-REQUEST': true })
+            get_queued_data(:read, nil, headers: {'X-SYNCHROMESH-SILENT-REQUEST' =>  true })
           end
         end
       end
