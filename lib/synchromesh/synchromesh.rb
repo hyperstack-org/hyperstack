@@ -99,7 +99,12 @@ module HyperMesh
   end
 
   def self.on_console?
-    defined?(Rails::Console)
+    !Rails.const_defined?('Server')
+    #defined?(Rails::Console)
+  end
+
+  def self.on_server?
+    Rails.const_defined? 'Server'
   end
 
   def self.send_to_server(channel, data)
