@@ -98,7 +98,7 @@ module React
       class << self
         def included(component)
           _name, parent = find_name_and_parent(component)
-          class << parent
+          tag_names_module = Module.new do
             define_method _name do |*params, &children|
               React::RenderingContext.render(component, *params, &children)
             end
@@ -107,6 +107,7 @@ module React
               React::RenderingContext.build_only(component, *params, &children)
             end
           end
+          parent.extend(tag_names_module)
         end
 
         private
