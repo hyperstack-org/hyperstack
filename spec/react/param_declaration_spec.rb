@@ -66,7 +66,16 @@ describe 'the param macro', type: :component do
       end
     end
 
+    %x{
+      var log = [];
+      var org_warn_console =  window.console.warn;
+      var org_error_console = window.console.error;
+      window.console.warn = window.console.error = function(str){log.push(str)}
+    }
     expect(Foo).to render_static_html('<div>12-string</div>').with_params(foo1: 12, foo2: "string")
+    `window.console.warn = org_warn_console; window.console.error = org_error_console;`
+
+    expect(`log[0]`).to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo1` could not be converted to String/)
   end
 
   it 'logs error in warning if validation failed' do
