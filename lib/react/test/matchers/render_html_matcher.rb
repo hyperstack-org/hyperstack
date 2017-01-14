@@ -22,9 +22,11 @@ module React
           failure_string
         end
 
-        def negative_failure_message
+        def failure_message_when_negated
           failure_string(:negative)
         end
+
+        alias negative_failure_message failure_message_when_negated
 
         private
 
