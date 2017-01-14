@@ -251,12 +251,12 @@ describe 'the React DSL', type: :component do
     Foo.class_eval do
       include React::Component
       def render
-        div(data: { foo: :bar }, aria: { foo_bar: :foo })
+        div(data: { foo: :bar }, aria: { label: "title" })
       end
     end
 
     expect(Foo)
-      .to render_static_html('<div data-foo="bar" aria-foo-bar="foo"></div>')
+      .to render_static_html('<div data-foo="bar" aria-label="title"></div>')
   end
 
   it 'should not convert a hash param to hyphenated html attributes if not in React::HASH_ATTRIBUTES' do
