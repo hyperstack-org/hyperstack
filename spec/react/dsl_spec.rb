@@ -172,7 +172,7 @@ describe 'the React DSL', type: :component do
         _undefined_method
       end
     end
-    expect { React.render_to_static_markup(React.create_element(Foo)) }
+    expect { React::Server.render_to_static_markup(React.create_element(Foo)) }
       .to raise_error(NoMethodError)
   end
 
