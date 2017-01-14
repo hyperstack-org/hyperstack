@@ -109,11 +109,15 @@ describe 'the React DSL', type: :component do
     Foo.class_eval do
       include React::Component
       def render
-        table { tr { "hello".td } }
+        table {
+          tbody {
+            tr { "hello".td }
+          }
+        }
       end
     end
 
-    expect(Foo).to render_static_html('<table><tr><td>hello</td></tr></table>')
+    expect(Foo).to render_static_html('<table><tbody><tr><td>hello</td></tr></tbody></table>')
   end
 
   it "has a .para short hand String method" do
