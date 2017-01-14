@@ -712,15 +712,16 @@ describe React::Component, type: :component do
         include React::Component
 
         def render
-          p(class_name: 'foo') do
+          div {
+            p(class_name: 'foo')
             p
             div { 'lorem ipsum' }
             p(id: '10')
-          end
+          }
         end
       end
 
-      markup = '<p class="foo"><p></p><div>lorem ipsum</div><p id="10"></p></p>'
+      markup = '<div><p class="foo"></p><p></p><div>lorem ipsum</div><p id="10"></p></div>'
       expect(Foo).to render_static_html(markup)
     end
 
