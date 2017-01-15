@@ -41,12 +41,6 @@ matrix:
     gemfile: gemfiles/opal_0.9_react_14.gemfile
   - rvm: jruby-19mode
     gemfile: gemfiles/opal_0.9_react_15.gemfile
-  - rvm: 1.9.3
-    gemfile: gemfiles/opal_master_react_15.gemfile
-  - rvm: jruby-19mode
-    gemfile: gemfiles/opal_master_react_15.gemfile
-  - rvm: 2.1
-    gemfile: gemfiles/opal_master_react_15.gemfile
   include:
   - rvm: 2.1
     env: PHANTOMJS_VERSION=2.1.1
@@ -57,3 +51,6 @@ matrix:
   - rvm: 2.1
     env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_0.10_react_15.gemfile
+  - rvm: 2.1
+    env: PHANTOMJS_VERSION=2.1.1
+    gemfile: gemfiles/opal_master_react_15.gemfile
