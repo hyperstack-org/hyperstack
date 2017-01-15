@@ -13,8 +13,9 @@ describe React::Callbacks do
       end
     end
 
-    expect_any_instance_of(Foo).to receive(:wash_hand)
-    Foo.new.run_callback(:before_dinner)
+    instance = Foo.new
+    expect(instance).to receive(:wash_hand)
+    instance.run_callback(:before_dinner)
   end
 
   it 'defines multiple callbacks' do
@@ -30,9 +31,10 @@ describe React::Callbacks do
       def turn_of_laptop;end
     end
 
-    expect_any_instance_of(Foo).to receive(:wash_hand)
-    expect_any_instance_of(Foo).to receive(:turn_of_laptop)
-    Foo.new.run_callback(:before_dinner)
+    instance = Foo.new
+    expect(instance).to receive(:wash_hand)
+    expect(instance).to receive(:turn_of_laptop)
+    instance.run_callback(:before_dinner)
   end
 
   it 'defines block callback' do
@@ -95,9 +97,8 @@ describe React::Callbacks do
       def eat_ice_cream(a,b,c);  end
     end
 
-    expect_any_instance_of(Foo).to receive(:eat_ice_cream).with(4,5,6)
-
     foo = Foo.new
+    expect(foo).to receive(:eat_ice_cream).with(4,5,6)
     foo.run_callback(:before_dinner, 1, 2)
     foo.run_callback(:after_dinner, 4, 5, 6)
     expect(foo.lorem).to eq('1-2')
