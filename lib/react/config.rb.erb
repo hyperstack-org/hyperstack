@@ -1,0 +1,38 @@
+if RUBY_ENGINE != 'opal'
+  module React
+    module Config
+      extend self
+      def environment=(value)
+        config[:environment] = value
+      end
+
+      def config
+        @config ||= default_config
+      end
+
+      def default_config
+        {
+          environment: ENV['RACK_ENV'] || 'development'
+        }
+      end
+    end
+  end
+else
+  module React
+    module Config
+      extend self
+      def environment=(value)
+        raise "Environment cannot be configured at runtime."
+      end
+
+      def config
+        hash = %x{
+          Opal.hash({
+            environment: <%= '"' + React::Config.config[:environment] + '"' %>
+          })
+        }
+        hash
+      end
+    end
+  end
+end
