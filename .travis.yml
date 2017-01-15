@@ -53,3 +53,7 @@ matrix:
   - rvm: 2.1
     env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_master_react_15.gemfile
+  allow_failures:
+  - rvm: 2.1
+    env: PHANTOMJS_VERSION=2.1.1
+    gemfile: gemfiles/opal_master_react_15.gemfile
