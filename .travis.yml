@@ -15,7 +15,6 @@ gemfile:
   - gemfiles/opal_0.9_react_13.gemfile
   - gemfiles/opal_0.9_react_14.gemfile
   - gemfiles/opal_0.9_react_15.gemfile
-  - gemfiles/opal_master_react_15.gemfile
 cache:
   directories:
     - "travis_phantomjs"
