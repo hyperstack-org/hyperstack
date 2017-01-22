@@ -205,6 +205,28 @@ describe "React::NativeLibrary", type: :component do
     end.to raise_error(/^Foo cannot import \'window\.Baz\'\: (?!does not appear to be a native react component)..*$/)
   end
 
+  it "allows passing native object as props" do
+    %x{
+      window.NativeComponent = React.createClass({
+        displayName: "HelloMessage",
+        render: function render() {
+          return React.createElement("div", null, "Hello ", this.props.user.name);
+        }
+      })
+    }
+    stub_const 'Foo', Class.new(React::Component::Base)
+    Foo.class_eval do
+      imports "NativeComponent"
+    end
+    stub_const 'Wrapper', Class.new(React::Component::Base)
+    Wrapper.class_eval do
+      def render
+        Foo(user: `{name: 'David'}`)
+      end
+    end
+    expect(Wrapper).to render_static_html('<div>Hello David</div>')
+  end
+
   context "automatic importing" do
 
     it "will automatically import a React.js component when referenced in another component" do
