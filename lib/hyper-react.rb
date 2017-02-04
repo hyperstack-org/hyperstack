@@ -8,7 +8,7 @@ if RUBY_ENGINE == 'opal'
       "A global `React` must be defined before requiring 'hyper-react'",
       "",
       "To USE THE BUILT-IN SOURCE: ",
-      "   add 'require \"react/react-source\"' immediately before the 'require \"hyper-react\" directive.",
+      "   add 'require \"react/react-source-browser\"' immediately before the 'require \"hyper-react\" directive.",
       "IF USING WEBPACK:",
       "   add 'react' to your webpack manifest."
     ].join("\n")
