@@ -23,6 +23,7 @@ Whitespace conventions:
 ### Added
 
 - `React::Server` is provided as a module wrapping the original `ReactDOMServer` API, require `react/server` to use it. (#186)
+- `React::Config` is introduced, `environment` is the only config option provided for now. See [#204](https://github.com/ruby-hyperloop/hyper-react/issues/204) for usage details.
 
 ### Deprecated
 
