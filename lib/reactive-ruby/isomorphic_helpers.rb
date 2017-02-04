@@ -1,3 +1,5 @@
+require "react/config"
+
 module React
   module IsomorphicHelpers
     def self.included(base)
@@ -28,6 +30,13 @@ module React
 
     def self.log(message, message_type = :info)
       message = [message] unless message.is_a? Array
+
+      is_production = React::Config.config[:environment] == 'production'
+
+      if (message_type == :info || message_type == :warning) && is_production
+        return
+      end
+
       if message_type == :info
         if on_opal_server?
           style = 'background: #00FFFF; color: red'
