@@ -48,6 +48,5 @@ else
   require 'reactive-ruby/serializers'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
-  Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   require "react/react-source"
 end

@@ -31,6 +31,10 @@ Whitespace conventions:
 - `React.render_to_string` & `React.render_to_static_markup` is deprecated, use `React::Server.render_to_string` & `React::Server.render_to_static_markup` instead. (#186)
 - `react/react-source` is deprecated, use `react/react-source-browser` or `react/react-source-server` instead. For most usecase, `react/react-source-browser` is sufficient. If you are using the built-in server side rendering feature, the actual `ReactDOMServer` is already provided by the `react-rails` gem. Therefore, unless you are building a custom server side rendering mechanism, it's not suggested to use `react/react-source-server` in browser code. (#186)
 
+### Removed
+
+- `react-latest` & `react-v1x` is removed. Use `react/react-source-browser` or `react/react-source-server` instead.
+
 ### Fixed
 
 - [NativeLibrary] Passing native JS object as props will raise exception. (#195)
