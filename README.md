@@ -47,7 +47,7 @@ end
 
 Hyperloop wants to make the server-client divide as transparent to the developer as practical.  Given this, it makes sense that the testing should also be done with as little concern for client versus server.  
 
-HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code. 
+HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code.
 
 
 ## Installation
@@ -68,7 +68,19 @@ and then in your spec_helper.rb file
 require 'hyper-spec'
 ```
 
-## Usage
+You will also need to install selenium, poltergeist and firefox version **46.0.1** (ff latest still does not play well with selenium).
+
+Sadly at this time the selenium chrome driver does not play nicely with Opal, so you can't use Chrome.  We are working on getting rid of the whole selenium business.  Stay tuned.
+
+## Environment Variables
+
+You can set `DRIVER` to `ff` to run the client in Firefox and see what is going on.  By default tests will run in poltergeist which is quicker, but harder to debug problems.
+
+```
+DRIVER=ff bundle exec rspec
+```
+
+## Spec Helpers
 
 HyperSpec adds the following spec helpers to your test environment
 
@@ -296,7 +308,7 @@ it "can add classes during testing" do
 end
 ```
 
-### Integration with the Steps gem
+## Integration with the Steps gem
 
 The [rspec-steps gem](https://github.com/LRDesign/rspec-steps) can be useful in doing client side testing.  Without rspec-steps, each test spec will cause a reload of the browser window.  While this insures that each test runs in a clean environment, it is typically not necessary and can really slow down testing.
 
@@ -306,7 +318,7 @@ Checkout the rspec-steps example in the `hyper_spec.rb` file for an example.
 
 *Note that hopefully in the near future we are going to build a custom capybara driver that will just directly talk to Hyperloop on the client side.  Once this is in place these troubles should go away! - Volunteers welcome to help!*
 
-### Timecop Integration
+## Timecop Integration
 
 HyperSpec is integrated with [Timecop](https://github.com/travisjeffery/timecop) to freeze, move and speed up time.  The client and server times will be kept in sync when you use any these Timecop methods:
 
@@ -340,14 +352,21 @@ There is one confusing thing to note:  On the server if you `sleep` then you wil
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run bundle install and you should be good to go.
+
+Tests are run either by running `rake` or for more control:
+
+```
+DRIVER=ff bundle exec rspec spec/hyper_spec.rb
+```
+
+where DRIVER can be either `ff` (firefox) or `pg` (poltergeist - default).
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/hyper-spec. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 
 ## License
 
