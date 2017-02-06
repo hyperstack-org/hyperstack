@@ -1,0 +1,3 @@
+class AutoLoaderTestClassxPolicy
+  always_allow_connection
+end
