@@ -26,7 +26,7 @@ end
 
 The `mount` method will setup a blank client window, and *mount* the named component in the window, passing any parameters.
 
-Notice that the spec will need a client environment so we `js: true`.
+Notice that the spec will need a client environment so we must set `js: true`.
 
 The `mount` method can also take a block which will be recompiled and set to the client before mounting the component.  You can place any client side code in the mount block including the definition of components.
 
@@ -47,7 +47,7 @@ end
 
 Hyperloop wants to make the server-client divide as transparent to the developer as practical.  Given this, it makes sense that the testing should also be done with as little concern for client versus server.  
 
-HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  Without HyperSpec you would have to redundantly setup fixture data for both the client and the server.
+HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code. 
 
 
 ## Installation
@@ -79,7 +79,7 @@ HyperSpec adds the following spec helpers to your test environment
 + `evaluate_ruby`
 + `expect_evaluate_ruby`
 + `expect_promise`
-+ call back and event histories
++ call back and event history methods
 + `pause`
 + `attributes_on_client`
 + `size_window`
@@ -89,7 +89,7 @@ HyperSpec adds the following spec helpers to your test environment
 
 `mount` takes the name of a component, prepares an empty test window, and mounts the named component in the window.  
 You may give a block to `mount` which will be recompiled on the client, and run *before* mounting.  This means that the component
-mounted may be actually defined in the block.  You can also modify existing components for white box testing, or local fixture data, constants, etc.
+mounted may be actually defined in the block, which is useful for setting up top level wrapper components, which will invoke your component under test.  You can also modify existing components for white box testing, or local fixture data, constants, etc.
 
 `mount` may also be given a hash of the parameters to be passed to the component.
 
@@ -138,13 +138,13 @@ This way you will not pollute your application with these 'test only' files.
 
 #### The `on_client` Method
 
-`on_client` takes a block and compiles and runs it on the client.  This is useful in setting up test constants on the client etc.
+`on_client` takes a block and compiles and runs it on the client.  This is useful in setting up test constants and client only fixtures.
 
 Note that `on_client` needs to *proceed* any calls to `mount`, `evaluate_ruby`, `expect_evaluate_ruby` or `expect_promise` as these methods will initiate the client load process.
 
 #### The `isomorphic` Method
 
-Similar to `on_client` but the block is *also* run on the server.  This is useful for modifying behavior of isomorphic classes such as ActiveRecord models, and HyperOperations.
+Similar to `on_client` but the block is *also* run on the server.  This is useful for setting constants shared by both client and server, and modifying behavior of isomorphic classes such as ActiveRecord models, and HyperOperations.
 
 ```ruby
 isomorphic do
@@ -176,7 +176,7 @@ end
 expect(evaluate_ruby("factorial(5)")).to eq(factorial(5))
 ```
 
-`evaluate_ruby` can also be very useful for debug.  Set a breakpoint in your test, then use evaluate_ruby to interrogate the state of the client.
+`evaluate_ruby` can also be very useful for debug.  Set a breakpoint in your test, then use `evaluate_ruby` to interrogate the state of the client.
 
 #### The `expect_evaluate_ruby` Method
 
@@ -192,7 +192,7 @@ end.to eq(120)
 
 #### The `expect_promise` Method
 
-Works like `expect_evaluate_ruby` but is used with promises.  `expect_promise` will hang until the promise resolves and then return to the client.
+Works like `expect_evaluate_ruby` but is used with promises.  `expect_promise` will hang until the promise resolves and then return to the results.
 
 ```ruby
 expect_promise do
@@ -239,7 +239,7 @@ For debugging.  Everything stops, until you type `go()` in the client console.  
 
 #### The `attributes_on_client` Method
 
-*This feature is currently untested use at your own risk.*
+*This feature is currently untested - use at your own risk.*
 
 This reads the value of active record model attributes on the client.
 
@@ -278,7 +278,7 @@ Typically you will use this in a `before(:each)` or `before(:step)` block
 
 #### The `add_class` Method
 
-Sometimes its useful to change styles during testing (mainly for debug so that changes on screen are visible.)
+Sometimes it's useful to change styles during testing (mainly for debug so that changes on screen are visible.)
 
 The `add_class` method takes a class name (as a symbol or string), and hash representing the style.
 
@@ -298,11 +298,11 @@ end
 
 ### Integration with the Steps gem
 
-The [rspec-steps gem](https://github.com/LRDesign/rspec-steps) can be useful in doing client side testing.  Without the rspec-steps, each test spec will cause a reload of the browser window.  While this insures that each test runs in a clean environment, it is typically not necessary and can really slow down testing.
+The [rspec-steps gem](https://github.com/LRDesign/rspec-steps) can be useful in doing client side testing.  Without rspec-steps, each test spec will cause a reload of the browser window.  While this insures that each test runs in a clean environment, it is typically not necessary and can really slow down testing.
 
 The rspec-steps gem will run each test without reloading the window, which is usually fine.
 
-Checkout the rspec-steps example at the end of the `hyper_spec.rb` file for an example.
+Checkout the rspec-steps example in the `hyper_spec.rb` file for an example.
 
 *Note that hopefully in the near future we are going to build a custom capybara driver that will just directly talk to Hyperloop on the client side.  Once this is in place these troubles should go away! - Volunteers welcome to help!*
 
