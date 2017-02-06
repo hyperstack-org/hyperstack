@@ -110,7 +110,6 @@ There are several options that control the mounting process.  Use `client_option
 + `layout`: specify the layout to be used.  Default is :none.
 + `style_sheet`: specify the name of the style sheet to be loaded. Defaults to the application stylesheet.
 + `javascript`: specify the name of the javascript asset file to be loaded. Defaults to the application js file.
-+ `mock_time`: specify a time to be set on the browser. See [Timecop Integration] for details.
 
 For example:
 
@@ -309,33 +308,35 @@ Checkout the rspec-steps example at the end of the `hyper_spec.rb` file for an e
 
 ### Timecop Integration
 
-You can use the [Timecop]() gem to freeze time server side.  When the browser starts it will have time frozen at the same time as the server.   
+HyperSpec is integrated with [Timecop](https://github.com/travisjeffery/timecop) to freeze, move and speed up time.  The client and server times will be kept in sync when you use any these Timecop methods:
 
-You can also simply initialize the browser's clock to whatever you want using the `client_option :mock_time` setting:
++ `freeze`:  Freezes time at the specified point in time (default is Time.now)
++ `travel`:  Time runs normally forward from the point specified.
++ `scale`:   Like travel but times runs faster.
++ `return`:  Return to normal system time.
 
+For example:
 ```ruby
-client_option mock_time: 1.year_ago
+Timecop.freeze # freeze time at current time
+# ... test some stuff
+Timecop.freeze Time.now+10.minutes # move time forward 10 minutes
+# ... check to see if expected events happened etc
+Timecop.return
 ```
 
-Once the client begins running, time will advance whenever the `after` and `every` (or js `setTimeout` or `setInterval`) methods are used.  For example if the application executed
-
 ```ruby
-after(1.year) do
-  ...
+Timecop.scale 60, Time.now-1.year do
+  # Time will begin 1 year ago but advance 60 times faster than normal
+  sleep 10
+  # still sleeps for 10 seconds YOUR time, but server and client will
+  # think 10 minutes have passed
 end
+# no need for Timecop.return if using the block style
 ```
 
-and there were no other timers running, 1 year would elapse instantly.
+See the Timecop [README](https://github.com/travisjeffery/timecop/blob/master/README.markdown) for more details.
 
-Browser time is mocked using the [lolex]() library, which will be loaded automatically if time is frozen either by Timecop or using the `:mock_time` setting.
-
-If you want to simply mock time on the browser you can just say:
-
-```ruby
-client_option :mock_time
-# short for client_option mock_time: Time.now
-```
-
+There is one confusing thing to note:  On the server if you `sleep` then you will sleep for the specified number of seconds when viewed *outside* of the test.  However inside the test environment if you look at Time.now, you will see it advancing according to the scale factor.  Likewise if you have a `after` or `every` block on the client, you will wait according to *simulated* time.
 
 ## Development
 

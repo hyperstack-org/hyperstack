@@ -58,7 +58,7 @@ describe 'hyper-spec', js: true do
     end.to eq(12)
   end
 
-  it "can isomorphic code using the isomorphic method" do
+  it "can load isomorphic code using the isomorphic method" do
     isomorphic do
       def factorial(n)
         n==1 ? 1 : n * factorial(n-1)
