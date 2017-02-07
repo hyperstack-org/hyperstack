@@ -11,6 +11,7 @@ require 'react/isomorphic_helpers'
 require 'selenium/web_driver/firefox/profile'
 
 RSpec.configure do |config|
+  config.include HyperSpec::ComponentTestHelpers
   config.include HyperSpec::WaitForAjax
   config.include Capybara::DSL
 
@@ -42,7 +43,7 @@ RSpec.configure do |config|
 end
 
 # Capybara config
-RSpec.configure do |config|
+RSpec.configure do |_config|
   Capybara.default_max_wait_time = 10
 
   # # In case Google ever fixes chromedriver to work with Opal...
@@ -84,6 +85,4 @@ RSpec.configure do |config|
     else
       :poltergeist
     end
-
-  config.include HyperSpec::ComponentTestHelpers
 end
