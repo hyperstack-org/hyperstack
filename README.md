@@ -26,7 +26,7 @@ end
 
 The `mount` method will setup a blank client window, and *mount* the named component in the window, passing any parameters.
 
-Notice that the spec will need a client environment so we `js: true`.
+Notice that the spec will need a client environment so we must set `js: true`.
 
 The `mount` method can also take a block which will be recompiled and set to the client before mounting the component.  You can place any client side code in the mount block including the definition of components.
 
@@ -47,7 +47,7 @@ end
 
 Hyperloop wants to make the server-client divide as transparent to the developer as practical.  Given this, it makes sense that the testing should also be done with as little concern for client versus server.  
 
-HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  Without HyperSpec you would have to redundantly setup fixture data for both the client and the server.
+HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code.
 
 
 ## Installation
@@ -68,7 +68,19 @@ and then in your spec_helper.rb file
 require 'hyper-spec'
 ```
 
-## Usage
+You will also need to install selenium, poltergeist and firefox version **46.0.1** (ff latest still does not play well with selenium).
+
+Sadly at this time the selenium chrome driver does not play nicely with Opal, so you can't use Chrome.  We are working on getting rid of the whole selenium business.  Stay tuned.
+
+## Environment Variables
+
+You can set `DRIVER` to `ff` to run the client in Firefox and see what is going on.  By default tests will run in poltergeist which is quicker, but harder to debug problems.
+
+```
+DRIVER=ff bundle exec rspec
+```
+
+## Spec Helpers
 
 HyperSpec adds the following spec helpers to your test environment
 
@@ -79,7 +91,7 @@ HyperSpec adds the following spec helpers to your test environment
 + `evaluate_ruby`
 + `expect_evaluate_ruby`
 + `expect_promise`
-+ call back and event histories
++ call back and event history methods
 + `pause`
 + `attributes_on_client`
 + `size_window`
@@ -89,7 +101,7 @@ HyperSpec adds the following spec helpers to your test environment
 
 `mount` takes the name of a component, prepares an empty test window, and mounts the named component in the window.  
 You may give a block to `mount` which will be recompiled on the client, and run *before* mounting.  This means that the component
-mounted may be actually defined in the block.  You can also modify existing components for white box testing, or local fixture data, constants, etc.
+mounted may be actually defined in the block, which is useful for setting up top level wrapper components, which will invoke your component under test.  You can also modify existing components for white box testing, or local fixture data, constants, etc.
 
 `mount` may also be given a hash of the parameters to be passed to the component.
 
@@ -110,7 +122,6 @@ There are several options that control the mounting process.  Use `client_option
 + `layout`: specify the layout to be used.  Default is :none.
 + `style_sheet`: specify the name of the style sheet to be loaded. Defaults to the application stylesheet.
 + `javascript`: specify the name of the javascript asset file to be loaded. Defaults to the application js file.
-+ `mock_time`: specify a time to be set on the browser. See [Timecop Integration] for details.
 
 For example:
 
@@ -139,13 +150,13 @@ This way you will not pollute your application with these 'test only' files.
 
 #### The `on_client` Method
 
-`on_client` takes a block and compiles and runs it on the client.  This is useful in setting up test constants on the client etc.
+`on_client` takes a block and compiles and runs it on the client.  This is useful in setting up test constants and client only fixtures.
 
 Note that `on_client` needs to *proceed* any calls to `mount`, `evaluate_ruby`, `expect_evaluate_ruby` or `expect_promise` as these methods will initiate the client load process.
 
 #### The `isomorphic` Method
 
-Similar to `on_client` but the block is *also* run on the server.  This is useful for modifying behavior of isomorphic classes such as ActiveRecord models, and HyperOperations.
+Similar to `on_client` but the block is *also* run on the server.  This is useful for setting constants shared by both client and server, and modifying behavior of isomorphic classes such as ActiveRecord models, and HyperOperations.
 
 ```ruby
 isomorphic do
@@ -177,7 +188,7 @@ end
 expect(evaluate_ruby("factorial(5)")).to eq(factorial(5))
 ```
 
-`evaluate_ruby` can also be very useful for debug.  Set a breakpoint in your test, then use evaluate_ruby to interrogate the state of the client.
+`evaluate_ruby` can also be very useful for debug.  Set a breakpoint in your test, then use `evaluate_ruby` to interrogate the state of the client.
 
 #### The `expect_evaluate_ruby` Method
 
@@ -193,7 +204,7 @@ end.to eq(120)
 
 #### The `expect_promise` Method
 
-Works like `expect_evaluate_ruby` but is used with promises.  `expect_promise` will hang until the promise resolves and then return to the client.
+Works like `expect_evaluate_ruby` but is used with promises.  `expect_promise` will hang until the promise resolves and then return to the results.
 
 ```ruby
 expect_promise do
@@ -240,7 +251,7 @@ For debugging.  Everything stops, until you type `go()` in the client console.  
 
 #### The `attributes_on_client` Method
 
-*This feature is currently untested use at your own risk.*
+*This feature is currently untested - use at your own risk.*
 
 This reads the value of active record model attributes on the client.
 
@@ -279,7 +290,7 @@ Typically you will use this in a `before(:each)` or `before(:step)` block
 
 #### The `add_class` Method
 
-Sometimes its useful to change styles during testing (mainly for debug so that changes on screen are visible.)
+Sometimes it's useful to change styles during testing (mainly for debug so that changes on screen are visible.)
 
 The `add_class` method takes a class name (as a symbol or string), and hash representing the style.
 
@@ -297,61 +308,70 @@ it "can add classes during testing" do
 end
 ```
 
-### Integration with the Steps gem
+## Integration with the Steps gem
 
-The [rspec-steps gem](https://github.com/LRDesign/rspec-steps) can be useful in doing client side testing.  Without the rspec-steps, each test spec will cause a reload of the browser window.  While this insures that each test runs in a clean environment, it is typically not necessary and can really slow down testing.
+The [rspec-steps gem](https://github.com/LRDesign/rspec-steps) can be useful in doing client side testing.  Without rspec-steps, each test spec will cause a reload of the browser window.  While this insures that each test runs in a clean environment, it is typically not necessary and can really slow down testing.
 
 The rspec-steps gem will run each test without reloading the window, which is usually fine.
 
-Checkout the rspec-steps example at the end of the `hyper_spec.rb` file for an example.
+Checkout the rspec-steps example in the `hyper_spec.rb` file for an example.
 
 *Note that hopefully in the near future we are going to build a custom capybara driver that will just directly talk to Hyperloop on the client side.  Once this is in place these troubles should go away! - Volunteers welcome to help!*
 
-### Timecop Integration
+## Timecop Integration
 
-You can use the [Timecop]() gem to freeze time server side.  When the browser starts it will have time frozen at the same time as the server.   
+HyperSpec is integrated with [Timecop](https://github.com/travisjeffery/timecop) to freeze, move and speed up time.  The client and server times will be kept in sync when you use any these Timecop methods:
 
-You can also simply initialize the browser's clock to whatever you want using the `client_option :mock_time` setting:
++ `freeze`:  Freezes time at the specified point in time (default is Time.now)
++ `travel`:  Time runs normally forward from the point specified.
++ `scale`:   Like travel but times runs faster.
++ `return`:  Return to normal system time.
 
+For example:
 ```ruby
-client_option mock_time: 1.year_ago
+Timecop.freeze # freeze time at current time
+# ... test some stuff
+Timecop.freeze Time.now+10.minutes # move time forward 10 minutes
+# ... check to see if expected events happened etc
+Timecop.return
 ```
 
-Once the client begins running, time will advance whenever the `after` and `every` (or js `setTimeout` or `setInterval`) methods are used.  For example if the application executed
-
 ```ruby
-after(1.year) do
-  ...
+Timecop.scale 60, Time.now-1.year do
+  # Time will begin 1 year ago but advance 60 times faster than normal
+  sleep 10
+  # still sleeps for 10 seconds YOUR time, but server and client will
+  # think 10 minutes have passed
 end
+# no need for Timecop.return if using the block style
 ```
 
-and there were no other timers running, 1 year would elapse instantly.
+See the Timecop [README](https://github.com/travisjeffery/timecop/blob/master/README.markdown) for more details.
 
-Browser time is mocked using the [lolex]() library, which will be loaded automatically if time is frozen either by Timecop or using the `:mock_time` setting.
-
-If you want to simply mock time on the browser you can just say:
-
-```ruby
-client_option :mock_time
-# short for client_option mock_time: Time.now
-```
+There is one confusing thing to note:  On the server if you `sleep` then you will sleep for the specified number of seconds when viewed *outside* of the test.  However inside the test environment if you look at Time.now, you will see it advancing according to the scale factor.  Likewise if you have a `after` or `every` block on the client, you will wait according to *simulated* time.
 
 ## Common Problems
 
 If you are getting failures on Poltergeist but not Firefox, make sure you are not requiring `browser` in your components.rb.
 Requiring `browser/interval` or `browser/delay` is okay.
 
-
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run bundle install and you should be good to go.
+
+Tests are run either by running `rake` or for more control:
+
+```
+DRIVER=ff bundle exec rspec spec/hyper_spec.rb
+```
+
+where DRIVER can be either `ff` (firefox) or `pg` (poltergeist - default).
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/hyper-spec. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 
 ## License
 
