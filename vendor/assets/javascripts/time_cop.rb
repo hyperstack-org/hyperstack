@@ -38,7 +38,6 @@ if RUBY_ENGINE == 'opal'
         mock_elapsed_time = mock_clock - @mock_start_time
 
         ticks = real_elapsed_time * @scale - mock_elapsed_time
-        #puts "ticking... #{real_clock}: #{Time.now} + #{ticks / 1000} = #{Time.now + ticks/1000}"
 
         `#{@lolex}.tick(#{ticks.to_i})`
         nil
@@ -53,21 +52,22 @@ if RUBY_ENGINE == 'opal'
             #{@resolution}
           )
         }
-        return ticker
+        ticker
       end
 
       def update_lolex(time, scale, resolution)
-        #puts "update_lolex(#{time}, #{scale}, #{resolution}) time.to_f: #{(time.to_f*1000)}"
         `#{@lolex}.uninstall()` && return if scale.nil?
         @mock_start_time = time.to_f * 1000
+
         if @lolex
           `#{@lolex}['_clearInterval'].call(window, #{@ticker})` if @ticker
           @real_start_time = `(new #{@lolex}['_Date']).getTime()`
-          `#{@lolex}.tick(#{@mock_start_time-Time.now.to_f * 1000})`
+          `#{@lolex}.tick(#{@mock_start_time - Time.now.to_f * 1000})`
         else
           @real_start_time = Time.now.to_f * 1000
           @lolex = `lolex.install(window, #{@mock_start_time})`
         end
+
         @scale = scale
         @resolution = resolution
         @ticker = create_ticker
@@ -77,6 +77,8 @@ if RUBY_ENGINE == 'opal'
   end
 
 else
+  require 'timecop'
+  
   # Interface to the Lolex package running on the client side
   # Below we will monkey patch Timecop to call these methods
   class Lolex
@@ -138,19 +140,14 @@ else
 
       def run_pending_evaluations
         return if pending_evaluations.empty?
-        @capybara_page.evaluate_ruby(pending_evaluations.collect do |block|
-          block.call
-        end.join("\n"))
+        @capybara_page.evaluate_ruby(pending_evaluations.collect(&:call).join("\n"))
         @pending_evaluations ||= []
       end
     end
   end
 
-  require 'timecop'
-
   # Monkey patches to call our Lolex interface
   class Timecop
-
     private
 
     def travel(mock_type, *args, &block)

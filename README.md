@@ -336,6 +336,11 @@ client_option :mock_time
 # short for client_option mock_time: Time.now
 ```
 
+## Common Problems
+
+If you are getting failures on Poltergeist but not Firefox, make sure you are not requiring `browser` in your components.rb.
+Requiring `browser/interval` or `browser/delay` is okay.
+
 
 ## Development
 
