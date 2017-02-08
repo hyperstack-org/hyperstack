@@ -114,7 +114,72 @@ Often states hold data structures like arrays, hashes, sets, or other Ruby class
 mutate.items[item] = value
 ```
 
-#### Explicitly Declaring States
+### Instances and Classes
+
+Stores are often singleton classes.  In an application there is one 'cart' for example.
+
+However sometimes you will want to create a class where each instance is a Store.  This is straight forward because if a state is read or mutated in an instance method, then you will be referring to that instance's copy of the state.
+```ruby
+# Each UserStream provides a stream of unique user profiles.
+# Each instance has a single HyperStore state variable called user
+# user will contain a single hash representing the user profile.
+class UserStream < HyperStore::Base
+
+  # get another user
+
+  def get_another!
+    mutate.user UserStream._select_random_user
+  end
+
+  # extract various attributes from the user hash
+
+  def user_name
+    state.user[:login]
+  end
+
+  def user_url
+    state.user[:html_url]
+  end
+
+  def avatar
+    state.user[:avatar_url]
+  end
+
+  def initialize
+    get_another!
+  end
+
+  def self._select_random_user
+    # _select_random_user provides a stream of unique user profiles.
+    # It will either return a user profile hash, or a promise of one
+    # to come.
+
+    # The cache of users to choose from does not have to be an state
+    # variable, so we use plain instance variables.
+    return @users.delete_at(rand(@users.length)) unless @users.blank?
+    # execute the GetMoreUsers Operation to grab another batch of users
+    # if we are not already waiting on a promise
+    @promise = GetMoreUsers.then do |response|
+      @users = response.json
+    end if @promise.nil? || @promise.resolved?
+    # wait for the promise to resolve then try again
+    @promise.then { _select_random_user }
+  end
+end
+
+class GetMoreUsers < HyperOperation
+  def execute
+    HTTP.get("https://api.github.com/users?since=#{rand(500)}")
+  end
+end
+```
+Stores that have multiple instances will typically have instance methods that directly mutate the store.  We recommend you end these methods with an exclamation (!) to make it clear you are exposing a mutator.
+
+### States and Promises
+
+The above example is greatly simplified because if a promise is assigned to a state it will not mutate  *until the promise resolves*.  Combining this with instance Stores gives a powerful way to encapsulate system behavior.
+
+### Explicitly Declaring States
 
 States like instance variables are created when they are first referenced.  
 
@@ -160,7 +225,7 @@ The default value for `scope:` depends on where the state is declared:
   end
 ```
 
-In the above example there is one class instance state named `items` and an addition *different* state variable also called
+In the above example there is one class instance state named `items` and an additional state variable also called
 items for each instance.
 
 The `shared` option just makes it easier to access a class state from instances.
@@ -222,65 +287,6 @@ In the first case `my_state` will be re-initialized to nil on every boot, in the
 
 
 
-#### The `state_reader` and `private_state` methods
-
-These are convenience methods that reduce code noise:
-
-The `state_reader` method will
-+ initialize a state automatically and
-+ create a *getter* method
-
-```ruby
-state_reader items: Hash.new { |h, k| h[k] = 0 }, scope: :class
-# same as
-receives HyperLoop::Boot do
-  mutate.items(Hash.new { |h, k| h[k] = 0 } )
-end
-def self.items
-  state.items
-end
-# 6 lines for the price of 1!
-```
-
-The `:scope` option indicates whether the state exists once for the class, or for each instance.  More on instance states in a bit.
-
-You may leave off the initializer by just giving the name of the state, and it will be initialized to nil
-```ruby
-state_reader :ready? # initialized to nil
-```
-
-You may use the `as:` option to give a different name to the reader method than the state.  This can help make the code more readable.  For example:
-```ruby
-class Todos < HyperStore::Base
-  state_reader todos: [], scope: :class, as: :all
-  # now we can internally refer to our state as todos, while
-  # externally it can be called Todos.all
-end
-```
-
-The `private_state` method works the same but does not create the reader method.  Its useful for initializing states, and makes the code more readable by declaring upfront what states you are using.
-
-### Instances and Classes
-
-Stores are often singleton classes.  In an application there is one 'cart' for example.
-
-However sometimes you will want to create a normal Ruby class that acts as a Store.  If a state is read or mutated in an instance method, then you will be referring to that instance's copy of the state.  When you use `state_reader` and `private_state` you can use the `scope: :instance` option.  The only caveat is that if you use `state_reader` or `private_state` with `scope: :class`, then that variable will be directly accessible to the instances as well.  In other words you can't have the same state declared at the class and instance level.
-
-On the other hand you can also use the `state_reader` and `private_state` method within a classes *I DONT KNOW WHAT TO CALL THIS*.  In this case the default scope is class instead of instance.
-
-```ruby
-class Foo < HyperStore::Base
-  class << self
-    private_state :bar
-    # bar by default is a class state variablle
-  end
-end
-```
-
 ### The `HyperStore` Mixin
 
 You can also include `HyperStore` in any class and then use all the methods described above.  Useful when you want to add HyperStore capabilities to another class.
-
-### States and Promises
-
-If you assign a promise to a state Hyperloop is clever, and will not mutate the state *until the promise resolves*.  Combining this with instance Stores gives a powerful way to encapsulate system behavior.
