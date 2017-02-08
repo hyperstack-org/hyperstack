@@ -114,6 +114,114 @@ Often states hold data structures like arrays, hashes, sets, or other Ruby class
 mutate.items[item] = value
 ```
 
+#### Explicitly Declaring States
+
+States like instance variables are created when they are first referenced.  
+
+As a convenience you may also explicitly declare states.  This reduces code noise, and improves readability.
+
+```ruby
+class Cart < HyperStore::Base
+  state items: Hash.new { |h, k| h[k] = 0 }, scope: :class, reader: true
+end
+```
+
+This *declares* the `items` state as a class state variable, will initialize it with the hash on `Hyperloop::Boot`, and provides a reader method.
+That is 6 lines of code for the price of 1, plus now the intention of `items` is clearly defined.
+
+The `state` declaration has the following flavors, depending on how the state is to be initialized:
+
+```ruby
+  state :items, ... other options ... # items will be initialized to nil
+  state items: [1, 2, 3], ... other options ... # items will be initialized to the array [1, 2, 3]
+  state :items, ... other options ... do
+    ... compute initial value ...
+    ... context will be either the class an ...
+    ... instance depending on the scope ...
+  end
+```
+
+other options to the `state` declaration are:
++ `scope:` either `:class`, `:instance`, `:shared`.  Details below!
++ `reader:` either `true`, or a symbol used to declare a reader (getter) method.  
++ `initializer:` either a proc or a symbol (indicating a method), to be used to initialize the state.
+
+The value of the `scope` option determines where the state resides.  
++ A class state has one instance per class and is directly accessible in class methods, and indirectly in instances using `self.class.state`.
++ An instance state has a different copy in each instance of the class, and is not accessible by class methods.
++ A shared state is like a class state, but is also directly accessible in instances.
+
+The default value for `scope:` depends on where the state is declared:
+
+```ruby
+  state :items # declares an instance state variable, each instance gets its own state
+  class << self
+    state :items # declares a class instance state variable
+  end
+```
+
+In the above example there is one class instance state named `items` and an addition *different* state variable also called
+items for each instance.
+
+The `shared` option just makes it easier to access a class state from instances.
+
+```ruby
+class MyStore < HyperStore::Base
+  state :shared_state, scope: :shared
+  state :class_state, scope: :class
+  state :instance_state # scope: :instance is default here
+  def instance_method
+    # shared state makes class states easy to access
+    state.shared_state
+    # without shared state class_state is still accessible
+    # with more typing
+    self.class.class_state
+    # each instance gets its own copy of instance states
+    state.instance_state
+    # attempt to access a declared state variable out of context
+    # results in an error!
+    state.class_state # exception!
+  end
+  def self.class_method
+    # this is the same state as was referenced in instance_method
+    state.shared_state
+    # and so is this
+    state.class_state
+    # and this will raise an exception
+    state.instance_state
+  end
+```
+
+Class state variables are initialized by an implicit `Hyperloop::Boot` receiver.  If an initial value is directly provided (not via a proc, method or block) then the value will be `dup`ed when the second and following Boot dispatches are received.  The proc, method or block initializers will run in the context of the class, and the state variable will be available.  For example:
+
+```ruby
+state :boot_counter, scope: :shared do
+  (state.boot_counter || 0)+1
+end
+
+# more practically perhaps:
+
+state :my_state, scope: :shared do
+  state.my_state || [] # don't re-initialize me on reboots
+end
+```
+
+Instance variables are initialized when instances of the Store are created.  Each initialization will `dup` the initial value unless supplied by a proc, method or block.
+
+This initialization behavior will work in most cases but for more control simply leave off any initializer, and write your own.
+
+**Note for class states there is a subtle difference between saying:**
+```ruby
+state my_state: nil, scope: :shared # or :class
+# and
+state :my_state, scope: :shared # or :class
+
+```
+
+In the first case `my_state` will be re-initialized to nil on every boot, in the second case it will not.
+
+
+
 #### The `state_reader` and `private_state` methods
 
 These are convenience methods that reduce code noise:
