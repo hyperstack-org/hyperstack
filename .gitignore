@@ -44,3 +44,6 @@ bower.json
 # Ignore test app files
 /spec/test_app/log/
 /spec/test_app/tmp/
+
+# Ignore built gem
+*.gem

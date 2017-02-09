@@ -6,7 +6,7 @@ require 'hyper-spec/version'
 Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.name          = 'hyper-spec'
   spec.version       = HyperSpec::VERSION
-  spec.authors       = ['catmando']
+  spec.authors       = ['catmando', 'adamcreekroad']
   spec.email         = ['mitch@catprint.com']
 
   spec.summary       =
