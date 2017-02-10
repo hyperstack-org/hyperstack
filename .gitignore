@@ -40,3 +40,7 @@ bower.json
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore test_app tmp folders
+/test_app/tmp
+/test_app/log
