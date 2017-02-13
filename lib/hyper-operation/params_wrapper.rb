@@ -14,7 +14,7 @@ class HyperOperation
       @inputs.with_indifferent_access
     end
 
-    def to_s 
+    def to_s
       to_h.to_s
     end
 
@@ -29,12 +29,12 @@ class HyperOperation
         [raw_inputs, new(inputs), errors]
       end
 
-      def add_param(*args)
-        type_method, name, opts = translate_args(*args)
+      def add_param(*args, &block)
+        type_method, name, opts, block = translate_args(*args, block)
         if opts.key? :default
-          hash_filter.optional { send(type_method, name, opts) }
+          hash_filter.optional { send(type_method, name, opts, &block) }
         else
-          hash_filter.required { send(type_method, name, opts) }
+          hash_filter.required { send(type_method, name, opts, &block) }
         end
 
         # don't forget specially handling for procs
@@ -57,14 +57,22 @@ class HyperOperation
         @hash_filter ||= Mutations::HashFilter.new
       end
 
-      def translate_args(*args)
+      def translate_args(*args, block)
         name, opts = get_name_and_opts(*args)
         if opts.key?(:type)
-          type_method = opts.delete(:type).to_s.underscore
+          type_method = opts.delete(:type)
+          if type_method.is_a?(Array)
+            opts[:class] = type_method.first if type_method.count > 0
+            type_method = Array
+          elsif type_method.is_a?(Hash) || type_method == Hash
+            type_method = Hash
+            block ||= proc { duck :* }
+          end
+          type_method = type_method.to_s.underscore
         else
           type_method = :duck
         end
-        [type_method, name, opts]
+        [type_method, name, opts, block || proc {}]
       end
 
       def get_name_and_opts(*args)
@@ -83,7 +91,7 @@ class HyperOperation
   end
 
   class << self
-    def param(*args)
+    def param(*args, &block)
       _params_wrapper.add_param(*args)
     end
 

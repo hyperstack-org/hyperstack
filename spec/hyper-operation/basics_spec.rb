@@ -104,6 +104,30 @@ describe 'HyperOperation basics' do
       .to have_failed_with(HyperOperation::ValidationException)
     end
 
+    it "can have array, array of types, or hash types" do
+      MyOperation.param :array, type: []
+      MyOperation.param :int_array, type: [Integer]
+      MyOperation.param :hash, type: {}
+      expect(Store).to receive(:receiver).with(array: ['hi'], int_array: [1], hash: {a: 1})
+      expect(MyOperation.run(array: ['hi'], int_array: [1], hash: {a: 1})).to be_resolved
+      expect(MyOperation.run(array: 'hi', int_array: [1], hash: {a: 1}))
+      .to have_failed_with(HyperOperation::ValidationException)
+      expect(MyOperation.run(array: ['hi'], int_array: ['hi'], hash: {a: 1}))
+      .to have_failed_with(HyperOperation::ValidationException)
+      expect(MyOperation.run(array: ['hi'], int_array: [1], hash: nil))
+      .to have_failed_with(HyperOperation::ValidationException)
+    end
+
+    xit "can use complex Mutations filters" do
+      MyOperation.param :hash, type: Hash do
+        string :a
+        integer :b
+      end
+      expect(Store).to receive(:receiver).with(hash: {a: '1', b: 1})
+      binding.pry
+      expect(MyOperation.run(hash: {a: '1', b: '1'})).to be_resolved
+    end
+
     it "can have an execute method" do
       MyOperation.param :sku, type: String
       MyOperation.send(:define_method, :execute) do

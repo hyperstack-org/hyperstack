@@ -145,24 +145,33 @@ QuickCheckout(sku: selected_item, qty: selected_qty)
   # show confirmation
 end
 .fail do |exception|
-  # whatever exception was raised is passed on
+  # whatever exception was raised is passed to the fail block
 end
 ```
-Failures to validate params result in Hyperloop::
+Failures to validate params result in `Hyperloop::ValidationException` which contains a [Mutations error object](https://github.com/cypriss/mutations#what-about-validation-errors).
+```ruby
+MyOperation.run.fail do |e|
+  if e.is_a? Hyperloop::ValidationException
+    e.errors.symbolic # hash: each key is a parameter that failed validation, value is a symbol representing the reason
+    e.errors.message # same as symbolic but message is in English
+    e.errors.message_list # array of messages where failed parameter is combined with the message
+  end
+end
+```
 
 ### Dispatch Syntax
 
 You can dispatch to an Operation by using ...
 + the Operation class name as a method:  
-  ```ruby
+  ```
   MyOperation()
   ```
 + the `run` method:  
-  ```ruby
+  ```
   MyOperation.run
   ```
 + the `then` method, which will dispatch the operation and attach a promise handler:  
-  ```ruby
+  ```
   MyOperation.then { alert 'operation completed' }
   ```
 
