@@ -175,8 +175,8 @@ describe 'HyperOperation basics' do
             @count ||= 0
             @count += 1
           end
-          def execute
-            dispatch count: count
+          def execute(op)
+            op.dispatch count: count
           end
         end
       end
@@ -185,7 +185,7 @@ describe 'HyperOperation basics' do
       expect(MyOperation.then { MyOperation.run }).to be_resolved
     end
 
-    it "can be run with the run method", js: true do
+    it "can be run without the run method", js: true do
       stub_const "Foo", Class.new
       stub_const "Mod", Module.new
       stub_const "Klass", Class.new

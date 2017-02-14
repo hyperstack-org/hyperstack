@@ -29,8 +29,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mutations'
   spec.add_dependency 'hyper-react'
   spec.add_dependency 'opal-activesupport'
+  spec.add_dependency 'activerecord', '>= 0.3.0'
 
-  spec.add_development_dependency "bundler", "~> 1.12"
+  spec.add_development_dependency "bundler", "~> 1.8"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency 'hyper-spec'
   spec.add_development_dependency 'rspec-rails'
@@ -38,4 +39,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'opal-rails'
   spec.add_development_dependency 'hyper-react'
   spec.add_development_dependency 'opal-browser'
+  spec.add_development_dependency 'sqlite3', '1.3.10'
+
 end

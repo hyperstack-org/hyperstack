@@ -1,14 +1,5 @@
 
-require "rails"
-# Pick the frameworks you want:
-require "active_model/railtie"
-require "active_job/railtie"
-# require "active_record/railtie"
-require "action_controller/railtie"
-require "action_mailer/railtie"
-require "action_view/railtie"
-require "sprockets/railtie"
-require "rails/test_unit/railtie"
+require 'rails/all'
 require File.expand_path('../boot', __FILE__)
 
 # Require the gems listed in Gemfile, including any gems
@@ -20,7 +11,7 @@ require 'hyper-react'
 
 module TestApp
   class Application < Rails::Application
-    #config.action_cable.allowed_request_origins = [/http\:\/\/127\.0\.0\.1\:[0-9]*/]
+    config.action_cable.allowed_request_origins = [/http\:\/\/127\.0\.0\.1\:[0-9]*/]
     config.eager_load_paths += %W(#{config.root}/app/models/public)
     config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s

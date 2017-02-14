@@ -240,22 +240,49 @@ Find out more about Channels in the Authorization Policies guide.
 
 **Note that any Operation that has a downlink regulation will return true (wrapped in a promise) if dispatched from the server, and false otherwise.**
 
-### Serialize and Deserialize
+### Serialization
 
-By default incoming parameters and outgoing results will be serialized and deserialized using the objects `to_json` method, and `JSON.parse`. You can override this by defining `serializer` and `deserializer` methods:
+If you need to control serialization and deserialization you can define the following *class* methods:
 
 ```ruby
-class Announcement < HyperOperation
-  param :message
-  param :duration
-  param to: nil, type: user
+def self.serialize_params(hash)
+  # receives param_name -> value pairs
+  # return an object ready for to_json
+  # default is just return the input hash
+end
 
-  def serializer(serializing, value)
-    return super unless serializing.user?
-    value.full_name
-  end
+def self.deserialize_params(object)
+  # recieves whatever was returned from serialize_to_server
+  # (param_name => value pairs by default)
+  # must return a hash of param_name => value pairs
+  # by default this returns object
+end
+
+def self.serialize_response(object)
+  # receives the object ready for to_json
+  # by default this returns object
+end
+
+def self.deserialize_response(object)
+  # receives whatever was returned from serialize_response
+  # by default this returns object
+end
+
+def self.serialize_dispatch(hash)
+  # input is always key - value pairs
+  # return an object ready for to_json
+  # default is just return the input hash
+end
+
+def self.deserialize_dispatch(object)
+  # recieves whatever was returned from serialize_to_server
+  # (param_name => value pairs by default)
+  # must return a hash of param_name => value pairs
+  # by default this returns object
 end
 ```
+
+
 
 The value of the first parameter (`serializing` above) is a symbol with additional methods corresponding to each of the parameter names (i.e. `message?`, `duration?` and `to?`) plus `exception?` and `result?`
 
@@ -330,6 +357,22 @@ class GetRandomGithubUser < HyperOperation
       end
     end if @promise.nil? || @promise.resolved?
     @promise.then { execute }
+  end
+end
+```
+
+Before the class `execute` method is called an instance of the class is created to hold the current parameter values, dispatcher, etc.  If the class `execute` method accepts a parameter, this object will be sent in, and can be used.
+
+```ruby
+class Interesting < HyperOperation
+  param :increment
+  param :multiply
+  outbound :result
+  outbound :total
+  def self.execute(op)
+    @total ||= 0
+    @total += (op.params.result = op.params.increment * op.params.multiply)
+    op.dispatch {total: @total}
   end
 end
 ```

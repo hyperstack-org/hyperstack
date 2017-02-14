@@ -20,11 +20,24 @@ class HyperOperation
 
     class << self
 
-      def process_params(args)
-        raw_inputs = args.inject({}.with_indifferent_access) do |h, arg|
+      def keys_klass
+        @keys_klass ||= begin
+          keys = (hash_filter.optional_keys + hash_filter.required_keys)
+          Class.new(String) do
+            keys.each { |key| define_method(:"#{key}?") { self == key } }
+          end
+        end
+      end
+
+      def combine_arg_array(args)
+        hash = args.inject({}.with_indifferent_access) do |h, arg|
           raise ArgumentError.new("All arguments must be hashes") unless arg.is_a?(Hash)
           h.merge!(arg)
         end
+      end
+
+      def process_params(args)
+        raw_inputs = combine_arg_array(args)
         inputs, errors = hash_filter.filter(raw_inputs)
         [raw_inputs, new(inputs), errors]
       end
