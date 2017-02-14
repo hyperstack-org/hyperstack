@@ -41,11 +41,15 @@ module HyperStore
       def add_readers(klass, name, opts)
         return unless opts[:reader]
 
-        if opts[:scope] == :instance
-          klass.define_method(:"#{opts[:reader]}") do
-            state.send(:"#{name}")
+        if [:instance, :shared].include?(opts[:scope])
+          klass.class_eval do
+            define_method(:"#{opts[:reader]}") do
+              state.send(:"#{name}")
+            end
           end
-        else
+        end
+
+        if [:class, :shared].include?(opts[:scope])
           klass.define_singleton_method(:"#{opts[:reader]}") do
             state.send(:"#{name}")
           end
@@ -56,7 +60,7 @@ module HyperStore
         return if opts[:scope] == :shared
 
         [@shared_state_wrapper, @shared_mutator_wrapper].each do |klass|
-          klass.define_method(:"#{name}") do |*args, &block|
+          klass.define_singleton_method(:"#{name}") do
             'nope!'
           end
         end
@@ -64,9 +68,7 @@ module HyperStore
 
       def add_methods(klass, name, opts)
         instance_variable_get("@#{opts[:scope]}_state_wrapper").add_method(klass, name, opts)
-
-        instance_variable_get("@#{opts[:scope]}_mutator_wrapper")
-          .add_method(klass, name, opts)
+        instance_variable_get("@#{opts[:scope]}_mutator_wrapper").add_method(klass, name, opts)
       end
 
       def add_method(klass, method_name, opts = {})

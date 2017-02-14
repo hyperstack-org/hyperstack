@@ -2,6 +2,7 @@ require 'hyper-react'
 
 require 'hyper-store/base'
 require 'hyper-store/class_methods'
+require 'hyper-store/dispatch_receiver'
 require 'hyper-store/hyper_store'
 require 'hyper-store/instance_methods'
 require 'hyper-store/mutator_wrapper'

@@ -1,10 +1,9 @@
-require_relative 'boot'
-
-require 'rails/all'
+require "rails/all"
+require File.expand_path('../boot', __FILE__)
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
-Bundler.require(*Rails.groups)
+Bundler.require(*Rails.groups(assets: %w(development test)))
 
 require 'opal-rails'
 require 'hyper-react'

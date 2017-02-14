@@ -19,17 +19,31 @@ module HyperStore
           end
         end
 
-        if [:class, :shared].include?(opts[:scope]) && opts[:initialize] || opts[:block]
+        if [:class, :shared].include?(opts[:scope]) && (opts[:initialize] || opts[:block])
           initialize_values(klass, method_name, opts)
         end
       end
 
       def initialize_values(klass, name, opts)
-        # First initialize value from initialize Proc
-        klass.mutate.send(:"#{name}", opts[:initialize].call(klass))
+        initializer =
+          if opts[:initialize] && opts[:initialize].parameters && opts[:initialize].parameters.any?
+            -> { klass.mutate.send(:"#{name}", opts[:initialize].call(klass)) }
+          else
+            -> { klass.mutate.send(:"#{name}", opts[:initialize].call) }
+          end
 
-        # Then call the block if a block is passed
-        klass.instance_eval(&opts[:block]) if opts[:block]
+        # First initialize value from initialize Proc
+        if initializer && opts[:block]
+          klass.receives(HyperLoop::Boot, initializer) do
+            klass.mutate.send(:"#{name}", opts[:block].call)
+          end
+        elsif initializer
+          klass.receives(HyperLoop::Boot, initializer)
+        elsif opts[:block]
+          klass.receives(HyperLoop::Boot) do
+            klass.mutate.send(:"#{name}", opts[:block].call)
+          end
+        end
       end
     end
 

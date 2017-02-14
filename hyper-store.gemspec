@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'opal'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-rails'
+  spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'rails'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'react-rails', '< 1.10.0'

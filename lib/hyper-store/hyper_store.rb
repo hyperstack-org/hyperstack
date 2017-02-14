@@ -3,6 +3,7 @@ module HyperStore
     def included(base)
       base.include(InstanceMethods)
       base.extend(ClassMethods)
+      base.extend(DispatchReceiver)
 
       base.singleton_class.define_singleton_method(:__state_wrapper) do
         @__state_wrapper ||= Class.new(StateWrapper)

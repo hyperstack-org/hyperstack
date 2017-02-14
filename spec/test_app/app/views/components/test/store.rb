@@ -1,0 +1,12 @@
+module Test
+  class Store < HyperStore::Base
+    class << self
+      state singleton_klass: 'SC', reader: true
+      state singleton_instance: 'SI', scope: :instance, reader: true
+      state singleton_shared: 'SS', scope: :shared, reader: true
+    end
+    state class_class: 'CC', scope: :class, reader: true
+    state class_instance: 'CI', reader: true
+    state class_shared: 'CS', scope: :shared, reader: true
+  end
+end
