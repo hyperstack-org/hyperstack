@@ -4,11 +4,6 @@ module Test
       @store = Store.new
     end
 
-    after_mount do
-      # Mock HyperLoop::Boot Operation
-      after(0) { HyperLoop::Boot.dispatch }
-    end
-
     render(DIV) do
       TABLE do
         THEAD do
@@ -25,12 +20,14 @@ module Test
             TD(id: :scc) { Store.state.class_class }
             TD(id: :sci) { @store.state.class_instance }
             TD(id: :scs) { @store.state.class_shared }
+            TD(id: :scsf) { @store.state.instance_foo }
           end
           TR do
             TH { 'Singleton' }
             TD(id: :ssc) { Store.state.singleton_klass }
             TD(id: :ssi) { @store.state.singleton_instance }
             TD(id: :sss) { Store.state.singleton_shared }
+            TD(id: :sssf) { Store.state.class_foo }
           end
           TR do
             TH { 'Mutate Class' }

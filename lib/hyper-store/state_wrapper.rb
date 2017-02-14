@@ -43,16 +43,12 @@ module HyperStore
 
         if [:instance, :shared].include?(opts[:scope])
           klass.class_eval do
-            define_method(:"#{opts[:reader]}") do
-              state.send(:"#{name}")
-            end
+            define_method(:"#{opts[:reader]}") { state.send(:"#{name}") }
           end
         end
 
         if [:class, :shared].include?(opts[:scope])
-          klass.define_singleton_method(:"#{opts[:reader]}") do
-            state.send(:"#{name}")
-          end
+          klass.define_singleton_method(:"#{opts[:reader]}") { state.send(:"#{name}") }
         end
       end
 
@@ -82,7 +78,7 @@ module HyperStore
         return unless opts[:scope] == :shared
 
         wrappers.each do |wrapper|
-          wrapper.remove_method(:"#{name}") if wrapper.respond_to?(:"#{name}")
+          wrapper.send(:remove_method, :"#{name}") if wrapper.respond_to?(:"#{name}")
         end
       end
 

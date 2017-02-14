@@ -59,327 +59,856 @@ describe 'StateWrapper' do
   end
 
   context 'macros' do
-    after(:each) do
-      # There's gotta be a better way to deal with this
-      Object.send(:remove_const, :Foo)
-
-      # We're very basically mocking React::State so we can run these outside of Opal
-      React::State.reset!
-    end
-
     context 'state' do
-      context 'with an initial value' do
-        context 'declared in the class level' do
-          context 'for shared states' do
-            it 'can be declared as the value of the name key in the hash' do
-              class Foo < HyperStore::Base
-                state bar: 'a state value', scope: :shared
-              end
-              HyperLoop::Boot.dispatch
-              foo = Foo.new
+      context 'component test', js: true do
+        context 'with an initial value' do
+          context 'declared in the class level' do
+            context 'for shared states' do
+              it 'can be declared as the value of the name key in the hash' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state bar: 'a state value', scope: :shared
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
 
-              expect(Foo.state.bar).to eq('a state value')
-              expect(foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with \'initialize: Symbol\'' do
-              class Foo < HyperStore::Base
-                state :bar, scope: :shared, initialize: :baz
-
-                def self.baz
-                  'a state value'
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
                 end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
               end
 
-              HyperLoop::Boot.dispatch
-              foo = Foo.new
+              it 'can be declared with \'initializer: Symbol\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, scope: :shared, initializer: :baz
 
-              expect(Foo.state.bar).to eq(Foo.baz)
-              expect(foo.state.bar).to eq(Foo.baz)
-            end
+                    def self.baz
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
 
-            it 'can be declared with \'initialize: Proc\'' do
-              class Foo < HyperStore::Base
-                state :bar, scope: :shared, initialize: -> { 'a state value' }
-              end
-              foo = Foo.new
-              HyperLoop::Boot.dispatch
-
-              expect(Foo.state.bar).to eq('a state value')
-              expect(foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with a block' do
-              class Foo < HyperStore::Base
-                state :bar, scope: :shared do
-                  'a state value'
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
                 end
-              end
-              foo = Foo.new
-              HyperLoop::Boot.dispatch
 
-              expect(Foo.state.bar).to eq('a state value')
-              expect(foo.state.bar).to eq('a state value')
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, scope: :shared, initializer: -> { 'a state value' }
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with a block' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, scope: :shared do
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+            end
+
+            context 'for class states' do
+              it 'can be declared as the value of the name key in the hash' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state bar: 'a state value', scope: :class
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Symbol\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, scope: :class, initializer: :baz
+
+                    def self.baz
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, scope: :class, initializer: -> { 'a state value' }
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+
+              it 'can be declared with a block' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, scope: :class do
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+            end
+
+            context 'for instance states' do
+              it 'can be declared as the value of the name key in the hash' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state bar: 'a state value'
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Symbol\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, initializer: :baz
+
+                    def baz
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar, initializer: -> { 'a state value' }
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with a block' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    state :bar do
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
             end
           end
 
-          context 'for class states' do
-            it 'can be declared as the value of the name key in the hash' do
-              class Foo < HyperStore::Base
-                state bar: 'a state value', scope: :class
-              end
-              HyperLoop::Boot.dispatch
+          context 'declared in the singleton class level' do
+            context 'for shared states' do
+              it 'can be declared as the value of the name key in the hash' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state bar: 'a state value', scope: :shared
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
 
-              expect(Foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with \'initialize: Symbol\'' do
-              class Foo < HyperStore::Base
-                state :bar, scope: :class, initialize: :baz
-
-                def self.baz
-                  'a state value'
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
                 end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
               end
-              HyperLoop::Boot.dispatch
 
-              expect(Foo.state.bar).to eq(Foo.baz)
-            end
+              it 'can be declared with \'initializer: Symbol\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, scope: :shared, initializer: :baz
 
-            it 'can be declared with \'initialize: Proc\'' do
-              class Foo < HyperStore::Base
-                state :bar, scope: :class, initialize: -> { 'a state value' }
-              end
-              HyperLoop::Boot.dispatch
+                      def baz
+                        'a state value'
+                      end
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
 
-              expect(Foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with a block' do
-              class Foo < HyperStore::Base
-                state :bar, scope: :class do
-                  'a state value'
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
                 end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
               end
-              HyperLoop::Boot.dispatch
 
-              expect(Foo.state.bar).to eq('a state value')
-            end
-          end
+              it 'can be declared with \'initializer: Proc\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, scope: :shared, initializer: -> { 'a state value' }
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
 
-          context 'for instance states' do
-            it 'can be declared as the value of the name key in the hash' do
-              class Foo < HyperStore::Base
-                state bar: 'a state value'
-              end
-              foo = Foo.new
-
-              expect(foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with \'initialize: Symbol\'' do
-              class Foo < HyperStore::Base
-                state :bar, initialize: :baz
-
-                def baz
-                  'a state value'
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
                 end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
               end
-              foo = Foo.new
 
-              expect(foo.state.bar).to eq(foo.baz)
-            end
+              it 'can be declared with a block' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, scope: :shared do
+                        'a state value'
+                      end
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
 
-            it 'can be declared with \'initialize: Proc\'' do
-              class Foo < HyperStore::Base
-                state :bar, initialize: -> { 'a state value' }
-              end
-              foo = Foo.new
-
-              expect(foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with a block' do
-              class Foo < HyperStore::Base
-                state :bar do
-                  'a state value'
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
                 end
-              end
-              foo = Foo.new
 
-              expect(foo.state.bar).to eq('a state value')
+                expect(page).to have_content('Foo.state.bar: a state value')
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+            end
+
+            context 'for class states' do
+              it 'can be declared as the value of the name key in the hash' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state bar: 'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Symbol\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, initializer: :baz
+
+                      def baz
+                        'a state value'
+                      end
+                    end
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, initializer: -> { 'a state value' }
+                    end
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+
+              it 'can be declared with a block' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar do
+                        'a state value'
+                      end
+                    end
+                  end
+                  class App < React::Component::Base
+                    render(DIV) do
+                      H1 { "Foo.state.bar: #{Foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('Foo.state.bar: a state value')
+              end
+            end
+
+            context 'for instance states' do
+              it 'can be declared as the value of the name key in the hash' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state bar: 'a state value', scope: :instance
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Symbol\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, scope: :instance, initializer: :baz
+                    end
+
+                    def baz
+                      'a state value'
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, scope: :instance, initializer: -> { 'a state value' }
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
+
+              it 'can be declared with a block' do
+                mount 'App' do
+                  class Foo < HyperStore::Base
+                    class << self
+                      state :bar, scope: :instance do
+                        'a state value'
+                      end
+                    end
+                  end
+                  class App < React::Component::Base
+                    before_mount do
+                      @foo = Foo.new
+                    end
+
+                    render(DIV) do
+                      H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    end
+                  end
+                end
+
+                expect(page).to have_content('@foo.state.bar: a state value')
+              end
             end
           end
         end
+      end
+      context 'unit test' do
+        after(:each) do
+          # There's gotta be a better way to deal with this
+          Object.send(:remove_const, :Foo)
 
-        context 'declared in the singleton class level' do
-          context 'for shared states' do
-            it 'can be declared as the value of the name key in the hash' do
-              class Foo < HyperStore::Base
-                class << self
+          # We're very basically mocking React::State so we can run these outside of Opal
+          React::State.reset!
+        end
+
+        context 'with an initial value' do
+          context 'declared in the class level' do
+            context 'for shared states' do
+              it 'can be declared as the value of the name key in the hash' do
+                class Foo < HyperStore::Base
                   state bar: 'a state value', scope: :shared
                 end
+                HyperLoop::Boot.dispatch
+                foo = Foo.new
+
+                expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
               end
-              HyperLoop::Boot.dispatch
-              foo = Foo.new
 
-              expect(Foo.state.bar).to eq('a state value')
-              expect(foo.state.bar).to eq('a state value')
-            end
+              it 'can be declared with \'initializer: Symbol\'' do
+                class Foo < HyperStore::Base
+                  state :bar, scope: :shared, initializer: :baz
 
-            it 'can be declared with \'initialize: Symbol\'' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, scope: :shared, initialize: :baz
-
-                  def baz
+                  def self.baz
                     'a state value'
                   end
                 end
+
+                HyperLoop::Boot.dispatch
+                foo = Foo.new
+
+                expect(Foo.state.bar).to eq(Foo.baz)
+                expect(foo.state.bar).to eq(Foo.baz)
               end
-              HyperLoop::Boot.dispatch
-              foo = Foo.new
 
-              expect(Foo.state.bar).to eq(Foo.baz)
-              expect(foo.state.bar).to eq(Foo.baz)
-            end
-
-            it 'can be declared with \'initialize: Proc\'' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, scope: :shared, initialize: -> { 'a state value' }
+              it 'can be declared with \'initializer: Proc\'' do
+                class Foo < HyperStore::Base
+                  state :bar, scope: :shared, initializer: -> { 'a state value' }
                 end
+                foo = Foo.new
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
               end
-              HyperLoop::Boot.dispatch
-              foo = Foo.new
 
-              expect(Foo.state.bar).to eq('a state value')
-              expect(foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with a block' do
-              class Foo < HyperStore::Base
-                class << self
+              it 'can be declared with a block' do
+                class Foo < HyperStore::Base
                   state :bar, scope: :shared do
                     'a state value'
                   end
                 end
+                foo = Foo.new
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
               end
-              HyperLoop::Boot.dispatch
-              foo = Foo.new
-
-              expect(Foo.state.bar).to eq('a state value')
-              expect(foo.state.bar).to eq('a state value')
             end
-          end
 
-          context 'for class states' do
-            it 'can be declared as the value of the name key in the hash' do
-              class Foo < HyperStore::Base
-                class << self
+            context 'for class states' do
+              it 'can be declared as the value of the name key in the hash' do
+                class Foo < HyperStore::Base
+                  state bar: 'a state value', scope: :class
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+              end
+
+              it 'can be declared with \'initializer: Symbol\'' do
+                class Foo < HyperStore::Base
+                  state :bar, scope: :class, initializer: :baz
+
+                  def self.baz
+                    'a state value'
+                  end
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq(Foo.baz)
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                class Foo < HyperStore::Base
+                  state :bar, scope: :class, initializer: -> { 'a state value' }
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+              end
+
+              it 'can be declared with a block' do
+                class Foo < HyperStore::Base
+                  state :bar, scope: :class do
+                    'a state value'
+                  end
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+              end
+            end
+
+            context 'for instance states' do
+              it 'can be declared as the value of the name key in the hash' do
+                class Foo < HyperStore::Base
                   state bar: 'a state value'
                 end
+                foo = Foo.new
+
+                expect(foo.state.bar).to eq('a state value')
               end
-              HyperLoop::Boot.dispatch
 
-              expect(Foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with \'initialize: Symbol\'' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, initialize: :baz
+              it 'can be declared with \'initializer: Symbol\'' do
+                class Foo < HyperStore::Base
+                  state :bar, initializer: :baz
 
                   def baz
                     'a state value'
                   end
                 end
+                foo = Foo.new
+
+                expect(foo.state.bar).to eq(foo.baz)
               end
-              HyperLoop::Boot.dispatch
 
-              expect(Foo.state.bar).to eq(Foo.baz)
-            end
-
-            it 'can be declared with \'initialize: Proc\'' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, initialize: -> { 'a state value' }
+              it 'can be declared with \'initializer: Proc\'' do
+                class Foo < HyperStore::Base
+                  state :bar, initializer: -> { 'a state value' }
                 end
+                foo = Foo.new
+
+                expect(foo.state.bar).to eq('a state value')
               end
-              HyperLoop::Boot.dispatch
 
-              expect(Foo.state.bar).to eq('a state value')
-            end
-
-            it 'can be declared with a block' do
-              class Foo < HyperStore::Base
-                class << self
+              it 'can be declared with a block' do
+                class Foo < HyperStore::Base
                   state :bar do
                     'a state value'
                   end
                 end
-              end
-              HyperLoop::Boot.dispatch
+                foo = Foo.new
 
-              expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
+              end
             end
           end
 
-          context 'for instance states' do
-            it 'can be declared as the value of the name key in the hash' do
-              class Foo < HyperStore::Base
-                class << self
-                  state bar: 'a state value', scope: :instance
+          context 'declared in the singleton class level' do
+            context 'for shared states' do
+              it 'can be declared as the value of the name key in the hash' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state bar: 'a state value', scope: :shared
+                  end
                 end
-              end
-              foo = Foo.new
+                HyperLoop::Boot.dispatch
+                foo = Foo.new
 
-              expect(foo.state.bar).to eq('a state value')
+                expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
+              end
+
+              it 'can be declared with \'initializer: Symbol\'' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, scope: :shared, initializer: :baz
+
+                    def baz
+                      'a state value'
+                    end
+                  end
+                end
+                HyperLoop::Boot.dispatch
+                foo = Foo.new
+
+                expect(Foo.state.bar).to eq(Foo.baz)
+                expect(foo.state.bar).to eq(Foo.baz)
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, scope: :shared, initializer: -> { 'a state value' }
+                  end
+                end
+                HyperLoop::Boot.dispatch
+                foo = Foo.new
+
+                expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
+              end
+
+              it 'can be declared with a block' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, scope: :shared do
+                      'a state value'
+                    end
+                  end
+                end
+                HyperLoop::Boot.dispatch
+                foo = Foo.new
+
+                expect(Foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq('a state value')
+              end
             end
 
-            it 'can be declared with \'initialize: Symbol\'' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, scope: :instance, initialize: :baz
+            context 'for class states' do
+              it 'can be declared as the value of the name key in the hash' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state bar: 'a state value'
+                  end
                 end
+                HyperLoop::Boot.dispatch
 
-                def baz
-                  'a state value'
-                end
+                expect(Foo.state.bar).to eq('a state value')
               end
-              foo = Foo.new
 
-              expect(foo.state.bar).to eq(foo.baz)
+              it 'can be declared with \'initializer: Symbol\'' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, initializer: :baz
+
+                    def baz
+                      'a state value'
+                    end
+                  end
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq(Foo.baz)
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, initializer: -> { 'a state value' }
+                  end
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+              end
+
+              it 'can be declared with a block' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar do
+                      'a state value'
+                    end
+                  end
+                end
+                HyperLoop::Boot.dispatch
+
+                expect(Foo.state.bar).to eq('a state value')
+              end
             end
 
-            it 'can be declared with \'initialize: Proc\'' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, scope: :instance, initialize: -> { 'a state value' }
+            context 'for instance states' do
+              it 'can be declared as the value of the name key in the hash' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state bar: 'a state value', scope: :instance
+                  end
                 end
+                foo = Foo.new
+
+                expect(foo.state.bar).to eq('a state value')
               end
-              foo = Foo.new
 
-              expect(foo.state.bar).to eq('a state value')
-            end
+              it 'can be declared with \'initializer: Symbol\'' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, scope: :instance, initializer: :baz
+                  end
 
-            it 'can be declared with a block' do
-              class Foo < HyperStore::Base
-                class << self
-                  state :bar, scope: :instance do
+                  def baz
                     'a state value'
                   end
                 end
-              end
-              foo = Foo.new
+                foo = Foo.new
 
-              expect(foo.state.bar).to eq('a state value')
+                expect(foo.state.bar).to eq(foo.baz)
+              end
+
+              it 'can be declared with \'initializer: Proc\'' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, scope: :instance, initializer: -> { 'a state value' }
+                  end
+                end
+                foo = Foo.new
+
+                expect(foo.state.bar).to eq('a state value')
+              end
+
+              it 'can be declared with a block' do
+                class Foo < HyperStore::Base
+                  class << self
+                    state :bar, scope: :instance do
+                      'a state value'
+                    end
+                  end
+                end
+                foo = Foo.new
+
+                expect(foo.state.bar).to eq('a state value')
+              end
             end
           end
         end
       end
 
       context 'arguments' do
+        after(:each) do
+          # There's gotta be a better way to deal with this
+          Object.send(:remove_const, :Foo)
+
+          # We're very basically mocking React::State so we can run these outside of Opal
+          React::State.reset!
+        end
+
         context 'name' do
           it 'can be passed in as a single argument first' do
             class Foo < HyperStore::Base
@@ -406,6 +935,7 @@ describe 'StateWrapper' do
               .to raise_error(HyperStore::StateWrapper::ArgumentValidator::InvalidOptionError)
           end
         end
+
         context 'reader' do
           context 'declared in the class level' do
             context 'for shared states' do

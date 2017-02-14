@@ -33,6 +33,11 @@ end
 
 module HyperLoop
   class Boot < HyperOperation
+    include React::IsomorphicHelpers
+
+    before_first_mount do
+      dispatch
+    end
   end
 end
 

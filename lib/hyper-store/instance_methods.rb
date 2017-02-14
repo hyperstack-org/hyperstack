@@ -2,23 +2,14 @@ module HyperStore
   module InstanceMethods
     def initialize
       self.class.__instance_states.each do |instance_state|
+        # If the scope is shared then we initialize at the class level
         next if instance_state[1][:scope] == :shared
+
         # TODO: Figure out exactly how we're going to handle passing in procs and blocks together
-        # But for now...
+        # But for now...just do the proc first then the block
 
-        # First initialize value from initialize Proc
-
-        # If the initialize argument was passed in as a symbol,
-        # we need to pass in the instance to the proc
-        # Otherwise we do not pass in anything
-        proc_value =
-          if instance_state[1][:initialize].parameters &&
-             instance_state[1][:initialize].parameters.any?
-            instance_state[1][:initialize].call(self)
-          else
-            instance_state[1][:initialize].call
-          end
-
+        # First initialize value from initializer Proc
+        proc_value = initializer_value(instance_state[1][:initializer])
         mutate.send(:"#{instance_state[0]}", proc_value)
 
         # Then call the block if a block is passed
@@ -37,6 +28,14 @@ module HyperStore
 
     def mutate
       @mutate ||= self.class.singleton_class.__state_wrapper.instance_mutator_wrapper.new(self)
+    end
+
+    private
+
+    def initializer_value(initializer)
+      # We gotta check the arity because a Proc passed in directly from initializer has no args,
+      # but if we created one then we might have wanted self
+      initializer.arity > 0 ? initializer.call(self) : initializer.call
     end
   end
 end

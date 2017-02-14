@@ -19,20 +19,14 @@ module HyperStore
           end
         end
 
-        if [:class, :shared].include?(opts[:scope]) && (opts[:initialize] || opts[:block])
+        if [:class, :shared].include?(opts[:scope]) && (opts[:initializer] || opts[:block])
           initialize_values(klass, method_name, opts)
         end
       end
 
       def initialize_values(klass, name, opts)
-        initializer =
-          if opts[:initialize] && opts[:initialize].parameters && opts[:initialize].parameters.any?
-            -> { klass.mutate.send(:"#{name}", opts[:initialize].call(klass)) }
-          else
-            -> { klass.mutate.send(:"#{name}", opts[:initialize].call) }
-          end
+        initializer = initializer_proc(opts[:initializer], klass, name) if opts[:initializer]
 
-        # First initialize value from initialize Proc
         if initializer && opts[:block]
           klass.receives(HyperLoop::Boot, initializer) do
             klass.mutate.send(:"#{name}", opts[:block].call)
@@ -40,9 +34,19 @@ module HyperStore
         elsif initializer
           klass.receives(HyperLoop::Boot, initializer)
         elsif opts[:block]
-          klass.receives(HyperLoop::Boot) do
-            klass.mutate.send(:"#{name}", opts[:block].call)
-          end
+          klass.receives(HyperLoop::Boot) { klass.mutate.send(:"#{name}", opts[:block].call) }
+        end
+      end
+
+      private
+
+      def initializer_proc(initializer, klass, name)
+        # We gotta check the arity because a Proc passed in directly from initializer has no args,
+        # but if we created one then we might have wanted the class
+        if initializer.arity > 0
+          -> { klass.mutate.send(:"#{name}", initializer.call(klass)) }
+        else
+          -> { klass.mutate.send(:"#{name}", initializer.call) }
         end
       end
     end
