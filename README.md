@@ -48,6 +48,13 @@ You can simply include `React::Component` to get the power of a complete DSL to 
 As events occur, components update their state, which causes them to rerender, and perhaps pass new parameters to lower level components, thus causing them to rerender.
 
 ```ruby
+require 'opal'
+require 'browser/interval'
+require 'opal-jquery'
+require 'react/react-source'
+require 'hyper-react'
+require 'react/top_level_render'
+
 class HelloWorld < React::Component::Base
   param :time, type: Time
   render do
