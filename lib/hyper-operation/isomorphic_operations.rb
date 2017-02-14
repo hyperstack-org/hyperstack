@@ -4,10 +4,6 @@ class HyperOperation
       @uplink_regulation = block || proc { true }
     end
 
-    def uplink?
-      @uplink_regulation && RUBY_ENGINE == 'opal'
-    end
-
     def run_on_server(args)
       hash = _params_wrapper.combine_arg_array(args)
       hash = serialize_params(hash)
@@ -20,7 +16,6 @@ class HyperOperation
         deserialize_response response.json[:response]
       end.fail do |response|
         Exception.new response.json[:error]
-        #Promise.new.reject Exception.new(response.json)
       end
     end
 

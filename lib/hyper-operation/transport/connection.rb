@@ -118,7 +118,7 @@ module Hyperloop
 
       def send_to_channel(channel, data)
         pending_for(channel).each do |connection|
-          QueuedMessage.create(data: data, synchromesh_connection: connection)
+          QueuedMessage.create(data: data, hyperloop_connection: connection)
         end
         transport.send(channel, data) if exists?(channel: channel, session: nil)
       end

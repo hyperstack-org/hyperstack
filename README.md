@@ -238,6 +238,7 @@ Find out more about Channels in the Authorization Policies guide.
 
 **Note that any Operation that has a downlink regulation will *always* run on the client.**
 
+WHY IS THE BELOW TRUE? OR NEEDED? 
 **Note that any Operation that has a downlink regulation will return true (wrapped in a promise) if dispatched from the server, and false otherwise.**
 
 ### Serialization
@@ -345,7 +346,7 @@ Or if you prefer a more procedural approach:
 
 Normally the execute method is declared, and runs as an instance method.  An instance of the Operation is created, runs and is thrown away.  
 
-Sometimes it's useful to declare `execute` as a class method.  In this case all dispatches of the Operation will be run with the same class instance variables.  This is useful especially for caching values, between calls to the Operation.  Note that the primary use should be in interfacing to outside APIs.  Don't hide your application state inside an Operation - Move it to a Store.
+Sometimes it's useful to declare `execute` as a class method.  This is useful especially for caching values, between calls to the Operation.  Note that the primary use should be in interfacing to outside APIs.  Don't hide your application state inside an Operation - Move it to a Store.
 
 ```ruby
 class GetRandomGithubUser < HyperOperation
@@ -361,7 +362,7 @@ class GetRandomGithubUser < HyperOperation
 end
 ```
 
-Before the class `execute` method is called an instance of the class is created to hold the current parameter values, dispatcher, etc.  If the class `execute` method accepts a parameter, this object will be sent in, and can be used.
+Before the class `execute` method is called an instance of the operation is created to hold the current parameter values, dispatcher, etc.  If the class `execute` method accepts a parameter, this object will be sent in, and can be used.
 
 ```ruby
 class Interesting < HyperOperation

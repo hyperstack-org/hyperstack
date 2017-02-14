@@ -40,5 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-react'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'sqlite3', '1.3.10'
+  spec.add_development_dependency 'database_cleaner'
+
 
 end
