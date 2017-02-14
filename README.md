@@ -1,4 +1,5 @@
-## HyperStore
+[ ![Codeship Status for ruby-hyperloop/hyper-store](https://app.codeship.com/projects/4454c560-d4ea-0134-7c96-362b4886dd22/status?branch=master)](https://app.codeship.com/projects/202301)
+## HyperStore 
 
 + `HyperStore` can be mixed to to any class to turn it into a Flux Store
 + You can also create Stores by subclassing `HyperStore::Base`
