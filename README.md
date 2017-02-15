@@ -234,11 +234,39 @@ class Announcement < HyperOperation
 end
 ```
 
+
+
+    class AdminUserPolicy
+      # channel
+      regulate_dispatches_from(Operation1, Operation2, Operation3) &block
+        Operation1.regulate_dispatch { AdminUser if &block.call }
+      always_dispatch_from(....)
+        Operation1.regulate_dispatch(AdminUser)
+    end
+
+    class Operation1Policy
+      always_allow_connection
+        always_allow_connection + Operation1.regulate_dispatch(Operation1)
+      regulate_class_connection &block # now we have a channel connected to the operation ... that is cool
+        regulate_class_connection &block + Operation1.regulate_dispatch(Operation1)
+      regulate_dispatch(list of channel classes) { returns 1 or more channels }
+    end
+
+
+regulate_dispatch <- applied directly to an Operation
+regulate_dispatches_from
+always_dispatch_from
+
++ the application, or some function within the application
++ or some class which is *authenticated* like a User or Administrator,
++ instances of those classes,
++ or instances of related classes.
+
 Find out more about Channels in the Authorization Policies guide.
 
 **Note that any Operation that has a downlink regulation will *always* run on the client.**
 
-WHY IS THE BELOW TRUE? OR NEEDED? 
+WHY IS THE BELOW TRUE? OR NEEDED?
 **Note that any Operation that has a downlink regulation will return true (wrapped in a promise) if dispatched from the server, and false otherwise.**
 
 ### Serialization

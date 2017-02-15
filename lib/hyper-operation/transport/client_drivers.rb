@@ -75,8 +75,7 @@ module Hyperloop
     include React::IsomorphicHelpers
 
     def self.sync_dispatch(data)
-      # get the operation class pointed to by data
-      # call it with the data object (We will add a method like dispatch_remote(string))
+      data[:operation].constantize.dispatch_from_server(data[:params])
     end
 
     # save the configuration info needed in window.HyperloopOpts

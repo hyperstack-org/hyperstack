@@ -142,6 +142,14 @@ module Hyperloop
     )
   end
 
+  def self.dispatch(channel, data)
+    if !Hyperloop.on_server? && Connection.root_path
+      Hyperloop.send_to_server(channel, [:dispatch, data])
+    else
+      Connection.send_to_channel(channel, [:dispatch, data])
+    end
+  end
+
   def self.after_commit(operation, model)
     InternalPolicy.regulate_broadcast(model) do |data|
       if !Hyperloop.on_server? && Connection.root_path

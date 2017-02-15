@@ -8,8 +8,9 @@ module Hyperloop
 
     EXPOSED_METHODS = [
       :regulate_class_connection, :always_allow_connection, :regulate_instance_connections,
-      :regulate_all_broadcasts, :regulate_broadcast, :allow_change, :allow_create, :allow_read,
-      :allow_update, :allow_destroy
+      :regulate_all_broadcasts, :regulate_broadcast,
+      :regulate_dispatch, :regulate_dispatches_from, :always_dispatch_from,
+      :allow_change, :allow_create, :allow_read, :allow_update, :allow_destroy
     ]
 
     def regulate_class_connection(*args, &regulation)
@@ -32,6 +33,25 @@ module Hyperloop
       regulate(InstanceBroadcastRegulation, :broadcast, args, &regulation)
     end
 
+    def regulate_dispatches_from(*args, &regulation)
+      args.each do |klass|
+        unless klass.respond_to? :regulate_dispatch
+          raise 'you can only regulate_dispatches_from Operation classes'
+        end
+        klass.regulate_dispatch { regulated_klass if regulation.call }
+      end
+    end
+
+    def always_dispatch_from(*args, &regulation)
+      regulate_dispatches_from(*args) { true }
+    end
+
+    def regulate_dispatch(*args, &regulation)
+      unless regulated_klass.respond_to? :regulate_dispatch
+        raise 'you can only regulate_dispatch on Operation classes'
+      end
+      regulated_klass.regulate_dispatch(*args, &regulation)
+    end
 
     CHANGE_POLICIES = [:create, :update, :destroy]
 
@@ -175,6 +195,11 @@ module Hyperloop
   end
 
   class ClassConnectionRegulation < Regulation
+
+    def self.add_regulation(klass, opts={}, &regulation)
+      klass.regulate_dispatch(klass) rescue nil # TODO check into why / how klass.respond_to? :regulate_dispatch possibly works here on simple classes!
+      super
+    end
 
     def connectable?(acting_user)
       regulate_for(acting_user).all? unless regulations.empty? rescue nil
