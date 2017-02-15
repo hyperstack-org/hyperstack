@@ -12,7 +12,7 @@ class HyperOperation
 
   def dispatch(*hashes)
     self.class.receivers.each do |receiver|
-      receiver.call self.class._params_wrapper.dispatch_params(params, hashes)
+      receiver.call self.class._params_wrapper.dispatch_params(params, hashes), self
     end
   end
 end

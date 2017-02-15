@@ -6,6 +6,8 @@ module Hyperloop
       @regulated_klass = regulated_klass
     end
 
+    attr_reader :regulated_klass
+
     EXPOSED_METHODS = [
       :regulate_class_connection, :always_allow_connection, :regulate_instance_connections,
       :regulate_all_broadcasts, :regulate_broadcast,
@@ -38,7 +40,7 @@ module Hyperloop
         unless klass.respond_to? :regulate_dispatch
           raise 'you can only regulate_dispatches_from Operation classes'
         end
-        klass.regulate_dispatch { regulated_klass if regulation.call }
+        klass._regulate_dispatch(self) { |sself| sself.regulated_klass if instance_eval(&regulation) }
       end
     end
 
@@ -47,10 +49,12 @@ module Hyperloop
     end
 
     def regulate_dispatch(*args, &regulation)
-      unless regulated_klass.respond_to? :regulate_dispatch
+      actual_klass = regulated_klass.is_a?(Class) ? regulated_klass : regulated_klass.constantize rescue nil
+      actual_klass.regulate_dispatch(actual_klass) if actual_klass.respond_to? :regulate_dispatch
+      unless actual_klass.respond_to? :regulate_dispatch
         raise 'you can only regulate_dispatch on Operation classes'
       end
-      regulated_klass.regulate_dispatch(*args, &regulation)
+      actual_klass.regulate_dispatch(*args, &regulation)
     end
 
     CHANGE_POLICIES = [:create, :update, :destroy]
@@ -197,7 +201,8 @@ module Hyperloop
   class ClassConnectionRegulation < Regulation
 
     def self.add_regulation(klass, opts={}, &regulation)
-      klass.regulate_dispatch(klass) rescue nil # TODO check into why / how klass.respond_to? :regulate_dispatch possibly works here on simple classes!
+      actual_klass = klass.is_a?(Class) ? klass : klass.constantize rescue nil
+      actual_klass.regulate_dispatch(actual_klass) if actual_klass.respond_to? :regulate_dispatch
       super
     end
 

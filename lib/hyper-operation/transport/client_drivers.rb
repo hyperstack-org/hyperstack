@@ -26,6 +26,11 @@ module Hyperloop
     end
 
     class IncomingBroadcast
+
+      def self.open_channels
+        @open_channels ||= Set.new
+      end
+
       def self.add_connection(channel_name, id = nil)
         channel_string = "#{channel_name}#{'-'+id.to_s if id}"
         open_channels << channel_string
@@ -188,7 +193,7 @@ module Hyperloop
     end
 
     def self.polling_path(to, id = nil)
-      s = "#{`window.HyperloopEnginePath`}/hyperloop-channel-#{to}/#{opts[:id]}"
+      s = "#{`window.HyperloopEnginePath`}/hyperloop-#{to}/#{opts[:id]}"
       s = "#{s}/#{id}" if id
       s
     end

@@ -22,7 +22,7 @@ RSpec.configure do |config|
     unless example.exception
       #Object.send(:remove_const, :Application) rescue nil
       ObjectSpace.each_object(Class).each do |klass|
-        if klass < Hyperloop::Regulation
+        if klass < Hyperloop::Regulation || klass < HyperOperation
           klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
         end
       end

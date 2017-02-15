@@ -127,6 +127,21 @@ module Hyperloop
         render json: Hyperloop::Connection.connect_to_transport(params[:channel], client_id, root_path)
       end
 
+      def execute_remote
+        render run_from_client(acting_user, JSON.parse(params[:json]).symbolize_keys)
+      end
+
+      def run_from_client(acting_user, params)
+        params[:operation].constantize.class_eval do
+          raise Hyperloop::AccessViolation unless @uplink_regulation.call(acting_user)
+          run(deserialize_params(params[:params]))
+          .then { |r| return { json: { response: serialize_response(r) } } }
+          .fail { |e| return { json: { error: e}, status: 500 } }
+        end
+      rescue Exception => e
+        { json: {error: e}, status: 500 }
+      end
+
       def console_update
         authorization = Hyperloop.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
         return head :unauthorized if authorization != params[:authorization]
@@ -142,6 +157,12 @@ module Hyperloop
 
     end unless defined? HyperloopController
 
+    match 'execute_remote',
+          to: 'hyperloop#execute_remote', via: :post
+    # match 'hyperloop-subscribe',
+    #       to: 'hyperloop#subscribe', via: :get
+    # match 'hyperloop-read/:subscriber',
+    #       to: 'hyperloop#read',      via: :get
     match 'hyperloop-subscribe/:client_id/:channel',
           to: 'hyperloop#subscribe', via: :get
     match 'hyperloop-read/:client_id',
@@ -151,7 +172,7 @@ module Hyperloop
     match 'hyperloop-action-cable-auth/:client_id/:channel_name',
           to: 'hyperloop#action_cable_auth', via: :post
     match 'hyperloop-connect-to-transport/:client_id/:channel',
-          to: 'hyperlooph#connect_to_transport', via: :get
+          to: 'hyperloop#connect_to_transport', via: :get
     match 'console',
           to: 'hyperloop#debug_console', via: :get
     match 'console_update',

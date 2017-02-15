@@ -87,7 +87,7 @@ module Hyperloop
     end
   end
 
-  def self.send(channel, data)
+  def self.send_data(channel, data)
     if !on_server?
       send_to_server(channel, data)
     elsif transport == :pusher
@@ -142,11 +142,11 @@ module Hyperloop
     )
   end
 
-  def self.dispatch(channel, data)
+  def self.dispatch(data)
     if !Hyperloop.on_server? && Connection.root_path
-      Hyperloop.send_to_server(channel, [:dispatch, data])
+      Hyperloop.send_to_server(data[:channel], [:dispatch, data])
     else
-      Connection.send_to_channel(channel, [:dispatch, data])
+      Connection.send_to_channel(data[:channel], [:dispatch, data])
     end
   end
 

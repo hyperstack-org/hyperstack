@@ -44,20 +44,22 @@ class HyperOperation
     end
 
     def regulate_dispatch(*args, &regulation)
-      if RUBY_ENGINE != 'opal'
-        if args.count == 0 && regulation.nil?
-          raise "must provide either a list of channel classes or a block to regulate_dispatch"
-        elsif args.count > 0 && regulation
-          raise "cannot provide both a list of channel classes and a block to regulate_dispatch"
-        end
-        regulation = -> () { args } if args.count > 0
-        on_dispatch do |params|
-          data = { operation: self.name, params: serialize_dispach(params.to_h) }
-          [*instance_eval(&regulation)].flatten.each do |channel|
-            Hyperloop.dispatch(channel,  data)
-          end
-        end
+      _regulate_dispatch(nil, args, &regulation) if RUBY_ENGINE != 'opal'
+    end
+
+    def _regulate_dispatch(context, args=[], &regulation)
+      if args.count == 0 && regulation.nil?
+        raise "must provide either a list of channel classes or a block to regulate_dispatch"
+      elsif args.count > 0 && regulation
+        raise "cannot provide both a list of channel classes and a block to regulate_dispatch"
       end
+      regulation ||= proc { args }
+      on_dispatch do |params, operation|
+        serialized_params = serialize_dispatch(params.to_h)
+        [operation.instance_exec(*context, &regulation)].flatten.compact.each do |channel|
+          Hyperloop.dispatch(channel: channel, operation: name, params: serialized_params)
+        end
+      end if RUBY_ENGINE != 'opal'
     end
 
     def dispatch_from_server(params_hash)

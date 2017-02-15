@@ -120,7 +120,7 @@ module Hyperloop
         pending_for(channel).each do |connection|
           QueuedMessage.create(data: data, hyperloop_connection: connection)
         end
-        transport.send(channel, data) if exists?(channel: channel, session: nil)
+        transport.send_data(channel, data) if exists?(channel: channel, session: nil)
       end
 
       def read(session, root_path)

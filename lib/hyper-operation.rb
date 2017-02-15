@@ -43,6 +43,7 @@ else
   require 'hyper-operation/promise'
   require 'hyper-operation/call_by_class_name'
   require 'hyper-operation/isomorphic_operations.rb'
+  require 'hyper-operation/transport/hyperloop_controller'
   Opal.use_gem 'mutations'
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
