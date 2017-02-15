@@ -95,15 +95,10 @@ module HyperStore
       @from = from
     end
 
-    def method_missing(name, *args, &block)
+    # Any method_missing call will create a state and accessor with that name
+    def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
       self.class.add_method(nil, name)
       send(name, *args, &block)
-
-      super
-    end
-
-    def respond_to_missing?(method_name, include_private = false)
-      super
     end
   end
 end
