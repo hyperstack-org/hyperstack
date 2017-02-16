@@ -244,7 +244,7 @@ end
 
 class UserPolicy
   regulate_instance_connection { self }
-  regulate_
+  regulate_dispatch { params.acting_user }
 
 ```
 
