@@ -171,7 +171,7 @@ module Hyperloop
             %x{
               h = {
                 encrypted: #{opts[:encrypted]},
-                authEndpoint: window.ReactiveRecordEnginePath+'/hyperloop-pusher-auth',
+                authEndpoint: window.HyperloopEnginePath+'/hyperloop-pusher-auth',
                 auth: {headers: {'X-CSRF-Token': #{opts[:form_authenticity_token]}}}
               };
               pusher_api = new Pusher(#{opts[:key]}, h)
