@@ -20,15 +20,6 @@ class HyperOperation
 
     class << self
 
-      def keys_klass
-        @keys_klass ||= begin
-          keys = (hash_filter.optional_keys + hash_filter.required_keys)
-          Class.new(String) do
-            keys.each { |key| define_method(:"#{key}?") { self == key } }
-          end
-        end
-      end
-
       def combine_arg_array(args)
         hash = args.inject({}.with_indifferent_access) do |h, arg|
           raise ArgumentError.new("All arguments must be hashes") unless arg.is_a?(Hash)
@@ -105,7 +96,10 @@ class HyperOperation
 
   class << self
     def param(*args, &block)
+
       _params_wrapper.add_param(*args)
+      #debugger if RUBY_ENGINE == 'opal'
+      nil
     end
 
     def outbound(*keys)
@@ -117,7 +111,9 @@ class HyperOperation
         if HyperOperation == superclass
           Class.new(ParamsWrapper)
         else
-          superclass._params_wrapper.dup
+          Class.new(superclass._params_wrapper).tap do |wrapper|
+            wrapper.instance_variable_set('@hash_filter', superclass._params_wrapper.hash_filter)
+          end
         end
       end
     end

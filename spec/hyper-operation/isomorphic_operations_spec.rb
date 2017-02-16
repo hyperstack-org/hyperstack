@@ -4,9 +4,8 @@ describe "isomorphic operations", js: true do
   context 'uplinking' do
     before(:each) do
       isomorphic do
-        class ServerFacts < HyperOperation
-          regulate_uplink
-
+        class ServerFacts < HyperOperation::Isomorphic
+          param :acting_user, nils: true
           param :n, type: Integer, min: 0
 
           class << self
@@ -41,7 +40,11 @@ describe "isomorphic operations", js: true do
     end
 
     it "will block bad uplinks" do
-      ServerFacts.regulate_uplink { false }
+      class ServerFacts < HyperOperation::Isomorphic
+        def validate
+         raise Hyperloop::AccessViolation
+       end
+     end
       expect_promise do
         ServerFacts(n: 5).fail { |exception| Promise.new.resolve(exception) }
       end.to include('Hyperloop::AccessViolation')

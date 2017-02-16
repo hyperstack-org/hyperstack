@@ -1,19 +1,15 @@
 class HyperOperation
   class << self
     def run(*args)
-      if @uplink_regulation && RUBY_ENGINE == 'opal'
-        run_on_server(args)
-      else
-        new.instance_eval do
-          @raw_inputs, @params, @errors = self.class._params_wrapper.process_params(args)
-          if has_errors?
-            Promise.new.reject(ValidationException.new(@errors))
-          else
-            validate
-            result = execute
-            result = Promise.new.resolve(result) unless result.is_a? Promise
-            result
-          end
+      new.instance_eval do
+        @raw_inputs, @params, @errors = self.class._params_wrapper.process_params(args)
+        if has_errors?
+          Promise.new.reject(ValidationException.new(@errors))
+        else
+          validate
+          result = execute
+          result = Promise.new.resolve(result) unless result.is_a? Promise
+          result
         end
       end
     rescue Exception => e
@@ -24,18 +20,19 @@ class HyperOperation
       run(*args).then(&block)
     end
 
-    def has_errors?
-      !@errors.nil?
-    end
+  end
 
-    def params
-      @params
-    end
+  def add_error(key, kind, message = nil)
+    raise ArgumentError.new("Invalid kind") unless kind.is_a?(Symbol)
 
-    protected
-
-    def validate
-      # Meant to be overridden
+    @errors ||= ErrorHash.new
+    @errors.tap do |errs|
+      path = key.to_s.split(".")
+      last = path.pop
+      inner = path.inject(errs) do |cur_errors,part|
+        cur_errors[part.to_sym] ||= ErrorHash.new
+      end
+      inner[last] = ErrorAtom.new(key, kind, :message => message)
     end
   end
 

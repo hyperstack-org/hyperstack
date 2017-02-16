@@ -176,36 +176,32 @@ You can dispatch to an Operation by using ...
   ```
 
 
-### Uplinking Operations
+### The `HyperOperation::Server` Class
 
-HyperOperations can run on the client or the server.  For example, an Operation like `ValidateUserDefaultCC` probably needs to check information server side, and perhaps make secure API calls to our credit card processor which again can only be done from the server.  Rather than build an API and controller to "validate the user credentials" you simply *uplink* the operation to the server.
+HyperOperations can run on the client or the server.  Some Operations like `ValidateUserDefaultCC` probably needs to check information server side, and perhaps make secure API calls to our credit card processor which again can only be done from the server.  Rather than build an API and controller to "validate the user credentials" you simply specify that the operation must run on the server by using the `HyperOperation::Server` class.
 
 ```ruby
-class ValidateUserCredentials < HyperOperation
-  # uplink can only happen if there is a current acting user
-  regulate_uplink { acting_user }
-  def execute
-    raise Cart::CheckoutFailure("no default credit card") unless acting_user.has_default_cc?
+class ValidateUserCredentials < HyperOperation::Server
+  def validate
+    add_error(:acting_user, :invalid_default_cc, "No valid default credit card") unless params.acting_user.has_default_cc?
   end
 end
 ```
 
-The `regulate_uplink` *regulation* takes a block, a symbol (indicating a method to call) or a proc.  If the block, proc or method returns a truthy value the client will be allowed to remotely dispatch the Operation on the server.   If the block, proc or method returns a falsy value or raises an exception, the uplink will fail with a 403 error.  If no block or parameter is provided the uplink is *always* allowed.
+`HyperOperation::Server` is a subclass of `HyperOperation` that will always run on the server even if invoked on the client.  Server Operations always take an additional parameter `param :acting_user` that is predefined for you, and will be initialized with whatever the current value of your ApplicationController's `acting_user` method is.   By default `acting_user` must not be nil, but you can override this by providing your own declaration: `param :acting_user, nils: true`.
 
-The uplink regulation will generally interrogate `acting_user` and the params object to determine if the current acting user has permission to execute the Operation.  More on `acting_user` in the Authorization Policies guide.
+As shown above you can also define a `validate` method to further verify that the acting_user (with perhaps other parameters) is allowed to perform the operation.  In the above case that is the only purpose of Operation.
 
-**Note that any Operation that has an uplink regulation will *always* run on the server.**
+### Dispatching From Server Operations
 
-### Downlinking Operations
-
-Likewise you can *downlink* Operations to the client:
+You can also broadcast the dispatch from Server Operations to all authorized clients:
 
 ```ruby
-class Announcement < HyperOperation
+class Announcement < HyperOperation::Server
   param :message
   param :duration
-  # downlink to the Application channel
-  regulate_downlink Application
+  # dispatch to the Application channel
+  regulate_dispatch Application
 end
 
 class CurrentAnnouncements < HyperStore::Base
@@ -220,7 +216,7 @@ class CurrentAnnouncements < HyperStore::Base
 end
 ```
 
-The `regulate_downlink` regulation takes a list of classes, representing *Channels.*  The Operation will be dispatched to all clients connected on those Channels.   Alternatively `regulate_downlink` can take a block, a symbol (indicating a method to call) or a proc.  The block, proc or method should return a single Channel, or an array of Channels, which the Operation will be dispatched to.   The downlink regulation has access to the params object.  For example we can add an optional `to` param to our Operation, and use this to select which Channel we will broadcast to.
+The `regulate_dispatch` policy takes a list of classes, representing *Channels.*  The Operation will be dispatched to all clients connected on those Channels.   Alternatively `regulate_dispatch` can take a block, a symbol (indicating a method to call) or a proc.  The block, proc or method should return a single Channel, or an array of Channels, which the Operation will be dispatched to.   The dispatch regulation has access to the params object.  For example we can add an optional `to` param to our Operation, and use this to select which Channel we will broadcast to.
 
 ```ruby
 class Announcement < HyperOperation
@@ -228,13 +224,29 @@ class Announcement < HyperOperation
   param :duration
   param to: nil, type: User
   # downlink only to the Users channel if specified
-  regulate_downlink do
+  regulate_dispatch do
     params.to || Application
   end
 end
 ```
 
+### Regulating Dispatches in Policy Classes
 
+```ruby
+class Announcement < HyperOperation::Server
+  # all clients will have a Announcement Channel which will receive all dispatches from the Annoucement Operation
+  always_allow_connection
+end
+# regulations can be specified in the class or in a separate policy file
+class AnnouncementPolicy
+  always_allow_connection
+end
+
+class UserPolicy
+  regulate_instance_connection { self }
+  regulate_
+
+```
 
     class AdminUserPolicy
       # channel
@@ -262,12 +274,6 @@ always_dispatch_from
 + instances of those classes,
 + or instances of related classes.
 
-Find out more about Channels in the Authorization Policies guide.
-
-**Note that any Operation that has a downlink regulation will *always* run on the client.**
-
-WHY IS THE BELOW TRUE? OR NEEDED?
-**Note that any Operation that has a downlink regulation will return true (wrapped in a promise) if dispatched from the server, and false otherwise.**
 
 ### Serialization
 
