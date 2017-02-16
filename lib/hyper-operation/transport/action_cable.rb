@@ -12,28 +12,28 @@ module Hyperloop
     end
 
     def inc_subscription
-      self.class.subscriptions[params[:synchromesh_channel]] =
-        self.class.subscriptions[params[:synchromesh_channel]] + 1
+      self.class.subscriptions[params[:hyperloop_channel]] =
+        self.class.subscriptions[params[:hyperloop_channel]] + 1
     end
 
     def dec_subscription
-      self.class.subscriptions[params[:synchromesh_channel]] =
-        self.class.subscriptions[params[:synchromesh_channel]] - 1
+      self.class.subscriptions[params[:hyperloop_channel]] =
+        self.class.subscriptions[params[:hyperloop_channel]] - 1
     end
 
     def subscribed
       session_id = params["client_id"]
-      authorization = HyperMesh.authorization(params["salt"], params["synchromesh_channel"], session_id)
+      authorization = Hyperloop.authorization(params["salt"], params["hyperloop_channel"], session_id)
       if params["authorization"] == authorization
         inc_subscription
-        stream_from "synchromesh-#{params[:synchromesh_channel]}"
+        stream_from "hyperloop-#{params[:hyperloop_channel]}"
       else
         reject
       end
     end
 
     def unsubscribed
-      Hyperloop::Connection.disconnect(params[:synchromesh_channel]) if dec_subscription == 0
+      Hyperloop::Connection.disconnect(params[:hyperloop_channel]) if dec_subscription == 0
     end
   end
 end

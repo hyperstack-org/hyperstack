@@ -16,8 +16,8 @@ class HyperOperation
           end
         end
       end
-    # rescue Exception => e
-    #   Promise.new.reject(e)
+    rescue Exception => e
+      Promise.new.reject(e)
     end
 
     def then(*args, &block)

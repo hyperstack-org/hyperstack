@@ -135,7 +135,7 @@ describe Hyperloop::Connection do
     end
 
     it "sends messages to the transport as well as open channels" do
-      expect(Hyperloop).to receive(:send).with('TestChannel', 'data2')
+      expect(Hyperloop).to receive(:send_data).with('TestChannel', 'data2')
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.send_to_channel('TestChannel', 'data2')
       expect(described_class.read(1, 'path')).to eq(['data', 'data2'])

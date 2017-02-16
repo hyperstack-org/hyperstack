@@ -43,6 +43,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
+  spec.add_development_dependency 'rspec-wait'
+  spec.add_development_dependency 'puma'
+
 
 
 end

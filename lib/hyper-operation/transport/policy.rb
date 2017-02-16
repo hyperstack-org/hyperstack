@@ -202,7 +202,7 @@ module Hyperloop
 
     def self.add_regulation(klass, opts={}, &regulation)
       actual_klass = klass.is_a?(Class) ? klass : klass.constantize rescue nil
-      actual_klass.regulate_dispatch(actual_klass) if actual_klass.respond_to? :regulate_dispatch
+      actual_klass.regulate_dispatch(actual_klass) if actual_klass.respond_to? :regulate_dispatch rescue nil
       super
     end
 

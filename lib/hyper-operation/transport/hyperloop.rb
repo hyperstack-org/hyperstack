@@ -33,7 +33,7 @@ module Hyperloop
 
   define_setting(:transport, :none) do |transport|
     if transport == :action_cable
-      require 'transport/action_cable'
+      require 'hyper-operation/transport/action_cable'
       opts[:refresh_channels_every] = :never
     else
       require 'pusher' if transport == :pusher
@@ -93,7 +93,7 @@ module Hyperloop
     elsif transport == :pusher
       pusher.trigger("#{Hyperloop.channel}-#{data[1][:channel]}", *data)
     elsif transport == :action_cable
-      ActionCable.server.broadcast("hyperloop-channel-#{channel}", message: data[0], data: data[1])
+      ActionCable.server.broadcast("hyperloop-#{channel}", message: data[0], data: data[1])
     end
   end
 

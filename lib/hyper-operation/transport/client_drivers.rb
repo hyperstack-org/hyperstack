@@ -63,7 +63,7 @@ module Hyperloop
                     #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
                   },
                   received: function(data) { `data`['data']
-                    #{ClientDrivers.sync_dispatch(JSON.parse(`JSON.stringify(data)`['data']))}
+                    #{ClientDrivers.sync_dispatch(JSON.parse(`JSON.stringify(data)`)['data'])}
                   }
                 }
               )
@@ -134,9 +134,9 @@ module Hyperloop
 
     def self.get_queued_data(operation, channel = nil, opts = {})
       HTTP.get(polling_path(operation, channel), opts).then do |response|
-        response.json.each do |dispatch|
+        response.json.each do |data|
           #send "sync_#{update[0]}", update[1]
-          sync_dispatch(dispatch)
+          sync_dispatch(data[1])
         end
       end
     end
