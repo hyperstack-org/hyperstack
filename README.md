@@ -112,9 +112,15 @@ HyperOperations will *always* return a *Promise*.  If an Operation's execute met
 ```ruby
 class QuickCheckout < HyperOperation
   param :sku, type: String
-  param qty: 1, type: Numeric, minimum: 1
+  param qty: 1, type: Integer, minimum: 1
+
+  step { AddItemToCart(params) }
+  step ValidateUserDefaultCC
+  step Checkout
+
   def execute
-    AddItemToCart(params) do
+    AddItemToCart(params)
+    .then do
       ValidateUserDefaultCC()
     end.then do
       Checkout()
@@ -135,6 +141,31 @@ class DoABunchOStuff < HyperOperation
 end
 ```
 
+### The `validate` method
+
+An Operation can also have a `validate` method which will be called before the `execute` method.  This is a handy place to put any additional validations.  In the validate method you can add validation type messages using the `add_error` method, and these will be passed along like any other param validation failures.
+
+```ruby
+class UpdateProfile < HyperOperation
+  param :first_name, type: String  
+  param :last_name, type: String
+  param :password, type: String, nils: true
+  param :password_confirmation, type: String, nils: true
+
+  def validate
+    add_error(
+      :password_confirmation,
+      :doesnt_match,
+      "Your new password and confirmation do not match"
+    ) unless params.password == params.confirmation
+  end
+  ...
+end
+```
+If the validate method returns a promise, then execution will wait until the promise resolves.  If the promise fails, then the whole operation will fail.
+
+You can also raise an exception directly in validate if appropriate.
+
 ### Handling Failures
 
 Because Operations always return a promise, you can use the `fail` method on the result to detect failures.
@@ -152,9 +183,11 @@ Failures to validate params result in `Hyperloop::ValidationException` which con
 ```ruby
 MyOperation.run.fail do |e|
   if e.is_a? Hyperloop::ValidationException
-    e.errors.symbolic # hash: each key is a parameter that failed validation, value is a symbol representing the reason
-    e.errors.message # same as symbolic but message is in English
-    e.errors.message_list # array of messages where failed parameter is combined with the message
+    e.errors.symbolic     # hash: each key is a parameter that failed validation,
+                          # value is a symbol representing the reason
+    e.errors.message      # same as symbolic but message is in English
+    e.errors.message_list # array of messages where failed parameter is
+                          # combined with the message
   end
 end
 ```
@@ -163,48 +196,87 @@ end
 
 You can dispatch to an Operation by using ...
 + the Operation class name as a method:  
-  ```
-  MyOperation()
-  ```
+```ruby
+MyOperation()
+```
 + the `run` method:  
-  ```
-  MyOperation.run
-  ```
-+ the `then` method, which will dispatch the operation and attach a promise handler:  
-  ```
-  MyOperation.then { alert 'operation completed' }
-  ```
+```ruby
+MyOperation.run
+```
++ the `then` and `fail` methods, which will dispatch the operation and attach a promise handler:  
+```ruby
+MyOperation.then { alert 'operation completed' }
+```
 
 
-### The `HyperOperation::Server` Class
+### The `Hyperloop::ServerOp` class
 
-HyperOperations can run on the client or the server.  Some Operations like `ValidateUserDefaultCC` probably needs to check information server side, and perhaps make secure API calls to our credit card processor which again can only be done from the server.  Rather than build an API and controller to "validate the user credentials" you simply specify that the operation must run on the server by using the `HyperOperation::Server` class.
+Operations will run on the client or the server.  Some Operations like `ValidateUserDefaultCC` probably need to check information server side, and perhaps make secure API calls to our credit card processor which again can only be done from the server.  Rather than build an API and controller to "validate the user credentials" you simply specify that the operation must run on the server by using the `Hyperloop::ServerOp` class.
 
 ```ruby
-class ValidateUserCredentials < HyperOperation::Server
+class ValidateUserCredentials < Hyperloop::ServerOp
+  param :acting_user
   def validate
-    add_error(:acting_user, :invalid_default_cc, "No valid default credit card") unless params.acting_user.has_default_cc?
+    add_error(
+      :acting_user, :no_valid_default_cc,
+      "No valid default credit card"
+    ) unless params.acting_user.has_default_cc?
+  end
+  # no execute method needed in this case...
+end
+```
+
+A Server Operation will always run on the server even if invoked on the client.  When invoked from the client Server Operations will receive the `acting_user` param with the current value of your ApplicationController's `acting_user` method returns.   Typically the `acting_user` method will return either some User model, or nil (if there is no logged in user.)  Its up to you to define how `acting_user` is computed, but this is easily done with any of the proper authentication gems.  Note that unless you explicitly add `nils: true` to the param declaration, nil will not be accepted.
+
+As shown above you can also define a `validate` method to further verify that the acting user (with perhaps other parameters) is allowed to perform the operation.  In the above case that is the only purpose of Operation.   A typical use would be to make sure the current acting user has the correct role to perform the operation:
+
+```ruby
+  ...
+  def validate
+    raise Hyperloop::AccessViolation unless params.acting_user.admin?
+  end
+  ...
+```
+
+You can bake this kind logic into a class:
+
+```ruby
+class AdminOnlyOp < Hyperloop::ServerOp
+  param :acting_user
+  def validate
+    raise Hyperloop::AccessViolation unless params.acting_user.admin?
+  end
+end
+
+class DeleteUser < AdminOnlyOp
+  param :user
+  def validate
+    add_error(
+      :user, :cant_delete_user
+      "Can't delete yourself, or the last admin user"
+    ) if params.user == params.acting_user || (params.user.admin? && AdminUsers.count == 1)
   end
 end
 ```
 
-`HyperOperation::Server` is a subclass of `HyperOperation` that will always run on the server even if invoked on the client.  Server Operations always take an additional parameter `param :acting_user` that is predefined for you, and will be initialized with whatever the current value of your ApplicationController's `acting_user` method is.   By default `acting_user` must not be nil, but you can override this by providing your own declaration: `param :acting_user, nils: true`.
+Note that there is no need to call `super`, as Hyperloop will chain the validate methods together for you.
 
-As shown above you can also define a `validate` method to further verify that the acting_user (with perhaps other parameters) is allowed to perform the operation.  In the above case that is the only purpose of Operation.
+Because Operations always return a promise, there is no code changed needed on the client to handle a Server Operation. A Server Operation will return a promise that will be resolved (or rejected) when the Operation completes (or fails) on the server.  
 
 ### Dispatching From Server Operations
 
 You can also broadcast the dispatch from Server Operations to all authorized clients:
 
 ```ruby
-class Announcement < HyperOperation::Server
+class Announcement < Hyperloop::ServerOp
+  # no acting_user because we don't want clients to invoke the Operation
   param :message
-  param :duration
+  param :duration, type: Float, nils: true
   # dispatch to the Application channel
-  regulate_dispatch Application
+  dispatch_to Application
 end
 
-class CurrentAnnouncements < HyperStore::Base
+class CurrentAnnouncements < Hyperloop::Store
   state_reader all: [], scope: :class
   receives Announcement do
     mutate.all << params.message
@@ -215,6 +287,120 @@ class CurrentAnnouncements < HyperStore::Base
   end
 end
 ```
+
+#### Channels
+
+As seen above broadcasting is done over a *Channel*.  Any ruby class (including Operations) can be used *class channel*.  Any Ruby class that responds to the `id` method can be used as an *instance channel.*  
+
+For example the `User` active record model could be a used as channel to broadcast to *all* users.  Each user instance could also be a separate instance channel that would be used to broadcast to that user.
+
+The purpose of having channels is to restrict what gets broadcast to who, therefore typically channels represent *connections* to
+
++ the application (represented by the `Hyperloop::Application` class), or some function within the application (like an Operation)
++ or some class which is *authenticated* like a User or Administrator,
++ instances of those classes,
++ or instances of classes in some relationship like a `team` that a `user` belongs to.
+
+You create a channel by including the `Hyperloop::PolicyMethods` module.
+
+This gives you three class methods: `regulate_class_connection` `always_allow_connection` and `regulate_instance_connections`.  For example:
+
+```ruby
+class User < ActiveRecord::Base
+  include Hyperloop::PolicyMethods
+  regulate_class_connection { self }  
+  regulate_instance_connection { self }
+end
+```
+
+will attach the current acting user to the  `User` channel (which is shared with all users) and to that user's private channel.
+
+Both blocks have self == to the current acting user, but the return value has a different meaning.  If regulate_class_connection returns any truthy value, then the class level connection will be made on behalf of the acting user.  On the other hand `regulate_instance_connection` returns an array (possibly nested) or Active Record relationship and an instance connection is made with each object.  So for example you could add:
+
+```ruby
+class User < ActiveRecord::Base
+  # assume has_many :chat_rooms
+  regulate_instance_connection { chat_rooms }
+  # we will connect to all the chat rooms we are members of
+end
+```
+
+Now if we want to broadcast to all users our operation would have
+
+```ruby
+  dispatch_to User # dispatch to the User class channel
+```
+
+or to send an announcement to specific user
+
+```ruby
+class PrivateAnnouncement < Hyperloop::ServerOp
+  param :receiver
+  param :message
+  # dispatch_to can take a block if we need to dynamically
+  # compute the channels
+  dispatch_to { params.receiver }
+end
+...
+# somewhere else in the server
+PrivateAnnouncement(receiver: User.find_by_login(login), message: 'log off now!')
+```  
+
+Usually some other client would be sending the message so the operation could look like this:
+
+```ruby
+class PrivateAnnouncement < Hyperloop::ServerOp
+  param :acting_user
+  param :receiver
+  param :message
+  def validate
+    raise Hyperloop::AccessViolation unless params.acting_user.admin?
+    params.receiver = User.find_by_login(receiver)
+  end
+  dispatch_to { params.receiver }
+end
+```
+
+Now on the client we can say:
+
+```ruby
+  PrivateAnnouncement(receiver: login_name, message: 'log off now!').fail do
+    alert('message could not be sent')
+  end
+```
+
+and elsewhere in the client code we would have a component like this:
+
+```ruby
+class Alerts < Hyperloop::Component
+  before_mount do
+    mutate.alert_messages = []
+    receives PrivateAnnouncement { |params| mutate.alert_messages << params.message }
+  end
+  render(DIV, class: :alert_messages) do
+    UL do
+      state.alert_messages.each do |message|
+        LI do
+          SPAN { message }
+          BUTTON { 'dismiss' }.on(:click) { mutate.alert_messages.delete(message) }
+        end
+      end
+    end
+  end
+end
+```
+
+This will
++ associates a channel with each logged in user
++ invoke the PrivateAnnouncement Operation on the server (remotely from the client)
++ validate that there is a logged in user at that client
++ validate that we have a non-nil, non-blank receiver and message
++ validate that the acting_user is an admin
++ lookup the receiver in the database under their login name
++ dispatch the parameters back to any clients where the receiver is logged in
++ those clients will update their alert_messages state and
++ display the message
+
 
 The `regulate_dispatch` policy takes a list of classes, representing *Channels.*  The Operation will be dispatched to all clients connected on those Channels.   Alternatively `regulate_dispatch` can take a block, a symbol (indicating a method to call) or a proc.  The block, proc or method should return a single Channel, or an array of Channels, which the Operation will be dispatched to.   The dispatch regulation has access to the params object.  For example we can add an optional `to` param to our Operation, and use this to select which Channel we will broadcast to.
 
@@ -227,6 +413,9 @@ class Announcement < HyperOperation
   regulate_dispatch do
     params.to || Application
   end
+
+  on_dispatch do |params|
+    dispatch
 end
 ```
 
@@ -247,33 +436,6 @@ class UserPolicy
   regulate_dispatch { params.acting_user }
 
 ```
-
-    class AdminUserPolicy
-      # channel
-      regulate_dispatches_from(Operation1, Operation2, Operation3) &block
-        Operation1.regulate_dispatch { AdminUser if &block.call }
-      always_dispatch_from(....)
-        Operation1.regulate_dispatch(AdminUser)
-    end
-
-    class Operation1Policy
-      always_allow_connection
-        always_allow_connection + Operation1.regulate_dispatch(Operation1)
-      regulate_class_connection &block # now we have a channel connected to the operation ... that is cool
-        regulate_class_connection &block + Operation1.regulate_dispatch(Operation1)
-      regulate_dispatch(list of channel classes) { returns 1 or more channels }
-    end
-
-
-regulate_dispatch <- applied directly to an Operation
-regulate_dispatches_from
-always_dispatch_from
-
-+ the application, or some function within the application
-+ or some class which is *authenticated* like a User or Administrator,
-+ instances of those classes,
-+ or instances of related classes.
-
 
 ### Serialization
 
@@ -317,15 +479,13 @@ def self.deserialize_dispatch(object)
 end
 ```
 
-
-
 The value of the first parameter (`serializing` above) is a symbol with additional methods corresponding to each of the parameter names (i.e. `message?`, `duration?` and `to?`) plus `exception?` and `result?`
 
 Make sure to call `super` unless you are serializing/deserializing all values.
 
 ### Isomorphic Operations
 
-If an Operation has no uplink or downlink regulations it will run on the same place as it was dispatched from.  This can be handy if you have an Operation that needs to run on both the server and the client.  For example an Operation that calculates the customers discount, will want to run on the client so the user gets immediate feedback, and then will be run again on the server when the order is submitted as a double check.
+Unless the Operation is a Server Operation it will run where it was invoked.   This can be handy if you have an Operation that needs to run on both the server and the client.  For example an Operation that calculates the customers discount, will want to run on the client so the user gets immediate feedback, and then will be run again on the server when the order is submitted as a double check.
 
 ### Dispatching With New Parameters
 
@@ -414,13 +574,13 @@ end
 
 ### The `Hyperloop::Boot` Operation
 
-Hyperloop includes one predefined Operation, `Hyperloop::Boot`, that runs at system initialization.  Stores can receive Hyperloop::Boot to initialize their state.  To reset the state of the application you can simply execute `Hyperloop::Boot`
+Hyperloop includes one predefined Operation, `Hyperloop::Boot`, that runs at system initialization.  Stores can receive `Hyperloop::Boot` to initialize their state.  To reset the state of the application you can simply execute `Hyperloop::Boot`
 
 ### Flux and Operations
 
 Hyperloop is a merger of the concepts of the Flux pattern, the [Mutation Gem](https://github.com/cypriss/mutations), and Trailblazer Operations.
 
-We chose the name `Operation` rather than `Action` or `Mutation` because we feel it best captures all the capabilities of a HyperOperation.  Nevertheless HyperOperations are fully compatible with the Flux Pattern.
+We chose the name `Operation` rather than `Action` or `Mutation` because we feel it best captures all the capabilities of a `Hyperloop::Operation`.  Nevertheless Operations are fully compatible with the Flux Pattern.
 
 | Flux | HyperLoop |
 |-----| --------- |
