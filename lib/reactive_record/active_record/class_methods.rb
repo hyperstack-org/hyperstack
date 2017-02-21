@@ -135,7 +135,7 @@ module ActiveRecord
       :distinct, :unscope, :calculate, :average, :count_by_sql, :minimum, :lock, :find_by_sql, :count, :cache, :uncached, :connection, :connection_pool,
       :establish_connection, :connected?, :clear_cache!, :clear_reloadable_connections!, :connection_id, :connection_config, :clear_all_connections!,
       :remove_connection, :connection_specification_name, :connection_specification_name=, :retrieve_connection, :connection_id=, :clear_active_connections!,
-      :sqlite3_connection, :direct_descendants, :benchmark, :model_name
+      :sqlite3_connection, :direct_descendants, :benchmark, :model_name, :with_options, :attr_protected, :attr_accessible
     ]
 
     def method_missing(name, *args, &block)
@@ -275,6 +275,13 @@ module ActiveRecord
               [key, [value]]
             end
           end
+          
+          # We do want to be doing something like this, but this breaks other stuff...
+          #
+          # ReactiveRecord::Base.load_data do
+          #   ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
+          # end
+
           ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
           target
         end

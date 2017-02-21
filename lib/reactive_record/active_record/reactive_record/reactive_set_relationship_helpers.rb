@@ -86,12 +86,12 @@ module ReactiveRecord
       if value.nil?
         current_value.attributes[inverse_attr].delete(@ar_instance) unless current_value.nil?
       else
-        value.backing_record.push_onto_collection(association.inverse, @ar_instance)
+        value.backing_record.push_onto_collection(@model, association.inverse, @ar_instance)
       end
     end
 
-    def push_onto_collection(association, ar_instance)
-      attributes[association.attribute] ||= Collection.new(@model, @ar_instance, association)
+    def push_onto_collection(model, association, ar_instance)
+      attributes[association.attribute] ||= Collection.new(model, @ar_instance, association)
       attributes[association.attribute] << ar_instance
     end
 

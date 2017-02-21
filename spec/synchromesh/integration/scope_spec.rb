@@ -185,6 +185,34 @@ describe "synchronized scopes", js: true do
     page.should have_content('scope1.scope2.count = 1')
   end
 
+  it 'collections passed from server will not interfere with client associations' do
+    user = FactoryGirl.create(:user)
+    5.times do
+      FactoryGirl.create(:todo, title: 'active', created_by_id: user.id)
+    end
+
+    isomorphic do
+      Todo.class_eval do
+        scope :active, -> { where('title LIKE ?', 'active') }
+      end
+    end
+
+    todos = user.authored_todos.active
+
+    mount 'TestComponent2', todos: todos do
+      class TestComponent2 < React::Component::Base
+        param :todos, type: [Todo]
+        render(:div) do
+          P { "params.todos = #{params.todos.count}" }
+          P { "params.user.authored_todos.active = #{User.find(1).authored_todos.active.count}" }
+        end
+      end
+    end
+
+    page.should have_content('params.todos = 5')
+    page.should have_content('params.user.authored_todos.active = 5')
+  end
+
   context 'basic joins' do
 
     it 'will not update a joined scope without a joins option' do

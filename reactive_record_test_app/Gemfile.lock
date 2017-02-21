@@ -8,9 +8,9 @@ GIT
       opal-rspec (~> 0.5.0)
 
 PATH
-  remote: ../
+  remote: ..
   specs:
-    hyper-mesh (0.5.2)
+    hyper-mesh (0.5.4)
       activerecord (>= 0.3.0)
       hyper-react (>= 0.10.0)
 
@@ -71,7 +71,7 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hike (1.2.3)
-    hyper-react (0.10.0)
+    hyper-react (0.11.0)
       opal (>= 0.8.0)
       opal-activesupport (>= 0.2.0)
       react-rails
@@ -206,4 +206,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   1.12.5
+   1.14.3

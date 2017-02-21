@@ -39,11 +39,14 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'factory_girl_rails'
     s.add_development_dependency 'reactrb-rails-generator'
     s.add_development_dependency 'rspec-wait'
-    s.add_development_dependency 'puma'
+    s.add_development_dependency 'puma', '~> 3.6.0'
 
     s.add_development_dependency 'pusher'
     s.add_development_dependency 'pusher-fake'
     s.add_development_dependency 'opal-browser'
+
+    # Keep linter-rubocop happy
+    s.add_development_dependency 'rubocop'
 
     if RUBY_PLATFORM == 'java'
       s.add_development_dependency 'jdbc-sqlite3'
@@ -68,7 +71,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'rspec-collection_matchers'
       s.add_development_dependency 'database_cleaner'
       s.add_development_dependency 'capybara'
-      s.add_development_dependency 'selenium-webdriver'
+      s.add_development_dependency 'selenium-webdriver', '< 3'
       s.add_development_dependency 'poltergeist'
       s.add_development_dependency 'spring-commands-rspec'
       s.add_development_dependency 'chromedriver-helper'
