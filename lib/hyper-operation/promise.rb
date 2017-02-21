@@ -58,6 +58,10 @@ class Promise
     @realized == :reject
   end
 
+  def pending?
+    !realized?
+  end
+
   def ^(promise)
     promise << self
     self    >> promise
