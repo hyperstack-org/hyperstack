@@ -1,11 +1,9 @@
-class HyperOperation
-  class Isomorphic < HyperOperation
-
-    param :acting_user
+module Hyperloop
+  class ServerOp < Operation
 
     class << self
       def run(*args)
-        hash = _params_wrapper.combine_arg_array(args)
+        hash = _Railway.params_wrapper.combine_arg_array(args)
         hash = serialize_params(hash)
         HTTP.post(
           "#{`window.HyperloopEnginePath`}/execute_remote",
@@ -53,7 +51,7 @@ class HyperOperation
         hash
       end
 
-      def regulate_dispatch(*args, &regulation)
+      def dispatch_to(*args, &regulation)
         _regulate_dispatch(nil, args, &regulation) if RUBY_ENGINE != 'opal'
       end
 
@@ -69,11 +67,11 @@ class HyperOperation
           [operation.instance_exec(*context, &regulation)].flatten.compact.each do |channel|
             Hyperloop.dispatch(channel: channel, operation: name, params: serialized_params)
           end
-        end if RUBY_ENGINE != 'opal'
-      end
+        end
+      end if RUBY_ENGINE != 'opal'
 
       def dispatch_from_server(params_hash)
-        params = _params_wrapper.new(deserialize_dispatch(params_hash)).lock
+        params = _Railway.params_wrapper.new(deserialize_dispatch(params_hash)).lock
         receivers.each { |receiver| receiver.call params }
       end
     end

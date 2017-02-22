@@ -1,4 +1,6 @@
-class HyperOperation 
+module Hyperloop
+  class Operation
+  end
 end
 
 class Object
@@ -13,7 +15,7 @@ class Object
         scope = scopes.detect { |s| s.const_defined?(name) }
         const = scope.const_get(name) if scope
       end
-      _hyper_operation_original_method_missing(name, *args, &block) unless const.is_a?(Class) && const < HyperOperation
+      _hyper_operation_original_method_missing(name, *args, &block) unless const.is_a?(Class) && const < Hyperloop::Operation
       const.send(:run, *args)
     end
   end
@@ -29,7 +31,7 @@ class Object
       scope = scopes.detect { |s| s.const_defined?(name) }
       const = scope.const_get(name) if scope
     end
-    _hyper_operation_original_method_missing(name, *args, &block) unless const.is_a?(Class) && const < HyperOperation
+    _hyper_operation_original_method_missing(name, *args, &block) unless const.is_a?(Class) && const < Hyperloop::Operation
     const.send(:run, *args)
   end
 end

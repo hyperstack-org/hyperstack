@@ -13,7 +13,7 @@ describe "Transport Tests", js: true do
 
   before(:each) do
     isomorphic do
-      class CreateTestModel < HyperOperation
+      class CreateTestModel < Hyperloop::Operation
         param :test_attribute
       end
     end

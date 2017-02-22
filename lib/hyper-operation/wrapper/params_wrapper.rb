@@ -27,13 +27,15 @@ class HyperOperation
         end
       end
 
-      def process_params(args)
+      def process_params(hash_filter, operation, args)
         raw_inputs = combine_arg_array(args)
         inputs, errors = hash_filter.filter(raw_inputs)
-        [raw_inputs, new(inputs), errors]
+        operation.instance_eval do
+          @raw_inputs, @params, @errors = [raw_inputs, new(inputs), errors]
+        end
       end
 
-      def add_param(*args, &block)
+      def add_param(hash_filter, *args, &block)
         type_method, name, opts, block = translate_args(*args, block)
         if opts.key? :default
           hash_filter.optional { send(type_method, name, opts, &block) }
@@ -55,10 +57,6 @@ class HyperOperation
         params = params.dup
         hashes.each { |hash| hash.each { |k, v| params.send(:"#{k}=", v) } }
         params.lock
-      end
-
-      def hash_filter
-        @hash_filter ||= Mutations::HashFilter.new
       end
 
       def translate_args(*args, block)
@@ -96,10 +94,7 @@ class HyperOperation
 
   class << self
     def param(*args, &block)
-
       _params_wrapper.add_param(*args)
-      #debugger if RUBY_ENGINE == 'opal'
-      nil
     end
 
     def outbound(*keys)

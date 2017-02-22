@@ -24,7 +24,6 @@ class HyperOperation
 
   def add_error(key, kind, message = nil)
     raise ArgumentError.new("Invalid kind") unless kind.is_a?(Symbol)
-
     @errors ||= ErrorHash.new
     @errors.tap do |errs|
       path = key.to_s.split(".")

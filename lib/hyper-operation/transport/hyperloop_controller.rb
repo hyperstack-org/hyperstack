@@ -128,7 +128,7 @@ module Hyperloop
       end
 
       def execute_remote
-        render HyperOperation::Isomorphic.run_from_client(acting_user, JSON.parse(params[:json]).symbolize_keys)
+        render ServerOp.run_from_client(acting_user, JSON.parse(params[:json]).symbolize_keys)
       end
 
       def console_update

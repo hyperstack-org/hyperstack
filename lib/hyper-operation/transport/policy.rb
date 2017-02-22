@@ -11,7 +11,7 @@ module Hyperloop
     EXPOSED_METHODS = [
       :regulate_class_connection, :always_allow_connection, :regulate_instance_connections,
       :regulate_all_broadcasts, :regulate_broadcast,
-      :regulate_dispatch, :regulate_dispatches_from, :always_dispatch_from,
+      :dispatch_to, :regulate_dispatches_from, :always_dispatch_from,
       :allow_change, :allow_create, :allow_read, :allow_update, :allow_destroy
     ]
 
@@ -37,10 +37,10 @@ module Hyperloop
 
     def regulate_dispatches_from(*args, &regulation)
       args.each do |klass|
-        unless klass.respond_to? :regulate_dispatch
+        unless klass.respond_to? :dispatch_to
           raise 'you can only regulate_dispatches_from Operation classes'
         end
-        klass._regulate_dispatch(self) { |sself| sself.regulated_klass if instance_eval(&regulation) }
+        klass._dispatch_to(self) { |sself| sself.regulated_klass if instance_eval(&regulation) }
       end
     end
 
@@ -48,13 +48,13 @@ module Hyperloop
       regulate_dispatches_from(*args) { true }
     end
 
-    def regulate_dispatch(*args, &regulation)
+    def dispatch_to(*args, &regulation)
       actual_klass = regulated_klass.is_a?(Class) ? regulated_klass : regulated_klass.constantize rescue nil
-      actual_klass.regulate_dispatch(actual_klass) if actual_klass.respond_to? :regulate_dispatch
-      unless actual_klass.respond_to? :regulate_dispatch
-        raise 'you can only regulate_dispatch on Operation classes'
+      actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to
+      unless actual_klass.respond_to? :dispatch_to
+        raise 'you can only dispatch_to Operation classes'
       end
-      actual_klass.regulate_dispatch(*args, &regulation)
+      actual_klass.dispatch_to(*args, &regulation)
     end
 
     CHANGE_POLICIES = [:create, :update, :destroy]
@@ -202,7 +202,7 @@ module Hyperloop
 
     def self.add_regulation(klass, opts={}, &regulation)
       actual_klass = klass.is_a?(Class) ? klass : klass.constantize rescue nil
-      actual_klass.regulate_dispatch(actual_klass) if actual_klass.respond_to? :regulate_dispatch rescue nil
+      actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to rescue nil
       super
     end
 

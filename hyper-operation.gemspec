@@ -5,7 +5,7 @@ require 'hyper-operation/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "hyper-operation"
-  spec.version       = Hyper::Operation::VERSION
+  spec.version       = Hyperloop::Operation::VERSION
   spec.authors       = ["catmando"]
   spec.email         = ["mitch@catprint.com"]
 

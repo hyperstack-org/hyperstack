@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe 'HyperOperation basics' do
+describe 'Hyperloop::Operation basics' do
 
-  it "HyperOperation is defined" do
-    expect(HyperOperation).to be_a_kind_of(Class)
+  it "Hyperloop::Operation is defined" do
+    expect(Hyperloop::Operation).to be_a_kind_of(Class)
   end
 
   it "can be run and will dispatch to each receiver" do
-    stub_const 'MyOperation', Class.new(HyperOperation)
+    stub_const 'MyOperation', Class.new(Hyperloop::Operation)
     stub_const 'BaseStore', Class.new
     BaseStore.class_eval do
       def self.inherited(child)
@@ -20,7 +20,7 @@ describe 'HyperOperation basics' do
   end
 
   it "can be subclassed" do
-    stub_const 'MyOperation', Class.new(HyperOperation)
+    stub_const 'MyOperation', Class.new(Hyperloop::Operation)
     stub_const 'MySubOperation', Class.new(MyOperation)
     stub_const 'BaseStore', Class.new
     BaseStore.class_eval do
@@ -35,7 +35,7 @@ describe 'HyperOperation basics' do
 
   context "parameters" do
     before(:each) do
-      stub_const 'MyOperation', Class.new(HyperOperation)
+      stub_const 'MyOperation', Class.new(Hyperloop::Operation)
       stub_const 'Store', Class.new
       Store.class_eval do
         MyOperation.on_dispatch { |params| receiver(params.to_h) }
@@ -66,14 +66,14 @@ describe 'HyperOperation basics' do
       MyOperation.param :foo, type: Integer
       expect(Store).not_to receive(:receiver)
       expect(MyOperation.run(foo: "hello"))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
     end
 
     it "will fail if a required param is missing" do
       MyOperation.param :foo, type: Integer
       expect(Store).not_to receive(:receiver)
       expect(MyOperation.run)
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
     end
 
     it "can have a default parameter" do
@@ -88,7 +88,7 @@ describe 'HyperOperation basics' do
       stub_const "SubOperation", Class.new(MyOperation)
       SubOperation.param :bar
       expect(Store).to receive(:receiver).with(foo: 15, bar: 'hello')
-      MyOperation.run(foo: 15, bar: 'hello')
+      SubOperation.run(foo: 15, bar: 'hello')
     end
 
     it "checks parameter types" do
@@ -97,11 +97,11 @@ describe 'HyperOperation basics' do
       expect(Store).to receive(:receiver).with({sku: "i'm skewed alright", qty: 1})
       expect(MyOperation.run(sku: "i'm skewed alright")).to be_resolved
       expect(MyOperation.run(sku: "i'm skewed alright", qty: 3.2))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
       expect(MyOperation.run(qty: 3))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
       expect(MyOperation.run(sku: "i'm skewed alright", qty: 0))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
     end
 
     it "can have array, array of types, or hash types" do
@@ -111,11 +111,11 @@ describe 'HyperOperation basics' do
       expect(Store).to receive(:receiver).with(array: ['hi'], int_array: [1], hash: {a: 1})
       expect(MyOperation.run(array: ['hi'], int_array: [1], hash: {a: 1})).to be_resolved
       expect(MyOperation.run(array: 'hi', int_array: [1], hash: {a: 1}))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
       expect(MyOperation.run(array: ['hi'], int_array: ['hi'], hash: {a: 1}))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
       expect(MyOperation.run(array: ['hi'], int_array: [1], hash: nil))
-      .to have_failed_with(HyperOperation::ValidationException)
+      .to have_failed_with(Hyperloop::Operation::ValidationException)
     end
 
     xit "can use complex Mutations filters" do
@@ -128,11 +128,9 @@ describe 'HyperOperation basics' do
       expect(MyOperation.run(hash: {a: '1', b: '1'})).to be_resolved
     end
 
-    it "can have an execute method" do
+    it "has a step method" do
       MyOperation.param :sku, type: String
-      MyOperation.send(:define_method, :execute) do
-        dispatch sku: 'fred'
-      end
+      MyOperation.step { params.sku = 'fred' }
       expect(Store).to receive(:receiver).with({sku: 'fred'})
       expect(MyOperation.run(sku: 'anything but fred')).to be_resolved
     end
@@ -141,10 +139,8 @@ describe 'HyperOperation basics' do
       MyOperation.param :sku, type: String
       MyOperation.param qty: 1, type: Integer, min: 1
       MyOperation.outbound :available
-      MyOperation.send(:define_method, :execute) do
-        params.available = params.qty - 1
-        dispatch qty: 100
-      end
+      MyOperation.step { params.available = params.qty - 1 }
+      MyOperation.step { params.qty = 100 }
       expect(Store).to receive(:receiver).with({sku: "sku", qty: 100, available: 3})
       expect(MyOperation.run(sku: "sku", qty: 4)).to be_resolved
     end
@@ -199,24 +195,24 @@ describe 'HyperOperation basics' do
           end
         end
         module Mod
-          class Op < HyperOperation
+          class Op < Hyperloop::Operation
             def execute
               Op2().then { |s1| Mod::Op2().then { |s2| s1+s2 } }
             end
           end
-          class Op2 < HyperOperation
+          class Op2 < Hyperloop::Operation
             def execute
               "Op2()"
             end
           end
         end
         class Klass
-          class Op < HyperOperation
+          class Op < Hyperloop::Operation
             def execute
               Op2().then { |s1| Klass::Op2().then { |s2| s1+s2 } }
             end
           end
-          class Op2 < HyperOperation
+          class Op2 < Hyperloop::Operation
             def execute
               "COp2()"
             end
@@ -245,7 +241,7 @@ describe 'HyperOperation basics' do
 
   it "will use the promise returned by execute", js: true do
     isomorphic do
-      class MyOperation < HyperOperation
+      class MyOperation < Hyperloop::Operation
         param :wait, type: Float, min: 0
         param :result
         def execute
@@ -264,13 +260,13 @@ describe 'HyperOperation basics' do
 
   it "can combine the operations with a Promise.when", js: true do
     on_client do
-      class SomeOperation < HyperOperation
+      class SomeOperation < Hyperloop::Operation
         param :wait
         def execute
           Promise.new.tap { |p| after(params.wait) { p.resolve } }
         end
       end
-      class DoABunchOStuff < HyperOperation
+      class DoABunchOStuff < Hyperloop::Operation
         def execute
           start_time = Time.now
           Promise.when(SomeOperation.run(wait: 2), SomeOperation.run(wait: 1)).then do
