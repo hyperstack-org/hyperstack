@@ -1,8 +1,8 @@
-module HyperStore
-  class Base
+module Hyperloop
+  class Store
     class << self
       def inherited(child)
-        child.include(HyperStore)
+        child.include(Mixin)
       end
     end
   end

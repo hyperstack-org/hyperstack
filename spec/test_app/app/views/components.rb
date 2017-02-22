@@ -31,12 +31,14 @@ class HyperOperation
   end
 end
 
-module HyperLoop
-  class Boot < HyperOperation
-    include React::IsomorphicHelpers
+module Hyperloop
+  class Application
+    class Boot < HyperOperation
+      include React::IsomorphicHelpers
 
-    before_first_mount do
-      dispatch
+      before_first_mount do
+        dispatch
+      end
     end
   end
 end

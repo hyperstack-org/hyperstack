@@ -14,7 +14,7 @@ describe 'the receives macro' do
   context 'arguments' do
     before(:each) do
       class Bar < HyperOperation; end
-      class Foo < HyperStore::Base
+      class Foo < Hyperloop::Store
         state :bar, scope: :class
       end
     end

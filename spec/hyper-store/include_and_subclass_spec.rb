@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 # Just checks to make sure all methods are available when either subclassing or including
-describe 'subclassing HyperStore::Base' do
+describe 'subclassing Hyperloop::Store' do
   before(:each) do
-    class Foo < HyperStore::Base
+    class Foo < Hyperloop::Store
     end
   end
 
@@ -44,10 +44,10 @@ describe 'subclassing HyperStore::Base' do
   end
 end
 
-describe 'including HyperStore' do
+describe 'including Hyperloop::Store::Mixin' do
   before(:each) do
     class Foo
-      include HyperStore
+      include Hyperloop::Store::Mixin
     end
   end
 

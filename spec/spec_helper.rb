@@ -64,7 +64,9 @@ class HyperOperation
   end
 end
 
-module HyperLoop
-  class Boot < HyperOperation
+module Hyperloop
+  class Application
+    class Boot < HyperOperation
+    end
   end
 end
