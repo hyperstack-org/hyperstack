@@ -62,6 +62,168 @@ describe 'StateWrapper' do
     context 'state' do
       context 'component test', js: true do
         context 'with an initial value' do
+          context 'of type' do
+            it 'nil' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: nil
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page).to have_content('@foo.state.bar: ')
+            end
+
+            it 'string' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: 'a state value'
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page).to have_content('@foo.state.bar: a state value')
+            end
+
+            it 'boolean' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: true
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page).to have_content('@foo.state.bar: true')
+            end
+
+            it 'integer' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: 30
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page).to have_content('@foo.state.bar: 30')
+            end
+
+            it 'decimal' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: 30.0
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page).to have_content('@foo.state.bar: 30')
+            end
+
+            it 'array' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: ['30', 30, 30.0]
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page).to have_content('@foo.state.bar: 30,30,30')
+            end
+
+            it 'hash' do
+              mount 'App' do
+                class Foo < HyperStore::Base
+                  state bar: { string: '30', integer: 30, decimal: 30.0 }
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page)
+                .to have_content('@foo.state.bar: {"string"=>"30", "integer"=>30, "decimal"=>30}')
+            end
+
+            it 'class instance' do
+              mount 'App' do
+                class Bar
+                  def to_s
+                    'Bar'
+                  end
+                end
+
+                class Foo < HyperStore::Base
+                  state bar: Bar.new
+                end
+                class App < React::Component::Base
+                  before_mount do
+                    @foo = Foo.new
+                  end
+
+                  render(DIV) do
+                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                  end
+                end
+              end
+
+              expect(page)
+                .to have_content('@foo.state.bar: Bar')
+            end
+          end
+
           context 'declared in the class level' do
             context 'for shared states' do
               it 'can be declared as the value of the name key in the hash' do

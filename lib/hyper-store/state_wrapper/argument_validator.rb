@@ -49,7 +49,7 @@ module HyperStore
         # If we pass in the name as a hash with a value ex: state foo: :bar,
         # we just put that value inside a Proc and return that
         if initial_value
-          -> { initial_value.dup }
+          dup_or_return_intial_value(initial_value)
         # If we pass in the initialize option
         elsif opts[:initializer]
           # If it's a Symbol we convert to to a Proc that calls the method on the instance
@@ -72,6 +72,19 @@ module HyperStore
         else
           -> {}
         end
+      end
+
+      # Dup the initial value if possible, otherwise just return it
+      # Ruby has no nice way of doing this...
+      def dup_or_return_intial_value(value)
+        value =
+          begin
+            value.dup
+          rescue
+            value
+          end
+
+        -> { value }
       end
     end
   end
