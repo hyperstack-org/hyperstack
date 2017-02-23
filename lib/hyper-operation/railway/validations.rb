@@ -45,7 +45,6 @@ module Hyperloop
               add_validation_error(i, "param validation #{i+1} aborted")
             end
             @state = :failed
-            @last_result = e.result unless e.result.empty?
             return # break does not work in Opal
           rescue AccessViolation => e
             add_validation_error(i, e)

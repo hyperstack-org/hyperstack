@@ -23,8 +23,8 @@ module Hyperloop
 
         def combine_arg_array(args)
           hash = args.inject({}.with_indifferent_access) do |h, arg|
-            raise ArgumentError.new("All arguments must be hashes") unless arg.is_a?(Hash)
-            h.merge!(arg)
+            raise ArgumentError.new("All arguments must be hashes") unless arg.respond_to? :to_h
+            h.merge!(arg.to_h)
           end
         end
 

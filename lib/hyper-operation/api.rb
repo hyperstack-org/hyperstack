@@ -23,12 +23,12 @@ module Hyperloop
       @params
     end
 
-    def abort!(*args)
-      Railway.abort!(args)
+    def abort!(arg = nil)
+      Railway.abort!(arg)
     end
 
-    def succeed!(*args)
-      Railway.succeed!(args)
+    def succeed!(arg = nil)
+      Railway.succeed!(arg)
     end
 
     def initialize
