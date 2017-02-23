@@ -27,7 +27,6 @@ class Object
       scopes = first.to_s.split('::').inject([Module]) do |nesting, next_const|
         nesting + [nesting.last.const_get(next_const)]
       end.reverse
-      #binding.pry
       scope = scopes.detect { |s| s.const_defined?(name) }
       const = scope.const_get(name) if scope
     end

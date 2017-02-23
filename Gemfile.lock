@@ -242,6 +242,8 @@ GEM
       rspec-expectations (~> 3.5.0)
       rspec-mocks (~> 3.5.0)
       rspec-support (~> 3.5.0)
+    rspec-steps (2.1.1)
+      rspec (>= 3.0, < 3.99)
     rspec-support (3.5.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
@@ -302,6 +304,7 @@ DEPENDENCIES
   rails (~> 5.0.0)
   rake (~> 10.0)
   rspec-rails
+  rspec-steps
   rspec-wait
   sqlite3 (= 1.3.10)
 

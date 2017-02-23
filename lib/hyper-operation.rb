@@ -16,14 +16,14 @@ if RUBY_ENGINE == 'opal'
   end
   require 'hyper-operation/exception'
   require 'hyper-operation/promise'
-  require 'hyper-operation/boot'
-  require 'hyper-operation/server_op'
   require 'hyper-operation/railway'
   require 'hyper-operation/api'
   require 'hyper-operation/railway/dispatcher'
   require 'hyper-operation/railway/params_wrapper'
   require 'hyper-operation/railway/run'
   require 'hyper-operation/railway/validations'
+  require 'hyper-operation/server_op'
+  require 'hyper-operation/boot'
 else
   require 'mutations'
   require 'hyper-operation/filters/outbound_filter'
@@ -42,7 +42,6 @@ else
   require 'hyper-operation/exception'
   require 'hyper-operation/promise'
   require 'hyper-operation/call_by_class_name'
-  require 'hyper-operation/server_op'
   require 'hyper-operation/railway'
   require 'hyper-operation/api'
   require 'hyper-operation/railway/dispatcher'
@@ -50,6 +49,7 @@ else
   require 'hyper-operation/railway/run.rb'
   require 'hyper-operation/railway/validations'
   require 'hyper-operation/transport/hyperloop_controller'
+  require 'hyper-operation/server_op'
   Opal.use_gem 'mutations'
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint

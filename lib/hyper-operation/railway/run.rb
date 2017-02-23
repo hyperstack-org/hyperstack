@@ -25,7 +25,7 @@ module Hyperloop
         end
 
         [:step, :failed, :async].each do |meth|
-          define_method :"add_#{meth}" do |*args, block|
+          define_method :"add_#{meth}" do |*args, &block|
             tracks << [instance_method(meth), to_opts(args), block]
           end
         end
@@ -43,10 +43,10 @@ module Hyperloop
         if @last_result.is_a? Promise
           @last_result = @last_result.then do |*result|
             @last_result = result
-            apply(:success, opts, block)
+            apply(opts, block)
           end
         elsif @state == :success
-          apply(:success, opts, block)
+          apply(opts, block)
         end
       end
 
@@ -54,25 +54,32 @@ module Hyperloop
         if @last_result.is_a? Promise
           @last_result = @last_result.fail do |*result|
             @last_result = result
-            apply(:failed, opts, block)
+            apply(opts, block)
           end
         elsif @state == :failed
-          apply(:failed, opts, block)
+          apply(opts, block)
         end
       end
 
       def async(opts, block)
-        apply(:failed, opts, block) if @state != :failed
+        apply(opts, block) if @state != :failed
       end
 
-      def apply(state, opts, block)
+      def apply(opts, block)
+        if opts[:scope] == :class
+          args = [@operation, *@last_result]
+          instance = @operation.class
+        else
+          args = @last_result
+          instance = @operation
+        end
         @last_result =
           if block.arity.zero?
-            @operation.instance_eval(&block)
-          elsif @last_result.is_a?(Array) && block.arity == result.count
-            @operation.instance_exec(*@last_result, &block)
+            instance.instance_eval(&block)
+          elsif args.is_a?(Array) && block.arity == args.count
+            instance.instance_exec(*args, &block)
           else
-            @operation.instance_exec(@last_result, block)
+            instance.instance_exec(args, &block)
           end
       rescue Exit => e
         @state = e.state
@@ -84,10 +91,10 @@ module Hyperloop
       end
 
       def run
-        return if @state
-        if @operation.has_errors?
+        if @operation.has_errors? || @state
+          @last_result ||= ValidationException.new(@operation.instance_variable_get('@errors'))
+          return if @state  # handles abort out of validation
           @state = :failed
-          @last_result = ValidationException.new(@operation.instance_variable_get('@errors'))
         else
           @state = :success
         end
@@ -99,9 +106,9 @@ module Hyperloop
         return @last_result if @last_result.is_a? Promise
         @last_result =
           if @state == :success
-            Promise.new.resolve(@last_result)
+            Promise.new.resolve(*@last_result)
           else
-            Promise.new.reject(@last_result)
+            Promise.new.reject(*@last_result)
           end
       end
     end

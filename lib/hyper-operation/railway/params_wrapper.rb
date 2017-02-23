@@ -7,7 +7,7 @@ module Hyperloop
       end
 
       def lock
-        @lock = true
+        @locked = true
         self
       end
 
@@ -104,7 +104,7 @@ module Hyperloop
       end
 
       def self.add_param(*args, &block)
-        params_wrapper.add_param(*args)
+        params_wrapper.add_param(*args, &block)
       end
 
       def self.params_wrapper

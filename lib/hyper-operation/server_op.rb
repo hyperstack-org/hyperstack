@@ -19,6 +19,7 @@ module Hyperloop
 
       def run_from_client(acting_user, params)
         params[:operation].constantize.class_eval do
+          raise AccessViolation unless _Railway.params_wrapper.method_defined? :acting_user
           run(params[:params].merge(acting_user: acting_user))
           .then { |r| return { json: { response: serialize_response(r) } } }
           .fail { |e| return { json: { error: e}, status: 500 } }
@@ -52,10 +53,10 @@ module Hyperloop
       end
 
       def dispatch_to(*args, &regulation)
-        _regulate_dispatch(nil, args, &regulation) if RUBY_ENGINE != 'opal'
+        _dispatch_to(nil, args, &regulation) if RUBY_ENGINE != 'opal'
       end
 
-      def _regulate_dispatch(context, args=[], &regulation)
+      def _dispatch_to(context, args=[], &regulation)
         if args.count == 0 && regulation.nil?
           raise "must provide either a list of channel classes or a block to regulate_dispatch"
         elsif args.count > 0 && regulation
@@ -72,7 +73,7 @@ module Hyperloop
 
       def dispatch_from_server(params_hash)
         params = _Railway.params_wrapper.new(deserialize_dispatch(params_hash)).lock
-        receivers.each { |receiver| receiver.call params }
+        _Railway.receivers.each { |receiver| receiver.call params }
       end
     end
   end

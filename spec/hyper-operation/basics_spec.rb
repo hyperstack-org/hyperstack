@@ -145,25 +145,24 @@ describe 'Hyperloop::Operation basics' do
       expect(MyOperation.run(sku: "sku", qty: 4)).to be_resolved
     end
 
-    it "dispatch will not accept undeclared parameters" do
-      MyOperation.param :sku, type: String
-      MyOperation.param qty: 1, type: Integer, min: 1
-      MyOperation.send(:define_method, :execute) do
-        dispatch qtyz: 100
-      end
-      expect(Store).not_to receive(:receiver)
-      expect(MyOperation.run(sku: "sku", qty: 4)).to have_failed_with(NoMethodError)
-    end
-
     it "params cannot be updated in a reciever" do
       MyOperation.param :sku, type: String
       Store.class_eval do
-        MyOperation.on_dispatch { |params| params.sku = nil }
+        def self.receiver(*args)
+        end
+        MyOperation.on_dispatch do |params|
+          begin
+            params.sku = nil
+          rescue Exception => e
+            error(e)
+          end
+        end
       end
-      expect(MyOperation.run(sku: "sku")).to have_failed_with(NoMethodError)
+      expect(Store).to receive(:error).with(NoMethodError)
+      MyOperation.run(sku: "sku")
     end
 
-    it "can have a class execute method" do
+    it "can have a class step method" do
       MyOperation.outbound :count
       MyOperation.class_eval do
         class << self
@@ -171,9 +170,7 @@ describe 'Hyperloop::Operation basics' do
             @count ||= 0
             @count += 1
           end
-          def execute(op)
-            op.dispatch count: count
-          end
+          step { |op| op.params.count = count }
         end
       end
       expect(Store).to receive(:receiver).with({count: 1})
@@ -196,26 +193,18 @@ describe 'Hyperloop::Operation basics' do
         end
         module Mod
           class Op < Hyperloop::Operation
-            def execute
-              Op2().then { |s1| Mod::Op2().then { |s2| s1+s2 } }
-            end
+            step { Op2().then { |s1| Mod::Op2().then { |s2| s1+s2 } } }
           end
           class Op2 < Hyperloop::Operation
-            def execute
-              "Op2()"
-            end
+            step { "Op2()" }
           end
         end
         class Klass
           class Op < Hyperloop::Operation
-            def execute
-              Op2().then { |s1| Klass::Op2().then { |s2| s1+s2 } }
-            end
+            step { Op2().then { |s1| Klass::Op2().then { |s2| s1+s2 } } }
           end
           class Op2 < Hyperloop::Operation
-            def execute
-              "COp2()"
-            end
+            step { "COp2()" }
           end
         end
       end
@@ -244,7 +233,7 @@ describe 'Hyperloop::Operation basics' do
       class MyOperation < Hyperloop::Operation
         param :wait, type: Float, min: 0
         param :result
-        def execute
+        step do
           Promise.new.tap { |p| after(params.wait) { p.resolve params.result } }
         end
       end
@@ -262,12 +251,12 @@ describe 'Hyperloop::Operation basics' do
     on_client do
       class SomeOperation < Hyperloop::Operation
         param :wait
-        def execute
+        step do
           Promise.new.tap { |p| after(params.wait) { p.resolve } }
         end
       end
       class DoABunchOStuff < Hyperloop::Operation
-        def execute
+        step do
           start_time = Time.now
           Promise.when(SomeOperation.run(wait: 2), SomeOperation.run(wait: 1)).then do
             Time.now - start_time
@@ -286,14 +275,14 @@ describe 'Hyperloop::Operation basics' do
         def self.bootcount
           @bootcount ||= 0
         end
-        Hyperloop::Boot.on_dispatch do
+        Hyperloop::Application::Boot.on_dispatch do
           @bootcount ||= 0
           @bootcount += 1
         end
       end
     end
     expect_evaluate_ruby("Receiver.bootcount").to eq(1)
-    evaluate_ruby("Hyperloop.Boot()")
+    evaluate_ruby("Hyperloop::Application::Boot()")
     expect_evaluate_ruby("Receiver.bootcount").to eq(2)
   end
 end

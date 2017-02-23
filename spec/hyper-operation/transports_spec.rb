@@ -12,8 +12,9 @@ end
 describe "Transport Tests", js: true do
 
   before(:each) do
+    stub_const "CreateTestModel", Class.new(Hyperloop::ServerOp)
     isomorphic do
-      class CreateTestModel < Hyperloop::Operation
+      class CreateTestModel < Hyperloop::ServerOp
         param :test_attribute
       end
     end

@@ -3,9 +3,9 @@ require 'spec_helper'
 describe "isomorphic operations", js: true do
   context 'uplinking' do
     before(:each) do
+      stub_const "ServerFacts", Class.new(Hyperloop::ServerOp)
       isomorphic do
-        class ServerFacts < HyperOperation::Isomorphic
-          param :acting_user, nils: true
+        class ServerFacts < Hyperloop::ServerOp
           param :n, type: Integer, min: 0
 
           class << self
@@ -15,14 +15,13 @@ describe "isomorphic operations", js: true do
             end
           end
 
-          def execute
-            ServerFacts.executed = true
-            ServerFacts.fact(params.n)
-          end
+          step { ServerFacts.executed = true }
+          step { ServerFacts.fact(params.n) }
         end
       end
     end
     it "can run a method on the server" do
+      ServerFacts.param :acting_user, nils: true
       expect_promise do
         ServerFacts(n: 5)
       end.to eq(ServerFacts.fact(5))
@@ -31,6 +30,7 @@ describe "isomorphic operations", js: true do
     end
 
     it "will pass server failures back" do
+      ServerFacts.param :acting_user, nils: true
       expect_promise do
         ServerFacts(n: -1).fail { |exception| Promise.new.resolve(exception) }
       end.to eq('N is too small')
@@ -39,12 +39,17 @@ describe "isomorphic operations", js: true do
       end.to eq('stack level too deep')
     end
 
-    it "will block bad uplinks" do
-      class ServerFacts < HyperOperation::Isomorphic
-        def validate
-         raise Hyperloop::AccessViolation
-       end
-     end
+    it "pass validation failures back" do
+      ServerFacts.param :acting_user, nils: true
+      class ServerFacts < Hyperloop::ServerOp
+        validate { false }
+      end
+      expect_promise do
+        ServerFacts(n: 5).fail { |exception| Promise.new.resolve(exception) }
+      end.to include('param validation 1 failed')
+    end
+
+    it "will reject uplinks that don't accept acting_user" do
       expect_promise do
         ServerFacts(n: 5).fail { |exception| Promise.new.resolve(exception) }
       end.to include('Hyperloop::AccessViolation')
@@ -69,6 +74,7 @@ describe "isomorphic operations", js: true do
     end
 
     before(:each) do
+      stub_const "Operation", Class.new(Hyperloop::ServerOp)
       on_client do
         class Test < React::Component::Base
           before_mount do
@@ -87,7 +93,7 @@ describe "isomorphic operations", js: true do
 
     it 'will dispatch to the client' do
       isomorphic do
-        class Operation < HyperOperation
+        class Operation < Hyperloop::ServerOp
           param :message
         end
       end
@@ -101,10 +107,10 @@ describe "isomorphic operations", js: true do
 
     it 'will evaluate channels dynamically' do
       isomorphic do
-        class Operation < HyperOperation
+        class Operation < Hyperloop::ServerOp
           param :message
           param :channels
-          regulate_dispatch { params.channels }
+          dispatch_to { params.channels }
         end
       end
       stub_const "ApplicationPolicy", Class.new
@@ -117,7 +123,7 @@ describe "isomorphic operations", js: true do
 
     it 'will attach the channel with the regulate_connection' do
       isomorphic do
-        class Operation < HyperOperation
+        class Operation < Hyperloop::ServerOp
           param :message
         end
       end
@@ -131,7 +137,7 @@ describe "isomorphic operations", js: true do
 
     it 'can regulate dispatches with the regulate_dispatches_from' do
       isomorphic do
-        class Operation < HyperOperation
+        class Operation < Hyperloop::ServerOp
           param :message
           param :broadcast, default: false
         end
@@ -150,7 +156,7 @@ describe "isomorphic operations", js: true do
 
     it 'can regulate dispatches with the regulate_dispatch applied to a policy' do
       isomorphic do
-        class Operation < HyperOperation
+        class Operation < Hyperloop::ServerOp
           param :message
           param :broadcast, default: false
         end
@@ -158,7 +164,7 @@ describe "isomorphic operations", js: true do
       stub_const "ApplicationPolicy", Class.new
       stub_const "OperationPolicy", Class.new
       ApplicationPolicy.always_allow_connection
-      OperationPolicy.regulate_dispatch { ['Application'] if params.broadcast }
+      OperationPolicy.dispatch_to { ['Application'] if params.broadcast }
       mount 'Test'
       expect(page).to have_content('No messages yet')
       Operation(message: 'hello')
@@ -170,7 +176,7 @@ describe "isomorphic operations", js: true do
 
     it 'will regulate with the always_dispatch_from regulation' do
       isomorphic do
-        class Operation < HyperOperation
+        class Operation < Hyperloop::ServerOp
           param :message
         end
       end

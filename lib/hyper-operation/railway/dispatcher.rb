@@ -11,7 +11,7 @@ module Hyperloop
           @receivers ||= []
         end
 
-        def add_receiver(block)
+        def add_receiver(&block)
           receivers << block
         end
       end

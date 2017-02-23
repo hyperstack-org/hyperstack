@@ -7,7 +7,7 @@ module Hyperloop
       end
 
       def add_validation_error(i, e)
-        @operation.add_error('param validation #{i}', :validation_error, e.to_s)
+        @operation.add_error("param validation #{i+1}", :validation_error, e.to_s)
       end
 
       class << self
@@ -15,17 +15,18 @@ module Hyperloop
           @validations ||= []
         end
 
-        def add_validation(args, block)
+        def add_validation(*args, &block)
           validations << block
         end
 
-        def add_error(param, symbol, message, args, block)
+        def add_error(param, symbol, message, *args, &block)
           add_validation(args) do
             begin
               add_error(param, symbol, message) if instance_eval(&block)
             rescue Exit => e
-              add_error(param, symbol, message) if e.state == :failed
-              raise e
+              raise e unless e.state == :failed
+              add_error(param, symbol, message)
+              raise Exit.new(:abort_from_add_error, e.result)
             end
           end
         end
@@ -34,20 +35,23 @@ module Hyperloop
       def process_validations
         validations.each_with_index do |validator, i|
           begin
-            next unless @operation.instance_eval(&validator)
-            add_validation_error(i, "failed")
+            next if @operation.instance_eval(&validator)
+            add_validation_error(i, "param validation #{i+1} failed")
           rescue Exit => e
-            if e.state != :failed
+            case e.state
+            when :success
               add_validation_error(i, "illegal use of succeed! in validation")
+            when :failed
+              add_validation_error(i, "param validation #{i+1} aborted")
             end
             @state = :failed
-            @last_result = e.result
-            break
+            @last_result = e.result unless e.result.empty?
+            return # break does not work in Opal
           rescue AccessViolation => e
             add_validation_error(i, e)
             @state = :failed
             @last_result = e
-            break
+            return # break does not work in Opal
           rescue Exception => e
             add_validation_error(i, e)
           end
