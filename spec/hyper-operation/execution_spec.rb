@@ -401,14 +401,8 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
         failed SayHelloOp # your params will be passed along to SayHelloOp
         failed { succeed! }
       end
-      begin
-        result = operation.run(xxx: 123)
-        [operation.hello_count, result.resolved?]
-      rescue Exception => e
-        puts "ERROR"
-        debugger
-        nil
-      end
+      result = operation.run(xxx: 123)
+      [operation.hello_count, result.resolved?]
     end.to eq [15, true]
   end
 
