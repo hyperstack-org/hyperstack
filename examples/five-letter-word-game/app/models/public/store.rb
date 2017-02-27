@@ -10,7 +10,7 @@ class Store
 
       def self.run(params = {})
         params[:sender] = id
-        super(params)
+        super
       end
 
       def self.dispatch_from_server(params)
