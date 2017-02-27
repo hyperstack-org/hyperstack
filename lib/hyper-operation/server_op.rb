@@ -66,7 +66,7 @@ module Hyperloop
         on_dispatch do |params, operation|
           serialized_params = serialize_dispatch(params.to_h)
           [operation.instance_exec(*context, &regulation)].flatten.compact.each do |channel|
-            Hyperloop.dispatch(channel: channel, operation: name, params: serialized_params)
+            Hyperloop.dispatch(channel: channel, operation: operation.class.name, params: serialized_params)
           end
         end
       end if RUBY_ENGINE != 'opal'
