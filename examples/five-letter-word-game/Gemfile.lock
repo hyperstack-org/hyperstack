@@ -10,6 +10,7 @@ PATH
     hyper-operation (0.1.0)
       activerecord (>= 0.3.0)
       hyper-react
+      hyperloop-config
       mutations
       opal-activesupport
 
@@ -103,6 +104,7 @@ GEM
     hyper-router (2.4.0)
       hyper-react
       opal-browser
+    hyperloop-config (0.8.1)
     i18n (0.8.1)
     jbuilder (2.6.3)
       activesupport (>= 3.0.0, < 5.2)

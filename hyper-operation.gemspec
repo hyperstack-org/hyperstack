@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-react'
   spec.add_dependency 'opal-activesupport'
   spec.add_dependency 'activerecord', '>= 0.3.0'
+  spec.add_dependency 'hyperloop-config'
 
   spec.add_development_dependency "bundler", "~> 1.8"
   spec.add_development_dependency "rake", "~> 10.0"
@@ -46,7 +47,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-wait'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rspec-steps'
-
-
 
 end

@@ -4,6 +4,7 @@ PATH
     hyper-operation (0.1.0)
       activerecord (>= 0.3.0)
       hyper-react
+      hyperloop-config
       mutations
       opal-activesupport
 
@@ -116,6 +117,7 @@ GEM
       selenium-webdriver (= 2.53.4)
       timecop
       unparser (= 0.2.5)
+    hyperloop-config (0.8.1)
     i18n (0.8.0)
     ice_nine (0.11.2)
     jquery-rails (4.2.2)
@@ -135,7 +137,7 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.10.1)
     multi_json (1.12.1)
-    mutations (0.8.0)
+    mutations (0.8.1)
       activesupport
     nio4r (1.2.1)
     nokogiri (1.7.0.1)

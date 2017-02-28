@@ -2,13 +2,11 @@
 # to indicate that records have changed: after_change and after_destroy
 module Hyperloop
 
-  extend Configuration
-
   def self.initialize_policies
     config_reset unless @config_reset_called
   end
 
-  def self.config_reset
+  on_config_reset do
     @config_reset_called = true
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
@@ -98,8 +96,7 @@ module Hyperloop
   end
 
   def self.on_server?
-    true
-    #Rails.const_defined? 'Server'
+    Rails.const_defined? 'Server'
   end
 
   def self.send_to_server(channel, data)
