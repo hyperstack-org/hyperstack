@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "hyperloop-config"
-  spec.version       = "0.8.0"
+  spec.version       = "0.8.1"
   spec.authors       = ["catmando"]
   spec.email         = ["mitch@catprint.com"]
 
