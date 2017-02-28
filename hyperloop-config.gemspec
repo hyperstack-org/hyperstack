@@ -1,17 +1,15 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'hyperloop/config/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "hyperloop-config"
-  spec.version       = Hyperloop::Config::VERSION
+  spec.version       = "0.8.0"
   spec.authors       = ["catmando"]
   spec.email         = ["mitch@catprint.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Provides a single point configuration module for hyperloop gems}
+  spec.homepage      = "http://ruby-hyperloop.io"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
