@@ -245,7 +245,7 @@ module Hyperloop
       regulations.collect do |_channel, regulation|
         # the following was bizarelly passing true for auto_connections_only????
         regulation.connectable_to(acting_user, auto_connections_only).collect do |obj|
-          if auto_connections_only
+          if false && auto_connections_only # false added to try to get channel instances to connect???
             [obj.class.name, obj.id]
           else
            InternalPolicy.channel_to_string obj
@@ -296,6 +296,7 @@ module Hyperloop
     def self.channels(session, acting_user)
       channels = ClassConnectionRegulation.connections_for(acting_user, true) +
         InstanceConnectionRegulation.connections_for(acting_user, true)
+      channels = channels.uniq
       channels.each do |channel|
         Connection.open(channel, session)
       end

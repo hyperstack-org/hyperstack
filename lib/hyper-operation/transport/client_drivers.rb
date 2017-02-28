@@ -6,6 +6,13 @@ module Hyperloop
   # We use ERB to determine the configuration and implement the appropriate
   # client interface to sync_change or sync_destroy
 
+  class Application
+    def self.acting_user_id
+      ClientDrivers.opts[:acting_user_id]
+    end
+  end
+
+
   if RUBY_ENGINE == 'opal'
     def self.connect(*channels)
       channels.each do |channel|
@@ -62,7 +69,7 @@ module Hyperloop
                   connected: function() {
                     #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
                   },
-                  received: function(data) { `data`['data']
+                  received: function(data) {
                     #{ClientDrivers.sync_dispatch(JSON.parse(`JSON.stringify(data)`)['data'])}
                   }
                 }
@@ -107,6 +114,7 @@ module Hyperloop
       config_hash = {
         transport: Hyperloop.transport,
         id: id,
+        acting_user_id: (controller.acting_user && controller.acting_user.id),
         client_logging: Hyperloop.client_logging,
         pusher_fake_js: pusher_fake_js,
         key: Hyperloop.key,

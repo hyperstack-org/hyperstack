@@ -98,7 +98,8 @@ module Hyperloop
   end
 
   def self.on_server?
-    Rails.const_defined? 'Server'
+    true
+    #Rails.const_defined? 'Server'
   end
 
   def self.send_to_server(channel, data)

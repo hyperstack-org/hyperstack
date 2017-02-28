@@ -60,4 +60,6 @@ gem 'hyper-react'
 gem 'therubyracer', platforms: :ruby
 gem 'react-router-rails', '~> 0.13.3'
 gem 'hyper-router'
-#gem 'hyper-mesh'
+gem 'hyper-store', git: 'https://github.com/ruby-hyperloop/hyper-store.git'
+gem 'pusher'
+gem 'pusher-fake'

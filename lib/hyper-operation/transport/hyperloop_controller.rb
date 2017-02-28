@@ -89,6 +89,7 @@ module Hyperloop
       end
 
       def subscribe
+        byebug
         Hyperloop::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
         root_path = request.original_url.gsub(/hyperloop-subscribe.*$/, '')
         Hyperloop::Connection.open(params[:channel], client_id, root_path)

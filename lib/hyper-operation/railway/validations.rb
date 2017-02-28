@@ -16,6 +16,7 @@ module Hyperloop
         end
 
         def add_validation(*args, &block)
+          block = args[0] if args[0]
           validations << block
         end
 
@@ -35,7 +36,8 @@ module Hyperloop
       def process_validations
         validations.each_with_index do |validator, i|
           begin
-            next if @operation.instance_eval(&validator)
+            validator = @operation.method(validator) if validator.is_a? Symbol
+            next if @operation.instance_exec(&validator)
             add_validation_error(i, "param validation #{i+1} failed")
           rescue Exit => e
             case e.state

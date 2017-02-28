@@ -65,8 +65,8 @@ module Hyperloop
         regulation ||= proc { args }
         on_dispatch do |params, operation|
           serialized_params = serialize_dispatch(params.to_h)
-          [operation.instance_exec(*context, &regulation)].flatten.compact.each do |channel|
-            Hyperloop.dispatch(channel: channel, operation: operation.class.name, params: serialized_params)
+          [operation.instance_exec(*context, &regulation)].flatten.compact.uniq.each do |channel|
+            Hyperloop.dispatch(channel: Hyperloop::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
           end
         end
       end if RUBY_ENGINE != 'opal'
