@@ -17,6 +17,19 @@ Style/DotPosition:
     - leading
     - trailing
 
+Style/MutableConstant:
+  Description: 'Do not assign mutable objects to constants.'
+  Enabled: false
+
+Metrics/AbcSize:
+  # The ABC size is a calculated magnitude, so this number can be a Fixnum or
+  # a Float.
+  Max: 20
+
+Metrics/BlockLength:
+  Description: 'Avoid long blocks with many lines.'
+  Enabled: false
+
 Metrics/LineLength:
   Max: 100
 
