@@ -1,5 +1,4 @@
-# ![](/work-in-progress-drinking.png) WARNING DOCS AND EXAMPLES ARE BEING REWRITTEN  MANY LINKS MAY BE BROKEN  STAY TUNED OR CHECK IN AT [![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) FOR MORE INFO 
-
+TODO: not sure where this should go?
 
 ## Random Words example
 
@@ -13,7 +12,7 @@ Your initial component should look like this:
 
 ```ruby
 # app/views/components/app.rb
-class App < React::Component::Base
+class App < Hyperloop::Component
 
   def add_new_word
     # for fun we will use setgetgo.com to get random words!

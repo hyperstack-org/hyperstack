@@ -1,4 +1,6 @@
-## The 5 Letter Word Game in HyperMesh
+TODO: delete?
+
+## The 5 Letter Word Game in Hyperloop
 
 We are going to implement a simple game (that is actually quite fun to play) using HyperMesh.
 

@@ -1,14 +1,14 @@
 ## ActiveRecord Scope Enhancement
 
-When the client receives notification that a record has changed HyperMesh finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
+When the client receives notification that a record has changed Hyperloop finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated in the browser.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way HyperMesh keeps the data requested by the browser limited to a reasonable amount.  
+On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated in the browser.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way Hyperloop keeps the data requested by the browser limited to a reasonable amount.  
 
-To make scopes work efficiently on the client HyperMesh adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with HyperMesh.
+To make scopes work efficiently on the client Hyperloop adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with Hyperloop.
 
 The additional features are accessed via the `:joins`, `:client`, and `:select` options.
 
-The `:joins` option tells the HyperMesh client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, HyperMesh will not know to update the scope.*
+The `:joins` option tells the Hyperloop client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, Hyperloop will not know to update the scope.*
 
 The `:client` and `:select` options provide the client a way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization and is not required for scopes to work.
 
@@ -34,7 +34,7 @@ class Todo < ActiveRecord::Base
   # Now with_recent_comments will be re-evaluated whenever a Todo record, or a Comment
   # joined with a Todo change.
 
-  # Normally whenever HyperMesh detects that a scope may be effected by a changed
+  # Normally whenever Hyperloop detects that a scope may be effected by a changed
   # model, it will request the scope be re-evaluated on the server.  To offload this
   # computation to the client provide a client side scope method:
 

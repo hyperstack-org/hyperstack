@@ -1,38 +1,40 @@
 ## ActiveRecord API
 
-HyperMesh uses a subset of the standard ActiveRecord API to give your client side HyperReact components access to your server side models.  As much as possible HyperMesh follows the syntax and semantics of ActiveRecord.  
+Hyperloop uses a subset of the standard ActiveRecord API to give your Isomorphic Components, Operations and Stores access to your server side Models.  As much as possible Hyperloop follows the syntax and semantics of ActiveRecord.  
 
 ### Interfacing to React
 
-HyperMesh integrates with React to deliver your model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
+Hyperloop integrates with React (through Components) to deliver your Model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
 
-HyperMesh automatically creates react state objects that will be updated as server side data is loaded or changes.  When these states change the associated parts of the display will be updated.
+Hyperloop automatically creates React state objects that will be updated as server side data is loaded or changes.  When these states change the associated parts of the display will be updated.
 
-A brief overview of how this works will help you understand the how HyperMesh gets the job done.
+A brief overview of how this works will help you understand the how Hypeloop gets the job done.
 
 #### Rendering Cycle
 
 On the UI you will be reading models in order to display data.
 
-If during the rendering of the display the model data is not yet loaded, placeholder values (the default values from the `columns_hash`) will be returned by HyperMesh.  
+If during the rendering of the display the Model data is not yet loaded, placeholder values (the default values from the `columns_hash`) will be returned by Hyperloop.  
 
-HyperMesh then keeps track of where these placeholders (or `DummyValue`s) are displayed, and when they do get loaded, those parts of the display will re-render.
+Hyperloop then keeps track of where these placeholders (or `DummyValue`s) are displayed, and when they do get loaded, those parts of the display will re-render.
 
 If later the data changes (either due to local user actions, or receiving push updates) then again any parts of the display that were dependent on the current values will be re-rendered.
 
-You normally do not have to be aware of this.  Just access your models using the normal scopes and finders, then compute values and display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
+You normally do not have to be aware of this.  Just access your Models using the normal scopes and finders, then compute values and display attributes as you would on the server.  Initially the display will show the placeholder values and then will be replaced with the real values.
 
 #### Prerendering
 
-During server-side pre-rendering, HyperMesh has direct access to the server so on initial page load all the values will be loaded and present.  
+During server-side pre-rendering, Hyperloop has direct access to the server so on initial page load all the values will be loaded and present.  
 
 #### Lazy Loading
 
-HyperMesh lazy loads values, and does not load any thing until an explicit displayable value is requested.  For example `Todo.all` will have no action, but `Todo.all.pluck[:title]` will return an array of titles.
+Hyperloop lazy loads values, and does not load any thing until an explicit displayable value is requested.  For example `Todo.all` will have no action, but `Todo.all.pluck[:title]` will return an array of titles.
 
 At the end of the rendering cycle the set of all values requested will be merged into a tree structure and sent to the server, returning the minimum amount of data needed.
 
 #### Load Cycle Methods
+
+TODO check link below
 
 There are a number of methods that allow you to interact with this load cycle when needed.  These are documented [below](#other-methods-for-interacting-with-the-load-and-render-cycle).
 
@@ -40,7 +42,7 @@ There are a number of methods that allow you to interact with this load cycle wh
 
 #### New and Create
 
-`new`: Takes a hash of attributes and initializes a new unsaved record.  The values of any attributes not specified in the hash will be taken from the models default values specified in the `columns_hash`.
+`new`: Takes a hash of attributes and initializes a new unsaved record.  The values of any attributes not specified in the hash will be taken from the Models default values specified in the `columns_hash`.
 
 If `new` is passed a native javascript object it will be treated as a hash and converted accordingly.
 
@@ -48,7 +50,9 @@ If `new` is passed a native javascript object it will be treated as a hash and c
 
 #### Scoping and Finding
 
-`scope` and `default_scope`:  HyperMesh adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the other options.  See the [Client Side Scoping](/docs/client_side_scoping.md) page for more details.
+`scope` and `default_scope`:  Hyperloop adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the other options.  See the [Client Side Scoping](/docs/client_side_scoping.md) page for more details.
+
+TODO check link above
 
 ```ruby
 # the active scope proc is executed on the server
@@ -74,7 +78,7 @@ scope :completed,
 Word.all.each { |word| LI { word.text }}
 ```
 
-BTW: to save typing you can skip the `all`:  Models will respond like enumerators
+BTW: to save typing you can skip the `all`:  Models will respond like enumerators.
 
 `find`: takes an id and delivers the corresponding record.
 
@@ -94,7 +98,7 @@ Word.offset(500).limit(20) # get words 500-519
 
 #### Relationships and Aggregations
 
-`belongs_to, has_many, has_one`:  These all work as on the server.  However it is important that you fully specify both sides of the relationship.  
+`belongs_to, has_many, has_one`:  These all work as on the server.  **However it is important that you fully specify both sides of the relationship.**  
 
 ```ruby
 class Todo < ActiveRecord::Base
@@ -233,12 +237,14 @@ After the destroy completes the record's `destroyed?` method will return true.
 
 All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.  Any value for which `loaded?` returns `false` (or `loading?` returns `true`) will eventually load and cause a re-render
 
-#### The `HyperMesh.load` Method
+TODO check below (was HyperMesh.load)
 
-Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `HyperMesh.load` method:
+#### The `HyperModel.load` Method
+
+Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `HyperModel.load` method:
 
 ```ruby
-HyperMesh.load do
+HyperModel.load do
   x = my_model.some_attribute
   OtherModel.find(x+12).other_attribute
   # code in here can be arbitrarily complex and load
@@ -266,4 +272,4 @@ before_mount do
 end
 ```
 
-Think hard about how you are using this, as HyperMesh already acts as flux store, and is managing state for you.  It may be you are just creating a redundant store!
+Think hard about how you are using this, as Hyperloop already acts as flux store, and is managing state for you.  It may be you are just creating a redundant store!
