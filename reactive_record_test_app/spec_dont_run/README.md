@@ -24,3 +24,10 @@ the server updates properly, is the way to go.
 
 Consult the existing specs in the spec/reactive_record directory and compare them to the
 old style files stored in `reactive_record_test_app/test/spec_dont_run/moved_to_main_spec_dir`.
+
+
+Note: Permissions is superceeded by a different set of tests in the main test spec directory
+however the old tests are there in case somebody has a chance to go through and make sure
+everything is covered.
+
+Note: Prerendering has not been formally tested... Probably should be its just a bit difficult.

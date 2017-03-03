@@ -137,17 +137,17 @@ module ActiveRecord
 
       def synchromesh_after_create
         return if do_not_synchronize? #|| previous_changes.empty?
-        HyperMesh.after_commit :create, self
+        ReactiveRecord::Broadcast.after_commit :create, self
       end
 
       def synchromesh_after_change
         return if do_not_synchronize? || previous_changes.empty?
-        HyperMesh.after_commit :change, self
+        ReactiveRecord::Broadcast.after_commit :change, self
       end
 
       def synchromesh_after_destroy
         return if do_not_synchronize?
-        HyperMesh.after_commit :destroy, self
+        ReactiveRecord::Broadcast.after_commit :destroy, self
       end
     else
 

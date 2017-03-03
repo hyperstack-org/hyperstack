@@ -195,7 +195,7 @@ describe "integration with react" do
     puts "html = #{html}"
     html == "R. VanDuyn - mitch@catprint.com (2 todos)"
   end
-
+  
   rendering("a server side value dynamically changed after first fetch from server") do
     puts "rendering"
     @render_times ||= 0
@@ -213,9 +213,18 @@ describe "integration with react" do
   end.should_generate do
     puts "html = #{html}"
     if html == "R. VanDuyn - mitch@catprint.com (2 todos)"
-      debugger
       true
     end
+  end
+
+  rendering('cleanup') do
+    times_up = React::State.get_state(self, "times_up")
+    @timer ||= after(0.5) { React::State.set_state(self, "times_up", "DONE")}
+    @count ||= 0
+    @count += 1
+    "#{times_up}#{@count}"
+  end.should_generate do
+    html == "DONE2"
   end
 
 end

@@ -1,3 +1,9 @@
+require './app/models/public/comment'
+require './app/models/public/todo_item'
+require './app/models/public/address'
+require './app/models/public/user'
+
+
 users = [
   ["Mitch", "VanDuyn", "mitch@catprint.com"],
   ["Todd", "Russell", "todd@catprint.com"],

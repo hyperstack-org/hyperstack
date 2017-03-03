@@ -1,0 +1,6 @@
+# normally this line would be set up in isomorphic base as part of the rails prerendering footer
+# we don't have rails so we do it manually.
+
+`window.ReactiveRecordPublicColumnsHash = <%= ActiveRecord::Base.public_columns_hash.to_json %>`
+
+require_tree './public' if RUBY_ENGINE == 'opal'

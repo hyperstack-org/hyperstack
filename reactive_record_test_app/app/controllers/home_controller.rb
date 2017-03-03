@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
 
   def index
-    redirect_to "/opal_spec"
+    redirect_to "/spec-opal"
   end
 
 end

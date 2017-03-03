@@ -58,4 +58,5 @@ gem 'therubyracer', platforms: :ruby
 gem 'react-router-rails', '~> 0.13.3'
 gem 'reactrb-router'
 gem 'hyper-mesh', path: '../..'
+gem 'hyper-operation', path: '../../../hyper-operation'
 gem 'opal-browser'

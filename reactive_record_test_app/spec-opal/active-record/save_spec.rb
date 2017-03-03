@@ -27,7 +27,7 @@ describe "simple record update and save" do
     mitch = User.find_by_email("mitch@catprint.com")
     mitch.first_name = "Mitchell"
     expect(mitch.first_name).to eq("Mitchell")
-  end
+  end  # TODO this was broken
 
   it "and the attribute will be marked as changed"do
     expect(User.find_by_email("mitch@catprint.com")).to be_changed
@@ -40,7 +40,7 @@ describe "simple record update and save" do
 
   it "after saving changed? will be false" do
     expect(User.find_by_email("mitch@catprint.com")).not_to be_changed
-  end
+  end  # TODO this was broken
 
   it "after saving saving? will be false" do
     expect(User.find_by_email("mitch@catprint.com")).not_to be_saving
@@ -53,7 +53,7 @@ describe "simple record update and save" do
     end.then do |first_name|
       expect(first_name).to eq("Mitchell")
     end
-  end
+  end  # TODO this was broken
 
   it "after saving within the block saving? will be false" do
     mitchell = User.find_by_email("mitch@catprint.com")
@@ -121,5 +121,4 @@ describe "simple record update and save" do
       expect(mitch).to be_changed
     end
   end
-
 end

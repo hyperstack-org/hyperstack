@@ -6,7 +6,7 @@
 /doc/
 /pkg/
 /spec/reports/
-/tmp/
+tmp/
 /spec/test_app/tmp/
 /spec/test_app/db/test.sqlite3
 /spec/test_app/log/test.log
@@ -25,3 +25,4 @@ reactive_record_test_app/log/
 reactive_record_test_app/tmp/
 reactive_record_test_app/.sass-cache
 .DS_Store
+public/assets/*

@@ -164,7 +164,8 @@ For complete details see [Authorization Policies](docs/authorization-policies.md
 
 - **Wrong version of pusher-fake**  (pusher-fake/base vs. pusher-fake/rspec) See the Pusher-Fake gem repo for details.
 
-- **Forgetting to add `require pusher` in application.js file**   will results in an error like this:   
+- Forgetting to add `require pusher` in application.js file  
+this results in an error like this:   
   ```text
   Exception raised while rendering #<TopLevelRailsComponent:0x53e>
       ReferenceError: Pusher is not defined
@@ -249,17 +250,16 @@ You can of course simulate server side changes to your Models through this conso
 
 `hyper-model` is the merger of `reactive-record`, `synchromesh` and `hyper-mesh` gems.  As such a lot of the internal names are still using either ReactiveRecord or Synchromesh module names.
 
-TODO check below is vstill alid
+The original `ReactiveRecord` specs were written in opal-rspec.  These are being migrated to use server rspec with isomorphic helpers.  There are about 150 of the original tests left and to run these you
 
-The original `ReactiveRecord` specs were written in opal-rspec.  These are being migrated to use server rspec with isomorphic helpers.  There are about 170 of the original tests left and to run these you
-
-1. cd to `reactive_record_spec/test_app`
+1. cd to `reactive_record_test_app`
 2. do a bundle install/update as needed,
-3. `rake db:reset db:test:prepare`,
+3. `bundle exec rake db:reset`,
 4. start the server: `bundle exec rails s`,
 5. then visit `localhost:3000/spec-opal`.
 
 If you want to help **PLEASE** consider spending an hour and migrate a spec file to the new format.  You can find examples by looking in the `spec/reactive_record/` directory and matching to the original file in
+
 `reactive_record_test_app/spec_dont_run/moved_to_main_spec_dir`
 
 The remaining tests are run in the more traditional `bundle exec rake`

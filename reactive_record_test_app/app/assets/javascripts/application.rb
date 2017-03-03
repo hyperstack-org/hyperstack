@@ -1,5 +1,3 @@
-require 'opal'
-require 'opal_ujs'
-#require 'react'
-require 'hyper-react'
-# not sure why we are not requiring components
+require 'components'
+require 'react_ujs'
+Opal.load('components')

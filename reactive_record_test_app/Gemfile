@@ -2,15 +2,19 @@ source "http://rubygems.org"
 gem "rails"
 gem 'sqlite3'
 gem 'react-rails'
-gem 'opal', '~> 0.9.0'
+gem 'opal'#, '~> 0.9.0'
 gem 'opal-rails'
 gem 'therubyracer'
 gem 'jquery-cookie-rails'
 gem 'byebug'
 gem 'pry-rails'
 gem 'pry-rescue'
-gem 'opal-rspec-rails', github: 'opal/opal-rspec-rails'
+# change gems and bundle update opal-rspec-rails to switch opal version...
+#gem 'opal-rspec-rails', github: 'opal/opal-rspec-rails', ref: '0b8dc2745bee1aa59fe56323cc6d6493d2129cfc' # 9.0
+gem 'opal-rspec-rails', github: 'opal/opal-rspec-rails', ref: '65de2771a539cda44a84c75082306869284b2ab4' # 10.0
+gem 'hyper-react'
 gem 'hyper-mesh', path: "../"
+gem 'hyper-operation', path: '../../hyper-operation'
 gem 'web-console'
 gem 'hyper-trace'
 gem 'pry'

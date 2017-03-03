@@ -104,7 +104,7 @@ if RUBY_ENGINE != 'opal'
       unless example.exception
         #Object.send(:remove_const, :Application) rescue nil
         ObjectSpace.each_object(Class).each do |klass|
-          if klass < HyperMesh::Regulation
+          if klass < Hyperloop::Regulation
             klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
           end
         end
@@ -130,7 +130,7 @@ if RUBY_ENGINE != 'opal'
   require 'database_cleaner'
   require 'capybara/rspec'
   require 'capybara/rails'
-  require 'support/component_helpers'
+  #require 'support/component_helpers'
   require 'capybara/poltergeist'
   require 'selenium-webdriver'
 
@@ -228,7 +228,7 @@ if RUBY_ENGINE != 'opal'
     end
 
     config.before(:each) do |x|
-      HyperMesh.class_eval do
+      Hyperloop.class_eval do
         def self.on_server?
           true
         end

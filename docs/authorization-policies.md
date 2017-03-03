@@ -170,7 +170,7 @@ Any ruby class that has a connection policy is a Hyperloop channel. The fully sc
 The purpose of having channels is to restrict what gets broadcast when models change, therefore typically channels represent *connections* to
 
 + the application, or some function within the application
-+ or some class which *authenticated* like a User or Administrator,
++ or some class which is *authenticated* like a User or Administrator,
 + instances of those classes,
 + or instances of related classes.
 

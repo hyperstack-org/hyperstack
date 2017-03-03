@@ -6,7 +6,7 @@ module ReactiveRecord
   end
 end
 
-module HyperMesh
+module Hyperloop
   class InternalPolicy
 
     def self.accessible_attributes_for(model, acting_user)
@@ -34,7 +34,7 @@ class ActiveRecord::Base
   attr_accessor :acting_user
 
   def view_permitted?(attribute)
-    HyperMesh::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
+    Hyperloop::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
   end
 
   def create_permitted?

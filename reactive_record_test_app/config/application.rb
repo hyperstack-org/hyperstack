@@ -63,11 +63,12 @@ module Dummy
     config.opal.arity_check         = false
     config.opal.const_missing       = true
     config.opal.dynamic_require_severity = :ignore
-    config.opal.source_map_enabled = false
+    #config.opal.source_map_enabled = false
 
     # Enable/disable /opal_specs route
     config.opal.enable_specs        = true
 
     config.opal.spec_location = 'spec-opal'
+    config.web_console.development_only = false
   end
 end

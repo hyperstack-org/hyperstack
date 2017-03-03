@@ -210,11 +210,11 @@ module ActiveRecord
     end
 
     def column_names
-      HyperMesh::ClientDrivers.public_columns_hash.keys
+      ReactiveRecord::Base.public_columns_hash.keys
     end
 
     def columns_hash
-      HyperMesh::ClientDrivers.public_columns_hash[name] || {}
+      ReactiveRecord::Base.public_columns_hash[name] || {}
     end
 
     def server_methods

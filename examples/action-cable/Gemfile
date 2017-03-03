@@ -54,4 +54,5 @@ gem 'hyper-react'
 gem 'therubyracer', platforms: :ruby
 gem 'react-router-rails', '~> 0.13.3'
 gem 'hyper-router'
-gem 'hyper-mesh'
+gem 'hyper-mesh', path: '../..'
+gem 'hyper-operation', path: '../../../hyper-operation'
