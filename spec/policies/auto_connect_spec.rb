@@ -33,7 +33,7 @@ describe 'channel auto connect' do
   it 'will not autoconnect a class channel if disabled' do
     ApplicationPolicy.regulate_class_connection(auto_connect: false) { true }
     ApplicationPolicy.regulate_instance_connections(TestModel) { self }
-    expect(Hyperloop::AutoConnect.channels(0, TestModel.find(1))).to eq([['TestModel',1]])
+    expect(Hyperloop::AutoConnect.channels(0, TestModel.find(1))).to eq(['TestModel-1'])
   end
 
   it 'will not autoconnect an instance channel if disabled' do
@@ -44,17 +44,17 @@ describe 'channel auto connect' do
 
   it 'can autoconnect to an instance' do
     TestModelPolicy.regulate_instance_connections { self }
-    expect(Hyperloop::AutoConnect.channels(0, TestModel.find(1))).to eq([['TestModel', 1]])
+    expect(Hyperloop::AutoConnect.channels(0, TestModel.find(1))).to eq(['TestModel-1'])
   end
 
   it 'can autoconnect to an instance and class' do
     TestModelPolicy.always_allow_connection
     TestModelPolicy.regulate_instance_connections { self }
-    expect(Hyperloop::AutoConnect.channels(0, TestModel.find(1))).to eq(['TestModel', ['TestModel', 1]])
+    expect(Hyperloop::AutoConnect.channels(0, TestModel.find(1))).to eq(['TestModel', 'TestModel-1'])
   end
 
   it 'can autoconnect to multiple instances' do
     TestModelPolicy.regulate_instance_connections { [TestModel.find(1), TestModel.find(2)] if self == 'acting_user'}
-    expect(Hyperloop::AutoConnect.channels(0, 'acting_user')).to eq([['TestModel', 1], ['TestModel', 2]])
+    expect(Hyperloop::AutoConnect.channels(0, 'acting_user')).to eq(['TestModel-1', 'TestModel-2'])
   end
 end

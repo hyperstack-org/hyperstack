@@ -21,7 +21,7 @@ module Hyperloop
         end
 
         def add_error(param, symbol, message, *args, &block)
-          add_validation(args) do
+          add_validation do
             begin
               add_error(param, symbol, message) if instance_eval(&block)
             rescue Exit => e
