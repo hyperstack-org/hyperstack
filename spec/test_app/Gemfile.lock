@@ -1,8 +1,19 @@
 PATH
+  remote: ../../../hyper-operation
+  specs:
+    hyper-operation (0.1.0)
+      activerecord (>= 0.3.0)
+      hyper-react
+      hyperloop-config
+      mutations
+      opal-activesupport
+
+PATH
   remote: ../..
   specs:
     hyper-mesh (0.5.4)
       activerecord (>= 0.3.0)
+      hyper-operation
       hyper-react (>= 0.10.0)
 
 GEM
@@ -74,6 +85,8 @@ GEM
       opal (>= 0.8.0)
       opal-activesupport (>= 0.2.0)
       react-rails
+    hyper-trace (0.3.1)
+    hyperloop-config (0.8.1)
     i18n (0.7.0)
     jbuilder (2.6.0)
       activesupport (>= 3.0.0, < 5.1)
@@ -97,6 +110,8 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.9.1)
     multi_json (1.12.1)
+    mutations (0.8.1)
+      activesupport
     mysql2 (0.4.5)
     nio4r (1.2.1)
     nokogiri (1.6.8.1)
@@ -225,6 +240,8 @@ DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
   hyper-mesh!
+  hyper-operation!
+  hyper-trace
   jbuilder (~> 2.0)
   jquery-rails
   jquery-ui-rails

@@ -14,7 +14,7 @@ gem 'pry-rescue'
 gem 'opal-rspec-rails', github: 'opal/opal-rspec-rails', ref: '65de2771a539cda44a84c75082306869284b2ab4' # 10.0
 gem 'hyper-react'
 gem 'hyper-mesh', path: "../"
-gem 'hyper-operation', path: '../../hyper-operation'
+gem 'hyper-operation', git: 'https://github.com/ruby-hyperloop/hyper-operation.git' # path: '../../hyper-operation'
 gem 'web-console'
 gem 'hyper-trace'
 gem 'pry'
