@@ -15,10 +15,12 @@ class Object
         scope = scopes.detect { |s| s.const_defined?(name) }
         const = scope.const_get(name) if scope
       end
+      debugger if name == '_Railway'
       _hyper_operation_original_method_missing(name, *args, &block) unless const.is_a?(Class) && const < Hyperloop::Operation
       const.send(:run, *args)
     end
   end
+
   alias _hyper_operation_original_method_missing method_missing
 
   def method_missing(name, *args, &block)
@@ -30,6 +32,7 @@ class Object
       scope = scopes.detect { |s| s.const_defined?(name) }
       const = scope.const_get(name) if scope
     end
+    debugger if name == '_Railway'
     _hyper_operation_original_method_missing(name, *args, &block) unless const.is_a?(Class) && const < Hyperloop::Operation
     const.send(:run, *args)
   end

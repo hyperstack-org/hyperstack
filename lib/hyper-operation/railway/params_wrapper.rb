@@ -38,7 +38,7 @@ module Hyperloop
         end
 
         def add_param(*args, &block)
-          type_method, name, opts, block = translate_args(*args, block)
+          type_method, name, opts, block = translate_args(*args, &block)
           if opts.key? :default
             hash_filter.optional { send(type_method, name, opts, &block) }
           else
@@ -65,7 +65,7 @@ module Hyperloop
           @hash_filter ||= Mutations::HashFilter.new
         end
 
-        def translate_args(*args, block)
+        def translate_args(*args, &block)
           name, opts = get_name_and_opts(*args)
           if opts.key?(:type)
             type_method = opts.delete(:type)

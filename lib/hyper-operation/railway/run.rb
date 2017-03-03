@@ -130,9 +130,9 @@ module Hyperloop
         return @last_result if @last_result.is_a? Promise
         @last_result =
           if @state == :success
-            Promise.new.resolve(*@last_result)
+            Promise.new.resolve(@last_result)
           else
-            Promise.new.reject(*@last_result)
+            Promise.new.reject(@last_result)
           end
       end
     end

@@ -3,10 +3,14 @@
 module Hyperloop
 
   def self.initialize_policies
-    config_reset unless @config_reset_called
+    reset_operations unless @config_reset_called
   end
 
   on_config_reset do
+    reset_operations
+  end
+
+  def self.reset_operations
     @config_reset_called = true
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
@@ -99,22 +103,22 @@ module Hyperloop
     Rails.const_defined? 'Server'
   end
 
-  def self.send_to_server(channel, data)
-    salt = SecureRandom.hex
-    authorization = Hyperloop.authorization(salt, channel, data[1][:broadcast_id])
-    raise 'no server running' unless Connection.root_path
-    uri = URI("#{Connection.root_path}console_update")
-    http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
-    if uri.scheme == 'https'
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
-    request.body = {
-      channel: channel, data: data, salt: salt, authorization: authorization
-    }.to_json
-    http.request(request)
-  end
+  # def self.send_to_server(channel, data)
+  #   salt = SecureRandom.hex
+  #   authorization = Hyperloop.authorization(salt, channel, data[1][:broadcast_id])
+  #   raise 'no server running' unless Connection.root_path
+  #   uri = URI("#{Connection.root_path}console_update")
+  #   http = Net::HTTP.new(uri.host, uri.port)
+  #   request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
+  #   if uri.scheme == 'https'
+  #     http.use_ssl = true
+  #     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+  #   end
+  #   request.body = {
+  #     channel: channel, data: data, salt: salt, authorization: authorization
+  #   }.to_json
+  #   http.request(request)
+  # end
 
   def self.pusher
     unless @pusher
@@ -148,17 +152,17 @@ module Hyperloop
     end
   end
 
-  def self.after_commit(operation, model)
-    InternalPolicy.regulate_broadcast(model) do |data|
-      if !Hyperloop.on_server? && Connection.root_path
-        Hyperloop.send_to_server(data[:channel], [operation, data])
-      else
-        Connection.send_to_channel(data[:channel], [operation, data])
-      end
-    end
-  rescue Exception
-    nil  # this is because during db migration we have problems... should investigate more...
-  end
+  # def self.after_commit(operation, model)
+  #   InternalPolicy.regulate_broadcast(model) do |data|
+  #     if !Hyperloop.on_server? && Connection.root_path
+  #       Hyperloop.send_to_server(data[:channel], [operation, data])
+  #     else
+  #       Connection.send_to_channel(data[:channel], [operation, data])
+  #     end
+  #   end
+  # rescue Exception
+  #   nil  # this is because during db migration we have problems... should investigate more...
+  # end
 
   Connection.transport = self
 end

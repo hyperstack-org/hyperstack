@@ -124,12 +124,14 @@ module Hyperloop
 
         child.singleton_class.define_singleton_method(:_Railway) do
           @_railway ||= begin
-            if superclass == Operation.singleton_class
+            # overcomes a bug in Opal 0.9 which returns nil for singleton superclass
+            my_super = superclass || `self.$$singleton_of`.superclass.singleton_class
+            if my_super == Operation.singleton_class
               Class.new(Railway)
             else
-              Class.new(superclass._Railway).tap do |wrapper|
+              Class.new(my_super._Railway).tap do |wrapper|
                 [:@validations, :@tracks, :@receivers].each do |var|
-                  value = superclass._Railway.instance_variable_get(var)
+                  value = my_super._Railway.instance_variable_get(var)
                   wrapper.instance_variable_set(var, value && value.dup)
                 end
               end

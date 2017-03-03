@@ -17,16 +17,33 @@ module Hyperloop
         end
       end if RUBY_ENGINE == 'opal'
 
-      def run_from_client(acting_user, params)
-        params[:operation].constantize.class_eval do
-          raise AccessViolation unless _Railway.params_wrapper.method_defined? :acting_user
-          run(params[:params].merge(acting_user: acting_user))
+      def run_from_client(security_param, operation, params)
+        operation.constantize.class_eval do
+          raise AccessViolation unless _Railway.params_wrapper.method_defined? security_param
+          run(params)
           .then { |r| return { json: { response: serialize_response(r) } } }
           .fail { |e| return { json: { error: e}, status: 500 } }
         end
       rescue Exception => e
         { json: {error: e}, status: 500 }
       end
+
+      def remote(path, *args)
+        promise = Promise.new
+        uri = URI("#{path}/execute_remote_api")
+        http = Net::HTTP.new(uri.host, uri.port)
+        request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+        request.body =
+          Hyperloop::Operation::ParamsWrapper.combine_arg_array(args).to_json
+        promise.resolve http.request(request)
+      rescue Exception => e
+        promise.reject e
+      end
+
 
       def serialize_params(hash)
         hash

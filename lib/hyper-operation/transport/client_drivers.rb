@@ -87,6 +87,8 @@ module Hyperloop
     include React::IsomorphicHelpers
 
     def self.sync_dispatch(data)
+      # TODO old synchromesh double checked at this point to make sure that this client
+      # expected to recieve from the channel the data was sent on.  Was that really needed?
       data[:operation].constantize.dispatch_from_server(data[:params])
     end
 

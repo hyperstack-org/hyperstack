@@ -32,7 +32,7 @@ module Hyperloop
 
     class HyperloopController < ::ApplicationController
 
-      protect_from_forgery except: [:console_update]
+      protect_from_forgery except: [:console_update, :execute_remote_api]
 
       def client_id
         params[:client_id]
@@ -128,7 +128,15 @@ module Hyperloop
       end
 
       def execute_remote
-        render ServerOp.run_from_client(acting_user, JSON.parse(params[:json]).symbolize_keys)
+        parsed_params = JSON.parse(params[:json]).symbolize_keys
+        render ServerOp.run_from_client(
+          :acting_user, parsed_params[:operation], parsed_params[:params].merge(acting_user: acting_user))
+      end
+
+      def execute_remote_api
+        parsed_params = JSON.parse(params[:json]).symbolize_keys
+        raise AccessViolation unless parsed_params[:authorization]
+        render ServerOp.run_from_client(:authorization, parsed_params[:operation], parsed_params[:params])
       end
 
       def console_update
