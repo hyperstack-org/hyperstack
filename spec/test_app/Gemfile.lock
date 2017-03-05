@@ -14,6 +14,15 @@ GIT
       unparser (= 0.2.5)
 
 PATH
+  remote: ../../../hyper-react
+  specs:
+    hyper-react (0.11.0)
+      hyper-store
+      opal (>= 0.8.0)
+      opal-activesupport (>= 0.2.0)
+      react-rails
+
+PATH
   remote: ../..
   specs:
     hyper-store (0.1.0)
@@ -98,10 +107,6 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hike (1.2.3)
-    hyper-react (0.11.0)
-      opal (>= 0.8.0)
-      opal-activesupport (>= 0.2.0)
-      react-rails
     i18n (0.8.0)
     ice_nine (0.11.2)
     jquery-rails (4.2.2)
@@ -285,7 +290,7 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
-  hyper-react
+  hyper-react!
   hyper-spec!
   hyper-store!
   jquery-rails

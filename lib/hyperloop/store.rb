@@ -5,5 +5,8 @@ module Hyperloop
         child.include(Mixin)
       end
     end
+    def initialize
+      init_store
+    end
   end
 end

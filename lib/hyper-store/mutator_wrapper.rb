@@ -1,11 +1,10 @@
 module HyperStore
-  class MutatorWrapper
-    attr_reader :from
+  class MutatorWrapper < BasicObject
 
     class << self
       def add_method(klass, method_name, opts = {})
         define_method(:"#{method_name}") do |*args|
-          from = opts[:scope] == :shared ? klass.state.from : @from
+          from = opts[:scope] == :shared ? klass.state.__from__ : @__from__
           current_value = React::State.get_state(from, method_name.to_s)
 
           if args.count > 0
@@ -55,14 +54,22 @@ module HyperStore
       end
     end
 
-    def initialize(from)
-      @from = from
+    attr_accessor :__from__
+
+    def self.new(from)
+      instance = allocate
+      instance.__from__ = from
+      instance
+    end
+
+    def __class__
+      (class << self; self end).superclass
     end
 
     # Any method_missing call will create a state and accessor with that name
     def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
-      self.class.add_method(nil, name)
-      send(name, *args, &block)
+      __class__.add_method(nil, name)
+      __send__(name, *args, &block)
     end
   end
 end

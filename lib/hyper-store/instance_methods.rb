@@ -1,6 +1,6 @@
 module HyperStore
   module InstanceMethods
-    def initialize
+    def init_store
       self.class.__instance_states.each do |instance_state|
         # If the scope is shared then we initialize at the class level
         next if instance_state[1][:scope] == :shared
@@ -19,7 +19,6 @@ module HyperStore
         mutate.send(:"#{instance_state[0]}", block_value)
       end
 
-      super
     end
 
     def state

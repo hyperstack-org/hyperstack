@@ -1,8 +1,6 @@
 module HyperStore
-  class StateWrapper
+  class StateWrapper #< BasicObject # TODO StateWrapper should from basic object to avoid name space conflicts
     extend ArgumentValidator
-
-    attr_reader :from
 
     class << self
       attr_reader :instance_state_wrapper, :class_state_wrapper,
@@ -69,7 +67,7 @@ module HyperStore
 
       def add_method(klass, method_name, opts = {})
         define_method(:"#{method_name}") do
-          from = opts[:scope] == :shared ? klass.state.from : @from
+          from = opts[:scope] == :shared ? klass.state.__from__ : @__from__
           React::State.get_state(from, method_name.to_s)
         end
       end
@@ -91,13 +89,20 @@ module HyperStore
       end
     end
 
+    attr_accessor :__from__
+
     def initialize(from)
-      @from = from
+      __from__ = from
     end
 
+    # def self.new(from)
+    #   instance = allocate
+    #   instance.__from__ = from
+    #   instance
+    # end
     # Any method_missing call will create a state and accessor with that name
     def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
-      self.class.add_method(nil, name)
+      self.class.add_method(nil, name) #(class << self; self end).superclass.add_method(nil, name)
       send(name, *args, &block)
     end
   end
