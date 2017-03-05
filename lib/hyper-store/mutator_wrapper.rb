@@ -4,7 +4,7 @@ module HyperStore
     class << self
       def add_method(klass, method_name, opts = {})
         define_method(:"#{method_name}") do |*args|
-          from = opts[:scope] == :shared ? klass.state.__from__ : @__from__
+          from = opts[:scope] == :shared ? klass.state.__from__ : __from__
           current_value = React::State.get_state(from, method_name.to_s)
 
           if args.count > 0
@@ -56,10 +56,14 @@ module HyperStore
 
     attr_accessor :__from__
 
-    def self.new(from)
-      instance = allocate
-      instance.__from__ = from
-      instance
+    # def self.new(from)
+    #   instance = allocate
+    #   instance.__from__ = from
+    #   instance
+    # end
+
+    def initialize(from)
+      __from__ = from
     end
 
     def __class__
@@ -68,8 +72,8 @@ module HyperStore
 
     # Any method_missing call will create a state and accessor with that name
     def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
-      __class__.add_method(nil, name)
-      __send__(name, *args, &block)
+      self.class.add_method(nil, name)
+      send(name, *args, &block)
     end
   end
 end
