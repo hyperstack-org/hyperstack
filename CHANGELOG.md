@@ -25,6 +25,10 @@ Whitespace conventions:
 - `React::Server` is provided as a module wrapping the original `ReactDOMServer` API, require `react/server` to use it. (#186)
 - `React::Config` is introduced, `environment` is the only config option provided for now. See [#204](https://github.com/ruby-hyperloop/hyper-react/issues/204) for usage details.
 
+### Changed
+
+- State syntax is now consistent with Hyperloop::Store, old syntax is deprecated. (#209, #97)
+
 ### Deprecated
 
 - Current ref callback behavior is deprecated. Require `"react/ref_callback"` to get the updated behavior. (#188)
@@ -34,10 +38,15 @@ Whitespace conventions:
 ### Removed
 
 - `react-latest` & `react-v1x` is removed. Use `react/react-source-browser` or `react/react-source-server` instead.
+- Support for Ruby < 2.0 is removed. (#201)
 
 ### Fixed
 
 - [NativeLibrary] Passing native JS object as props will raise exception. (#195)
+- Returns better error message if result of rendering block is not suitable (#207)
+- Batch all state changes and execute *after* rendering cycle (#206, #178)  (Code is now moved to Hyper::Store)  
+  You can revert to the old behavior by defining the `React::State::ALWAYS_UPDATE_STATE_AFTER_RENDER = false`
+- Memory Leak in render context fixed (#192)
 
 
 ## [0.11.0] - 2016-12-13

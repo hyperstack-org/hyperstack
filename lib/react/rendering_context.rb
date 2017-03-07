@@ -4,6 +4,8 @@ module React
       attr_accessor :waiting_on_resources
 
       def render(name, *args, &block)
+        was_outer_most = !@not_outer_most
+        @not_outer_most = true
         remove_nodes_from_args(args)
         @buffer ||= [] unless @buffer
         if block
@@ -31,6 +33,8 @@ module React
         @buffer << element
         self.waiting_on_resources = nil
         element
+      ensure
+        @not_outer_most = @buffer = nil if was_outer_most
       end
 
       def build

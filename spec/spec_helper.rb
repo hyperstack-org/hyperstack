@@ -46,6 +46,13 @@ if RUBY_ENGINE == 'opal'
     end
   end
 
+  module React
+    class State
+      # this messes with lots of tests, these tests will be retested in the new hyper-component gem tests
+      ALWAYS_UPDATE_STATE_AFTER_RENDER = false
+    end
+  end
+
   module Opal
     module RSpec
       module AsyncHelpers
