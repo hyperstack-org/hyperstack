@@ -186,7 +186,7 @@ describe React::Component, type: :component do
         define_state :foo
         before_mount :set_up
         def set_up
-          self.foo = 'bar'
+          mutate.foo 'bar'
         end
       end
 
@@ -208,7 +208,7 @@ describe React::Component, type: :component do
         define_state(:foo) { 10 }
         before_mount :bump
         def bump
-          self.foo = self.foo + 20
+          mutate.foo(state.foo + 20)
         end
       end
 
@@ -221,8 +221,8 @@ describe React::Component, type: :component do
         define_state :foo, :foo2
         before_mount :set_up
         def set_up
-          self.foo = 10
-          self.foo2 = 20
+          mutate.foo 10
+          mutate.foo2 20
         end
       end
 
@@ -267,7 +267,7 @@ describe React::Component, type: :component do
       Foo.class_eval do
         define_state(:foo) { 10 }
         def render
-          React.create_element('div') { self.foo }
+          React.create_element('div') { state.foo }
         end
       end
 
@@ -289,12 +289,16 @@ describe React::Component, type: :component do
     it 'supports original `replaceState` as `set_state!` method' do
       Foo.class_eval do
         before_mount do
-          self.set_state(foo: 'bar')
-          self.set_state!(bar: 'lorem')
+          set_state(foo: 'bar')
+          set_state!(bar: 'lorem')
         end
       end
 
       element = renderToDocument(Foo)
+      puts "*************************************************************************************"
+      puts "element.state[:foo] = #{element.state[:foo]}"
+      puts "element.state[:bar] = #{element.state[:bar]}"
+      puts "*************************************************************************************"
       expect(element.state[:foo]).to be_nil
       expect(element.state[:bar]).to eq('lorem')
     end
@@ -318,11 +322,11 @@ describe React::Component, type: :component do
         define_state :foo
 
         before_mount do
-          self.foo = [{a: "Hello"}]
+          mutate.foo [{a: "Hello"}]
         end
 
         def render
-          div { self.foo[0][:a] }
+          div { state.foo[0][:a] }
         end
       end
 
@@ -567,7 +571,7 @@ describe React::Component, type: :component do
 
         def render
           React.create_element('div').on(:click) do
-            self.clicked = true
+            mutate.clicked true
           end
         end
       end
@@ -580,10 +584,15 @@ describe React::Component, type: :component do
 
     it 'invokes handler on `this.props` using emit' do
       Foo.class_eval do
+        param :_onFooSubmit, type: Proc
         after_mount :setup
 
         def setup
+          puts "***************************** about to emit******************************"
           self.emit(:foo_submit, 'bar')
+          puts "***************************** emitted!!! ********************************"
+        rescue Exception => e
+          puts "FAILED FAILED FAILED #{e}"
         end
 
         def render
@@ -599,6 +608,7 @@ describe React::Component, type: :component do
 
     it 'invokes handler with multiple params using emit' do
       Foo.class_eval do
+        param :_onFooInvoked, type: Proc
         after_mount :setup
 
         def setup

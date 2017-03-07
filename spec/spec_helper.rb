@@ -26,6 +26,26 @@ if RUBY_ENGINE == 'opal'
 
   require File.expand_path('../support/react/spec_helpers', __FILE__)
 
+  # turn off deprecation warnings for old style name spaces during this test
+  module React
+    module Component
+
+      def self.included(base)
+        # deprecation_warning base, "The module name React::Component has been deprecated.  Use Hyperloop::Component::Mixin instead."
+        base.include Hyperloop::Component::Mixin
+      end
+
+      class Base
+        def self.inherited(child)
+          # unless child.to_s == "React::Component::HyperTestDummy"
+          #   React::Component.deprecation_warning child, "The class name React::Component::Base has been deprecated.  Use Hyperloop::Component instead."
+          # end
+          child.include(ComponentNoNotice)
+        end
+      end
+    end
+  end
+
   module Opal
     module RSpec
       module AsyncHelpers

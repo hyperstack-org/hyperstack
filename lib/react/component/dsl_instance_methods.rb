@@ -18,10 +18,6 @@ module React
       def refs
         Hash.new(`#{@native}.refs`)
       end
-
-      def state
-        @state_wrapper ||= StateWrapper.new(@native, self)
-      end
     end
   end
 end

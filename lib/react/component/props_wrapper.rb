@@ -1,11 +1,6 @@
 module React
   module Component
 
-    def deprecated_params_method(name, *args, &block)
-      React::Component.deprecation_warning"Direct access to param `#{name}`.  Use `params.#{name}` instead."
-      params.send(name, *args, &block)
-    end
-
     class PropsWrapper
       attr_reader :component
 

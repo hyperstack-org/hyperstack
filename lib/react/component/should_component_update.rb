@@ -83,13 +83,9 @@ module React
       end
       # rubocop:enable Metrics/MethodLength
 
-      # Do a shallow compare on the two hashes. Starting in 0.9 we will do a deep compare.
+      # Do a shallow compare on the two hashes. Starting in 0.9 we will do a deep compare. ???
 
       def props_changed?(next_params)
-        Component.deprecation_warning(
-          "Using shallow incoming params comparison.\n"\
-          'Do a require "reactrb/deep-compare, to get 0.9 behavior'
-        )
         (props.keys.sort != next_params.keys.sort) ||
           next_params.detect { |k, v| `#{v} != #{@native}.props[#{k}]` }
       end

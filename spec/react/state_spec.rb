@@ -2,13 +2,13 @@ require 'spec_helper'
 
 if opal?
 describe 'React::State' do
-  it "can created static exported states" do
+  it "can create dynamically initialized exported states" do
     stub_const 'Foo', Class.new
     Foo.class_eval do
       include React::Component
       export_state(:foo) { 'bar' }
     end
-
+    Hyperloop::Application::Boot.run
     expect(Foo.foo).to eq('bar')
   end
 

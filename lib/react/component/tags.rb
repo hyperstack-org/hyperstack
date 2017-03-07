@@ -27,16 +27,10 @@ module React
                   %w(circle clipPath defs ellipse g line linearGradient mask path pattern polygon polyline
                   radialGradient rect stop svg text tspan)
 
-      # note: any tag can end in _as_node but this is deprecated
-
       # the present method is retained as a legacy behavior
 
       def present(component, *params, &children)
         React::RenderingContext.render(component, *params, &children)
-      end
-
-      def present_as_node(component, *params, &children)
-        React::RenderingContext.build_only(component, *params, &children)
       end
 
       # define each predefined tag as an instance method
@@ -64,10 +58,6 @@ module React
           #const_set tag.upcase, React.create_element(tag)
           #Object.const_set tag.upcase, Class.new(HtmlTagWrapper)
         end
-        # handle deprecated _as_node style
-        define_method("#{tag}_as_node") do |*params, &children|
-          React::RenderingContext.build_only(tag, *params, &children)
-        end
       end
 
       def self.html_tag_class_for(tag)
@@ -81,14 +71,9 @@ module React
       # where there is no preceeding scope.
 
       def method_missing(name, *params, &children)
-        if name =~ /_as_node$/
-          # handle deprecated _as_node style
-          component = find_component(name.gsub(/_as_node$/, ''))
-          return React::RenderingContext.build_only(component, *params, &children) if component
-        else
-          component = find_component(name)
-          return React::RenderingContext.render(component, *params, &children) if component
-        end
+        debugger
+        component = find_component(name)
+        return React::RenderingContext.render(component, *params, &children) if component
         Object.method_missing(name, *params, &children)
       end
 
@@ -97,13 +82,13 @@ module React
 
       class << self
         def included(component)
-          _name, parent = find_name_and_parent(component)
+          name, parent = find_name_and_parent(component)
           tag_names_module = Module.new do
-            define_method _name do |*params, &children|
+            define_method name do |*params, &children|
               React::RenderingContext.render(component, *params, &children)
             end
             # handle deprecated _as_node style
-            define_method "#{_name}_as_node" do |*params, &children|
+            define_method "#{name}_as_node" do |*params, &children|
               React::RenderingContext.build_only(component, *params, &children)
             end
           end

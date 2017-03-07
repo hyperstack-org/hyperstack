@@ -1,6 +1,12 @@
 
 
 if RUBY_ENGINE == 'opal'
+
+  module Hyperloop
+    class Component
+    end
+  end
+
   if `Opal.global.React === undefined || Opal.global.React.version === undefined`
     raise [
       "No React.js Available",
@@ -32,7 +38,17 @@ if RUBY_ENGINE == 'opal'
   require 'reactive-ruby/isomorphic_helpers'
   require 'rails-helpers/top_level_rails_component'
   require 'reactive-ruby/version'
-
+  module Hyperloop
+    class Component
+      def self.inherited(child)
+        child.include(Mixin)
+      end
+    end
+  end
+  React::Component.deprecation_warning(
+    'components.rb',
+    "Requiring 'hyper-react' is deprecated.  Use gem 'hyper-component', and require 'hyper-component' instead."
+  ) unless defined? Hyperloop::Component::VERSION
 else
   require 'opal'
   # rubocop:disable Lint/HandleExceptions

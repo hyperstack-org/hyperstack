@@ -111,6 +111,7 @@ module React
           ctx["ServerSideIsomorphicMethods"] = self
           send_to_opal(:load_context, @unique_id, name)
         end
+        Hyperloop::Application::Boot.run(context: self)
         self.class.before_first_mount_blocks.each { |block| block.call(self) }
       end
 

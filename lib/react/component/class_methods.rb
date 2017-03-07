@@ -3,6 +3,10 @@ module React
     # class level methods (macros) for components
     module ClassMethods
 
+      def deprecation_warning(message)
+        React::Component.deprecation_warning(self, message)
+      end
+
       def reactrb_component?
         true
       end
@@ -113,51 +117,22 @@ module React
       end
 
       def define_state(*states, &block)
+        deprecation_warning "'define_state' is deprecated. Use the 'state' macro to declare states."
         default_initial_value = (block && block.arity == 0) ? yield : nil
         states_hash = (states.last.is_a?(Hash)) ? states.pop : {}
-        states.each { |name| states_hash[name] = default_initial_value }
-        (self.initial_state ||= {}).merge! states_hash
-        states_hash.each do |name, initial_value|
-          define_state_methods(self, name, &block)
-        end
+        states.each { |name| state(name => default_initial_value) } # was states_hash[name] = default_initial_value
+        states_hash.each { |name, value| state(name => value) }
       end
 
       def export_state(*states, &block)
+        deprecation_warning "'export_state' is deprecated. Use the 'state' macro to declare states."
         default_initial_value = (block && block.arity == 0) ? yield : nil
         states_hash = (states.last.is_a?(Hash)) ? states.pop : {}
         states.each { |name| states_hash[name] = default_initial_value }
-        State.initialize_states(self, states_hash)
-        states_hash.each do |name, initial_value|
-          define_state_methods(self, name, self, &block)
-          define_state_methods(singleton_class, name, self, &block)
-        end
-      end
-
-      def define_state_methods(this, name, from = nil, &block)
-        this.define_method("#{name}") do
-          React::Component.deprecation_warning "Direct access to state `#{name}`.  Use `state.#{name}` instead." if from.nil? || from == this
-          State.get_state(from || self, name)
-        end
-        this.define_method("#{name}=") do |new_state|
-          React::Component.deprecation_warning "Direct assignment to state `#{name}`.  Use `#{(from && from != this) ? from : 'state'}.#{name}!` instead."
-          yield name, State.get_state(from || self, name), new_state if block && block.arity > 0
-          State.set_state(from || self, name, new_state)
-        end
-        this.define_method("#{name}!") do |*args|
-          React::Component.deprecation_warning "Direct access to state `#{name}`.  Use `state.#{name}` instead."  if from.nil? or from == this
-          if args.count > 0
-            yield name, State.get_state(from || self, name), args[0] if block && block.arity > 0
-            current_value = State.get_state(from || self, name)
-            State.set_state(from || self, name, args[0])
-            current_value
-          else
-            current_state = State.get_state(from || self, name)
-            yield name, State.get_state(from || self, name), current_state if block && block.arity > 0
-            State.set_state(from || self, name, current_state)
-            Observable.new(current_state) do |update|
-              yield name, State.get_state(from || self, name), update if block && block.arity > 0
-              State.set_state(from || self, name, update)
-            end
+        states_hash.each do |name, value|
+          state(name => value, scope: :class, reader: true)
+          singleton_class.define_method("#{name}!") do |*args|
+            mutate.__send__(name, *args)
           end
         end
       end

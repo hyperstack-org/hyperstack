@@ -1,6 +1,6 @@
 module React
   class TopLevelRailsComponent
-    include React::Component
+    include Hyperloop::Component::Mixin
 
     def self.search_path
       @search_path ||= [Module]

@@ -3,13 +3,6 @@ module React
     class << self
       attr_accessor :waiting_on_resources
 
-      def build_only(name, *args, &block)
-        React::Component.deprecation_warning(
-          '..._as_node is deprecated.  Render component and then use the .node method instead'
-        )
-        React::RenderingContext.build { React::RenderingContext.render(name, *args, &block) }.to_n
-      end
-
       def render(name, *args, &block)
         remove_nodes_from_args(args)
         @buffer ||= [] unless @buffer
