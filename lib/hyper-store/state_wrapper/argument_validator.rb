@@ -1,5 +1,5 @@
 module HyperStore
-  class StateWrapper < BasicObject
+  class StateWrapper < BaseStoreClass
     module ArgumentValidator
       class InvalidOptionError < StandardError; end
 

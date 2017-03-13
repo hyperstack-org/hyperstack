@@ -16,6 +16,7 @@ module TestApp
     config.eager_load_paths += %W(#{config.root}/app/models/public)
     config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s
+    config.hyperloop.auto_config = false
     # config.opal.arity_check = false
   end
 end

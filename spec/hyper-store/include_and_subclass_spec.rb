@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+def class_of(x)
+  (class << x; self end)
+end
+
 # Just checks to make sure all methods are available when either subclassing or including
 describe 'subclassing Hyperloop::Store' do
   before(:each) do
@@ -16,12 +20,12 @@ describe 'subclassing Hyperloop::Store' do
   context 'class level' do
     it 'should define the :state method' do
       expect(Foo.singleton_methods).to include(:state)
-      expect(Foo.state).to be_a(HyperStore::StateWrapper)
+      expect(class_of(Foo.state)).to be < HyperStore::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(Foo.singleton_methods).to include(:mutate)
-      expect(Foo.mutate).to be_a(HyperStore::MutatorWrapper)
+      expect(class_of(Foo.mutate)).to be < HyperStore::MutatorWrapper
     end
 
     it 'should define the :receieves method' do
@@ -34,12 +38,12 @@ describe 'subclassing Hyperloop::Store' do
 
     it 'should define the :state method' do
       expect(@foo.methods).to include(:state)
-      expect(@foo.state).to be_a(HyperStore::StateWrapper)
+      expect(class_of(@foo.state)).to be < HyperStore::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(@foo.methods).to include(:mutate)
-      expect(@foo.mutate).to be_a(HyperStore::MutatorWrapper)
+      expect(class_of(@foo.mutate)).to be < HyperStore::MutatorWrapper
     end
   end
 end
@@ -60,12 +64,12 @@ describe 'including Hyperloop::Store::Mixin' do
   context 'class level' do
     it 'should define the :state method' do
       expect(Foo.singleton_methods).to include(:state)
-      expect(Foo.state).to be_a(HyperStore::StateWrapper)
+      expect(class_of(Foo.state)).to be < HyperStore::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(Foo.singleton_methods).to include(:mutate)
-      expect(Foo.mutate).to be_a(HyperStore::MutatorWrapper)
+      expect(class_of(Foo.mutate)).to be < HyperStore::MutatorWrapper
     end
 
     it 'should define the :receieves method' do
@@ -78,12 +82,12 @@ describe 'including Hyperloop::Store::Mixin' do
 
     it 'should define the :state method' do
       expect(@foo.methods).to include(:state)
-      expect(@foo.state).to be_a(HyperStore::StateWrapper)
+      expect(class_of(@foo.state)).to be < HyperStore::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(@foo.methods).to include(:mutate)
-      expect(@foo.mutate).to be_a(HyperStore::MutatorWrapper)
+      expect(class_of(@foo.mutate)).to be < HyperStore::MutatorWrapper
     end
   end
 end

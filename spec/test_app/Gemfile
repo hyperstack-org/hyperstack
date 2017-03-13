@@ -11,7 +11,7 @@ gem 'sqlite3'
 gem 'puma', '~> 3.6.0'
 gem 'jquery-rails'
 
-gem 'hyper-react', path: '../../../hyper-react'
+#gem 'hyper-react', path: '../../../hyper-react'
 gem 'hyper-spec', git: 'https://www.github.com/ruby-hyperloop/hyper-spec'
 gem 'hyper-store', path: '../..'
 gem 'opal', '~> 0.9.0'

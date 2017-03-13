@@ -757,7 +757,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: 'a state value', scope: :shared
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -773,7 +773,7 @@ describe 'StateWrapper' do
                   end
                 end
 
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq(Foo.baz)
@@ -785,7 +785,7 @@ describe 'StateWrapper' do
                   state :bar, scope: :shared, initializer: -> { 'a state value' }
                 end
                 foo = Foo.new
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
                 expect(foo.state.bar).to eq('a state value')
@@ -798,7 +798,7 @@ describe 'StateWrapper' do
                   end
                 end
                 foo = Foo.new
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
                 expect(foo.state.bar).to eq('a state value')
@@ -810,7 +810,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: 'a state value', scope: :class
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -823,7 +823,7 @@ describe 'StateWrapper' do
                     'a state value'
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq(Foo.baz)
               end
@@ -832,7 +832,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state :bar, scope: :class, initializer: -> { 'a state value' }
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -843,7 +843,7 @@ describe 'StateWrapper' do
                     'a state value'
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -902,7 +902,7 @@ describe 'StateWrapper' do
                     state bar: 'a state value', scope: :shared
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -919,7 +919,7 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq(Foo.baz)
@@ -932,7 +932,7 @@ describe 'StateWrapper' do
                     state :bar, scope: :shared, initializer: -> { 'a state value' }
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -947,7 +947,7 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -962,7 +962,7 @@ describe 'StateWrapper' do
                     state bar: 'a state value'
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -977,7 +977,7 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq(Foo.baz)
               end
@@ -988,7 +988,7 @@ describe 'StateWrapper' do
                     state :bar, initializer: -> { 'a state value' }
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -1001,7 +1001,7 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-                Hyperloop::Application::Boot.dispatch
+                Hyperloop::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -1077,8 +1077,7 @@ describe 'StateWrapper' do
               state :bar
             end
             foo = Foo.new
-
-            expect(foo.state.methods).to include(:bar)
+            expect((class << foo.state; self; end).respond_to? :bar).to be_truthy
           end
 
           it 'can be passed in as a hash argument first' do
@@ -1086,8 +1085,7 @@ describe 'StateWrapper' do
               state bar: nil
             end
             foo = Foo.new
-
-            expect(foo.state.methods).to include(:bar)
+            expect((class << foo.state; self; end).respond_to? :bar).to be_truthy
           end
 
           it 'will raise an error if it is not passed in first' do

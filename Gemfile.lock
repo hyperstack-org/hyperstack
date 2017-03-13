@@ -1,8 +1,9 @@
 PATH
   remote: ../hyper-react
   specs:
-    hyper-react (0.11.0)
+    hyper-react (0.12.0)
       hyper-store
+      hyperloop-config
       opal (>= 0.8.0)
       opal-activesupport (>= 0.2.0)
       react-rails
@@ -10,7 +11,8 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-store (0.1.0)
+    hyper-store (0.2.0)
+      hyperloop-config
 
 GEM
   remote: https://rubygems.org/
@@ -81,7 +83,7 @@ GEM
     concord (0.1.5)
       adamantium (~> 0.2.0)
       equalizer (~> 0.0.9)
-    concurrent-ruby (1.0.4)
+    concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     diff-lcs (1.2.5)
     equalizer (0.0.11)
@@ -101,6 +103,8 @@ GEM
       selenium-webdriver (= 2.53.4)
       timecop
       unparser (= 0.2.5)
+    hyperloop-config (0.9.1)
+      opal
     i18n (0.8.0)
     ice_nine (0.11.2)
     jquery-rails (4.2.2)

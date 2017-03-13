@@ -2,6 +2,16 @@ require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
 describe 'the receives macro' do
+
+  before(:all) do
+    class TestOp < Hyperloop::Operation
+      def self.dispatch(params={})
+        receivers.each do |receiver|
+          receiver.call params
+        end
+      end
+    end
+  end
   after(:each) do
     # There's gotta be a better way to deal with this
     Object.send(:remove_const, :Foo)
@@ -13,7 +23,7 @@ describe 'the receives macro' do
 
   context 'arguments' do
     before(:each) do
-      class Bar < HyperOperation; end
+      class Bar < TestOp; end
       class Foo < Hyperloop::Store
         state :bar, scope: :class
       end
@@ -33,8 +43,8 @@ describe 'the receives macro' do
       end
 
       it 'will allow several to be passed in' do
-        class Baz < HyperOperation; end
-        class Bat < HyperOperation; end
+        class Baz < TestOp; end
+        class Bat < TestOp; end
         Foo.class_eval do
           receives Bar, Baz, Bat do |params|
             mutate.bar(params[:foo])
@@ -54,8 +64,8 @@ describe 'the receives macro' do
       end
 
       it 'will allow one passed in to different receivers' do
-        class Baz < HyperOperation; end
-        class Bat < HyperOperation; end
+        class Baz < TestOp; end
+        class Bat < TestOp; end
         Foo.class_eval do
           receives Bar do |params|
             mutate.bar(params[:bar])
@@ -83,11 +93,11 @@ describe 'the receives macro' do
       end
 
       it 'will allow several passed in to different receivers' do
-        class Baz < HyperOperation; end
-        class Bat < HyperOperation; end
-        class Bak < HyperOperation; end
-        class Baq < HyperOperation; end
-        class Bax < HyperOperation; end
+        class Baz < TestOp; end
+        class Bat < TestOp; end
+        class Bak < TestOp; end
+        class Baq < TestOp; end
+        class Bax < TestOp; end
         Foo.class_eval do
           receives Bar, Baz, Bat do |params|
             mutate.bar(params[:foo])

@@ -1,5 +1,5 @@
 module HyperStore
-  class MutatorWrapper < BasicObject
+  class MutatorWrapper < BaseStoreClass # < BasicObject
 
     class << self
       def add_method(klass, method_name, opts = {})
@@ -30,13 +30,13 @@ module HyperStore
 
         if initializer && opts[:block]
           klass.receives(Hyperloop::Application::Boot, initializer) do
-            klass.mutate.send(:"#{name}", opts[:block].call)
+            klass.mutate.__send__(:"#{name}", opts[:block].call)
           end
         elsif initializer
           klass.receives(Hyperloop::Application::Boot, initializer)
         elsif opts[:block]
           klass.receives(Hyperloop::Application::Boot) do
-            klass.mutate.send(:"#{name}", opts[:block].call)
+            klass.mutate.__send__(:"#{name}", opts[:block].call)
           end
         end
       end
@@ -47,33 +47,25 @@ module HyperStore
         # We gotta check the arity because a Proc passed in directly from initializer has no args,
         # but if we created one then we might have wanted the class
         if initializer.arity > 0
-          -> { klass.mutate.send(:"#{name}", initializer.call(klass)) }
+          -> { klass.mutate.__send__(:"#{name}", initializer.call(klass)) }
         else
-          -> { klass.mutate.send(:"#{name}", initializer.call) }
+          -> { klass.mutate.__send__(:"#{name}", initializer.call) }
         end
       end
     end
 
     attr_accessor :__from__
 
-    # def self.new(from)
-    #   instance = allocate
-    #   instance.__from__ = from
-    #   instance
-    # end
-
-    def initialize(from)
-      __from__ = from
-    end
-
-    def __class__
-      (class << self; self end).superclass
+    def self.new(from)
+      instance = allocate
+      instance.__from__ = from
+      instance
     end
 
     # Any method_missing call will create a state and accessor with that name
     def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
-      self.class.add_method(nil, name)
-      send(name, *args, &block)
+      (class << self; self end).add_method(nil, name)
+      __send__(name, *args, &block)
     end
   end
 end

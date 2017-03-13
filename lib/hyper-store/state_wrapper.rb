@@ -1,5 +1,5 @@
 module HyperStore
-  class StateWrapper #< BasicObject # TODO StateWrapper should from basic object to avoid name space conflicts
+  class StateWrapper < BaseStoreClass #< BasicObject # TODO StateWrapper should from basic object to avoid name space conflicts
     extend ArgumentValidator
 
     class << self
@@ -41,12 +41,12 @@ module HyperStore
 
         if [:instance, :shared].include?(opts[:scope])
           klass.class_eval do
-            define_method(:"#{opts[:reader]}") { state.send(:"#{name}") }
+            define_method(:"#{opts[:reader]}") { state.__send__(:"#{name}") }
           end
         end
 
         if [:class, :shared].include?(opts[:scope])
-          klass.define_singleton_method(:"#{opts[:reader]}") { state.send(:"#{name}") }
+          klass.define_singleton_method(:"#{opts[:reader]}") { state.__send__(:"#{name}") }
         end
       end
 
@@ -67,6 +67,7 @@ module HyperStore
 
       def add_method(klass, method_name, opts = {})
         define_method(:"#{method_name}") do
+          #puts "**************** args = #{args}"
           from = opts[:scope] == :shared ? klass.state.__from__ : @__from__
           React::State.get_state(from, method_name.to_s)
         end
@@ -91,19 +92,17 @@ module HyperStore
 
     attr_accessor :__from__
 
-    def initialize(from)
-      __from__ = from
+    def self.new(from)
+      instance = allocate
+      instance.__from__ = from
+      instance
     end
 
-    # def self.new(from)
-    #   instance = allocate
-    #   instance.__from__ = from
-    #   instance
-    # end
     # Any method_missing call will create a state and accessor with that name
     def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
-      self.class.add_method(nil, name) #(class << self; self end).superclass.add_method(nil, name)
-      send(name, *args, &block)
+      $method_missing = [name, *args]
+      (class << self; self end).add_method(nil, name) #(class << self; self end).superclass.add_method(nil, name)
+      __send__(name, *args, &block)
     end
   end
 end

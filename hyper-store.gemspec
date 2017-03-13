@@ -26,8 +26,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'hyperloop-config'
   spec.add_development_dependency 'bundler', '~> 1.12'
-  spec.add_development_dependency 'hyper-react', '>= 0.10.0'
+  spec.add_development_dependency 'hyper-react', '>= 0.12.0'
   spec.add_development_dependency 'hyper-spec'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'opal'

@@ -10,13 +10,13 @@ module HyperStore
 
         # First initialize value from initializer Proc
         proc_value = initializer_value(instance_state[1][:initializer])
-        mutate.send(:"#{instance_state[0]}", proc_value)
+        mutate.__send__(:"#{instance_state[0]}", proc_value)
 
         # Then call the block if a block is passed
         next unless instance_state[1][:block]
 
         block_value = instance_eval(&instance_state[1][:block])
-        mutate.send(:"#{instance_state[0]}", block_value)
+        mutate.__send__(:"#{instance_state[0]}", block_value)
       end
 
     end
