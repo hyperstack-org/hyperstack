@@ -4,72 +4,90 @@ module Hyperloop
       @requires ||= []
     end
 
-    def require(value, gem: nil, override_with: nil, client_only: nil, tree: nil)
-      if override_with
-        define_class_method "#{override_with}=" do |value|
-          requires.detect do |name, _value, _client_only, _kind|
-            name == override_with
-          end[1] = value
+    def require(value, gem: nil, instead_of: nil, client_only: nil, server_only: nil, tree: nil)
+      if instead_of
+        current_spec = requires.detect { |old_value, *_rest| instead_of == old_value }
+        if current_spec
+          current_spec[0] = value
+        else
+          raise [
+            "Could not substitute require '#{instead_of}' with '#{value}'.  '#{instead_of}' not found.",
+            'The following requires are listed:',
+            *requires.collect { |old_value, *_rest| old_value }
+          ].join("\n")
         end
+      else
+        kind = if gem
+                 :gem
+               elsif tree
+                 :tree
+               end
+        requires << [value, !client_only, !server_only, kind]
       end
-      kind = if gem
-        :gem
-      elsif tree
-        :tree
-      end
-      requires << [override_with, value, client_only, kind]
     end
 
-    def require_tree(value, override_with: nil, client_only: nil)
-      require(value, override_with: override_with, client_only: client_only, tree: true)
+    def unrequire(value)
+      require(nil, instead_of: value)
     end
 
-    def require_gem(value, override_with: nil, client_only: nil)
-      require(value, override_with: override_with, client_only: client_only, gem: true)
+    def require_tree(value, instead_of: nil, client_only: nil, server_only: nil)
+      require(value, instead_of: instead_of, client_only: client_only, server_only: server_only, tree: true)
+    end
+
+    def require_gem(value, instead_of: nil, client_only: nil, server_only: nil)
+      require(value, instead_of: instead_of, client_only: client_only, server_only: server_only, gem: true)
     end
 
     def generate_requires(mode, file)
       puts "***** generating requires for #{mode} - #{file}"
-      requires.collect do |name, value, client_only, kind|
+      requires.collect do |value, render_on_server, render_on_client, kind|
         next unless value
-        next if client_only && mode != :client
+        next if mode == :client && !render_on_client
+        next if mode == :server && !render_on_server
         if kind == :tree
-          generate_require_tree(value, client_only)
+          generate_require_tree(value, render_on_server, render_on_client)
         elsif kind == :gem
-          r = "require '#{value}' #{client_guard(client_only)}"
+          r = "require '#{value}' #{client_guard(render_on_server, render_on_client)}"
           puts r
           "puts \"#{r}\"; #{r}"
         else
-          generate_directive(:require, value, file, client_only)
+          generate_directive(:require, value, file, render_on_server, render_on_client)
         end
       end.compact.join("\n")
     end
 
-    def generate_directive(directive, to, file, client_only = false)
+    def generate_directive(directive, to, file, render_on_server, render_on_client)
       gem_path = File.expand_path('../', file).split('/')
       comp_path = Rails.root.join('app', 'hyperloop', to).to_s.split('/')
       while comp_path.first == gem_path.first do
         gem_path.shift
         comp_path.shift
       end
-      r = "#{directive} '#{(['.'] + ['..'] * gem_path.length + comp_path).join('/')}' #{client_guard(client_only)}"
+      r = "#{directive} '#{(['.'] + ['..'] * gem_path.length + comp_path).join('/')}' #{client_guard(render_on_server, render_on_client)}"
       puts r
       "puts \"#{r}\"; #{r}"
     end
 
-    def generate_require_tree(path, client_only)
+    def generate_require_tree(path, render_on_server, render_on_client)
       base_name = Rails.root.join('app', path).to_s+'/'
       Dir.glob(Rails.root.join('app', path, '**', '*')).collect do |fname|
-        if ['.js', '.rb', '.erb'].include? File.extname(fname)
-          r = "require '#{fname.gsub(base_name, '')}' #{client_guard(client_only)}"
+        fname = fname.gsub(/^#{base_name}/, '')
+        fname = fname.gsub(/\.erb$/, '')
+        if fname =~ /(\.js$)|(\.rb$)/
+          fname = fname.gsub(/(\.js$)|(\.rb$)/, '')
+          r = "require '#{fname}' #{client_guard(render_on_server, render_on_client)}"
           puts r
           "puts \"#{r}\"; #{r}"
         end
       end.compact.join("\n")
     end
 
-    def client_guard(client_only)
-      "# CLIENT ONLY" if client_only
+    def client_guard(render_on_server, render_on_client)
+      if !render_on_server
+        '# CLIENT ONLY'
+      elsif !render_on_client
+        '# SERVER ONLY'
+      end
     end
 
   end

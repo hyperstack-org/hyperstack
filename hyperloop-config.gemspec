@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "hyperloop-config"
-  spec.version       = "0.9.0"
+  spec.version       = "0.9.1"
   spec.authors       = ["catmando"]
   spec.email         = ["mitch@catprint.com"]
 
@@ -21,4 +21,16 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
+
+  spec.add_development_dependency 'hyper-spec'
+  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'timecop'
+  spec.add_development_dependency 'opal-rails'
+  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'rails'
+  spec.add_development_dependency 'jquery-rails'
+
+  # Keep linter-rubocop happy
+  spec.add_development_dependency 'rubocop'
+
 end
