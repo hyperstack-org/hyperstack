@@ -1,4 +1,9 @@
-
+require 'hyperloop-config'
+Hyperloop.require_gem 'react/react-source-browser'
+Hyperloop.require_gem 'react/react-source-server', server_only: true
+Hyperloop.require_gem 'opal-jquery', client_only: true
+Hyperloop.require_gem 'browser/delay', client_only: true
+Hyperloop.require_gem 'react_ujs', client_only: true
 
 if RUBY_ENGINE == 'opal'
 

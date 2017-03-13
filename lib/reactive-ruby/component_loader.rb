@@ -29,7 +29,8 @@ module ReactiveRuby
     private
 
     def components
-      # Make this configurable at some point
+      opts = ::Rails.configuration.react.server_renderer_options
+      return opts[:files].first.gsub(/.js$/,'') if opts && opts[:files]
       'components'
     end
 

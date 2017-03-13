@@ -4,6 +4,8 @@ source "https://rubygems.org"
 
 ruby ">= 1.9.3"
 
+gem "hyper-store", :path => "../../hyper-store"
+gem "hyperloop-config", :path => "../../hyperloop-config"
 gem "opal", "~> 0.8.0"
 gem "opal-rails", "~> 0.8.1"
 gem "react-rails", "~> 1.6.2", :require => false
