@@ -1,6 +1,6 @@
 require 'set'
 require 'hyperloop-config'
-Hyperloop.require 'hyper-store', gem: true
+Hyperloop.import 'hyper-store'
 
 
 module HyperStore # allows us to easily turn off BasicObject for debug
