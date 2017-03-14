@@ -14,7 +14,7 @@ Element.instance_eval do
 
   define_method :render do |container = nil, params = {}, &block|
     if `#{self.to_n}._reactrb_component_class === undefined`
-      `#{self.to_n}._reactrb_component_class = #{Class.new(React::Component::Base)}`
+      `#{self.to_n}._reactrb_component_class = #{Class.new(Hyperloop::Component)}`
     end
     klass = `#{self.to_n}._reactrb_component_class`
     klass.class_eval do

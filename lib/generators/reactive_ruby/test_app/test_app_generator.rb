@@ -68,6 +68,8 @@ module ReactiveRuby
     config.opal.dynamic_require_severity = :ignore
     config.opal.enable_specs = true
     config.opal.spec_location = 'spec-opal'
+    config.hyperloop.auto_config = false
+
 ]
       end
     end
