@@ -20,9 +20,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'opal', '>= 0.8.0'
   s.add_dependency 'opal-activesupport', '>= 0.2.0'
-  s.add_dependency 'react-rails'
-  s.add_dependency 'hyper-store'
-  s.add_dependency 'hyperloop-config'
+  s.add_dependency 'hyper-store', '>= 0.2.1'
+  s.add_dependency 'hyperloop-config', '>= 0.9.2'
   s.add_development_dependency 'rake', '< 11.0'
   s.add_development_dependency 'rspec-rails', '3.3.3'
   s.add_development_dependency 'timecop'
@@ -34,6 +33,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rails', '4.2.4'
   s.add_development_dependency 'mime-types', '< 3'
   s.add_development_dependency 'opal-rails'
+  s.add_development_dependency 'react-rails', '< 1.10.0'
+
   s.add_development_dependency 'nokogiri', '< 1.7'
   s.add_development_dependency 'rubocop'
   if RUBY_PLATFORM == 'java'

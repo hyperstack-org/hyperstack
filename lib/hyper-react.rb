@@ -1,9 +1,11 @@
 require 'hyperloop-config'
-Hyperloop.require_gem 'react/react-source-browser'
-Hyperloop.require_gem 'react/react-source-server', server_only: true
-Hyperloop.require_gem 'opal-jquery', client_only: true
-Hyperloop.require_gem 'browser/delay', client_only: true
-Hyperloop.require_gem 'react_ujs', client_only: true
+Hyperloop.import 'hyper-store'
+Hyperloop.import 'react/react-source-browser'
+Hyperloop.import 'react/react-source-server', server_only: true
+Hyperloop.import 'opal-jquery', client_only: true
+Hyperloop.import 'browser/delay', client_only: true
+Hyperloop.import 'react_ujs', client_only: true
+Hyperloop.import 'hyper-react'
 
 if RUBY_ENGINE == 'opal'
 
@@ -62,6 +64,8 @@ else
   rescue LoadError
   end
   # rubocop:enable Lint/HandleExceptions
+
+  require 'hyper-store'
   require 'opal-activesupport'
   require 'reactive-ruby/version'
   require 'reactive-ruby/rails' if defined?(Rails)
