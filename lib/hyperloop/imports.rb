@@ -1,46 +1,44 @@
 module Hyperloop
   class << self
-    def requires
-      @requires ||= []
+    def import_list
+      @import_list ||= []
     end
 
-    def require(value, gem: nil, instead_of: nil, client_only: nil, server_only: nil, tree: nil)
+    def import(value, gem: nil, instead_of: nil, client_only: nil, server_only: nil, tree: nil)
       if instead_of
-        current_spec = requires.detect { |old_value, *_rest| instead_of == old_value }
+        current_spec = import_list.detect { |old_value, *_rest| instead_of == old_value }
         if current_spec
           current_spec[0] = value
         else
           raise [
-            "Could not substitute require '#{instead_of}' with '#{value}'.  '#{instead_of}' not found.",
-            'The following requires are listed:',
-            *requires.collect { |old_value, *_rest| old_value }
+            "Could not substitute import '#{instead_of}' with '#{value}'.  '#{instead_of}' not found.",
+            'The following files are currently being imported:',
+            *import_list.collect { |old_value, *_rest| old_value }
           ].join("\n")
         end
       else
-        kind = if gem
-                 :gem
-               elsif tree
+        kind = if tree
                  :tree
+               else
+                 :gem
                end
-        requires << [value, !client_only, !server_only, kind]
+        import_list << [value, !client_only, !server_only, kind]
       end
     end
 
-    def unrequire(value)
-      require(nil, instead_of: value)
+    alias imports import
+
+    def import_tree(value, instead_of: nil, client_only: nil, server_only: nil)
+      import(value, instead_of: instead_of, client_only: client_only, server_only: server_only, tree: true)
     end
 
-    def require_tree(value, instead_of: nil, client_only: nil, server_only: nil)
-      require(value, instead_of: instead_of, client_only: client_only, server_only: server_only, tree: true)
-    end
-
-    def require_gem(value, instead_of: nil, client_only: nil, server_only: nil)
-      require(value, instead_of: instead_of, client_only: client_only, server_only: server_only, gem: true)
+    def cancel_import(value)
+      import(nil, instead_of: value)
     end
 
     def generate_requires(mode, file)
       puts "***** generating requires for #{mode} - #{file}"
-      requires.collect do |value, render_on_server, render_on_client, kind|
+      import_list.collect do |value, render_on_server, render_on_client, kind|
         next unless value
         next if mode == :client && !render_on_client
         next if mode == :server && !render_on_server

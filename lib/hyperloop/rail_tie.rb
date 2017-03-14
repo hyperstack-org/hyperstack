@@ -45,7 +45,7 @@ module Hyperloop
 
     config.after_initialize do |app|
       next unless config.hyperloop.auto_config
-      Hyperloop.require_tree('hyperloop')
+      Hyperloop.import_tree('hyperloop')
       next unless config.respond_to?(:react)
       if (opts = config.react.server_renderer_options)
         opts.merge! FILES

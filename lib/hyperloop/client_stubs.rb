@@ -1,12 +1,12 @@
 module Hyperloop
   class << self
-    def require(value, gem: nil, override_with: nil, client_only: nil, tree: nil)
+    def import(*args)
     end
 
-    def require_tree(value, override_with: nil, client_only: nil)
+    def imports(*args)
     end
 
-    def require_gem(value, override_with: nil, client_only: nil)
+    def import_tree(*args)
     end
   end
 end
