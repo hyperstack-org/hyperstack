@@ -1,6 +1,6 @@
 require 'opal'
 require 'react/react-source'
-require 'hyper-react'
+require 'hyper-component'
 require 'hyper-operation'
 if React::IsomorphicHelpers.on_opal_client?
   require 'opal-jquery'

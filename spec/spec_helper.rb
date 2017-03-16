@@ -1,15 +1,17 @@
 require 'hyper-spec'
-require 'hyper-operation'
 require 'pry'
 #require 'opal-browser'
-require 'hyper-spec'
 require 'opal-browser'
 
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path('../test_app/config/environment', __FILE__)
 
 require 'rspec/rails'
+require 'rspec-steps'
+require 'hyper-operation'
+
 require "rspec/wait"
+require 'database_cleaner'
 
 Capybara.server = :puma
 

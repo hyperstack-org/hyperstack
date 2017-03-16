@@ -27,10 +27,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'mutations'
-  spec.add_dependency 'hyper-react'
+  spec.add_dependency 'hyper-component', '>= 0.12.2'
+  spec.add_dependency 'hyperloop-config', '>= 0.9.2'
   spec.add_dependency 'opal-activesupport'
   spec.add_dependency 'activerecord', '>= 0.3.0'
-  spec.add_dependency 'hyperloop-config'
+  spec.add_dependency 'pry'
 
   spec.add_development_dependency "bundler", "~> 1.8"
   spec.add_development_dependency "rake", "~> 10.0"

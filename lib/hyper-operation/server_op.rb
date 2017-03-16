@@ -15,6 +15,8 @@ module Hyperloop
         end.fail do |response|
           Exception.new response.json[:error]
         end
+      rescue Exception => e
+        puts "#{name} trying to talk to server with #{args}"
       end if RUBY_ENGINE == 'opal'
 
       def run_from_client(security_param, operation, params)
@@ -30,20 +32,21 @@ module Hyperloop
 
       def remote(path, *args)
         promise = Promise.new
-        uri = URI("#{path}/execute_remote_api")
+        uri = URI("#{path}execute_remote_api")
         http = Net::HTTP.new(uri.host, uri.port)
         request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
         if uri.scheme == 'https'
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
-        request.body =
-          Hyperloop::Operation::ParamsWrapper.combine_arg_array(args).to_json
+        request.body = {
+          operation: name,
+          params: Hyperloop::Operation::ParamsWrapper.combine_arg_array(args)
+        }.to_json
         promise.resolve http.request(request)
       rescue Exception => e
         promise.reject e
       end
-
 
       def serialize_params(hash)
         hash

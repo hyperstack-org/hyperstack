@@ -1,11 +1,13 @@
 require "hyper-operation/version"
+require 'hyperloop-config'
+Hyperloop.import 'hyper-operation'
 
 if RUBY_ENGINE == 'opal'
   require 'active_support/core_ext/string'
   require 'mutations'
   require 'hyper-operation/filters/outbound_filter'
+  require 'hyper-component'
   require 'hyper-operation/call_by_class_name'
-  require 'hyper-react'
   require 'hyper-operation/transport/client_drivers'
   class HashWithIndifferentAccess < Hash
   end
@@ -28,7 +30,7 @@ else
   require 'hyperloop-config'
   require 'mutations'
   require 'hyper-operation/filters/outbound_filter'
-  require 'hyper-react'
+  require 'hyper-component'
   require 'active_record'
   require 'hyper-operation/transport/active_record'
   require 'hyper-operation/engine'

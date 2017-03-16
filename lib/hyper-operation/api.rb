@@ -38,6 +38,10 @@ module Hyperloop
     class << self
 
       def run(*args)
+        _run(*args)
+      end
+
+      def _run(*args)
         new.instance_eval do
           @_railway.process_params(args)
           @_railway.process_validations

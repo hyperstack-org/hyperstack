@@ -1,2 +1,4 @@
 require "bundler/gem_tasks"
-task :default => :spec
+task :default do
+  sh "DRIVER=ff bundle exec rspec"
+end

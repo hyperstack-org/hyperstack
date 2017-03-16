@@ -12,6 +12,12 @@ module Hyperloop
 
   def self.reset_operations
     @config_reset_called = true
+    Rails.configuration.tap do |config|
+      # config.eager_load_paths += %W(#{config.root}/app/hyperloop/models)
+      # config.autoload_paths += %W(#{config.root}/app/hyperloop/models)
+      # config.assets.paths << ::Rails.root.join('app', 'hyperloop').to_s
+      config.after_initialize { Connection.build_tables }
+    end
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
       Object.const_get 'ApplicationPolicy'
@@ -30,15 +36,14 @@ module Hyperloop
       @fake_application_defined = true
     end
     @pusher = nil
-    Connection.build_tables
   end
 
   define_setting(:transport, :none) do |transport|
     if transport == :action_cable
-      require 'hyper-operation/transport/action_cable'
+      Object.send(:require, 'hyper-operation/transport/action_cable')
       opts[:refresh_channels_every] = :never
     else
-      require 'pusher' if transport == :pusher
+      Object.send(:require, 'pusher') if transport == :pusher
       opts[:refresh_channels_every] = nil if opts[:refresh_channels_every] == :never
     end
   end
@@ -103,23 +108,6 @@ module Hyperloop
     Rails.const_defined? 'Server'
   end
 
-  # def self.send_to_server(channel, data)
-  #   salt = SecureRandom.hex
-  #   authorization = Hyperloop.authorization(salt, channel, data[1][:broadcast_id])
-  #   raise 'no server running' unless Connection.root_path
-  #   uri = URI("#{Connection.root_path}console_update")
-  #   http = Net::HTTP.new(uri.host, uri.port)
-  #   request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
-  #   if uri.scheme == 'https'
-  #     http.use_ssl = true
-  #     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-  #   end
-  #   request.body = {
-  #     channel: channel, data: data, salt: salt, authorization: authorization
-  #   }.to_json
-  #   http.request(request)
-  # end
-
   def self.pusher
     unless @pusher
       unless channel_prefix
@@ -144,6 +132,23 @@ module Hyperloop
     )
   end
 
+  def self.send_to_server(channel, data) # TODO this should work the same/similar to HyperMesh / Models way of sending to console
+    salt = SecureRandom.hex
+    authorization = authorization(salt, channel, data[1][:broadcast_id])
+    raise 'no server running' unless Connection.root_path
+    uri = URI("#{Connection.root_path}console_update")
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
+    if uri.scheme == 'https'
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    end
+    request.body = {
+      channel: channel, data: data, salt: salt, authorization: authorization
+    }.to_json
+    http.request(request)
+  end
+
   def self.dispatch(data)
     if !Hyperloop.on_server? && Connection.root_path
       Hyperloop.send_to_server(data[:channel], [:dispatch, data])
@@ -151,18 +156,6 @@ module Hyperloop
       Connection.send_to_channel(data[:channel], [:dispatch, data])
     end
   end
-
-  # def self.after_commit(operation, model)
-  #   InternalPolicy.regulate_broadcast(model) do |data|
-  #     if !Hyperloop.on_server? && Connection.root_path
-  #       Hyperloop.send_to_server(data[:channel], [operation, data])
-  #     else
-  #       Connection.send_to_channel(data[:channel], [operation, data])
-  #     end
-  #   end
-  # rescue Exception
-  #   nil  # this is because during db migration we have problems... should investigate more...
-  # end
 
   Connection.transport = self
 end

@@ -134,12 +134,12 @@ module Hyperloop
       end
 
       def execute_remote_api
-        parsed_params = JSON.parse(params[:json]).symbolize_keys
+        parsed_params = params[:params].symbolize_keys
         raise AccessViolation unless parsed_params[:authorization]
-        render ServerOp.run_from_client(:authorization, parsed_params[:operation], parsed_params[:params])
+        render ServerOp.run_from_client(:authorization, params[:operation], parsed_params)
       end
 
-      def console_update
+      def console_update # TODO this should just become an execute-remote-api call
         authorization = Hyperloop.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
         return head :unauthorized if authorization != params[:authorization]
         Hyperloop::Connection.send_to_channel(params[:channel], params[:data])
@@ -156,6 +156,9 @@ module Hyperloop
 
     match 'execute_remote',
           to: 'hyperloop#execute_remote', via: :post
+    match 'execute_remote_api',
+          to: 'hyperloop#execute_remote_api', via: :post
+
     # match 'hyperloop-subscribe',
     #       to: 'hyperloop#subscribe', via: :get
     # match 'hyperloop-read/:subscriber',
