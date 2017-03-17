@@ -89,9 +89,10 @@ module Hyperloop
       end
 
       def subscribe
-        Hyperloop::InternalPolicy.regulate_connection(try(:acting_user), params[:channel])
+        channel = params[:channel].gsub('==', '::')
+        Hyperloop::InternalPolicy.regulate_connection(try(:acting_user), channel)
         root_path = request.original_url.gsub(/hyperloop-subscribe.*$/, '')
-        Hyperloop::Connection.open(params[:channel], client_id, root_path)
+        Hyperloop::Connection.open(channel, client_id, root_path)
         head :ok
       rescue Exception
         head :unauthorized
@@ -104,7 +105,7 @@ module Hyperloop
       end
 
       def pusher_auth
-        channel = params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'')
+        channel = params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'').gsub('==', '::')
         Hyperloop::InternalPolicy.regulate_connection(acting_user, channel)
         response = Hyperloop.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response

@@ -36,8 +36,9 @@ describe "Transport Tests", js: true do
     ApplicationController.acting_user = nil
     # spec_helper resets the policy system after each test so we have to setup
     # before each test
-    stub_const 'TestApplicationPolicy', Class.new
-    TestApplicationPolicy.class_eval do
+    #stub_const 'ScopeIt', Class.new
+    stub_const 'ScopeIt::TestApplicationPolicy', Class.new
+    ScopeIt::TestApplicationPolicy.class_eval do
       regulate_class_connection { !self }
       always_dispatch_from(CreateTestModel)
     end
@@ -76,13 +77,10 @@ describe "Transport Tests", js: true do
 
       Hyperloop.configuration do |config|
         config.transport = :pusher
-        config.channel_prefix = "synchromesh"
         config.opts = {
           app_id: Pusher.app_id,
           key: Pusher.key,
-          secret: Pusher.secret,
-          auth: {headers: {'X-CSRF-Token' => "123"}},
-          authEndpoint: "rr/synchromesh-pusher-auth"
+          secret: Pusher.secret
         }.merge(PusherFake.configuration.web_options)
       end
     end
@@ -91,12 +89,12 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['TestApplication'])
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
       wait_for { Hyperloop::Connection.active }.to eq([])
     end
@@ -105,7 +103,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['TestApplication'])
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
@@ -148,7 +146,7 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
     end
 
     it "sees the connection going offline" do
@@ -156,7 +154,7 @@ describe "Transport Tests", js: true do
       wait_for_ajax
       ApplicationController.acting_user = true
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperloop.expire_polled_connection_in)
       wait(10.seconds).for { Hyperloop::Connection.active }.to eq([])
     end
@@ -164,9 +162,9 @@ describe "Transport Tests", js: true do
     it "receives change notifications" do
       mount "TestComponent"
       CreateTestModel(test_attribute: "I'm new here!")
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
       page.should have_content("1 items")
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
     end
 
   end
@@ -179,7 +177,6 @@ describe "Transport Tests", js: true do
 
       Hyperloop.configuration do |config|
         config.transport = :pusher
-        config.channel_prefix = "synchromesh"
         config.opts = pusher_credentials
       end
     end
@@ -188,12 +185,12 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['TestApplication'])
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
       wait_for { Hyperloop::Connection.active }.to eq([])
     end
@@ -202,9 +199,10 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['TestApplication'])
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
+      binding.pry
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.refresh_channels_every)
       wait_for { Hyperloop::Connection.active }.to eq([])
@@ -246,12 +244,12 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['TestApplication'])
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['TestApplication']
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
       wait_for { Hyperloop::Connection.active }.to eq([])
     end
@@ -260,7 +258,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['TestApplication'])
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"

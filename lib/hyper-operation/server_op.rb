@@ -15,8 +15,6 @@ module Hyperloop
         end.fail do |response|
           Exception.new response.json[:error]
         end
-      rescue Exception => e
-        puts "#{name} trying to talk to server with #{args}"
       end if RUBY_ENGINE == 'opal'
 
       def run_from_client(security_param, operation, params)

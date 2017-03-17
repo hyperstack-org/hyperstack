@@ -31,7 +31,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyperloop-config', '>= 0.9.2'
   spec.add_dependency 'opal-activesupport'
   spec.add_dependency 'activerecord', '>= 0.3.0'
-  spec.add_dependency 'pry'
+  spec.add_dependency 'pusher'
+  spec.add_dependency 'pusher-fake'
 
   spec.add_development_dependency "bundler", "~> 1.8"
   spec.add_development_dependency "rake", "~> 10.0"
@@ -43,8 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'sqlite3', '1.3.10'
   spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'pusher'
-  spec.add_development_dependency 'pusher-fake'
+  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rspec-wait'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rspec-steps'

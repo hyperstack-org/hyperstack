@@ -49,7 +49,7 @@ module Hyperloop
         if ClientDrivers.opts[:transport] == :pusher
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
-            var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel});
+            var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel.gsub('::', '==')});
             channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
             channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }

@@ -40,16 +40,20 @@ module Hyperloop
 
   define_setting(:transport, :none) do |transport|
     if transport == :action_cable
-      Object.send(:require, 'hyper-operation/transport/action_cable')
+      require 'hyper-operation/transport/action_cable'
       opts[:refresh_channels_every] = :never
+      import 'action_cable', client_only: true if Rails.configuration.hyperloop.auto_config
+    elsif transport == :pusher
+      require 'pusher'
+      import 'hyperloop/pusher', client_only: true if Rails.configuration.hyperloop.auto_config
+      opts[:refresh_channels_every] = nil if opts[:refresh_channels_every] == :never
     else
-      Object.send(:require, 'pusher') if transport == :pusher
       opts[:refresh_channels_every] = nil if opts[:refresh_channels_every] == :never
     end
   end
 
   define_setting :opts, {}
-  define_setting :channel_prefix
+  define_setting :channel_prefix, 'synchromesh'
   define_setting :client_logging, true
 
   def self.app_id
@@ -89,16 +93,17 @@ module Hyperloop
   end
 
   def self.refresh_channels
-    new_channels = pusher.channels[:channels].collect do |channel|
-      channel.gsub(/^#{Regexp.quote(Hyperloop.channel)}/,'')
-    end
+    puts "******************* refresh_channels = #{pusher.channels[:channels]}"
+    new_channels = pusher.channels[:channels].collect do |channel, _etc|
+      channel.gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/, '').gsub('==', '::')
+    end.tap { |r| puts "result is = #{r}"}
   end
 
   def self.send_data(channel, data)
     if !on_server?
       send_to_server(channel, data)
     elsif transport == :pusher
-      pusher.trigger("#{Hyperloop.channel}-#{data[1][:channel]}", *data)
+      pusher.trigger("#{Hyperloop.channel}-#{data[1][:channel].gsub('::', '==')}", *data)
     elsif transport == :action_cable
       ActionCable.server.broadcast("hyperloop-#{channel}", message: data[0], data: data[1])
     end
