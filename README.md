@@ -1,35 +1,25 @@
-## Hyperloop::Operation
+#  Hyper-Operation
 
-+ `Hyperloop::Operation` is the base class for *Operations*.  
-+ An Operation orchestrates the updating of the state of your system.  
-+ Operations also wrap asynchronous operations such as HTTP API requests.  
-+ Operations serve the role of both Action Creators and Dispatchers described in the Flux architecture.  
-+ Operations also serve as the bridge between client and server.  An operation can run on the client or the server, and can be invoked remotely.
+## Hyper-Operation gem
 
-Here is the simplest Operation:
+Operations encapsulate business logic. In a traditional MVC architecture, Operations end up either in Controllers, Models or some other secondary construct such as service objects, helpers, or concerns. Here they are first class objects. Their job is to mutate state in the Stores and Models.
 
-```ruby
-class Reset < Hyperloop::Operation
-end
-```
++ Hyperloop::Operation is the base class for Operations.
++ An Operation orchestrates the updating of the state of your system.
++ Operations also wrap asynchronous operations such as HTTP API requests.
++ Operations serve the role of both Action Creators and Dispatchers described in the Flux architecture.
++ Operations also serve as the bridge between client and server. An operation can run on the client or the server, and can be invoked remotely.
 
-To 'Reset' the system you would say
-```ruby
-  Reset() # short for Reset.run
-```
+## Documentation and Help
 
-Elsewhere your HyperStores can receive the Reset *Dispatch* using the `receives` macro:
++ Please see the [ruby-hyperloop.io](http://ruby-hyperloop.io/) website for documentation.
++ Join the Hyperloop [gitter.io](https://gitter.im/ruby-hyperloop/chat) chat for help and support.
 
-```ruby
-class Cart < Hyperloop::Store
-  receives Reset do
-    mutate.items Hash.new { |h, k| h[k] = 0 }
-  end
-end
-```
+## Basic Installation and Setup
 
-Note that multiple stores can receive the same *Dispatch*.
+The easiest way to install is to use the `hyper-rails` gem.
 
+<<<<<<< HEAD
 ### Installation
 
 **Note: only runs with rails currently.**
@@ -93,21 +83,24 @@ end
 See the [Channels](#channels) section for more details on authorization.
 
 ### Operation Structure
+=======
+1. Add `gem 'hyper-rails'` to your Rails `Gemfile` development section.
+2. Install the Gem: `bundle install`
+3. Run the generator: `bundle exec rails g hyperloop:install --all`
+4. Update the bundle: `bundle update`
+>>>>>>> 14990fb3321e5a8b1cc1cb2d859d747695ffd907
 
-An operation does the following things:
+Your Isomorphic Operations live in a `hyperloop/operations` folder and your server only Operations in `app/operations`
 
-1. receives incoming parameters, and does basic validations  
-2. performs any further validations  
-3. executes the operation  
-4. dispatches to any listeners  
-5. returns the value of the execution (step 3)
+You will also find an `app/policies` folder with a simple access policy suited for development.  Policies are how you will provide detailed access control to your Isomorphic models.  
 
-These are defined by series of class methods described below.
+## Contributing
 
-### Parameters
+Bug reports and pull requests are welcome on GitHub at https://github.com/ruby-hyperloop/hyper-operation. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Code of Conduct](https://github.com/ruby-hyperloop/hyper-operation/blob/master/CODE_OF_CONDUCT.md) code of conduct.
 
-Operations can take parameters when they are run.  Parameters are described and accessed with the same syntax as HyperReact components.
+## License
 
+<<<<<<< HEAD
 ```ruby
 class AddItemToCart < Hyperloop::Operation
   param :sku, type: String
@@ -710,4 +703,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/ruby-h
 
 ## License
 
+=======
+>>>>>>> 14990fb3321e5a8b1cc1cb2d859d747695ffd907
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
