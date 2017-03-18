@@ -6,6 +6,43 @@
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <style type="text/css">
+    body {
+      padding-top: 50px;
+      padding-bottom: 60px;
+    }
+    div.alternating:nth-of-type(odd) {
+      background-color: #ddd;
+    }
+    div.alternating:nth-of-type(even) {
+      background-color: #ccc;
+    }
+    .input-box {
+      padding: 10px;
+    }
+    .white {
+      color: white;
+    }
+    .message {
+      padding-top: 10px;
+    }
+    textarea {
+      width: 100%;;
+    }
+    div.reactrb-icon {
+      float: left;
+      width: 50px;
+      height: 50px;
+      margin-right: 8px;
+      background-size: contain;
+      background-image: url("http://ruby-hyperloop.io/images/hyperloop_white.svg");
+  }
+      </style>
   </head>
 
   <body>

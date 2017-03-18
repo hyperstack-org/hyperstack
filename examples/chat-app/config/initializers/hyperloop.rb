@@ -1,4 +1,4 @@
 Hyperloop.configuration do |config|
-  config.transport = :simple_poller
-  #config.opts = { seconds_between_poll: 5 }
+  config.transport = :action_cable
+  config.import 'active_support'
 end

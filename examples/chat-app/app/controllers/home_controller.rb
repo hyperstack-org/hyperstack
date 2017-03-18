@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  def chat
-    render_component "::Chat"
+  def app
+    render_component
   end
 end

@@ -4,6 +4,7 @@ class App < React::Component::Base
   render(DIV) do
     puts "rendering: game_state = #{Store.game_state}"
     puts "their_id: #{Store.state.their_id}, my_id: #{Store.my_id} words: #{Store.state.word}"
+    DIV { Store.message } if Store.message
     send Store.game_state # for each game_state we have a method below...
     Guesses() unless Store.my_guesses.empty?
   end
@@ -17,7 +18,8 @@ class App < React::Component::Base
   end
 
   def waiting_for_other_player
-    SPAN { 'waiting for the other player to pick their word...' }
+    SPAN { "Your word is: #{Store.my_word}. Waiting for the other player to pick their word..." }
+    BUTTON { 'Change Your Word' }.on(:click) { Ops::ChangeWord() }
   end
 
   def waiting_for_your_guess
@@ -42,7 +44,7 @@ class App < React::Component::Base
       if e.target.value == :win
         Ops::YouWin()
       else
-        Ops::Clue correct: e.target.value
+        Ops::Clue their_word: Store.current_guess, my_word: Store.my_word, correct: e.target.value
       end
     end
   end

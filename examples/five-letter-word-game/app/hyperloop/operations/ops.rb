@@ -2,7 +2,7 @@ module Ops
   class Base < Hyperloop::ServerOp
     # base class for all the other server side operations
     # All operations take the acting_user and add outbound
-    # sender and other_player params which have just the ids.
+    # sender and other_player params which are just the ids.
 
     param :acting_user
     outbound :sender
@@ -54,6 +54,13 @@ module Ops
       abort "words and guesses must have 5 different letters"
     end
 
+    # check clue for accuracy
+
+    def check_clue
+      params.true_count =
+        (Set.new(params.their_word.split('')) & params.my_word.split('')).count
+    end
+
     # grab the ids from the two players
     step { params.other_player = other_player && other_player.id }
     step { params.sender = params.acting_user.id }
@@ -70,13 +77,20 @@ module Ops
     validate :five_unique_letters
   end
 
+  class ChangeWord < Base
+  end
+
   class Guess < Base
     param :word
     validate :five_unique_letters
   end
 
   class Clue < Base
+    param :their_word
+    param :my_word
     param :correct, type: Integer, min: 0, max: 5
+    outbound :true_count
+    step :check_clue
   end
 
   class YouWin < Base
@@ -86,6 +100,14 @@ module Ops
 
   class Join < Base
     step :partner_up
+  end
+
+  class ShareState < Base
+    param :guesses
+    param :word
+    param :current_guesser, nils: true
+    param :current_guess,   nils: true
+    param :message
   end
 
   class PlayAgain < Hyperloop::Operation

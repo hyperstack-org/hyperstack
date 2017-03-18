@@ -155,8 +155,7 @@ module Hyperloop
     # to insure this is done first.
 
     ####### TODO TODO TODO make sure to provide a hook that calls reactive record base AFTER this.. (hey use the boot hook)
-
-    before_first_mount do
+    def self.initialize_client_drivers_on_boot
 
       if RUBY_ENGINE == 'opal'
         @opts = Hash.new(`window.HyperloopOpts`)

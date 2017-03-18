@@ -15,6 +15,7 @@ module Hyperloop
         _Railway.add_receiver(&block)
       end
       def self.run(*args)
+        ClientDrivers.initialize_client_drivers_on_boot
         _run(*args)
       end
     end

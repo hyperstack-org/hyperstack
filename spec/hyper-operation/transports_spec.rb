@@ -201,8 +201,8 @@ describe "Transport Tests", js: true do
       Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
       wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
+      sleep 1 # needed so Pusher can catch up since its not controlled by timecop
       mount "TestComponent"
-      binding.pry
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperloop::Connection.transport.refresh_channels_every)
       wait_for { Hyperloop::Connection.active }.to eq([])

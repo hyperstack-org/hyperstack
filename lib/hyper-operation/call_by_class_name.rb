@@ -14,7 +14,7 @@ module React
       # let Object.method_missing (see below) handle the method call to run.
       def find_component(name)
         component = lookup_const(name)
-        return nil if component < Hyperloop::Operation
+        return nil if component && component < Hyperloop::Operation
         if component && !component.method_defined?(:render)
           raise "#{name} does not appear to be a react component."
         end

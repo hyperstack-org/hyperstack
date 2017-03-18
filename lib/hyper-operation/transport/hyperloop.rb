@@ -93,10 +93,9 @@ module Hyperloop
   end
 
   def self.refresh_channels
-    puts "******************* refresh_channels = #{pusher.channels[:channels]}"
     new_channels = pusher.channels[:channels].collect do |channel, _etc|
       channel.gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/, '').gsub('==', '::')
-    end.tap { |r| puts "result is = #{r}"}
+    end
   end
 
   def self.send_data(channel, data)

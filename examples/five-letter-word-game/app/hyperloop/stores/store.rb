@@ -12,6 +12,10 @@ class Store < Hyperloop::Store
 
     state :current_guess, reader: true
 
+    def message
+      state.message[my_id]
+    end
+
     def my_id
       Hyperloop::Application.acting_user_id
     end
@@ -35,44 +39,78 @@ class Store < Hyperloop::Store
     end
 
     def setup
-      mutate.guesses Hash.new { |h, k| h[k] = [] }
+      mutate.guesses Hash.new { |guesses, player| guesses[player] = [] }
       mutate.winner nil
       mutate.word Hash.new
       mutate.current_guesser nil
       mutate.current_guess nil
       mutate.their_id nil
-      Ops::Join.run
+      mutate.message Hash.new
+      Ops::Join.run if Hyperloop.on_client?
     end
   end
 
   receives Ops::Join do |params|
     puts "receiving Ops::Join(#{params})"
-    mutate.their_id params.sender != my_id ? params.sender : params.other_player
-    Ops::ReadyToPlay.run(word: state.word[my_id]) if state.word[my_id]
+    if state.their_id && params.sender != my_id
+      Ops::ShareState(
+        guesses: state.guesses,
+        word: state.word,
+        current_guesser: state.current_guesser,
+        current_guess: state.current_guess,
+        message: state.message
+      )
+    else
+      mutate.their_id params.sender != my_id ? params.sender : params.other_player
+      Ops::ReadyToPlay.run(word: state.word[my_id]) if state.word[my_id]
+    end
+  end
+
+  receives Ops::ShareState do |params|
+    puts "receiving Ops::ShareState(#{params})"
+    if params.sender != my_id
+      params.guesses.each { |player, guesses| mutate.guesses[player] = guesses }
+      mutate.word params.word
+      mutate.current_guesser params.current_guesser
+      mutate.current_guess params.current_guess
+      mutate.message params.message
+    end
   end
 
   receives Ops::ReadyToPlay do |params|
-    puts "receiving READYTOPLAY #{params.word}"
+    puts "receiving Ops::ReadyToPlay(#{params})"
     mutate.current_guesser params.sender unless state.current_guesser
     mutate.word[params.sender] = params.word
   end
 
+  receives Ops::ChangeWord do |params|
+    puts "receiving Ops::ChangeWord(#{params})"
+    mutate.word[params.sender] = nil
+    mutate.current_guesser nil if params.sender == state.current_guesser
+  end
+
   receives Ops::Guess do |params|
-    puts "receiving guess #{params}"
+    puts "receiving Ops::Guess(#{params})"
     mutate.current_guess params.word
+    mutate.message({})
   end
 
   receives Ops::Clue do |params|
-    puts "receving CLUE #{params}"
-    mutate.guesses[params.other_player] << [state.current_guess, params.correct]
-    puts "updated guesses"
+    puts "receiving Ops::Clue(#{params})"
+    mutate.guesses[params.other_player] << [state.current_guess, params.true_count]
+    if params.true_count == params.correct
+      mutate.current_guesser params.sender
+    else
+      mutate.message[params.sender] =
+        "That was a bogus clue.  There are #{params.true_count} correct in #{current_guess}.  They get a free guess!"
+      mutate.message[params.other_player] =
+        "They tried to give you a bogus clue!  There are #{params.true_count} correct in #{current_guess}.  Have a free turn!"
+    end
     mutate.current_guess nil
-    puts "updated current guess to nil"
-    mutate.current_guesser params.sender
-    puts "switched to other guys turn"
   end
 
   receives Ops::YouWin do |params|
+    puts "receiving Ops::YouWin(#{params})"
     mutate.winner params.other_player
     mutate.message params.message
   end
