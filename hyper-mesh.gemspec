@@ -23,8 +23,8 @@ Gem::Specification.new do |s|
     s.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
     s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
     s.require_paths  = ['lib']
+
     s.add_dependency 'activerecord', '>= 0.3.0'
-    s.add_dependency 'hyper-react', '>= 0.10.0'
     s.add_dependency 'hyper-operation'
 
     s.add_development_dependency 'bundler', '~> 1.8'
@@ -82,6 +82,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'jquery-rails'
       s.add_development_dependency 'pry-byebug'
       s.add_development_dependency 'hyper-spec'
-      #s.add_development_dependency 'hyper-trace'
+      s.add_development_dependency 'hyper-trace'
     end
 end

@@ -228,7 +228,7 @@ module React
 
   end
 
-  module Component
+  module Component  # not this needs to be rewritten
 
     alias_method :original_component_did_mount, :component_did_mount
 
@@ -299,6 +299,6 @@ module React
 
     end
 
-  end if RUBY_ENGINE == 'opal'
+  end if false && RUBY_ENGINE == 'opal'
 
 end

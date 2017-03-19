@@ -1,6 +1,5 @@
 require 'set'
 if RUBY_ENGINE == 'opal'
-  require "hyper-react"
   require 'hyper-operation'
   require 'active_support'
   require 'time'
@@ -33,10 +32,8 @@ if RUBY_ENGINE == 'opal'
   require_relative 'opal/equality_patches'
 else
   require 'opal'
-  require 'hyper-react'
   require 'hyper-operation'
   require "reactive_record/permissions"
-  #require "reactive_record/engine"
   require "reactive_record/server_data_cache"
   require "reactive_record/active_record/reactive_record/operations"
   require 'synchromesh/broadcast'
@@ -46,14 +43,9 @@ else
   require "reactive_record/pry"
   require_relative 'active_record_base'
   require 'hypermesh/version'
-  #require 'synchromesh/connection'
-  #require 'synchromesh/synchromesh'
-  #require 'synchromesh/policy'
-  #require 'synchromesh/synchromesh_controller'
 
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
   Opal.append_path File.expand_path('../../vendor', __FILE__).untaint
 end
 require 'enumerable/pluck'
-#require_relative 'synchromesh/client_drivers'

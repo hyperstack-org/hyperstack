@@ -9,7 +9,6 @@ require 'opal-jquery'
 require 'jquery.cookie'
 require 'models'
 
-
 Document.ready? do
   `$.cookie('acting_user', null, { path: '/' })`
   Opal::RSpec::Runner.autorun rescue nil

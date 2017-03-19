@@ -1,6 +1,6 @@
 require 'opal'
 require 'react'
-require 'hyper-trace'
+#require 'hyper-trace'
 require 'hyper-mesh'
 
 if React::IsomorphicHelpers.on_opal_client?

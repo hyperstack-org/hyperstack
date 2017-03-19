@@ -483,7 +483,6 @@ module ReactiveRecord
       elsif ScopeDescription.find(@target_klass, method) || (args.count == 1 && method =~ /^find_by_/)
         apply_scope(method, *args)
       elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
-        puts "here we are..."
         apply_scope("_#{method}", *args).first
       else
         super

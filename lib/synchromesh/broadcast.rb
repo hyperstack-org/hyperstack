@@ -3,20 +3,22 @@ module ReactiveRecord
 
     def self.after_commit(operation, model)
       Hyperloop::InternalPolicy.regulate_broadcast(model) do |data|
-        if !Hyperloop.on_server? && Connection.root_path
+        if !Hyperloop.on_server? && Hyperloop::Connection.root_path
           send_to_server(operation, data)
         else
           SendPacket.run(data, operation: operation)
         end
       end
+    rescue ActiveRecord::StatementInvalid => e
+      raise e unless e.message == "Could not find table 'hyperloop_connections'"
     end unless RUBY_ENGINE == 'opal'
 
     def self.send_to_server(operation, data)
       salt = SecureRandom.hex
-      authorization = authorization(salt, data)
-      raise 'no server running' unless Connection.root_path
+      authorization = Hyperloop.authorization(salt, data[:channel], data[:broadcast_id])
+      raise 'no server running' unless Hyperloop::Connection.root_path
       SendPacket.remote(
-        Connection.root_path,
+        Hyperloop::Connection.root_path,
         data,
         operation: operation,
         salt: salt,
@@ -39,8 +41,8 @@ module ReactiveRecord
       unless RUBY_ENGINE == 'opal'
         validate do
           params.authorization.nil? ||
-          authorization = Hyperloop.authorization(
-            params.channel, params.salt, params.broadcast_id
+          Hyperloop.authorization(
+            params.salt, params.channel, params.broadcast_id
           ) == params.authorization
         end
         dispatch_to { params.channel }

@@ -71,6 +71,7 @@ end
 
 if RUBY_ENGINE != 'opal'
   require 'pry'
+  require 'opal-browser'
   begin
     require File.expand_path('../test_app/config/environment', __FILE__)
   rescue LoadError
@@ -130,7 +131,7 @@ if RUBY_ENGINE != 'opal'
   require 'database_cleaner'
   require 'capybara/rspec'
   require 'capybara/rails'
-  #require 'support/component_helpers'
+  require 'support/component_helpers'
   require 'capybara/poltergeist'
   require 'selenium-webdriver'
 
