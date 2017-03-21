@@ -1,3 +1,7 @@
+module Hyperloop
+  define_setting :public_model_directories, ['app/models/public', 'app/hyperloop/models']
+end
+
 module ActiveRecord
   # adds method to get the HyperMesh public column types
   # for now we are just getting all models column types, but we should
@@ -6,8 +10,10 @@ module ActiveRecord
   class Base
     def self.public_columns_hash
       return @public_columns_hash if @public_columns_hash
-      Dir.glob(Rails.root.join('app/models/public/*.rb')).each do |file|
-        require_dependency(file)
+      Hyperloop.public_model_directories.each do |dir|
+        Dir.glob(Rails.root.join("#{dir}/*.rb")).each do |file|
+          require_dependency(file)
+        end
       end
       @public_columns_hash = {}
       descendants.each do |model|

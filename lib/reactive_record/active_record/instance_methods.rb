@@ -73,6 +73,14 @@ module ActiveRecord
       @backing_record == ar_instance.instance_eval { @backing_record }
     end
 
+    def [](attr)
+      send(attr)
+    end
+
+    def []=(attr, val)
+      send("#{attr}=", val)
+    end
+
     def method_missing_warning(name)
       @backing_record.deprecation_warning("Server side method #{name} must be defined using the 'server_method' macro.")
     end

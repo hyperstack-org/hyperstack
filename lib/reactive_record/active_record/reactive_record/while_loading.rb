@@ -83,12 +83,12 @@ module ReactiveRecord
       @while_loading_counter = 0
     end
 
-    def get_next_while_loading_counter
+    def self.get_next_while_loading_counter
       @while_loading_counter += 1
     end
 
-    def preload_css(css)
-      @css_to_preload << css << "\n"
+    def self.preload_css(css)
+      @css_to_preload += "#{css}\n"
     end
 
     def self.has_observers?
@@ -103,14 +103,14 @@ module ReactiveRecord
 
       # I DONT THINK WE USE opal-jquery in this module anymore - require 'opal-jquery' if opal_client?
 
-      include React::Component
+      include Hyperloop::Component::Mixin
 
       param :loading
       param :loaded_children
       param :loading_children
       param :element_type
       param :element_props
-      param :display, default: ""
+      param :display, default: ''
 
       class << self
 
@@ -158,35 +158,37 @@ module ReactiveRecord
       before_mount do
         @uniq_id = WhileLoading.get_next_while_loading_counter
         WhileLoading.preload_css(
-          ".reactive_record_while_loading_container_#{@uniq_id} > :nth-child(1n+#{loaded_children.count+1}) {\n"+
+          ".reactive_record_while_loading_container_#{@uniq_id} > :nth-child(1n+#{params.loaded_children.count+1}) {\n"+
           "  display: none;\n"+
           "}\n"
         )
       end
 
       after_mount do
-        @waiting_on_resources = loading
+        @waiting_on_resources = params.loading
         WhileLoading.add_style_sheet
         %x{
           var node = #{dom_node};
-          $(node).children(':nth-child(-1n+'+#{loaded_children.count}+')').addClass('reactive_record_show_when_loaded');
-          $(node).children(':nth-child(1n+'+#{loaded_children.count+1}+')').addClass('reactive_record_show_while_loading');
+          $(node).children(':nth-child(-1n+'+#{params.loaded_children.count}+')').addClass('reactive_record_show_when_loaded');
+          $(node).children(':nth-child(1n+'+#{params.loaded_children.count+1}+')').addClass('reactive_record_show_while_loading');
         }
       end
 
       after_update do
-        @waiting_on_resources = loading
+        @waiting_on_resources = params.loading
       end
 
       def render
-        props = element_props.dup
+        props = params.element_props.dup
         classes = [props[:class], props[:className], "reactive_record_while_loading_container_#{@uniq_id}"].compact.join(" ")
         props.merge!({
           "data-reactive_record_while_loading_container_id" => @uniq_id,
           "data-reactive_record_enclosing_while_loading_container_id" => @uniq_id,
           class: classes
         })
-        React.create_element(element_type, props) { loaded_children + loading_children }
+        React.create_element(params.element_type[0], props) do
+          params.loaded_children + params.loading_children
+        end.tap { |e| e.waiting_on_resources = params.loading }
       end
 
     end
@@ -204,22 +206,28 @@ module React
       loaded_children = []
       loaded_children = block.call.dup if block
 
-      loading_children = [display]
+      if display.respond_to? :as_node
+        display = display.as_node
+        loading_display_block = lambda { display.render }
+      elsif !loading_display_block
+        loading_display_block = lambda { display }
+      end
       loading_children = RenderingContext.build do |buffer|
         result = loading_display_block.call
-        buffer << result.to_s if result.is_a? String
+        result = result.to_s if result.try :acts_as_string?
+        result.span.tap { |e| e.waiting_on_resources = RenderingContext.waiting_on_resources } if result.is_a? String
         buffer.dup
-      end if loading_display_block
-      RenderingContext.replace(
-        self,
-        React.create_element(
-          ReactiveRecord::WhileLoading,
-          loading: waiting_on_resources,
-          loading_children: loading_children,
-          loaded_children: loaded_children,
-          element_type: type,
-          element_props: properties)
-        )
+      end
+
+      new_element = React.create_element(
+        ReactiveRecord::WhileLoading,
+        loading: waiting_on_resources,
+        loading_children: loading_children,
+        loaded_children: loaded_children,
+        element_type: [type],
+        element_props: properties)
+
+      RenderingContext.replace(self, new_element)
     end
 
     def hide_while_loading
@@ -228,77 +236,78 @@ module React
 
   end
 
-  module Component  # not this needs to be rewritten
+  module ::Hyperloop
+    class Component
+      module Mixin
 
-    alias_method :original_component_did_mount, :component_did_mount
+        alias_method :original_component_did_mount, :component_did_mount
 
-    def component_did_mount(*args)
-      original_component_did_mount(*args)
-      reactive_record_link_to_enclosing_while_loading_container
-      reactive_record_link_set_while_loading_container_class
-    end
+        def component_did_mount(*args)
+          original_component_did_mount(*args)
+          reactive_record_link_to_enclosing_while_loading_container
+          reactive_record_link_set_while_loading_container_class
+        end
 
-    alias_method :original_component_did_update, :component_did_update
+        alias_method :original_component_did_update, :component_did_update
 
-    def component_did_update(*args)
-      original_component_did_update(*args)
-      reactive_record_link_set_while_loading_container_class
-    end
+        def component_did_update(*args)
+          original_component_did_update(*args)
+          reactive_record_link_set_while_loading_container_class
+        end
 
-    def reactive_record_link_to_enclosing_while_loading_container
-      # Call after any component mounts - attaches the containers loading id to this component
-      # Fyi, the while_loading container is responsible for setting its own link to itself
+        def reactive_record_link_to_enclosing_while_loading_container
+          # Call after any component mounts - attaches the containers loading id to this component
+          # Fyi, the while_loading container is responsible for setting its own link to itself
 
-      %x{
-        var node = #{dom_node};
-        if (!$(node).is('[data-reactive_record_enclosing_while_loading_container_id]')) {
-          var while_loading_container = $(node).closest('[data-reactive_record_while_loading_container_id]')
-          if (while_loading_container.length > 0) {
-            var container_id = $(while_loading_container).attr('data-reactive_record_while_loading_container_id')
-            $(node).attr('data-reactive_record_enclosing_while_loading_container_id', container_id)
-          }
-        }
-      }
-
-    end
-
-    def reactive_record_link_set_while_loading_container_class
-
-      %x{
-
-        var node = #{dom_node};
-        var while_loading_container_id = $(node).attr('data-reactive_record_enclosing_while_loading_container_id');
-        if (while_loading_container_id) {
-          var while_loading_container = $('[data-reactive_record_while_loading_container_id='+while_loading_container_id+']');
-          var loading = (#{waiting_on_resources} == true);
-          if (loading) {
-            $(node).addClass('reactive_record_is_loading');
-            $(node).removeClass('reactive_record_is_loaded');
-            $(while_loading_container).addClass('reactive_record_is_loading');
-            $(while_loading_container).removeClass('reactive_record_is_loaded');
-
-          } else if (!$(node).hasClass('reactive_record_is_loaded')) {
-
-            if (!$(node).attr('data-reactive_record_while_loading_container_id')) {
-              $(node).removeClass('reactive_record_is_loading');
-              $(node).addClass('reactive_record_is_loaded');
-            }
-            if (!$(while_loading_container).hasClass('reactive_record_is_loaded')) {
-              var loading_children = $(while_loading_container).
-                find('[data-reactive_record_enclosing_while_loading_container_id='+while_loading_container_id+'].reactive_record_is_loading')
-              if (loading_children.length == 0) {
-                $(while_loading_container).removeClass('reactive_record_is_loading')
-                $(while_loading_container).addClass('reactive_record_is_loaded')
+          %x{
+            var node = #{dom_node};
+            if (!$(node).is('[data-reactive_record_enclosing_while_loading_container_id]')) {
+              var while_loading_container = $(node).closest('[data-reactive_record_while_loading_container_id]')
+              if (while_loading_container.length > 0) {
+                var container_id = $(while_loading_container).attr('data-reactive_record_while_loading_container_id')
+                $(node).attr('data-reactive_record_enclosing_while_loading_container_id', container_id)
               }
             }
-
           }
+        end
 
-        }
-      }
+        def reactive_record_link_set_while_loading_container_class
+          %x{
 
+            var node = #{dom_node};
+            var wl = #{!self.is_a?(ReactiveRecord::WhileLoading)}
+            if (#{!self.is_a?(ReactiveRecord::WhileLoading)} && $(node).is('[data-reactive_record_while_loading_container_id]')) {
+              return
+            }
+            var while_loading_container_id = $(node).attr('data-reactive_record_enclosing_while_loading_container_id');
+            if (while_loading_container_id) {
+              var while_loading_container = $('[data-reactive_record_while_loading_container_id='+while_loading_container_id+']');
+              var loading = #{!!waiting_on_resources == true};
+              if (loading) {
+                $(node).addClass('reactive_record_is_loading');
+                $(node).removeClass('reactive_record_is_loaded');
+                $(while_loading_container).addClass('reactive_record_is_loading');
+                $(while_loading_container).removeClass('reactive_record_is_loaded');
+
+              } else if (!$(node).hasClass('reactive_record_is_loaded')) {
+
+                if (!$(node).attr('data-reactive_record_while_loading_container_id')) {
+                  $(node).removeClass('reactive_record_is_loading');
+                  $(node).addClass('reactive_record_is_loaded');
+                }
+                if (!$(while_loading_container).hasClass('reactive_record_is_loaded')) {
+                  var loading_children = $(while_loading_container).
+                    find('[data-reactive_record_enclosing_while_loading_container_id='+while_loading_container_id+'].reactive_record_is_loading')
+                  if (loading_children.length == 0) {
+                    $(while_loading_container).removeClass('reactive_record_is_loading')
+                    $(while_loading_container).addClass('reactive_record_is_loaded')
+                  }
+                }
+              }
+            }
+          }
+        end
+      end
     end
-
-  end if false && RUBY_ENGINE == 'opal'
-
+  end if RUBY_ENGINE == 'opal'
 end

@@ -14,7 +14,6 @@ module ReactiveRecord
           params.acting_user
         ]
       end
-      #fail { {error: e.message, backtrace: e.backtrace} }
     end
 
     class Save < Hyperloop::ServerOp

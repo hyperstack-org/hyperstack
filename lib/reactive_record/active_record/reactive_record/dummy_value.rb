@@ -202,7 +202,8 @@ module ReactiveRecord
       end
 
       def acts_as_string?
-        return @object.acts_as_string if @object
+        return true if @object.is_a? String
+        return @object.acts_as_string? if @object
         true
       end
 

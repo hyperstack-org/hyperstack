@@ -25,7 +25,8 @@ Gem::Specification.new do |s|
     s.require_paths  = ['lib']
 
     s.add_dependency 'activerecord', '>= 0.3.0'
-    s.add_dependency 'hyper-operation'
+    s.add_dependency 'hyper-operation', '>= 0.5.0'
+    s.add_dependency 'hyper-component', '>= 0.12.3'
 
     s.add_development_dependency 'bundler', '~> 1.8'
     s.add_development_dependency 'rake', '~> 10.0'

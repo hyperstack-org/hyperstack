@@ -275,7 +275,7 @@ module ActiveRecord
               [key, [value]]
             end
           end
-          
+
           # We do want to be doing something like this, but this breaks other stuff...
           #
           # ReactiveRecord::Base.load_data do
