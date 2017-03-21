@@ -17,6 +17,7 @@ module React
               buffer = @buffer.dup
               React.create_element(name, *args) { buffer }.tap do |element|
                 element.waiting_on_resources = saved_waiting_on_resources || !!buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
+                element.waiting_on_resources ||= buffer.last.is_a?(String) && waiting_on_resources
               end
             elsif @buffer.last.is_a? React::Element
               @buffer.last.tap { |element| element.waiting_on_resources ||= saved_waiting_on_resources }
@@ -89,9 +90,10 @@ module React
       # so we insure that is the case, and also check to make sure that element in the buffer
       # is the element returned
 
+
       def run_child_block(is_outer_scope)
         result = yield
-        result = result.to_s if result.try :acts_as_string?
+        result = result.to_s.span if result.try :acts_as_string? || result.is_a?(String)
         @buffer << result if result.is_a?(String) || (result.is_a?(React::Element) && @buffer.empty?)
         raise_render_error(result) if is_outer_scope && @buffer != [result]
       end
