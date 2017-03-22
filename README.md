@@ -350,6 +350,11 @@ See the Timecop [README](https://github.com/travisjeffery/timecop/blob/master/RE
 
 There is one confusing thing to note:  On the server if you `sleep` then you will sleep for the specified number of seconds when viewed *outside* of the test.  However inside the test environment if you look at Time.now, you will see it advancing according to the scale factor.  Likewise if you have a `after` or `every` block on the client, you will wait according to *simulated* time.
 
+## Common Problems
+
+If you are getting failures on Poltergeist but not Firefox, make sure you are not requiring `browser` in your components.rb.
+Requiring `browser/interval` or `browser/delay` is okay.
+
 ## Development
 
 After checking out the repo, run bundle install and you should be good to go.

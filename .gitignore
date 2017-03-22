@@ -42,3 +42,10 @@ bower.json
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore test app files
+/spec/test_app/log/
+/spec/test_app/tmp/
+
+# Ignore built gem
+*.gem
