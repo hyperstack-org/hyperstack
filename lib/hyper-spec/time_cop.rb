@@ -1,3 +1,5 @@
+# Interface to the Lolex package running on the client side
+# Below we will monkey patch Timecop to call these methods
 class Lolex
   class << self
     def init(page, client_time_zone, resolution)
@@ -40,7 +42,7 @@ class Lolex
     private
 
     def time_string_in_zone
-      Time.now.in_time_zone(@client_time_zone).strftime("%Y/%m/%d %H:%M:%S %z")
+      Time.now.in_time_zone(@client_time_zone).strftime('%Y/%m/%d %H:%M:%S %z')
     end
 
     def pending_evaluations
@@ -67,6 +69,7 @@ end
 
 require 'timecop'
 
+# Monkey patches to call our Lolex interface
 class Timecop
 
   private

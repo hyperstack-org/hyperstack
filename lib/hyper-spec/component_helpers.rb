@@ -77,7 +77,7 @@ module ComponentTestHelpers
           component.validator.rules.each do |name, rules|
             if rules[:type] == Proc
               TopLevelRailsComponent.event_history[name] = []
-              @render_params[name] =  lambda { |*args|  TopLevelRailsComponent.event_history[name] << args.collect { |arg| Native(arg).to_n } }
+              @render_params[name] =  lambda { |*args|  TopLevelRailsComponent.event_history[name] << args } #args.collect { |arg| Native(arg).to_n } }
             end
           end
         end
