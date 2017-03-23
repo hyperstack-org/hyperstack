@@ -1,6 +1,3 @@
-require_relative 'router/class_methods'
-require_relative 'router/component_methods'
-
 module Hyperloop
   class Router
     def self.inherited(child)
@@ -12,28 +9,28 @@ module Hyperloop
   class BrowserRouter
     def self.inherited(child)
       child.include(React::Component)
-      child.include(Router::Browser)
+      child.include(Hyperloop::Router::Browser)
     end
   end
 
   class HashRouter
     def self.inherited(child)
       child.include(React::Component)
-      child.include(Router::Hash)
+      child.include(Hyperloop::Router::Hash)
     end
   end
 
   class MemoryRouter
     def self.inherited(child)
       child.include(React::Component)
-      child.include(Router::Memory)
+      child.include(Hyperloop::Router::Memory)
     end
   end
 
   class StaticRouter
     def self.inherited(child)
       child.include(React::Component)
-      child.include(Router::Static)
+      child.include(Hyperloop::Router::Static)
     end
   end
 end

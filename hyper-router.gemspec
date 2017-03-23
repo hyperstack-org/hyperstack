@@ -1,7 +1,7 @@
 # coding: utf-8
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 
-require 'react/router/version'
+require 'hyper-router/version'
 
 Gem::Specification.new do |s|
   s.name          = 'hyper-router'
@@ -21,12 +21,12 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 10.0'
   s.add_development_dependency 'rspec-rails', '3.3.3'
   s.add_development_dependency 'timecop'
-  s.add_development_dependency 'opal-rspec'#, '0.4.3'
+  s.add_development_dependency 'opal-rspec'
   s.add_development_dependency 'sinatra'
 
   # For Test Rails App
-  s.add_development_dependency 'rails', '4.2.4'
-  s.add_development_dependency 'react-rails', '1.3.1'
+  s.add_development_dependency 'rails'
+  s.add_development_dependency 'react-rails', '< 1.10.0'
   s.add_development_dependency 'opal-rails', '0.9.0'
 
   if RUBY_PLATFORM == 'java'
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'therubyrhino'
   else
     s.add_development_dependency 'sqlite3', '1.3.10'
-    s.add_development_dependency 'therubyracer', '0.12.2'
+    s.add_development_dependency 'therubyracer', '~> 0.12.2'
 
     # The following allow react code to be tested from the server side
     s.add_development_dependency 'rspec-mocks'

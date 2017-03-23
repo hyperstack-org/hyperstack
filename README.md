@@ -149,12 +149,12 @@ class Topics < Hyperloop::Router::Component
   render(:div) do
     H2 { 'Topics' }
     UL() do
-      LI { Link("#{params.match[:url]}/rendering") { 'Rendering with React' } }
-      LI { Link("#{params.match[:url]}/components") { 'Components' } }
-      LI { Link("#{params.match[:url]}/props-v-state") { 'Props v. State' } }
+      LI { Link("#{match.url}/rendering") { 'Rendering with React' } }
+      LI { Link("#{match.url}/components") { 'Components' } }
+      LI { Link("#{match.url}/props-v-state") { 'Props v. State' } }
     end
-    Route("#{params.match[:url]}/:topic_id", mounts: Topic)
-    Route(params.match[:url], exact: true) do
+    Route("#{match.url}/:topic_id", mounts: Topic)
+    Route(match.url, exact: true) do
       H3 { 'Please select a topic.' }
     end
   end
@@ -162,7 +162,7 @@ end
 
 class Topic < Hyperloop::Router::Component
   render(:div) do
-    H3 { params.match[:params][:topic_id] }
+    H3 { match.params[:topic_id] }
   end
 end
 ```
@@ -273,15 +273,16 @@ class MyRouter < Hyperloop::Router
   end
 end
 ```
-The block will give you the match data passed in as a hash:
+The block will give you the match, location, and history data:
 ```ruby
 class MyRouter < Hyperloop::Router
   ...
 
   route do
     DIV do
-      Route('/:name') do |match|
-        H1 { "Hello #{match[:params][:foo]}!" }
+      Route('/:name') do |match, location, history|
+        H1 { "Hello #{match.params[:foo]} from #{location.pathname}, click me to go back!" }
+          .on(:click) { history.go_back }
       end
     end
   end
@@ -289,7 +290,10 @@ end
 ```
 
 It is recommended to inherit from `Hyperloop::Router::Component` for components mounted by routes.
-This automatically sets the `match` params, and gives you access to the Route method and more.
+This automatically sets the `match`, `location`, and `history` params,
+and also gives you instance methods with those names.
+You can use either `params.match` or just `match`.
+and gives you access to the Route method and more.
 This allows you to create inner routes as you need them.
 ```ruby
 class MyRouter < Hyperloop::Router
@@ -304,20 +308,57 @@ end
 
 class Greet < Hyperloop::Router::Component
   render(DIV) do
-    H1 { "Hello #{params.match[:params][:foo]}!" }
-    Route(params.match[:url], exact: true) do
+    H1 { "Hello #{match.params[:foo]}!" }
+    Route(match.url, exact: true) do
       H2 { 'What would you like to do?' }
     end
-    Route("#{params.match[:url]}/:activity", mounts: Activity)
+    Route("#{match.url}/:activity", mounts: Activity)
   end
 end
 
 class Activity < Hyperloop::Router::Component
   render(DIV) do
-    H2 { params.match[:params][:activity] }
+    H2 { params.match.params[:activity] }
   end
 end
 ```
+
+Routes will **always** render alongside sibling routes that match as well.
+
+```ruby
+class MyRouter < Hyperloop::Router
+  ...
+
+  route do
+    DIV do
+      Route('/goodbye', mounts: Goodbye)
+      Route('/:name', mounts: Greet)
+    end
+  end
+end
+```
+
+### Switch
+
+Going to `/goodbye` would match `/:name` as well and render `Greet` with the `name` param with the value 'goodbye'.
+To avoid this behavior and only render one matching route at a time, use a `Switch` component.
+
+```ruby
+class MyRouter < Hyperloop::Router
+  ...
+
+  route do
+    DIV do
+      Switch do
+        Route('/goodbye', mounts: Goodbye)
+        Route('/:name', mounts: Greet)
+      end
+    end
+  end
+end
+```
+
+Now, going to `/goodbye` would match the `Goodbye` route first and only render that component.
 
 ### Links
 
@@ -338,7 +379,7 @@ class MyRouter < Hyperloop::Router
 
       Route('/', exact: true) { H1() }
       Route('/:name') do |match|
-        H1 { "Will #{match[:params][:name]} eat all the chickens?" }
+        H1 { "Will #{match.params[:name]} eat all the chickens?" }
       end
     end
   end
@@ -361,325 +402,45 @@ class MyRouter < Hyperloop::Router
       NavLink('/Rodrik Cassel', active_style: { color: 'grey' })
       NavLink('/Oberyn Martell',
               active: ->(match, location) {
-                match && match[:params][:name] && match[:params][:name] =~ /Martell/
+                match && match.params[:name] && match.params[:name] =~ /Martell/
               })
 
       Route('/', exact: true) { H1() }
       Route('/:name') do |match|
-        H1 { "Will #{match[:params][:name]} eat all the chickens?" }
+        H1 { "Will #{match.params[:name]} eat all the chickens?" }
       end
     end
   end
 end
 ```
 
-#### enter / leave / change transition hooks
+### Pre-rendering
 
-for adding an onEnter or onLeave hook you would say:
-
-```ruby
-route("foo").on(:leave) { | t | ... }.on(:enter) { | t |.... }
-```
-which follows the react.rb event handler convention.
-
-A `TransitionContext` object will be passed to the handler, which has the following methods:
-
-| method | available on | description |
-|-----------|------------------|-----------------|
-| `next_state` | `:change`, `:enter` | returns the next state object |
-| `prev_state` | `:change` | returns the previous state object |
-| `replace` | `:change`, `:enter` | pass `replace` a new path |
-| `promise` | `:change`, `:enter` | returns a new promise.  multiple calls returns the same promise |
-
-If you return a promise from the `:change` or `:enter` hooks, the transition will wait till the promise is resolved before proceeding.  For simplicity you can call the promise method, but you can also use some other method to define the promise.
-
-The hooks can also be specified as proc values to the `:on_leave`, `:on_enter`, `:on_change` options.
-
-#### multiple component mounting
-
-The `mounts` option can accept a single component, or a hash which will generate a `components` (plural) react-router prop, as in:
-
-`route("groups", mounts: {main: Groups, sidebar: GroupsSidebar})` which is equivalent to:
-
-`{path: "groups", components: {main: Groups, sidebar: GroupsSidebar}}` (json) or
-
-`<Route path="groups" components={{main: Groups, sidebar: GroupsSidebar}} />` JSX
-
-#### The `mounts` option can also take a `Proc` or be specified as a block
-
-The proc is passed a TransitionContext (see **Hooks** above) and may either return a react component to be mounted, or return a promise.  If a promise is returned the transition will wait till the promise is either resolved with a component, or rejected.
-
-`route("courses/:courseId", mounts: -> () { Course }`
-
-is the same as:
-
-```jsx
-<Route path="courses/:courseId" getComponent={(nextState, cb) => {cb(null, Course)}} />
-```
-
-Also instead of a proc, a block can be specified with the `mounts` method:
-
-`route("courses/:courseId").mounts { Course }`
-
-Which generates the same route as the above.
-
-More interesting would be something like this:
+Pre-rendering has been made extremely simple in this new version.
+Under the hood a StaticRouter is used whenever a Router component is prerendering.
+To prerender correctly though you will need to give it the current path.
+Since there is no DOM, you must pass in the current path from your controller/view as a param.
+There is a special param macro called `prerender_path`,
+which still acts as a normal param but will use that param as the current path in prerendering.
 
 ```ruby
-route("courses/:id").mounts do | ct |
-  HTTP.get("validate-user-access/courses/#{ct.next_state[:id]}").then {  Course }
+class MyController < ApplicationController
+  def show
+    render component: 'MyRouter', props: { current_path: request.path }
+  end
 end
-```
 
-*Note that the above works because of promise chaining.*
+class MyRouter < Hyperloop::Router
+  prerender_path :current_path
 
-You can use the `mount` method multiple times with different arguments as an alternative to passing the the `mount` option a hash:
-
-`route("foo").mount(:baz) { Comp1 }.mount(:bar) { Comp2 }.mount(:bomb)`
-
-Note that if no block is given (as in `:bomb` above) the component name will be inferred from the argument (`Bomb` in this case.)
-
-#### The index component can be specified as a proc
-
-Same deal as mount...
-
-`route("foo", index: -> { MyIndex })`
-
-#### The index method
-
-Instead of specifying the index component as a param to the parent route, it can be specified as a child using the
-index method:
-
-```ruby
-route("/", mounts: About, index: Home) do
-  index(mounts: MyIndex)
-  route("about")
-  route("privacy-policy")
-end
-```
-
-This is useful because the index method has all the features of a route except that it does not take a path or children.
-
-#### The `redirect` options
-
-with static arguments:
-
-`redirect("/from/path/spec", to: "/to/path/spec", query: {q1: 123, q2: :abc})`
-
-the `:to` and `:query` options can be Procs which will receive the current state.
-
-Or you can specify the `:to` an `:query` options with blocks:
-
-`redirect("/from/path/spec/:id").to { |curr_state| "/to/path/spec/#{current_state[:id]}"}.query { {q1: 12} }`
-
-#### The `index_redirect` method
-
-just like `redirect` without the first arg: `index_redirect(to: ... query: ...)`
-
-### The Router Component
-
-A router is defined as a subclass of `React::Router` which is itself a `React::Component::Base`.
-
-```ruby
-class Components::Router < React::Router
-  def routes # define your routes (there is no render method)
-    route("/", mounts: About, index: Home) do
-      route("about")
-      route("inbox") do
-        redirect('messages/:id').to { | params | "/messages/#{params[:id]}" }
-      end
-      route(mounts: Inbox) do
-        route("messages/:id")
-      end
-    end
-  end  
-end
-```
-#### Mounting your Router
-You will mount this component the usual way (i.e. via `render_component`, `Element#render`, `react_render`, etc) or even by mounting it within a higher level application component.
-
-```ruby
-class Components::App < React::Component::Base
-  render(DIV) do
-    Application::Nav()
-    MAIN do
-      Router()
+  route do
+    DIV do
+      Route('/:name', mounts: Greet)
     end
   end
 end
 ```
 
-#### navigating
-
-Create links to your routes with `Router::Link`
-```ruby
-#Application::Nav
-  LI.nav_link { TestRouter::Link("/") { "Home" } }
-  LI.nav_link { TestRouter::Link("/about") { "About" } }
-  params.messsages.each do |msg|
-    LI.nav_link { TestRouter::Link("/inbox/messages/#{msg.id}") { msg.title } }
-  end
-```
-
-Additionally, you can manipulate the history with by passing JS as so
-```ruby
-# app/views/components/app_links.rb
-class Components::AppLinks
-  class << self
-    if RUBY_ENGINE == 'opal'
-      def inbox
-        `window.ReactRouter.browserHistory.push('/inbox');`
-      end
-      def message(id)
-        `window.ReactRouter.browserHistory.push('/messages/#{id}');`
-      end
-    end
-  end
-end
-```
-
-
-#### Other router hooks:
-
-There are several other methods that can be redefined to modify the routers behavior
-
-#### history
-
-```ruby
-class Router < React::Router
-  def history
-  ... return a history object
-  end
-end
-```
-
-The two standard history objects are predefined as `browser_history` and `hash_history` so you can say:
-
-```ruby
-...
-  def history
-    browser_history
-  end
-```
-
-or just
-
-```ruby
-...
-  alias_method :history :browser_history
-```
-
-#### create_element
-
-`create_element` (if defined) is passed the component that the router will render, and its params.  Use it to intercept, inspect and/or modify the component behavior.
-
-`create_element` can return any of these values:
-
-+ Any falsy value: indicating that rendering should continue with no modification to behavior.
-+ A `React::Element`, or a native `React.Element` which will be used for rendering.
-+ Any truthy value: indicating that a new Element should be created using the (probably modified) params
-
-```ruby
-class Router < React::Router
-  def create_element(component, component_params)
-    # add the param :time_stamp to each element as its rendered
-    React.create_element(component, component_params.merge(time_stamp: Time.now))
-  end
-end
-```
-
-The above could be simplified to:
-
-```ruby
-...
-  def create_element(component, component_params)
-    component_params[:time_stamp] = Time.now
-  end
-```
-
-Just make sure that you return a truthy value otherwise it will ignore any changes to component or params.
-
-Or if you just wanted some kind of logging:
-
-```ruby
-...
-  def create_element(component, component_params)
-    puts "[#{Time.now}] Rendering: #{component.name}" # puts returns nil, so we are jake mate
-  end
-```
-
-The component_params will always contain the following keys as native js objects, and they must stay native js objects:
-
-+ `children`
-+ `history`
-+ `location`
-+ `params`
-+ `route`
-+ `route_params`
-+ `routes`
-
-We will try to get more fancy with a later version of reactrb-router ;-)
-
-#### `stringify_query(params_hash)` <- needs work
-
-The method used to convert an object from <Link>s or calls to transitionTo to a URL query string.
-
-```ruby
-class Router < React::Router
-  def stringify_query(params_hash)
-    # who knows doc is a little unclear on this one...is it being passed the full params_hash or just
-    # the query portion.... we shall see...
-  end
-end
-```
-
-#### `parse_query_string(string)` <- needs work
-
-The method used to convert a query string into the route components's param hash
-
-#### `on_error(data)`
-
-While the router is matching, errors may bubble up, here is your opportunity to catch and deal with them. Typically these will come when promises are rejected (see the DSL above for returning promises to handle async behaviors.)
-
-#### `on_update`
-
-Called whenever the router updates its state in response to URL changes.
-
-#### `render`
-
-A `Router` default `render` looks like this:
-
-```ruby
-  def render
-    # Router.router renders the native router component
-    Router.router(build_params)
-  end
-```
-
-
-This is primarily for integrating with other libraries that need to participate in rendering before the route components are rendered. It defaults to render={(props) => <RouterContext {...props} />}.
-
-Ensure that you render a <RouterContext> at the end of the line, passing all the props passed to render.
-
-### React::Router::Component
-
-The class React::Router::Component is a subclass of React::Component::Base that predefines the params that the router will be passing in to your component.  This includes
-
-`params.location`
-
-The current location.
-
-`params.params`
-
-The dynamic segments of the URL.
-
-`params.route`
-
-The route that rendered this component.
-
-`params.route_params`
-
-The subset of `params.params` that were directly specified in this component's route. For example, if the route's path is `users/:user_id` and the URL is /users/123/portfolios/345 then `params.route_params` will be `{user_id: '123'}`, and `params.params` will be `{user_id: '123', portfolio_id: 345}`.
 
 ## Development
 
