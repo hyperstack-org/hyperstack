@@ -29,6 +29,7 @@ IF USING NPM/WEBPACK:
   require 'hyper-router/match'
   require 'hyper-router/class_methods'
   require 'hyper-router/component_methods'
+  require 'hyper-router/instance_methods'
 
   require 'hyperloop/router/base/class_methods'
   require 'hyperloop/router/browser/class_methods'

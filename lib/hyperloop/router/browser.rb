@@ -5,6 +5,7 @@ module Hyperloop
         base.extend(HyperRouter::ClassMethods)
         base.extend(ClassMethods)
 
+        base.include(HyperRouter::InstanceMethods)
         base.include(HyperRouter::ComponentMethods)
       end
     end

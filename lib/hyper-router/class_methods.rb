@@ -10,10 +10,38 @@ module HyperRouter
       param(*args)
     end
 
-    def history(history_type)
-      define_method(:history) do
-        @history ||= self.class.send(:"#{history_type}_history")
+    def history(*args)
+      if args.count > 0
+        @__history = send(:"#{args.first}_history")
+      else
+        @__history
       end
+    end
+
+    def location
+      Location.new(`#{history.to_n}.location`)
+    end
+
+    def route(&block)
+      if React::IsomorphicHelpers.on_opal_client?
+        render_router(&block)
+      else
+        prerender_router(&block)
+      end
+    end
+
+    private
+
+    def browser_history
+      React::Router::History.current.create_browser_history
+    end
+
+    def hash_history(*args)
+      React::Router::History.current.create_hash_history(*args)
+    end
+
+    def memory_history(*args)
+      React::Router::History.current.create_memory_history(*args)
     end
 
     def prerender_router(&block)
@@ -28,26 +56,6 @@ module HyperRouter
           instance_eval(&block)
         end
       end
-    end
-
-    def route(&block)
-      if React::IsomorphicHelpers.on_opal_client?
-        render_router(&block)
-      else
-        prerender_router(&block)
-      end
-    end
-
-    def browser_history
-      React::Router::History.current.create_browser_history
-    end
-
-    def hash_history(*args)
-      React::Router::History.current.create_hash_history(*args)
-    end
-
-    def memory_history(*args)
-      React::Router::History.current.create_memory_history(*args)
     end
   end
 end

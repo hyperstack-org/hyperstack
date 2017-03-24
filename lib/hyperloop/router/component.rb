@@ -2,7 +2,7 @@ module Hyperloop
   class Router
     class Component
       def self.inherited(base)
-        base.include(React::Component)
+        base.include(Hyperloop::Component::Mixin)
         base.include(HyperRouter::ComponentMethods)
 
         base.class_eval do
