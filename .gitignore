@@ -41,5 +41,4 @@ node_modules
 # Ignore bundler config.
 .bundle
 
-spec/test_app
 Gemfile.lock

@@ -1,3 +1,6 @@
+require 'hyper-component'
+Hyperloop.import 'hyper-router/react-router-source'
+Hyperloop.import 'hyper-router'
 if RUBY_ENGINE == 'opal'
   no_router_source = `Opal.global.ReactRouter === undefined`
   no_router_dom_source = `Opal.global.ReactRouterDOM === undefined`
@@ -16,9 +19,7 @@ IF USING NPM/WEBPACK:
     ERROR
     raise error
   end
-  require 'hyper-react'
 
-  require 'patches/react/rendering_context'
 
   require 'react/router'
   require 'react/router/dom'
@@ -44,7 +45,7 @@ IF USING NPM/WEBPACK:
   require 'hyperloop/router'
 else
   require 'opal'
-  require 'hyper-react'
+  # require 'hyper-react'
   require 'hyper-router/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
