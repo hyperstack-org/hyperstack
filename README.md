@@ -1,6 +1,17 @@
-## HyperRouter
+<p align="center">
+  <a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+    <img src="https://github.com/ruby-hyperloop/ruby-hyperloop.io/blob/sprint/source/images/HyperRouter.png" width="150px"/>
+  </a>
+ </p>
+ 
+<h1 align="center">
+  HyperRouter
+</h1>
 
-HyperRouter allows you write and use the React Router in Ruby through Opal.
+<p align="center">
+  HyperRouter allows you write and use the React Router in Ruby through Opal.
+</p>
+
 
 ## Installation
 

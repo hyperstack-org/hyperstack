@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   # s.add_dependency 'opal-rails'
   # s.add_dependency 'react-rails'
-  s.add_dependency 'hyper-react'
+  s.add_dependency 'hyper-component'
   s.add_dependency 'opal-browser'
 
   s.add_development_dependency 'bundler', '~> 1.8'
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rails'
   s.add_development_dependency 'react-rails', '< 1.10.0'
   s.add_development_dependency 'opal-rails', '0.9.0'
+  s.add_development_dependency 'hyper-spec'
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'jdbc-sqlite3'
