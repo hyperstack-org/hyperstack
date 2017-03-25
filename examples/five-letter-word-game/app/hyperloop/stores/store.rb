@@ -112,7 +112,7 @@ class Store < Hyperloop::Store
   receives Ops::YouWin do |params|
     puts "receiving Ops::YouWin(#{params})"
     mutate.winner params.other_player
-    mutate.message params.message
+    mutate.message[my_id] = params.message
   end
 
   receives Ops::PlayAgain, :setup

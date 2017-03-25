@@ -50,7 +50,7 @@ module Ops
     # check words for validity
 
     def five_unique_letters
-      return true if params.word.split('').uniq.join =~ /^[a-zA-Z]{5}$/
+      return true if params.word.downcase.split('').uniq.join =~ /^[a-zA-Z]{5}$/
       abort "words and guesses must have 5 different letters"
     end
 
@@ -58,7 +58,7 @@ module Ops
 
     def check_clue
       params.true_count =
-        (Set.new(params.their_word.split('')) & params.my_word.split('')).count
+        (Set.new(params.their_word.downcase.split('')) & params.my_word.downcase.split('')).count
     end
 
     # grab the ids from the two players

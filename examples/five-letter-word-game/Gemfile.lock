@@ -1,7 +1,7 @@
 PATH
   remote: ../..
   specs:
-    hyper-operation (0.1.0)
+    hyper-operation (0.5.1)
       activerecord (>= 0.3.0)
       hyper-component (>= 0.12.2)
       hyperloop-config (>= 0.9.2)

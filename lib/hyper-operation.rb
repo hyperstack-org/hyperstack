@@ -52,7 +52,7 @@ else
   require 'hyper-operation/railway/validations'
   require 'hyper-operation/transport/hyperloop_controller'
   require 'hyper-operation/server_op'
-  Opal.use_gem 'mutations'
+  Opal.use_gem 'mutations', false
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint
   Opal.append_path File.expand_path('../../vendor', __FILE__).untaint
