@@ -1,5 +1,6 @@
 require "hyper-operation/version"
 require 'hyperloop-config'
+Hyperloop.import 'browser/interval', client_only: true
 Hyperloop.import 'hyper-operation'
 
 if RUBY_ENGINE == 'opal'
