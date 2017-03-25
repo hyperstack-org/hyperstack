@@ -16,7 +16,7 @@ module Hyperloop
             *import_list.collect { |old_value, *_rest| old_value }
           ].join("\n")
         end
-      else
+      elsif !import_list.detect { |current_value, *_rest| value == current_value }
         kind = if tree
                  :tree
                else
