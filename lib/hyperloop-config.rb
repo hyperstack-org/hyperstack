@@ -1,9 +1,11 @@
 if RUBY_ENGINE == 'opal'
   require 'hyperloop/client_stubs'
+  require 'hyperloop/context'
   require 'hyperloop/on_client'
 else
   require 'opal'
   require 'hyperloop/config_settings'
+  require 'hyperloop/context'
   require 'hyperloop/imports'
   require 'hyperloop/client_readers'
   require 'hyperloop/on_client'
