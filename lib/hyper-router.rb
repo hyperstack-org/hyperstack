@@ -32,11 +32,6 @@ IF USING NPM/WEBPACK:
   require 'hyper-router/component_methods'
   require 'hyper-router/instance_methods'
 
-  require 'hyperloop/router/base/class_methods'
-  require 'hyperloop/router/browser/class_methods'
-  require 'hyperloop/router/hash/class_methods'
-  require 'hyperloop/router/memory/class_methods'
-  require 'hyperloop/router/static/class_methods'
   require 'hyperloop/router/base'
   require 'hyperloop/router/browser'
   require 'hyperloop/router/component'

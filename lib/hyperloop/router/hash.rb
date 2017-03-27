@@ -1,9 +1,9 @@
 module Hyperloop
   class Router
-    module Browser
+    module Hash
       def self.included(base)
         base.extend(HyperRouter::ClassMethods)
-        base.extend(ClassMethods)
+        base.history(:hash)
 
         base.include(HyperRouter::InstanceMethods)
         base.include(HyperRouter::ComponentMethods)

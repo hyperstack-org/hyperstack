@@ -3,7 +3,7 @@
     <img src="https://github.com/ruby-hyperloop/ruby-hyperloop.io/blob/sprint/source/images/HyperRouter.png" width="150px"/>
   </a>
  </p>
- 
+
 <h1 align="center">
   HyperRouter
 </h1>
@@ -212,7 +212,7 @@ class MyRouter < Hyperloop::Router
 end
 ```
 
-### BrowserRouter, HashRouter, MemoryRouter, StaticRouter
+### BrowserRouter, HashRouter, MemoryRouter
 
 Using one of these classes automatically takes care of the history for you,
 so you don't need to specify one.
@@ -224,6 +224,25 @@ end
 
 class MyRouter < React::Component::Base
   include Hyperloop::Router::Hash
+end
+```
+
+### StaticRouter
+
+Static router is a little different, since it doesn't actually have a history.
+These are used under-the-hood for any other Router during prerendering.
+To use a path with a StaticRouter, with the macro `initial_path`.
+This acts the same as `prerender_path` for other routers.
+
+```ruby
+class MyRouter < Hyperloop::StaticRouter
+  initial_path :current_path
+
+  route do
+    DIV do
+      Route('/:name', mounts: Greet)
+    end
+  end
 end
 ```
 
