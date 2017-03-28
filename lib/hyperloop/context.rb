@@ -12,7 +12,6 @@ module Hyperloop
     # If you want to record the current value of the instance variable then set
     # force to true.
     def self.set_var(ctx, var, force: nil)
-      puts "calling set_var(#{var})"
       inst_value_b4 = ctx.instance_variable_get(var)
       if @context && !@context[ctx].key?(var) && (force || !inst_value_b4)
         @context[ctx][var] = (inst_value_b4 && inst_value_b4.dup)
