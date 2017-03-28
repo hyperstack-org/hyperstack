@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-steps'
   spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'hyper-react'
 
   # Keep linter-rubocop happy
   spec.add_development_dependency 'rubocop'

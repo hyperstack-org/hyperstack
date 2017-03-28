@@ -9,7 +9,9 @@ module Hyperloop
       end
 
       def receivers
-        @receivers ||= []
+        # use the force: true option so that system code needing to receive
+        # boot will NOT be erased on the next Hyperloop::Context.reset!
+        Hyperloop::Context.set_var(self, :@receivers, force: true) { [] }
       end
     end
   end unless defined? Operation
@@ -26,8 +28,6 @@ module Hyperloop
         receivers.each do |receiver|
           receiver.call params
         end
-      rescue Exception => e
-        puts "called Boot.run and she broke #{e}"
       end
     end unless defined? Boot
   end

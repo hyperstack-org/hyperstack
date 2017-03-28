@@ -2,6 +2,7 @@ require 'hyper-spec'
 require 'hyper-store'
 require 'pry'
 require 'opal-browser'
+require 'hyper-react'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../test_app/config/environment', __FILE__)

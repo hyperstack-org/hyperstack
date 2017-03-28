@@ -1,5 +1,5 @@
 module HyperStore
-  class StateWrapper < BaseStoreClass #< BasicObject # TODO StateWrapper should from basic object to avoid name space conflicts
+  class StateWrapper < BaseStoreClass
     extend ArgumentValidator
 
     class << self
