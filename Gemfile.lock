@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    hyper-operation (0.5.1)
+    hyper-operation (0.5.3)
       activerecord (>= 0.3.0)
       hyper-component (>= 0.12.2)
-      hyperloop-config (>= 0.9.2)
+      hyperloop-config (>= 0.9.7)
       mutations
       opal-activesupport
       pusher
@@ -110,9 +110,9 @@ GEM
       hyperloop-config (>= 0.9.2)
       opal-rails (~> 0.9.0)
       react-rails (< 1.10.0)
-    hyper-react (0.12.3)
+    hyper-react (0.12.5)
       hyper-store (>= 0.2.1)
-      hyperloop-config (>= 0.9.2)
+      hyperloop-config (>= 0.9.7)
       opal (>= 0.8.0)
       opal-activesupport (>= 0.2.0)
     hyper-spec (0.1.0)
@@ -127,8 +127,9 @@ GEM
       unparser (= 0.2.5)
     hyper-store (0.2.1)
       hyperloop-config (>= 0.9.2)
-    hyperloop-config (0.9.2)
+    hyperloop-config (0.9.7)
       opal
+      opal-browser
     i18n (0.8.1)
     ice_nine (0.11.2)
     jquery-rails (4.3.1)

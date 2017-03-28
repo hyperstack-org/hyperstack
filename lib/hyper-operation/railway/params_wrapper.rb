@@ -108,7 +108,7 @@ module Hyperloop
       end
 
       def self.params_wrapper
-        @params_wrapper ||= begin
+        Hyperloop::Context.set_var(self, :@params_wrapper) do
           if Railway == superclass
             Class.new(ParamsWrapper)
           else

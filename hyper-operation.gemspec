@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'mutations'
   spec.add_dependency 'hyper-component', '>= 0.12.2'
-  spec.add_dependency 'hyperloop-config', '>= 0.9.2'
+  spec.add_dependency 'hyperloop-config', '>= 0.9.7'
   spec.add_dependency 'opal-activesupport'
   spec.add_dependency 'activerecord', '>= 0.3.0'
   spec.add_dependency 'pusher'

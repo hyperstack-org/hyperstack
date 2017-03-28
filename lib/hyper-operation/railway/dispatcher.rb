@@ -8,7 +8,9 @@ module Hyperloop
 
       class << self
         def receivers
-          @receivers ||= []
+          # use the force: true option so that system code needing to receive
+          # boot will NOT be erased on the next Hyperloop::Context.reset!
+          Hyperloop::Context.set_var(self, :@receivers, force: true) { [] }
         end
 
         def add_receiver(&block)
