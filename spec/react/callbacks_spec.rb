@@ -24,18 +24,49 @@ describe React::Callbacks do
       include React::Callbacks
       define_callback :before_dinner
 
-      before_dinner :wash_hand, :turn_of_laptop
+      before_dinner :wash_hand, :turn_off_laptop
 
       def wash_hand;end
 
-      def turn_of_laptop;end
+      def turn_off_laptop;end
     end
 
     instance = Foo.new
     expect(instance).to receive(:wash_hand)
-    expect(instance).to receive(:turn_of_laptop)
+    expect(instance).to receive(:turn_off_laptop)
     instance.run_callback(:before_dinner)
   end
+
+  context 'using Hyperloop::Context.reset!' do
+    after(:all) do
+      Hyperloop::Context.instance_variable_set(:@context, nil)
+    end
+    it 'clears callbacks on Hyperloop::Context.reset!' do
+      Hyperloop::Context.reset!
+      stub_const 'Foo', Class.new
+      Foo.class_eval do
+        include React::Callbacks
+        define_callback :before_dinner
+
+        before_dinner :wash_hand, :turn_off_laptop
+
+        def wash_hands;end
+
+        def turn_off_laptop;end
+      end
+      instance = Foo.new
+      expect(instance).to receive(:wash_hand).once
+      expect(instance).not_to receive(:turn_off_laptop)
+
+      Hyperloop::Context.reset!
+
+      instance.run_callback(:before_dinner)
+      Foo.class_eval do
+        before_dinner :wash_hand
+      end
+      instance.run_callback(:before_dinner)
+    end
+  end # moved elswhere cause its just hard to get anything to work in this environment
 
   it 'defines block callback' do
     stub_const 'Foo', Class.new
