@@ -21,19 +21,25 @@ module Hyperloop
     Object.send(:remove_const, :Application) if @fake_application_defined
     policy = begin
       Object.const_get 'ApplicationPolicy'
-    rescue Exception => e
-      #raise e unless e.is_a?(NameError) && e.message == "uninitialized constant ApplicationPolicy"
     rescue LoadError
+    rescue NameError => e
+      raise e unless e.message =~ /uninitialized constant ApplicationPolicy/
     end
     application = begin
       Object.const_get('Application')
     rescue LoadError
-    rescue Exception => e
-      #raise e unless e.is_a?(NameError) && e.message == "uninitialized constant Application"
+    rescue NameError
+      raise e unless e.message =~ /uninitialized constant Application/
     end if policy
     if policy && !application
       Object.const_set 'Application', Class.new
       @fake_application_defined = true
+    end
+    begin
+      Object.const_get 'Hyperloop::ApplicationPolicy'
+    rescue LoadError
+    rescue NameError => e
+      raise e unless e.message =~ /uninitialized constant Hyperloop::ApplicationPolicy/
     end
     @pusher = nil
   end
