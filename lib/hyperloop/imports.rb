@@ -95,10 +95,11 @@ module Hyperloop
     def compile_and_compress(name, never_compress: false)
       start_time = Time.now
       
-      Rails.logger.info "\n\n#############################################################\n"
+      Rails.logger.info "\n\n##########################################################################\n"
       Rails.logger.info "      HYPERLOOP LIBRARIES PRECOMPILING AND MINIFYING\n"
       Rails.logger.info "  FIRST TIME BOOTING YOUR APP IT CAN TAKE 1 OR 2 MINUTES\n"
-      Rails.logger.info "#############################################################\n\n"
+      Rails.logger.info " NB: You can force precompiling again by cleaning cache: rm -rf tmp/cache \n"
+      Rails.logger.info "##########################################################################\n\n"
 
       Rails.logger.info "Compiling the system assets for #{name}"
       
