@@ -1,4 +1,5 @@
 module Hyperloop
+
   class << self
     def import_list
       @import_list ||= []
@@ -89,17 +90,22 @@ module Hyperloop
       end
     end
 
-    def compile_and_compress(name)
+    Hyperloop.define_setting :compress_system_assets, true
+
+    def compile_and_compress(name, never_compress: false)
       start_time = Time.now
       puts "Compiling the system assets for #{name}"
       compiled_code = Rails.application.assets[name].to_s
       compilation_time = Time.now
-      puts "  compiled -  length: #{compiled_code.length}"
-      compressed_code = Uglifier.new.compile(compiled_code)
-      puts "  minimized - length: #{compressed_code.length}"
-      puts "  minification ratio #{(compressed_code.length*100.0/compiled_code.length).round}%"
+      compiled_code_length = compiled_code.length
+      puts "  compiled -  length: #{compiled_code_length}"
+      if Hyperloop.compress_system_assets && !never_compress
+        compiled_code = Uglifier.new.compile(compiled_code)
+        puts "  minimized - length: #{compiled_code.length}"
+        puts "  minification ratio #{(compiled_code.length*100.0/compiled_code_length).round}%"
+      end
       puts "  total time: #{(Time.now-start_time).to_f.round(2)} seconds"
-      compressed_code
+      compiled_code
     end
 
   end
