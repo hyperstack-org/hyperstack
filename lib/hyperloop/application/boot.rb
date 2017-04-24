@@ -6,15 +6,15 @@ module Hyperloop
     class << self
       def on_dispatch(&block)
         receivers << block
-      end
+      end unless method_defined? :on_dispatch
 
       def receivers
         # use the force: true option so that system code needing to receive
         # boot will NOT be erased on the next Hyperloop::Context.reset!
         Hyperloop::Context.set_var(self, :@receivers, force: true) { [] }
-      end
+      end unless method_defined? :receivers
     end
-  end unless defined? Operation
+  end
   class Application
     class Boot < Operation
       class ReactDummyParams
