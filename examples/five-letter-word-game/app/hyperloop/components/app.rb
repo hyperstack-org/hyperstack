@@ -23,11 +23,11 @@ class App < React::Component::Base
   end
 
   def waiting_for_your_guess
-    InputWord label: 'guess a word', button: 'guess', operation: Ops::Guess
+    InputWord label: 'Guess a word', button: 'guess', operation: Ops::Guess
   end
 
   def waiting_for_their_guess
-    SPAN { 'waiting for the other player to guess...' }
+    SPAN { 'waiting for the other player to guess a word...' }
   end
 
   def waiting_for_a_clue_from_them
