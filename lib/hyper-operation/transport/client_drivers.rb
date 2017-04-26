@@ -101,6 +101,7 @@ module Hyperloop
     # will remove the session from the list.
 
     prerender_footer do |controller|
+      next if Hyperloop.transport == :none
       if defined?(PusherFake)
         path = ::Rails.application.routes.routes.detect do |route|
           route.app == Hyperloop::Engine ||
@@ -145,16 +146,11 @@ module Hyperloop
     def self.get_queued_data(operation, channel = nil, opts = {})
       HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |data|
-          #send "sync_#{update[0]}", update[1]
           sync_dispatch(data[1])
         end
       end
     end
 
-    # called from ReactiveRecord::Base before_first_mount hook
-    # to insure this is done first.
-
-    ####### TODO TODO TODO make sure to provide a hook that calls reactive record base AFTER this.. (hey use the boot hook)
     def self.initialize_client_drivers_on_boot
 
       if RUBY_ENGINE == 'opal'

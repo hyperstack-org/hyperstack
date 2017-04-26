@@ -12,16 +12,16 @@
 
 ActiveRecord::Schema.define(version: 0) do
 
-  create_table "hyperloop_connections", force: :cascade do |t|
-    t.string   "channel"
-    t.string   "session"
+  create_table "hyperloop_connections", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "channel"
+    t.string "session"
     t.datetime "created_at"
     t.datetime "expires_at"
     t.datetime "refresh_at"
   end
 
-  create_table "hyperloop_queued_messages", force: :cascade do |t|
-    t.text    "data"
+  create_table "hyperloop_queued_messages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.text "data"
     t.integer "connection_id"
   end
 
