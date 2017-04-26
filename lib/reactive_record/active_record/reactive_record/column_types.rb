@@ -56,9 +56,15 @@ module ReactiveRecord
 
     alias convert_string convert_text
 
+    def self.serialized?
+      @serialized_attrs ||= Hash.new { |h, k| h[k] = Hash.new }
+    end
+
     def convert(attr, val)
       column_type = column_type(attr)
-      return val if !column_type || val.loading? || (!val && column_type != :boolean)
+      return val if self.class.serialized?[model][attr] ||
+                    !column_type || val.loading? ||
+                    (!val && column_type != :boolean)
       conversion_method = "convert_#{column_type}"
       return send(conversion_method, val) if respond_to? conversion_method
       val

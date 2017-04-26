@@ -315,4 +315,16 @@ describe "column types on client", js: true do
     expect_evaluate_ruby("ReactiveRecord::Base.last_fetch_at").to eq(starting_fetch_time)
   end
 
+  it 'handles a serialized attribute properly' do
+    isomorphic do
+      class TypeTest < ActiveRecord::Base
+        serialize :text
+      end
+    end
+    r = TypeTest.create(text: [{'foo' => {'bar' => 12}}, 13])
+    expect_promise do
+      ReactiveRecord.load { TypeTest.find(1).text }
+    end.to eq(r.text)
+  end
+
 end

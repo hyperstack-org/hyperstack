@@ -53,6 +53,10 @@ module ActiveRecord
       # when we implement schema validation we should also implement value checking
     end
 
+    def serialize(attr, *args)
+      ReactiveRecord::Base.serialized?[self][attr] = true
+    end
+
     # ignore any of these methods if they get called on the client.   This list should be trimmed down to include only
     # methods to be called as "macros" such as :after_create, etc...
     SERVER_METHODS = [
