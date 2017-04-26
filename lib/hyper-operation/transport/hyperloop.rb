@@ -28,7 +28,7 @@ module Hyperloop
     application = begin
       Object.const_get('Application')
     rescue LoadError
-    rescue NameError
+    rescue NameError => e
       raise e unless e.message =~ /uninitialized constant Application/
     end if policy
     if policy && !application
