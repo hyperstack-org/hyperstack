@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
-    <img src="https://github.com/ruby-hyperloop/ruby-hyperloop.io/blob/sprint/source/images/HyperRouter.png" width="150px"/>
+    <img src="https://github.com/ruby-hyperloop/ruby-hyperloop.io/blob/sprint/source/source/images/HyperRouter.png" width="150px"/>
   </a>
  </p>
 
