@@ -9,6 +9,13 @@ module ReactiveRuby
         app.config.react.view_helper_implementation =
           ReactiveRuby::Rails::ComponentMount
       end
+      config.after_initialize do
+        class ::HyperloopController < ::ApplicationController
+          def action_missing(name)
+            render_component
+          end
+        end
+      end
     end
   end
 end
