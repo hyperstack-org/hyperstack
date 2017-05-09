@@ -153,7 +153,7 @@ module Hyperloop
         head :no_content
       end
 
-    end unless defined? HyperloopController
+    end unless defined? Hyperloop::HyperloopController
 
     match 'execute_remote',
           to: 'hyperloop#execute_remote', via: :post
