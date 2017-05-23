@@ -135,7 +135,8 @@ module Hyperloop
       end
 
       def execute_remote_api
-        parsed_params = params[:params].symbolize_keys
+        params.require(:params).permit!
+        parsed_params = params[:params].to_h.symbolize_keys
         raise AccessViolation unless parsed_params[:authorization]
         render ServerOp.run_from_client(:authorization, params[:operation], parsed_params)
       end
