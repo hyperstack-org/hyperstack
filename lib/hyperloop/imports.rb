@@ -38,7 +38,6 @@ module Hyperloop
     end
 
     def generate_requires(mode, sys, file)
-      puts "***** generating requires for #{mode} - #{file}"
       import_list.collect do |value, render_on_server, render_on_client, kind|
         next unless value
         next if (sys && kind == :tree) || (!sys && kind != :tree)
