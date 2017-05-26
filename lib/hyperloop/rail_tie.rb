@@ -46,12 +46,18 @@ module Hyperloop
     config.after_initialize do |app|
       next unless config.hyperloop.auto_config
       Hyperloop.import_tree('hyperloop')
-      next unless config.respond_to?(:react)
-      if (opts = config.react.server_renderer_options)
-        opts.merge! FILES
-      else
-        config.react.server_renderer_options = FILES
+      if config.respond_to?(:react)
+        if (opts = config.react.server_renderer_options)
+          opts.merge! FILES
+        else
+          config.react.server_renderer_options = FILES
+        end
       end
+      dest = "#{Rails.root}/vendor/assets/javascripts/compiled/"
+      js_asset = 'hyperloop-prerender-loader-system'
+      File.write(dest + js_asset + '.js', app.assets.find_asset(js_asset).to_s)
+      js_asset = 'hyperloop-loader-system'
+      File.write(dest + js_asset + '.js', app.assets.find_asset(js_asset).to_s)
     end
   end
 end

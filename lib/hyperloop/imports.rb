@@ -94,25 +94,25 @@ module Hyperloop
 
     def compile_and_compress(name, never_compress: false)
       start_time = Time.now
-      
-      Rails.logger.info "\n\n##########################################################################\n"
-      Rails.logger.info "      HYPERLOOP LIBRARIES PRECOMPILING AND MINIFYING\n"
-      Rails.logger.info "  FIRST TIME BOOTING YOUR APP IT CAN TAKE 1 OR 2 MINUTES\n"
-      Rails.logger.info " NB: You can force precompiling again by cleaning cache: rm -rf tmp/cache \n"
-      Rails.logger.info "##########################################################################\n\n"
 
-      Rails.logger.info "Compiling the system assets for #{name}"
-      
+      puts "\n\n##########################################################################\n"
+      puts "      HYPERLOOP LIBRARIES PRECOMPILING AND MINIFYING\n"
+      puts "  FIRST TIME BOOTING YOUR APP IT CAN TAKE 1 OR 2 MINUTES\n"
+      puts " NB: You can force precompiling again by cleaning cache: rm -rf tmp/cache \n"
+      puts "##########################################################################\n\n"
+
+      puts "Compiling the system assets for #{name}"
+
       compiled_code = Rails.application.assets[name].to_s
       compilation_time = Time.now
       compiled_code_length = compiled_code.length
-      Rails.logger.info "  compiled -  length: #{compiled_code_length}"
+      puts "  compiled -  length: #{compiled_code_length}"
       if Hyperloop.compress_system_assets && !never_compress
         compiled_code = Uglifier.new.compile(compiled_code)
-        Rails.logger.info "  minimized - length: #{compiled_code.length}"
-        Rails.logger.info "  minification ratio #{(compiled_code.length*100.0/compiled_code_length).round}%"
+        puts "  minimized - length: #{compiled_code.length}"
+        puts "  minification ratio #{(compiled_code.length*100.0/compiled_code_length).round}%"
       end
-      Rails.logger.info "  total time: #{(Time.now-start_time).to_f.round(2)} seconds"
+      puts "  total time: #{(Time.now-start_time).to_f.round(2)} seconds"
       compiled_code
     end
 
