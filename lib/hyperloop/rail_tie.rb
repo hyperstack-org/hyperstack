@@ -54,6 +54,10 @@ module Hyperloop
         end
       end
       dest = "#{Rails.root}/vendor/assets/javascripts/compiled/"
+      dirname = File.dirname(dest)
+      unless File.directory?(dirname)
+        FileUtils.mkdir_p(dirname)
+      end
       js_asset = 'hyperloop-prerender-loader-system'
       File.write(dest + js_asset + '.js', app.assets.find_asset(js_asset).to_s)
       js_asset = 'hyperloop-loader-system'
