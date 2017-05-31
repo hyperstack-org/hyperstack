@@ -136,12 +136,16 @@ module React
     end
 
     class IsomorphicProcCall
+
+      attr_reader :context
+
       def result
         @result.first if @result
       end
 
-      def initialize(name, block, *args)
+      def initialize(name, block, context, *args)
         @name = name
+        @context = context
         block.call(self, *args)
         @result ||= send_to_server(*args) if IsomorphicHelpers.on_opal_server?
       end
@@ -190,7 +194,7 @@ module React
       if RUBY_ENGINE != 'opal'
         def isomorphic_method(name, &block)
           React::IsomorphicHelpers::Context.send(:define_method, name) do |args_as_json|
-            React::IsomorphicHelpers::IsomorphicProcCall.new(name, block, *JSON.parse(args_as_json)).result
+            React::IsomorphicHelpers::IsomorphicProcCall.new(name, block, self, *JSON.parse(args_as_json)).result
           end
         end
       else
@@ -198,10 +202,11 @@ module React
 
         def isomorphic_method(name, &block)
           self.class.send(:define_method, name) do | *args |
-            React::IsomorphicHelpers::IsomorphicProcCall.new(name, block, *args).result
+            React::IsomorphicHelpers::IsomorphicProcCall.new(name, block, self, *args).result
           end
         end
       end
+
     end
   end
 end
