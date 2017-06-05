@@ -2,8 +2,8 @@
 
 require 'hyper-component'
 
-Hyperloop.import 'hyper-router'
 Hyperloop.import 'hyper-router/react-router-source'
+Hyperloop.import 'hyper-router'
 
 if RUBY_ENGINE == 'opal'
   no_router_source = `Opal.global.ReactRouter === undefined`

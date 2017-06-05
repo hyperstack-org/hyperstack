@@ -231,13 +231,9 @@ end
 
 Static router is a little different, since it doesn't actually have a history.
 These are used under-the-hood for any other Router during prerendering.
-To use a path with a StaticRouter, with the macro `initial_path`.
-This acts the same as `prerender_path` for other routers.
 
 ```ruby
 class MyRouter < Hyperloop::StaticRouter
-  initial_path :current_path
-
   route do
     DIV do
       Route('/:name', mounts: Greet)
@@ -393,7 +389,7 @@ Now, going to `/goodbye` would match the `Goodbye` route first and only render t
 ### Links
 
 Links are available to Routers, classes that inherit from `HyperLoop::Router::Component`,
-or by including `Hyperloop::Router::ComponentMethods`.
+or by including `Hyperloop::Router::Mixin`.
 
 The `Link` method takes a url path, and these options:
 - `search: String` adds the specified string to the search query
@@ -446,30 +442,7 @@ end
 
 ### Pre-rendering
 
-Pre-rendering has been made extremely simple in this new version.
-Under the hood a StaticRouter is used whenever a Router component is prerendering.
-To prerender correctly though you will need to give it the current path.
-Since there is no DOM, you must pass in the current path from your controller/view as a param.
-There is a special param macro called `prerender_path`,
-which still acts as a normal param but will use that param as the current path in prerendering.
-
-```ruby
-class MyController < ApplicationController
-  def show
-    render component: 'MyRouter', props: { current_path: request.path }
-  end
-end
-
-class MyRouter < Hyperloop::Router
-  prerender_path :current_path
-
-  route do
-    DIV do
-      Route('/:name', mounts: Greet)
-    end
-  end
-end
-```
+Pre-rendering is automatically taken care for you unde the hood, no more need to pass in the url.
 
 
 ## Development
