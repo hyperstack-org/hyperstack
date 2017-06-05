@@ -2,18 +2,6 @@ module HyperRouter
   class NoHistoryError < StandardError; end
 
   module ClassMethods
-    def initial_path(*args)
-      name = args[0].is_a?(Hash) ? args[0].first[0] : args[0]
-
-      define_method(:initial_path) do
-        params.send(:"#{name}")
-      end
-
-      param(*args)
-    end
-
-    alias prerender_path initial_path
-
     def history(*args)
       if args.count > 0
         @__history_type = args.first
@@ -23,7 +11,7 @@ module HyperRouter
     end
 
     def location
-      Location.new(`#{history.to_n}.location`)
+      @__location ||= Location.new(`#{history.to_n}.location`)
     end
 
     def route(&block)
@@ -37,15 +25,15 @@ module HyperRouter
     private
 
     def browser_history
-      React::Router::History.current.create_browser_history
+      @__browser_history ||= React::Router::History.current.create_browser_history
     end
 
     def hash_history(*args)
-      React::Router::History.current.create_hash_history(*args)
+      @__hash_history ||= React::Router::History.current.create_hash_history(*args)
     end
 
     def memory_history(*args)
-      React::Router::History.current.create_memory_history(*args)
+      @__memory_history ||= React::Router::History.current.create_memory_history(*args)
     end
 
     def render_router(&block)
@@ -61,7 +49,7 @@ module HyperRouter
     def prerender_router(&block)
       define_method(:render) do
         location = {}.tap do |hash|
-          pathname, search = (respond_to?(:initial_path) ? initial_path : '').split('?', 2)
+          pathname, search = IsomorphicMethods.request_fullpath.split('?', 2)
           hash[:pathname] = pathname
           hash[:search] = search ? "?#{search}" : ''
         end
