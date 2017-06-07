@@ -11,7 +11,7 @@ module HyperRouter
     end
 
     def location
-      @__location ||= Location.new(`#{history.to_n}.location`)
+      Location.new(`#{history.to_n}.location`)
     end
 
     def route(&block)
