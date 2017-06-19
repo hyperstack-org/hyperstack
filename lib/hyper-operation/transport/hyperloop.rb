@@ -74,6 +74,11 @@ module Hyperloop
     opts[:secret] || Pusher.secret if transport == :pusher
   end
 
+  def self.cluster
+    # mt1 is the default Pusher app cluster
+    opts[:cluster] || 'mt1' if transport == :pusher
+  end
+
   def self.encrypted
     opts.key?(:encrypted) ? opts[:encrypted] : true
   end
@@ -125,7 +130,7 @@ module Hyperloop
         raise '******** NO CHANNEL PREFIX SET ***************'
       end
       @pusher = Pusher::Client.new(
-        opts || { app_id: app_id, key: key, secret: secret }
+        opts || { app_id: app_id, key: key, secret: secret, cluster: cluster }
       )
     end
     @pusher
