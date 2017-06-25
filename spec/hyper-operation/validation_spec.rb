@@ -83,6 +83,14 @@ describe 'Hyperloop::Operation validations (server side)' do
     expect(errors.symbolic).to eq("foo" => :manchu)
   end
 
+  it "can skip explicit errors using the add_error macro" do
+    MyOperation.class_eval do
+      add_error(:foo, :manchu, "to you!") { false }
+    end
+    result = MyOperation.run
+    expect(result).to be_resolved
+  end
+
   it "can add explicit errors using the add_error macro after an abort" do
     MyOperation.class_eval do
       add_error(:foo, :manchu, "to you!") { abort! }

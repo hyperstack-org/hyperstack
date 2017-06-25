@@ -24,6 +24,7 @@ module Hyperloop
           add_validation do
             begin
               add_error(param, symbol, message) if instance_eval(&block)
+              true
             rescue Exit => e
               raise e unless e.state == :failed
               add_error(param, symbol, message)
