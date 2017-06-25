@@ -121,6 +121,7 @@ module Hyperloop
         client_logging: Hyperloop.client_logging,
         pusher_fake_js: pusher_fake_js,
         key: Hyperloop.key,
+        cluster: Hyperloop.cluster,
         encrypted: Hyperloop.encrypted,
         channel: Hyperloop.channel,
         form_authenticity_token: controller.send(:form_authenticity_token),
@@ -188,6 +189,7 @@ module Hyperloop
             %x{
               h = {
                 encrypted: #{opts[:encrypted]},
+                cluster: #{opts[:cluster]},
                 authEndpoint: window.HyperloopEnginePath+'/hyperloop-pusher-auth',
                 auth: {headers: {'X-CSRF-Token': #{opts[:form_authenticity_token]}}}
               };
