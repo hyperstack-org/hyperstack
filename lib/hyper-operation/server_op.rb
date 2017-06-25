@@ -17,7 +17,7 @@ module Hyperloop
         end
       end if RUBY_ENGINE == 'opal'
 
-      def self.run_from_client(security_param, controller, operation, params)
+      def run_from_client(security_param, controller, operation, params)
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
