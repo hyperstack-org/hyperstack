@@ -17,12 +17,16 @@ module Hyperloop
         end
       end if RUBY_ENGINE == 'opal'
 
-      def run_from_client(security_param, operation, params)
+      def self.run_from_client(security_param, controller, operation, params)
         operation.constantize.class_eval do
-          raise AccessViolation unless _Railway.params_wrapper.method_defined? security_param
+          if _Railway.params_wrapper.method_defined?(:controller)
+            params[:controller] = controller
+          elsif !_Railway.params_wrapper.method_defined?(security_param)
+            raise AccessViolation
+          end
           run(params)
           .then { |r| return { json: { response: serialize_response(r) } } }
-          .fail { |e| return { json: { error: e}, status: 500 } }
+          .fail { |e| return { json: { error: e }, status: 500 } }
         end
       rescue Exception => e
         { json: {error: e}, status: 500 }
@@ -92,6 +96,18 @@ module Hyperloop
       def dispatch_from_server(params_hash)
         params = _Railway.params_wrapper.new(deserialize_dispatch(params_hash)).lock
         _Railway.receivers.each { |receiver| receiver.call params }
+      end
+    end
+  end
+
+  class ControllerOp < ServerOp
+    param :controller
+    alias pre_controller_op_method_missing method_missing
+    def method_missing(name, *args, &block)
+      if params.controller.respond_to? name
+        params.controller.send(name, *args, &block)
+      else
+        pre_controller_op_method_missing(name, *args, &block)
       end
     end
   end

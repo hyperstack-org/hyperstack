@@ -131,14 +131,18 @@ module Hyperloop
       def execute_remote
         parsed_params = JSON.parse(params[:json]).symbolize_keys
         render ServerOp.run_from_client(
-          :acting_user, parsed_params[:operation], parsed_params[:params].merge(acting_user: acting_user))
+          :acting_user,
+          self,
+          parsed_params[:operation],
+          parsed_params[:params].merge(acting_user: acting_user)
+        )
       end
 
       def execute_remote_api
         params.require(:params).permit!
         parsed_params = params[:params].to_h.symbolize_keys
         raise AccessViolation unless parsed_params[:authorization]
-        render ServerOp.run_from_client(:authorization, params[:operation], parsed_params)
+        render ServerOp.run_from_client(:authorization, self, params[:operation], parsed_params)
       end
 
       def console_update # TODO this should just become an execute-remote-api call
