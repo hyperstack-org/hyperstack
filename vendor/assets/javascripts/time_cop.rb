@@ -65,7 +65,7 @@ if RUBY_ENGINE == 'opal'
           `#{@lolex}.tick(#{@mock_start_time - Time.now.to_f * 1000})`
         else
           @real_start_time = Time.now.to_f * 1000
-          @lolex = `lolex.install(window, #{@mock_start_time})`
+          @lolex = `lolex.install({ now: #{@mock_start_time} })`
         end
 
         @scale = scale
@@ -78,7 +78,7 @@ if RUBY_ENGINE == 'opal'
 
 else
   require 'timecop'
-  
+
   # Interface to the Lolex package running on the client side
   # Below we will monkey patch Timecop to call these methods
   class Lolex
