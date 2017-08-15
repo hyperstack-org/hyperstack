@@ -41,7 +41,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   if RUBY_PLATFORM == 'java'
     spec.add_development_dependency 'therubyrhino'
   else
-    spec.add_development_dependency 'therubyracer', '0.12.2'
+    spec.add_development_dependency 'therubyracer', '~> 0.12.2'
 
     # Actual dependencies
     spec.add_dependency 'capybara'
@@ -50,9 +50,10 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
     spec.add_dependency 'poltergeist'
     spec.add_dependency 'pry'
     spec.add_dependency 'rspec-rails'
-    spec.add_dependency 'selenium-webdriver', '2.53.4'
+    spec.add_dependency 'selenium-webdriver', '~> 3.5.0'
     spec.add_dependency 'timecop'
-    spec.add_dependency 'unparser', '0.2.5'
+    spec.add_dependency 'unparser'
+    spec.add_dependency 'webdrivers'
 
     # Test app dependencies
     spec.add_development_dependency 'chromedriver-helper'

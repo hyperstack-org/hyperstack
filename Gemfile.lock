@@ -1,16 +1,17 @@
 PATH
   remote: .
   specs:
-    hyper-spec (0.1.2)
+    hyper-spec (0.1.3)
       capybara
       opal
       parser
       poltergeist
       pry
       rspec-rails
-      selenium-webdriver (= 2.53.4)
+      selenium-webdriver (~> 3.5.0)
       timecop
-      unparser (= 0.2.5)
+      unparser
+      webdrivers
 
 GEM
   remote: https://rubygems.org/
@@ -56,7 +57,7 @@ GEM
     adamantium (0.2.0)
       ice_nine (~> 0.11.0)
       memoizable (~> 0.4.0)
-    addressable (2.5.0)
+    addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
     archive-zip (0.7.0)
       io-like (~> 0.3.0)
@@ -67,14 +68,14 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     builder (3.2.3)
-    capybara (2.13.0)
+    capybara (2.15.1)
       addressable
-      mime-types (>= 1.16)
+      mini_mime (>= 0.1.3)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    childprocess (0.6.2)
+    childprocess (0.7.1)
       ffi (~> 1.0, >= 1.0.11)
     chromedriver-helper (1.0.0)
       archive-zip (~> 0.7.0)
@@ -117,6 +118,7 @@ GEM
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
+    mini_mime (0.1.4)
     mini_portile2 (2.1.0)
     minitest (5.10.1)
     nio4r (1.2.1)
@@ -149,7 +151,7 @@ GEM
     paggio (0.2.6)
     parser (2.3.3.1)
       ast (~> 2.2)
-    poltergeist (1.14.0)
+    poltergeist (1.16.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
@@ -233,10 +235,9 @@ GEM
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.8.1)
     rubyzip (1.2.1)
-    selenium-webdriver (2.53.4)
+    selenium-webdriver (3.5.1)
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
-      websocket (~> 1.0)
     shoulda (3.5.0)
       shoulda-context (~> 1.0, >= 1.0.1)
       shoulda-matchers (>= 1.4.1, < 3.0)
@@ -262,7 +263,7 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.5)
     tilt (2.0.6)
-    timecop (0.8.1)
+    timecop (0.9.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unicode-display_width (1.1.3)
@@ -274,11 +275,13 @@ GEM
       equalizer (~> 0.0.9)
       parser (~> 2.3.0)
       procto (~> 0.0.2)
-    websocket (1.2.4)
+    webdrivers (2.4.0)
+      nokogiri (~> 1.6)
+      rubyzip (~> 1.0)
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
-    xpath (2.0.0)
+    xpath (2.1.0)
       nokogiri (~> 1.3)
 
 PLATFORMS
@@ -305,7 +308,7 @@ DEPENDENCIES
   shoulda
   shoulda-matchers
   spring-commands-rspec
-  therubyracer (= 0.12.2)
+  therubyracer (~> 0.12.2)
 
 BUNDLED WITH
-   1.12.5
+   1.15.3
