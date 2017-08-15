@@ -17,9 +17,10 @@ RSpec.configure do |config|
 
   config.mock_with :rspec
 
-  if defined?(HyperMesh)
+  if (hyper_module = (defined?(Hyperloop) && const_get(Hyperloop) ||
+                      defined?(HyperMesh) && const_get(HyperMesh)))
     config.before(:each) do
-      HyperMesh.class_eval do
+      hyper_module.class_eval do
         def self.on_server?
           true
         end
@@ -46,15 +47,6 @@ end
 RSpec.configure do |_config|
   Capybara.default_max_wait_time = 10
 
-  # # In case Google ever fixes chromedriver to work with Opal...
-  # Capybara.register_driver :chrome do |app|
-  #   caps = Selenium::WebDriver::Remote::Capabilities.chrome(
-  #     'chromeOptions' => { 'args' => ['--window-size=200,200'] }
-  #   )
-  #
-  #   Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: caps)
-  # end
-
   Capybara.register_driver :poltergeist do |app|
     options = {
       js_errors: false, timeout: 180, inspector: true,
@@ -65,24 +57,32 @@ RSpec.configure do |_config|
         hash[:logger] = StringIO.new
       end
     end
-
     Capybara::Poltergeist::Driver.new(app, options)
+  end
+
+  Capybara.register_driver :chrome do |app|
+    Capybara::Selenium::Driver.new(app, browser: :chrome)
+  end
+
+  Capybara.register_driver :firefox do |app|
+    Capybara::Selenium::Driver.new(app, browser: :firefox)
   end
 
   Capybara.register_driver :selenium_with_firebug do |app|
     profile = Selenium::WebDriver::Firefox::Profile.new
-    profile.frame_position = ENV['DRIVER'] && ENV['DRIVER'][2]
+    ENV['FRAME_POSITION'] && profile.frame_position = ENV['FRAME_POSITION']
     profile.enable_firebug
 
-    Capybara::Selenium::Driver.new(app, browser: :firefox, profile: profile)
+    options = Selenium::WebDriver::Firefox::Options.new(profile: profile)
+
+    Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
   end
 
   Capybara.javascript_driver =
-    if ENV['DRIVER'] =~ /^ff/
-      :selenium_with_firebug
-    # elsif ENV['DRIVER'] == 'chrome'
-    #   Capybara.javascript_driver = :chrome
-    else
-      :poltergeist
+    case ENV['DRIVER']
+    when 'ff' then :selenium_with_firebug
+    when 'firefox' then :firefox
+    when 'chrome' then :chrome
+    else :poltergeist
     end
 end

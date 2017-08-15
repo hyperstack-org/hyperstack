@@ -6,7 +6,7 @@ module Selenium
           attr_accessor :firebug_version
 
           def firebug_version
-            @firebug_version ||= '2.0.13-fx'
+            @firebug_version ||= '2.0.19-fx'
           end
         end
 
@@ -15,7 +15,7 @@ module Selenium
         end
 
         def frame_position=(position)
-          @frame_position = %w(left right top detached).detect do |side|
+          @frame_position = %w[left right top detached].detect do |side|
             position && position[0].downcase == side[0]
           end || 'detached'
         end
@@ -36,7 +36,7 @@ module Selenium
           self['extensions.firebug.allPagesActivation'] = 'on'
 
           # Enable all features.
-          %w(console net script).each do |feature|
+          %w[console net script].each do |feature|
             self["extensions.firebug.#{feature}.enableSites"] = true
           end
 
