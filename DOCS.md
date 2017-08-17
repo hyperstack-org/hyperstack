@@ -19,15 +19,15 @@ SimpleOperation.run(anything: :something)
 
 Hyperloop's Isomorphic Operations span the client and server divide automagically. Operations can run on the client, the server, and traverse between the two.
 
-This goal of this documentation is to outline Hyperloop's Operations classes and provides enough information and examples to show how to implement Operations in an application.
+This goal of this documentation is to outline Operations classes and provides enough information and examples to show how to implement Operations in an application.
 
-### What do Operations do?
+### Operations have three core functions
 
 Operations are packaged as one neat package but perform three different functions:
 
 1. Operations encapsulate business logic into a series of steps
 2. Operations can dispatch messages (either on the client or between the client and server)
-3. Operations can be used to replace boiler-plate APIs through a bi-directional RPC mechanism
+3. ServerOps can be used to replace boiler-plate APIs through a bi-directional RPC mechanism
 
 **Important to understand:** There is no requirement to use all three functions. Use only the functionality your application requires.
 
@@ -80,23 +80,26 @@ class InvoiceOpertion < Hyperloop::Operation
 end
 ```
 
-This approach allows you to build complicated, yet fully testable workflows in your application.
+This approach allows you to build readable and testable workflows in your application.
 
 ### Running Operations
 
 To run an Operation:
 
 + use the `run` method:  
+
 ```ruby
 MyOperation.run
 ```
 
 + passing params:
+
 ```ruby
 MyOperation.run(params)
 ```
 
 + the `then` and `fail` methods, which will dispatch the operation and attach a promise handler:  
+
 ```ruby
 MyOperation.run(params)
 .then { do_the_next_thing }
@@ -365,6 +368,7 @@ end
 ```
 
 To 'Reset' the system you would say
+
 ```ruby
   Reset.run
 ```
@@ -408,7 +412,7 @@ As stated earlier in this documentation, the `step` idea came from Trailblazer, 
 
 In designing Hyperloop's Isomorphic Operations (which would run on the client and the server), we decided to borrow from the best of both architectures and let Operations work in either way.  The decision as to adopt the dispatching or stepping based model is left down to the programmer as determined by their preference or the needs of their application.
 
-## Operations as an API - ServerOps
+## ServerOps can be used to replace boiler-plate APIs
 
 Some Operations simply do not make sense to run on the client as the resources they depend on may not be available on the client. For example, consider an Operation that needs to send an email - there is no mailer on the client so the Operation has to execute from the server.
 
