@@ -1,7 +1,7 @@
 
 # <span class="bigfirstletter">H</span>yperloop Operations
 
-Operations are the engine rooms of Hyperloop; they orchestrate the interactions between Components, external services, Models, and Stores. Operations are where your business logic lives.
+Operations are the engine rooms of Hyperloop; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
 
 Operations receive parameters and execute a series of steps. They have a simple structure which is not dissimilar to a Component:
 
@@ -65,9 +65,7 @@ This Operation is run from anywhere in the client or server code:
 SaveWithUpdatingMemberOp.run(model: MyModel)
 ```
 
-This example of encapsulated business logic (ensuring that created_by and updated_by are always correctly set), in a traditional MVC architecture, would have at best, kept in the Model itself, or at worst scattered around the Controllers or Views and duplicated whenever a Model was saved or updated. **Operations provide a tidy place to keep this logic.**
-
-Operations always return Promises, and those promises can be chained together. Please see the section on Promises later in this documentation for details on how Promises work.
+Operations always return Promises, and those Promises can be chained together. See the section on Promises later in this documentation for details on how Promises work.
 
 Operations can invoke other Operations so you can chain a sequence of `steps` and Promises which proceed unless the previous `step` fails:
 
