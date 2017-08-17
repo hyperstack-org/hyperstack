@@ -10,34 +10,26 @@ class SimpleOperation < Hyperloop::Operation
   param :anything
   step { do_something }
 end
+
+#to invoke from anywhere
+SimpleOperation.run(anything: :something)
+.then { success }
+.fail { fail }
 ```
-
-This goal of this documentation is to outline Hyperloop's Operations classes and provides enough information and examples to show how to implement Operations in an application.
-
-### What do Operations do?
-
-Operations are packaged as one neat package but perform three different functions:
-
-1. Operations encapsulate business logic
-2. They can dispatch messages (either on the client or between the client and server)
-3. They can be used to replace boiler-plate APIs through a bi-directional RPC mechanism
-
-> The design of Hyperloop's Operations have been inspired by three concepts: [Trailblazer Operations](http://trailblazer.to/gems/operation/2.0/) (for encapsulating business logic in `steps`), the [Flux pattern](https://facebook.github.io/flux/) (for dispatchers and receivers), and the [Mutation Gem](https://github.com/cypriss/mutations) (for validating params).
 
 Hyperloop's Isomorphic Operations span the client and server divide automagically. Operations can run on the client, the server, and traverse between the two.
 
-Operations have the following capabilities:
+This goal of this documentation is to outline Hyperloop's Operations classes and provides enough information and examples to show how to implement Operations in an application.
 
-+ Can easily be chained because they always return promises
-+ declare both their parameters and what they will dispatch
-+ Parameters can be validated and type checked
-+ Can run remotely on the server
-+ Can be dispatched from the server to all authorized clients.
-+ Can hold their own state data when appropriate
-+ Operations also serves as the bridge between client and server
-+ An operation can run on the client or the server and can be invoked remotely.
+### Operations have three functions
 
-> **Use Operations as you choose**. This architecture is descriptive but not prescriptive. Depending on the needs of your application and your overall thoughts on architecture, you may need a little or a lot of the functionality provided by Operations. If you chose, you could keep all your business logic in your Models, Stores or Components - we suggest that it is better application design not to do this, but the choice is yours.
+Operations are packaged as one neat package but perform three different functions:
+
+1. Operations encapsulate business logic into a series of steps
+2. Operations can dispatch messages (either on the client or between the client and server)
+3. Operations can be used to replace boiler-plate APIs through a bi-directional RPC mechanism
+
+**Important to understand:** There is no requirement to use all three functions. Use only the functionality your application requires.
 
 ## Operations encapsulate business logic
 
@@ -55,10 +47,7 @@ These are defined by series of class methods described below.
 
 ### Operation Structure
 
-+ `Hyperloop::Operation` is the base class for an *Operation*
-+ An Operation orchestrates the updating of the state of your system
-+ An Operation can be used to encapsulate business logic
-+ Operations can also wrap asynchronous operations such as HTTP API requests (this will be covered later)
+`Hyperloop::Operation` is the base class for an *Operation*
 
 As an example, here is an Operation which ensures that the Model being saved always has the current `created_by` and `updated_by` `Member`.
 
@@ -168,9 +157,9 @@ end
 
 Together `step` and `failed` form two *railway tracks*.  Initially, execution proceeds down the success track until something goes wrong; then execution switches to the failure track starting at the next `failed` statement.  Once on the failed track execution continues performing each `failed` callback and skipping any `step` callbacks.
 
-Failure occurs when either an exception is raised, or a promise fails (more on this in the next section.) The Ruby `fail` keyword can be used as a simple way to switch to the failed track.
+Failure occurs when either an exception is raised, or a Promise fails (more on this in the next section.) The Ruby `fail` keyword can be used as a simple way to switch to the failed track.
 
-Both `step` and `failed` can receive any results delivered by the previous step.   If the last step raised an exception (outside a promise), the failure track would receive the exception object.
+Both `step` and `failed` can receive any results delivered by the previous step.   If the last step raised an exception (outside a Promise), the failure track would receive the exception object.
 
 The callback may be provided to `step` and `failed` either as a block, a symbol (which will name a method), a proc, a lambda, or an Operation.
 
@@ -186,28 +175,28 @@ FYI: You can also use the Ruby `next` keyword as expected to leave the current s
 
 ### Promises and Operations
 
-Within the browser, the code does not wait for asynchronous methods (such as HTTP requests or timers) to complete.  Operations use Opal's [Promise library](http://opalrb.org/docs/api/v0.10.3/stdlib/Promise.html) to deal with these situations cleanly.  A Promise is an object that has three states:  It is either still pending, or has been rejected (i.e. failed), or has been successfully resolved.  A promise can have callbacks attached to either the failed or resolved state, and these callbacks will be executed once the promise is resolved or rejected.
+Within the browser, the code does not wait for asynchronous methods (such as HTTP requests or timers) to complete.  Operations use Opal's [Promise library](http://opalrb.org/docs/api/v0.10.3/stdlib/Promise.html) to deal with these situations cleanly.  A Promise is an object that has three states:  It is either still pending, or has been rejected (i.e. failed), or has been successfully resolved.  A Promise can have callbacks attached to either the failed or resolved state, and these callbacks will be executed once the Promise is resolved or rejected.
 
-If a `step` or `failed` callback returns a pending promise then the execution of the operation is suspended, and the Operation will return the promise to the caller.  If there is more track ahead, then execution will resume at the next step when the promise is resolved.  Likewise, if the pending promise is rejected execution will resume on the next `failed` callback.  Because of the way promises work, the operation steps will all be completed before the resolved state is passed along to the caller so that everything will execute in its original order.
+If a `step` or `failed` callback returns a pending Promise then the execution of the operation is suspended, and the Operation will return the Promise to the caller.  If there is more track ahead, then execution will resume at the next step when the Promise is resolved.  Likewise, if the pending Promise is rejected execution will resume on the next `failed` callback.  Because of the way Promises work, the operation steps will all be completed before the resolved state is passed along to the caller so that everything will execute in its original order.
 
-Likewise, the Operation's dispatch occurs when the promise resolves as well.
+Likewise, the Operation's dispatch occurs when the Promise resolves as well.
 
-The `async` method can be used to override the waiting behavior.  If a `step` returns a promise, and there is an `async` callback further down the track, execution will immediately pick up at the `async`.  Any steps in between will still be run when the promise resolves, but their results will not be passed outside of the operation.
+The `async` method can be used to override the waiting behavior.  If a `step` returns a Promise, and there is an `async` callback further down the track, execution will immediately pick up at the `async`.  Any steps in between will still be run when the Promise resolves, but their results will not be passed outside of the operation.
 
 These features make it easy to organize, understand and compose asynchronous code:
 
 ```ruby
 class AddItemToCart < Hyperloop::Operation
   step { HTTP.get('/inventory/#{params.sku}/qty') }
-  # previous step returned a promise so next step
-  # will execute when that promise resolves
+  # previous step returned a Promise so next step
+  # will execute when that Promise resolves
   step { |response| fail if params.qty > response.to_i }
   # once we are sure we have inventory we will dispatch
   # to any listening stores.
 end
 ```
 
-Operations will *always* return a *Promise*.  If an Operation has no steps that return a promise the value of the last step will be wrapped in a resolved promise.  Operations can be essily chaned regardless of their internal implementation:
+Operations will *always* return a *Promise*.  If an Operation has no steps that return a Promise the value of the last step will be wrapped in a resolved Promise.  Operations can be easily changed regardless of their internal implementation:
 
 ```ruby
 class QuickCheckout < Hyperloop::Operation
@@ -269,7 +258,7 @@ class UpdateProfile < Hyperloop::Operation
 end
 ```
 
-If the validate method returns a Promise, then execution will wait until the Promise resolves.  If the promise fails, then the current validation fails.
+If the validate method returns a Promise, then execution will wait until the Promise resolves.  If the Promise fails, then the current validation fails.
 
 `abort!` can be called from within `validate` or `add_error` to exit the Operation immediately.  Otherwise, all validations will be run and collected together, and the Operation will move onto the `failed` track.  If `abort!` is called within an `add_error` callback the error will be added before aborting.
 
@@ -288,7 +277,7 @@ before the first `validate` or `add_error` call.
 Because Operations always return a promise, the Promise's `fail` method can be used on the Operation's result to detect failures.
 
 ```ruby
-QuickCheckout(sku: selected_item, qty: selected_qty)
+QuickCheckout.run(sku: selected_item, qty: selected_qty)
 .then do
   # show confirmation
 end
@@ -396,15 +385,6 @@ Note that multiple stores can receive the same *Dispatch*.
 
 >**Note: Flux pattern vs. Hyperloop Operations** Operations serve the role of both Action Creators and Dispatchers described in the Flux architecture. We chose the name `Operation` rather than `Action` or `Mutation` because we feel it best captures all the capabilities of a `Hyperloop::Operation`.  Nevertheless, Operations are fully compatible with the Flux Pattern.  
 
-| Flux | HyperLoop |
-|-----| --------- |
-| Action | Hyperloop::Operation subclass |
-| ActionCreator | `Hyperloop::Operation.step/failed/async` methods |
-| Action Data | Hyperloop::Operation parameters |
-| Dispatcher | `Hyperloop::Operation#dispatch` method |
-| Registering a Store | `Store.receives` |
-
-
 ### Dispatching With New Parameters
 
 The `dispatch` method sends the `params` object on to any registered receivers.  Sometimes it's useful to add additional outbound params before dispatching.  Additional params can be declared using the `outbound` macro:
@@ -436,7 +416,7 @@ Some Operations simply do not make sense to run on the client as the resources t
 
 That said, with our highest goal being developer productivity, it should be as invisible as possible to the developer where the Operation will execute. A developer writing front-end code should be able to invoke a server-side resource (like a mailer) just as easily as they might invoke a client-side resource.
 
-Hyperloop `ServerOps` replace the need for a boiler-plate HTTP API. All serialization and de-serialization of params are handled by Hyperloop. Hyperloop automagically creates the API endpoint needed to invoke a function from the client which executes on the server and returns the results (via a promise) to the calling client-side code.
+Hyperloop `ServerOps` replace the need for a boiler-plate HTTP API. All serialization and de-serialization of params are handled by Hyperloop. Hyperloop automagically creates the API endpoint needed to invoke a function from the client which executes on the server and returns the results (via a Promise) to the calling client-side code.
 
 ### Server Operations
 
@@ -481,7 +461,7 @@ class DeleteUser < AdminOnlyOp
 end
 ```
 
-Because Operations always return a promise, there is nothing to change on the client to call a Server Operation. A Server Operation will return a promise that will be resolved (or rejected) when the Operation completes (or fails) on the server.  
+Because Operations always return a Promise, there is nothing to change on the client to call a Server Operation. A Server Operation will return a Promise that will be resolved (or rejected) when the Operation completes (or fails) on the server.  
 
 ### Isomorphic Operations
 
@@ -661,7 +641,7 @@ class PrivateAnnouncement < Hyperloop::ServerOp
 end
 ...
   # somewhere else in the server
-  PrivateAnnouncement(receiver: User.find_by_login(login), message: 'log off now!')
+  PrivateAnnouncement.run(receiver: User.find_by_login(login), message: 'log off now!')
 ```  
 
 The above will work if `PrivateAnnouncement` is invoked from the server, but usually, some other client would be sending the message so the operation could look like this:
@@ -680,7 +660,7 @@ end
 On the client::
 
 ```ruby
-  PrivateAnnouncement(receiver: login_name, message: 'log off now!').fail do
+  PrivateAnnouncement.run(receiver: login_name, message: 'log off now!').fail do
     alert('message could not be sent')
   end
 ```
@@ -854,3 +834,34 @@ class App < Hyperloop::Component
   after_mount :connect_session
 end
 ```
+
+## Additional information
+
+### Operation Capabilities
+
+Operations have the following capabilities:
+
++ Can easily be chained because they always return Promises
++ declare both their parameters and what they will dispatch
++ Parameters can be validated and type checked
++ Can run remotely on the server
++ Can be dispatched from the server to all authorized clients.
++ Can hold their own state data when appropriate
++ Operations also serves as the bridge between client and server
++ An operation can run on the client or the server and can be invoked remotely.
+
+**Use Operations as you choose**. This architecture is descriptive but not prescriptive. Depending on the needs of your application and your overall thoughts on architecture, you may need a little or a lot of the functionality provided by Operations. If you chose, you could keep all your business logic in your Models, Stores or Components - we suggest that it is better application design not to do this, but the choice is yours.
+
+## Background
+
+The design of Hyperloop's Operations have been inspired by three concepts: [Trailblazer Operations](http://trailblazer.to/gems/operation/2.0/) (for encapsulating business logic in `steps`), the [Flux pattern](https://facebook.github.io/flux/) (for dispatchers and receivers), and the [Mutation Gem](https://github.com/cypriss/mutations) (for validating params).
+
+## Hyperloop Operations compared to Flux
+
+| Flux | HyperLoop |
+|-----| --------- |
+| Action | Hyperloop::Operation subclass |
+| ActionCreator | `Hyperloop::Operation.step/failed/async` methods |
+| Action Data | Hyperloop::Operation parameters |
+| Dispatcher | `Hyperloop::Operation#dispatch` method |
+| Registering a Store | `Store.receives` |
