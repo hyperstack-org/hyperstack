@@ -1,5 +1,5 @@
 
-# Hyperloop Operation
+# <span class="bigfirstletter">H</span>yperloop Operations
 
 Operations are the engine rooms of Hyperloop; they orchestrate the interactions between Components, external services, Models, and Stores. Operations are where your business logic lives.
 
