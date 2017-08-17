@@ -852,11 +852,11 @@ Operations have the following capabilities:
 
 **Use Operations as you choose**. This architecture is descriptive but not prescriptive. Depending on the needs of your application and your overall thoughts on architecture, you may need a little or a lot of the functionality provided by Operations. If you chose, you could keep all your business logic in your Models, Stores or Components - we suggest that it is better application design not to do this, but the choice is yours.
 
-## Background
+### Background
 
 The design of Hyperloop's Operations have been inspired by three concepts: [Trailblazer Operations](http://trailblazer.to/gems/operation/2.0/) (for encapsulating business logic in `steps`), the [Flux pattern](https://facebook.github.io/flux/) (for dispatchers and receivers), and the [Mutation Gem](https://github.com/cypriss/mutations) (for validating params).
 
-## Hyperloop Operations compared to Flux
+### Hyperloop Operations compared to Flux
 
 | Flux | HyperLoop |
 |-----| --------- |
