@@ -61,7 +61,7 @@ class WordOfTheDay < Hyperloop::Component
 
 For complete examples with *push* updates, see any of the apps in the `examples` directory, or build your own in 5 minutes following one of the quickstart guides:
 
-### Isomorphic Models
+## Isomorphic Models
 
 Depending on the architecture of your application, you may decide that some of your models should be Isomorphic and some should remain server-only. The consideration will be that your Isomorphic models will be compiled by Opal to JavaScript and accessible on he client (without the need for a boilerplate API) - Hyperloop takes care of the communication between your server-side models and their client-side compiled versions and you can use Policy to govern access to the models.
 
