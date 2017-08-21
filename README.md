@@ -14,7 +14,7 @@ HyperI18n seamlessly brings Rails I18n into your Hyperloop application.
 
 ## Installation and Setup
 
-1. Add `gem 'hyper-i18n', git: 'https://https://github.com/ruby-hyperloop/hyper-i18n.git'` to your `Gemfile`
+1. Add `gem 'hyper-i18n', git: 'https://github.com/ruby-hyperloop/hyper-i18n.git'` to your `Gemfile`
 2. Install the Gem: `bundle install`
 3. Add `require 'hyper-i18n'` to your components manifest
 
@@ -26,7 +26,7 @@ Contributions are very welcome!
 
 ### Usage
 
-Hyper-I81n brings in the standard ActiveSupport API.
+Hyper-I18n brings in the standard ActiveSupport API.
 
 
 #### ActiveRecord Models
