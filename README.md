@@ -34,7 +34,7 @@ Hyper-I18n brings in the standard ActiveSupport API.
 The methods `Model.model_name.human` and `Model.human_attribute_name` are available:
 
 ```yaml
-# config/locals/models/en.yml
+# config/locales/models/en.yml
 en:
   activerecord:
     models:
@@ -57,7 +57,7 @@ It also implements the same lazy-loading pattern,
 so if you name space your locale file the same as your components, it will just work:
 
 ```yaml
-# config/locals/views/en.yml
+# config/locales/views/en.yml
 en:
   users:
     show:
