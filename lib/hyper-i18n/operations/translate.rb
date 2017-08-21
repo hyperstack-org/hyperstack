@@ -6,7 +6,7 @@ module HyperI18n
     param :translation, default: nil
 
     def opts
-      opts.with_indifferent_access
+      params.opts.with_indifferent_access
     end
 
     step do

@@ -24,6 +24,8 @@ module HyperI18n
             I18nStore.translations[attribute] = translation
             I18nStore.mutate.translations(I18nStore.translations)
           end
+
+        opts[:default] || ''
       end
 
       f.when_on_server do
@@ -49,6 +51,8 @@ module HyperI18n
 
             I18nStore.mutate.localizations(I18nStore.localizations)
           end
+
+        opts[:default] || ''
       end
 
       f.when_on_server do

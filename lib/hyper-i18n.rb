@@ -13,7 +13,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-store'
 
   require 'hyper-i18n/active_model/name'
-  require 'hyper-i18n/active_record/base'
+  require 'hyper-i18n/active_record/class_methods'
   require 'hyper-i18n/hyperloop/component/mixin'
 
   require 'hyper-i18n/stores/i18n_store'

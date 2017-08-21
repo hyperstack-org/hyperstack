@@ -1,11 +1,11 @@
 module ActiveRecord
-  class Base
+  module ClassMethods
     def model_name
       @model_name ||= ActiveModel::Name.new(self)
     end
 
     def human_attribute_name(attribute, opts = {})
-      attribute = "activerecord.attributes.#{self.class.name.underscore}.#{attribute}"
+      attribute = "activerecord.attributes.#{model_name.i18n_key}.#{attribute}"
 
       HyperI18n::I18n.t(attribute, opts)
     end

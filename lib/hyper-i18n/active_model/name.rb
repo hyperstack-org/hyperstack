@@ -2,8 +2,8 @@ module ActiveModel
   class Name
     attr_accessor :i18n_key
 
-    def initialize(record)
-      @i18n_key = :"#{record.class.name.underscore}"
+    def initialize(klass)
+      @i18n_key = :"#{klass.name.underscore}"
     end
 
     def human
