@@ -1,5 +1,6 @@
 module HyperI18n
   class I18n
+    extend HelperMethods
     include React::IsomorphicHelpers
 
     before_first_mount do
@@ -7,23 +8,18 @@ module HyperI18n
         @server_data_cache = { t: {}, l: {} }
       else
         unless no_initial_data?
-          JSON.from_object(`window.HyperI18nInitialData.t`).each do |attribute, translation|
-            I18nStore.translations[attribute] = translation
-          end
-
-          JSON.from_object(`window.HyperI18nInitialData.l`).each do |time, localization|
-            I18nStore.localizations[time] = localization
-          end
+          I18nStore.mutate.translations(JSON.from_object(`window.HyperI18nInitialData.t`))
+          I18nStore.mutate.localizations(JSON.from_object(`window.HyperI18nInitialData.l`))
         end
       end
     end
 
-    isomorphic_method(:t) do |f, attribute, default = ''|
+    isomorphic_method(:t) do |f, attribute, opts = {}|
       f.when_on_client do
         return I18nStore.translations[attribute] if I18nStore.translations[attribute]
 
         Translate
-          .run(attribute: attribute)
+          .run(attribute: attribute, opts: opts)
           .then do |translation|
             I18nStore.translations[attribute] = translation
             I18nStore.mutate.translations(I18nStore.translations)
@@ -31,54 +27,60 @@ module HyperI18n
       end
 
       f.when_on_server do
-        @server_data_cache[:t][attribute] = ::I18n.t(attribute, default)
+        @server_data_cache[:t][attribute] = ::I18n.t(attribute, opts.with_indifferent_access)
       end
     end
 
-    isomorphic_method(:l) do |f, time, format = :default|
-      time = Time.parse(time.to_s)
-      format = :"#{format}" unless format =~ /%/
+    isomorphic_method(:l) do |f, date_or_time, format = :default, opts = {}|
+      format = formatted_format(format)
+      date_or_time = formatted_date_or_time(date_or_time)
 
       f.when_on_client do
-        return I18nStore.localizations[time][format] if I18nStore.localizations[time] &&
-                                                        I18nStore.localizations[time][format]
+        if I18nStore.localizations[date_or_time.to_s] &&
+           I18nStore.localizations[date_or_time.to_s][format]
+          return I18nStore.localizations[date_or_time.to_s][format]
+        end
 
         Localize
-          .run(time: time, format: format)
+          .run(date_or_time: date_or_time, format: format, opts: {})
           .then do |localization|
-            I18nStore.localizations[time] ||= {}
-            I18nStore.localizations[time][format] = localization
+            I18nStore.localizations[date_or_time.to_s] ||= {}
+            I18nStore.localizations[date_or_time.to_s][format] = localization
 
             I18nStore.mutate.localizations(I18nStore.localizations)
           end
       end
 
       f.when_on_server do
-        @server_data_cache[:l][time] ||= {}
+        @server_data_cache[:l][date_or_time.to_s] ||= {}
 
-        @server_data_cache[:l][time][format] = ::I18n.l(time, format: format)
+        @server_data_cache[:l][date_or_time.to_s][format] =
+          ::I18n.l(date_or_time, opts.with_indifferent_access.merge(format: format))
       end
     end
 
     if RUBY_ENGINE != 'opal'
       prerender_footer do
-        json =
-          if @server_data_cache
-            @server_data_cache.as_json.to_json
-          else
-            {}.to_json
-          end
-
         "<script type=\"text/javascript\">\n"\
           "if (typeof window.HyperI18nInitialData === 'undefined') {\n"\
-          "  window.HyperI18nInitialData = #{json};\n"\
+          "  window.HyperI18nInitialData = #{initial_data_json};\n"\
           "}\n"\
           "</script>\n"
       end
     end
 
-    def self.no_initial_data?
-      `typeof window.HyperI18nInitialData === 'undefined'`
+    class << self
+      def no_initial_data?
+        `typeof window.HyperI18nInitialData === 'undefined'`
+      end
+
+      def initial_data_json
+        if @server_data_cache
+          @server_data_cache.as_json.to_json
+        else
+          {}.to_json
+        end
+      end
     end
   end
 end

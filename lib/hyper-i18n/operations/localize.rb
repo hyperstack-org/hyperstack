@@ -1,36 +1,23 @@
 module HyperI18n
   class Localize < Hyperloop::ServerOp
+    include HelperMethods
+
     param :acting_user
-    param :time
+    param :date_or_time
     param :format
+    param :opts
     param :localization, default: nil
 
-    def formatted_time
-      # All params are strings, so ensure we have a Time object
-      Time.parse(params.time.to_s)
+    def date_or_time
+      @date_or_time ||= formatted_date_or_time(params.date_or_time)
     end
 
-    def formatted_format # lol
-      # If a string is passed in it will use that as the pattern for formatting, ex:
-      #
-      # I18n.l(Time.now, format: "%b %d, %Y")
-      # => "Aug 20, 2017"
-      #
-      # If a symbol is passed in it will find that definition from the locales.
-      #
-      # Since all parameters are Strings, we check if the '%' is in the string.
-
-      # If it is, we just pass the string over without doing anything.
-      if params.format.match?(/%/)
-        params.format
-      # Otherwise, we convert it to a symbol.
-      else
-        :"#{params.format}"
-      end
+    def opts
+      @opts ||= params.opts.with_indifferent_access.merge(format: formatted_format(params.format))
     end
 
     step do
-      params.localization = ::I18n.l(formatted_time, format: formatted_format)
+      params.localization = ::I18n.l(date_or_time, opts)
     end
   end
 end
