@@ -4,6 +4,7 @@ Hyperloop.import 'hyper-i18n'
 require 'hyper-component'
 require 'hyper-operation'
 
+require 'hyper-i18n/operations/localize'
 require 'hyper-i18n/operations/translate'
 
 if RUBY_ENGINE == 'opal'
@@ -14,7 +15,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-i18n/active_record/base'
   require 'hyper-i18n/hyperloop/component/mixin'
 
-  require 'hyper-i18n/stores/translations_store'
+  require 'hyper-i18n/stores/i18n_store'
 else
   require 'opal'
 
