@@ -82,7 +82,7 @@ module HyperI18n
         if @server_data_cache
           @server_data_cache.as_json.to_json
         else
-          {}.to_json
+          { t: {}, l: {} }.to_json
         end
       end
     end
