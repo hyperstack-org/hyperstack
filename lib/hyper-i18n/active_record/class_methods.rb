@@ -1,5 +1,6 @@
 module ActiveRecord
   module ClassMethods
+    # TODO: This should really be in hyper-mesh
     def model_name
       @model_name ||= ActiveModel::Name.new(self)
     end
