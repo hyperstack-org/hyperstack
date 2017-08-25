@@ -30,39 +30,7 @@
 
 ## Hyper-React GEM is part of Hyperloop GEMS family
 
-Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
-
-One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
-
-Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
-
-**Hyper-react** is an [Opal Ruby](http://opalrb.org) wrapper of [React.js library](https://facebook.github.io/react).
-
-**Hyper-react** brings Components modules uesed in the Hyperloop interface.
-
-## Getting Started
-
-1. Update your Gemfile:
-        
-```ruby
-#Gemfile
-
-gem 'hyperloop'
-```
-
-2. At the command prompt, update your bundle :
-
-        $ bundle update
-
-3. Run the hyperloop install generator:
-
-        $ rails g hyperloop:install
-
-4. Follow the guidelines to start developing your application. You may find
-   the following resources handy:
-    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
-    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
-    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
+Hyper-react GEM comes with the Hyperloop GEM. But if you want to install it separately, please install the [Hyper-component GEM}(https://github.com/ruby-hyperloop/hyper-component).
 
 ## Community
 
