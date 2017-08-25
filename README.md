@@ -24,7 +24,7 @@
 
 </div>
 
-<img src="http://ruby-hyperloop.io/images/HyperStores.png" width="50" alt="Hyperstores">## Hyper-Store GEM is part of Hyperloop GEMS family
+<img src="http://ruby-hyperloop.io/images/HyperStores.png" width="50" alt="Hyperstores"><h2>Hyper-Store GEM is part of Hyperloop GEMS family</h2>
 
 Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
 
