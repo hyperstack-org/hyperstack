@@ -28,7 +28,7 @@
 
 </div>
 
-##Hyper-Store GEM is part of Hyperloop GEMS family
+## Hyper-Store GEM is part of Hyperloop GEMS family
 
 Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
 
