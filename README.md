@@ -1,128 +1,78 @@
-# hyper-react
+<div class="githubhyperloopheader">
 
-[![Join the chat at https://gitter.im/reactrb/chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/reactrb/chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/ruby-hyperloop/hyper-react.svg?branch=master)](https://travis-ci.org/ruby-hyperloop/hyper-react)
-[![Code Climate](https://codeclimate.com/github/reactrb/reactrb/badges/gpa.svg)](https://codeclimate.com/github/reactrb/reactrb)
+<p align="center">
+
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
+</a>
+
+</p>
+
+<h2 align="center">The Complete Isomorphic Ruby Framework</h2>
+
+<br>
+
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img src="http://ruby-hyperloop.io/images/githubhyperloopbadge.png">
+</a>
+
+<a href="https://gitter.im/ruby-hyperloop/chat" alt="Gitter chat" title="Gitter chat">
+<img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
+</a>
+
 [![Gem Version](https://badge.fury.io/rb/hyper-react.svg)](https://badge.fury.io/rb/hyper-react)
 
-**hyper-react is an [Opal Ruby](http://opalrb.org) wrapper of
-[React.js library](https://facebook.github.io/react)**.
+<p align="center">
+<img src="http://ruby-hyperloop.io/images/HyperComponents.png" width="100" alt="Hyper-components">
+</p>
 
-It lets you write reactive UI components, with Ruby's elegance using the tried
-and true React.js engine. :heart:
+</div>
 
-Visit [ruby-hyperloop.io](http://ruby-hyperloop.io) for the full story.
+## Hyper-React GEM is part of Hyperloop GEMS family
 
-### Important: `react.rb`, `reactive-ruby` and `reactrb` gems are **deprecated**. See [**UPGRADING**](UPGRADING.md) for details.
+Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
 
-## Installation
+One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
 
-Install the gem, or load the js library
+Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
 
-1. Add `gem 'hyper-react'` to your **Gemfile**
-2. Or `gem install hyper-react`
-3. Or install (or load via cdn) from [reactrb-express.js](http://github.com/ruby-hyperloop/reactrb-express)
+**hyper-react** is an [Opal Ruby](http://opalrb.org) wrapper of [React.js library](https://facebook.github.io/react).
 
-For gem installation it is highly recommended to read the [getting started](http://ruby-hyperloop.io/get_started/) and [installation](http://ruby-hyperloop.io/installation/) guides at [ruby-hyperloop.io.](http://ruby-hyperloop.io)
+**Hyper-react** brings Components modules uesed in the Hyperloop interface.
 
-## Quick Overview
+## Getting Started
 
-A component is a plain ruby class with a `#render` method defined.
-
+1. Update your Gemfile:
+        
 ```ruby
-class HelloMessage
-  def render
-    React.create_element("div") { "Hello World!" }
-  end
-end
+#Gemfile
 
-puts React.render_to_static_markup(React.create_element(HelloMessage))
-
-# => '<div>Hello World!</div>'
+gem 'hyperloop'
 ```
 
-### React::Component
+2. At the command prompt, update your bundle :
 
-You can simply include `React::Component` to get the power of a complete DSL to generate html markup, event handlers and it also provides a full set of class macros to define states, parameters, and lifecycle callbacks.
+        $ bundle update
 
-As events occur, components update their state, which causes them to rerender, and perhaps pass new parameters to lower level components, thus causing them to rerender.
+3. Run the hyperloop install generator:
 
-```ruby
-require 'opal'
-require 'browser/interval'
-require 'opal-jquery'
-require 'react/react-source'
-require 'hyper-react'
-require 'react/top_level_render'
+        $ rails g hyperloop:install
 
-class HelloWorld < React::Component::Base
-  param :time, type: Time
-  render do
-    p do
-      span { "Hello, " }
-      input(type: :text, placeholder: "Your Name Here")
-      span { "! It is #{params.time}"}
-    end
-  end
-end
+4. Follow the guidelines to start developing your application. You may find
+   the following resources handy:
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
+    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
+    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
 
-every(1) do
-  Element["#example"].render do
-    HelloWorld(time: Time.now)
-  end
-end
-```
+## Community
 
-hyper-react components are *isomorphic* (or *univeral*) meaning they can run on the server as well as the client.
+#### Getting Help
+Please **do not post** usage questions to GitHub Issues. For these types of questions use our [Gitter chatroom](https://gitter.im/ruby-hyperloop/chat) or [StackOverflow](http://stackoverflow.com/questions/tagged/hyperloop).
 
-hyper-react integrates well with Rails, Sinatra, and simple static sites, and can be added to existing web pages very easily.
-
-Under the hood the actual work is effeciently done by the [React.js](https://facebook.github.io/react) engine.
-
-
-## Why ?
-
-+ *Single Language:*  Use Ruby everywhere, no JS, markup languages, or JSX
-+ *Powerful DSL:* Describe HTML and event handlers with a minimum of fuss
-+ *Ruby Goodness:* Use all the features of Ruby to create reusable, maintainable UI code
-+ *React Simplicity:* Nothing is taken away from the React.js model
-+ *Enhanced Features:* Enhanced parameter and state management and other new features
-+ *Plays well with Others:* Works with other frameworks, React.js components, Rails, Sinatra and static web pages
-
-## Problems, Questions, Issues
-
-+ [Stack Overflow](http://stackoverflow.com/questions/tagged/react.rb) tag `react.rb` for specific problems.
-+ [Gitter.im](https://gitter.im/reactrb/chat) for general questions, discussion, and interactive help.
-+ [Github Issues](https://github.com/reactrb/reactrb/issues) for bugs, feature enhancements, etc.
-
-
-## Roadmap
-
-Version 0.10.x **will not be** 100% backward compatible with 0.3.0 (`react.rb`) or 0.7.x (`reactive-ruby`).
-
-Please let us know either at [Gitter.im](https://gitter.im/reactrb/chat) or [via an issue](https://github.com/reactrb/reactrb/issues) if you have specific concerns with the upgrade from 0.3.0 to 0.10.x.
-
-## Developing
-
-`git clone` the project.
-
-To play with some live examples, refer to https://github.com/ruby-hyperloop/reactrb-examples.
-
-Note that these are very simple examples, for the purpose of showing how to configure the gem in various server environments.  For more examples and information see [ruby-hyperloop.io.](http://ruby-hyperloop.io)
-
-## Testing
-
-1. Run `bundle exec rake test_app` to generate a dummy test app.
-2. `bundle exec appraisal install` to generate separate gemfiles for different environments.
-2. `bundle exec appraisal opal-0.10-react-15 rake` to run test for opal-0.10 & react-v0.15.
-
-## Contributions
-
-This project is still in early stage, so discussion, bug reports and PRs are
-really welcome :wink:.
-
+#### Submitting Bugs and Enhancements
+[GitHub Issues](https://github.com/ruby-hyperloop/hyperloop/issues) is for suggesting enhancements and reporting bugs. Before submiting a bug make sure you do the following:
+* Check out our [contributing guide](https://github.com/ruby-hyperloop/hyperloop/blob/master/CONTRIBUTING.md) for info on our release cycle.
 
 ## License
 
-In short, hyper-react is available under the MIT license. See the LICENSE file for
-more info.
+Hyperloop is released under the [MIT License](http://www.opensource.org/licenses/MIT).
