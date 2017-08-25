@@ -1,38 +1,74 @@
+<div class="githubhyperloopheader">
+
+<p align="center">
+
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
+</a>
+
+</p>
+
+<h2 align="center">The Complete Isomorphic Ruby Framework</h2>
+
+<br>
+
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img src="http://ruby-hyperloop.io/images/githubhyperloopbadge.png">
+</a>
+
+<a href="https://gitter.im/ruby-hyperloop/chat" alt="Gitter chat" title="Gitter chat">
+<img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
+</a>
+
 [ ![Codeship Status for ruby-hyperloop/hyper-store](https://app.codeship.com/projects/4454c560-d4ea-0134-7c96-362b4886dd22/status?branch=master)](https://app.codeship.com/projects/202301)
 
-## Hyper-Store gem
+</div>
 
-Stores are where the state of your Application lives. Anything but a completely static web page will have dynamic states that change because of user inputs, the passage of time, or other external events.
+## Hyper-Store GEM is part of Hyperloop GEMS family
+
+Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
+
+One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
+
+Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
+
+**Stores** are where the state of your Application lives. Anything but a completely static web page will have dynamic states that change because of user inputs, the passage of time, or other external events.
 
 **Stores are Ruby classes that keep the dynamic parts of the state in special state variables**
 
-+ `Hyperloop::Store::Mixin` can be mixed in to any class to turn it into a Flux Store.
-+ You can also create Stores by subclassing `Hyperloop::Store`.
-+ Stores are built out of *reactive state variables*.
-+ Components that *read* a Store's state will **automatically** update when the state changes.
-+ All of your **shared** reactive state should be Stores - *The Store is the Truth*!
-+ Stores can *receive* **dispatches** from *Operations*
+## Getting Started
 
-## Documentation and Help
+1. Update your Gemfile:
+        
+```ruby
+#Gemfile
 
-+ Please see the [ruby-hyperloop.io](http://ruby-hyperloop.io/) website for documentation.
-+ Join the Hyperloop [gitter.io](https://gitter.im/ruby-hyperloop/chat) chat for help and support.
+gem 'hyperloop'
+```
 
-## Basic Installation and Setup
+2. At the command prompt, update your bundle :
 
-The easiest way to install is to use the `hyper-rails` gem.
+        $ bundle update
 
-1. Add `gem 'hyper-rails'` to your Rails `Gemfile` development section.
-2. Install the Gem: `bundle install`
-3. Run the generator: `bundle exec rails g hyperloop:install --all`
-4. Update the bundle: `bundle update`
+3. Run the hyperloop install generator:
 
-Your Isomorphic Operations live in a `hyperloop/stores` folder.
+        $ rails g hyperloop:install
 
-## Contributing
+4. Follow the guidelines to start developing your application. You may find
+   the following resources handy:
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
+    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
+    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ruby-hyperloop/hyper-store. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Code of Conduct](https://github.com/ruby-hyperloop/hyper-store/blob/master/CODE_OF_CONDUCT.md) code of conduct.
+## Community
+
+#### Getting Help
+Please **do not post** usage questions to GitHub Issues. For these types of questions use our [Gitter chatroom](https://gitter.im/ruby-hyperloop/chat) or [StackOverflow](http://stackoverflow.com/questions/tagged/hyperloop).
+
+#### Submitting Bugs and Enhancements
+[GitHub Issues](https://github.com/ruby-hyperloop/hyperloop/issues) is for suggesting enhancements and reporting bugs. Before submiting a bug make sure you do the following:
+* Check out our [contributing guide](https://github.com/ruby-hyperloop/hyperloop/blob/master/CONTRIBUTING.md) for info on our release cycle.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+Hyperloop is released under the [MIT License](http://www.opensource.org/licenses/MIT).
