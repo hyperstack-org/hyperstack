@@ -1,45 +1,73 @@
-# Hyperloop::Configuration
+<div class="githubhyperloopheader">
 
-This gem is used internally by other [Hyperloop](http://ruby-hyperloop.io) gems for keeping config settings, and for registering client side autoload requirements.
+<p align="center">
 
-To indicate gems to be autoloaded on client side:
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
+</a>
 
+</p>
+
+<h2 align="center">The Complete Isomorphic Ruby Framework</h2>
+
+<br>
+
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img src="http://ruby-hyperloop.io/images/githubhyperloopbadge.png">
+</a>
+
+<a href="https://gitter.im/ruby-hyperloop/chat" alt="Gitter chat" title="Gitter chat">
+<img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
+</a>
+
+[![Gem Version](https://badge.fury.io/rb/hyperloop-config.svg)](https://badge.fury.io/rb/hyperloop-config)
+
+</div>
+
+## Hyperloop-config GEM is part of Hyperloop GEMS family
+
+Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
+
+One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
+
+Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
+
+**Hyperloop-config** gem is used internally by other [Hyperloop](http://ruby-hyperloop.io) gems for keeping config settings, and for registering client side autoload requirements.
+
+## Getting Started
+
+1. Update your Gemfile:
+        
 ```ruby
-require 'hyperloop-config'
-Hyperloop.import 'my-gem-name'
-Hyperloop.imports 'my-gem-name' # same as above
-Hyperloop.import 'my-gem-name', server_only: true
-Hyperloop.import 'my-gem-name', client_only: true
-Hyperloop.import 'path', tree: true  # same as saying require_tree 'path' in a manifest file
-Hyperloop.import_tree 'path' # same as above
-Hyperloop.import 'asset_name' # same as saying require 'asset_name' in a manifest file
+#Gemfile
+
+gem 'hyperloop'
 ```
 
-Once a gem file spec does a `Hyperloop.import` the listed gem will be automatically added to the `hyperloop-loader` manifest.   This means all you do is add a gem
-to rails, and it will get sent on to the client (plus any other dependencies you care to require.)
+2. At the command prompt, update your bundle :
 
-The require method can be used in the hyperloop initializer as well to add code to the manifest (i.e. add a gem to that is not using Hyperloop.import)
+        $ bundle update
 
-To define an initializer:
+3. Run the hyperloop install generator:
 
-```ruby
-module Hyperloop
-  on_config_reset do
-    # anything you want to run when initialization begins
-  end
+        $ rails g hyperloop:install
 
-  on_config_initialized do
-    # anything you want when initialization completes
-  end
+4. Follow the guidelines to start developing your application. You may find
+   the following resources handy:
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
+    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
+    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
 
-  define_setting :default_prerendering_mode, :on
+## Community
 
-  define_setting(:transport, :none) do |transport|
-    # value of transport is whatever the user set in the initializer,
-    # you do what you want here...
-  end
-```
+#### Getting Help
+Please **do not post** usage questions to GitHub Issues. For these types of questions use our [Gitter chatroom](https://gitter.im/ruby-hyperloop/chat) or [StackOverflow](http://stackoverflow.com/questions/tagged/hyperloop).
+
+#### Submitting Bugs and Enhancements
+[GitHub Issues](https://github.com/ruby-hyperloop/hyperloop/issues) is for suggesting enhancements and reporting bugs. Before submiting a bug make sure you do the following:
+* Check out our [contributing guide](https://github.com/ruby-hyperloop/hyperloop/blob/master/CONTRIBUTING.md) for info on our release cycle.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+Hyperloop is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+
