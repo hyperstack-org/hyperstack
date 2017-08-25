@@ -21,6 +21,7 @@
 </a>
 
 [![Codeship Status for ruby-hyperloop/hyper-store](https://app.codeship.com/projects/4454c560-d4ea-0134-7c96-362b4886dd22/status?branch=master)](https://app.codeship.com/projects/202301)
+[![Gem Version](https://badge.fury.io/rb/hyper-store.svg)](https://badge.fury.io/rb/hyper-store)
 
 <p align="center">
 <img src="http://ruby-hyperloop.io/images/HyperStores.png" width="100" alt="Hyperstores">
@@ -28,7 +29,7 @@
 
 </div>
 
-## Hyper-Store GEM is part of Hyperloop GEMS family  [![Gem Version](https://badge.fury.io/rb/hyper-store.svg)](https://badge.fury.io/rb/hyper-store)
+## Hyper-Store GEM is part of Hyperloop GEMS family
 
 Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
 
