@@ -31,15 +31,9 @@
 
 ## Hyper-Mesh GEM is part of Hyperloop GEMS family
 
-Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
+Hyper-Mesh GEM comes with the Hyperloop GEM. 
 
-One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
-
-Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
-
-The **Hyper-Mesh** gem extends your ActiveRecord Models to your Isomorphic code so they are accessible from the client or server.
-
-Hyperloop Components, Operations, and Stores have CRUD access to your server side ActiveRecord Models, using the standard ActiveRecord API.
+But if you want to install it separately, please install the [Hyper-model GEM](https://github.com/ruby-hyperloop/hyper-model).
 
 ## Getting Started
 
