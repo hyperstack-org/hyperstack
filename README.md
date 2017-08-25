@@ -20,13 +20,13 @@
 <img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
 </a>
 
-[ ![Codeship Status for ruby-hyperloop/hyper-store](https://app.codeship.com/projects/4454c560-d4ea-0134-7c96-362b4886dd22/status?branch=master)](https://app.codeship.com/projects/202301)
-
-</div>
+[![Codeship Status for ruby-hyperloop/hyper-store](https://app.codeship.com/projects/4454c560-d4ea-0134-7c96-362b4886dd22/status?branch=master)](https://app.codeship.com/projects/202301)
 
 <p align="center">
 <img src="http://ruby-hyperloop.io/images/HyperStores.png" width="100" alt="Hyperstores">
 </p>
+
+</div>
 
 ##Hyper-Store GEM is part of Hyperloop GEMS family
 
