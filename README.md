@@ -30,7 +30,9 @@
 
 ## Hyper-React GEM is part of Hyperloop GEMS family
 
-Hyper-react GEM comes with the Hyperloop GEM. But if you want to install it separately, please install the [Hyper-component GEM](https://github.com/ruby-hyperloop/hyper-component).
+Hyper-react GEM comes with the Hyperloop GEM. 
+
+But if you want to install it separately, please install the [Hyper-component GEM](https://github.com/ruby-hyperloop/hyper-component).
 
 ## Community
 
