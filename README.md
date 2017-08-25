@@ -1,110 +1,76 @@
-#  Hyper-Operation
+<div class="githubhyperloopheader">
 
-## Hyper-Operation gem
+<p align="center">
 
-Operations encapsulate business logic. In a traditional MVC architecture, Operations end up either in Controllers, Models or some other secondary construct such as service objects, helpers, or concerns. Here they are first class objects. Their job is to mutate state in the Stores and Models.
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
+</a>
 
-+ Hyperloop::Operation is the base class for Operations.
-+ An Operation orchestrates the updating of the state of your system.
-+ Operations also wrap asynchronous operations such as HTTP API requests.
-+ Operations serve the role of both Action Creators and Dispatchers described in the Flux architecture.
-+ Operations also serve as the bridge between client and server. An operation can run on the client or the server, and can be invoked remotely.
+</p>
 
-## Documentation and Help
+<h2 align="center">The Complete Isomorphic Ruby Framework</h2>
 
-+ Please see the [ruby-hyperloop.io](http://ruby-hyperloop.io/) website for documentation.
-+ Join the Hyperloop [gitter.io](https://gitter.im/ruby-hyperloop/chat) chat for help and support.
+<br>
 
-## Installation and Setup
+<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
+<img src="http://ruby-hyperloop.io/images/githubhyperloopbadge.png">
+</a>
 
-**Note: Operations require Rails currently.**
+<a href="https://gitter.im/ruby-hyperloop/chat" alt="Gitter chat" title="Gitter chat">
+<img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
+</a>
 
-### Easy Installation
+[![Gem Version](https://badge.fury.io/rb/hyper-operation.svg)](https://badge.fury.io/rb/hyper-operation)
 
-The easiest way to install is to use the `hyper-rails` generator.
+<p align="center">
+<img src="http://ruby-hyperloop.io/images/HyperOperations.png" width="100" alt="Hyper-operation">
+</p>
 
-1. Add `gem 'hyper-rails'` to your Rails `Gemfile` development section.
-2. Install the Gem: `bundle install`
-3. Run the generator: `bundle exec rails g hyperloop:install --all`
-4. Update the bundle: `bundle update`
+</div>
 
-### Manual Installation
+## Hyper-Operation GEM is part of Hyperloop GEMS family
 
-Add `gem 'hyper-operation'` to your Gemfile
-Add `//= require hyperloop-loader` to your application.rb
+Build interactive Web applications quickly. Hyperloop encourages rapid development with clean, pragmatic design. With developer productivity as our highest goal, Hyperloop takes care of much of the hassle of Web development, so you can focus on innovation and delivering end-user value.
 
-If you want operations to interact between server and client you will have to pick a transport:
+One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
+
+Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
+
+**Hyper-Operation** brings Operations which encapsulate business logic. In a traditional MVC architecture, Operations end up either in Controllers, Models or some other secondary construct such as service objects, helpers, or concerns. Here they are first class objects. Their job is to mutate state in the Stores and Models.
+
+## Getting Started
+
+1. Update your Gemfile:
+        
 ```ruby
-# initializers/hyperloop.rb
-Hyperloop.configuration do |config|
+#Gemfile
 
-  # to use Action Cable
-    config.transport = :action_cable # for rails 5+
-
-  # to use Pusher (see www.pusher.com)
-    config.transport = :pusher
-    config.opts = {
-      app_id: "pusher application id",
-      key: "pusher public key",
-      secret: "pusher secret key"
-    }
-
-  # to use Pusher Fake (creates a fake pusher service)
-    # Its a bit weird:  You have to define require pusher and
-    # define some FAKE pusher keys first, then bring in pusher-fake
-    # the actual key values don't matter just the order!!!
-    require 'pusher'  
-    require 'pusher-fake'
-    Pusher.app_id = "MY_TEST_ID"      # don't bother changing these strings
-    Pusher.key =    "MY_TEST_KEY"
-    Pusher.secret = "MY_TEST_SECRET"
-    require 'pusher-fake/support/base'
-    # then setup your config like pusher but merge in the pusher fake
-    # options
-    config.transport = :pusher
-    config.opts = {
-      app_id: Pusher.app_id,
-      key: Pusher.key,
-      secret: Pusher.secret
-    }.merge(PusherFake.configuration.web_options)
-
-  # For down and dirty simplicity use polling:
-    config.transport = :simple_poller
-    # change this to slow down polling, default is much faster
-    # and hard to debug
-    config.opts = { seconds_between_poll: 2 }
-end
+gem 'hyperloop'
 ```
 
-You will also have to add at least one channel policy to authorize the connection between clients and the server.
+2. At the command prompt, update your bundle :
 
-```ruby
-# app/policies/application_policy.rb
-class Hyperloop::ApplicationPolicy
-  # allow any client too attach to the Hyperloop::Application for example
-  always_allow_connection  
-end
-```
+        $ bundle update
 
-See the [Channels](#channels) section for more details on authorization.
+3. Run the hyperloop install generator:
 
-### Add the engine
+        $ rails g hyperloop:install
 
-```ruby
-# config/routes.rb
-mount Hyperloop::Engine => '/hyperloop'
-```
+4. Follow the guidelines to start developing your application. You may find
+   the following resources handy:
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
+    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
+    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
 
-### Operation Folder Structure
+## Community
 
-Your Isomorphic Operations live in a `app/hyperloop/operations` folder and your server only Operations in `app/operations`
+#### Getting Help
+Please **do not post** usage questions to GitHub Issues. For these types of questions use our [Gitter chatroom](https://gitter.im/ruby-hyperloop/chat) or [StackOverflow](http://stackoverflow.com/questions/tagged/hyperloop).
 
-You will also find an `app/policies` folder with a simple access policy suited for development.  Policies are how you will provide detailed access control to your Isomorphic models.  
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/ruby-hyperloop/hyper-operation. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Code of Conduct](https://github.com/ruby-hyperloop/hyper-operation/blob/master/CODE_OF_CONDUCT.md) code of conduct.
+#### Submitting Bugs and Enhancements
+[GitHub Issues](https://github.com/ruby-hyperloop/hyperloop/issues) is for suggesting enhancements and reporting bugs. Before submiting a bug make sure you do the following:
+* Check out our [contributing guide](https://github.com/ruby-hyperloop/hyperloop/blob/master/CONTRIBUTING.md) for info on our release cycle.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+Hyperloop is released under the [MIT License](http://www.opensource.org/licenses/MIT).
