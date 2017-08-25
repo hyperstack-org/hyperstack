@@ -36,7 +36,7 @@ One language. One model. One set of tests. The same business logic and domain mo
 
 Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
 
-**hyper-react** is an [Opal Ruby](http://opalrb.org) wrapper of [React.js library](https://facebook.github.io/react).
+**Hyper-react** is an [Opal Ruby](http://opalrb.org) wrapper of [React.js library](https://facebook.github.io/react).
 
 **Hyper-react** brings Components modules uesed in the Hyperloop interface.
 
