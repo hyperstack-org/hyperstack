@@ -58,7 +58,7 @@ gem 'hyperloop'
 
 4. Follow the guidelines to start developing your application. You may find
    the following resources handy:
-    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start/components/)
     * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
     * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
 
