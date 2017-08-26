@@ -35,30 +35,6 @@ Hyper-Mesh GEM comes with the Hyperloop GEM.
 
 But if you want to install it separately, please install the [Hyper-model GEM](https://github.com/ruby-hyperloop/hyper-model).
 
-## Getting Started
-
-1. Update your Gemfile:
-        
-```ruby
-#Gemfile
-
-gem 'hyperloop'
-```
-
-2. At the command prompt, update your bundle :
-
-        $ bundle update
-
-3. Run the hyperloop install generator:
-
-        $ rails g hyperloop:install
-
-4. Follow the guidelines to start developing your application. You may find
-   the following resources handy:
-    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start)
-    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
-    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
-
 ## Community
 
 #### Getting Help
