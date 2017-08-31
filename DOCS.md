@@ -1,4 +1,4 @@
-# <span class="bigfirstletter">H</span>yperloop Models
+# Hyperloop Models
 
 Hyperloop **Models** are implemented in the **HyperModel Gem**.
 
