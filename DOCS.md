@@ -1,4 +1,4 @@
-# <span class="bigfirstletter">H</span>yperloop Stores
+# Hyperloop Stores
 
 Hyperloop **Stores** are implemented in the **HyperStore Gem**.
 
