@@ -1,4 +1,4 @@
-# <span class="bigfirstletter">H</span>yperloop Components
+# Hyperloop Components
 
 ## Components DSL Overview
 
