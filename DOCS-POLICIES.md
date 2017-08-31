@@ -1,4 +1,4 @@
-# <span class="bigfirstletter">H</span>yperloop Policies
+# Hyperloop Policies
 
 ## Authorization
 
