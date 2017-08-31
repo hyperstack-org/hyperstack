@@ -1,4 +1,4 @@
-# <span class="bigfirstletter">H</span>yperloop Router
+# Hyperloop Router
 
 ## Usage
 
