@@ -17,8 +17,7 @@ RSpec.configure do |config|
 
   config.mock_with :rspec
 
-  if (hyper_module = (defined?(Hyperloop) && const_get(Hyperloop) ||
-                      defined?(HyperMesh) && const_get(HyperMesh)))
+  if (hyper_module = ((defined?(Hyperloop) && Hyperloop) || defined?(HyperMesh) && HyperMesh))
     config.before(:each) do
       hyper_module.class_eval do
         def self.on_server?
