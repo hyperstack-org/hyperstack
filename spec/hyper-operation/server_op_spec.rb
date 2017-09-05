@@ -78,7 +78,10 @@ describe "isomorphic operations", js: true do
       on_client do
         class Test < React::Component::Base
           before_mount do
-            Operation.on_dispatch { |params| state.message! params.message}
+            Operation.on_dispatch do |params|
+              # password is for testing inbound param filtering
+              state.message! "#{params.message}#{params.try(:password)}"
+            end
           end
           render do
             if state.message
@@ -95,13 +98,14 @@ describe "isomorphic operations", js: true do
       isomorphic do
         class Operation < Hyperloop::ServerOp
           param :message
+          inbound :password
         end
       end
       stub_const "OperationPolicy", Class.new
       OperationPolicy.always_allow_connection
       mount 'Test'
       expect(page).to have_content('No messages yet')
-      Operation(message: 'hello')
+      Operation(message: 'hello', password: 'better not see this')
       expect(page).to have_content("The server says 'hello'!")
     end
 

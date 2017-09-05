@@ -19,6 +19,7 @@ module Hyperloop
       config.after_initialize { Connection.build_tables }
     end
     Object.send(:remove_const, :Application) if @fake_application_defined
+    @fake_application_defined = false
     policy = begin
       Object.const_get 'ApplicationPolicy'
     rescue LoadError
@@ -61,6 +62,7 @@ module Hyperloop
   define_setting :opts, {}
   define_setting :channel_prefix, 'synchromesh'
   define_setting :client_logging, true
+  define_setting :connect_session, true
 
   def self.app_id
     opts[:app_id] || Pusher.app_id if transport == :pusher

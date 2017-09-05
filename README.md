@@ -101,6 +101,23 @@ Your Isomorphic Operations live in a `app/hyperloop/operations` folder and your 
 
 You will also find an `app/policies` folder with a simple access policy suited for development.  Policies are how you will provide detailed access control to your Isomorphic models.  
 
+## Developing and Testing
+
+`git clone` the project.
+
+setup the environment  
+`bundle install`  
+`cd spec/test_app`  
+`bundle install`  
+`bundle exec rake db:create`  
+`cd ../..`  
+
+run the tests  
+`bundle exec rake`
+
+client side tests will run normally in the headless poltergeist browser environment.  To see what is going on say  
+`DRIVER=ff bundle exec rake`
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/ruby-hyperloop/hyper-operation. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Code of Conduct](https://github.com/ruby-hyperloop/hyper-operation/blob/master/CODE_OF_CONDUCT.md) code of conduct.

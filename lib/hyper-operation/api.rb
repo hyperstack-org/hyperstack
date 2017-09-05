@@ -63,6 +63,11 @@ module Hyperloop
         _Railway.add_param(*args, &block)
       end
 
+      def inbound(*args, &block)
+        name, opts = ParamsWrapper.get_name_and_opts(*args)
+        _Railway.add_param(name, opts.merge(inbound: :true), &block)
+      end
+
       def outbound(*keys)
         keys.each { |key| _Railway.add_param(key => nil, :type => :outbound) }
         #singleton_class.outbound(*keys)
@@ -100,6 +105,11 @@ module Hyperloop
 
         child.singleton_class.define_singleton_method(:param) do |*args, &block|
           _Railway.add_param(*args, &block)
+        end
+
+        child.singleton_class.define_singleton_method(:inbound) do |*args, &block|
+          name, opts = ParamsWrapper.get_name_and_opts(*args)
+          _Railway.add_param(name, opts.merge(inbound: :true), &block)
         end
 
         child.singleton_class.define_singleton_method(:outbound) do |*keys|

@@ -296,11 +296,8 @@ module Hyperloop
     def self.channels(session, acting_user)
       channels = ClassConnectionRegulation.connections_for(acting_user, true) +
         InstanceConnectionRegulation.connections_for(acting_user, true)
-      channels = channels.uniq
-      channels.each do |channel|
-        Connection.open(channel, session)
-      end
-      channels
+      channels << "Hyperloop::Session-#{session.split('-').last}" if Hyperloop.connect_session && session
+      channels.uniq.each { |channel| Connection.open(channel, session) }
     end
   end
 

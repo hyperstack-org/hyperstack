@@ -28,6 +28,10 @@ module Hyperloop
       end
     end
 
+    def self.connect_session
+      connect(['Hyperloop::Session', ClientDrivers.opts[:id].split('-').last])
+    end
+
     def self.action_cable_consumer
       ClientDrivers.opts[:action_cable_consumer]
     end
@@ -114,6 +118,7 @@ module Hyperloop
       end
       controller.session.delete 'hyperloop-dummy-init' unless controller.session.id
       id = "#{SecureRandom.uuid}-#{controller.session.id}"
+      auto_connections = Hyperloop::AutoConnect.channels(id, controller.acting_user)
       config_hash = {
         transport: Hyperloop.transport,
         id: id,
@@ -126,7 +131,7 @@ module Hyperloop
         channel: Hyperloop.channel,
         form_authenticity_token: controller.send(:form_authenticity_token),
         seconds_between_poll: Hyperloop.seconds_between_poll,
-        auto_connect: Hyperloop::AutoConnect.channels(id, controller.acting_user)
+        auto_connect:  auto_connections
       }
       path = ::Rails.application.routes.routes.detect do |route|
         # not sure why the second check is needed.  It happens in the test app
@@ -171,7 +176,6 @@ module Hyperloop
       end
 
       if on_opal_client?
-
         if opts[:transport] == :pusher
 
           opts[:dispatch] = lambda do |data|

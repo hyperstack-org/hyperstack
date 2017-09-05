@@ -13,7 +13,12 @@ describe "Transport Tests", js: true do
 
   before(:each) do
     stub_const "CreateTestModel", Class.new(Hyperloop::ServerOp)
+    stub_const "MyControllerOp", Class.new(Hyperloop::ControllerOp)
     isomorphic do
+      class MyControllerOp < Hyperloop::ControllerOp
+        param :data
+        dispatch_to { session_channel }
+      end
       class CreateTestModel < Hyperloop::ServerOp
         param :test_attribute
       end
@@ -23,10 +28,12 @@ describe "Transport Tests", js: true do
         before_mount do
           state.items! []
           CreateTestModel.on_dispatch { |params| state.items! << params.test_attribute }
+          MyControllerOp.on_dispatch { |params| mutate.message params.data }
         end
         render(:div) do
           div { "#{state.items.count} items" }
           ul { state.items.each { |test_attribute| li { test_attribute }}}
+          div { state.message }
         end
       end
     end
@@ -76,6 +83,7 @@ describe "Transport Tests", js: true do
       require "pusher-fake/support/base"
 
       Hyperloop.configuration do |config|
+        config.connect_session = false
         config.transport = :pusher
         config.opts = {
           app_id: Pusher.app_id,
@@ -132,12 +140,22 @@ describe "Transport Tests", js: true do
       CreateTestModel(test_attribute: "I'm also new here!")
       page.should have_content("2 items")
     end
+
+    it "broadcasts to the session channel" do
+      Hyperloop.connect_session = true
+      mount "TestComponent"
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      wait_for_ajax
+      evaluate_ruby "MyControllerOp(data: 'hello')"
+      page.should have_content("hello")
+    end
   end
 
   context "Simple Polling" do
 
     before(:all) do
       Hyperloop.configuration do |config|
+        config.connect_session = false
         config.transport = :simple_poller
         # slow down the polling so wait_for_ajax works
         config.opts = { seconds_between_poll: 2 }
@@ -167,6 +185,16 @@ describe "Transport Tests", js: true do
       Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
     end
 
+    it "broadcasts to the session channel" do
+      Hyperloop.connect_session = true
+      mount "TestComponent"
+      sleep 0.25
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      wait_for_ajax
+      evaluate_ruby "MyControllerOp(data: 'hello')"
+      page.should have_content("hello")
+    end
+
   end
 
   context "Real Pusher Account", skip: (pusher_credentials ? false : SKIP_MESSAGE) do
@@ -176,6 +204,7 @@ describe "Transport Tests", js: true do
       Object.send(:remove_const, :PusherFake) if defined?(PusherFake)
 
       Hyperloop.configuration do |config|
+        config.connect_session = false
         config.transport = :pusher
         config.opts = pusher_credentials
       end
@@ -229,12 +258,23 @@ describe "Transport Tests", js: true do
       CreateTestModel(test_attribute: "I'm also new here!")
       page.should have_content("2 items")
     end
+
+    it "broadcasts to the session channel" do
+      Hyperloop.connect_session = true
+      mount "TestComponent"
+      sleep 0.25
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      wait_for_ajax
+      evaluate_ruby "MyControllerOp(data: 'hello')"
+      page.should have_content("hello")
+    end
   end
 
   context "Action Cable" do
 
     before(:each) do
       Hyperloop.configuration do |config|
+        config.connect_session = false
         config.transport = :action_cable
         config.channel_prefix = "synchromesh"
       end
@@ -285,6 +325,16 @@ describe "Transport Tests", js: true do
       # now that we are connected the UI should keep updating
       CreateTestModel(test_attribute: "I'm also new here!")
       page.should have_content("2 items")
+    end
+
+    it "broadcasts to the session channel" do
+      Hyperloop.connect_session = true
+      mount "TestComponent"
+      sleep 0.25
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      wait_for_ajax
+      evaluate_ruby "MyControllerOp(data: 'hello')"
+      page.should have_content("hello")
     end
   end
 end

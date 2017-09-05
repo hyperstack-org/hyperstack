@@ -42,6 +42,17 @@ module Hyperloop
         session.delete 'hyperloop-dummy-init' unless session.id
       end
 
+      def session_channel
+        "Hyperloop::Session-#{session.id}"
+      end
+
+      def regulate(channel)
+        unless channel == session_channel # "Hyperloop::Session-#{client_id.split('-').last}"
+          Hyperloop::InternalPolicy.regulate_connection(try(:acting_user), channel)
+        end
+        channel
+      end
+
       def channels(user = acting_user, session_id = session.id)
         Hyperloop::AutoConnect.channels(session_id, user)
       end
@@ -89,8 +100,7 @@ module Hyperloop
       end
 
       def subscribe
-        channel = params[:channel].gsub('==', '::')
-        Hyperloop::InternalPolicy.regulate_connection(try(:acting_user), channel)
+        channel = regulate params[:channel].gsub('==', '::')
         root_path = request.original_url.gsub(/hyperloop-subscribe.*$/, '')
         Hyperloop::Connection.open(channel, client_id, root_path)
         head :ok
@@ -105,8 +115,7 @@ module Hyperloop
       end
 
       def pusher_auth
-        channel = params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'').gsub('==', '::')
-        Hyperloop::InternalPolicy.regulate_connection(acting_user, channel)
+        channel = regulate params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'').gsub('==', '::')
         response = Hyperloop.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response
       rescue Exception => e
@@ -114,8 +123,7 @@ module Hyperloop
       end
 
       def action_cable_auth
-        channel = params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'')
-        Hyperloop::InternalPolicy.regulate_connection(acting_user, channel)
+        channel = regulate params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'')
         salt = SecureRandom.hex
         authorization = Hyperloop.authorization(salt, channel, client_id)
         render json: {authorization: authorization, salt: salt}

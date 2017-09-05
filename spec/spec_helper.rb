@@ -63,6 +63,7 @@ RSpec.configure do |config|
   Capybara.default_max_wait_time = 10.seconds
 
   config.before(:suite) do
+    #Hyperloop.define_setting :connect_session, false
     DatabaseCleaner.clean_with(:truncation)
   end
 
@@ -76,6 +77,9 @@ RSpec.configure do |config|
         true
       end
     end
+    # Hyperloop.configuration do |config|
+    #   config.connect_session = false
+    # end
   end
 
   config.before(:each, :js => true) do

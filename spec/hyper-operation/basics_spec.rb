@@ -145,6 +145,14 @@ describe 'Hyperloop::Operation basics' do
       expect(MyOperation.run(sku: "sku", qty: 4)).to be_resolved
     end
 
+    it "can have inbound params" do
+      MyOperation.inbound :inbounder
+      MyOperation.outbound :outbounder
+      MyOperation.step { params.outbounder = params.inbounder }
+      expect(Store).to receive(:receiver).with({outbounder: 'hello'})
+      expect(MyOperation.run(inbounder: 'hello')).to be_resolved
+    end
+
     it "params cannot be updated in a reciever" do
       MyOperation.param :sku, type: String
       Store.class_eval do

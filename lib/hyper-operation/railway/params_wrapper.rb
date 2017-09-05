@@ -12,7 +12,12 @@ module Hyperloop
       end
 
       def to_h
-        @inputs.with_indifferent_access
+        inputs = @inputs
+        if @locked
+          inputs = inputs.dup
+          self.class.inbound_params.each { |name| inputs.delete :"#{name}" }
+        end
+        inputs.with_indifferent_access
       end
 
       def to_s
@@ -39,6 +44,7 @@ module Hyperloop
 
         def add_param(*args, &block)
           type_method, name, opts, block = translate_args(*args, &block)
+          inbound_params << :"#{name}" if opts.delete(:inbound)
           if opts.key? :default
             hash_filter.optional { send(type_method, name, opts, &block) }
           else
@@ -63,6 +69,10 @@ module Hyperloop
 
         def hash_filter
           @hash_filter ||= Mutations::HashFilter.new
+        end
+
+        def inbound_params
+          @inbound_params ||= Set.new
         end
 
         def translate_args(*args, &block)
@@ -115,6 +125,8 @@ module Hyperloop
             Class.new(superclass.params_wrapper).tap do |wrapper|
               hash_filter = superclass.params_wrapper.hash_filter
               wrapper.instance_variable_set('@hash_filter', hash_filter && hash_filter.dup)
+              inbound_params = superclass.params_wrapper.inbound_params
+              wrapper.instance_variable_set('@inbound_params', inbound_params && inbound_params.dup)
             end
           end
         end

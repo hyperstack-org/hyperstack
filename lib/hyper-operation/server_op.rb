@@ -101,7 +101,7 @@ module Hyperloop
   end
 
   class ControllerOp < ServerOp
-    param :controller
+    inbound :controller
     alias pre_controller_op_method_missing method_missing
     def method_missing(name, *args, &block)
       if params.controller.respond_to? name
