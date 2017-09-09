@@ -6,6 +6,12 @@ describe 'rails autoloader' do
   # can't figure out how to get rails to dump class cache between tests so
   # we define two different class policy pairs...
 
+  before(:all) do
+    Hyperloop.configuration do |config|
+      config.connect_session = false
+    end
+  end
+
   context "when using const_set" do
 
     it 'will find the policy class file if available' do

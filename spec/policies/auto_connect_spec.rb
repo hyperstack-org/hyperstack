@@ -2,6 +2,12 @@ require 'spec_helper'
 
 describe 'channel auto connect' do
 
+  before(:all) do
+    Hyperloop.configuration do |config|
+      config.connect_session = false
+    end
+  end
+
   before(:each) do
     stub_const 'ApplicationPolicy', Class.new
     stub_const 'TestModelPolicy', Class.new
