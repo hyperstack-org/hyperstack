@@ -11,10 +11,18 @@ describe Hyperloop::Connection do
     Timecop.return
   end
 
-  it 'creates the tables' do
-    ActiveRecord::Base.connection.tables.should include('hyperloop_connections')
-    ActiveRecord::Base.connection.tables.should include('hyperloop_queued_messages')
-    described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
+  if ActiveRecord::Base.connection.respond_to? :data_sources
+    it 'creates the tables (rails 5.x)' do
+      ActiveRecord::Base.connection.data_sources.should include('hyperloop_connections')
+      ActiveRecord::Base.connection.data_sources.should include('hyperloop_queued_messages')
+      described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
+    end
+  else
+    it 'creates the tables (rails 4.x)' do
+      ActiveRecord::Base.connection.tables.should include('hyperloop_connections')
+      ActiveRecord::Base.connection.tables.should include('hyperloop_queued_messages')
+      described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
+    end
   end
 
   it 'creates the messages queue' do
