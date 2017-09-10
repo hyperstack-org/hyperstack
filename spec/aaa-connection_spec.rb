@@ -12,8 +12,8 @@ describe Hyperloop::Connection do
   end
 
   it 'creates the tables' do
-    ActiveRecord::Base.connection.tables.should include('hyperloop_connections')
-    ActiveRecord::Base.connection.tables.should include('hyperloop_queued_messages')
+    ActiveRecord::Base.connection.data_sources.should include('hyperloop_connections')
+    ActiveRecord::Base.connection.data_sources.should include('hyperloop_queued_messages')
     described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
   end
 

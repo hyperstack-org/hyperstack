@@ -47,3 +47,6 @@ bower.json
 
 # Ignore built gem
 *.gem
+
+.idea
+*.iml

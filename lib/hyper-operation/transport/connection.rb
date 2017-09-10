@@ -2,7 +2,7 @@ module Hyperloop
   module AutoCreate
     def needs_init?
       return false if Hyperloop.transport == :none
-      return true unless connection.tables.include?(table_name)
+      return true unless connection.data_sources.include?(table_name)
       return false unless Hyperloop.on_server?
       return true if defined?(Rails::Server)
       return true unless Connection.root_path
