@@ -51,7 +51,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
     spec.add_dependency 'pry'
     spec.add_dependency 'rspec-rails'
     spec.add_dependency 'selenium-webdriver', '~> 3.5.0'
-    spec.add_dependency 'timecop'
+    spec.add_dependency 'timecop', '~> 0.8.1'
     spec.add_dependency 'unparser'
     spec.add_dependency 'webdrivers'
 
