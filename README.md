@@ -2,8 +2,8 @@
 
 <p align="center">
 
-<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
-<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
+<a href="http://ruby-hyperloop.org/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.org/images/hyperloop-github-logo.png">
 </a>
 
 </p>
@@ -12,12 +12,12 @@
 
 <br>
 
-<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
-<img src="http://ruby-hyperloop.io/images/githubhyperloopbadge.png">
+<a href="http://ruby-hyperloop.org/" alt="Hyperloop" title="Hyperloop">
+<img src="http://ruby-hyperloop.org/images/githubhyperloopbadge.png">
 </a>
 
 <a href="https://gitter.im/ruby-hyperloop/chat" alt="Gitter chat" title="Gitter chat">
-<img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
+<img src="http://ruby-hyperloop.org/images/githubgitterbadge.png">
 </a>
 
 [![Gem Version](https://badge.fury.io/rb/hyperloop-config.svg)](https://badge.fury.io/rb/hyperloop-config)
@@ -32,7 +32,7 @@ One language. One model. One set of tests. The same business logic and domain mo
 
 Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
 
-**Hyperloop-config** gem is used internally by other [Hyperloop](http://ruby-hyperloop.io) gems for keeping config settings, and for registering client side autoload requirements.
+**Hyperloop-config** gem is used internally by other [Hyperloop](http://ruby-hyperloop.org) gems for keeping config settings, and for registering client side autoload requirements.
 
 ## Getting Started
 
@@ -54,9 +54,9 @@ gem 'hyperloop'
 
 4. Follow the guidelines to start developing your application. You may find
    the following resources handy:
-    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start/components/)
-    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
-    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.org/start/components/)
+    * [Hyperloop Guides](http://ruby-hyperloop.org/docs/architecture)
+    * [Hyperloop Tutorial](http://ruby-hyperloop.org/tutorials)
 
 ## Community
 
