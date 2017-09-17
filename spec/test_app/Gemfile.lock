@@ -14,10 +14,11 @@ GIT
       unparser (= 0.2.5)
 
 PATH
-  remote: ../../../hyperloop-config
+  remote: ../..
   specs:
-    hyperloop-config (0.9.1)
+    hyperloop-config (0.9.11)
       opal
+      opal-browser
 
 GEM
   remote: https://rubygems.org/
@@ -303,4 +304,4 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 BUNDLED WITH
-   1.14.3
+   1.15.1

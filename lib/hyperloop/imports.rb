@@ -69,7 +69,7 @@ module Hyperloop
 
     def generate_require_tree(path, render_on_server, render_on_client)
       base_name = Rails.root.join('app', path).to_s+'/'
-      Dir.glob(Rails.root.join('app', path, '**', '*')).collect do |fname|
+      Dir.glob(Rails.root.join('app', path, '**', '*')).sort.collect do |fname|
         fname = fname.gsub(/^#{base_name}/, '')
         fname = fname.gsub(/\.erb$/, '')
         if fname =~ /(\.js$)|(\.rb$)/
