@@ -36,6 +36,19 @@ ActiveRecord::Schema.define(version: 20160731182106) do
     t.integer  "todo_item_id"
   end
 
+  create_table "hyperloop_connections", force: :cascade do |t|
+    t.string   "channel"
+    t.string   "session"
+    t.datetime "created_at"
+    t.datetime "expires_at"
+    t.datetime "refresh_at"
+  end
+
+  create_table "hyperloop_queued_messages", force: :cascade do |t|
+    t.text    "data"
+    t.integer "connection_id"
+  end
+
   create_table "test_models", force: :cascade do |t|
     t.string   "test_attribute"
     t.boolean  "completed"
