@@ -2,3 +2,6 @@ language: ruby
 rvm:
   - 2.4
 before_install: gem install bundler
+before_script:
+  - cd spec/test_app
+  - bundle install
