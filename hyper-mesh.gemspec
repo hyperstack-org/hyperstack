@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
     s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
     s.require_paths  = ['lib']
 
-    s.add_dependency 'activerecord', '>= 0.3.0'
+    s.add_dependency 'activerecord'
     s.add_dependency 'hyper-operation', '>= 0.5.0'
     s.add_dependency 'hyper-component', '>= 0.12.3'
 
@@ -34,14 +34,14 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'timecop'
 
     # For Test Rails App
-    s.add_development_dependency 'rails', '~>5.0.0' #'4.2.4'
+    s.add_development_dependency 'rails'
     s.add_development_dependency 'react-rails'
     s.add_development_dependency 'opal-rails'
     s.add_development_dependency 'opal-activesupport'
     s.add_development_dependency 'factory_girl_rails'
     s.add_development_dependency 'reactrb-rails-generator'
     s.add_development_dependency 'rspec-wait'
-    s.add_development_dependency 'puma', '~> 3.6.0'
+    s.add_development_dependency 'puma'
 
     s.add_development_dependency 'pusher'
     s.add_development_dependency 'pusher-fake'
@@ -55,9 +55,9 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
       s.add_development_dependency 'therubyrhino'
     else
-      s.add_development_dependency 'sqlite3', '1.3.10'
+      s.add_development_dependency 'sqlite3'
       s.add_development_dependency 'mysql2' # for codeship
-      s.add_development_dependency 'therubyracer', '0.12.2'
+      s.add_development_dependency 'therubyracer'
 
       # The following allow react code to be tested from the server side
       s.add_development_dependency 'rspec-mocks'
