@@ -1,6 +1,11 @@
 language: ruby
 rvm:
   - 2.4
+services:
+  - mysql
 before_install: gem install bundler
-before_script: cd spec/test_app && bundle install
+before_script:
+  - cd spec/test_app
+  - bundle install
+  - rails db:setup
 script: bundle exec rake spec
