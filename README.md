@@ -20,6 +20,7 @@
 <img src="http://ruby-hyperloop.org/images/githubgitterbadge.png">
 </a>
 
+[![Build Status](https://travis-ci.org/ruby-hyperloop/hyper-mesh.svg?branch=master)](https://travis-ci.org/ruby-hyperloop/hyper-mesh)
 [![Codeship Status for ruby-hyperloop/hyper-store](https://app.codeship.com/projects/4454c560-d4ea-0134-7c96-362b4886dd22/status?branch=master)](https://app.codeship.com/projects/202301)
 [![Gem Version](https://badge.fury.io/rb/hyper-mesh.svg)](https://badge.fury.io/rb/hyper-mesh)
 
