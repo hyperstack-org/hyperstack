@@ -11,4 +11,4 @@ before_script:
   - bundle update
   - rails db:setup
   - cd ../../
-script: bundle exec rake spec
+script: bundle exec rspec
