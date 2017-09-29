@@ -3,10 +3,12 @@ rvm:
   - ruby
 services:
   - mysql
-before_install: gem install bundler
+before_install:
+  - export TZ=Europe/Berlin
+  - gem install bundler
 before_script:
   - cd spec/test_app
-  - bundle install
+  - bundle update
   - rails db:setup
   - cd ../../
 script: bundle exec rake spec
