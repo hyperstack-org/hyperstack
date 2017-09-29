@@ -1,0 +1,14 @@
+language: ruby
+rvm:
+  - ruby
+services:
+  - mysql
+before_install:
+  - export TZ=Europe/Berlin
+  - gem install bundler
+before_script:
+  - cd spec/test_app
+  - bundle update
+  - rails db:setup
+  - cd ../../
+script: bundle exec rspec
