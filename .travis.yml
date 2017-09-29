@@ -7,7 +7,6 @@ before_script:
 env:
   - PHANTOMJS_VERSION=1.9.8
 gemfile:
-  - gemfiles/opal_0.8_react_13.gemfile
   - gemfiles/opal_0.8_react_14.gemfile
   - gemfiles/opal_0.8_react_15.gemfile
   - gemfiles/opal_0.9_react_13.gemfile
