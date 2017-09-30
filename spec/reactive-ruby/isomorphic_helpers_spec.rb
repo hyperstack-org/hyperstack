@@ -79,7 +79,7 @@ if ruby?
     def react_context
       if ::Rails.application.assets['react-server.js'] &&
          !::Rails.application.assets['react-server.js'].to_s.start_with?("// A placeholder file")
-        test_context(['components', 'react-server.js'])
+        test_context(['server_rendering.js', 'react-server.js'])
       else
         test_context(['components', 'react.js'])
       end
@@ -136,7 +136,7 @@ if ruby?
         context.instance_variable_set(:@ctx, test_context)
         expect {
           context.send_to_opal(:foo)
-        }.to raise_error(/No react.rb components found/)
+        }.to raise_error(/No HyperReact components found/)
       end
 
       it 'executes method with args inside opal rubyracer context' do
