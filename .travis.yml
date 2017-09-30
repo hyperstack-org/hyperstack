@@ -22,8 +22,8 @@ script:
   - bundle exec rake
 matrix:
   include:
-  - rvm: ruby
-    gemfile: gemfiles/opal_0.10_react_15.gemfile
+    - rvm: ruby
+      gemfile: gemfiles/opal_0.10_react_15.gemfile
   allow_failures:
-  - rvm: ruby
-    gemfile: gemfiles/opal_master_react_15.gemfile
+    - rvm: ruby
+      gemfile: gemfiles/opal_master_react_15.gemfile
