@@ -9,9 +9,6 @@ env:
 cache:
   directories:
     - "travis_phantomjs"
-branches:
-  only:
-    - master
 before_install:
   - "phantomjs --version"
   - "export PATH=$PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION-linux-x86_64/bin:$PATH"
