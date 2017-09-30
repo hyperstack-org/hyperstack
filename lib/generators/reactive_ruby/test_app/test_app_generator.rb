@@ -28,6 +28,8 @@ module ReactiveRuby
       template 'test_application.rb.erb', "#{test_app_path}/config/application.rb", force: true
       template 'assets/javascripts/test_application.rb',
         "#{test_app_path}/app/assets/javascripts/application.rb", force: true
+      template 'assets/javascripts/server_rendering.js',
+               "#{test_app_path}/app/assets/javascripts/server_rendering.rb", force: true
       template 'assets/javascripts/components.rb',
         "#{test_app_path}/app/views/components.rb", force: true
       template 'views/components/hello_world.rb',
@@ -70,6 +72,10 @@ module ReactiveRuby
     config.opal.spec_location = 'spec-opal'
     config.hyperloop.auto_config = false
 
+    config.react.server_renderer_options = {
+      files: ["server_rendering.js"]
+    }
+    config.react.server_renderer_directories = ["/app/assets/javascripts"]
 ]
       end
     end
