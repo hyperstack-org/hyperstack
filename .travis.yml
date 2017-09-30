@@ -5,7 +5,7 @@ rvm:
 before_script:
   - phantomjs --version
 env:
-  - PHANTOMJS_VERSION=1.9.8
+  - PHANTOMJS_VERSION=2.1.1
 cache:
   directories:
     - "travis_phantomjs"
@@ -32,9 +32,7 @@ matrix:
     gemfile: gemfiles/opal_0.10_react_15.gemfile
   include:
   - rvm: ruby
-    env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_0.10_react_15.gemfile
   allow_failures:
   - rvm: ruby
-    env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_master_react_15.gemfile
