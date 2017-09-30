@@ -34,13 +34,13 @@ RSpec.describe ReactiveRuby::ComponentLoader do
       loader = described_class.new(v8_context)
 
       expect {
-        loader.load
+        loader.load('components')
       }.to change { !!v8_context.eval('Opal.React') }.from(false).to(true)
     end
 
     it 'is truthy upon successful load' do
       loader = described_class.new(v8_context)
-      expect(loader.load).to be_truthy
+      expect(loader.load('components')).to be_truthy
     end
 
     it 'fails silently returning false' do
@@ -52,19 +52,19 @@ RSpec.describe ReactiveRuby::ComponentLoader do
   describe '#load!' do
     it 'is truthy upon successful load' do
       loader = described_class.new(v8_context)
-      expect(loader.load!).to be_truthy
+      expect(loader.load!('components')).to be_truthy
     end
 
     it 'raises an expection if loading fails' do
       loader = described_class.new(v8_context)
-      expect { loader.load!('foo') }.to raise_error(/No react\.rb components/)
+      expect { loader.load!('foo') }.to raise_error(/No HyperReact components/)
     end
   end
 
   describe '#loaded?' do
     it 'is truthy if components file is already loaded' do
       loader = described_class.new(v8_context)
-      loader.load
+      loader.load('components')
       expect(loader).to be_loaded
     end
 
