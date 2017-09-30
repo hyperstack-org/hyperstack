@@ -6,11 +6,6 @@ before_script:
   - phantomjs --version
 env:
   - PHANTOMJS_VERSION=1.9.8
-gemfile:
-  - gemfiles/opal_0.8_react_15.gemfile
-  - gemfiles/opal_0.9_react_13.gemfile
-  - gemfiles/opal_0.9_react_14.gemfile
-  - gemfiles/opal_0.9_react_15.gemfile
 cache:
   directories:
     - "travis_phantomjs"
@@ -34,24 +29,11 @@ script:
 matrix:
   exclude:
   - rvm: jruby-19mode
-    gemfile: gemfiles/opal_0.9_react_13.gemfile
-  - rvm: jruby-19mode
-    gemfile: gemfiles/opal_0.9_react_14.gemfile
-  - rvm: jruby-19mode
-    gemfile: gemfiles/opal_0.9_react_15.gemfile
+    gemfile: gemfiles/opal_0.10_react_15.gemfile
   include:
   - rvm: ruby
     env: PHANTOMJS_VERSION=2.1.1
-    gemfile: gemfiles/opal_0.10_react_13.gemfile
-  - rvm: ruby
-    env: PHANTOMJS_VERSION=2.1.1
-    gemfile: gemfiles/opal_0.10_react_14.gemfile
-  - rvm: ruby
-    env: PHANTOMJS_VERSION=2.1.1
     gemfile: gemfiles/opal_0.10_react_15.gemfile
-  - rvm: ruby
-    env: PHANTOMJS_VERSION=2.1.1
-    gemfile: gemfiles/opal_master_react_15.gemfile
   allow_failures:
   - rvm: ruby
     env: PHANTOMJS_VERSION=2.1.1
