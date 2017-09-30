@@ -22,17 +22,17 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-component', '>= 0.12.2'
   spec.add_dependency 'hyperloop-config', '>= 0.9.7'
   spec.add_dependency 'opal-activesupport'
-  spec.add_dependency 'activerecord', '>= 0.3.0'
+  spec.add_dependency 'activerecord'
 
-  spec.add_development_dependency "bundler", "~> 1.8"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'rake'
   spec.add_development_dependency 'hyper-spec'
   spec.add_development_dependency 'rspec-rails'
-  spec.add_development_dependency 'rails', '~>5.0.0'
+  spec.add_development_dependency 'rails'
   spec.add_development_dependency 'opal-rails'
   spec.add_development_dependency 'hyper-react'
   spec.add_development_dependency 'opal-browser'
-  spec.add_development_dependency 'sqlite3', '1.3.10'
+  spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'pry'
@@ -41,6 +41,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-steps'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
-  spec.add_development_dependency 'timecop', '~>0.8.1'
+  spec.add_development_dependency 'timecop'
 
 end
