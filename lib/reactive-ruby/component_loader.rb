@@ -19,11 +19,13 @@ module ReactiveRuby
       return true if loaded?
       self.load(file)
     ensure
-      raise "No react.rb components found in #{components}.rb" unless loaded?
+      raise "No HyperReact components found in #{components}" unless loaded?
     end
 
     def loaded?
       !!v8_context.eval('Opal.React')
+    rescue ::V8::Error
+      false
     end
 
     private
@@ -35,16 +37,7 @@ module ReactiveRuby
     end
 
     def opal(file)
-      if Opal::Processor.respond_to?(:load_asset_code)
-        Opal::Processor.load_asset_code(assets, file)
-      else
-        Opal::Sprockets.load_asset(file, assets)
-      end
-    rescue # What exception is being caught here?
-    end
-
-    def assets
-      ::Rails.application.assets
+      Opal::Sprockets.load_asset(file)
     end
   end
 end
