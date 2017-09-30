@@ -1,8 +1,6 @@
 language: ruby
 rvm:
   - ruby
-before_script:
-  - phantomjs --version
 env:
   - PHANTOMJS_VERSION=2.1.1
 cache:
@@ -17,13 +15,14 @@ before_install:
   - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then tar -xvf $PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION-linux-x86_64.tar.bz2 -C $PWD/travis_phantomjs; fi"
   - "phantomjs --version"
   - gem install bundler
+before_script:
+  - phantomjs --version
 script:
   - bundle exec rake test_app
   - bundle exec rake
+gemfile:
+  - gemfiles/opal_0.10_react_15.gemfile
+  - gemfiles/opal_master_react_15.gemfile
 matrix:
-  include:
-    - rvm: ruby
-      gemfile: gemfiles/opal_0.10_react_15.gemfile
   allow_failures:
-    - rvm: ruby
-      gemfile: gemfiles/opal_master_react_15.gemfile
+    - gemfile: gemfiles/opal_master_react_15.gemfile
