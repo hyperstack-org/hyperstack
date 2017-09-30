@@ -1,7 +1,6 @@
 language: ruby
 rvm:
   - ruby
-  - jruby-19mode
 before_script:
   - phantomjs --version
 env:
@@ -21,12 +20,7 @@ before_install:
 script:
   - bundle exec rake test_app
   - bundle exec rake
-# These two setup seems to run indefinitely long
-# further investigation required.
 matrix:
-  exclude:
-  - rvm: jruby-19mode
-    gemfile: gemfiles/opal_0.10_react_15.gemfile
   include:
   - rvm: ruby
     gemfile: gemfiles/opal_0.10_react_15.gemfile

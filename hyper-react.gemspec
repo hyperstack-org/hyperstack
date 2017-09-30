@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mime-types'
   s.add_development_dependency 'listen'
   s.add_development_dependency 'opal-rails'
-  s.add_development_dependency 'react-rails'
+  s.add_development_dependency 'react-rails', '>= 2.3.0'
   s.add_development_dependency 'rails-controller-testing'
 
   s.add_development_dependency 'nokogiri'
