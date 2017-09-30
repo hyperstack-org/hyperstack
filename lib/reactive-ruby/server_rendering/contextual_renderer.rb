@@ -9,7 +9,7 @@ module ReactiveRuby
       context.instance_variable_get(context_instance_name)
     end
 
-    class ContextualRenderer < React::ServerRendering::SprocketsRenderer
+    class ContextualRenderer < React::ServerRendering::BundleRenderer
       def initialize(options = {})
         super(options)
         ComponentLoader.new(v8_context).load
@@ -17,9 +17,10 @@ module ReactiveRuby
 
       def render(component_name, props, prerender_options)
         if prerender_options.is_a?(Hash)
-          if v8_runtime? && prerender_options[:context_initializer]
-            raise PrerenderError.new(component_name, props, "you must use 'therubyracer' with the prerender[:context] option") unless v8_runtime?
+          if !v8_runtime? && prerender_options[:context_initializer]
+            raise React::ServerRendering::PrerenderError.new(component_name, props, "you must use 'therubyracer' with the prerender[:context] option") unless v8_runtime?
           else
+            puts "defining v8_context for #{ExecJS.runtime.name}"
             prerender_options[:context_initializer].call v8_context
             prerender_options = prerender_options[:static] ? :static : true
           end
@@ -31,7 +32,7 @@ module ReactiveRuby
       private
 
       def v8_runtime?
-        ["(V8)", "therubyrhino (Rhino)"].include?(ExecJS.runtime.name)
+        ["therubyracer (V8)", "therubyrhino (Rhino)"].include?(ExecJS.runtime.name)
       end
 
       def v8_context
