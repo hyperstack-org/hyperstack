@@ -21,7 +21,7 @@ before_script:
   - bundle update
   - cd ../../
 script:
-  - bundle exec rake test
+  - bundle exec rake spec
 gemfile:
   - gemfiles/opal_release_react-rails_release.gemfile
   - gemfiles/opal_master_react-rails_release.gemfile
