@@ -4,8 +4,7 @@ rvm:
 services:
   - mysql
 env:
-  - PHANTOMJS_VERSION=2.1.1
-  - TZ=Europe/Berlin
+  - PHANTOMJS_VERSION=2.1.1 TZ=Europe/Berlin
 cache:
   directories:
     - "travis_phantomjs"
