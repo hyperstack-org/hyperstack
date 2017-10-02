@@ -19,10 +19,13 @@ before_script:
   - phantomjs --version
 script:
   - bundle exec rake test_app
-  - bundle exec rake
+  - bundle exec rake test
 gemfile:
-  - gemfiles/opal_0.10_react_15.gemfile
-  - gemfiles/opal_master_react_15.gemfile
+  - gemfiles/opal_release_react-rails_release.gemfile
+  - gemfiles/opal_master_react-rails_release.gemfile
+  - gemfiles/opal_release_react-rails_master.gemfile
 matrix:
   allow_failures:
-    - gemfile: gemfiles/opal_master_react_15.gemfile
+    - gemfile: gemfiles/opal_master_react-rails_release.gemfile
+    - gemfile: gemfiles/opal_release_react-rails_master.gemfile
+

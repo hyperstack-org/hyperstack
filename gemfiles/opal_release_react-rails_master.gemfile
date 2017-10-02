@@ -4,9 +4,9 @@ source "https://rubygems.org"
 
 ruby ">= 2.4.0"
 
-gem "opal", "~> 0.10.0"
-gem "opal-rails", "~> 0.9.0"
-gem "react-rails", ">= 2.3.0", :require => false
+gem "opal", "~> 0.10.5"
+gem "opal-rails", "~> 0.9.3"
+gem "react-rails", https://github.com/reactjs/react-rails.git
 
 group :development do
   gem "appraisal"
