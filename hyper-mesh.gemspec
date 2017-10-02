@@ -28,14 +28,14 @@ Gem::Specification.new do |s|
     s.add_dependency 'hyper-operation', '>= 0.5.0'
     s.add_dependency 'hyper-component', '>= 0.12.3'
 
-    s.add_development_dependency 'bundler', '~> 1.8'
-    s.add_development_dependency 'rake', '~> 10.0'
+    s.add_development_dependency 'bundler'
+    s.add_development_dependency 'rake'
     s.add_development_dependency 'rspec-rails'
     s.add_development_dependency 'timecop'
 
     # For Test Rails App
     s.add_development_dependency 'rails'
-    s.add_development_dependency 'react-rails'
+    s.add_development_dependency 'react-rails', '>= 2.3.0'
     s.add_development_dependency 'opal-rails'
     s.add_development_dependency 'opal-activesupport'
     s.add_development_dependency 'factory_girl_rails'
