@@ -4,7 +4,7 @@ rvm:
 services:
   - mysql
 env:
-  - PHANTOMJS_VERSION=2.1.1
+  - PHANTOMJS_VERSION=2.1.1 TZ=Europe/Berlin
 cache:
   directories:
     - "travis_phantomjs"
@@ -17,7 +17,6 @@ before_install:
   - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then tar -xvf $PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION-linux-x86_64.tar.bz2 -C $PWD/travis_phantomjs; fi"
   - "phantomjs --version"
   - gem install bundler
-  - export TZ=Europe/Berlin
 before_script:
   - phantomjs --version
 before_script:
@@ -26,3 +25,9 @@ before_script:
   - rails db:setup
   - cd ../../
 script: bundle exec rspec
+gemfile:
+  - gemfiles/opal_release.gemfile
+  - gemfiles/opal_master.gemfile
+matrix:
+  allow_failures:
+    - gemfile: gemfiles/opal_master.gemfile
