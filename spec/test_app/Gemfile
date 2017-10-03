@@ -12,14 +12,14 @@ gem 'puma'
 gem 'jquery-rails'
 
 gem 'hyper-react'
-gem 'hyper-spec', git: 'https://www.github.com/ruby-hyperloop/hyper-spec'
+gem 'hyper-spec'
 gem 'hyper-store', path: '../..'
 gem 'opal'
 gem 'opal-browser'
 gem 'opal-jquery'
 gem 'opal-rails'
 gem 'therubyracer', platforms: :ruby
-gem 'react-rails'
+gem 'react-rails', '>= 2.3.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
