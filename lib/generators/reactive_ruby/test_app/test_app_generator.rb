@@ -29,7 +29,7 @@ module ReactiveRuby
       template 'assets/javascripts/test_application.rb',
         "#{test_app_path}/app/assets/javascripts/application.rb", force: true
       template 'assets/javascripts/server_rendering.js',
-               "#{test_app_path}/app/assets/javascripts/server_rendering.rb", force: true
+               "#{test_app_path}/app/assets/javascripts/server_rendering.js", force: true
       template 'assets/javascripts/components.rb',
         "#{test_app_path}/app/views/components.rb", force: true
       template 'views/components/hello_world.rb',
