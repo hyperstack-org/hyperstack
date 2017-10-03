@@ -31,9 +31,9 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   # Test app dependencies
   spec.add_development_dependency 'bundler', '~> 1.12'
   spec.add_development_dependency 'hyper-react', '>= 0.10.0'
-  spec.add_development_dependency 'rails', '~>5.0.0'
-  spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'react-rails', '< 1.10.0'
+  spec.add_development_dependency 'rails'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'react-rails', '>= 2.3.0'
 
   # Keep linter-rubocop happy
   spec.add_development_dependency 'rubocop'
@@ -41,7 +41,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   if RUBY_PLATFORM == 'java'
     spec.add_development_dependency 'therubyrhino'
   else
-    spec.add_development_dependency 'therubyracer', '~> 0.12.2'
+    spec.add_development_dependency 'therubyracer'
 
     # Actual dependencies
     spec.add_dependency 'capybara'
