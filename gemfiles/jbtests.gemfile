@@ -10,6 +10,7 @@ gem "react-rails", ">= 2.3.0", :require => false
 gem "hyperloop-config", :git => "https://github.com/janbiedermann/hyperloop-config.git", :branch => 'jbtests'
 gem "hyper-component", :git => "https://github.com/janbiedermann/hyper-component.git", :branch => 'jbtests'
 gem "hyper-mesh", :git => "https://github.com/janbiedermann/hyper-mesh.git", :branch => 'jbtest'
+gem "hyper-model", :git => "https://github.com/janbiedermann/hyper-model.git", :branch => 'jbtest'
 gem "hyper-operation", :git => "https://github.com/janbiedermann/hyper-operation.git", :branch => 'jbtests'
 gem "hyper-react", :git => "https://github.com/janbiedermann/hyper-react.git", :branch => 'jbtests'
 gem "hyper-spec", :git => "https://github.com/janbiedermann/hyper-spec.git", :branch => 'jbtests'
