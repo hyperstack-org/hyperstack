@@ -1,5 +1,7 @@
 # HyperSpec
 
+[![Build Status](https://travis-ci.org/ruby-hyperloop/hyper-spec.svg?branch=master)](https://travis-ci.org/ruby-hyperloop/hyper-spec)
+
 With HyperSpec you can run *isomorphic* specs for all your Hyperloop code using RSpec.  Everything runs as standard RSpec test specs.  
 
 For example if you have a component like this:
