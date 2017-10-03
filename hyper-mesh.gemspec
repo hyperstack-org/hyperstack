@@ -73,7 +73,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency 'rspec-collection_matchers'
       s.add_development_dependency 'database_cleaner'
       s.add_development_dependency 'capybara'
-      s.add_development_dependency 'selenium-webdriver', '< 3'
+      s.add_development_dependency 'selenium-webdriver', '~> 3.5.0'
       s.add_development_dependency 'poltergeist'
       s.add_development_dependency 'spring-commands-rspec'
       s.add_development_dependency 'chromedriver-helper'
