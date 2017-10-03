@@ -26,7 +26,6 @@ gemfile:
   - gemfiles/opal_release_react-rails_release.gemfile
   - gemfiles/opal_master_react-rails_release.gemfile
   - gemfiles/opal_release_react-rails_master.gemfile
-  - gemfiles/jbtests.gemfile
 matrix:
   allow_failures:
     - gemfile: gemfiles/opal_master_react-rails_release.gemfile
