@@ -31,8 +31,14 @@ module TestApp
     config.opal.dynamic_require_severity = :ignore
     config.opal.enable_specs = true
     config.opal.spec_location = 'spec-opal'
+    config.hyperloop.auto_config = false
 
     config.assets.cache_store = :null_store
+
+    config.react.server_renderer_options = {
+      files: ['server_rendering.js']
+    }
+    config.react.server_renderer_directories = ['/app/assets/javascripts']
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
