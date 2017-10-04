@@ -20,7 +20,6 @@ module ReactiveRuby
           if !v8_runtime? && prerender_options[:context_initializer]
             raise React::ServerRendering::PrerenderError.new(component_name, props, "you must use 'therubyracer' with the prerender[:context] option") unless v8_runtime?
           else
-            puts "defining v8_context for #{ExecJS.runtime.name}"
             prerender_options[:context_initializer].call v8_context
             prerender_options = prerender_options[:static] ? :static : true
           end
