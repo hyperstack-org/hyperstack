@@ -45,13 +45,13 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
     # Actual dependencies
     spec.add_dependency 'capybara'
-    spec.add_dependency 'opal'
+    spec.add_dependency 'opal', '~> 0.10.5'
     spec.add_dependency 'parser'
-    spec.add_dependency 'poltergeist'
+    spec.add_dependency 'poltergeist', '>= 1.16.0'
     spec.add_dependency 'pry'
     spec.add_dependency 'rspec-rails'
-    spec.add_dependency 'selenium-webdriver', '~> 3.5.0'
-    spec.add_dependency 'timecop', '~> 0.8.1'
+    spec.add_dependency 'selenium-webdriver', '~> 3.6.0'
+    spec.add_dependency 'uglifier'
     spec.add_dependency 'unparser'
     spec.add_dependency 'webdrivers'
 
@@ -59,7 +59,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
     spec.add_development_dependency 'chromedriver-helper'
     spec.add_development_dependency 'method_source'
     spec.add_development_dependency 'opal-browser'
-    spec.add_development_dependency 'opal-rails'
+    spec.add_development_dependency 'opal-rails', '~> 0.9.3'
     spec.add_development_dependency 'puma'
     spec.add_development_dependency 'rspec-collection_matchers'
     spec.add_development_dependency 'rspec-expectations'
@@ -69,5 +69,6 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
     spec.add_development_dependency 'shoulda'
     spec.add_development_dependency 'shoulda-matchers'
     spec.add_development_dependency 'spring-commands-rspec'
+    spec.add_development_dependency 'timecop', '~> 0.8.1'
   end
 end
