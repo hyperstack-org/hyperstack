@@ -13,32 +13,33 @@ Gem::Specification.new do |s|
   s.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   s.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
 
-  # s.add_dependency 'opal-rails'
-  # s.add_dependency 'react-rails'
+  s.add_dependency 'opal-rails'
+  s.add_dependency 'react-rails', '>= 2.3.0'
   s.add_dependency 'hyper-component'
   s.add_dependency 'hyper-react', '~> 0.12.7'
   s.add_dependency 'opal-browser'
 
-  s.add_development_dependency 'bundler', '~> 1.8'
-  s.add_development_dependency 'rake', '~> 10.0'
-  s.add_development_dependency 'rspec-rails', '3.3.3'
+  s.add_development_dependency 'bundler'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'opal-rspec'
   s.add_development_dependency 'sinatra'
 
   # For Test Rails App
   s.add_development_dependency 'rails'
-  s.add_development_dependency 'react-rails', '< 1.10.0'
-  s.add_development_dependency 'opal-rails', '0.9.0'
+  s.add_development_dependency 'react-rails'
+  s.add_development_dependency 'opal-rails'
   s.add_development_dependency 'hyper-spec'
+  s.add_development_dependency 'listen'
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'jdbc-sqlite3'
     s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
     s.add_development_dependency 'therubyrhino'
   else
-    s.add_development_dependency 'sqlite3', '1.3.10'
-    s.add_development_dependency 'therubyracer', '~> 0.12.2'
+    s.add_development_dependency 'sqlite3'
+    s.add_development_dependency 'therubyracer'
 
     # The following allow react code to be tested from the server side
     s.add_development_dependency 'rspec-mocks'
@@ -54,7 +55,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'rspec-collection_matchers'
     s.add_development_dependency 'database_cleaner'
     s.add_development_dependency 'capybara'
-    s.add_development_dependency 'selenium-webdriver', '~> 2.0'
+    s.add_development_dependency 'selenium-webdriver', '~> 3.6'
     s.add_development_dependency 'poltergeist'
     s.add_development_dependency 'spring-commands-rspec'
     s.add_development_dependency 'chromedriver-helper'
