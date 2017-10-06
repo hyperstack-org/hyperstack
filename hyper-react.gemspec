@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency 'hyper-store', '= 0.15.0'
+  s.add_dependency 'hyper-store', '0.15.0'
   s.add_dependency 'opal'
   s.add_dependency 'opal-activesupport'
 
