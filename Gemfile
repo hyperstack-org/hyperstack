@@ -1,6 +1,3 @@
 source 'https://rubygems.org'
-
-#gem 'hyper-react', path: '../hyper-react'
-
-# Specify your gem's dependencies in hyper-store.gemspec
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 gemspec
