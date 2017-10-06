@@ -34,3 +34,6 @@ Gemfile.lock
 
 /gemfiles/*.lock
 /tmp
+
+# ignore IDE files
+.idea
