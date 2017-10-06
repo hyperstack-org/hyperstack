@@ -1,3 +1,3 @@
 module HyperStore
-  VERSION = '0.2.4'
+  VERSION = '0.15.0'
 end
