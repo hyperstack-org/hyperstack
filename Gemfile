@@ -1,8 +1,3 @@
 source 'https://rubygems.org'
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 gemspec
-
-ruby ">= 2.4.0"
-
-group :development do
-  gem "appraisal"
-end
