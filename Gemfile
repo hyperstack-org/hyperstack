@@ -1,6 +1,3 @@
 source 'https://rubygems.org'
-# gem 'reactrb'
-# gem 'opal'
-# gem 'react-rails'
-# gem 'react-router-rails'
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 gemspec
