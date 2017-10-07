@@ -45,5 +45,8 @@ bower.json
 /test_app/tmp
 /test_app/log
 
+# ignore gem
+*.gem
+
 # ignore IDE files
 .idea
