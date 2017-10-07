@@ -1,4 +1,3 @@
 source 'https://rubygems.org'
-
-# Specify your gem's dependencies in hyperloop-config.gemspec
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 gemspec
