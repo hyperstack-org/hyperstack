@@ -49,3 +49,6 @@ bower.json
 
 # Ignore built gem
 *.gem
+
+# ignore Idea files
+.idea
