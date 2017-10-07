@@ -20,19 +20,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal'
   spec.add_dependency 'opal-browser'
   spec.add_dependency 'uglifier'
-
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'rake'
-
-  spec.add_development_dependency 'hyper-spec'
-  spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'timecop', '~> 0.8.1'
-  spec.add_development_dependency 'opal-rails'
-  spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'rails'
+  spec.add_development_dependency 'hyper-spec', '0.15.0'
   spec.add_development_dependency 'jquery-rails'
-
-  # Keep linter-rubocop happy
+  spec.add_development_dependency 'opal-rails', '>= 0.9.3'
+  spec.add_development_dependency 'rails', '>= 5.1.4'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rubocop'
-
+  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'timecop', '~> 0.8.1'
 end
