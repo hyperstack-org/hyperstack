@@ -8,5 +8,8 @@
 /spec/reports/
 /tmp/
 
+# ignore gems
+*.gem
+
 # ignore Idea files
 .idea
