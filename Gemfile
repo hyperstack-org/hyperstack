@@ -1,7 +1,3 @@
 source 'https://rubygems.org'
-
-# gem 'hyperloop-config', path: '../hyperloop-config'
-# gem 'hyper-react', path: '../hyper-react'
-# gem 'hyper-store', path: '../hyper-store'
-# Specify your gem's dependencies in hyper-spec.gemspec
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 gemspec
