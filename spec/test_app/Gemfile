@@ -42,7 +42,7 @@ end
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console'
-  gem "reactrb-rails-generator"
+  gem 'reactrb-rails-generator'
   gem 'puma'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
@@ -51,9 +51,9 @@ end
 
 # gem 'jquery-ui-rails'
 
-gem 'react-rails'
+gem 'react-rails', '>= 2.3.0'
 gem 'opal-rails'
-gem 'therubyracer', platforms: :ruby
+gem 'therubyracer', '>= 0.12.3', platforms: :ruby
 # gem 'react-router-rails', '~> 0.13.3'
 # gem 'reactrb-router'
 gem 'hyper-operation', path: '../..'
