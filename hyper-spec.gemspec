@@ -28,47 +28,36 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  # Test app dependencies
+  spec.add_dependency 'capybara'
+  spec.add_dependency 'opal', '~> 0.10.5'
+  spec.add_dependency 'parser'
+  spec.add_dependency 'poltergeist', '>= 1.16.0'
+  spec.add_dependency 'pry'
+  spec.add_dependency 'rspec-rails'
+  spec.add_dependency 'selenium-webdriver', '~> 3.6.0'
+  spec.add_dependency 'timecop', '~> 0.8.1'
+  spec.add_dependency 'uglifier'
+  spec.add_dependency 'unparser'
+  spec.add_dependency 'webdrivers'
+
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-react', '>= 0.10.0'
-  spec.add_development_dependency 'rails'
+  spec.add_development_dependency 'chromedriver-helper'
+  spec.add_development_dependency 'hyper-react', '0.15.0'
+  spec.add_development_dependency 'method_source'
+  spec.add_development_dependency 'opal-browser'
+  spec.add_development_dependency 'opal-rails', '~> 0.9.3'
+  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'rails', '>= 5.1.4'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.3.0'
-
-  # Keep linter-rubocop happy
+  spec.add_development_dependency 'react-rails', '~> 2.3.0'
+  spec.add_development_dependency 'rspec-collection_matchers'
+  spec.add_development_dependency 'rspec-expectations'
+  spec.add_development_dependency 'rspec-its'
+  spec.add_development_dependency 'rspec-mocks'
+  spec.add_development_dependency 'rspec-steps'
   spec.add_development_dependency 'rubocop'
-
-  if RUBY_PLATFORM == 'java'
-    spec.add_development_dependency 'therubyrhino'
-  else
-    spec.add_development_dependency 'therubyracer'
-
-    # Actual dependencies
-    spec.add_dependency 'capybara'
-    spec.add_dependency 'opal', '~> 0.10.5'
-    spec.add_dependency 'parser'
-    spec.add_dependency 'poltergeist', '>= 1.16.0'
-    spec.add_dependency 'pry'
-    spec.add_dependency 'rspec-rails'
-    spec.add_dependency 'selenium-webdriver', '~> 3.6.0'
-    spec.add_dependency 'uglifier'
-    spec.add_dependency 'unparser'
-    spec.add_dependency 'webdrivers'
-
-    # Test app dependencies
-    spec.add_development_dependency 'chromedriver-helper'
-    spec.add_development_dependency 'method_source'
-    spec.add_development_dependency 'opal-browser'
-    spec.add_development_dependency 'opal-rails', '~> 0.9.3'
-    spec.add_development_dependency 'puma'
-    spec.add_development_dependency 'rspec-collection_matchers'
-    spec.add_development_dependency 'rspec-expectations'
-    spec.add_development_dependency 'rspec-its'
-    spec.add_development_dependency 'rspec-mocks'
-    spec.add_development_dependency 'rspec-steps'
-    spec.add_development_dependency 'shoulda'
-    spec.add_development_dependency 'shoulda-matchers'
-    spec.add_development_dependency 'spring-commands-rspec'
-    spec.add_development_dependency 'timecop', '~> 0.8.1'
-  end
+  spec.add_development_dependency 'shoulda'
+  spec.add_development_dependency 'shoulda-matchers'
+  spec.add_development_dependency 'spring-commands-rspec'
+  spec.add_development_dependency 'therubyracer', '>= 0.12.3'
 end
