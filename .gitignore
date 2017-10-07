@@ -42,3 +42,9 @@ node_modules
 .bundle
 
 Gemfile.lock
+
+# ignore gems
+*.gem
+
+# ignore Idea
+.idea
