@@ -26,3 +26,9 @@ reactive_record_test_app/tmp/
 reactive_record_test_app/.sass-cache
 .DS_Store
 public/assets/*
+
+# ignore gems
+*.gem
+
+# ingore Idea
+.idea
