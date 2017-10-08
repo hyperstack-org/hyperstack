@@ -1,4 +1,4 @@
-require "hyper-operation/version"
+require 'hyper-operation/version'
 require 'hyperloop-config'
 Hyperloop.import 'browser/interval', client_only: true
 Hyperloop.import 'hyper-operation'
