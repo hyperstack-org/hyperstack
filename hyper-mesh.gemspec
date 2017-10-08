@@ -4,19 +4,19 @@ $:.push File.expand_path('../lib/', __FILE__)
 require 'hypermesh/version'
 
 Gem::Specification.new do |s|
-  s.name          = "hyper-mesh"
+  s.name          = 'hyper-mesh'
   s.version       = Hypermesh::VERSION
   s.authors       = ['Mitch VanDuyn', 'janbiedermann']
-  s.email         = ["mitch@catprint.com"]
+  s.email         = ['mitch@catprint.com']
 
-  s.summary       = "React based CRUD access and Synchronization of active record models across multiple clients"
-  s.description   = "HyperMesh gives your HyperReact components CRUD access to your "\
-                    "ActiveRecord models on the client, using the the standard ActiveRecord "\
-                    "API. HyperMesh also implements push notifications (via a number of "\
-                    "possible technologies) so changes to records on the server are "\
-                    "dynamically updated on all authorised clients."
-  s.homepage      = "https://github.com/reactive-ruby/hyper-mesh"
-  s.license       = "MIT"
+  s.summary       = 'React based CRUD access and Synchronization of active record models across multiple clients'
+  s.description   = 'HyperMesh gives your HyperReact components CRUD access to your '\
+                    'ActiveRecord models on the client, using the the standard ActiveRecord '\
+                    'API. HyperMesh also implements push notifications (via a number of '\
+                    'possible technologies) so changes to records on the server are '\
+                    'dynamically updated on all authorised clients.'
+  s.homepage      = 'https://github.com/reactive-ruby/hyper-mesh'
+  s.license       = 'MIT'
 
   s.files          = `git ls-files`.split("\n")
   s.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
@@ -24,14 +24,14 @@ Gem::Specification.new do |s|
   s.require_paths  = ['lib']
 
   s.add_dependency 'activerecord', '>= 5.1.4'
-  s.add_dependency 'hyper-component', '0.15.1'
-  s.add_dependency 'hyper-operation', '0.15.1'
+  s.add_dependency 'hyper-component', '0.15.2'
+  s.add_dependency 'hyper-operation', '0.15.2'
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'capybara'
   s.add_development_dependency 'chromedriver-helper'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'factory_girl_rails'
-  s.add_development_dependency 'hyper-spec', '0.15.1'
+  s.add_development_dependency 'hyper-spec', '0.15.2'
   s.add_development_dependency 'hyper-trace'
   s.add_development_dependency 'jquery-rails'
   s.add_development_dependency 'mysql2'
