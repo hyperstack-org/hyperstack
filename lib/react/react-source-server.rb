@@ -1,3 +1,3 @@
 if RUBY_ENGINE == 'opal'
-  require "react-server.js"
+  require 'react-server.js'
 end
