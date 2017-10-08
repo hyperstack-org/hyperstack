@@ -52,6 +52,7 @@ if RUBY_ENGINE == 'opal'
     end
   end
   React::Component.deprecation_warning(
+    'component.rb',
     "Requiring 'hyper-react' is deprecated.  Use gem 'hyper-component', and require 'hyper-component' instead."
   ) unless defined? Hyperloop::Component::VERSION
 else
