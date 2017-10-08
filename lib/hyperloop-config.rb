@@ -13,5 +13,6 @@ else
   Hyperloop.import 'opal', gem: true
   Hyperloop.import 'browser', client_only: true
   Hyperloop.import 'hyperloop-config', gem: true
+  Hyperloop.import 'hyperloop/autoloader'
   Opal.append_path(File.expand_path('../', __FILE__).untaint)
 end
