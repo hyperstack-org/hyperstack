@@ -6,7 +6,7 @@ require 'hyper-spec/version'
 Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.name          = 'hyper-spec'
   spec.version       = HyperSpec::VERSION
-  spec.authors       = ['catmando', 'adamcreekroad']
+  spec.authors       = ['catmando', 'adamcreekroad', 'janbiedermann']
   spec.email         = ['mitch@catprint.com']
 
   spec.summary       =
@@ -42,7 +42,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'hyper-react', '0.15.0'
+  spec.add_development_dependency 'hyper-react', '0.15.1'
   spec.add_development_dependency 'method_source'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
