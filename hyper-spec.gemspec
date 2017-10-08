@@ -42,7 +42,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'hyper-react', '0.15.2'
+  spec.add_development_dependency 'hyper-react', '0.15.3'
   spec.add_development_dependency 'method_source'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
