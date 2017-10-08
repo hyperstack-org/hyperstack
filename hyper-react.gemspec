@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.name         = 'hyper-react'
   s.version      = React::VERSION
 
-  s.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn']
+  s.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'janbiedermann']
   s.email        = 'reactrb@catprint.com'
   s.homepage     = 'http://ruby-hyperloop.io/gems/reactrb/'
   s.summary      = 'Opal Ruby wrapper of React.js library.'
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency 'hyper-store', '0.15.0'
+  s.add_dependency 'hyper-store', '0.15.1'
   s.add_dependency 'opal'
   s.add_dependency 'opal-activesupport'
 
