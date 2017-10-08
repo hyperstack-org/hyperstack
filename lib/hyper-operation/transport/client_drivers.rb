@@ -170,12 +170,13 @@ module Hyperloop
       end
 
       @initialized = true
-
-      if RUBY_ENGINE == 'opal'
-        @opts = Hash.new(`window.HyperloopOpts`)
-      end
+      @opts = {}
 
       if on_opal_client?
+        if RUBY_ENGINE == 'opal'
+          @opts = Hash.new(`window.HyperloopOpts`)
+        end
+
         if opts[:transport] == :pusher
 
           opts[:dispatch] = lambda do |data|
