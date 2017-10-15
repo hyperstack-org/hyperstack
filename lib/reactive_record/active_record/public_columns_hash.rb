@@ -1,25 +1,35 @@
 module Hyperloop
-  define_setting :public_model_directories, ['app/models/public', 'app/hyperloop/models']
+  define_setting :public_model_directories, ['app/hyperloop/models']
 end
 
 module ActiveRecord
   # adds method to get the HyperMesh public column types
-  # for now we are just getting all models column types, but we should
-  # look through the public folder, and just get those models.
-  # this works because the public folder is currently required to be eaer loaded.
+  # this works because the public folder is currently required to be eager loaded.
   class Base
     def self.public_columns_hash
-      return @public_columns_hash if @public_columns_hash
+      return @public_columns_hash if @public_columns_hash && Rails.env.production?
+      files = []
       Hyperloop.public_model_directories.each do |dir|
-        Dir.glob(Rails.root.join("#{dir}/*.rb")).each do |file|
+        dir_length = Rails.root.join(dir).to_s.length + 1
+        Dir.glob(Rails.root.join(dir, '**', '*.rb')).each do |file|
           require_dependency(file)
+          files << file[dir_length..-4]
         end
       end
       @public_columns_hash = {}
       descendants.each do |model|
-        @public_columns_hash[model.name] = model.columns_hash rescue nil
+        if files.include?(model.name.underscore) && model != ApplicationRecord
+          @public_columns_hash[model.name] = model.columns_hash rescue nil # why rescue?
+        end
       end
       @public_columns_hash
+    end
+
+    def self.public_columns_hash_as_json
+      return @public_columns_hash_json if @public_columns_hash_json && Rails.env.production?
+      return @public_columns_hash_json if @prev_public_columns_hash == @public_columns_hash
+      @prev_public_columns_hash = @public_columns_hash
+      @public_columns_hash_json = @public_columns_hash.to_json
     end
   end
 end
