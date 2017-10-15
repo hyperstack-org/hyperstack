@@ -86,7 +86,7 @@ module ReactiveRecord
       end
       "<script type='text/javascript'>\n"+
         "if (typeof window.ReactiveRecordPublicColumnsHash === 'undefined') { \n" +
-        "  window.ReactiveRecordPublicColumnsHash = #{ActiveRecord::Base.public_columns_hash.to_json}}\n" +
+        "  window.ReactiveRecordPublicColumnsHash = #{ActiveRecord::Base.public_columns_hash_as_json}}\n" +
         "if (typeof window.ReactiveRecordInitialData === 'undefined') { window.ReactiveRecordInitialData = [] }\n" +
         "window.ReactiveRecordInitialData.push(#{json})\n"+
       "</script>\n"
