@@ -27,9 +27,10 @@ module ActiveRecord
 
     def self.public_columns_hash_as_json
       return @public_columns_hash_json if @public_columns_hash_json && Rails.env.production?
-      return @public_columns_hash_json if @prev_public_columns_hash == @public_columns_hash
-      @prev_public_columns_hash = @public_columns_hash
-      @public_columns_hash_json = @public_columns_hash.to_json
+      pch = public_columns_hash
+      return @public_columns_hash_json if @prev_public_columns_hash == pch
+      @prev_public_columns_hash = pch
+      @public_columns_hash_json = pch.to_json
     end
   end
 end
