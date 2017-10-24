@@ -16,7 +16,7 @@ module Hyperloop
       def self.included(base)
         base.include(Store::Mixin)
         base.include(React::Component::API)
-        base.include(React::Component::Callbacks)
+        base.include(React::Callbacks)
         base.include(React::Component::Tags)
         base.include(React::Component::DslInstanceMethods)
         base.include(React::Component::ShouldComponentUpdate)
