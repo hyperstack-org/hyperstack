@@ -6,7 +6,7 @@ class App < React::Component::Base
     puts "their_id: #{Store.state.their_id}, my_id: #{Store.my_id} words: #{Store.state.word}"
     DIV { Store.message } if Store.message
     send Store.game_state # for each game_state we have a method below...
-    Guesses() unless Store.my_guesses.empty?
+    Guesses.run() unless Store.my_guesses.empty?
   end
 
   def initializing
@@ -19,7 +19,7 @@ class App < React::Component::Base
 
   def waiting_for_other_player
     SPAN { "Your word is: #{Store.my_word}. Waiting for the other player to pick their word..." }
-    BUTTON { 'Change Your Word' }.on(:click) { Ops::ChangeWord() }
+    BUTTON { 'Change Your Word' }.on(:click) { Ops::ChangeWord.run() }
   end
 
   def waiting_for_your_guess
@@ -42,9 +42,9 @@ class App < React::Component::Base
       OPTION(value: :win) { "#{Store.current_guess} is correct!"}
     end.on(:change) do |e|
       if e.target.value == :win
-        Ops::YouWin()
+        Ops::YouWin.run()
       else
-        Ops::Clue their_word: Store.current_guess, my_word: Store.my_word, correct: e.target.value
+        Ops::Clue.run their_word: Store.current_guess, my_word: Store.my_word, correct: e.target.value
       end
     end
   end
@@ -60,6 +60,6 @@ class App < React::Component::Base
   end
 
   def play_again
-    BUTTON { 'Play Again!' }.on(:click) { Ops::PlayAgain() }
+    BUTTON { 'Play Again!' }.on(:click) { Ops::PlayAgain.run() }
   end
 end

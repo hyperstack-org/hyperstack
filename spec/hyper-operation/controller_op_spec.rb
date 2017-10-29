@@ -17,7 +17,7 @@ describe "controller operations", js: true do
   end
   it "can run uplink to a controller method and will delegate to the controller" do
     expect_promise do
-      MyControllerOp(data: 'hello')
+      MyControllerOp.run(data: 'hello')
     end.to eq(12)
   end
   it "connects globally and broadcasts to the session channel" do
@@ -32,7 +32,7 @@ describe "controller operations", js: true do
     end
     MyControllerOp.dispatch_to { session_channel }
     evaluate_ruby do
-      MyControllerOp(data: 'hello')
+      MyControllerOp.run(data: 'hello')
     end
     expect(page).to have_content('hello')
   end
@@ -49,7 +49,7 @@ describe "controller operations", js: true do
     end
     MyControllerOp.dispatch_to { session_channel }
     evaluate_ruby do
-      MyControllerOp(data: 'hello')
+      MyControllerOp.run(data: 'hello')
     end
     expect(page).to have_content('hello')
   end
@@ -58,10 +58,10 @@ end
 #     it "will pass server failures back" do
 #       ServerFacts.param :acting_user, nils: true
 #       expect_promise do
-#         ServerFacts(n: -1).fail { |exception| Promise.new.resolve(exception) }
+#         ServerFacts.run(n: -1).fail { |exception| Promise.new.resolve(exception) }
 #       end.to eq('N is too small')
 #       expect_promise do
-#         ServerFacts(n: 10000000000).fail { |exception| Promise.new.resolve(exception) }
+#         ServerFacts.run(n: 10000000000).fail { |exception| Promise.new.resolve(exception) }
 #       end.to eq('stack level too deep')
 #     end
 #
@@ -71,13 +71,13 @@ end
 #         validate { false }
 #       end
 #       expect_promise do
-#         ServerFacts(n: 5).fail { |exception| Promise.new.resolve(exception) }
+#         ServerFacts.run(n: 5).fail { |exception| Promise.new.resolve(exception) }
 #       end.to include('param validation 1 failed')
 #     end
 #
 #     it "will reject uplinks that don't accept acting_user" do
 #       expect_promise do
-#         ServerFacts(n: 5).fail { |exception| Promise.new.resolve(exception) }
+#         ServerFacts.run(n: 5).fail { |exception| Promise.new.resolve(exception) }
 #       end.to include('Hyperloop::AccessViolation')
 #     end
 #   end
@@ -131,7 +131,7 @@ end
 #       OperationPolicy.always_allow_connection
 #       mount 'Test'
 #       expect(page).to have_content('No messages yet')
-#       Operation(message: 'hello', password: 'better not see this')
+#       Operation.run(message: 'hello', password: 'better not see this')
 #       expect(page).to have_content("The server says 'hello'!")
 #     end
 #
@@ -147,7 +147,7 @@ end
 #       ApplicationPolicy.always_allow_connection
 #       mount 'Test'
 #       expect(page).to have_content('No messages yet')
-#       Operation(message: 'hello', channels: 'Application')
+#       Operation.run(message: 'hello', channels: 'Application')
 #       expect(page).to have_content("The server says 'hello'!")
 #     end
 #
@@ -161,7 +161,7 @@ end
 #       OperationPolicy.regulate_class_connection { true }
 #       mount 'Test'
 #       expect(page).to have_content('No messages yet')
-#       Operation(message: 'hello')
+#       Operation.run(message: 'hello')
 #       expect(page).to have_content("The server says 'hello'!")
 #     end
 #
@@ -177,10 +177,10 @@ end
 #       ApplicationPolicy.regulate_dispatches_from(Operation) { params.broadcast }
 #       mount 'Test'
 #       expect(page).to have_content('No messages yet')
-#       Operation(message: 'hello')
+#       Operation.run(message: 'hello')
 #       wait_for_ajax
 #       expect(page).not_to have_content("The server says 'hello'!", wait: 0)
-#       Operation(message: 'goodby', broadcast: true)
+#       Operation.run(message: 'goodby', broadcast: true)
 #       expect(page).to have_content("The server says 'goodby'!")
 #     end
 #
@@ -197,10 +197,10 @@ end
 #       OperationPolicy.dispatch_to { ['Application'] if params.broadcast }
 #       mount 'Test'
 #       expect(page).to have_content('No messages yet')
-#       Operation(message: 'hello')
+#       Operation.run(message: 'hello')
 #       wait_for_ajax
 #       expect(page).not_to have_content("The server says 'hello'!", wait: 0)
-#       Operation(message: 'goodby', broadcast: true)
+#       Operation.run(message: 'goodby', broadcast: true)
 #       expect(page).to have_content("The server says 'goodby'!")
 #     end
 #
@@ -215,7 +215,7 @@ end
 #       ApplicationPolicy.always_dispatch_from(Operation)
 #       mount 'Test'
 #       expect(page).to have_content('No messages yet')
-#       Operation(message: 'hello')
+#       Operation.run(message: 'hello')
 #       expect(page).to have_content("The server says 'hello'!")
 #     end
 #   end

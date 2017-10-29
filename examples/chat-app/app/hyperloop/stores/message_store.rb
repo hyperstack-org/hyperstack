@@ -7,17 +7,17 @@ class MessageStore < Hyperloop::Store
   end
 
   receives Operations::Join do |params|
-    puts "receiving Operations::Join(#{params})"
+    puts "receiving Operations::Join.run(#{params})"
     mutate.user_name params.user_name
   end
 
   receives Operations::GetMessages do |params|
-    puts "receiving Operations::GetMessages(#{params})"
+    puts "receiving Operations::GetMessages.run(#{params})"
     mutate.messages params.messages
   end
 
   receives Operations::Send do |params|
-    puts "receiving Operations::Send(#{params})"
+    puts "receiving Operations::Send.run(#{params})"
     mutate.messages << params.message
   end
 end

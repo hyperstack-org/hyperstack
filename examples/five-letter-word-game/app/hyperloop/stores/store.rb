@@ -51,9 +51,9 @@ class Store < Hyperloop::Store
   end
 
   receives Ops::Join do |params|
-    puts "receiving Ops::Join(#{params})"
+    puts "receiving Ops::Join.run(#{params})"
     if state.their_id && params.sender != my_id
-      Ops::ShareState(
+      Ops::ShareState.run(
         guesses: state.guesses,
         word: state.word,
         current_guesser: state.current_guesser,
@@ -67,7 +67,7 @@ class Store < Hyperloop::Store
   end
 
   receives Ops::ShareState do |params|
-    puts "receiving Ops::ShareState(#{params})"
+    puts "receiving Ops::ShareState.run(#{params})"
     if params.sender != my_id
       params.guesses.each { |player, guesses| mutate.guesses[player] = guesses }
       mutate.word params.word
@@ -78,25 +78,25 @@ class Store < Hyperloop::Store
   end
 
   receives Ops::ReadyToPlay do |params|
-    puts "receiving Ops::ReadyToPlay(#{params})"
+    puts "receiving Ops::ReadyToPlay.run(#{params})"
     mutate.current_guesser params.sender unless state.current_guesser
     mutate.word[params.sender] = params.word
   end
 
   receives Ops::ChangeWord do |params|
-    puts "receiving Ops::ChangeWord(#{params})"
+    puts "receiving Ops::ChangeWord.run(#{params})"
     mutate.word[params.sender] = nil
     mutate.current_guesser nil if params.sender == state.current_guesser
   end
 
   receives Ops::Guess do |params|
-    puts "receiving Ops::Guess(#{params})"
+    puts "receiving Ops::Guess.run(#{params})"
     mutate.current_guess params.word
     mutate.message({})
   end
 
   receives Ops::Clue do |params|
-    puts "receiving Ops::Clue(#{params})"
+    puts "receiving Ops::Clue.run(#{params})"
     mutate.guesses[params.other_player] << [state.current_guess, params.true_count]
     if params.true_count == params.correct
       mutate.current_guesser params.sender
@@ -110,7 +110,7 @@ class Store < Hyperloop::Store
   end
 
   receives Ops::YouWin do |params|
-    puts "receiving Ops::YouWin(#{params})"
+    puts "receiving Ops::YouWin.run(#{params})"
     mutate.winner params.other_player
     mutate.message[my_id] = params.message
   end

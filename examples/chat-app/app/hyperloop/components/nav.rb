@@ -15,7 +15,7 @@ class Nav < Hyperloop::Component
                 mutate.user_name_input e.target.value
               end
               button.btn.btn_default(type: :button) { "login!" }.on(:click) do
-                Operations::Join(user_name: state.user_name_input)
+                Operations::Join.run(user_name: state.user_name_input)
               end if valid_new_input?
             end
           end

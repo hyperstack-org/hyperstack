@@ -9,9 +9,9 @@ class Hello < Hyperloop::Component
   render(DIV) do
     DIV { "Hello! The time is #{state.time}." }
     DIV { INPUT(id: :message1); BUTTON { "send"}
-    .on(:click) { SendToAll(message: Element['#message1'].value) } }
+    .on(:click) { SendToAll.run(message: Element['#message1'].value) } }
     DIV { INPUT(id: :message2); BUTTON { "send2"}
-    .on(:click) { Operations::NestedSendToAll(message: Element['#message2'].value) } }
+    .on(:click) { Operations::NestedSendToAll.run(message: Element['#message2'].value) } }
     if Messages.all.count == 0
       DIV { "No Messages" }
     else
