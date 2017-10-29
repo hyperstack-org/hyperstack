@@ -124,6 +124,8 @@ module Hyperloop
   def self.on_server?
     if !Rails.const_defined?('Console') || Rails.const_defined?('Puma') || Rails.const_defined?('Server')
       true
+    elsif Rails.const_defined?('Console')
+      false
     else
       Rails.logger.warn "Warning: You may encounter performance problems, because your server is currently not known.\n" +
         'Please open a server support ticket at http://github.com/ruby-hyperloop/hyper-operation.'
