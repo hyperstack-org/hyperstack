@@ -88,5 +88,9 @@ module Hyperloop
         '# SERVER ONLY'
       end
     end
+
+    Hyperloop.define_setting(:compress_system_assets, true) do
+       puts "INFO: The configuration option 'compress_assets' is no longer used."}
+    end
   end
 end
