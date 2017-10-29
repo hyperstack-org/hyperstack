@@ -50,4 +50,5 @@ bower.json
 *.gem
 
 .idea
+.vscode
 *.iml
