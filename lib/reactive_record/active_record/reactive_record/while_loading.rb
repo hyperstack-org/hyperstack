@@ -236,7 +236,7 @@ module React
 
   end
 
-  module ::Hyperloop
+  module Hyperloop
     class Component
       module Mixin
 
