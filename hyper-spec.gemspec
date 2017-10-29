@@ -29,9 +29,9 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.require_paths = ['lib']
 
   spec.add_dependency 'capybara'
+  spec.add_dependency 'chromedriver-helper'
   spec.add_dependency 'opal', '~> 0.10.5'
   spec.add_dependency 'parser'
-  spec.add_dependency 'poltergeist', '>= 1.16.0'
   spec.add_dependency 'pry'
   spec.add_dependency 'rspec-rails'
   spec.add_dependency 'selenium-webdriver', '~> 3.6.0'
@@ -42,7 +42,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'hyper-react', '0.15.3'
+  spec.add_development_dependency 'hyper-react', '0.15.0-autobahn-a3'
   spec.add_development_dependency 'method_source'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'

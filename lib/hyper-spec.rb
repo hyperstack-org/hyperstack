@@ -1,5 +1,4 @@
 require 'capybara/rspec'
-require 'capybara/poltergeist'
 require 'opal'
 require 'selenium-webdriver'
 
@@ -46,19 +45,6 @@ end
 RSpec.configure do |_config|
   Capybara.default_max_wait_time = 10
 
-  Capybara.register_driver :poltergeist do |app|
-    options = {
-      js_errors: false, timeout: 180, inspector: true,
-      phantomjs_options: ['--load-images=no', '--ignore-ssl-errors=yes']
-    }.tap do |hash|
-      unless ENV['SHOW_LOGS']
-        hash[:phantomjs_logger] = StringIO.new
-        hash[:logger] = StringIO.new
-      end
-    end
-    Capybara::Poltergeist::Driver.new(app, options)
-  end
-
   Capybara.register_driver :chrome do |app|
     Capybara::Selenium::Driver.new(app, browser: :chrome)
   end
@@ -82,6 +68,6 @@ RSpec.configure do |_config|
     when 'ff' then :selenium_with_firebug
     when 'firefox' then :firefox
     when 'chrome' then :chrome
-    else :poltergeist
+    else :selenium_chrome_headless
     end
 end
