@@ -118,13 +118,12 @@ describe 'Hyperloop::Operation basics' do
       .to have_failed_with(Hyperloop::Operation::ValidationException)
     end
 
-    xit "can use complex Mutations filters" do
+    it "can use complex Mutations filters" do
       MyOperation.param :hash, type: Hash do
         string :a
         integer :b
       end
       expect(Store).to receive(:receiver).with(hash: {a: '1', b: 1})
-      binding.pry
       expect(MyOperation.run(hash: {a: '1', b: '1'})).to be_resolved
     end
 
@@ -185,55 +184,6 @@ describe 'Hyperloop::Operation basics' do
       expect(Store).to receive(:receiver).with({count: 2})
       expect(MyOperation.then { MyOperation.run }).to be_resolved
     end
-
-    it "can be run without the run method", js: true do
-      stub_const "Foo", Class.new
-      stub_const "Mod", Module.new
-      stub_const "Klass", Class.new
-      isomorphic do
-        class Foo
-          def call_it
-            Mod::Op2()
-          end
-          def self.call_it
-            Mod::Op2()
-          end
-        end
-        module Mod
-          class Op < Hyperloop::Operation
-            step { Op2().then { |s1| Mod::Op2().then { |s2| s1+s2 } } }
-          end
-          class Op2 < Hyperloop::Operation
-            step { "Op2()" }
-          end
-        end
-        class Klass
-          class Op < Hyperloop::Operation
-            step { Op2().then { |s1| Klass::Op2().then { |s2| s1+s2 } } }
-          end
-          class Op2 < Hyperloop::Operation
-            step { "COp2()" }
-          end
-        end
-      end
-      expect_promise(Mod::Op()).to eq("Op2()Op2()")
-      expect_promise(Foo.new.call_it).to eq("Op2()")
-      expect_promise(Foo.call_it).to eq("Op2()")
-      expect_promise(Klass::Op()).to eq("COp2()COp2()")
-      expect_promise do
-        Mod::Op()
-      end.to eq("Op2()Op2()")
-      expect_promise do
-        Foo.new.call_it
-      end.to eq("Op2()")
-      expect_promise do
-        Foo.call_it
-      end.to eq("Op2()")
-      expect_promise do
-        Klass::Op()
-      end.to eq("COp2()COp2()")
-    end
-
   end
 
   it "will use the promise returned by execute", js: true do
@@ -290,7 +240,7 @@ describe 'Hyperloop::Operation basics' do
       end
     end
     expect_evaluate_ruby("Receiver.bootcount").to eq(1)
-    evaluate_ruby("Hyperloop::Application::Boot()")
+    evaluate_ruby("Hyperloop::Application::Boot.run")
     expect_evaluate_ruby("Receiver.bootcount").to eq(2)
   end
 end
