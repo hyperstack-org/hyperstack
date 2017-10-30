@@ -146,7 +146,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
-      evaluate_ruby "MyControllerOp(data: 'hello')"
+      evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
     end
   end
@@ -191,7 +191,7 @@ describe "Transport Tests", js: true do
       sleep 0.25
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
-      evaluate_ruby "MyControllerOp(data: 'hello')"
+      evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
     end
 
@@ -265,7 +265,7 @@ describe "Transport Tests", js: true do
       sleep 0.25
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
-      evaluate_ruby "MyControllerOp(data: 'hello')"
+      evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
     end
   end
@@ -333,7 +333,7 @@ describe "Transport Tests", js: true do
       sleep 0.25
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
-      evaluate_ruby "MyControllerOp(data: 'hello')"
+      evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
     end
   end
