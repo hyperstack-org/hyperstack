@@ -71,23 +71,30 @@ describe "authorization integration", js: true do
     ApplicationController.acting_user = User.new(name: "fred")
     page.evaluate_ruby('Hyperloop.connect("TestApplication")')
     wait_for_ajax
+    # sleep a little, to make sure that on fast systems the seconds precision is covered
+    sleep 2
     model1.update_attribute(:test_attribute, 'george')
     wait_for_ajax
-    model1.attributes_on_client(page).should eq({
-      id: 1,
-      created_at: model1.created_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z'),
-      updated_at: model1.updated_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z')
-    })
+    # make sure the order of the elements in the returned hash does not fail the test
+    # make sure time zone doesn't matter, as it is about time in space
+    # we get only seconds precision, millisecs are dropped in AR adapters here, but they are in the db with pg
+    # compare only with seconds precision
+    m1_attr_cl1 = model1.attributes_on_client(page)
+    m1_attr_cl1[:id].should eq(1)
+    m1_attr_cl1[:created_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.created_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
+    m1_attr_cl1[:updated_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.updated_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
     ApplicationController.acting_user = User.new(name: "george")
     page.evaluate_ruby("Hyperloop.connect(['TestModel', #{model1.id}])")
     wait_for_ajax
+    sleep 2
     model1.update_attribute(:completed, true)
     wait_for_ajax
-    model1.attributes_on_client(page).should eq({
-      id: 1, test_attribute: "george", completed: true,
-      created_at: model1.created_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z'),
-      updated_at: model1.updated_at.localtime.strftime('%Y-%m-%dT%H:%M:%S%z')
-    })
+    m1_attr_cl2 = model1.attributes_on_client(page)
+    m1_attr_cl2[:id].should eq(1)
+    m1_attr_cl2[:test_attribute].should eq("george")
+    m1_attr_cl2[:completed].should eq(true)
+    m1_attr_cl2[:created_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.created_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
+    m1_attr_cl2[:updated_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.updated_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
   end
 
   it "will fail on illegal class connections" do
