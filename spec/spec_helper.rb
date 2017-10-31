@@ -132,7 +132,6 @@ if RUBY_ENGINE != 'opal'
   require 'capybara/rspec'
   require 'capybara/rails'
   require 'support/component_helpers'
-  require 'capybara/poltergeist'
   require 'selenium-webdriver'
 
   module React
@@ -274,17 +273,6 @@ if RUBY_ENGINE != 'opal'
       Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
     end
 
-    options = {
-      js_errors: false,
-      timeout: 180,
-      inspector: true,
-      phantomjs_options: ['--load-images=no', '--ignore-ssl-errors=yes']
-    }
-    options.merge!({phantomjs_logger: StringIO.new, logger: StringIO.new,}) unless ENV['SHOW_LOGS']
-    Capybara.register_driver :poltergeist do |app|
-      Capybara::Poltergeist::Driver.new(app, options)
-    end
-
     class Selenium::WebDriver::Firefox::Profile
 
       def self.firebug_version
@@ -343,7 +331,7 @@ if RUBY_ENGINE != 'opal'
       Capybara::Selenium::Driver.new(app, :browser => :firefox, :profile => profile)
     end
 
-    Capybara.javascript_driver = :poltergeist
+    Capybara.javascript_driver = :selenium_chrome_headless
 
     Capybara.register_driver :chrome do |app|
       Capybara::Selenium::Driver.new(app, :browser => :chrome)
@@ -354,7 +342,7 @@ if RUBY_ENGINE != 'opal'
     elsif ENV['DRIVER'] == 'chrome'
       Capybara.javascript_driver = :chrome
     else
-      Capybara.javascript_driver = :poltergeist
+      Capybara.javascript_driver = :selenium_chrome_headless
     end
 
     include ComponentTestHelpers

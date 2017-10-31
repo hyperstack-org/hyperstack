@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
-gem 'mysql2' # for codeship
+gem 'pg' # for codeship
 # Use SCSS for stylesheets
 # gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
@@ -40,7 +40,7 @@ end
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console'
-  gem 'reactrb-rails-generator'
+  # gem 'reactrb-rails-generator'
   gem 'puma'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
@@ -50,11 +50,11 @@ end
 gem 'jquery-ui-rails'
 
 gem 'opal'
-gem 'react-rails', '>= 2.3.0'
+gem 'react-rails', '~> 2.3.1'
 gem 'opal-rails'
 gem 'therubyracer', platforms: :ruby
 #gem 'react-router-rails', '~> 0.13.3'
-gem 'reactrb-router'
+gem 'hyper-router'
 gem 'hyper-mesh', path: '../..'
 # gem 'hyperloop-config', path: '../../../hyperloop-config'
 # gem 'hyper-operation', path: '../../../hyper-operation'
