@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyperloop-config'
-  spec.version       = '0.15.0-autobahn-a5'
+  spec.version       = '0.15.0-autobahn-a6'
   spec.authors       = ['catmando', 'janbiedermann']
   spec.email         = ['mitch@catprint.com']
 
@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-browser'
   spec.add_dependency 'uglifier'
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a5'
+  spec.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a6'
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'opal-rails', '>= 0.9.3'
   spec.add_development_dependency 'rails', '>= 5.1.4'
