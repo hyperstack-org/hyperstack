@@ -19,11 +19,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyperloop-config', '0.15.0-autobahn-a5'
+  spec.add_dependency 'hyperloop-config', '0.15.0-autobahn-a6'
   spec.add_dependency 'opal'
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-react', '0.15.0-autobahn-a5'
-  spec.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a5'
+  spec.add_development_dependency 'hyper-react', '0.15.0-autobahn-a6'
+  spec.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a6'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-rails', '>= 0.9.3'
