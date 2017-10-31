@@ -192,16 +192,17 @@ describe 'Hyperloop::Operation basics' do
         param :wait, type: Float, min: 0
         param :result
         step do
-          Promise.new.tap { |p| after(params.wait) { p.resolve params.result } }
+          pro = Promise.new.tap { |p| after(params.wait) { p.resolve params.result } }
+          pro
         end
       end
     end
     start_time = Time.now
     expect_promise do
-      MyOperation.run(wait: 1, result: 'done')
+      MyOperation.run(wait: 1.0, result: 'done')
     end.to eq('done')
     expect(Time.now - start_time).to be >= 1
-    expect_promise(MyOperation.run(wait: 1, result: 'done')).to eq('done')
+    expect_promise(MyOperation.run(wait: 1.0, result: 'done')).to eq('done')
     expect(Time.now - start_time).to be >= 2
   end
 
