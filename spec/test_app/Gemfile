@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails'
 # Use sqlite3 as the database for Active Record
 #gem 'sqlite3'
-gem 'mysql2' # for codeship
+gem 'pg' # for codeship
 # Use SCSS for stylesheets
 # gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -51,8 +51,8 @@ end
 
 # gem 'jquery-ui-rails'
 
-gem 'react-rails', '>= 2.3.0'
-gem 'opal-rails'
+gem 'react-rails', '~> 2.3.1'
+gem 'opal-rails', '0.9.3'
 gem 'therubyracer', '>= 0.12.3', platforms: :ruby
 # gem 'react-router-rails', '~> 0.13.3'
 # gem 'reactrb-router'
