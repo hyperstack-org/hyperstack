@@ -19,7 +19,7 @@ gem 'opal-browser'
 gem 'opal-jquery'
 gem 'opal-rails'
 gem 'therubyracer', platforms: :ruby
-gem 'react-rails', '>= 2.3.0'
+gem 'react-rails', '~> 2.3.1'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
