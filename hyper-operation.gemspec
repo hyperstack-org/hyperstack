@@ -19,14 +19,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activerecord', '>= 5.1.4'
-  spec.add_dependency 'hyper-component', '0.15.0-autobahn-a5'
-  spec.add_dependency 'hyperloop-config', '0.15.0-autobahn-a5'
+  spec.add_dependency 'hyper-component', '0.15.0-autobahn-a6'
+  spec.add_dependency 'hyperloop-config', '0.15.0-autobahn-a6'
   spec.add_dependency 'mutations'
   spec.add_dependency 'opal-activesupport'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'hyper-react', '0.15.0-autobahn-a5'
-  spec.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a5'
+  spec.add_development_dependency 'hyper-react', '0.15.0-autobahn-a6'
+  spec.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a6'
   spec.add_development_dependency 'opal', '0.10.5'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
