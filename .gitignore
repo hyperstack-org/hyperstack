@@ -11,8 +11,10 @@ tmp/
 /spec/test_app/db/test.sqlite3
 /spec/test_app/log/test.log
 /spec/test_app/log/development.log
+/spec/test_app/Gemfile.lock
 /synchromesh-simple-poller-store
 /synchromesh-pusher-channel-store
+/spec/test_app/Gemfile.lock
 /Gemfile.lock
 /examples/action-cable/rails_cache_dir/
 rails_cache_dir/
