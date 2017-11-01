@@ -331,8 +331,6 @@ if RUBY_ENGINE != 'opal'
       Capybara::Selenium::Driver.new(app, :browser => :firefox, :profile => profile)
     end
 
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     Capybara.register_driver :chrome do |app|
       Capybara::Selenium::Driver.new(app, :browser => :chrome)
     end
@@ -344,6 +342,8 @@ if RUBY_ENGINE != 'opal'
     else
       Capybara.javascript_driver = :selenium_chrome_headless
     end
+
+    Capybara.javascript_driver = :selenium_chrome_headless
 
     include ComponentTestHelpers
 
