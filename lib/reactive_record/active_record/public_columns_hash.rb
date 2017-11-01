@@ -1,5 +1,5 @@
 module Hyperloop
-  define_setting :public_model_directories, ['app/hyperloop/models']
+  define_setting :public_model_directories, [File.join('app','hyperloop','models'), File.join('app','models','public')]
 end
 
 module ActiveRecord
@@ -12,18 +12,14 @@ module ActiveRecord
       Hyperloop.public_model_directories.each do |dir|
         dir_length = Rails.root.join(dir).to_s.length + 1
         Dir.glob(Rails.root.join(dir, '**', '*.rb')).each do |file|
-          require_dependency(file)
+          require_dependency(file) # still the file is loaded to make sure for development and test env
           files << file[dir_length..-4]
         end
       end
       @public_columns_hash = {}
       # descendants only works for already loaded models!
-      # in production they are eager loaded -> no problem
-      # in development this hash is always recreated, the model is loaded when its first used,
-      # probably elsewhere, before this method is called, otherwise a page reload is needed
-      # TODO: investigate, make sure all public models are loaded or info for all models is included.
       descendants.each do |model|
-        if files.include?(model.name.underscore) && model != ApplicationRecord
+        if files.include?(model.name.underscore) && model.name.underscore != 'application_record'
           @public_columns_hash[model.name] = model.columns_hash rescue nil # why rescue?
         end
       end
