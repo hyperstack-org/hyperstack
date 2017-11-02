@@ -12,7 +12,7 @@ describe 'Hyperloop::Operation execution (server side)' do
       step { params.i + 1 }
       step { |r| r + params.i }
     end
-    expect(MyOperation(i: 1).value).to eq 3
+    expect(MyOperation.run(i: 1).value).to eq 3
   end
 
   it "will chain promises" do
@@ -25,7 +25,7 @@ describe 'Hyperloop::Operation execution (server side)' do
       step { |n| params.i + n }
       step { |r| r + params.i }
     end
-    expect(MyOperation(i: 1).tap { MyOperation.promise.resolve(2) }.value).to eq 4
+    expect(MyOperation.run(i: 1).tap { MyOperation.promise.resolve(2) }.value).to eq 4
   end
 
   it "will interrupt the promise chain with async" do
@@ -39,7 +39,7 @@ describe 'Hyperloop::Operation execution (server side)' do
       step { |r| r + params.i }
       async { 'hi' }
     end
-    expect(MyOperation(i: 1).value).to eq 'hi'
+    expect(MyOperation.run(i: 1).value).to eq 'hi'
   end
 
   it "will continue running after the async" do
@@ -54,7 +54,7 @@ describe 'Hyperloop::Operation execution (server side)' do
       async { 'hi' }
       step { self.class.promise }
     end
-    expect(MyOperation(i: 1).tap { MyOperation.promise.resolve(2) }.value).to eq 2
+    expect(MyOperation.run(i: 1).tap { MyOperation.promise.resolve(2) }.value).to eq 2
   end
 
   it "will switch to the failure track on an error" do
@@ -70,7 +70,7 @@ describe 'Hyperloop::Operation execution (server side)' do
       failed { |s| raise "#{s} failure" }
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation(i: 1).tap { MyOperation.promise.resolve('x') }.error.to_s).to eq 'i am a failure'
+    expect(MyOperation.run(i: 1).tap { MyOperation.promise.resolve('x') }.error.to_s).to eq 'i am a failure'
   end
 
   it "will begin on the failure track if there are validation errors" do
@@ -86,18 +86,18 @@ describe 'Hyperloop::Operation execution (server side)' do
       failed { |s| "#{s} failure!" }
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation().tap { MyOperation.promise.resolve('x') }.error.to_s).to eq 'I is required! Looks like i am still a failure!'
+    expect(MyOperation.run.tap { MyOperation.promise.resolve('x') }.error.to_s).to eq 'I is required! Looks like i am still a failure!'
   end
 
   it "succeed! will skip to the end" do
     MyOperation.class_eval do
       step { succeed! "I succeeded at last!"}
       step { MyOperation.dont_call_me }
-      failed { MyOperation.dont_call_me}
+      failed { MyOperation.dont_call_me }
 
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation().value).to eq 'I succeeded at last!'
+    expect(MyOperation.run.value).to eq 'I succeeded at last!'
   end
 
   it "succeed! will skip to the end and succeed even on the failure track" do
@@ -105,11 +105,11 @@ describe 'Hyperloop::Operation execution (server side)' do
       step { fail }
       failed { succeed! "I still can succeed!"}
       step { MyOperation.dont_call_me }
-      failed { MyOperation.dont_call_me}
+      failed { MyOperation.dont_call_me }
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation().value).to eq 'I still can succeed!'
-    expect(MyOperation()).to be_resolved
+    expect(MyOperation.run.value).to eq 'I still can succeed!'
+    expect(MyOperation.run).to be_resolved
   end
 
   it "abort! will skip to the end with a failure" do
@@ -119,27 +119,27 @@ describe 'Hyperloop::Operation execution (server side)' do
       failed { MyOperation.dont_call_me}
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation().error.result).to eq 'Pride cometh before the fall!'
+    expect(MyOperation.run.error.result).to eq 'Pride cometh before the fall!'
   end
 
   it "if abort! is given an exception it will return that exception" do
     MyOperation.class_eval do
       step { abort! Exception.new("okay okay okay")}
       step { MyOperation.dont_call_me }
-      failed { MyOperation.dont_call_me}
+      failed { MyOperation.dont_call_me }
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation().error.to_s).to eq 'okay okay okay'
+    expect(MyOperation.run.error.to_s).to eq 'okay okay okay'
   end
 
   it "can chain an exception after returning" do
     MyOperation.class_eval do
       step { abort! Exception.new("okay okay okay")}
       step { MyOperation.dont_call_me }
-      failed { MyOperation.dont_call_me}
+      failed { MyOperation.dont_call_me }
     end
     expect(MyOperation).not_to receive(:dont_call_me)
-    expect(MyOperation().fail { |e| raise "pow" }.error.to_s).to eq 'pow'
+    expect(MyOperation.run.fail { |e| raise "pow" }.error.to_s).to eq 'pow'
   end
 
   it "can define the step, async and failed callbacks many ways" do
@@ -172,7 +172,7 @@ describe 'Hyperloop::Operation execution (server side)' do
       failed { succeed! }
     end
     expect(MyOperation).to receive(:say_hello).exactly(15).times
-    expect(MyOperation(xxx: 123)).to be_resolved
+    expect(MyOperation.run(xxx: 123)).to be_resolved
   end
 
   it "can define class level callbacks" do
