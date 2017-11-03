@@ -58,14 +58,14 @@ module Hyperloop
     extend AutoCreate
 
     def self.build_tables
-      create_table(force: true) do |t|
+      create_table(force: :cascade) do |t|
         t.string   :channel
         t.string   :session
         t.datetime :created_at
         t.datetime :expires_at
         t.datetime :refresh_at
       end
-      QueuedMessage.create_table(force: true) do |t|
+      QueuedMessage.create_table(force: :cascade) do |t|
         t.text    :data
         t.integer :connection_id
       end
