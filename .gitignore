@@ -40,3 +40,4 @@ Gemfile.lock
 
 # ignore IDE files
 .idea
+.vscode
