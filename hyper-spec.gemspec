@@ -59,5 +59,5 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec'
-  spec.add_development_dependency 'therubyracer', '>= 0.12.3'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.14'
 end
