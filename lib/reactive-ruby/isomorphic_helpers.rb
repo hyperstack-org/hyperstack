@@ -197,7 +197,7 @@ module React
 
       if RUBY_ENGINE != 'opal'
         def isomorphic_method(name, &block)
-          React::IsomorphicHelpers::Context.send(:define_isomorphic_method, self, name) do |args_as_json|
+          React::IsomorphicHelpers::Context.send(:define_isomorphic_method, name, self) do |args_as_json|
             React::IsomorphicHelpers::IsomorphicProcCall.new(name, block, self, *JSON.parse(args_as_json)).result
           end
         end
