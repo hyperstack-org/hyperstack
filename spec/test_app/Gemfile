@@ -12,7 +12,7 @@ gem 'mysql2' # for codeship
 # Use CoffeeScript for .coffee assets and views
 # gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
+# gem 'mini_racer', platforms: :ruby
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -53,7 +53,7 @@ end
 
 gem 'react-rails', '~> 2.3.1'
 gem 'opal-rails', '0.9.3'
-gem 'therubyracer', '>= 0.12.3', platforms: :ruby
+gem 'mini_racer', '~> 0.1.14', platforms: :ruby
 # gem 'react-router-rails', '~> 0.13.3'
 # gem 'reactrb-router'
 gem 'hyper-operation', path: '../..'

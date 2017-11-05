@@ -37,7 +37,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pusher-fake'
   spec.add_development_dependency 'rails', '>= 5.1.4'
   spec.add_development_dependency 'rake'
-  # temporary
   spec.add_development_dependency 'react-rails', '~> 2.3.1'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rspec-steps'
