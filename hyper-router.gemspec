@@ -46,7 +46,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'sinatra'
   s.add_development_dependency 'spring-commands-rspec'
   s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'therubyracer', '>= 0.12.3'
+  s.add_development_dependency 'mini_racer', '~> 0.1.14'
   s.add_development_dependency 'timecop', '~> 0.8.1'
   s.add_development_dependency 'unparser'
 end
