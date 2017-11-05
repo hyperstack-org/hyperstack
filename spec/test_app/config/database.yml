@@ -27,8 +27,9 @@
 #   database: production_db_name
 
 default: &default
-  adapter: postgresql
+  adapter: mysql2
   encoding: utf8
+  username: root
 
 development:
   <<: *default
