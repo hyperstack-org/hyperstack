@@ -95,8 +95,9 @@ module React
       attr_reader :controller
       attr_reader :unique_id
 
-      def self.define_isomorphic_method(method_name, the_self, &block)
-        @ctx.attach("ServerSideIsomorphicMethod.#{the_self.name}.#{method_name}", block)
+      def self.define_isomorphic_method(method_name, &block)
+        @@ctx_methods ||= []
+        @@ctx_methods << [method_name, block]
         define_method(method_name, block)
       end
 
@@ -113,6 +114,9 @@ module React
         if RUBY_ENGINE != 'opal'
           @controller = controller
           @ctx = ctx
+          @@ctx_methods.each do |ctxm|
+            @ctx.attach("ServerSideIsomorphicMethod.#{ctxm[0]}", ctxm[1])
+          end
           send_to_opal(:load_context, @unique_id, name)
         end
         Hyperloop::Application::Boot.run(context: self)
@@ -197,7 +201,7 @@ module React
 
       if RUBY_ENGINE != 'opal'
         def isomorphic_method(name, &block)
-          React::IsomorphicHelpers::Context.send(:define_isomorphic_method, name, self) do |args_as_json|
+          React::IsomorphicHelpers::Context.send(:define_isomorphic_method, name) do |args_as_json|
             React::IsomorphicHelpers::IsomorphicProcCall.new(name, block, self, *JSON.parse(args_as_json)).result
           end
         end
