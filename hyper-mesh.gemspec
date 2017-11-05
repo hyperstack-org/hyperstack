@@ -24,14 +24,14 @@ Gem::Specification.new do |s|
   s.require_paths  = ['lib']
 
   s.add_dependency 'activerecord', '>= 5.1.4'
-  s.add_dependency 'hyper-component', '0.15.0-autobahn-a6'
-  s.add_dependency 'hyper-operation', '0.15.0-autobahn-a6'
+  s.add_dependency 'hyper-component', '0.15.0-autobahn-a8'
+  s.add_dependency 'hyper-operation', '0.15.0-autobahn-a8'
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'capybara'
   s.add_development_dependency 'chromedriver-helper'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'factory_girl_rails'
-  s.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a6'
+  s.add_development_dependency 'hyper-spec', '0.15.0-autobahn-a8'
   s.add_development_dependency 'hyper-trace'
   s.add_development_dependency 'jquery-rails'
   s.add_development_dependency 'mysql2'
