@@ -18,7 +18,7 @@ gem 'opal'
 gem 'opal-browser'
 gem 'opal-jquery'
 gem 'opal-rails'
-gem 'therubyracer', platforms: :ruby
+gem 'mini_racer', platforms: :ruby
 gem 'react-rails', '~> 2.3.1'
 
 group :development, :test do
