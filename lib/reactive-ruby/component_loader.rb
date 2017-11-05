@@ -23,8 +23,8 @@ module ReactiveRuby
     end
 
     def loaded?
-      !!v8_context.eval('Opal.React')
-    rescue ::V8::Error
+      !!v8_context.eval('Opal.React !== undefined')
+    rescue ::ExecJS::Error
       false
     end
 

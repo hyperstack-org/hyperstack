@@ -93,11 +93,6 @@ if ruby?
     end
 
     describe '#initialize' do
-      it "sets the given V8 context's ServerSideIsomorphicMethods to itself" do
-        context = described_class.new('unique-id', v8_context, controller, name)
-        expect(v8_context['ServerSideIsomorphicMethods']).to eq(context)
-      end
-
       it 'calls before mount callbacks' do
         string = instance_double(String)
         described_class.register_before_first_mount_block do
@@ -118,7 +113,7 @@ if ruby?
     end
 
     describe '#send_to_opal' do
-      let(:opal_code) { Opal::Builder.new.build_str(ruby_code, __FILE__) }
+      let(:opal_code) { Opal::Builder.new.build_str(ruby_code, __FILE__).to_s }
       let(:ruby_code) { %Q[
         module React::IsomorphicHelpers
           def self.greet(name)

@@ -34,6 +34,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'therubyracer', '>= 0.12.3'
+  s.add_development_dependency 'mini_racer', '~> 0.1.14'
   s.add_development_dependency 'timecop', '~> 0.8.1'
 end

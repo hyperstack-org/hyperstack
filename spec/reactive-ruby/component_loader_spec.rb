@@ -35,7 +35,7 @@ RSpec.describe ReactiveRuby::ComponentLoader do
 
       expect {
         loader.load('components')
-      }.to change { !!v8_context.eval('Opal.React') }.from(false).to(true)
+      }.to change { !!v8_context.eval('Opal.React !== undefined') }.from(false).to(true)
     end
 
     it 'is truthy upon successful load' do
