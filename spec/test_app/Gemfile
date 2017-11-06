@@ -50,7 +50,7 @@ end
 gem 'jquery-ui-rails'
 
 gem 'opal'
-gem 'react-rails', '~> 2.3.1'
+gem 'react-rails', '~> 2.4.0'
 gem 'opal-rails'
 gem 'mini_racer', platforms: :ruby
 #gem 'react-router-rails', '~> 0.13.3'
