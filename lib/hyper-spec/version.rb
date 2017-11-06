@@ -1,3 +1,3 @@
 module HyperSpec
-  VERSION = '0.15.0-autobahn-a8'
+  VERSION = '0.15.0-sachsenring-lap2'
 end
