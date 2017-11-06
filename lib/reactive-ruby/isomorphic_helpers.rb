@@ -114,8 +114,10 @@ module React
         if RUBY_ENGINE != 'opal'
           @controller = controller
           @ctx = ctx
-          @@ctx_methods.each do |method_name, block|
-            @ctx.attach("ServerSideIsomorphicMethod.#{method_name}", block)
+          if defined? @@ctx_methods
+            @@ctx_methods.each do |method_name, block|
+              @ctx.attach("ServerSideIsomorphicMethod.#{method_name}", block)
+            end
           end
           send_to_opal(:load_context, @unique_id, name)
         end
@@ -127,11 +129,11 @@ module React
         @ctx.eval(js) if @ctx
       end
 
-      def send_to_opal(method, *args)
+      def send_to_opal(method_name, *args)
         return unless @ctx
         args = [1] if args.length == 0
         ::ReactiveRuby::ComponentLoader.new(@ctx).load!
-        @ctx.eval("Opal.React.$const_get('IsomorphicHelpers').$#{method}(#{args.collect { |arg| "'#{arg}'"}.join(', ')})")
+        @ctx.eval("Opal.React.$const_get('IsomorphicHelpers').$#{method_name}(#{args.collect { |arg| "'#{arg}'"}.join(', ')})")
       end
 
       def self.register_before_first_mount_block(&block)
