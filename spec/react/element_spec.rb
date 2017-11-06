@@ -60,9 +60,9 @@ describe React::Element, type: :component do
 
     it 'will subscribe to a native components event param' do
       %x{
-        window.NativeComponent = React.createClass({
+        window.NativeComponent = class extends React.Component({
           displayName: "HelloMessage",
-          render: function render() {
+          render() {
             return React.createElement("span", null, this.props.onEvent());
           }
         })
