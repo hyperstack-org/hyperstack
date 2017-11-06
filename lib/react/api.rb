@@ -46,43 +46,48 @@ module React
       render_fn = (type.method_defined? :_render_wrapper) ? :_render_wrapper : :render
       # this was hashing type.to_s, not sure why but .to_s does not work as it Foo::Bar::View.to_s just returns "View"
       @@component_classes[type] ||= %x{
-        React.createClass({
-          displayName: #{type.name},
-          propTypes: #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`},
-          getDefaultProps: function(){
+        class extends React.Component {
+          constructor(props) {
+            super(props);
+            this.displayName = #{type.name};
+            this.mixins = #{type.respond_to?(:native_mixins) ? type.native_mixins : `[]`};
+            this.statics = #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`};
+          }
+          static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
-          },
-          mixins: #{type.respond_to?(:native_mixins) ? type.native_mixins : `[]`},
-          statics: #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`},
-          componentWillMount: function() {
+          }
+          /* static get propTypes() {
+            return  #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`};
+          } */
+          componentWillMount() {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_will_mount if type.method_defined? :component_will_mount};
-          },
-          componentDidMount: function() {
+          }
+          componentDidMount() {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_did_mount if type.method_defined? :component_did_mount};
-          },
-          componentWillReceiveProps: function(next_props) {
+          }
+          componentWillReceiveProps(next_props) {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_will_receive_props(Hash.new(`next_props`)) if type.method_defined? :component_will_receive_props};
-          },
-          shouldComponentUpdate: function(next_props, next_state) {
+          }
+          shouldComponentUpdate(next_props, next_state) {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.should_component_update?(Hash.new(`next_props`), Hash.new(`next_state`)) if type.method_defined? :should_component_update?};
-          },
-          componentWillUpdate: function(next_props, next_state) {
+          }
+          componentWillUpdate(next_props, next_state) {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_will_update(Hash.new(`next_props`), Hash.new(`next_state`)) if type.method_defined? :component_will_update};
-          },
-          componentDidUpdate: function(prev_props, prev_state) {
+          }
+          componentDidUpdate(prev_props, prev_state) {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_did_update(Hash.new(`prev_props`), Hash.new(`prev_state`)) if type.method_defined? :component_did_update};
-          },
-          componentWillUnmount: function() {
+          }
+          componentWillUnmount() {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_will_unmount if type.method_defined? :component_will_unmount};
-          },
-          _getOpalInstance: function() {
+          }
+          _getOpalInstance() {
             if (this.__opalInstance == undefined) {
               var instance = #{type.new(`this`)};
             } else {
@@ -90,12 +95,12 @@ module React
             }
             this.__opalInstance = instance;
             return instance;
-          },
-          render: function() {
+          }
+          render() {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.send(render_fn).to_n};
           }
-        })
+        }
       }
     end
 
