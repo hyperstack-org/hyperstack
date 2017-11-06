@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency 'hyper-store', '0.15.0-autobahn-a8'
+  s.add_dependency 'hyper-store', '0.15.0-sachsenring-lap2'
   s.add_dependency 'opal'
   s.add_dependency 'opal-activesupport'
 
@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rails', '>= 5.1.4'
   s.add_development_dependency 'rails-controller-testing'
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'react-rails', '~> 2.3.1'
+  s.add_development_dependency 'react-rails', '~> 2.4.0'
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'sqlite3'
