@@ -96,8 +96,8 @@ module React
       attr_reader :unique_id
 
       def self.define_isomorphic_method(method_name, &block)
-        @@ctx_methods ||= []
-        @@ctx_methods << [method_name, block]
+        @@ctx_methods ||= {}
+        @@ctx_methods[method_name] = block
         define_method(method_name, block)
       end
 
@@ -114,8 +114,8 @@ module React
         if RUBY_ENGINE != 'opal'
           @controller = controller
           @ctx = ctx
-          @@ctx_methods.each do |ctxm|
-            @ctx.attach("ServerSideIsomorphicMethod.#{ctxm[0]}", ctxm[1])
+          @@ctx_methods.each do |method_name, block|
+            @ctx.attach("ServerSideIsomorphicMethod.#{method_name}", block)
           end
           send_to_opal(:load_context, @unique_id, name)
         end
