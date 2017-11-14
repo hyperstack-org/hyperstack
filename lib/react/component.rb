@@ -70,20 +70,20 @@ module Hyperloop
       def component_will_receive_props(next_props)
         # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
         # for now we are just using it to clear processed_params
-        React::State.set_state_context_to(self) { self.run_callback(:before_receive_props, Hash.new(next_props)) }
+        React::State.set_state_context_to(self) { self.run_callback(:before_receive_props, next_props) }
       rescue Exception => e
         self.class.process_exception(e, self)
       end
 
       def component_will_update(next_props, next_state)
-        React::State.set_state_context_to(self) { self.run_callback(:before_update, Hash.new(next_props), Hash.new(next_state)) }
+        React::State.set_state_context_to(self) { self.run_callback(:before_update, next_props, next_state) }
       rescue Exception => e
         self.class.process_exception(e, self)
       end
 
       def component_did_update(prev_props, prev_state)
         React::State.set_state_context_to(self) do
-          self.run_callback(:after_update, Hash.new(prev_props), Hash.new(prev_state))
+          self.run_callback(:after_update, prev_props, prev_state)
           React::State.update_states_to_observe
         end
       rescue Exception => e
