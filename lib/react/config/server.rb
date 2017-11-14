@@ -18,6 +18,6 @@ if RUBY_ENGINE != 'opal'
     end
   end
   module Hyperloop
-    define_setting :prerendering, :on
+    define_setting :prerendering, :off
   end
 end
