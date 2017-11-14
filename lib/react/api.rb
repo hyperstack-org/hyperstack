@@ -73,7 +73,7 @@ module React
           }
           shouldComponentUpdate(next_props, next_state) {
             var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.should_component_update?(Hash.new(`next_props`), Hash.new(`next_state`)) if type.method_defined? :should_component_update?};
+            return #{`instance`.should_component_update?(`Opal.hash(next_props !== null ? next_props : {})`, `Opal.hash(next_state !== null ? next_state : {})`) if type.method_defined? :should_component_update?};
           }
           componentWillUpdate(next_props, next_state) {
             var instance = this._getOpalInstance.apply(this);

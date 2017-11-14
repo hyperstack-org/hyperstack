@@ -25,7 +25,7 @@ module React
     module ShouldComponentUpdate
       def should_component_update?(native_next_props, native_next_state)
         State.set_state_context_to(self, false) do
-          next_params = Hash.new(native_next_props)
+          next_params = native_next_props.clone
           # rubocop:disable Style/DoubleNegation # we must return true/false to js land
           if respond_to?(:needs_update?)
             !!call_needs_update(next_params, native_next_state)
@@ -65,6 +65,7 @@ module React
 
       # rubocop:disable Metrics/MethodLength # for effeciency we want this to be one method
       def native_state_changed?(next_state)
+        next_state = next_state_hash.to_n
         %x{
           var current_state = #{@native}.state
           var normalized_next_state =
