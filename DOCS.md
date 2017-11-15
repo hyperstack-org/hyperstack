@@ -1468,7 +1468,7 @@ There are also good tutorials on integrating Webpack with existing rails apps a 
 
  ```ruby
  Hyperloop.configuration do |config|
-   config.prerendering = :off # :on by default
+   config.prerendering = :on # :off by default
  end
  ```
 
