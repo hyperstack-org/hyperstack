@@ -35,9 +35,6 @@ module React
 
       # define each predefined tag as an instance method
 
-
-
-
       HTML_TAGS.each do |tag|
         if tag == 'p'
           define_method(tag) do |*params, &children|
