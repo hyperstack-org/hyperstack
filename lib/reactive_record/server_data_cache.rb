@@ -1,5 +1,3 @@
-require 'stackprof'
-
 module ReactiveRecord
 
   # the point is to collect up a all records needed, with whatever attributes were required + primary key, and inheritance column
