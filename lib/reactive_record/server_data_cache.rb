@@ -1,3 +1,5 @@
+require 'stackprof'
+
 module ReactiveRecord
 
   # the point is to collect up a all records needed, with whatever attributes were required + primary key, and inheritance column
@@ -100,9 +102,13 @@ module ReactiveRecord
           root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
           vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
           vector[0] = vector[0].constantize
-          new_items = @cache.select { | cache_item | cache_item.root == root }
-          @requested_cache_items += new_items
-          new_items.last.value if new_items.last
+          last_value = nil
+          @cache.each do | cache_item |
+            next if cache_item.root != root || @requested_cache_items.include?(cache_item)
+            @requested_cache_items << cache_item 
+            last_value = cache_item
+          end
+          last_value
         end
 
         def self.[](models, associations, vectors, acting_user)
