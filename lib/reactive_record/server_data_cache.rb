@@ -109,14 +109,14 @@ module ReactiveRecord
           last_value
         end
 
-        def self.[](models, associations, vectors, acting_user)
+        def self.[](models, associations, vectors, acting_user)   
           ActiveRecord::Base.public_columns_hash
           result = nil
           ActiveRecord::Base.transaction do
             cache = new(acting_user, ReactiveRecord::Base.save_records(models, associations, acting_user, false, false))
             vectors.each { |vector| cache[*vector] }
             result = cache.as_json
-            raise ActiveRecord::Rollback
+            raise ActiveRecord::Rollback, "This Rollback is intentional!"
           end
           result
         end
@@ -191,14 +191,14 @@ module ReactiveRecord
                 elsif aggregation = cache_item.aggregation?(method)
                   cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
                 else
-                  begin
-                    cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
-                  rescue Exception => e
-                    if cache_item.value and cache_item.value != []
+                  if cache_item.value.nil? || cache_item.value == []
+                    representative
+                  else
+                    begin
+                      cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
+                    rescue Exception => e
                       ReactiveRecord::Pry::rescued(e)
                       raise e, "ReactiveRecord exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
-                    else
-                      representative
                     end
                   end
                 end
