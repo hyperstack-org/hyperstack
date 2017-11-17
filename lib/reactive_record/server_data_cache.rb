@@ -191,14 +191,14 @@ module ReactiveRecord
                 elsif aggregation = cache_item.aggregation?(method)
                   cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
                 else
-                  if cache_item.value.nil? || cache_item.value == []
-                    representative
-                  else
-                    begin
-                      cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
-                    rescue Exception => e
+                  begin
+                    cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
+                  rescue Exception => e
+                    if cache_item.value and cache_item.value != []
                       ReactiveRecord::Pry::rescued(e)
                       raise e, "ReactiveRecord exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
+                    else
+                      representative
                     end
                   end
                 end
