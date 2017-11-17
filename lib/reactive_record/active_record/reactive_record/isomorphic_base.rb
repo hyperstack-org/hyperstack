@@ -465,7 +465,7 @@ module ReactiveRecord
 
           else
 
-            vectors.each { |vector, model| model.reload unless model.nil? or model.new_record? or model.frozen? }
+            # vectors.each { |vector, model| model.reload unless model.nil? or model.new_record? or model.frozen? }
             vectors
 
           end
