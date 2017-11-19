@@ -18,7 +18,7 @@ gem 'opal-browser'
 gem 'opal-jquery'
 gem 'opal-rails', '~> 0.9.3'
 gem 'mini_racer', platforms: :ruby
-gem 'react-rails', '~> 2.4.0'
+gem 'react-rails', '>= 2.3.0', '< 2.5.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
