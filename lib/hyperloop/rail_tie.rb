@@ -11,11 +11,18 @@ module Hyperloop
         Rails.configuration.tap do |config|
           if on
             config.eager_load_paths += %W(#{config.root}/app/hyperloop/models)
-            config.autoload_paths += %W(#{config.root}/app/hyperloop/models)
-            # config.eager_load_paths += %W(#{config.root}/app/hyperloop/stores)
-            # config.autoload_paths += %W(#{config.root}/app/hyperloop/stores)
             config.eager_load_paths += %W(#{config.root}/app/hyperloop/operations)
-            config.autoload_paths += %W(#{config.root}/app/hyperloop/operations)
+            # rails will add everything immediately below app to eager and auto load, so we need to remove it
+            delete_first config.eager_load_paths, "#{config.root}/app/hyperloop"
+
+            unless Rails.env.production?
+              config.autoload_paths += %W(#{config.root}/app/hyperloop/models)
+              # config.eager_load_paths += %W(#{config.root}/app/hyperloop/stores)
+              # config.autoload_paths += %W(#{config.root}/app/hyperloop/stores)
+              
+              config.autoload_paths += %W(#{config.root}/app/hyperloop/operations)
+              delete_first config.autoload_paths, "#{config.root}/app/hyperloop"
+            end
 
             config.assets.paths.unshift ::Rails.root.join('app', 'hyperloop').to_s
          else
@@ -53,8 +60,8 @@ module Hyperloop
           config.react.server_renderer_options = FILES
         end
       end
-      app.assets.find_asset('hyperloop-prerender-loader-system')
-      app.assets.find_asset('hyperloop-loader-system')
+      #app.assets.find_asset('hyperloop-prerender-loader-system')
+      #app.assets.find_asset('hyperloop-loader-system')
     end
   end
 end
