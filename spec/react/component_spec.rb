@@ -456,7 +456,7 @@ describe React::Component, type: :component do
         %x{
           var log = [];
           var org_warn_console = window.console.warn;
-          var org_error_console = window.console.error
+          var org_error_console = window.console.error;
           window.console.warn = window.console.error = function(str){log.push(str)}
         }
         renderToDocument(Foo, foo: 10, bar: '10', lorem: Lorem.new)
@@ -496,7 +496,7 @@ describe React::Component, type: :component do
       %x{
         var log = [];
         var org_warn_console = window.console.warn;
-        var org_error_console = window.console.error
+        var org_error_console = window.console.error;
         window.console.warn = window.console.error = function(str){log.push(str)}
       }
       renderToDocument(foo)
@@ -510,7 +510,7 @@ describe React::Component, type: :component do
       %x{
         window.test_log = [];
         window.org_warn_console = window.console.warn;
-        window.org_error_console = window.console.error
+        window.org_error_console = window.console.error;
         window.console.warn = window.console.error = function(str){window.test_log.push(str)}
       }
     end
