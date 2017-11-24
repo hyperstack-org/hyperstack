@@ -50,9 +50,9 @@ end
 # gem 'jquery-ui-rails'
 
 
-gem 'react-rails', '~> 2.4.0'
-gem 'hyper-react' #, path: '../../../hyper-react'
-gem 'hyper-store' #, path: '../../../hyper-store'
+gem 'react-rails', '>= 2.3.0', '< 2.5.0'
+gem 'hyper-react', '0.15.0-sachsenring-lap2' #, path: '../../../hyper-react'
+gem 'hyper-store', '0.15.0-sachsenring-lap2' #, path: '../../../hyper-store'
 gem 'hike'
 gem 'opal-rails'
 gem 'parser'
