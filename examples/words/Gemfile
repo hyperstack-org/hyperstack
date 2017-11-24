@@ -51,7 +51,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'hyper-react'
 gem 'opal-browser'
-gem 'react-rails', '~> 2.4.0'
+gem 'react-rails', '>= 2.3.0', '< 2.5.0'
 gem 'opal-rails', '>= 0.8.1'
 gem 'mini_racer', platforms: :ruby
 gem 'react-router-rails', '~> 0.13.3'

@@ -50,7 +50,7 @@ end
 gem 'jquery-ui-rails'
 
 gem 'opal'
-gem 'react-rails', '~> 2.4.0'
+gem 'react-rails', '>= 2.3.0', '< 2.5.0'
 gem 'opal-rails'
 gem 'mini_racer', platforms: :ruby
 #gem 'react-router-rails', '~> 0.13.3'
@@ -62,3 +62,4 @@ gem 'hyper-mesh', path: '../..'
 # gem 'hyper-react', path: '../../../hyper-react'
 # gem 'hyper-store', path: '../../../hyper-store'
 gem 'opal-browser'
+gem 'rspec-rails'
