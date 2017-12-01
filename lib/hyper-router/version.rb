@@ -1,3 +1,3 @@
 module HyperRouter
-  VERSION = '4.2.6-sachsenring-lap5'
+  VERSION = '4.2.6-lap6'
 end
