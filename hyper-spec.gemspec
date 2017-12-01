@@ -2,28 +2,26 @@
 lib = File.expand_path('../lib/', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'hyper-spec/version'
+require '../hyperloop/lib/hyperloop/version'
+GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.name          = 'hyper-spec'
   spec.version       = HyperSpec::VERSION
-  spec.authors       = ['catmando', 'adamcreekroad', 'janbiedermann']
-  spec.email         = ['mitch@catprint.com']
-
-  spec.summary       =
-    'Drive your Hyperloop client and server specs from RSpec and Capybara'
-  spec.description   =
-    'A Hyperloop application consists of isomorphic React Components, '\
-    'Active Record Models, Stores, Operations and Policiespec. '\
-    'Test them all from Rspec, regardless if the code runs on the client or server.'
-  spec.homepage      = 'https://github.com/ruby-hyperloop/hyper-spec'
+  spec.authors       = ['Mitch VanDuyn', 'Adam Creekroad', 'Jan Biedermann']
+  spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
+  spec.summary       = 'Drive your Hyperloop client and server specs from RSpec and Capybara'
+  spec.description   = 'A Hyperloop application consists of isomorphic React Components, '\
+                       'Active Record Models, Stores, Operations and Policiespec. '\
+                       'Test them all from Rspec, regardless if the code runs on the client or server.'
+  spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
+  spec.metadata      = {
+    homepage_uri: 'http://ruby-hyperloop.org',
+    source_code_uri: 'https://github.com/ruby-hyperloop/hyper-spec'
+  }
 
-  # Prevent pushing this gem to RubyGemspec.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  spec.metadata['allowed_push_host'] = 'https://rubygems.org'
-
-  spec.files         =
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
@@ -41,7 +39,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'webdrivers'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-react', '0.15.0-sachsenring-lap5'
+  spec.add_development_dependency 'hyper-react', GEM_VERSION
   spec.add_development_dependency 'method_source'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
