@@ -16,8 +16,8 @@ Gem::Specification.new do |spec|
   spec.license       = 'MIT'
   spec.description   = 'Write React UI components in pure Ruby.'
   spec.metadata      = {
-    'homepage_uri' => 'http://ruby-hyperloop.org',
-    'source_code_uri' => 'https://github.com/ruby-hyperloop/hyper-react'
+    "homepage_uri" => 'http://ruby-hyperloop.org',
+    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
   }
 
   spec.files         = `git ls-files`.split("\n").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
