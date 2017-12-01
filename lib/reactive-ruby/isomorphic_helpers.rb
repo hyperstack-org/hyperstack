@@ -16,7 +16,7 @@ module React
         # can be called on the client to force re-initialization for testing purposes
         if !unique_id || !@context || @context.unique_id != unique_id
           if on_opal_server?
-           `console.history = []` rescue nil
+            `console.history = []` rescue nil
             message = "************************ React Prerendering Context Initialized #{name} ***********************"
           else
             message = "************************ React Browser Context Initialized ****************************"
@@ -98,7 +98,6 @@ module React
       def self.define_isomorphic_method(method_name, &block)
         @@ctx_methods ||= {}
         @@ctx_methods[method_name] = block
-        define_method(method_name, block)
       end
 
       def self.before_first_mount_blocks
@@ -116,7 +115,7 @@ module React
           @ctx = ctx
           if defined? @@ctx_methods
             @@ctx_methods.each do |method_name, block|
-              @ctx.attach("ServerSideIsomorphicMethod.#{method_name}", block)
+              @ctx.attach("ServerSideIsomorphicMethod.#{method_name}", proc{|*args| block.call(args.to_json)})
             end
           end
           send_to_opal(:load_context, @unique_id, name)
@@ -133,7 +132,8 @@ module React
         return unless @ctx
         args = [1] if args.length == 0
         ::ReactiveRuby::ComponentLoader.new(@ctx).load!
-        @ctx.eval("Opal.React.$const_get('IsomorphicHelpers').$#{method_name}(#{args.collect { |arg| "'#{arg}'"}.join(', ')})")
+        method_args = args.collect { |arg| "\"#{arg}\""}.join(', ')
+        @ctx.eval("Opal.React.$const_get('IsomorphicHelpers').$#{method_name}(#{method_args})")
       end
 
       def self.register_before_first_mount_block(&block)
@@ -157,7 +157,7 @@ module React
         @name = name
         @context = context
         block.call(self, *args)
-        @result ||= send_to_server(*args) if IsomorphicHelpers.on_opal_server?
+        @result ||= send_to_server(*args)
       end
 
       def when_on_client(&block)
@@ -166,8 +166,8 @@ module React
 
       def send_to_server(*args)
         if IsomorphicHelpers.on_opal_server?
-          args_as_json = args.to_json
-          @result = [JSON.parse(`ServerSideIsomorphicMethod.#{self.name}.#{@name}(#{args_as_json})`)]
+          method_string = "ServerSideIsomorphicMethod." + @name + "(" + args.to_json + ")"
+          @result = [JSON.parse(`eval(method_string)`)]
         end
       end
 
