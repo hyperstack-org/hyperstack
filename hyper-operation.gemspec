@@ -2,31 +2,36 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'hyper-operation/version'
+require '../hyperloop/lib/hyperloop/version'
+GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-operation'
   spec.version       = Hyperloop::Operation::VERSION
-  spec.authors       = ['catmando', 'janbiedermann']
-  spec.email         = ['mitch@catprint.com']
-
+  spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
+  spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = %q{Compose your business logic into isomorphic commands that sanitize and validate input. Write safe, reusable, and maintainable code for Ruby and Rails app}
-  spec.homepage      = 'http://ruby-hyperloop.io'
+  spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
+  spec.metadata      = {
+    homepage_uri: 'http://ruby-hyperloop.org',
+    source_code_uri: 'https://github.com/ruby-hyperloop/hyper-model'
+  }
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|examples|spec)/}) }
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activerecord', '~> 5.1.4'
-  spec.add_dependency 'hyper-component', '0.15.0-sachsenring-lap5'
-  spec.add_dependency 'hyperloop-config', '0.15.0-sachsenring-lap5'
+  spec.add_dependency 'hyper-component', GEM_VERSION
+  spec.add_dependency 'hyperloop-config', GEM_VERSION
   spec.add_dependency 'mutations'
   spec.add_dependency 'opal-activesupport'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'hyper-react', '0.15.0-sachsenring-lap5'
-  spec.add_development_dependency 'hyper-spec', '0.15.0-sachsenring-lap5'
+  spec.add_development_dependency 'hyper-react', GEM_VERSION
+  spec.add_development_dependency 'hyper-spec', GEM_VERSION
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal', '0.10.5'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
