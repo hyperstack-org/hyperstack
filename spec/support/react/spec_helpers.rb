@@ -11,11 +11,7 @@ module React
     def build_element(type, options)
       component = React.create_element(type, options)
       element = `ReactTestUtils.renderIntoDocument(#{component.to_n})`
-      if `typeof React.findDOMNode === 'undefined'`
-        `$(element.getDOMNode())`          # v0.12
-      else
-        `$(React.findDOMNode(element))`    # v0.13
-      end
+      `$(React.findDOMNode(element))`    # v0.13
     end
 
     def expect_component_to_eventually(component_class, opts = {}, &block)
