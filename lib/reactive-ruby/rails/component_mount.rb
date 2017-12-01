@@ -8,7 +8,9 @@ module ReactiveRuby
       end
 
       def react_component(name, props = {}, options = {}, &block)
-        options = context_initializer_options(options, name) if options[:prerender]
+        if options[:prerender] || [:on, 'on', true].include?(Hyperloop.prerendering)
+          options = context_initializer_options(options, name)
+        end
         props = serialized_props(props, name, controller)
         super(top_level_name, props, options, &block).gsub("\n","")
           .gsub(/(<script>.*<\/script>)<\/div>$/,'</div>\1').html_safe +
