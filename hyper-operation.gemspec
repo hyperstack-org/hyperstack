@@ -14,8 +14,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
   spec.metadata      = {
-    homepage_uri: 'http://ruby-hyperloop.org',
-    source_code_uri: 'https://github.com/ruby-hyperloop/hyper-model'
+    "homepage_uri" => 'http://ruby-hyperloop.org',
+    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
   }
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|examples|spec)/}) }
