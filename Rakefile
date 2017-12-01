@@ -14,6 +14,7 @@ RSpec::Core::RakeTask.new('ruby:rspec')
 Opal::RSpec::RakeTask.new('opal:rspec') do |s, task|
   s.append_path 'spec/vendor'
   s.index_path = 'spec/index.html.erb'
+  task.runner = :node
   task.timeout = 80000 if task
 end
 
