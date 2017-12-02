@@ -1,9 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-
 require 'reactive-ruby/version'
-require '../hyperloop/lib/hyperloop/version'
-GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-react'
@@ -25,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyper-store', GEM_VERSION
+  spec.add_dependency 'hyper-store', React::VERSION
   spec.add_dependency 'opal', '~> 0.10.5'
   spec.add_dependency 'opal-activesupport', '~> 0.3.0'
 
@@ -34,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'nokogiri'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'opal-rspec'
-  spec.add_development_dependency 'rails', '~> 5.1.4'
+  spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
