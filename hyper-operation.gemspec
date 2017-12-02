@@ -2,8 +2,6 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'hyper-operation/version'
-require '../hyperloop/lib/hyperloop/version'
-GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-operation'
@@ -23,15 +21,15 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activerecord', '~> 5.1.4'
-  spec.add_dependency 'hyper-component', GEM_VERSION
-  spec.add_dependency 'hyperloop-config', GEM_VERSION
+  spec.add_dependency 'activerecord', '>= 4.0.0'
+  spec.add_dependency 'hyper-component', Hyperloop::Operation::VERSION
+  spec.add_dependency 'hyperloop-config', Hyperloop::Operation::VERSION
   spec.add_dependency 'mutations'
   spec.add_dependency 'opal-activesupport'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'hyper-react', GEM_VERSION
-  spec.add_development_dependency 'hyper-spec', GEM_VERSION
+  spec.add_development_dependency 'hyper-react', Hyperloop::Operation::VERSION
+  spec.add_development_dependency 'hyper-spec', Hyperloop::Operation::VERSION
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal', '0.10.5'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
@@ -39,7 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
-  spec.add_development_dependency 'rails', '~> 5.1.4'
+  spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-rails'
