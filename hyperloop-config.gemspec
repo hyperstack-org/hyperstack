@@ -6,7 +6,7 @@ GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyperloop-config'
-  spec.version       = GEM_VERSION
+  spec.version       = Hyperloop::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = %q{Provides a single point configuration module for hyperloop gems}
@@ -26,10 +26,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'uglifier'
   spec.add_development_dependency 'bundler', '~> 1.16.0'
-  spec.add_development_dependency 'hyper-spec', GEM_VERSION
+  spec.add_development_dependency 'hyper-spec', Hyperloop::VERSION
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
-  spec.add_development_dependency 'rails', '~> 5.1.4'
+  spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.7.0'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
