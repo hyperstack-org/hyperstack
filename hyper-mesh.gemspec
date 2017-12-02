@@ -1,9 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-
 require 'hypermesh/version'
-require '../hyperloop/lib/hyperloop/version'
-GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-mesh'
@@ -28,15 +25,15 @@ Gem::Specification.new do |spec|
   spec.test_files     = `git ls-files -- {spec}/*`.split("\n")
   spec.require_paths  = ['lib']
 
-  spec.add_dependency 'activerecord', '~> 5.1.4'
-  spec.add_dependency 'hyper-component', GEM_VERSION
-  spec.add_dependency 'hyper-operation', GEM_VERSION
+  spec.add_dependency 'activerecord', '=> 4.0.0'
+  spec.add_dependency 'hyper-component', Hypermesh::VERSION
+  spec.add_dependency 'hyper-operation', Hypermesh::VERSION
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_girl_rails'
-  spec.add_development_dependency 'hyper-spec', GEM_VERSION
+  spec.add_development_dependency 'hyper-spec', Hypermesh::VERSION
   spec.add_development_dependency 'hyper-trace'
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'mysql2'
@@ -47,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
-  spec.add_development_dependency 'rails', '~> 5.1.4'
+  spec.add_development_dependency 'rails', '=> 4.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
   spec.add_development_dependency 'reactrb-rails-generator'
