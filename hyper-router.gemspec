@@ -1,10 +1,7 @@
 # coding: utf-8
-
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
-
 require 'hyper-router/version'
 require '../hyperloop/lib/hyperloop/version'
-GEM_VERSION = Hyperloop::VERSION
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-router'
@@ -22,8 +19,8 @@ Gem::Specification.new do |spec|
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   spec.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
 
-  spec.add_dependency 'hyper-component', GEM_VERSION
-  spec.add_dependency 'hyper-react', GEM_VERSION
+  spec.add_dependency 'hyper-component', Hyperloop::VERSION
+  spec.add_dependency 'hyper-react', Hyperloop::VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'opal-rails', '~> 0.9.3'
   spec.add_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
@@ -31,12 +28,12 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'hyper-spec', GEM_VERSION
+  spec.add_development_dependency 'hyper-spec', Hyperloop::VERSION
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'parser'
-  spec.add_development_dependency 'rails', '~> 5.1.4'
+  spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-collection_matchers'
