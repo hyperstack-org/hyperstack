@@ -51,8 +51,8 @@ end
 
 
 gem 'react-rails', '>= 2.3.0', '< 2.5.0'
-gem 'hyper-react', '0.15.0-sachsenring-lap2' #, path: '../../../hyper-react'
-gem 'hyper-store', '0.15.0-sachsenring-lap2' #, path: '../../../hyper-store'
+gem 'hyper-react', '1.0.0-lap8' #, path: '../../../hyper-react'
+gem 'hyper-store', '1.0.0-lap8' #, path: '../../../hyper-store'
 gem 'hike'
 gem 'opal-rails'
 gem 'parser'
