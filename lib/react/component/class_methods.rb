@@ -184,6 +184,10 @@ module React
           current_tree
         end
       end
+
+      def to_n 
+        React::API.class_eval('@@component_classes')[self]
+      end
     end
   end
 end
