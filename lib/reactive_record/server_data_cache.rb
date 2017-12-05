@@ -291,7 +291,7 @@ module ReactiveRecord
           end
 
           def to_json
-            as_hash.to_json
+            value.to_json
           end
 
         end
