@@ -28,6 +28,10 @@ module React
       end
     end
 
+    def self.context
+      @context
+    end
+
     def self.log(message, message_type = :info)
       message = [message] unless message.is_a? Array
 
