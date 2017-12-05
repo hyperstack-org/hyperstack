@@ -10,18 +10,18 @@ module ReactiveRuby
           ReactiveRuby::Rails::ComponentMount
       end
       config.after_initialize do
-        ::ApplicationController.class_eval do
-          before_action do
-            if params.has_key? 'hyperloop-prerendering'
-              params['hyperloop-prerendering'].to_s == 'on'
-            elsif params.has_key? 'hyperloop_prerendering'
-              params['hyperloop_prerendering'].to_s == 'on'
-            else
-              Hyperloop.prerendering.to_s == 'on'
-            end && next
-            params[:no_prerender] = '1'
-          end
-        end
+        # ::ApplicationController.class_eval do
+        #   before_action do
+        #     if params.has_key? 'hyperloop-prerendering'
+        #       params['hyperloop-prerendering'].to_s == 'on'
+        #     elsif params.has_key? 'hyperloop_prerendering'
+        #       params['hyperloop_prerendering'].to_s == 'on'
+        #     else
+        #       Hyperloop.prerendering.to_s == 'on'
+        #     end && next
+        #     params[:no_prerender] = '1'
+        #   end
+        # end
         class ::HyperloopController < ::ApplicationController
           def action_missing(name)
             render_component

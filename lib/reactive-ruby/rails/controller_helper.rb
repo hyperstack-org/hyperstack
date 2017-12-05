@@ -7,8 +7,7 @@ module ActionController
       @component_name = (args[0].is_a? Hash) || args.empty? ? params[:action].camelize : args.shift
       @render_params = args.shift || {}
       options = args[0] || {}
-      render inline: '<%= react_component @component_name, @render_params, '\
-                     '{ prerender: !params[:no_prerender] } %>',
+      render inline: '<%= react_component @component_name, @render_params %>',
              layout: options.key?(:layout) ? options[:layout].to_s : :default
     end
   end
