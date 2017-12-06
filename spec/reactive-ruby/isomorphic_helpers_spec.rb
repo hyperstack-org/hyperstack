@@ -87,7 +87,9 @@ if ruby?
 
     let(:v8_context) { TestV8Context.new }
     let(:controller) { double('controller') }
-    let(:name) { double('name') }
+    # was double('name'), double gets converted to a doulbe quoted string with
+    # unquoted double quotes which breaks js
+    let(:name) { 'name' }
     before do
       described_class.instance_variable_set :@before_first_mount_blocks, nil
     end
@@ -117,7 +119,7 @@ if ruby?
       let(:ruby_code) { %Q[
         module React::IsomorphicHelpers
           def self.greet(name)
-            "Hello, #\{name}!"
+            "Hello, " + name + "!"
           end
 
           def self.valediction
@@ -137,7 +139,7 @@ if ruby?
       it 'executes method with args inside opal rubyracer context' do
         ctx = react_context
         context = described_class.new('unique-id', ctx, controller, name)
-        ctx.eval(opal_code)
+        context.eval(opal_code)
         result = context.send_to_opal(:greet, 'world')
         expect(result).to eq('Hello, world!')
       end
@@ -145,7 +147,7 @@ if ruby?
       it 'executes the method inside opal rubyracer context' do
         ctx = react_context
         context = described_class.new('unique-id', ctx, controller, name)
-        ctx.eval(opal_code)
+        context.eval(opal_code)
         result = context.send_to_opal(:valediction)
         expect(result).to eq('Goodbye')
       end
