@@ -48,7 +48,7 @@ module HyperStore
       def validate_initializer(initial_value, klass, opts) # rubocop:disable Metrics/MethodLength
         # If we pass in the name as a hash with a value ex: state foo: :bar,
         # we just put that value inside a Proc and return that
-        if initial_value
+        if initial_value != nil
           dup_or_return_intial_value(initial_value)
         # If we pass in the initialize option
         elsif opts[:initializer]
