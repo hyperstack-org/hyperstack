@@ -136,7 +136,11 @@ module React
         return unless @ctx
         args = [1] if args.length == 0
         ::ReactiveRuby::ComponentLoader.new(@ctx).load!
-        method_args = args.collect { |arg| "\"#{arg}\""}.join(', ')
+        method_args = args.collect do |arg|
+          starg = "#{arg}"
+          quarg = starg.include?('"') ? starg.tr('"', "'") : starg
+          "\"#{quarg}\""
+        end.join(', ')
         @ctx.eval("Opal.React.$const_get('IsomorphicHelpers').$#{method_name}(#{method_args})")
       end
 
