@@ -87,9 +87,7 @@ if ruby?
 
     let(:v8_context) { TestV8Context.new }
     let(:controller) { double('controller') }
-    # was double('name'), double gets converted to a doulbe quoted string with
-    # unquoted double quotes which breaks js
-    let(:name) { 'name' }
+    let(:name) { double('name') }
     before do
       described_class.instance_variable_set :@before_first_mount_blocks, nil
     end
