@@ -76,6 +76,8 @@ module React
             !current_state || Object.keys(current_state).length === 0 ? false : current_state
           if (!normalized_current_state != !normalized_next_state) return(true)
           if (!normalized_current_state && !normalized_next_state) return(false)
+          if (!normalized_current_state['***_state_updated_at-***'] &&
+            !normalized_next_state['***_state_updated_at-***']) return(false)
           if (!normalized_current_state['***_state_updated_at-***'] ||
               !normalized_next_state['***_state_updated_at-***']) return(true)
           return (normalized_current_state['***_state_updated_at-***'] !=
