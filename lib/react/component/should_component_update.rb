@@ -53,6 +53,10 @@ module React
       # We can rapidly check for state changes comparing the incoming state time_stamp
       # with the current time stamp.
 
+      # we receive a Opal Ruby Hash here, always, so the Hash is either empty or filled
+      # Hash is converted to native object
+      # if the Hash was empty, the Object has no keys
+
       # Different versions of react treat empty state differently, so we first
       # convert anything that looks like an empty state to "false" for consistency.
 
@@ -67,11 +71,9 @@ module React
         %x{
           var current_state = #{@native}.state
           var normalized_next_state =
-            !#{next_state} || Object.keys(#{next_state}).length === 0 || #{nil} == #{next_state} ?
-            false : #{next_state}
+            !next_state || Object.keys(next_state).length === 0 ? false : next_state
           var normalized_current_state =
-            !current_state || Object.keys(current_state).length === 0 || #{nil} == current_state ?
-            false : current_state
+            !current_state || Object.keys(current_state).length === 0 ? false : current_state
           if (!normalized_current_state != !normalized_next_state) return(true)
           if (!normalized_current_state && !normalized_next_state) return(false)
           if (!normalized_current_state['***_state_updated_at-***'] ||
