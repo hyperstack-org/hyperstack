@@ -2,13 +2,7 @@ module React
   module Component
     module API
       def dom_node
-        if !(`typeof ReactDOM === 'undefined' || typeof ReactDOM.findDOMNode === 'undefined'`)
-          `ReactDOM.findDOMNode(#{self}.native)` # v0.14.0
-        elsif !(`typeof React.findDOMNode === 'undefined'`)
-          `React.findDOMNode(#{self}.native)`    # v0.13.0
-        else
-          `#{self}.native.getDOMNode`            # v0.12.0
-        end
+        `ReactDOM.findDOMNode(#{self}.native)` # react > v0.14.0
       end
 
       def mounted?
