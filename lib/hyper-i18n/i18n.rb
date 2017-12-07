@@ -7,7 +7,7 @@ module HyperI18n
       if RUBY_ENGINE != 'opal'
         @server_data_cache = { t: {}, l: {} }
       else
-        unless no_initial_data?
+        unless on_opal_server? || no_initial_data?
           I18nStore.mutate.translations(JSON.from_object(`window.HyperI18nInitialData.t`))
           I18nStore.mutate.localizations(JSON.from_object(`window.HyperI18nInitialData.l`))
         end
