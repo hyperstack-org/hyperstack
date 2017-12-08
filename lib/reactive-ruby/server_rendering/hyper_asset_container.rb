@@ -12,22 +12,27 @@ module ReactiveRuby
         else
           @ass_containers << React::ServerRendering::EnvironmentContainer.new if ::Rails.application.assets
         end
-        @ass_containers << React::ServerRendering::WebpackerManifestContainer.new if React::ServerRendering::WebpackerManifestContainer.compatible?
+        if React::ServerRendering::WebpackerManifestContainer.compatible?
+          @ass_containers << React::ServerRendering::WebpackerManifestContainer.new
+        end
       end
 
       def find_asset(logical_path)
         @ass_containers.each do |ass|
           begin
             asset = ass.find_asset(logical_path)
-            return asset if asset
+            return asset if asset && asset != ''
           rescue
-            # no asset found, try the next container
+            next # no asset found, try the next container
           end
         end
         raise "No asset found for #{logical_path}, tried: #{@ass_containers.map { |c| c.class.name }.join(', ')}"
       end
 
       private
+      def delete_first(a, e)
+        a.delete_at(a.index(e) || a.length)
+      end
 
       def assets_precompiled?
         !::Rails.application.config.assets.compile
