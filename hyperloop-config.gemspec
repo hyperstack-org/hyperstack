@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require '../hyperloop/lib/hyperloop/version'
+require 'hyperloop/config/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyperloop-config'
-  spec.version       = Hyperloop::VERSION
+  spec.version       = Hyperloop::Config::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = %q{Provides a single point configuration module for hyperloop gems}
@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'uglifier'
   spec.add_development_dependency 'bundler', '~> 1.16.0'
-  spec.add_development_dependency 'hyper-spec', Hyperloop::VERSION
+  spec.add_development_dependency 'hyper-spec', Hyperloop::Config::VERSION
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'rails', '>= 4.0.0'
