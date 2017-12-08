@@ -1,5 +1,8 @@
 module Hyperloop
   define_setting :add_hyperloop_paths, true
+  
+  define_setting :prerendering_files, ['hyperloop-prerender-loader.js']
+
   class Railtie < ::Rails::Railtie
 
     class Options < ActiveSupport::OrderedOptions
@@ -9,7 +12,7 @@ module Hyperloop
 
       def auto_config=(on)
         Rails.configuration.tap do |config|
-          if on
+          if [:on, 'on', true].include?(on)
             config.eager_load_paths += %W(#{config.root}/app/hyperloop/models)
             config.eager_load_paths += %W(#{config.root}/app/hyperloop/operations)
             # rails will add everything immediately below app to eager and auto load, so we need to remove it
@@ -48,20 +51,16 @@ module Hyperloop
       config.hyperloop.auto_config = true
     end
 
-    FILES = {files: ['hyperloop-prerender-loader.js']}
-
     config.after_initialize do |app|
-      next unless config.hyperloop.auto_config
+      next unless [:on, 'on', true].include?(config.hyperloop.auto_config)
       Hyperloop.import_tree('hyperloop')
       if config.respond_to?(:react)
         if (opts = config.react.server_renderer_options)
-          opts.merge! FILES
+          opts.merge!(files: Hyperloop.prerendering_files)
         else
-          config.react.server_renderer_options = FILES
+          config.react.server_renderer_options = {files: Hyperloop.prerendering_files}
         end
       end
-      #app.assets.find_asset('hyperloop-prerender-loader-system')
-      #app.assets.find_asset('hyperloop-loader-system')
     end
   end
 end
