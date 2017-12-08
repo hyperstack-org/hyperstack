@@ -30,9 +30,6 @@ module ReactiveRuby
       end
 
       private
-      def delete_first(a, e)
-        a.delete_at(a.index(e) || a.length)
-      end
 
       def assets_precompiled?
         !::Rails.application.config.assets.compile
