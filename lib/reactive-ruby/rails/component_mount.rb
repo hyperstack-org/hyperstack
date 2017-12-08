@@ -25,7 +25,7 @@ module ReactiveRuby
 
         options[:prerender][:context_initializer] = lambda do |ctx|
           React::IsomorphicHelpers.load_context(ctx, controller, name)
-          existing_context_initializer.call ctx if existing_context_initializer
+          existing_context_initializer.call(ctx) if existing_context_initializer
         end
 
         options
