@@ -1,5 +1,5 @@
 module Hyperloop
   module Config
-    VERSION = '1.0.0-lap9'
+    VERSION = '1_0_0-lap10'
   end
 end
