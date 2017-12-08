@@ -11,13 +11,18 @@ module ActiveRecord
     def self.public_columns_hash
       return @public_columns_hash if @public_columns_hash
       Hyperloop.public_model_directories.each do |dir|
-        Dir.glob(Rails.root.join("#{dir}/*.rb")).each do |file|
+        Dir.glob(Rails.root.join("#{dir}/**/*.rb")).each do |file|
           require_dependency(file)
         end
       end
       @public_columns_hash = {}
       descendants.each do |model|
-        @public_columns_hash[model.name] = model.columns_hash rescue nil
+        begin
+          public_columns_hash[model.name] = model.columns_hash if model.table_name
+        rescue Exception => e
+          @public_columns_hash = nil
+          raise $!, "Could not read 'columns_hash' for #{model}: #{$!}", $!.backtrace
+        end
       end
       @public_columns_hash
     end

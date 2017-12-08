@@ -54,13 +54,33 @@ describe "authorization integration", js: true do
     end
     ApplicationController.acting_user = nil
     stub_const 'TestApplicationPolicy', Class.new
+    stub_const 'TestApplication', Class.new
     TestApplicationPolicy.class_eval do
-      regulate_class_connection { self }
+      regulate_class_connection { true }
       regulate_instance_connections(TestModel) { TestModel.find_by_test_attribute(name) }
-      regulate_all_broadcasts { |policy| policy.send_all_but(:completed, :test_attribute) }
-      regulate_broadcast(TestModel) { |policy| policy.send_all_but(:created_at).to(self) }
+      regulate_all_broadcasts do |policy|
+        #policy.send_all_but(:completed, :test_attribute)
+      end
+      #regulate_broadcast(TestModel) { |policy| policy.send_all_but(:created_at).to(self) }
+      regulate_broadcast(TestModel) do |policy|
+        puts "regulate_broadcast for #{id} completed: #{!!completed}"
+        if completed
+          policy.send_all_but(:completed, :test_attribute)
+        else
+          policy.send_all
+        end.to(TestApplication)
+      end
     end
     size_window(:small, :portrait)
+  end
+
+  it "will not allow access to attributes through a collection" do
+    FactoryGirl.create(:test_model, test_attribute: "hello", completed: false)
+    FactoryGirl.create(:test_model, test_attribute: "goodby", completed: true)
+    mount "TestComponent"
+    wait_for_ajax
+    pause
+    # test for failure....
   end
 
   it "will only synchronize the connected channels" do

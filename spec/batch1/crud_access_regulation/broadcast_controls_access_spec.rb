@@ -55,6 +55,22 @@ describe "regulate access allowed" do
     end
   end
 
+  it "will prevent access to specific attributes" do
+    stub_const 'TestApplication', Class.new
+    stub_const 'TestApplicationPolicy', Class.new
+    TestApplicationPolicy.class_eval do
+      always_allow_connection
+      regulate_broadcast(TestModel) do |policy|
+        policy.send_all_but(:created_at).to(TestApplication) 
+      end
+    end
+    m = FactoryGirl.create(:test_model)
+    expect { m.check_permission_with_acting_user(nil, :view_permitted?, :test_attribute) }.
+    not_to raise_error
+    expect { m.check_permission_with_acting_user(nil, :view_permitted?, :created_at) }.
+    to raise_error
+  end
+
   it "will include :id as read attribute as long as any other attribute is readable" do
     stub_const 'TestApplication', Class.new
     stub_const 'TestApplicationPolicy', Class.new

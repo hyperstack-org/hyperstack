@@ -52,12 +52,12 @@ module ReactiveRecord
 
     isomorphic_method(:fetch_from_db) do |f, vector|
       # vector must end with either "*all", or be a simple attribute
-      f.send_to_server [vector.shift.name, *vector] if  RUBY_ENGINE == 'opal'
+      f.send_to_server [vector.shift.name, *vector] if RUBY_ENGINE == 'opal'
       f.when_on_server { @server_data_cache[*vector] }
     end
 
     isomorphic_method(:find_in_db) do |f, klass, attribute, value|
-      f.send_to_server klass.name, attribute, value if  RUBY_ENGINE == 'opal'
+      f.send_to_server klass.name, attribute, value if RUBY_ENGINE == 'opal'
       f.when_on_server { @server_data_cache[klass, ["find_by_#{attribute}", value], :id] }
     end
 
