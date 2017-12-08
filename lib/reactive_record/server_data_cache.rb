@@ -100,19 +100,23 @@ module ReactiveRecord
           root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
           vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
           vector[0] = vector[0].constantize
-          new_items = @cache.select { | cache_item | cache_item.root == root }
-          @requested_cache_items += new_items
-          new_items.last.value if new_items.last
+          last_value = nil
+          @cache.each do |cache_item|
+            next if cache_item.root != root || @requested_cache_items.include?(cache_item)
+            @requested_cache_items << cache_item 
+            last_value = cache_item
+          end
+          last_value
         end
 
-        def self.[](models, associations, vectors, acting_user)
+        def self.[](models, associations, vectors, acting_user)   
           ActiveRecord::Base.public_columns_hash
           result = nil
           ActiveRecord::Base.transaction do
             cache = new(acting_user, ReactiveRecord::Base.save_records(models, associations, acting_user, false, false))
             vectors.each { |vector| cache[*vector] }
             result = cache.as_json
-            raise ActiveRecord::Rollback
+            raise ActiveRecord::Rollback, "This Rollback is intentional!"
           end
           result
         end
@@ -284,6 +288,10 @@ module ReactiveRecord
             else
               {method.name => children}
             end
+          end
+
+          def to_json
+            value.to_json
           end
 
         end

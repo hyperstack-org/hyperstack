@@ -86,7 +86,7 @@ module ReactiveRecord
       end
       "<script type='text/javascript'>\n"+
         "if (typeof window.ReactiveRecordPublicColumnsHash === 'undefined') { \n" +
-        "  window.ReactiveRecordPublicColumnsHash = #{ActiveRecord::Base.public_columns_hash.to_json}}\n" +
+        "  window.ReactiveRecordPublicColumnsHash = #{ActiveRecord::Base.public_columns_hash_as_json}}\n" +
         "if (typeof window.ReactiveRecordInitialData === 'undefined') { window.ReactiveRecordInitialData = [] }\n" +
         "window.ReactiveRecordInitialData.push(#{json})\n"+
       "</script>\n"
@@ -141,16 +141,16 @@ module ReactiveRecord
           models, associations = gather_records(@pending_records, false, nil)
           log(["Server Fetching: %o", pending_fetches.to_n])
           start_time = Time.now
-          Operations::Fetch(models: models, associations: associations, pending_fetches: pending_fetches)
+          Operations::Fetch.run(models: models, associations: associations, pending_fetches: pending_fetches)
             .then do |response|
               fetch_time = Time.now
-              log("       Fetched in:   #{(fetch_time-start_time).to_i}s")
+              log("       Fetched in:   #{(fetch_time - start_time).to_f}s")
               begin
                 ReactiveRecord::Base.load_from_json(response)
               rescue Exception => e
                 log("Unexpected exception raised while loading json from server: #{e}", :error)
               end
-              log("       Processed in: #{(Time.now-fetch_time).to_i}s")
+              log("       Processed in: #{(Time.now - fetch_time).to_f}s")
               log(["       Returned: %o", response.to_n])
               ReactiveRecord.run_blocks_to_load last_fetch_at
               ReactiveRecord::WhileLoading.loaded_at last_fetch_at
@@ -256,7 +256,7 @@ module ReactiveRecord
         backing_records.each { |id, record| record.saving! }
 
         promise = Promise.new
-        Operations::Save(models: models, associations: associations, validate: validate)
+        Operations::Save.run(models: models, associations: associations, validate: validate)
         .then do |response|
           begin
             response[:models] = response[:saved_models].collect do |item|
@@ -465,7 +465,7 @@ module ReactiveRecord
 
           else
 
-            vectors.each { |vector, model| model.reload unless model.nil? or model.new_record? or model.frozen? }
+            # vectors.each { |vector, model| model.reload unless model.nil? or model.new_record? or model.frozen? }
             vectors
 
           end
@@ -496,7 +496,7 @@ module ReactiveRecord
         promise = Promise.new
 
         if !data_loading? and (id or vector)
-          Operations::Destroy(model: ar_instance.model_name, id: id, vector: vector)
+          Operations::Destroy.run(model: ar_instance.model_name, id: id, vector: vector)
           .then do |response|
             Broadcast.to_self ar_instance
             yield response[:success], response[:message] if block

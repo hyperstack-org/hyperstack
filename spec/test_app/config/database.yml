@@ -8,23 +8,18 @@ default: &default
   adapter: mysql2
   encoding: utf8
   username: root
-  password:
-  host: 127.0.0.1
-  port: 3306
-  pool: 5
-  timeout: 10000
 
 development:
   <<: *default
-  database: development_db_name
+  database: hyper_mesh_development_db
 
 test:
   <<: *default
-  database: test_db_name
+  database: hyper_mesh_test_db
 
 production:
   <<: *default
-  database: production_db_name
+  database: hyper_mesh_production_db
 
 # default: &default
 #   adapter: sqlite3

@@ -235,8 +235,10 @@ module React
     end
 
   end
+end
 
-  module ::Hyperloop
+if RUBY_ENGINE == 'opal'
+  module Hyperloop
     class Component
       module Mixin
 
@@ -309,5 +311,5 @@ module React
         end
       end
     end
-  end if RUBY_ENGINE == 'opal'
+  end
 end

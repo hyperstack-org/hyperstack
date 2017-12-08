@@ -1,88 +1,66 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-
 require 'hypermesh/version'
 
-Gem::Specification.new do |s|
+Gem::Specification.new do |spec|
+  spec.name          = 'hyper-mesh'
+  spec.version       = Hypermesh::VERSION
+  spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
+  spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
+  spec.summary       = 'React based CRUD access and Synchronization of active record models across multiple clients'
+  spec.description   = 'HyperMesh is the base for HyperModel. HyperModel gives your HyperComponents CRUD access to your '\
+                       'ActiveRecord models on the client, using the the standard ActiveRecord '\
+                       'API. HyperModel also implements push notifications (via a number of '\
+                       'possible technologies) so changes to records on the server are '\
+                       'dynamically updated on all authorised clients.'
+  spec.homepage      = 'http://ruby-hyperloop.org'
+  spec.license       = 'MIT'
+  spec.metadata      = {
+    "homepage_uri" => 'http://ruby-hyperloop.org',
+    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  }
 
-    s.name          = "hyper-mesh"
-    s.version       = Hypermesh::VERSION
-    s.authors       = ["Mitch VanDuyn"]
-    s.email         = ["mitch@catprint.com"]
+  spec.files          = `git ls-files`.split("\n").reject { |f| f.match(%r{^(examples|gemfiles|pkg|reactive_record_test_app|spec)/}) }
+  spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
+  spec.test_files     = `git ls-files -- {spec}/*`.split("\n")
+  spec.require_paths  = ['lib']
 
-    s.summary       = "React based CRUD access and Synchronization of active record models across multiple clients"
-    s.description   = "HyperMesh gives your HyperReact components CRUD access to your "\
-                      "ActiveRecord models on the client, using the the standard ActiveRecord "\
-                      "API. HyperMesh also implements push notifications (via a number of "\
-                      "possible technologies) so changes to records on the server are "\
-                      "dynamically updated on all authorised clients."
-    s.homepage      = "https://github.com/reactive-ruby/hyper-mesh"
-    s.license       = "MIT"
-
-    s.files          = `git ls-files`.split("\n")
-    s.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
-    s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
-    s.require_paths  = ['lib']
-
-    s.add_dependency 'activerecord', '>= 0.3.0'
-    s.add_dependency 'hyper-operation', '>= 0.5.0'
-    s.add_dependency 'hyper-component', '>= 0.12.3'
-
-    s.add_development_dependency 'bundler', '~> 1.8'
-    s.add_development_dependency 'rake', '~> 10.0'
-    s.add_development_dependency 'rspec-rails'
-    s.add_development_dependency 'timecop'
-
-    # For Test Rails App
-    s.add_development_dependency 'rails', '~>5.0.0' #'4.2.4'
-    s.add_development_dependency 'react-rails'
-    s.add_development_dependency 'opal-rails'
-    s.add_development_dependency 'opal-activesupport'
-    s.add_development_dependency 'factory_girl_rails'
-    s.add_development_dependency 'reactrb-rails-generator'
-    s.add_development_dependency 'rspec-wait'
-    s.add_development_dependency 'puma', '~> 3.6.0'
-
-    s.add_development_dependency 'pusher'
-    s.add_development_dependency 'pusher-fake'
-    s.add_development_dependency 'opal-browser'
-
-    # Keep linter-rubocop happy
-    s.add_development_dependency 'rubocop'
-
-    if RUBY_PLATFORM == 'java'
-      s.add_development_dependency 'jdbc-sqlite3'
-      s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
-      s.add_development_dependency 'therubyrhino'
-    else
-      s.add_development_dependency 'sqlite3', '1.3.10'
-      s.add_development_dependency 'mysql2' # for codeship
-      s.add_development_dependency 'therubyracer', '0.12.2'
-
-      # The following allow react code to be tested from the server side
-      s.add_development_dependency 'rspec-mocks'
-      s.add_development_dependency 'rspec-expectations'
-      s.add_development_dependency 'pry'
-      s.add_development_dependency 'pry-rescue'
-      s.add_development_dependency 'pry-stack_explorer'
-
-      # s.add_development_dependency 'factory_girl_rails'
-      s.add_development_dependency 'shoulda'
-      s.add_development_dependency 'shoulda-matchers'
-      s.add_development_dependency 'rspec-its'
-      s.add_development_dependency 'rspec-collection_matchers'
-      s.add_development_dependency 'database_cleaner'
-      s.add_development_dependency 'capybara'
-      s.add_development_dependency 'selenium-webdriver', '< 3'
-      s.add_development_dependency 'poltergeist'
-      s.add_development_dependency 'spring-commands-rspec'
-      s.add_development_dependency 'chromedriver-helper'
-      s.add_development_dependency 'rspec-steps'
-      s.add_development_dependency 'parser'
-      s.add_development_dependency 'unparser'
-      s.add_development_dependency 'jquery-rails'
-      s.add_development_dependency 'pry-byebug'
-      s.add_development_dependency 'hyper-spec'
-      s.add_development_dependency 'hyper-trace'
-    end
+  spec.add_dependency 'activerecord', '>= 4.0.0'
+  spec.add_dependency 'hyper-component', Hypermesh::VERSION
+  spec.add_dependency 'hyper-operation', Hypermesh::VERSION
+  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'capybara'
+  spec.add_development_dependency 'chromedriver-helper'
+  spec.add_development_dependency 'database_cleaner'
+  spec.add_development_dependency 'factory_girl_rails'
+  spec.add_development_dependency 'hyper-spec', Hypermesh::VERSION
+  spec.add_development_dependency 'hyper-trace'
+  spec.add_development_dependency 'jquery-rails'
+  spec.add_development_dependency 'mysql2'
+  spec.add_development_dependency 'opal-activesupport', '~> 0.3.0'
+  spec.add_development_dependency 'opal-browser', '~> 0.2.0'
+  spec.add_development_dependency 'opal-rails', '~> 0.9.3'
+  spec.add_development_dependency 'parser'
+  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'pusher'
+  spec.add_development_dependency 'pusher-fake'
+  spec.add_development_dependency 'rails', '>= 4.0.0'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
+  spec.add_development_dependency 'reactrb-rails-generator'
+  spec.add_development_dependency 'rspec-collection_matchers'
+  spec.add_development_dependency 'rspec-expectations'
+  spec.add_development_dependency 'rspec-its'
+  spec.add_development_dependency 'rspec-mocks'
+  spec.add_development_dependency 'rspec-rails'
+  spec.add_development_dependency 'rspec-steps', '~> 2.1.1'
+  spec.add_development_dependency 'rspec-wait'
+  spec.add_development_dependency 'rubocop', '~> 0.51.0'
+  spec.add_development_dependency 'shoulda'
+  spec.add_development_dependency 'shoulda-matchers'
+  spec.add_development_dependency 'spring-commands-rspec'
+  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.14'
+  spec.add_development_dependency 'timecop', '~> 0.8.1'
+  spec.add_development_dependency 'unparser'
 end
