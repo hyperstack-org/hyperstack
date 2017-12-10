@@ -697,7 +697,7 @@ exports.install = function install(config) {
         uninstall(clock, target, config);
     };
 
-    clock.methods = config.toFake || [];
+    clock.methods = config.toFake || ["setTimeout", "clearTimeout", "setImmediate", "clearImmediate","setInterval", "clearInterval", "Date"];
 
     if (clock.methods.length === 0) {
         // do not fake nextTick by default - GitHub#126
