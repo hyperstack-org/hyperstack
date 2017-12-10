@@ -65,7 +65,7 @@ describe "authorization integration", js: true do
 
   it "will only synchronize the connected channels" do
     mount "TestComponent2"
-    model1 = FactoryGirl.create(:test_model, test_attribute: "hello")
+    model1 = FactoryBot.create(:test_model, test_attribute: "hello")
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})
     ApplicationController.acting_user = User.new(name: "fred")
@@ -99,7 +99,7 @@ describe "authorization integration", js: true do
 
   it "will fail on illegal class connections" do
     mount "TestComponent2"
-    model1 = FactoryGirl.create(:test_model, test_attribute: "hello")
+    model1 = FactoryBot.create(:test_model, test_attribute: "hello")
     page.evaluate_ruby('Hyperloop.connect("TestApplication")')
     model1.update_attribute(:test_attribute, 'george')
     wait_for_ajax
@@ -108,7 +108,7 @@ describe "authorization integration", js: true do
 
   it "will fail on illegal instance connections" do
     mount "TestComponent2"
-    model1 = FactoryGirl.create(:test_model, test_attribute: "george")
+    model1 = FactoryBot.create(:test_model, test_attribute: "george")
     ApplicationController.acting_user = User.new(name: "fred")
     page.evaluate_ruby("Hyperloop.connect(['TestModel', #{model1.id}])")
     model1.update_attribute(:completed, true)
