@@ -44,7 +44,15 @@ module ActiveRecord
         end
 
         def server_method(name, opts = {}, &block)
-          define_method name, &block
+          unless opts[:default].nil?
+            define_method(name) do |args = nil|
+              block.call(args.nil? ? opts[:default] : args)
+            end
+          else
+            define_method(name) do |args|
+              block.call(args)
+            end
+          end
         end
 
         def finder_method(name, &block)
