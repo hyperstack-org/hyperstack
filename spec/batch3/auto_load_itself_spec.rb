@@ -16,7 +16,7 @@ describe "HyperMesh.load", js: true do
   end
 
   it "uses itself to force loading" do
-    user = FactoryGirl.create(:user, first_name: 'Ima')
+    user = FactoryBot.create(:user, first_name: 'Ima')
     expect_promise do
       HyperMesh.load { User.find_by_first_name('Ima') }.then { |user| user.id }
     end.to eq(user.id)

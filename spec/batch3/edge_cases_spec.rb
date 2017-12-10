@@ -17,8 +17,8 @@ describe "reactive-record edge cases", js: true do
 
   it "trims the association tree" do
     5.times do |i|
-      user = FactoryGirl.create(:user, first_name: i) unless i == 3
-      FactoryGirl.create(:todo, title: "User #{i}'s todo", owner: user)
+      user = FactoryBot.create(:user, first_name: i) unless i == 3
+      FactoryBot.create(:todo, title: "User #{i}'s todo", owner: user)
     end
     expect_promise do
       HyperMesh.load do

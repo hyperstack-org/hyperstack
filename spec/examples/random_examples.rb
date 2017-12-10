@@ -73,7 +73,7 @@ describe "random examples", js: true do
   it "can destroy on the fly" do
 
     5.times do |i|
-      FactoryGirl.create(:test_model, test_attribute: "I am model #{i}")
+      FactoryBot.create(:test_model, test_attribute: "I am model #{i}")
     end
 
     mount "RecordsComp" do

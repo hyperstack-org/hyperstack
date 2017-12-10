@@ -58,7 +58,7 @@ describe "synchronized scopes", js: true do
       end
     end
     page.should have_content("count = 0")
-    m = FactoryGirl.create(:test_model)
+    m = FactoryBot.create(:test_model)
     page.should have_content("count = 1")
     m.destroy
     page.should have_content("count = 0")
@@ -94,21 +94,21 @@ describe "synchronized scopes", js: true do
     page.should have_content('scope2 count = 0')
     TestModel.scope1_count.should eq(2)  # once for scope1.count and once for scope1.each { .test_attribute }
     TestModel.scope2_count.should eq(1)
-    m1 = FactoryGirl.create(:test_model, test_attribute: "model 1", completed: true)
+    m1 = FactoryBot.create(:test_model, test_attribute: "model 1", completed: true)
     page.should have_content('rendered 3 times')
     page.should have_content('scope1 count = 1')
     page.should have_content('scope2 count = 1')
     page.should have_content('model 1')
     TestModel.scope1_count.should eq(3)
     TestModel.scope2_count.should eq(2)
-    m2 = FactoryGirl.create(:test_model, test_attribute: "model 2", completed: false)
+    m2 = FactoryBot.create(:test_model, test_attribute: "model 2", completed: false)
     page.should have_content('rendered 4 times')
     page.should have_content('scope1 count = 1')
     page.should have_content('scope2 count = 1')
     page.should have_content('model 1')
     TestModel.scope1_count.should eq(4)
     TestModel.scope2_count.should eq(3)
-    FactoryGirl.create(:test_model, test_attribute: "model 3", completed: true)
+    FactoryBot.create(:test_model, test_attribute: "model 3", completed: true)
     page.should have_content('rendered 5 times')
     page.should have_content('scope1 count = 2')
     page.should_not have_content('scope2', wait: 0)
@@ -142,7 +142,7 @@ describe "synchronized scopes", js: true do
         scope :with_args, ->(match, match2) { where(test_attribute: match) }
       end
     end
-    m1 = FactoryGirl.create(:test_model, test_attribute: "123")
+    m1 = FactoryBot.create(:test_model, test_attribute: "123")
     mount "TestComponent2", m: m1 do
       class TestComponent2 < React::Component::Base
         param :m, type: TestModel
@@ -158,7 +158,7 @@ describe "synchronized scopes", js: true do
         end
       end
     end
-    m2 = FactoryGirl.create(:test_model)
+    m2 = FactoryBot.create(:test_model)
     page.should have_content('.count = 1')
     m2.update_attribute(:test_attribute, m1.test_attribute)
     page.should have_content('.count = 2')
@@ -181,14 +181,14 @@ describe "synchronized scopes", js: true do
       end
     end
     page.should have_content('scope1.scope2.count = 0')
-    FactoryGirl.create(:test_model, test_attribute: "foo", completed: true)
+    FactoryBot.create(:test_model, test_attribute: "foo", completed: true)
     page.should have_content('scope1.scope2.count = 1')
   end
 
   it 'collections passed from server will not interfere with client associations' do
-    user = FactoryGirl.create(:user)
+    user = FactoryBot.create(:user)
     5.times do
-      FactoryGirl.create(:todo, title: 'active', created_by_id: user.id)
+      FactoryBot.create(:todo, title: 'active', created_by_id: user.id)
     end
 
     isomorphic do
@@ -227,8 +227,8 @@ describe "synchronized scopes", js: true do
           render { "TestModel.joined.count = #{TestModel.joined.count}" }
         end
       end
-      parent = FactoryGirl.create(:test_model)
-      child = FactoryGirl.create(:child_model, test_model: parent )
+      parent = FactoryBot.create(:test_model)
+      child = FactoryBot.create(:child_model, test_model: parent )
       page.should have_content('.count = 0')
       child.update_attribute(:child_attribute, 'WHAAA')
       page.should have_content('.count = 0')
@@ -247,8 +247,8 @@ describe "synchronized scopes", js: true do
           render { "TestModel.joined.count = #{TestModel.joined.count}" }
         end
       end
-      parent = FactoryGirl.create(:test_model)
-      child = FactoryGirl.create(:child_model, test_model: parent )
+      parent = FactoryBot.create(:test_model)
+      child = FactoryBot.create(:child_model, test_model: parent )
       page.should have_content('.count = 0')
       child.update_attribute(:child_attribute, 'WHAAA')
       page.should have_content('.count = 1')
@@ -277,7 +277,7 @@ describe "synchronized scopes", js: true do
         end
       end
     end
-    m1 = FactoryGirl.create(:test_model)
+    m1 = FactoryBot.create(:test_model)
     page.should have_content('.count = 0')
     page.should have_content('rendered 2 times')
     TestModel.quicker_count.should eq(1)
@@ -290,7 +290,7 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 1')
     page.should have_content('rendered 3 times')
     TestModel.quicker_count.should eq(1)
-    m2 = FactoryGirl.create(:test_model, completed: true)
+    m2 = FactoryBot.create(:test_model, completed: true)
     page.should have_content('.count = 2')
     page.should have_content('rendered 4 times')
     TestModel.quicker_count.should eq(1)
@@ -330,7 +330,7 @@ describe "synchronized scopes", js: true do
       end
     end
     TestModel.filter_and_sort_count.should eq(2)
-    m1 = FactoryGirl.create(:test_model)
+    m1 = FactoryBot.create(:test_model)
     page.should have_content('.count = 0')
     page.should have_content('rendered 2 times')
     page.should have_content('no test attributes')
@@ -346,12 +346,12 @@ describe "synchronized scopes", js: true do
     page.should have_content('rendered 3 times')
     page.should have_content('test attributes: N')
     TestModel.filter_and_sort_count.should eq(2)
-    m2 = FactoryGirl.create(:test_model, test_attribute: 'A', completed: true)
+    m2 = FactoryBot.create(:test_model, test_attribute: 'A', completed: true)
     page.should have_content('.count = 2')
     page.should have_content('rendered 4 times')
     page.should have_content('test attributes: A, N')
     TestModel.filter_and_sort_count.should eq(2)
-    m3 = FactoryGirl.create(:test_model, test_attribute: 'Z', completed: true)
+    m3 = FactoryBot.create(:test_model, test_attribute: 'Z', completed: true)
     page.should have_content('.count = 3')
     page.should have_content('rendered 5 times')
     page.should have_content('test attributes: A, N, Z')
@@ -411,7 +411,7 @@ describe "synchronized scopes", js: true do
       end
     end
     starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
-    m1 = FactoryGirl.create(:test_model)
+    m1 = FactoryBot.create(:test_model)
     page.should have_content('.count = 0')
     page.should have_content('rendered 2 times')
     page.should have_content('no test attributes')
@@ -423,11 +423,11 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 1')
     page.should have_content('rendered 3 times')
     page.should have_content('test attributes: N')
-    m2 = FactoryGirl.create(:test_model, test_attribute: 'A - is a foo')
+    m2 = FactoryBot.create(:test_model, test_attribute: 'A - is a foo')
     page.should have_content('.count = 2')
     page.should have_content('rendered 4 times')
     page.should have_content('test attributes: A, N')
-    m3 = FactoryGirl.create(:test_model, test_attribute: 'Z - is also a foo')
+    m3 = FactoryBot.create(:test_model, test_attribute: 'Z - is also a foo')
     page.should have_content('.count = 3')
     page.should have_content('rendered 5 times')
     page.should have_content('test attributes: A, N, Z')
@@ -472,9 +472,9 @@ describe "synchronized scopes", js: true do
       end
     end
     TestModel.has_children_count.should eq(1)
-    parent = FactoryGirl.create(:test_model)
+    parent = FactoryBot.create(:test_model)
     page.should have_content('.count = 0')
-    child = FactoryGirl.create(:child_model)
+    child = FactoryBot.create(:child_model)
     page.should have_content('.count = 0')
     child.update_attribute(:test_model, parent)
     page.should have_content('.count = 1')
@@ -512,11 +512,11 @@ describe "synchronized scopes", js: true do
     end
     TestModel.has_children_joins_all_count.should eq(1)
     TestModel.has_children_no_joins_count.should eq(1)
-    parent = FactoryGirl.create(:test_model)
+    parent = FactoryBot.create(:test_model)
     wait_for_ajax
     TestModel.has_children_no_joins_count.should eq(1)
     wait_for { TestModel.has_children_joins_all_count }.to eq(2)
-    child = FactoryGirl.create(:child_model)
+    child = FactoryBot.create(:child_model)
     wait_for { TestModel.has_children_joins_all_count }.to eq(3)
     parent.child_models << child
     wait_for { TestModel.has_children_joins_all_count }.to eq(4)
@@ -542,9 +542,9 @@ describe "synchronized scopes", js: true do
         end
       end
     end
-    FactoryGirl.create(:test_model, test_attribute: 1)
+    FactoryBot.create(:test_model, test_attribute: 1)
     page.should have_content('test attributes: 1')
-    FactoryGirl.create(:test_model, test_attribute: 2)
+    FactoryBot.create(:test_model, test_attribute: 2)
     page.should have_content('test attributes: 2, 1')
   end
 
@@ -573,9 +573,9 @@ describe "synchronized scopes", js: true do
         end
       end
     end
-    FactoryGirl.create(:test_model, test_attribute: 1)
+    FactoryBot.create(:test_model, test_attribute: 1)
     page.should have_content('test attributes: 1')
-    FactoryGirl.create(:test_model, test_attribute: 2)
+    FactoryBot.create(:test_model, test_attribute: 2)
     page.should have_content('test attributes: 2, 1')
   end
 end

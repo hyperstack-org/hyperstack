@@ -129,13 +129,13 @@ if RUBY_ENGINE != 'opal'
     config.run_all_when_everything_filtered = true
   end
 
-  FACTORY_GIRL = false
+  FACTORY_BOT = false
 
   #require 'rails_helper'
   require 'rspec'
   require 'rspec/expectations'
   begin
-    require 'factory_girl_rails'
+    require 'factory_bot_rails'
   rescue LoadError
   end
   require 'shoulda/matchers'
@@ -224,7 +224,7 @@ if RUBY_ENGINE != 'opal'
       mocks.verify_partial_doubles = true
     end
 
-    config.include FactoryGirl::Syntax::Methods if defined? FactoryGirl
+    config.include FactoryBot::Syntax::Methods if defined? FactoryBot
 
     config.use_transactional_fixtures = false
 
@@ -360,12 +360,12 @@ if RUBY_ENGINE != 'opal'
 
   end
 
-  FactoryGirl.define do
+  FactoryBot.define do
 
     sequence :seq_number do |n|
       " #{n}"
     end
 
-  end if defined? FactoryGirl
+  end if defined? FactoryBot
 
 end

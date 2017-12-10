@@ -23,7 +23,7 @@ describe "regulate access allowed" do
     end
 
     it "will allow access if the broadcast policy allows access" do
-      m = FactoryGirl.create(:test_model, test_attribute: "hello")
+      m = FactoryBot.create(:test_model, test_attribute: "hello")
       expect { m.check_permission_with_acting_user("user", :view_permitted?, :test_attribute) }.
       not_to raise_error
       expect { m.check_permission_with_acting_user("user", :view_permitted?, :created_at) }.
@@ -31,7 +31,7 @@ describe "regulate access allowed" do
     end
 
     it "will disallow access if acting_user is not allowed to connect" do
-      m = FactoryGirl.create(:test_model, test_attribute: "hello")
+      m = FactoryBot.create(:test_model, test_attribute: "hello")
       expect { m.check_permission_with_acting_user(nil, :view_permitted?, :test_attribute) }.
       to raise_error(ReactiveRecord::AccessViolation)
       expect { m.check_permission_with_acting_user(nil, :view_permitted?, :created_at) }.
@@ -39,7 +39,7 @@ describe "regulate access allowed" do
     end
 
     it "will disallow access to attributes not broadcast by the model" do
-      m = FactoryGirl.create(:test_model, test_attribute: "bogus")
+      m = FactoryBot.create(:test_model, test_attribute: "bogus")
       expect { m.check_permission_with_acting_user("user", :view_permitted?, :test_attribute) }.
       not_to raise_error
       expect { m.check_permission_with_acting_user("user", :view_permitted?, :created_at) }.
@@ -47,7 +47,7 @@ describe "regulate access allowed" do
     end
 
     it "will allow access to attributes broadcast over an instance channel" do
-      m = FactoryGirl.create(:test_model, test_attribute: "bogus")
+      m = FactoryBot.create(:test_model, test_attribute: "bogus")
       expect { m.check_permission_with_acting_user(m, :view_permitted?, :test_attribute) }.
       not_to raise_error
       expect { m.check_permission_with_acting_user(m, :view_permitted?, :created_at) }.
@@ -62,7 +62,7 @@ describe "regulate access allowed" do
       always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_only(:test_attribute) }
     end
-    m = FactoryGirl.create(:test_model)
+    m = FactoryBot.create(:test_model)
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :id) }.
     not_to raise_error
   end
@@ -73,7 +73,7 @@ describe "regulate access allowed" do
     TestApplicationPolicy.class_eval do
       always_allow_connection
     end
-    m = FactoryGirl.create(:test_model)
+    m = FactoryBot.create(:test_model)
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :id) }.
     to raise_error(ReactiveRecord::AccessViolation)
   end
@@ -87,7 +87,7 @@ describe "regulate access allowed" do
       regulate_all_broadcasts { |policy| policy.send_only(:test_attribute) }
       regulate_broadcast(TestModel) { |policy| policy.send_only(:created_at).to(self) }
     end
-    m = FactoryGirl.create(:test_model)
+    m = FactoryBot.create(:test_model)
     expect { m.check_permission_with_acting_user(m, :view_permitted?, :id) }.
     not_to raise_error
     expect { m.check_permission_with_acting_user(m, :view_permitted?, :test_attribute) }.

@@ -26,7 +26,7 @@ RSpec::Steps.steps "finder_method", js: true do
       end
     end
     size_window(:small, :portrait)
-    5.times { FactoryGirl.create(:todo) }
+    5.times { FactoryBot.create(:todo) }
   end
 
   it "returns the correct value" do

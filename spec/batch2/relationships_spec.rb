@@ -32,7 +32,7 @@ describe "synchronizing relationships", js: true do
   end
 
   it "belongs_to with count" do
-    parent = FactoryGirl.create(:test_model)
+    parent = FactoryBot.create(:test_model)
     mount "TestComponent2", model: parent do
       class TestComponent2 < React::Component::Base
         param :model, type: TestModel
@@ -45,16 +45,16 @@ describe "synchronizing relationships", js: true do
     end
 
     page.should have_content("0 items")
-    FactoryGirl.create(:child_model, test_model: parent, child_attribute: "first child")
+    FactoryBot.create(:child_model, test_model: parent, child_attribute: "first child")
     page.should have_content("1 items")
-    parent.child_models << FactoryGirl.create(:child_model, child_attribute: "second child")
+    parent.child_models << FactoryBot.create(:child_model, child_attribute: "second child")
     page.should have_content("2 items")
     parent.child_models.first.destroy
     page.should have_content("1 items")
   end
 
   it "belongs_to without the associated record" do
-    parent = FactoryGirl.create(:test_model)
+    parent = FactoryBot.create(:test_model)
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         render(:div) do
@@ -64,9 +64,9 @@ describe "synchronizing relationships", js: true do
       end
     end
     page.should have_content("0 items")
-    FactoryGirl.create(:child_model, test_model: parent, child_attribute: "first child")
+    FactoryBot.create(:child_model, test_model: parent, child_attribute: "first child")
     page.should have_content("1 items")
-    parent.child_models << FactoryGirl.create(:child_model, child_attribute: "second child")
+    parent.child_models << FactoryBot.create(:child_model, child_attribute: "second child")
     page.should have_content("2 items")
     parent.child_models.first.destroy
     page.should have_content("1 items")
@@ -99,8 +99,8 @@ describe "synchronizing relationships", js: true do
     # Hyperloop.configuration do |config|
     #   #config.transport = :none
     # end
-    m = FactoryGirl.create(:test_model)
-    m.child_models << FactoryGirl.create(:child_model)
+    m = FactoryBot.create(:test_model)
+    m.child_models << FactoryBot.create(:child_model)
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         def self.parent
@@ -117,13 +117,13 @@ describe "synchronizing relationships", js: true do
     end
     wait_for_ajax
     expect(TestModel.first.child_models.count).to eq(1)
-    m.child_models << FactoryGirl.create(:child_model)
+    m.child_models << FactoryBot.create(:child_model)
     evaluate_ruby("TestComponent2.add_child")
     page.should have_content("parent has 3 children")
   end
 
   it "will re-render the count after an item is added or removed from a model" do
-    m1 = FactoryGirl.create(:test_model)
+    m1 = FactoryBot.create(:test_model)
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         render(:div) do
@@ -132,7 +132,7 @@ describe "synchronizing relationships", js: true do
       end
     end
     page.should have_content("Count of TestModel: 1")
-    m2 = FactoryGirl.create(:test_model)
+    m2 = FactoryBot.create(:test_model)
     page.should have_content("Count of TestModel: 2")
     m1.destroy
     page.should have_content("Count of TestModel: 1")
@@ -141,7 +141,7 @@ describe "synchronizing relationships", js: true do
   end
 
   it "will re-render the model's all scope after an item is added or removed" do
-    m1 = FactoryGirl.create(:test_model)
+    m1 = FactoryBot.create(:test_model)
     mount "TestComponent2" do
       class TestComponent2 < React::Component::Base
         render(:div) do
@@ -151,7 +151,7 @@ describe "synchronizing relationships", js: true do
       end
     end
     page.should have_content("Count of TestModel: 1")
-    m2 = FactoryGirl.create(:test_model)
+    m2 = FactoryBot.create(:test_model)
     page.should have_content("Count of TestModel: 2")
     m1.destroy
     page.should have_content("Count of TestModel: 1")
@@ -169,8 +169,8 @@ describe "synchronizing relationships", js: true do
         end
       end
 
-      m = FactoryGirl.create(:test_model, test_attribute: 'hello')
-      FactoryGirl.create(:child_model, test_model: m)
+      m = FactoryBot.create(:test_model, test_attribute: 'hello')
+      FactoryBot.create(:child_model, test_model: m)
 
       mount "TestComponent3" do
         class TestComponent3 < React::Component::Base
@@ -215,8 +215,8 @@ describe "synchronizing relationships", js: true do
 
     before(:each) do
 
-      m = FactoryGirl.create(:test_model, test_attribute: 'hello')
-      FactoryGirl.create(:child_model, test_model: m)
+      m = FactoryBot.create(:test_model, test_attribute: 'hello')
+      FactoryBot.create(:child_model, test_model: m)
 
       mount "TestComponent3" do
         class TestComponent3 < React::Component::Base
