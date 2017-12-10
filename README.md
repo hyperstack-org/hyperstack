@@ -49,7 +49,7 @@ end
 
 Hyperloop wants to make the server-client divide as transparent to the developer as practical.  Given this, it makes sense that the testing should also be done with as little concern for client versus server.  
 
-HyperSpec allows you to directly use tools like FactoryGirl (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code.
+HyperSpec allows you to directly use tools like FactoryBot (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code.
 
 
 ## Installation
