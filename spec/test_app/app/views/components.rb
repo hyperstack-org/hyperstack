@@ -1,5 +1,5 @@
 require 'opal'
-require 'react/react-source'
+require 'react/react-source-browser'
 require 'hyper-component'
 require 'hyper-operation'
 if React::IsomorphicHelpers.on_opal_client?
