@@ -55,7 +55,7 @@ RSpec.configure do |config|
     #mocks.verify_partial_doubles = true
   end
 
-  #config.include FactoryGirl::Syntax::Methods if defined? FactoryGirl
+  #config.include FactoryBot::Syntax::Methods if defined? FactoryBot
 
   #config.use_transactional_fixtures = false
 
