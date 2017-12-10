@@ -165,7 +165,7 @@ describe 'Hyperloop::Operation basics' do
           end
         end
       end
-      expect(Store).to receive(:error).with(NoMethodError)
+      expect(Store).to receive(:error).with(NameError)
       MyOperation.run(sku: "sku")
     end
 
