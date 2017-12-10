@@ -113,6 +113,17 @@ if RUBY_ENGINE != 'opal'
       end
     end
 
+    # Fail tests on JavaScript errors in Chrome Headless
+    class JavaScriptError < StandardError; end
+
+    # config.after(:each, js: true) do |spec|
+    #   errors = page.driver.browser.manage.logs.get(:browser)
+    #               .select { |e| e.level == "SEVERE" && e.message.present? }
+    #               #.map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+    #               #.reject { |e| e =~ /Unexpected response code: 200/ }
+    #   raise JavaScriptError, errors.join("\n\n") if errors.present?
+    # end
+
     config.filter_run_including focus: true
     config.filter_run_excluding opal: true
     config.run_all_when_everything_filtered = true
