@@ -354,8 +354,6 @@ if RUBY_ENGINE != 'opal'
       Capybara.javascript_driver = :selenium_chrome_headless
     end
 
-    Capybara.javascript_driver = :selenium_chrome_headless
-
     include ComponentTestHelpers
 
   end
