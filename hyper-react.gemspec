@@ -12,10 +12,10 @@ Gem::Specification.new do |spec|
   spec.summary       = 'Opal Ruby wrapper of React.js library.'
   spec.license       = 'MIT'
   spec.description   = 'Write React UI components in pure Ruby.'
-  spec.metadata      = {
-    "homepage_uri" => 'http://ruby-hyperloop.org',
-    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  }
+  # spec.metadata      = {
+  #   "homepage_uri" => 'http://ruby-hyperloop.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  # }
 
   spec.files         = `git ls-files`.split("\n").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
