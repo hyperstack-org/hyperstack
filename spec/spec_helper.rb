@@ -350,6 +350,8 @@ if RUBY_ENGINE != 'opal'
       Capybara.javascript_driver = :selenium_with_firebug
     elsif ENV['DRIVER'] == 'chrome'
       Capybara.javascript_driver = :chrome
+    elsif ENV['DRIVER'] == 'headless'
+      Capybara.javascript_driver = :selenium_chrome_headless
     else
       Capybara.javascript_driver = :selenium_chrome_headless
     end
