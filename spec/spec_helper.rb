@@ -113,18 +113,29 @@ if RUBY_ENGINE != 'opal'
       end
     end
 
+    # Fail tests on JavaScript errors in Chrome Headless
+    class JavaScriptError < StandardError; end
+
+    # config.after(:each, js: true) do |spec|
+    #   errors = page.driver.browser.manage.logs.get(:browser)
+    #               .select { |e| e.level == "SEVERE" && e.message.present? }
+    #               #.map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+    #               #.reject { |e| e =~ /Unexpected response code: 200/ }
+    #   raise JavaScriptError, errors.join("\n\n") if errors.present?
+    # end
+
     config.filter_run_including focus: true
     config.filter_run_excluding opal: true
     config.run_all_when_everything_filtered = true
   end
 
-  FACTORY_GIRL = false
+  FACTORY_BOT = false
 
   #require 'rails_helper'
   require 'rspec'
   require 'rspec/expectations'
   begin
-    require 'factory_girl_rails'
+    require 'factory_bot_rails'
   rescue LoadError
   end
   require 'shoulda/matchers'
@@ -213,7 +224,7 @@ if RUBY_ENGINE != 'opal'
       mocks.verify_partial_doubles = true
     end
 
-    config.include FactoryGirl::Syntax::Methods if defined? FactoryGirl
+    config.include FactoryBot::Syntax::Methods if defined? FactoryBot
 
     config.use_transactional_fixtures = false
 
@@ -349,12 +360,12 @@ if RUBY_ENGINE != 'opal'
 
   end
 
-  FactoryGirl.define do
+  FactoryBot.define do
 
     sequence :seq_number do |n|
       " #{n}"
     end
 
-  end if defined? FactoryGirl
+  end if defined? FactoryBot
 
 end

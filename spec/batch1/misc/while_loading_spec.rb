@@ -36,7 +36,7 @@ describe "while loading", js: true do
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
     size_window(:small, :portrait)
-    FactoryGirl.create(:user, first_name: 'Lily', last_name: 'DaDog')
+    FactoryBot.create(:user, first_name: 'Lily', last_name: 'DaDog')
 
   end
 

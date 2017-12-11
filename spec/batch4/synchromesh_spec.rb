@@ -31,7 +31,7 @@ describe "HyperMesh", js: true do
 
   it "will synchronize on an attribute update" do
     mount "TestComponent"
-    FactoryGirl.create(:test_model, test_attribute: "hello")
+    FactoryBot.create(:test_model, test_attribute: "hello")
     page.should have_content("hello")
     TestModel.first.update_attribute(:test_attribute, 'goodby')
     page.should have_content("goodby")
@@ -40,7 +40,7 @@ describe "HyperMesh", js: true do
   describe "the .all method" do
     before(:each) do
       mount "TestComponent"
-      5.times { |i| FactoryGirl.create(:test_model, test_attribute: "I am item #{i}") }
+      5.times { |i| FactoryBot.create(:test_model, test_attribute: "I am item #{i}") }
       page.should have_content("5 items")
     end
 
@@ -58,7 +58,7 @@ describe "HyperMesh", js: true do
   describe "scopes" do
     before(:each) do
       mount "TestComponent", scope: :active
-      5.times { |i| FactoryGirl.create(:test_model, test_attribute: "I am item #{i}", completed: false) }
+      5.times { |i| FactoryBot.create(:test_model, test_attribute: "I am item #{i}", completed: false) }
       page.should have_content("5 items")
     end
 

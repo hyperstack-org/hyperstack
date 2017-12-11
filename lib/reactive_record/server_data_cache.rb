@@ -126,7 +126,7 @@ module ReactiveRecord
         end
 
         def as_json
-          @requested_cache_items.inject({}) do | hash, cache_item|
+          @requested_cache_items.inject({}) do |hash, cache_item|
             hash.deep_merge! cache_item.as_hash
           end
         end
@@ -141,16 +141,15 @@ module ReactiveRecord
 
           attr_reader :vector
           attr_reader :absolute_vector
-          attr_reader :record_chain
           attr_reader :root
           attr_reader :acting_user
 
           def value
-            @ar_object
+            @value # which is a ActiveRecord object
           end
 
           def method
-            vector.last
+            @vector.last
           end
 
           def self.new(db_cache, acting_user, klass, preloaded_records)
@@ -166,8 +165,7 @@ module ReactiveRecord
             @db_cache = db_cache
             @acting_user = acting_user
             @vector = @absolute_vector = [klass]
-            @ar_object = klass
-            @record_chain = []
+            @value = klass
             @parent = nil
             @root = self
             @preloaded_records = preloaded_records
@@ -175,10 +173,10 @@ module ReactiveRecord
           end
 
           def apply_method_to_cache(method)
-            @db_cache.inject(nil) do | representative, cache_item |
+            @db_cache.inject(nil) do |representative, cache_item|
               if cache_item.vector == vector
-                if @ar_object.class < ActiveRecord::Base and @ar_object.attributes.has_key?(method)
-                  @ar_object.check_permission_with_acting_user(acting_user, :view_permitted?, method)
+                if @value.class < ActiveRecord::Base and @value.attributes.has_key?(method)
+                  @value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
                 end
                 if method == "*"
                   cache_item.apply_star || representative
@@ -191,14 +189,14 @@ module ReactiveRecord
                 elsif aggregation = cache_item.aggregation?(method)
                   cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
                 else
-                  begin
-                    cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
-                  rescue Exception => e
-                    if cache_item.value and cache_item.value != []
-                      ReactiveRecord::Pry::rescued(e)
+                  if !cache_item.value || cache_item.value.class == Array
+                    representative
+                  else
+                    begin
+                      cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
+                    rescue Exception => e
+                      # ReactiveRecord::Pry::rescued(e)
                       raise e, "ReactiveRecord exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
-                    else
-                      representative
                     end
                   end
                 end
@@ -209,23 +207,23 @@ module ReactiveRecord
           end
 
           def aggregation?(method)
-            if method.is_a?(String) && value.class.respond_to?(:reflect_on_aggregation)
-              aggregation = value.class.reflect_on_aggregation(method.to_sym)
-              if aggregation && !(aggregation.klass < ActiveRecord::Base) && value.send(method)
+            if method.is_a?(String) && @value.class.respond_to?(:reflect_on_aggregation)
+              aggregation = @value.class.reflect_on_aggregation(method.to_sym)
+              if aggregation && !(aggregation.klass < ActiveRecord::Base) && @value.send(method)
                 aggregation
               end
             end
           end
 
           def apply_star
-            if value && value.length > 0
+            if @value && @value.length > 0
               i = -1
-              value.inject(nil) do | representative, ar_object |
+              @value.inject(nil) do |representative, current_value|
                 i += 1
-                if preloaded_value = @preloaded_records[absolute_vector + ["*#{i}"]]
+                if preloaded_value = @preloaded_records[@absolute_vector + ["*#{i}"]]
                   build_new_cache_item(preloaded_value, "*", "*#{i}")
                 else
-                  build_new_cache_item(ar_object, "*", "*#{i}")
+                  build_new_cache_item(current_value, "*", "*#{i}")
                 end
               end
             else
@@ -233,12 +231,12 @@ module ReactiveRecord
             end
           end
 
-          def build_new_cache_item(new_ar_object, method, absolute_method)
+          def build_new_cache_item(new_value, method, absolute_method)
             new_parent = self
             self.clone.instance_eval do
               @vector = @vector + [method]  # don't push it on since you need a new vector!
               @absolute_vector = @absolute_vector + [absolute_method]
-              @ar_object = new_ar_object
+              @value = new_value
               @db_cache << self
               @parent = new_parent
               @root = new_parent.root
@@ -265,20 +263,20 @@ module ReactiveRecord
 
           def as_hash(children = nil)
             unless children
-              return {} if @ar_object.is_a?(Class) and (@ar_object < ActiveRecord::Base)
-              children = [@ar_object.is_a?(BigDecimal) ? @ar_object.to_f : @ar_object]
+              return {} if @value.is_a?(Class) and (@value < ActiveRecord::Base)
+              children = [@value.is_a?(BigDecimal) ? @value.to_f : @value]
             end
             if @parent
               if method == "*"
-                if @ar_object.is_a? Array  # this happens when a scope is empty there is test case, but
+                if @value.is_a? Array  # this happens when a scope is empty there is test case, but
                   @parent.as_hash({})      # does it work for all edge cases?
                 else
-                  @parent.as_hash({@ar_object.id => children})
+                  @parent.as_hash({@value.id => children})
                 end
-              elsif @ar_object.class < ActiveRecord::Base and children.is_a? Hash
+              elsif @value.class < ActiveRecord::Base and children.is_a? Hash
                 @parent.as_hash({jsonize(method) => children.merge({
-                  :id => (method.is_a?(Array) && method.first == "new") ? [nil] : [@ar_object.id],
-                  @ar_object.class.inheritance_column => [@ar_object[@ar_object.class.inheritance_column]],
+                  :id => (method.is_a?(Array) && method.first == "new") ? [nil] : [@value.id],
+                  @value.class.inheritance_column => [@value[@value.class.inheritance_column]],
                   })})
               elsif method == "*all"
                 @parent.as_hash({jsonize(method) => children.first})
@@ -291,7 +289,7 @@ module ReactiveRecord
           end
 
           def to_json
-            value.to_json
+            @value.to_json
           end
 
         end

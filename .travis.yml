@@ -4,31 +4,19 @@ rvm:
 services:
   - mysql
 env:
-  - PHANTOMJS_VERSION=2.1.1 TZ=Europe/Berlin
-cache:
-  directories:
-    - "travis_phantomjs"
+  - HYPER_DEV_GEMSOURCE="https://gems.urby-hyperloop.org"
 before_install:
-  - "phantomjs --version"
-  - "export PATH=$PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION-linux-x86_64/bin:$PATH"
-  - "phantomjs --version"
-  - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then rm -rf $PWD/travis_phantomjs; mkdir -p $PWD/travis_phantomjs; fi"
-  - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then wget https://github.com/Medium/phantomjs/releases/download/v$PHANTOMJS_VERSION/phantomjs-$PHANTOMJS_VERSION-linux-x86_64.tar.bz2 -O $PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION-linux-x86_64.tar.bz2; fi"
-  - "if [ $(phantomjs --version) != $PHANTOMJS_VERSION ]; then tar -xvf $PWD/travis_phantomjs/phantomjs-$PHANTOMJS_VERSION-linux-x86_64.tar.bz2 -C $PWD/travis_phantomjs; fi"
-  - "phantomjs --version"
   - gem install bundler
 before_script:
-  - phantomjs --version
   - cd spec/test_app
   - bundle update
   - rails db:setup
   - cd ../../
 script: bundle exec rspec
 gemfile:
-  - gemfiles/opal_release_react-rails_release.gemfile
-  - gemfiles/opal_master_react-rails_release.gemfile
-  - gemfiles/opal_release_react-rails_master.gemfile
+  - gemfiles/opal_0_10_react-rails_2_3.gemfile
+  - gemfiles/opal_0_10_react-rails_2_4.gemfile
+  - gemfiles/opal_0_11_react-rails_2_4.gemfile
 matrix:
   allow_failures:
-    - gemfile: gemfiles/opal_master_react-rails_release.gemfile
-    - gemfile: gemfiles/opal_release_react-rails_master.gemfile
+    - gemfile: gemfiles/opal_0_11_react-rails_2_4.gemfile
