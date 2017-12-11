@@ -1,3 +1,3 @@
 module HyperRouter
-  VERSION = '4.2.6-lap10'
+  VERSION = '4.2.6-lap11'
 end
