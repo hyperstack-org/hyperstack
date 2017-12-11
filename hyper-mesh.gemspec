@@ -15,10 +15,10 @@ Gem::Specification.new do |spec|
                        'dynamically updated on all authorised clients.'
   spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
-  spec.metadata      = {
-    "homepage_uri" => 'http://ruby-hyperloop.org',
-    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  }
+  # spec.metadata      = {
+  #   "homepage_uri" => 'http://ruby-hyperloop.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  # }
 
   spec.files          = `git ls-files`.split("\n").reject { |f| f.match(%r{^(examples|gemfiles|pkg|reactive_record_test_app|spec)/}) }
   spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
