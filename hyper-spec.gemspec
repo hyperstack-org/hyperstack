@@ -14,10 +14,10 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
                        'Test them all from Rspec, regardless if the code runs on the client or server.'
   spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
-  spec.metadata      = {
-    "homepage_uri" => 'http://ruby-hyperloop.org',
-    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  }
+  # spec.metadata      = {
+  #   "homepage_uri" => 'http://ruby-hyperloop.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  # }
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.bindir        = 'exe'
