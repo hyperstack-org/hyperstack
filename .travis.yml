@@ -13,8 +13,8 @@ before_script:
   - bundle update
   - rails db:setup
   - cd ../../
-  - chomedriver-update
-  - ls -lR ~/.chomedriver-helper/
+  - chromedriver-update
+  - ls -lR ~/.chromedriver-helper/
 script: bundle exec rspec
 gemfile:
   - gemfiles/opal_0_10_react-rails_2_3.gemfile
