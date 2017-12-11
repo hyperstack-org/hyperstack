@@ -11,10 +11,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
   spec.summary       = 'hyper-router for Opal, part of ruby-hyperloop'
-  spec.metadata      = {
-    "homepage_uri" => 'http://ruby-hyperloop.org',
-    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  }
+  # spec.metadata      = {
+  #   "homepage_uri" => 'http://ruby-hyperloop.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  # }
 
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   spec.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
