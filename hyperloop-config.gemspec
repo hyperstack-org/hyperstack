@@ -11,10 +11,10 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Provides a single point configuration module for hyperloop gems}
   spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
-  spec.metadata      = {
-    "homepage_uri" => 'http://ruby-hyperloop.org',
-    "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  }
+  # spec.metadata      = {
+  #   "homepage_uri" => 'http://ruby-hyperloop.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  # }
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = 'exe'
