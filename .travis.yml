@@ -4,7 +4,7 @@ rvm:
 services:
   - mysql
 env:
-  - HYPER_DEV_GEMSOURCE="https://gems.urby-hyperloop.org"
+  - HYPER_DEV_GEM_SOURCE="https://gems.urby-hyperloop.org"
 before_install:
   - gem install bundler
 before_script:
