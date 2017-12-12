@@ -26,10 +26,14 @@ module Hyperloop
           end
           run(params)
           .then { |r| return { json: { response: serialize_response(r) } } }
-          .fail { |e| return { json: { error: e }, status: 500 } }
+          .fail do |e|
+            ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp failed when running #{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+            return { json: { error: e }, status: 500 }
+          end
         end
       rescue Exception => e
-        { json: {error: e}, status: 500 }
+        ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp exception caught when running #{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+        { json: { error: e }, status: 500 }
       end
 
       def remote(path, *args)
