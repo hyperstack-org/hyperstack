@@ -196,7 +196,8 @@ module ReactiveRecord
                       cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
                     rescue Exception => e
                       # ReactiveRecord::Pry::rescued(e)
-                      raise e, "ReactiveRecord exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
+                      ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel exception caught when applying #{method} to db object #{cache_item.value}: #{e}\033[0;30;21m"
+                      raise e, "HyperModel fetching records failed, exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
                     end
                   end
                 end
