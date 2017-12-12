@@ -8,7 +8,7 @@ module React
 
     if RUBY_ENGINE != 'opal'
       def self.load_context(ctx, controller, name = nil)
-        puts "************************** React Server Context Initialized #{name} *********************************************"
+        ::Rails.logger.debug "************************** React Server Context Initialized #{name} *********************************************"
         @context = Context.new("#{controller.object_id}-#{Time.now.to_i}", ctx, controller, name)
       end
     else
