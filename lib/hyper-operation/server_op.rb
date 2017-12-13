@@ -38,11 +38,12 @@ module Hyperloop
       isomorphic_method(:internal_iso_run) do |f, klass_name, op_params|
         f.send_to_server(klass_name, op_params)
         f.when_on_server {
-          Hyperloop::ServerOp.run_from_client(nil, controller, klass_name, op_params.first)
+          Hyperloop::ServerOp.run_from_client(controller.acting_user, controller, klass_name, op_params.first)
         }
       end
     
       def run_from_client(security_param, controller, operation, params)
+        puts "---------------------------------------------------> params #{params}"
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
