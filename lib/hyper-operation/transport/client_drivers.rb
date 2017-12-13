@@ -20,7 +20,8 @@ module Hyperloop
     end
 
     def self.env
-      ClientDrivers.env
+      @env = ClientDrivers.env unless @env
+      @env
     end
 
     def self.production?
