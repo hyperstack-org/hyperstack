@@ -2,7 +2,7 @@ module Hyperloop
   class ServerOp < Operation
 
     class << self
-      include React::IsomorphicHelpers # ::ClassMethods
+      include React::IsomorphicHelpers
 
       if RUBY_ENGINE == 'opal'
         if on_opal_client?
@@ -43,7 +43,6 @@ module Hyperloop
       end
     
       def run_from_client(security_param, controller, operation, params)
-        puts "---------------------------------------------------> params #{params}"
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
