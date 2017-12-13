@@ -7,8 +7,24 @@ module Hyperloop
   # client interface to sync_change or sync_destroy
 
   class Application
-    def self.acting_user_id
-      ClientDrivers.opts[:acting_user_id]
+    extend React::IsomorphicHelpers::ClassMethods
+    
+    if on_opal_client?
+      def self.acting_user_id
+        ClientDrivers.opts[:acting_user_id]
+      end
+    else
+      def self.acting_user_id
+        ClientDrivers.client_drivers_get_acting_user_id
+      end
+    end
+
+    def self.env
+      ClientDrivers.env
+    end
+
+    def self.production?
+      env == 'production'
     end
   end
 
@@ -123,6 +139,7 @@ module Hyperloop
         transport: Hyperloop.transport,
         id: id,
         acting_user_id: (controller.acting_user && controller.acting_user.id),
+        env: ::Rails.env,
         client_logging: Hyperloop.client_logging,
         pusher_fake_js: pusher_fake_js,
         key: Hyperloop.key,
@@ -147,6 +164,17 @@ module Hyperloop
 
     class << self
       attr_reader :opts
+    end
+
+    isomorphic_method(:client_drivers_get_acting_user_id) do |f|
+      f.send_to_server if RUBY_ENGINE == 'opal'
+      f.when_on_server { (controller.acting_user && controller.acting_user.id) }
+    end
+
+    isomorphic_method(:env) do |f|
+      f.when_on_client { opts[:env] }
+      f.send_to_server
+      f.when_on_server { ::Rails.env }
     end
 
     def self.get_queued_data(operation, channel = nil, opts = {})
