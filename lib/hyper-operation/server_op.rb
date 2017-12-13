@@ -2,21 +2,46 @@ module Hyperloop
   class ServerOp < Operation
 
     class << self
-      def run(*args)
-        hash = _Railway.params_wrapper.combine_arg_array(args)
-        hash = serialize_params(hash)
-        HTTP.post(
-          "#{`window.HyperloopEnginePath`}/execute_remote",
-          payload: {json: {operation: name, params: hash}.to_json},
-          headers: {'X-CSRF-Token' => Hyperloop::ClientDrivers.opts[:form_authenticity_token] }
-          )
-        .then do |response|
-          deserialize_response response.json[:response]
-        end.fail do |response|
-          Exception.new response.json[:error]
-        end
-      end if RUBY_ENGINE == 'opal'
+      include React::IsomorphicHelpers # ::ClassMethods
 
+      if RUBY_ENGINE == 'opal'
+        if on_opal_client?
+          def run(*args)
+            hash = _Railway.params_wrapper.combine_arg_array(args)
+            hash = serialize_params(hash)
+            HTTP.post(
+              "#{`window.HyperloopEnginePath`}/execute_remote",
+              payload: {json: {operation: name, params: hash}.to_json},
+              headers: {'X-CSRF-Token' => Hyperloop::ClientDrivers.opts[:form_authenticity_token] }
+              )
+            .then do |response|
+              deserialize_response response.json[:response]
+            end
+            .fail do |response|
+              Exception.new response.json[:error]
+            end
+          end
+        elsif on_opal_server?
+          def run(*args)
+            promise = Promise.new
+            response = internal_iso_run(name, args)
+            if response[:json][:response]
+              promise.resolve(response[:json][:response])
+            else
+              promise.reject Exception.new response[:json][:error]
+            end
+            promise
+          end
+        end
+      end
+
+      isomorphic_method(:internal_iso_run) do |f, klass_name, op_params|
+        f.send_to_server(klass_name, op_params)
+        f.when_on_server {
+          Hyperloop::ServerOp.run_from_client(nil, controller, klass_name, op_params.first)
+        }
+      end
+    
       def run_from_client(security_param, controller, operation, params)
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
