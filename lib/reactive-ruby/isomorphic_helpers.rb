@@ -8,8 +8,9 @@ module React
 
     if RUBY_ENGINE != 'opal'
       def self.load_context(ctx, controller, name = nil)
-        ::Rails.logger.debug "************************** React Server Context Initialized #{name} *********************************************"
         @context = Context.new("#{controller.object_id}-#{Time.now.to_i}", ctx, controller, name)
+        @context.load_opal_context
+        ::Rails.logger.debug "************************** React Server Context Initialized #{name} #{Time.now.to_f} *********************************************"
       end
     else
       def self.load_context(unique_id = nil, name = nil)
@@ -112,8 +113,9 @@ module React
         @prerender_footer_blocks ||= []
       end
 
-      def initialize(unique_id, ctx = nil, controller = nil, name = nil)
+      def initialize(unique_id, ctx = nil, controller = nil, cname = nil)
         @unique_id = unique_id
+        @cname = cname
         if RUBY_ENGINE != 'opal'
           @controller = controller
           @ctx = ctx
@@ -122,10 +124,14 @@ module React
               @ctx.attach("ServerSideIsomorphicMethod.#{method_name}", proc{|args| block.call(args.to_json)})
             end
           end
-          send_to_opal(:load_context, @unique_id, name)
         end
         Hyperloop::Application::Boot.run(context: self)
         self.class.before_first_mount_blocks.each { |block| block.call(self) }
+      end
+
+      def load_opal_context
+        puts "loc #{Time.now.to_f}"
+        send_to_opal(:load_context, @unique_id, @cname)
       end
 
       def eval(js)
