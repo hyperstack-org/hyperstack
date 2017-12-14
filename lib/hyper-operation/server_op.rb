@@ -38,7 +38,7 @@ module Hyperloop
       isomorphic_method(:internal_iso_run) do |f, klass_name, op_params|
         f.send_to_server(klass_name, op_params)
         f.when_on_server {
-          Hyperloop::ServerOp.run_from_client(controller.acting_user, controller, klass_name, op_params.first)
+          Hyperloop::ServerOp.run_from_client(:acting_user, controller, klass_name, *op_params)
         }
       end
     
