@@ -130,7 +130,6 @@ module React
       end
 
       def load_opal_context
-        puts "loc #{Time.now.to_f}"
         send_to_opal(:load_context, @unique_id, @cname)
       end
 
