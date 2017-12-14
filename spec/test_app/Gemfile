@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails'
@@ -49,10 +50,10 @@ end
 
 # gem 'jquery-ui-rails'
 
-
+require 'hyper-spec/version'
 gem 'react-rails', '>= 2.3.0', '< 2.5.0'
-gem 'hyper-react', '1.0.0-lap8' #, path: '../../../hyper-react'
-gem 'hyper-store', '1.0.0-lap8' #, path: '../../../hyper-store'
+gem 'hyper-react', HyperSpec::VERSION #, path: '../../../hyper-react'
+gem 'hyper-store', HyperSpec::VERSION #, path: '../../../hyper-store'
 gem 'hike'
 gem 'opal-rails'
 gem 'parser'
