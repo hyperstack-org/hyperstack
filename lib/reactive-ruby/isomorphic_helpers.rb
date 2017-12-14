@@ -11,6 +11,7 @@ module React
         @context = Context.new("#{controller.object_id}-#{Time.now.to_i}", ctx, controller, name)
         @context.load_opal_context
         ::Rails.logger.debug "************************** React Server Context Initialized #{name} #{Time.now.to_f} *********************************************"
+        @context
       end
     else
       def self.load_context(unique_id = nil, name = nil)
