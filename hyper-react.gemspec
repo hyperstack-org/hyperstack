@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-activesupport', '~> 0.3.0'
 
   spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'debase'
+  spec.add_development_dependency 'debase' # for test_app
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
+  spec.add_development_dependency 'ruby-debug-ide' # for test_app
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'mini_racer', '~> 0.1.14'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
