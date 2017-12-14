@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -11,8 +12,9 @@ gem 'sqlite3'
 gem 'puma'
 gem 'jquery-rails'
 
-gem 'hyper-react', '1.0.0-lap8'
-gem 'hyper-spec', '1.0.0-lap8'
+require 'hyper-store/version'
+gem 'hyper-react', HyperStore::VERSION
+gem 'hyper-spec', HyperStore::VERSION
 gem 'hyper-store', path: '../..'
 gem 'opal'
 gem 'opal-browser'
