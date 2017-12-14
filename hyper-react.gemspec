@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal', '~> 0.10.5'
   spec.add_dependency 'opal-activesupport', '~> 0.3.0'
 
+  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
