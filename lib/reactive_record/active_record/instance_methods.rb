@@ -86,19 +86,39 @@ module ActiveRecord
     end
 
     def method_missing(name, *args, &block)
-      method_missing_warning("#{name}(#{args})")
-      if name =~ /\!$/
-        name = name.gsub(/\!$/,"")
+      original_name = name
+
+      if name.end_with?('!')
+        name = name.chop # remove '!'
         force_update = true
       end
-      if name =~ /_changed\?$/
-        @backing_record.changed?(name.gsub(/_changed\?$/,""))
-      elsif args.count == 1 && name =~ /=$/ && !block
-        attribute_name = name.gsub(/=$/,"")
+
+      chopped_name = name.end_with?('=') ? name.chop : name
+      is_server_method = self.class.server_methods.has_key?(chopped_name)
+      chopped_name = chopped_name.end_with?('?') ? chopped_name.chop : name
+      is_attribute = attributes.has_key?(chopped_name)
+
+      unless is_server_method || is_attribute
+        if ReactiveRecord::Base.public_columns_hash.has_key?(self.class.name) && ReactiveRecord::Base.public_columns_hash[self.class.name].has_key?(chopped_name)
+          is_attribute = true
+        end
+        method_missing_warning("#{original_name}(#{args})") unless is_attribute
+      end
+
+      if name.end_with?('_changed?')
+        @backing_record.changed?(name[0...-9]) # remove '_changed?'
+      elsif args.count == 1 && name.end_with?('=') && !block
+        attribute_name = name.chop # remove '='
+        # for rails auto generated methods for booleans, remove '?' to get the attribute
+        attribute_name = attribute_name.chop if !is_server_method && is_attribute && attribute_name.end_with?('?')
         @backing_record.reactive_set!(attribute_name, backing_record.convert(attribute_name, args[0]))
       elsif args.count.zero? && !block
+        # for rails auto generated methods for booleans, remove '?' to get the attribute
+        name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
         @backing_record.reactive_get!(name, force_update)
-      elsif !block
+      elsif !block 
+        # for rails auto generated methods for booleans, remove '?' to get the attribute
+        name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
         @backing_record.reactive_get!([[name]+args], force_update)
       else
         super
