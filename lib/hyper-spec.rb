@@ -16,15 +16,20 @@ RSpec.configure do |config|
 
   config.mock_with :rspec
 
-  if (hyper_module = ((defined?(Hyperloop) && Hyperloop) || defined?(HyperMesh) && HyperMesh))
-    config.before(:each) do
-      hyper_module.class_eval do
-        def self.on_server?
-          true
-        end
+  config.before(:each) do
+    Hyperloop.class_eval do
+      def self.on_server?
+        true
       end
-    end
+    end if defined?(Hyperloop)
+    # for compatibility with HyperMesh
+    HyperMesh.class_eval do
+      def self.on_server?
+        true
+      end
+    end if defined?(HyperMesh)
   end
+
 
   config.before(:each, js: true) do
     size_window
