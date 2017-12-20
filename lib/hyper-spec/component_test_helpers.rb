@@ -283,7 +283,16 @@ module HyperSpec
 
       width, height = [height, width] if portrait
 
-      Capybara.current_session.current_window.resize_to(width, height)
+      loop do
+        Capybara.current_session.current_window
+                .resize_to(width + RSpec.configuration.debugger_width, height)
+        inner_width = evaluate_script('window.innerWidth')
+        # if we have matched the size then return
+        return if inner_width == width
+        # if we are bigger then desired and debugger_width is <= 0 then its as small as possible
+        return if inner_width > width && RSpec.configuration.debugger_width <= 0
+        RSpec.configuration.debugger_width += width - inner_width
+      end
     end
   end
 

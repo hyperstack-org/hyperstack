@@ -344,6 +344,7 @@ module ComponentTestHelpers
     if portrait
       width, height = [height, width]
     end
+    width, height = [width+RSpec.configuration.debugger_width, height+RSpec.configuration.debugger_height]
     if page.driver.browser.respond_to?(:manage)
       page.driver.browser.manage.window.resize_to(width, height)
     elsif page.driver.respond_to?(:resize)

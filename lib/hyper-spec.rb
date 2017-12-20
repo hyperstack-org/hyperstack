@@ -16,6 +16,8 @@ RSpec.configure do |config|
 
   config.mock_with :rspec
 
+  config.add_setting :debugger_width, default: 0
+
   config.before(:each) do
     Hyperloop.class_eval do
       def self.on_server?
@@ -29,7 +31,6 @@ RSpec.configure do |config|
       end
     end if defined?(HyperMesh)
   end
-
 
   config.before(:each, js: true) do
     size_window
@@ -51,7 +52,9 @@ RSpec.configure do |_config|
   Capybara.default_max_wait_time = 10
 
   Capybara.register_driver :chrome do |app|
-    Capybara::Selenium::Driver.new(app, browser: :chrome)
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.add_arg('auto-open-devtools-for-tabs') unless ENV['NO_DEBUGGER']
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
 
   Capybara.register_driver :firefox do |app|
