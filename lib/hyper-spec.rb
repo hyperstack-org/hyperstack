@@ -6,7 +6,6 @@ require 'hyper-spec/component_test_helpers'
 require 'hyper-spec/rails/engine'
 require 'hyper-spec/version'
 require 'hyper-spec/wait_for_ajax'
-require 'react/isomorphic_helpers'
 require 'selenium/web_driver/firefox/profile'
 
 RSpec.configure do |config|
