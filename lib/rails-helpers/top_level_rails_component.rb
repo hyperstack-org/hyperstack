@@ -18,19 +18,31 @@ module React
       paths_searched = []
       if params.component_name.start_with? "::"
         paths_searched << params.component_name.gsub(/^\:\:/,"")
-        component = params.component_name.gsub(/^\:\:/,"").split("::").inject(Module) { |scope, next_const| scope.const_get(next_const, false) } rescue nil
+        component = begin
+                      params.component_name.gsub(/^\:\:/,"").split("::").inject(Module) { |scope, next_const| scope.const_get(next_const, false) }
+                    rescue Exception
+                      nil
+                    end
         return present component, params.render_params if component && component.method_defined?(:render)
       else
         self.class.search_path.each do |path|
           # try each path + params.controller + params.component_name
           paths_searched << "#{path.name + '::' unless path == Module}#{params.controller}::#{params.component_name}"
-          component = "#{params.controller}::#{params.component_name}".split("::").inject(path) { |scope, next_const| scope.const_get(next_const, false) } rescue nil
+          component = begin
+                        "#{params.controller}::#{params.component_name}".split("::").inject(path) { |scope, next_const| scope.const_get(next_const, false) }
+                      rescue Exception
+                        nil
+                      end
           return present component, params.render_params if component && component.method_defined?(:render)
         end
         self.class.search_path.each do |path|
           # then try each path + params.component_name
           paths_searched << "#{path.name + '::' unless path == Module}#{params.component_name}"
-          component = "#{params.component_name}".split("::").inject(path) { |scope, next_const| scope.const_get(next_const, false) } rescue nil
+          component = begin
+                        "#{params.component_name}".split("::").inject(path) { |scope, next_const| scope.const_get(next_const, false) }
+                      rescue Exception
+                        nil
+                      end
           return present component, params.render_params if component && component.method_defined?(:render)
         end
       end
