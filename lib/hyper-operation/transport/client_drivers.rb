@@ -190,11 +190,13 @@ module Hyperloop
 
       if @initialized
         # 1) skip initialization if already initialized
-        # 2) if running action_cable make sure connection is up after pinging the server_up
-        #    action cable closes the connection if files change on the server
-        HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
-          `#{Hyperloop.action_cable_consumer}.connection.open()` if `#{Hyperloop.action_cable_consumer}.connection.disconnected`
-        end if Hyperloop.action_cable_consumer
+        if on_opal_client? && Hyperloop.action_cable_consumer
+          # 2) if running action_cable make sure connection is up after pinging the server_up
+          #    action cable closes the connection if files change on the server
+          HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
+            `#{Hyperloop.action_cable_consumer}.connection.open()` if `#{Hyperloop.action_cable_consumer}.connection.disconnected`
+          end
+        end
         return
       end
 
@@ -202,9 +204,9 @@ module Hyperloop
       @opts = {}
 
       if on_opal_client?
-        if RUBY_ENGINE == 'opal'
-          @opts = Hash.new(`window.HyperloopOpts`)
-        end
+        
+        @opts = Hash.new(`window.HyperloopOpts`)
+        
 
         if opts[:transport] == :pusher
 
