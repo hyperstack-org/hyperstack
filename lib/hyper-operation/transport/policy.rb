@@ -49,7 +49,15 @@ module Hyperloop
     end
 
     def dispatch_to(*args, &regulation)
-      actual_klass = regulated_klass.is_a?(Class) ? regulated_klass : regulated_klass.constantize rescue nil
+      actual_klass = if regulated_klass.is_a?(Class)
+                       regulated_klass
+                     else
+                       unless Hyperloop::Operation.descendants.map(&:to_s).include?(klass)
+                         Hyperloop::InternalPolicy.raise_operation_access_violation
+                       end
+                       regulated_klass.constantize
+                     end
+      # TODO: clean up following passage
       actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to
       unless actual_klass.respond_to? :dispatch_to
         raise 'you can only dispatch_to Operation classes'
@@ -83,9 +91,14 @@ module Hyperloop
     end
 
     def get_ar_model(str)
-      str.is_a?(Class) ? str : Object.const_get(str)
-    rescue
-      raise "#{str} is not a class"
+      if str.is_a?(Class)
+        str
+      else
+        unless ActiveRecord::Base.descendants.map(&:to_s).include?(str)
+          Hyperloop::InternalPolicy.raise_operation_access_violation
+        end
+        Object.const_get(str)
+      end
     end
 
     def regulate(regulation_klass, policy, args, &regulation)
@@ -201,7 +214,14 @@ module Hyperloop
   class ClassConnectionRegulation < Regulation
 
     def self.add_regulation(klass, opts={}, &regulation)
-      actual_klass = klass.is_a?(Class) ? klass : klass.constantize rescue nil
+      actual_klass = if klass.is_a?(Class)
+                       klass
+                     else
+                       unless Hyperloop::Operation.descendants.map(&:to_s).include?(klass)
+                         Hyperloop::InternalPolicy.raise_operation_access_violation
+                       end
+                       klass.constantize
+                     end
       actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to rescue nil
       super
     end
@@ -321,10 +341,18 @@ module Hyperloop
       @obj
     end
 
+    def self.raise_operation_access_violation
+      raise Hyperloop::AccessViolation
+    end
+
     def self.regulate_connection(acting_user, channel_string)
       channel = channel_string.split("-")
       if channel.length > 1
         id = channel[1..-1].join("-")
+        # TODO: should be from public_colums_hash?
+        unless ActiveRecord::Base.descendants.map(&:to_s).include?(channel[0])
+          Hyperloop::InternalPolicy.raise_operation_access_violation
+        end
         object = Object.const_get(channel[0]).find(id)
         InstanceConnectionRegulation.connect(object, acting_user)
       else
