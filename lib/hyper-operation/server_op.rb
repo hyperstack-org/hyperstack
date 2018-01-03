@@ -46,7 +46,11 @@ module Hyperloop
         if Rails.env.production?
           Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants.map(&:to_s).include?(operation)
         else
-          const = Object.const_get(operation)
+          begin
+            const = Object.const_get(operation)
+          rescue NameError
+            Hyperloop::InternalPolicy.raise_operation_access_violation
+          end
           Hyperloop::InternalPolicy.raise_operation_access_violation unless const < Hyperloop::ServerOp
         end
         operation.constantize.class_eval do
