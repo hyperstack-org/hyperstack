@@ -43,7 +43,12 @@ module Hyperloop
       end
     
       def run_from_client(security_param, controller, operation, params)
-        Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants.map(&:to_s).include?(operation)
+        if Rails.env.production?
+          Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants.map(&:to_s).include?(operation)
+        else
+          const = Object.const_get(operation)
+          Hyperloop::InternalPolicy.raise_operation_access_violation unless const < Hyperloop::ServerOp
+        end
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
