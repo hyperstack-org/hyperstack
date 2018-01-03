@@ -43,6 +43,7 @@ module Hyperloop
       end
     
       def run_from_client(security_param, controller, operation, params)
+        Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants.map(&:to_s).include?(operation)
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
@@ -68,7 +69,6 @@ module Hyperloop
         request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
         if uri.scheme == 'https'
           http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
         request.body = {
           operation: name,
