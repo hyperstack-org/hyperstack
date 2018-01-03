@@ -52,12 +52,8 @@ module Hyperloop
       actual_klass = if regulated_klass.is_a?(Class)
                        regulated_klass
                      else
-                       unless Hyperloop::Operation.descendants.map(&:to_s).include?(klass)
-                         Hyperloop::InternalPolicy.raise_operation_access_violation
-                       end
                        regulated_klass.constantize
                      end
-      # TODO: clean up following passage
       actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to
       unless actual_klass.respond_to? :dispatch_to
         raise 'you can only dispatch_to Operation classes'
@@ -92,6 +88,9 @@ module Hyperloop
 
     def get_ar_model(str)
       if str.is_a?(Class)
+        unless str < ActiveRecord::Base
+          Hyperloop::InternalPolicy.raise_operation_access_violation
+        end
         str
       else
         unless ActiveRecord::Base.descendants.map(&:to_s).include?(str)
@@ -217,12 +216,20 @@ module Hyperloop
       actual_klass = if klass.is_a?(Class)
                        klass
                      else
-                       unless Hyperloop::Operation.descendants.map(&:to_s).include?(klass)
-                         Hyperloop::InternalPolicy.raise_operation_access_violation
+                       begin
+                         klass.constantize
+                       rescue NameError
+                         nil
                        end
-                       klass.constantize
                      end
-      actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to rescue nil
+      if actual_klass && actual_klass.respond_to?(:dispatch_to)
+        begin
+          actual_klass.dispatch_to(actual_klass)
+        rescue NoMethodError
+          # this is the case for ClassPolicy where the instance method :dispatch_to has been deleted.
+          nil
+        end
+      end
       super
     end
 
