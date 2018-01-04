@@ -11,25 +11,6 @@ module Hyperloop
       end
     end if defined? ::WebConsole::Middleware
 
-    module ::Rails
-      module Rack
-        class Logger < ActiveSupport::LogSubscriber
-          unless method_defined? :pre_hyperloop_call
-            alias pre_hyperloop_call call
-            def call(env)
-              if !Hyperloop.opts[:noisy] && env['HTTP_X_HYPERLOOP_SILENT_REQUEST'] 
-                Rails.logger.silence do
-                  pre_hyperloop_call(env)
-                end
-              else
-                pre_hyperloop_call(env)
-              end
-            end
-          end
-        end
-      end
-    end if defined?(::Rails::Rack::Logger)
-
     class HyperloopController < ::ApplicationController
 
       protect_from_forgery except: [:console_update, :execute_remote_api]
