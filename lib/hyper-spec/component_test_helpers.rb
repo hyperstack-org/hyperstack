@@ -264,6 +264,10 @@ module HyperSpec
     end
 
     def size_window(width = nil, height = nil)
+      # return if @window_cannot_be_resized
+      # original_width = evaluate_script('window.innerWidth')
+      # original_height = evaluate_script('window.innerHeight')
+
       width, height = [height, width] if width == :portrait
       width, height = width if width.is_a? Array
       portrait = true if height == :portrait
@@ -283,16 +287,15 @@ module HyperSpec
 
       width, height = [height, width] if portrait
 
-      loop do
-        Capybara.current_session.current_window
-                .resize_to(width + RSpec.configuration.debugger_width, height)
+      unless RSpec.configuration.debugger_width
+        Capybara.current_session.current_window.resize_to(1000, 500)
+        sleep 0.125
         inner_width = evaluate_script('window.innerWidth')
-        # if we have matched the size then return
-        return if inner_width == width
-        # if we are bigger then desired and debugger_width is <= 0 then its as small as possible
-        return if inner_width > width && RSpec.configuration.debugger_width <= 0
-        RSpec.configuration.debugger_width += width - inner_width
+        RSpec.configuration.debugger_width = 1000 - inner_width
       end
+      Capybara.current_session.current_window
+              .resize_to(width + RSpec.configuration.debugger_width, height)
+      sleep 0.125
     end
   end
 

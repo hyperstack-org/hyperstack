@@ -15,7 +15,7 @@ RSpec.configure do |config|
 
   config.mock_with :rspec
 
-  config.add_setting :debugger_width, default: 0
+  config.add_setting :debugger_width, default: nil
 
   config.before(:each) do
     Hyperloop.class_eval do
@@ -44,6 +44,7 @@ RSpec.configure do |config|
       PusherFake::Channel.reset if defined? PusherFake
     end
   end
+
 end
 
 # Capybara config
@@ -51,9 +52,15 @@ RSpec.configure do |_config|
   Capybara.default_max_wait_time = 10
 
   Capybara.register_driver :chrome do |app|
-    options = Selenium::WebDriver::Chrome::Options.new
-    options.add_arg('auto-open-devtools-for-tabs') unless ENV['NO_DEBUGGER']
-    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+    options = {}
+    options.merge!(
+      args: %w[auto-open-devtools-for-tabs],
+      prefs: { 'devtools.open_docked' => false, "devtools.currentDockState" => "undocked", devtools: {currentDockState: :undocked} }
+    ) unless ENV['NO_DEBUGGER']
+    # this does not seem to work properly.  Don't document this feature yet.
+    options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(chromeOptions: options)
+    Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
   end
 
   Capybara.register_driver :firefox do |app|

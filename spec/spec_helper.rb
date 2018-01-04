@@ -16,6 +16,7 @@ module Helpers
     )
   end
   def calculate_window_restrictions
+    return if @min_width
     size_window(100,100)
     @min_width = width
     size_window(500,500)
