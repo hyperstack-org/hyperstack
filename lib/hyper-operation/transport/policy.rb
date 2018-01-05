@@ -52,12 +52,14 @@ module Hyperloop
       actual_klass = if regulated_klass.is_a?(Class)
                        regulated_klass
                      else
-                       regulated_klass.constantize
+                       begin
+                         regulated_klass.constantize
+                       rescue NameError
+                         nil
+                       end
                      end
-      actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to
-      unless actual_klass.respond_to? :dispatch_to
-        raise 'you can only dispatch_to Operation classes'
-      end
+      raise 'you can only dispatch_to Operation classes' unless actual_klass.respond_to? :dispatch_to
+      actual_klass.dispatch_to(actual_klass)
       actual_klass.dispatch_to(*args, &regulation)
     end
 
@@ -93,15 +95,23 @@ module Hyperloop
         end
         str
       else
-        unless ActiveRecord::Base.descendants.map(&:to_s).include?(str)
+        if Rails.env.production? && !ActiveRecord::Base.descendants.map(&:name).include?(str)
+          # AR::Base.descendants is eager loaded in production -> this guard works.
+          # In development it may be empty or partially filled -> this guard may fail.
+          # Thus guarded here only in production.
           Hyperloop::InternalPolicy.raise_operation_access_violation
         end
         Object.const_get(str)
       end
     end
 
+    def self.regulated_klasses
+      @regulated_klasses ||= Set.new
+    end
+
     def regulate(regulation_klass, policy, args, &regulation)
       process_args(policy, regulation_klass.allowed_opts, args, regulation) do |regulated_klass, opts|
+        self.class.regulated_klasses << regulated_klass.to_s
         regulation_klass.add_regulation regulated_klass, opts, &regulation
       end
     end
@@ -356,8 +366,7 @@ module Hyperloop
       channel = channel_string.split("-")
       if channel.length > 1
         id = channel[1..-1].join("-")
-        # TODO: should be from public_colums_hash?
-        unless ActiveRecord::Base.descendants.map(&:to_s).include?(channel[0])
+        unless Hyperloop::InternalClassPolicy.regulated_klasses.include?(channel[0])
           Hyperloop::InternalPolicy.raise_operation_access_violation
         end
         object = Object.const_get(channel[0]).find(id)
