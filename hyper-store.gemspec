@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hyperloop-config', HyperStore::VERSION
-  spec.add_dependency 'opal', '~> 0.10.5'
+  spec.add_dependency 'opal', '>= 0.10.5', '< 0.12.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'hyper-react', HyperStore::VERSION
   spec.add_development_dependency 'hyper-spec', HyperStore::VERSION
