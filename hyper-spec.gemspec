@@ -30,7 +30,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'parser'
   spec.add_dependency 'pry'
   spec.add_dependency 'rspec-rails'
-  spec.add_dependency 'selenium-webdriver', '~> 3.7.0'
+  spec.add_dependency 'selenium-webdriver'
   spec.add_dependency 'timecop', '~> 0.8.1'
   spec.add_dependency 'uglifier'
   spec.add_dependency 'unparser'
@@ -54,5 +54,5 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.14'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
 end
