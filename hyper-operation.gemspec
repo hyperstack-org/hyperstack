@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-react', Hyperloop::Operation::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperloop::Operation::VERSION
   spec.add_development_dependency 'mysql2'
-  spec.add_development_dependency 'opal', '0.10.5'
+  spec.add_development_dependency 'opal', '>= 0.10.5', '< 0.12.0'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'puma'
