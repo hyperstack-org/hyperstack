@@ -44,8 +44,14 @@ module Hyperloop
     
       def run_from_client(security_param, controller, operation, params)
         if Rails.env.production?
+          # in production everything is eager loaded so ServerOp.descendants is filled and can be used to guard the .constantize
+          # however ...
           Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants.map(&:to_s).include?(operation)
         else
+          # ... in development things are autoloaded on demand, thus ServerOp.descendants can be empty or partially filled and above guard
+          # would fail legal operations. To prevent this, the class has to be loaded first, what .const_get will take care of, and then
+          # its guarded, to achieve similar behaviour as in production. Doing the const_get first, before the guard, 
+          # would not be safe for production and allow for potential remote code execution!
           begin
             const = Object.const_get(operation)
           rescue NameError
