@@ -41,12 +41,17 @@ module Hyperloop
           Hyperloop::ServerOp.run_from_client(:acting_user, controller, klass_name, *op_params)
         }
       end
+
+      def descendants_map_cache
+        # calling descendants alone may take 10ms in a complex app, so better cache it
+        @cached_descendants ||= Hyperloop::ServerOp.descendants.map(&:to_s)
+      end
     
       def run_from_client(security_param, controller, operation, params)
         if Rails.env.production?
           # in production everything is eager loaded so ServerOp.descendants is filled and can be used to guard the .constantize
-          # however ...
-          Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants.map(&:to_s).include?(operation)
+          Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants_map_cache.include?(operation)
+          # however ... 
         else
           # ... in development things are autoloaded on demand, thus ServerOp.descendants can be empty or partially filled and above guard
           # would fail legal operations. To prevent this, the class has to be loaded first, what .const_get will take care of, and then

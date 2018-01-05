@@ -88,6 +88,10 @@ module Hyperloop
       end
     end
 
+    def self.ar_base_descendants_map_cache
+      @ar_base_descendants_map_cache ||= ActiveRecord::Base.descendants.map(&:name)
+    end
+
     def get_ar_model(str)
       if str.is_a?(Class)
         unless str < ActiveRecord::Base
@@ -95,7 +99,7 @@ module Hyperloop
         end
         str
       else
-        if Rails.env.production? && !ActiveRecord::Base.descendants.map(&:name).include?(str)
+        if Rails.env.production? && Hyperloop::InternalClassPolicy.ar_base_descendants_map_cache.include?(str)
           # AR::Base.descendants is eager loaded in production -> this guard works.
           # In development it may be empty or partially filled -> this guard may fail.
           # Thus guarded here only in production.
@@ -559,8 +563,8 @@ class Class
 
   Hyperloop::ClassPolicyMethods.instance_methods.each do |method|
     define_method method do |*args, &block|
-      if name =~ /Policy$/
-        @hyperloop_internal_policy_object = Hyperloop::InternalClassPolicy.new(name.gsub(/Policy$/,""))
+      if name.end_with?("Policy".freeze)
+        @hyperloop_internal_policy_object = Hyperloop::InternalClassPolicy.new(name.sub(/Policy$/,""))
         include Hyperloop::PolicyMethods
         send method, *args, &block
       else
