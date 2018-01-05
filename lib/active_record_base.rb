@@ -63,8 +63,8 @@ module ActiveRecord
         def method_missing(name, *args, &block)
           #return get_by_index(*args).first if name == "[]"
           return all.send(name, *args, &block) if [].respond_to?(name)
-          if name =~ /\!$/
-            return send(name.gsub(/\!$/,''), *args, &block).send(:reload_from_db) rescue nil
+          if name.end_with?('!')
+            return send(name.chop, *args, &block).send(:reload_from_db) rescue nil
           end
           pre_synchromesh_method_missing(name, *args, &block)
         end
