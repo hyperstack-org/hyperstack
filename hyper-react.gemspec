@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hyper-store', React::VERSION
-  spec.add_dependency 'opal', '~> 0.10.5'
+  spec.add_dependency 'opal', '>= 0.10.5', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.0'
 
   spec.add_development_dependency 'chromedriver-helper'
@@ -41,6 +41,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'ruby-debug-ide' # for test_app
   spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.14'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
 end
