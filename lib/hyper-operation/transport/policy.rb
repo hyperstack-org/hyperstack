@@ -534,7 +534,7 @@ module Hyperloop
 
   module PolicyAutoLoader
     def self.load(name, value)
-      const_get("#{name}Policy") if name && !(name =~ /Policy$/) && value.is_a?(Class)
+      const_get("#{name}Policy") if name && !name.end_with?("Policy".freeze) && value.is_a?(Class)
     rescue Exception => e
       raise e if e.is_a?(LoadError) && e.message =~ /Unable to autoload constant #{name}Policy/
     end
