@@ -60,7 +60,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec'
   spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.14'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
 end

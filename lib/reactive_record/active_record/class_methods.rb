@@ -143,8 +143,8 @@ module ActiveRecord
     ]
 
     def method_missing(name, *args, &block)
-      if args.count == 1 && name =~ /^find_by_/ && !block
-        find_by(name.gsub(/^find_by_/, "") => args[0])
+      if args.count == 1 && name.start_with?("find_by_") && !block
+        find_by(name.sub(/^find_by_/, "") => args[0])
       elsif !SERVER_METHODS.include?(name)
         raise "#{self.name}.#{name}(#{args}) (called class method missing)"
       end

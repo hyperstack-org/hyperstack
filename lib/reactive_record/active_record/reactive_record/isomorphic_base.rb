@@ -434,6 +434,7 @@ module ReactiveRecord
           #puts "!!!!!!!!!!!!associations updated"
 
           has_errors = false
+          error_messages = []
 
           #puts "ready to start saving... dont_save_list = #{dont_save_list}"
 
@@ -446,18 +447,28 @@ module ReactiveRecord
               #puts "has_errors before = #{has_errors}, validate= #{validate}, !valid= #{!valid}  (validate and !valid) #{validate and !valid}"
               has_errors ||= (validate and !valid)
               #puts "validation complete errors = <#{!valid}>, #{model.errors.messages} has_errors #{has_errors}"
+              error_messages << [model, model.errors.messages] unless valid
               [reactive_record_id, model.class.name, model.attributes,  (valid ? nil : model.errors.messages)]
             elsif model and (!model.id or model.changed?)
               #puts "saving #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
               saved = model.check_permission_with_acting_user(acting_user, new_models.include?(model) ? :create_permitted? : :update_permitted?).save(validate: validate)
               has_errors ||= !saved
               messages = model.errors.messages if (validate and !saved) or (!validate and !model.valid?)
+              error_messages << [model, messages] if messages
               #puts "saved complete errors = <#{!saved}>, #{messages} has_errors #{has_errors}"
               [reactive_record_id, model.class.name, model.attributes, messages]
             end
           end.compact
 
-          raise "Could not save all models" if has_errors
+          if has_errors
+            ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel saving records failed:\033[0;30;21m"
+            error_messages.each do |model, messages|
+              messages.each do |message|
+                ::Rails.logger.debug "\033[0;31;1m\t#{model}: #{message}\033[0;30;21m"
+              end
+            end
+            raise "HyperModel saving records failed!"
+          end
 
           if save
 

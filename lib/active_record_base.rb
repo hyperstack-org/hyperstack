@@ -44,15 +44,7 @@ module ActiveRecord
         end
 
         def server_method(name, opts = {}, &block)
-          unless opts[:default].nil?
-            define_method(name) do |args = nil|
-              block.call(args.nil? ? opts[:default] : args)
-            end
-          else
-            define_method(name) do |args|
-              block.call(args)
-            end
-          end
+          define_method(name, &block)
         end
 
         def finder_method(name, &block)
@@ -71,8 +63,8 @@ module ActiveRecord
         def method_missing(name, *args, &block)
           #return get_by_index(*args).first if name == "[]"
           return all.send(name, *args, &block) if [].respond_to?(name)
-          if name =~ /\!$/
-            return send(name.gsub(/\!$/,''), *args, &block).send(:reload_from_db) rescue nil
+          if name.end_with?('!')
+            return send(name.chop, *args, &block).send(:reload_from_db) rescue nil
           end
           pre_synchromesh_method_missing(name, *args, &block)
         end

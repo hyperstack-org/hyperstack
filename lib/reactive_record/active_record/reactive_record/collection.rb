@@ -480,7 +480,7 @@ module ReactiveRecord
     def method_missing(method, *args, &block)
       if [].respond_to? method
         all.send(method, *args, &block)
-      elsif ScopeDescription.find(@target_klass, method) || (args.count == 1 && method =~ /^find_by_/)
+      elsif ScopeDescription.find(@target_klass, method) || (args.count == 1 && method.start_with?("find_by_"))
         apply_scope(method, *args)
       elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
         apply_scope("_#{method}", *args).first
