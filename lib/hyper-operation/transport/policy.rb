@@ -94,7 +94,7 @@ module Hyperloop
 
     def get_ar_model(str)
       if str.is_a?(Class)
-        unless str < ActiveRecord::Base
+        unless str <= ActiveRecord::Base
           Hyperloop::InternalPolicy.raise_operation_access_violation
         end
         str
