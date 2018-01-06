@@ -19,12 +19,16 @@ module ActiveRecord
       @public_columns_hash = {}
       # descendants only works for already loaded models!
       descendants.each do |model|
-        begin
-          public_columns_hash[model.name] = model.columns_hash if model.table_name
-        rescue Exception => e
-          @public_columns_hash = nil
-          raise $!, "Could not read 'columns_hash' for #{model}: #{$!}", $!.backtrace
-        end if files.include?(model.name.underscore) && model.name.underscore != 'application_record'
+        if files.include?(model.name.underscore) && model.name.underscore != 'application_record'
+          @public_columns_hash[model.name] = model.columns_hash rescue nil # why rescue?
+        end
+        # begin
+        #   @public_columns_hash[model.name] = model.columns_hash if model.table_name
+        # rescue Exception => e
+        #   binding.pry
+        #   @public_columns_hash = nil
+        #   raise $!, "Could not read 'columns_hash' for #{model}: #{$!}", $!.backtrace
+        # end if files.include?(model.name.underscore) && model.name.underscore != 'application_record'
       end
       @public_columns_hash
     end

@@ -64,7 +64,7 @@ describe "regulate access allowed" do
         policy.send_all_but(:created_at).to(TestApplication) 
       end
     end
-    m = FactoryGirl.create(:test_model)
+    m = FactoryBot.create(:test_model)
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :test_attribute) }.
     not_to raise_error
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :created_at) }.

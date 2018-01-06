@@ -56,31 +56,37 @@ describe "authorization integration", js: true do
     stub_const 'TestApplicationPolicy', Class.new
     stub_const 'TestApplication', Class.new
     TestApplicationPolicy.class_eval do
-      regulate_class_connection { true }
+      regulate_class_connection { self } # was { self  }
       regulate_instance_connections(TestModel) { TestModel.find_by_test_attribute(name) }
-      regulate_all_broadcasts do |policy|
-        #policy.send_all_but(:completed, :test_attribute)
-      end
-      #regulate_broadcast(TestModel) { |policy| policy.send_all_but(:created_at).to(self) }
-      regulate_broadcast(TestModel) do |policy|
-        puts "regulate_broadcast for #{id} completed: #{!!completed}"
-        if completed
-          policy.send_all_but(:completed, :test_attribute)
-        else
-          policy.send_all
-        end.to(TestApplication)
-      end
+      regulate_all_broadcasts { |policy| policy.send_all_but(:completed, :test_attribute)}
+      regulate_broadcast(TestModel) { |policy| policy.send_all_but(:created_at).to(self) }
     end
     size_window(:small, :portrait)
   end
 
-  it "will not allow access to attributes through a collection" do
-    FactoryGirl.create(:test_model, test_attribute: "hello", completed: false)
-    FactoryGirl.create(:test_model, test_attribute: "goodby", completed: true)
-    mount "TestComponent"
+  it 'will not allow access to attributes through a collection' do
+    FactoryBot.create(:test_model, test_attribute: 'hello', completed: false)
+    FactoryBot.create(:test_model, test_attribute: 'goodby', completed: true)
+    mount 'TestComponent2' do
+      module ReactiveRecord
+        class Base
+          class << self
+            attr_accessor :last_log_message
+            def log(*args)
+              Base.last_log_message = args
+            end
+          end
+        end
+      end
+    end
     wait_for_ajax
-    pause
-    # test for failure....
+    ApplicationController.acting_user = User.new(name: 'fred')
+    page.evaluate_ruby('Hyperloop.connect("TestApplication")')
+    evaluate_ruby do
+      TestModel.all[0].test_attribute
+    end
+    wait_for_ajax
+    expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
   end
 
   it "will only synchronize the connected channels" do

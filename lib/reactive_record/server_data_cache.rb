@@ -103,13 +103,13 @@ module ReactiveRecord
           last_value = nil
           @cache.each do |cache_item|
             next if cache_item.root != root || @requested_cache_items.include?(cache_item)
-            @requested_cache_items << cache_item 
+            @requested_cache_items << cache_item
             last_value = cache_item
           end
           last_value
         end
 
-        def self.[](models, associations, vectors, acting_user)   
+        def self.[](models, associations, vectors, acting_user)
           ActiveRecord::Base.public_columns_hash
           result = nil
           ActiveRecord::Base.transaction do
@@ -295,6 +295,32 @@ module ReactiveRecord
         end
 
       end
+
+=begin
+tree is a hash, target is the object that will be filled in with the data hanging off the key.
+first time around target == nil, so for each key, value pair we do this: load_from_json(value, Object.const_get(JSON.parse(key)))
+keys:
+  ':*all':   target.replace tree["*all"].collect { |id| target.proxy_association.klass.find(id) }
+  Example: {'*all': [1, 7, 19, 23]}  target is a collection and will now have 4 records: 1, 7, 19, 23
+
+  'id':  if value is an array then target.id = value.first
+  Example: {'id': [17]} Example the target is a record, and its id is now set to 17
+  
+  '*count': target.set_count_state(value.first)  note: set_count_state sets the count of a collection and updates the associated state variable
+  integer-like-string-or-number: target.push_and_update_belongs_to(key)  note: collection will be a has_many association, so we are doing a target << find(key), and updating both ends of the relationship
+  [:new, nnn] do a ReactiveRecord::Base.find_by_object_id(target.base_class, method[1]) and that becomes the new target, with val being passed allow_change
+  [...] and current target is NOT an ActiveRecord Model (??? a collection ???) then send key to target, and that becomes new target
+      but note if value is an array then the scope returned nil, so we destroy the bogus record, and set new target back to nil
+        new_target.destroy and new_target = nil if value.is_a? Array
+  [...] and current target IS AN ActiveRecord Model (not a collection) then target.backing_record.update_attribute([method], target.backing_record.convert(method, value.first))
+  aggregation:
+    target.class.respond_to?(:reflect_on_aggregation) and aggregation = target.class.reflect_on_aggregation(method) and !(aggregation.klass < ActiveRecord::Base)
+      target.send "#{method}=", aggregation.deserialize(value.first)
+  other-string-method-name:
+    if value is a an array then value.first is the new value and we do target.send "{key}=", value.first
+    if value is a hash
+=end
+
 
       def self.load_from_json(tree, target = nil)
         ignore_all = nil

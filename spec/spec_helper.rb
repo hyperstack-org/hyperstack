@@ -278,10 +278,22 @@ if RUBY_ENGINE != 'opal'
 
     config.include Capybara::DSL
 
-    Capybara.register_driver :chrome do |app|
-      #caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"excludeSwitches" => [ "ignore-certificate-errors" ]})
-      caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "--window-size=200,200" ]})
-      Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
+    # Capybara.register_driver :chrome do |app|
+    #   #caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"excludeSwitches" => [ "ignore-certificate-errors" ]})
+    #   caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "--window-size=200,200" ]})
+    #   Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
+    # end
+
+    Capybara.register_driver :chromez do |app|
+      options = {}
+      options.merge!(
+        args: %w[auto-open-devtools-for-tabs],
+        prefs: { 'devtools.open_docked' => false, "devtools.currentDockState" => "undocked", devtools: {currentDockState: :undocked} }
+      ) unless ENV['NO_DEBUGGER']
+      # this does not seem to work properly.  Don't document this feature yet.
+      options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
+      capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(chromeOptions: options)
+      Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
     end
 
     class Selenium::WebDriver::Firefox::Profile
@@ -349,7 +361,7 @@ if RUBY_ENGINE != 'opal'
     if ENV['DRIVER'] =~ /^ff/
       Capybara.javascript_driver = :selenium_with_firebug
     elsif ENV['DRIVER'] == 'chrome'
-      Capybara.javascript_driver = :chrome
+      Capybara.javascript_driver = :chromez
     elsif ENV['DRIVER'] == 'headless'
       Capybara.javascript_driver = :selenium_chrome_headless
     else

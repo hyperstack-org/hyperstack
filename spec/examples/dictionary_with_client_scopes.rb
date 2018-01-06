@@ -185,12 +185,10 @@ describe "dictionary examples", js: true do
         end
       end
     end
-    pause
     evaluate_ruby do
       ReactiveRecord::Collection.hypertrace instrument: :all
       Definition.create(definition: :foo, dictionary_entry: DictionaryEntry.find(1))
     end
-    pause
   end
 
 end

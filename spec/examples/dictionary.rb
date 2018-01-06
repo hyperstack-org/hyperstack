@@ -233,7 +233,6 @@ class AddDefinition < React::Component::Base
 end
     end
     #binding.pry
-    pause
   end
 
 end
