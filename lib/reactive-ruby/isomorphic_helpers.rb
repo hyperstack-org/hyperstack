@@ -207,11 +207,11 @@ module React
       end
 
       def before_first_mount(&block)
-        React::IsomorphicHelpers::Context.register_before_first_mount_block &block
+        React::IsomorphicHelpers::Context.register_before_first_mount_block(&block)
       end
 
       def prerender_footer(&block)
-        React::IsomorphicHelpers::Context.register_prerender_footer_block &block
+        React::IsomorphicHelpers::Context.register_prerender_footer_block(&block)
       end
 
       if RUBY_ENGINE != 'opal'
