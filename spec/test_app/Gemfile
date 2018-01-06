@@ -49,10 +49,9 @@ end
 
 
 # gem 'jquery-ui-rails'
-
-require 'hyper-spec/version'
+require '../../lib/hyper-spec/version'
 gem 'react-rails', '>= 2.3.0', '< 2.5.0'
-gem 'hyper-react', HyperSpec::VERSION #, path: '../../../hyper-react'
+gem 'hyper-react', HyperSpec::VERSION , path: '../../../hyper-react'
 gem 'hyper-store', HyperSpec::VERSION #, path: '../../../hyper-store'
 gem 'hike'
 gem 'opal-rails'
