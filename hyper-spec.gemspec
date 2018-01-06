@@ -39,6 +39,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'hyper-react', HyperSpec::VERSION
   spec.add_development_dependency 'method_source'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'puma'
@@ -54,5 +55,4 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
 end
