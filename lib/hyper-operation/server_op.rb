@@ -9,7 +9,7 @@ module Hyperloop
           def run(*args)
             hash = _Railway.params_wrapper.combine_arg_array(args)
             hash = serialize_params(hash)
-            HTTP.post(
+            Hyperloop::HTTP.post(
               "#{`window.HyperloopEnginePath`}/execute_remote",
               payload: {json: {operation: name, params: hash}.to_json},
               headers: {'X-CSRF-Token' => Hyperloop::ClientDrivers.opts[:form_authenticity_token] }

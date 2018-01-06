@@ -8,6 +8,7 @@ if RUBY_ENGINE == 'opal'
   require 'mutations'
   require 'hyper-operation/filters/outbound_filter'
   require 'hyper-component'
+  require 'hyper-operation/http'
   require 'hyper-operation/transport/client_drivers'
   class HashWithIndifferentAccess < Hash
   end

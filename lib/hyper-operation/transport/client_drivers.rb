@@ -76,7 +76,7 @@ module Hyperloop
           }
         elsif ClientDrivers.opts[:transport] == :action_cable
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
-          HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel)).then do |response|
+          Hyperloop::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel)).then do |response|
             %x{
               #{Hyperloop.action_cable_consumer}.subscriptions.create(
                 {
@@ -98,7 +98,7 @@ module Hyperloop
             }
           end
         else
-          HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
+          Hyperloop::HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
         end
       end
     end
@@ -179,7 +179,7 @@ module Hyperloop
     end
 
     def self.get_queued_data(operation, channel = nil, opts = {})
-      HTTP.get(polling_path(operation, channel), opts).then do |response|
+      Hyperloop::HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |data|
           sync_dispatch(data[1])
         end
@@ -193,7 +193,7 @@ module Hyperloop
         if on_opal_client? && Hyperloop.action_cable_consumer
           # 2) if running action_cable make sure connection is up after pinging the server_up
           #    action cable closes the connection if files change on the server
-          HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
+          Hyperloop::HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
             `#{Hyperloop.action_cable_consumer}.connection.open()` if `#{Hyperloop.action_cable_consumer}.connection.disconnected`
           end
         end
