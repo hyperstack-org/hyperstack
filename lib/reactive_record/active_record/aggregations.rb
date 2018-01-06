@@ -32,7 +32,7 @@ module ActiveRecord
         @klass_name =  options[:class_name] || name.camelize
         @attribute =   name
         if options[:mapping].respond_to? :collect
-          @mapped_attributes = options[:mapping].collect &:last
+          @mapped_attributes = options[:mapping].collect(&:last)
         else
           ReactiveRecord::Base.log("improper aggregate definition #{@owner_class}, :#{name}, class_name: #{@klass_name} - missing mapping", :error)
           @mapped_attributes = []

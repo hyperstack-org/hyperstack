@@ -136,7 +136,7 @@ module ActiveRecord
       first_time = true
       ReactiveRecord.load do
         results = attributes.collect { |attr| @backing_record.reactive_get!(attr, first_time) }
-        results = yield *results if block
+        results = yield(*results) if block
         first_time = false
         block.nil? && results.count == 1 ? results.first : results
       end
@@ -151,7 +151,7 @@ module ActiveRecord
     end
 
     def destroy(&block)
-      @backing_record.destroy &block
+      @backing_record.destroy(&block)
     end
 
     def destroyed?

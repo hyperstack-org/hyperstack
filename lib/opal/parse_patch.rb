@@ -6,7 +6,7 @@ rescue Exception => e
       alias old_parse parse
     end
     def self.parse(*args, &block)
-      old_parse *args, &block
+      old_parse(*args, &block)
     rescue Exception => e
       raise StandardError.new e.message
     end
