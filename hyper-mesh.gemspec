@@ -35,11 +35,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'factory_bot_rails'
   spec.add_development_dependency 'hyper-spec', Hypermesh::VERSION
   spec.add_development_dependency 'hyper-trace'
-  spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal-activesupport', '~> 0.3.0'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'parser'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'
