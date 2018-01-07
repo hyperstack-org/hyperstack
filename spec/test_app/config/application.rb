@@ -6,7 +6,6 @@ require File.expand_path('../boot', __FILE__)
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups(assets: %w(development test)))
 
-require 'opal-rails'
 require 'hyper-react'
 
 module TestApp
@@ -16,13 +15,13 @@ module TestApp
     config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s
     config.hyperloop.auto_config = false
-    config.opal.method_missing = true
-    config.opal.optimized_operators = true
-    config.opal.arity_check = false
-    config.opal.const_missing = true
-    config.opal.dynamic_require_severity = :ignore
-    config.opal.enable_specs = true
-    config.opal.spec_location = 'spec-opal'
+    #config.opal.method_missing = true
+    #config.opal.optimized_operators = true
+    #config.opal.arity_check = false
+    #config.opal.const_missing = true
+    #config.opal.dynamic_require_severity = :ignore
+    #config.opal.enable_specs = true
+    #config.opal.spec_location = 'spec-opal'
 
     config.assets.cache_store = :null_store
     config.hyperloop.auto_config = false
