@@ -135,11 +135,6 @@ module ComponentTestHelpers
           if !render_params[:layout] || style_sheet
             page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' rescue nil %>\n"+page
           end
-          if render_on == :server_only # so that test helper wait_for_ajax works
-            page = "<script type='text/javascript'>window.jQuery = {'active': 0}</script>\n#{page}"
-          else
-            page = "<%= javascript_include_tag 'jquery' %>\n<%= javascript_include_tag 'jquery_ujs' %>\n#{page}"
-          end
           page = "<script type='text/javascript'>go = function() {window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
           title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
           title = "#{title}...continued." if ComponentTestHelpers.description_displayed
@@ -256,13 +251,25 @@ module ComponentTestHelpers
           def self.js_eval(s)
             `eval(s)`
           end
+          def self.dasherize(s)
+            `s.replace(/[-_\\s]+/g, '-')
+              .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1-$2')
+              .replace(/([a-z\\d])([A-Z])/g, '$1-$2')
+              .toLowerCase()`
+          end
           def self.add_class(class_name, styles={})
-            style = styles.collect { |attr, value| "\#{attr.dasherize}:\#{value}"}.join("; ")
+            style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}"}.join("; ")
+            cs = class_name.to_s
             %x{
               var style_el = document.createElement("style");
-              style_el.setAttribute("type", "text/css");
-              style_el.innerHTML = ".\#{class_name} { \#{style} }";
-              document.head.append(style_el);
+              var css = "." + cs + " { " + style + " }";
+              style_el.type = "text/css";
+              if (style_el.styleSheet){
+                style_el.styleSheet.cssText = css;
+              } else {
+                style_el.appendChild(document.createTextNode(css));
+              }
+              document.head.appendChild(style_el);
             }
           end
         end
