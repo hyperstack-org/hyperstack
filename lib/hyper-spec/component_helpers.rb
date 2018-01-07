@@ -122,7 +122,7 @@ module ComponentTestHelpers
           #page = "<%= javascript_include_tag 'reactrb-router' %>\n#{page}"
 
 
-          if true || Lolex.initialized?
+          if render_on != :server_only  || Lolex.initialized?
             page = "<%= javascript_include_tag 'time_cop' %>\n"+page
           end
           if (render_on != :server_only && !render_params[:layout]) || javascript
@@ -131,11 +131,6 @@ module ComponentTestHelpers
           end
           if !render_params[:layout] || style_sheet
             page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' %>\n"+page
-          end
-          if render_on == :server_only # so that test helper wait_for_ajax works
-            page = "<script type='text/javascript'>window.jQuery = {'active': 0}</script>\n#{page}"
-          else
-            page = "<%= javascript_include_tag 'jquery' %>\n<%= javascript_include_tag 'jquery_ujs' %>\n#{page}"
           end
           page = "<script type='text/javascript'>go = function() {window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
           title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
@@ -268,12 +263,18 @@ module ComponentTestHelpers
               .toLowerCase()`
           end
           def self.add_class(class_name, styles={})
-            style = styles.collect { |attr, value| "\#{attr.dasherize}:\#{value}"}.join("; ")
+            style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}" }.join("; ")
+            cs = class_name.to_s
             %x{
               var style_el = document.createElement("style");
-              style_el.setAttribute("type", "text/css");
-              style_el.innerHTML = ".\#{class_name} { \#{style} }";
-              document.head.append(style_el);
+              var css = "." + cs + " { " + style + " }";
+              style_el.type = "text/css";
+              if (style_el.styleSheet){
+                style_el.styleSheet.cssText = css;
+              } else {
+                style_el.appendChild(document.createTextNode(css));
+              }
+              document.head.appendChild(style_el);
             }
           end
         end
@@ -303,7 +304,7 @@ module ComponentTestHelpers
   end
 
   def add_class(class_name, style)
-    @client_code = "#{@client_code}ComponentHelpers.add_class '#{class_name}', #{style}\n"
+    @client_code = "#{@client_code}ComponentHelpers.add_class('#{class_name}', #{style})\n"
   end
 
   def open_in_chrome
