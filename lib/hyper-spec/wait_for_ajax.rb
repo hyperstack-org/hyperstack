@@ -10,10 +10,24 @@ module HyperSpec
     end
 
     def running?
-      result = page.evaluate_script('(function(active) { return active; })(jQuery.active)')
-      result && !result.zero?
+      page.evaluate_script('
+        if (Opal !== undefined && Opal.Hyperloop !== undefined) {
+          try {
+            return Opal.Hyperloop.$const_get("HTTP")["$active?"]();
+          } catch(err) {
+            if (jQuery !== undefined && jQuery.active !== undefined) {
+              return (jQuery.active > 0);
+            } else {
+              return false;
+            }
+          }
+        } else {
+          if (jQuery !== undefined && jQuery.active !== undefined) {
+            return (jQuery.active > 0);
+          }
+        }')
     rescue Exception => e
-      puts "wait_for_ajax failed while testing state of jQuery.active: #{e}"
+      puts "wait_for_ajax failed while testing state of ajax requests: #{e}"
     end
 
     def finished_all_ajax_requests?
@@ -24,7 +38,7 @@ module HyperSpec
     rescue Capybara::NotSupportedByDriverError
       true
     rescue Exception => e
-      e.message == 'jQuery is not defined'
+      e.message == 'either jQuery or Hyperloop::HTTP is not defined'
     end
   end
 end
