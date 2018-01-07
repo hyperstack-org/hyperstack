@@ -27,7 +27,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'capybara'
   spec.add_dependency 'chromedriver-helper'
   spec.add_dependency 'opal', '>= 0.10.5', '< 0.12.0'
-  spec.add_dependency 'parser'
+  spec.add_dependency 'parser', '~> 2.3.3'
   spec.add_dependency 'pry'
   spec.add_dependency 'rspec-rails'
   spec.add_dependency 'selenium-webdriver'
