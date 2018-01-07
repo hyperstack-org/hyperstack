@@ -3,7 +3,6 @@ require 'react/react-source-browser'
 require 'hyper-component'
 require 'hyper-operation'
 if React::IsomorphicHelpers.on_opal_client?
-  require 'opal-jquery'
   require 'browser/delay'
   require 'browser/interval'
   require 'hyperloop/pusher'

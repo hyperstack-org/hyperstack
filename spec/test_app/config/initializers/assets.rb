@@ -2,8 +2,6 @@
 
 # Version of your assets, change this if you want to expire all your assets.
 Rails.application.config.assets.version = '1.0'
-Rails.application.config.assets.precompile += %w( jquery.js )
-Rails.application.config.assets.precompile += %w( jquery_ujs.js )
 Rails.application.config.assets.precompile += %w( time_cop.js )
 
 # Add additional assets to the asset load path
