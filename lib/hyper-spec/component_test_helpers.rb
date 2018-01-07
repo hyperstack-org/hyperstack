@@ -51,7 +51,7 @@ module HyperSpec
 
             page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
 
-            page = "<%= javascript_include_tag 'time_cop' %>\n#{page}" if true || Lolex.initialized?
+            page = "<%= javascript_include_tag 'time_cop' %>\n#{page}" if render_on != :server_only  || Lolex.initialized?
 
             if (render_on != :server_only && !render_params[:layout]) || javascript
               page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n#{page}"
@@ -60,14 +60,6 @@ module HyperSpec
             if !render_params[:layout] || style_sheet
               page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' %>\n#{page}"
             end
-
-            if render_on == :server_only # so that test helper wait_for_ajax works
-              page = "<script type='text/javascript'>window.jQuery = {'active': 0}</script>\n#{page}"
-            else
-              page = "<%= javascript_include_tag 'jquery' %>\n"\
-                     "<%= javascript_include_tag 'jquery_ujs' %>\n#{page}"
-            end
-
             page = "<script type='text/javascript'>go = function() "\
                    "{window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
 
@@ -199,12 +191,18 @@ module HyperSpec
                 .toLowerCase()`
             end
             def self.add_class(class_name, styles={})
-              style = styles.collect { |attr, value| "\#{attr.dasherize}:\#{value}"}.join("; ")
+              style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}" }.join("; ")
+              cs = class_name.to_s
               %x{
                 var style_el = document.createElement("style");
-                style_el.setAttribute("type", "text/css");
-                style_el.innerHTML = ".\#{class_name} { \#{style} }";
-                document.head.append(style_el);
+                var css = "." + cs + " { " + style + " }";
+                style_el.type = "text/css";
+                if (style_el.styleSheet){
+                  style_el.styleSheet.cssText = css;
+                } else {
+                  style_el.appendChild(document.createTextNode(css));
+                }
+                document.head.appendChild(style_el);
               }
             end
           end
@@ -238,7 +236,7 @@ module HyperSpec
     end
 
     def add_class(class_name, style)
-      @client_code = "#{@client_code}ComponentHelpers.add_class '#{class_name}', #{style}\n"
+      @client_code = "#{@client_code}ComponentHelpers.add_class('#{class_name}', #{style})\n"
     end
 
     def open_in_chrome
@@ -267,11 +265,28 @@ module HyperSpec
       end
     end
 
+    def wait_for_size(width, height)
+      start_time = Capybara::Helpers.monotonic_time
+      stable_count_w = 0
+      stable_count_h = 0
+      prev_size = [0, 0]
+      begin
+        sleep 0.05
+        curr_size = Capybara.current_session.current_window.size
+        return if [width, height] == curr_size
+        # some maximum or minimum is reached and size doesnt change anymore
+        stable_count_w += 1 if prev_size[0] == curr_size[0]
+        stable_count_h += 1 if prev_size[1] == curr_size[1]
+        return if stable_count_w > 2 || stable_count_h > 2
+        prev_size = curr_size
+      end while (Capybara::Helpers.monotonic_time - start_time) < Capybara.current_session.config.default_max_wait_time
+      raise Capybara::WindowError, "Window size not stable within #{Capybara.current_session.config.default_max_wait_time} seconds."
+    end
+
     def size_window(width = nil, height = nil)
       # return if @window_cannot_be_resized
       # original_width = evaluate_script('window.innerWidth')
       # original_height = evaluate_script('window.innerHeight')
-
       width, height = [height, width] if width == :portrait
       width, height = width if width.is_a? Array
       portrait = true if height == :portrait
@@ -293,13 +308,13 @@ module HyperSpec
 
       unless RSpec.configuration.debugger_width
         Capybara.current_session.current_window.resize_to(1000, 500)
-        sleep 0.125
+        wait_for_size(1000, 500)
         inner_width = evaluate_script('window.innerWidth')
         RSpec.configuration.debugger_width = 1000 - inner_width
       end
       Capybara.current_session.current_window
               .resize_to(width + RSpec.configuration.debugger_width, height)
-      sleep 0.125
+      wait_for_size(width + RSpec.configuration.debugger_width, height)
     end
   end
 
