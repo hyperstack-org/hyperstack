@@ -10,22 +10,24 @@ module HyperSpec
     end
 
     def running?
-      page.evaluate_script('
-        if (Opal !== undefined && Opal.Hyperloop !== undefined) {
+      jscode = <<-CODE
+      (function() {
+        if (typeof Opal !== "undefined" && Opal.Hyperloop !== undefined) {
           try {
             return Opal.Hyperloop.$const_get("HTTP")["$active?"]();
           } catch(err) {
-            if (jQuery !== undefined && jQuery.active !== undefined) {
-              return (jQuery.active > 0);
-            } else {
-              return false;
+            if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
+              return jQuery.active > 0;
             }
           }
+        } else if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
+          return jQuery.active > 0;
         } else {
-          if (jQuery !== undefined && jQuery.active !== undefined) {
-            return (jQuery.active > 0);
-          }
-        }')
+          return false;
+        }
+      })();
+      CODE
+      page.evaluate_script(jscode)
     rescue Exception => e
       puts "wait_for_ajax failed while testing state of ajax requests: #{e}"
     end
