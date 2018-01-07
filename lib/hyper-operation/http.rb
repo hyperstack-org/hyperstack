@@ -140,7 +140,7 @@ module Hyperloop
     def self.active?
       jquery_active_requests = 0
       %x{
-        if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
+        if (typeof jQuery !== "undefined" && typeof jQuery.active !== "undefined") {
           jquery_active_requests = jQuery.active;
         }
       }
