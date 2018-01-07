@@ -177,8 +177,24 @@ if RUBY_ENGINE != 'opal'
     end
 
     def running?
-      result = page.evaluate_script("(function(active) {console.log('jquery is active? '+active); return active})(jQuery.active)")
-      result && !result.zero?
+      jscode = <<-CODE
+      (function() {
+        if (typeof Opal !== "undefined" && Opal.Hyperloop !== undefined) {
+          try {
+            return Opal.Hyperloop.$const_get("HTTP")["$active?"]();
+          } catch(err) {
+            if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
+              return jQuery.active > 0;
+            }
+          }
+        } else if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
+          return jQuery.active > 0;
+        } else {
+          return false;
+        }
+      })();
+      CODE
+      page.evaluate_script(jscode)
     rescue Exception => e
       puts "wait_for_ajax failed while testing state of jQuery.active: #{e}"
     end
@@ -191,7 +207,7 @@ if RUBY_ENGINE != 'opal'
     rescue Capybara::NotSupportedByDriverError
       true
     rescue Exception => e
-      e.message == "jQuery is not defined"
+      e.message == "jQuery or Hyperloop::HTTP is not defined"
     end
 
   end
