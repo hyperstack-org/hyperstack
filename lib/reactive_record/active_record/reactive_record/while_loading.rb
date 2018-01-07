@@ -153,7 +153,7 @@ module ReactiveRecord
               var style_el = document.createElement("style");
               style_el.setAttribute("type", "text/css");
               style_el.innerHTML = ".reactive_record_is_loading > .reactive_record_show_when_loaded { display: none; }\n" +
-                                   ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none; }"
+                                   ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none; }";
               document.head.append(style_el);
             }
           end
