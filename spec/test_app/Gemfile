@@ -15,8 +15,6 @@ gem 'uglifier'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 gem 'mini_racer', platforms: :ruby
 
-# Use jquery as the JavaScript library
-gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -47,11 +45,9 @@ group :development do
   gem 'spring'
 end
 
-
-# gem 'jquery-ui-rails'
 require '../../lib/hyper-spec/version'
 gem 'react-rails', '>= 2.3.0', '< 2.5.0'
-gem 'hyper-react', HyperSpec::VERSION , path: '../../../hyper-react'
+gem 'hyper-react', HyperSpec::VERSION #, path: '../../../hyper-react'
 gem 'hyper-store', HyperSpec::VERSION #, path: '../../../hyper-store'
 gem 'hike'
 gem 'opal-rails'
