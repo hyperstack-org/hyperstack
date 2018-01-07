@@ -199,9 +199,13 @@ module HyperSpec
                 .toLowerCase()`
             end
             def self.add_class(class_name, styles={})
-              style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}"}.join("; ")
-              s = "<style type='text/css'> .\#{class_name}{ \#{style} } </style>"
-              `$(\#{s}).appendTo("head");`
+              style = styles.collect { |attr, value| "\#{attr.dasherize}:\#{value}"}.join("; ")
+              %x{
+                var style_el = document.createElement("style");
+                style_el.setAttribute("type", "text/css");
+                style_el.innerHTML = ".\#{class_name} { \#{style} }";
+                document.head.append(style_el);
+              }
             end
           end
           class React::Component::HyperTestDummy < React::Component::Base
