@@ -12,6 +12,8 @@ else
   require 'hyperloop/rail_tie' if defined? Rails
   Hyperloop.import 'opal', gem: true
   Hyperloop.import 'browser', client_only: true
+  Hyperloop.import 'browser/delay', client_only: true
+  Hyperloop.import 'browser/interval', client_only: true
   Hyperloop.import 'hyperloop-config', gem: true
   Hyperloop.import 'hyperloop/autoloader'
   Hyperloop.import 'hyperloop/autoloader_starter'
