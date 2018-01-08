@@ -6,20 +6,17 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-
 gem 'rails'
 gem 'sqlite3'
 gem 'puma'
-gem 'jquery-rails'
 
-require 'hyper-store/version'
-gem 'hyper-react', HyperStore::VERSION
-gem 'hyper-spec', HyperStore::VERSION
+require '../../lib/hyper-store/version'
+# gem 'hyper-operation', HyperStore::VERSION #, path: '../../../hyper-operation'
+gem 'hyper-react', HyperStore::VERSION #, path: '../../../hyper-react'
+gem 'hyper-spec', HyperStore::VERSION #, path: '../../../hyper-spec'
 gem 'hyper-store', path: '../..'
 gem 'opal'
 gem 'opal-browser'
-gem 'opal-jquery'
-gem 'opal-rails'
 gem 'mini_racer', platforms: :ruby
 gem 'react-rails', '>= 2.3.0', '< 2.5.0'
 
