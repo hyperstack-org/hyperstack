@@ -11,7 +11,6 @@ gem 'sqlite3'
 gem 'puma'
 
 require '../../lib/hyper-store/version'
-# gem 'hyper-operation', HyperStore::VERSION #, path: '../../../hyper-operation'
 gem 'hyper-react', HyperStore::VERSION #, path: '../../../hyper-react'
 gem 'hyper-spec', HyperStore::VERSION #, path: '../../../hyper-spec'
 gem 'hyper-store', path: '../..'
