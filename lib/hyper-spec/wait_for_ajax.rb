@@ -17,26 +17,27 @@ module HyperSpec
             return Opal.Hyperloop.$const_get("HTTP")["$active?"]();
           } catch(err) {
             if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
-              return jQuery.active > 0;
+              return (jQuery.active > 0);
+            } else {
+              return false;
             }
           }
         } else if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
-          return jQuery.active > 0;
+          return (jQuery.active > 0);
         } else {
           return false;
         }
       })();
       CODE
-      page.evaluate_script(jscode)
+      res = page.evaluate_script(jscode)
+      puts "wafa: #{res}"
+      res
     rescue Exception => e
       puts "wait_for_ajax failed while testing state of ajax requests: #{e}"
     end
 
     def finished_all_ajax_requests?
-      unless running?
-        sleep 0.25 # this was 1 second, not sure if its necessary to be so long...
-        !running?
-      end
+      !running?
     rescue Capybara::NotSupportedByDriverError
       true
     rescue Exception => e
