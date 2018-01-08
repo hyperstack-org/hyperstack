@@ -136,17 +136,11 @@ module ReactiveRecord
           end
         end
 
-<<<<<<< HEAD
         # SECURITY - SAFE
-        def select(&block); @cache.select &block; end
-
-        # SECURITY - SAFE
-        def detect(&block); @cache.detect &block; end
-=======
         def select(&block); @cache.select(&block); end
 
+        # SECURITY - SAFE
         def detect(&block); @cache.detect(&block); end
->>>>>>> 7af14cd932f42ab2db44df47679fa9b1097387f0
 
         # SECURITY - SAFE
         def inject(initial, &block); @cache.inject(initial) &block; end
