@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-spec', Hyperloop::VERSION
-  spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'parser'
