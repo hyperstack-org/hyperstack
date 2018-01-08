@@ -171,7 +171,6 @@ module Hyperloop
       @url      = url
       @payload  = options.delete :payload
       @handler  = block
-
       %x{
         var payload_to_send = null;
         var content_type = null;
@@ -200,11 +199,12 @@ module Hyperloop
           xhr.setRequestHeader("Content-Type", content_type);
         }
         if (options["$has_key?"]("headers")) {
-          options['$[]']("headers").$each(
-            function(key, value) {
-              xhr.setRequestHeader(key, value);
-            }
-          );
+          var headers = options['$[]']("headers");
+          var keys = headers.$keys();
+          var keys_length = keys.length;
+          for (var i=0; i < keys_length; i++) {
+            xhr.setRequestHeader( keys[i], headers['$[]'](keys[i]) );
+          }
         }
         if (payload_to_send !== null) {
           self.$class().$incr_active_requests();
