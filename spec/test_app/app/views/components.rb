@@ -1,9 +1,11 @@
 require 'opal'
-require 'react/react-source'
 require 'hyper-react'
-require 'hyper-store'
 if React::IsomorphicHelpers.on_opal_client?
-  require 'opal-jquery'
+  require 'browser'
   require 'browser/delay'
 end
+
+require 'hyper-operation'
+require 'hyper-store'
+
 require_tree './components'
