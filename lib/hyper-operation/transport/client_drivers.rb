@@ -76,7 +76,7 @@ module Hyperloop
           }
         elsif ClientDrivers.opts[:transport] == :action_cable
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
-          Hyperloop::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel)).then do |response|
+          Hyperloop::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|
             %x{
               #{Hyperloop.action_cable_consumer}.subscriptions.create(
                 {
@@ -241,7 +241,7 @@ module Hyperloop
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection(*channel) }
           every(opts[:seconds_between_poll]) do
-            get_queued_data(:read, nil, headers: {'X-HYPERLOOP-SILENT-REQUEST' =>  true })
+            get_queued_data(:read, nil)
           end
         end
       end
