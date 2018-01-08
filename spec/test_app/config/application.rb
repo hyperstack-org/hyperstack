@@ -7,7 +7,6 @@ require File.expand_path('../boot', __FILE__)
 
 require 'hyper-router'
 require 'hyper-component'
-require 'jquery-rails'
 Bundler.require(*Rails.groups(assets: %w(development test)))
 
 
