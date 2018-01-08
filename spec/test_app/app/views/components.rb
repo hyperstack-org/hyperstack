@@ -1,13 +1,12 @@
 require 'opal'
-require 'react'
-require 'hyper-mesh'
-
+require 'react/react-source-browser'
+require 'hyper-component'
 if React::IsomorphicHelpers.on_opal_client?
-  require 'opal-jquery'
-  #require 'browser' # breaks poltergeist
-  require 'browser/interval'
+  require 'browser'
   require 'browser/delay'
+  require 'browser/interval'
   require 'hyperloop/pusher'
 end
+require 'hyper-mesh'
 require '_react_public_models'
 require_tree './components'

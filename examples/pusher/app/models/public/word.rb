@@ -1,2 +1,0 @@
-class Word < ApplicationRecord
-end

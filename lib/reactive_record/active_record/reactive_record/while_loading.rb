@@ -1,6 +1,6 @@
 module HyperMesh
   def self.load(&block)
-    ReactiveRecord.load &block
+    ReactiveRecord.load(&block)
   end
 end
 
@@ -101,7 +101,9 @@ module ReactiveRecord
 
     if RUBY_ENGINE == 'opal'
 
-      # I DONT THINK WE USE opal-jquery in this module anymore - require 'opal-jquery' if opal_client?
+      # +: I DONT THINK WE USE opal-jquery in this module anymore - require 'opal-jquery' if opal_client?
+      # -: You think wrong. add_style_sheet uses the jQuery $, after_mount too, others too
+      # -: I removed those references. 
 
       include Hyperloop::Component::Mixin
 
@@ -145,12 +147,17 @@ module ReactiveRecord
         end
 
         def add_style_sheet
-          @style_sheet ||= %x{
-            $('<style type="text/css">'+
-              '  .reactive_record_is_loading > .reactive_record_show_when_loaded { display: none; }'+
-              '  .reactive_record_is_loaded > .reactive_record_show_while_loading { display: none; }'+
-              '</style>').appendTo("head")
-          }
+          # directly assigning the code to the variable triggers a opal 0.10.5 compiler bug.
+          unless @style_sheet_added
+            %x{
+              var style_el = document.createElement("style");
+              style_el.setAttribute("type", "text/css");
+              style_el.innerHTML = ".reactive_record_is_loading > .reactive_record_show_when_loaded { display: none; }\n" +
+                                   ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none; }";
+              document.head.append(style_el);
+            }
+          end
+          @style_sheet_added = true
         end
 
       end
@@ -169,8 +176,23 @@ module ReactiveRecord
         WhileLoading.add_style_sheet
         %x{
           var node = #{dom_node};
-          $(node).children(':nth-child(-1n+'+#{params.loaded_children.count}+')').addClass('reactive_record_show_when_loaded');
-          $(node).children(':nth-child(1n+'+#{params.loaded_children.count+1}+')').addClass('reactive_record_show_while_loading');
+          var nodes;
+          nodes = node.querySelectorAll(':nth-child(-1n+'+#{params.loaded_children.count}+')');
+          nodes.forEach(
+            function(current_node, current_index, list_obj) {
+              if (current_node.className.indexOf('reactive_record_show_when_loaded') === -1) {
+                current_node.className = current_node.className + ' reactive_record_show_when_loaded';
+              }
+            }
+          );
+          nodes = node.querySelectorAll(':nth-child(1n+'+#{params.loaded_children.count+1}+')');
+          nodes.forEach(
+            function(current_node, current_index, list_obj) {
+              if (current_node.className.indexOf('reactive_record_show_while_loading') === -1) {
+                current_node.className = current_node.className + ' reactive_record_show_while_loading';
+              }
+            }
+          );
         }
       end
 
@@ -263,11 +285,12 @@ if RUBY_ENGINE == 'opal'
 
           %x{
             var node = #{dom_node};
-            if (!$(node).is('[data-reactive_record_enclosing_while_loading_container_id]')) {
-              var while_loading_container = $(node).closest('[data-reactive_record_while_loading_container_id]')
-              if (while_loading_container.length > 0) {
-                var container_id = $(while_loading_container).attr('data-reactive_record_while_loading_container_id')
-                $(node).attr('data-reactive_record_enclosing_while_loading_container_id', container_id)
+            var node_wl_attr = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
+            if (node_wl_attr === null || node_wl_attr === "") {
+              var while_loading_container = node.closest('[data-reactive_record_while_loading_container_id]');
+              if (while_loading_container !== null) {
+                var container_id = while_loading_container.getAttribute('data-reactive_record_while_loading_container_id');
+                node.setAttribute('data-reactive_record_enclosing_while_loading_container_id', container_id);
               }
             }
           }
@@ -275,37 +298,43 @@ if RUBY_ENGINE == 'opal'
 
         def reactive_record_link_set_while_loading_container_class
           %x{
-
-            var node = #{dom_node};
-            var wl = #{!self.is_a?(ReactiveRecord::WhileLoading)}
-            if (#{!self.is_a?(ReactiveRecord::WhileLoading)} && $(node).is('[data-reactive_record_while_loading_container_id]')) {
-              return
+            var node = #{dom_node};    
+            var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');
+            if (#{!self.is_a?(ReactiveRecord::WhileLoading)} && while_loading_container_id !== null && while_loading_container_id !== "") {
+              return;
             }
-            var while_loading_container_id = $(node).attr('data-reactive_record_enclosing_while_loading_container_id');
-            if (while_loading_container_id) {
-              var while_loading_container = $('[data-reactive_record_while_loading_container_id='+while_loading_container_id+']');
+            var enc_while_loading_container_id = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
+            if (enc_while_loading_container_id !== null && enc_while_loading_container_id !== "") {
+              var while_loading_container = document.body.querySelector('[data-reactive_record_while_loading_container_id="'+enc_while_loading_container_id+'"]');
               var loading = #{!!waiting_on_resources == true};
               if (loading) {
-                $(node).addClass('reactive_record_is_loading');
-                $(node).removeClass('reactive_record_is_loaded');
-                $(while_loading_container).addClass('reactive_record_is_loading');
-                $(while_loading_container).removeClass('reactive_record_is_loaded');
-
-              } else if (!$(node).hasClass('reactive_record_is_loaded')) {
-
-                if (!$(node).attr('data-reactive_record_while_loading_container_id')) {
-                  $(node).removeClass('reactive_record_is_loading');
-                  $(node).addClass('reactive_record_is_loaded');
+                node.className = node.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
+                if (node.className.indexOf('reactive_record_is_loading') === -1) {
+                  node.className = node.className + ' reactive_record_is_loading';
                 }
-                if (!$(while_loading_container).hasClass('reactive_record_is_loaded')) {
-                  var loading_children = $(while_loading_container).
-                    find('[data-reactive_record_enclosing_while_loading_container_id='+while_loading_container_id+'].reactive_record_is_loading')
-                  if (loading_children.length == 0) {
-                    $(while_loading_container).removeClass('reactive_record_is_loading')
-                    $(while_loading_container).addClass('reactive_record_is_loaded')
+                if (while_loading_container !== null) {
+                  while_loading_container.className = while_loading_container.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
+                  if (while_loading_container.className.indexOf('reactive_record_is_loading') === -1) {
+                    while_loading_container.className = while_loading_container.className + ' reactive_record_is_loading';
                   }
                 }
-              }
+              } else if (node.className.indexOf('reactive_record_is_loaded') === -1) {
+                if (while_loading_container_id === null || while_loading_container_id === "") {
+                  node.className = node.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
+                  if (node.className.indexOf('reactive_record_is_loaded') === -1) {
+                    node.className = node.className + 'reactive_record_is_loaded';
+                  }
+                }
+                if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {
+                  var loading_children = while_loading_container.querySelectorAll('[data-reactive_record_enclosing_while_loading_container_id="'+enc_while_loading_container_id+'"].reactive_record_is_loading');
+                  if (loading_children.length === 0) {
+                    while_loading_container.className = while_loading_container.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
+                    if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {
+                      while_loading_container.className = while_loading_container.className + ' reactive_record_is_loaded';
+                    }
+                  }
+                }
+             }
             }
           }
         end

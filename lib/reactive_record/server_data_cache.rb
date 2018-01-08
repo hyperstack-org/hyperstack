@@ -136,11 +136,17 @@ module ReactiveRecord
           end
         end
 
+<<<<<<< HEAD
         # SECURITY - SAFE
         def select(&block); @cache.select &block; end
 
         # SECURITY - SAFE
         def detect(&block); @cache.detect &block; end
+=======
+        def select(&block); @cache.select(&block); end
+
+        def detect(&block); @cache.detect(&block); end
+>>>>>>> 7af14cd932f42ab2db44df47679fa9b1097387f0
 
         # SECURITY - SAFE
         def inject(initial, &block); @cache.inject(initial) &block; end
@@ -374,7 +380,7 @@ keys:
             if method[0] == "new"
               new_target = ReactiveRecord::Base.find_by_object_id(target.base_class, method[1])
             elsif !(target.class < ActiveRecord::Base)
-              new_target = target.send *method
+              new_target = target.send(*method)
               # value is an array if scope returns nil, so we destroy the bogus record
               new_target.destroy and new_target = nil if value.is_a? Array
             else
@@ -390,7 +396,7 @@ keys:
             new_target = association.klass.find(value[:id].first)
             target.send "#{method}=", new_target
           elsif !(target.class < ActiveRecord::Base)
-            new_target = target.send *method
+            new_target = target.send(*method)
             # value is an array if scope returns nil, so we destroy the bogus record
             new_target.destroy and new_target = nil if value.is_a? Array
           else
