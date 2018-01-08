@@ -62,6 +62,9 @@ if ruby?
       def eval(args)
         true
       end
+      def attach(*args)
+        true
+      end
     end
 
     # Need to decouple/dry up this...
