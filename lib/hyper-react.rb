@@ -2,7 +2,6 @@ require 'hyperloop-config'
 Hyperloop.import 'hyper-store'
 Hyperloop.import 'react/react-source-browser', client_only: true
 Hyperloop.import 'react/react-source-server', server_only: true
-Hyperloop.import 'opal-jquery', client_only: true
 Hyperloop.import 'browser/delay', client_only: true
 Hyperloop.import 'hyper-react'
 Hyperloop.import 'react_ujs'
