@@ -205,7 +205,6 @@ module Hyperloop
               xhr.setRequestHeader(key, value);
             }
           );
-          console.log("xhr:", xhr);
         }
         if (payload_to_send !== null) {
           self.$class().$incr_active_requests();
