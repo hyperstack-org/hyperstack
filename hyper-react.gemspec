@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
+  spec.add_development_dependency 'opal-jquery'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'rails', '>= 4.0.0'
