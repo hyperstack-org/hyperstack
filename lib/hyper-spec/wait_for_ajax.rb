@@ -29,9 +29,7 @@ module HyperSpec
         }
       })();
       CODE
-      res = page.evaluate_script(jscode)
-      puts "wafa: #{res}"
-      res
+      page.evaluate_script(jscode)
     rescue Exception => e
       puts "wait_for_ajax failed while testing state of ajax requests: #{e}"
     end
