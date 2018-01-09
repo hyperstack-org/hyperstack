@@ -56,12 +56,6 @@ if RUBY_ENGINE == 'opal'
   ) unless defined? Hyperloop::Component::VERSION
 else
   require 'opal'
-  # rubocop:disable Lint/HandleExceptions
-  begin
-    require 'opal-jquery'
-  rescue LoadError
-  end
-  # rubocop:enable Lint/HandleExceptions
 
   require 'hyper-store'
   require 'opal-activesupport'
