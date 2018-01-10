@@ -1,32 +1,36 @@
 require 'spec_helper'
 
-if opal?
-RSpec.describe React::Component::Base, type: :component do
-  after(:each) do
-    React::API.clear_component_class_cache
+describe 'React::Component::Base', js: true do
+
+  before :each do
+    on_client do
+      class Foo < React::Component::Base
+        before_mount do
+          @instance_data = ["working"]
+        end
+        def render
+          @instance_data.first
+        end
+      end
+    end
   end
 
-  it 'can be inherited to create a component class' do
-    stub_const 'Foo', Class.new(React::Component::Base)
-    Foo.class_eval do
-      before_mount do
-        @instance_data = ["working"]
-      end
-      def render
-        @instance_data.first
-      end
-    end
-    stub_const 'Bar', Class.new(Foo)
-    Bar.class_eval do
-      before_mount do
-        @instance_data << "well"
-      end
-      def render
-        @instance_data.join(" ")
-      end
-    end
-    expect(Foo).to render_static_html("<span>working</span>")
-    expect(Bar).to render_static_html("<span>working well</span>")
+  it 'can create a simple component class' do
+    mount 'Foo'
+    expect(page).to have_xpath("//span", text: "working")
   end
-end
+
+  it 'can create a simple component class that can be inherited to create another component class' do
+    mount 'Bar' do
+      class Bar < Foo
+        before_mount do
+          @instance_data << "well"
+        end
+        def render
+          @instance_data.join(" ")
+        end
+      end
+    end
+    expect(page).to have_xpath("//span", text: "working well")
+  end
 end
