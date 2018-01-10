@@ -1,36 +1,43 @@
 require 'spec_helper'
 
-if opal?
-class HelloMessage
-  include React::Component
-  def render
-    div { "Hello World!" }
-  end
-end
-
-describe 'An Example from the react.rb doc', type: :component do
+describe 'An Example from the react.rb doc', js: true do
   it 'produces the correct result' do
-    expect(HelloMessage).to render_static_html('<div>Hello World!</div>')
+    mount 'HelloMessage' do
+      class HelloMessage
+        include React::Component
+        def render
+          div { "Hello World!" }
+        end
+      end
+    end
+    expect(page).to have_xpath('//div', text: 'Hello World!')
   end
 end
 
-class HelloMessage2
-  include React::Component
-  define_state(:user_name) { '@catmando' }
-  def render
-    div { "Hello #{state.user_name}" }
+describe 'Adding state to a component (second tutorial example)', js: true do
+  before :each do
+    on_client do
+      class HelloMessage2
+        include React::Component
+        define_state(:user_name) { '@catmando' }
+        def render
+          div { "Hello #{state.user_name}" }
+        end
+      end
+    end
   end
-end
 
-describe 'Adding state to a component (second tutorial example)', type: :component do
   it "produces the correct result" do
-    expect(HelloMessage2).to render_static_html('<div>Hello @catmando</div>')
+    mount 'HelloMessage2'
+    expect(page).to have_xpath('//div', text: 'Hello @catmando')
   end
 
   it 'renders to the document' do
-    ele = `document.createElement('div')`
-    React.render(React.create_element(HelloMessage2), ele)
-    expect(`#{ele}.innerHTML`) =~ 'Hello @catmando'
+    evaluate_ruby do
+      ele = JS.call(:eval, "document.body.appendChild(document.createElement('div'))")
+      React.render(React.create_element(HelloMessage2), ele)
+    end
+    sleep 60
+    expect(page).to have_xpath('//div', text: 'Hello @catmando')
   end
-end
 end
