@@ -37,7 +37,6 @@ describe 'Adding state to a component (second tutorial example)', js: true do
       ele = JS.call(:eval, "document.body.appendChild(document.createElement('div'))")
       React.render(React.create_element(HelloMessage2), ele)
     end
-    sleep 60
     expect(page).to have_xpath('//div', text: 'Hello @catmando')
   end
 end
