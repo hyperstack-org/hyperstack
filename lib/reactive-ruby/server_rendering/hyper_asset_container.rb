@@ -4,6 +4,12 @@ require 'react/server_rendering/webpacker_manifest_container'
 
 module ReactiveRuby
   module ServerRendering
+    class HyperTestAssetContainer
+      def find_asset(logical_path)
+        ::Rails.cache.read(logical_path)
+      end
+    end
+
     class HyperAssetContainer
       def initialize
         @ass_containers = []
@@ -15,6 +21,7 @@ module ReactiveRuby
         if React::ServerRendering::WebpackerManifestContainer.compatible?
           @ass_containers << React::ServerRendering::WebpackerManifestContainer.new
         end
+        @ass_containers << HyperTestAssetContainer.new  if ::Rails.env.test?
       end
 
       def find_asset(logical_path)
