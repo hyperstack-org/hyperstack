@@ -65,6 +65,7 @@ module React
           }
           componentDidMount() {
             var instance = this._getOpalInstance.apply(this);
+            instance.is_mounted = true
             return #{`instance`.component_did_mount if type.method_defined? :component_did_mount};
           }
           componentWillReceiveProps(next_props) {
@@ -85,6 +86,7 @@ module React
           }
           componentWillUnmount() {
             var instance = this._getOpalInstance.apply(this);
+            instance.is_mounted = false;
             return #{`instance`.component_will_unmount if type.method_defined? :component_will_unmount};
           }
           _getOpalInstance() {

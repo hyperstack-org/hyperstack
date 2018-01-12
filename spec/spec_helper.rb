@@ -121,6 +121,9 @@ if RUBY_ENGINE != 'opal'
     puts 'Could not load test application. Please ensure you have run `bundle exec rake test_app`'
   end
   require 'rspec/rails'
+  require 'hyper-spec'
+  require 'pry'
+  require 'opal-browser'
   require 'timecop'
 
   Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
@@ -145,5 +148,17 @@ if RUBY_ENGINE != 'opal'
     config.filter_run_including focus: true
     config.filter_run_excluding opal: true
     config.run_all_when_everything_filtered = true
+
+    # Fail tests on JavaScript errors in Chrome Headless
+    class JavaScriptError < StandardError; end
+    config.after(:each, js: true) do |spec|
+      logs = page.driver.browser.manage.logs.get(:browser)
+      errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
+                  .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+      warnings = logs.select { |e| e.level == "WARNING" && e.message.present? }
+                  .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+      puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
+      raise JavaScriptError, errors.join("\n\n") if errors.present?
+    end
   end
 end

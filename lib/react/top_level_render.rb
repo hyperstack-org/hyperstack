@@ -10,18 +10,13 @@ module React
       }
     }
 
-    if !(`typeof ReactDOM === 'undefined'`)
-      native = `ReactDOM.render(#{element.to_n}, container, cb)` # v0.15+
-    elsif !(`typeof React.renderToString === 'undefined'`)
-      native = `React.render(#{element.to_n}, container, cb)`
-    else
-      raise "render is not defined.  In React >= v15 you must import it with ReactDOM"
-    end
+    raise "ReactDOM.render is not defined.  In React >= v15 you must import it with ReactDOM" if (`typeof ReactDOM === 'undefined'`)
+    native = `ReactDOM.render(#{element.to_n}, container, cb)`
 
     if `#{native}._getOpalInstance !== undefined`
       `#{native}._getOpalInstance()`
-    elsif `React.findDOMNode !== undefined && #{native}.nodeType === undefined`
-      `React.findDOMNode(#{native})`
+    elsif `ReactDOM.findDOMNode !== undefined && #{native}.nodeType === undefined`
+      `ReactDOM.findDOMNode(#{native})`
     else
       native
     end

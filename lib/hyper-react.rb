@@ -26,6 +26,7 @@ if RUBY_ENGINE == 'opal'
   end
   require 'react/hash'
   require 'react/top_level'
+  require 'react/top_level_render'
   require 'react/observable'
   require 'react/validator'
   require 'react/component'

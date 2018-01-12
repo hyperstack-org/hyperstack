@@ -11,7 +11,7 @@ module React
     def build_element(type, options)
       component = React.create_element(type, options)
       element = `ReactTestUtils.renderIntoDocument(#{component.to_n})`
-      `React.findDOMNode(element)`    # v0.14 and up
+      `ReactDOM.findDOMNode(element)`    # v0.15 and up
     end
 
     def expect_component_to_eventually(component_class, opts = {}, &block)
