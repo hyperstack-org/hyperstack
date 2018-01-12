@@ -65,7 +65,7 @@ describe 'React::Element', js: true do
 
     it 'will subscribe to a native components event param' do
       evaluate_ruby do
-        "make sure everything is loaded"
+        "this makes sure everything is loaded"
       end
       page.execute_script('window.NativeComponent = class extends React.Component {
         constructor(props) {
