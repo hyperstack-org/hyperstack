@@ -63,14 +63,23 @@ describe 'React::Element', js: true do
       expect(page.body[-60..-19]).to include('<span>works!works!</span>')
     end
 
-    xit 'will subscribe to a native components event param' do
+    it 'will subscribe to a native components event param' do
       evaluate_ruby do
-        JS.call(:eval, 'window.NativeComponent = class extends React.Component({displayName: "HelloMessage", ' +
-            'render() { return React.createElement("span", null, this.props.onEvent()); }})')
+        "make sure everything is loaded"
+      end
+      page.execute_script('window.NativeComponent = class extends React.Component {
+        constructor(props) {
+          super(props);
+          this.displayName = "HelloMessage";
+        }
+        render() { return React.createElement("span", null, this.props.onEvent()); }
+      }')
+      evaluate_ruby do
         class Foo < React::Component::Base
           imports "NativeComponent"
         end
         React::Test::Utils.render_into_document(React.create_element(Foo).on(:event) {'works!'})
+        true
       end
       expect(page.body[-60..-19]).to include('<span>works!</span>')
     end
