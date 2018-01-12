@@ -23,4 +23,4 @@ Element.instance_eval do
 
     React.render(React.create_element(`#{self.to_n}._reactrb_component_class`), self)
   end
-end if Object.const_defined?('::Element')
+end if Object.const_defined?('Element')
