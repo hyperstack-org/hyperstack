@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'debase' # for test_app
+  spec.add_development_dependency 'hyper-spec', React::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
