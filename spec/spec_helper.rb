@@ -4,15 +4,6 @@ require 'opal'
 require 'opal-rspec'
 require 'opal-jquery'
 
-def opal?
-  RUBY_ENGINE == 'opal'
-end
-
-def ruby?
-  !opal?
-end
-
-
 if RUBY_ENGINE == 'opal'
   require File.expand_path('../vendor/jquery-2.2.4.min', __FILE__)
   require 'hyperloop-config'
@@ -151,12 +142,15 @@ if RUBY_ENGINE != 'opal'
 
     # Fail tests on JavaScript errors in Chrome Headless
     class JavaScriptError < StandardError; end
+
     config.after(:each, js: true) do |spec|
       logs = page.driver.browser.manage.logs.get(:browser)
       errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
                   .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
-      warnings = logs.select { |e| e.level == "WARNING" && e.message.present? }
-                  .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+      unless client_options[:deprecation_warnings] == :off
+        warnings = logs.select { |e| e.level == "WARNING" && e.message.present? }
+                    .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+      end
       puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
       raise JavaScriptError, errors.join("\n\n") if errors.present?
     end
