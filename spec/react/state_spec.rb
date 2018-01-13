@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'React::State', js: true do
   it "can create dynamically initialized exported states" do
-    client_option deprecation_warnings: :off
     expect_evaluate_ruby do
       class Foo
         include React::Component
@@ -25,8 +24,7 @@ describe 'React::State', js: true do
   it "can be accessed outside of react using get/set_state"
 
   it 'ignores state updates during rendering' do
-    client_option render_on: :both
-    client_option deprecation_warnings: :off
+    client_option render_on: :both    
     evaluate_ruby do
       class StateTest < React::Component::Base
         export_state :boom
