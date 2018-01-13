@@ -2,7 +2,6 @@ require "spec_helper"
 
 describe 'React::Event', js: true do
   it "should bridge attributes of native SyntheticEvent (see http://facebook.github.io/react/docs/events.html#syntheticevent)" do
-    client_option deprecation_warnings: :off
     expect_evaluate_ruby do
       results = {}
       element = React.create_element('div').on(:click) do |event|
