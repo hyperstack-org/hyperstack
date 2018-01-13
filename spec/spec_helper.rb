@@ -147,11 +147,11 @@ if RUBY_ENGINE != 'opal'
       logs = page.driver.browser.manage.logs.get(:browser)
       errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
                   .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
-      unless client_options[:deprecation_warnings] == :off
+      if client_options[:deprecation_warnings] == :on
         warnings = logs.select { |e| e.level == "WARNING" && e.message.present? }
                     .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+        puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
       end
-      puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
       raise JavaScriptError, errors.join("\n\n") if errors.present?
     end
   end
