@@ -3,7 +3,7 @@ require "spec_helper"
 describe 'React', js: true do
   describe "is_valid_element?" do
     it "should return true if passed a valid element" do
-      client_option deprecation_warnings: :off
+      
       expect_evaluate_ruby do
         element = React::Element.new(JS.call(:eval, "React.createElement('div')"))
         React.is_valid_element?(element)
@@ -11,7 +11,7 @@ describe 'React', js: true do
     end
 
     it "should return false is passed a non React element" do
-      client_option deprecation_warnings: :off
+      
       expect_evaluate_ruby do
         element = React::Element.new(JS.call(:eval, "{}"))
         React.is_valid_element?(element)
@@ -21,7 +21,7 @@ describe 'React', js: true do
 
   describe "create_element" do
     it "should create a valid element with only tag" do
-      client_option deprecation_warnings: :off
+      
       expect_evaluate_ruby do
         element = React.create_element('div')
         React.is_valid_element?(element)
@@ -30,7 +30,7 @@ describe 'React', js: true do
 
     context "with block" do
       it "should create a valid element with text as only child when block yield String" do
-        client_option deprecation_warnings: :off
+        
         evaluate_ruby do
           ELEMENT = React.create_element('div') { "lorem ipsum" }
         end
@@ -39,7 +39,7 @@ describe 'React', js: true do
       end
 
       it "should create a valid element with children as array when block yield Array of element" do
-        client_option deprecation_warnings: :off
+        
         evaluate_ruby do
           ELEMENT = React.create_element('div') do
             [React.create_element('span'), React.create_element('span'), React.create_element('span')]
@@ -50,7 +50,7 @@ describe 'React', js: true do
       end
 
       it "should render element with children as array when block yield Array of element" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element('div') do
             [React.create_element('span'), React.create_element('span'), React.create_element('span')]
@@ -81,7 +81,7 @@ describe 'React', js: true do
       end
 
       it "should render element with only one children correctly" do
-        client_option deprecation_warnings: :off
+        
         evaluate_ruby do
           element = React.create_element(Foo) { React.create_element('span') }
           INSTANCE = React::Test::Utils.render_into_document(element)
@@ -92,7 +92,7 @@ describe 'React', js: true do
       end
 
       it "should render element with more than one children correctly" do
-        client_option deprecation_warnings: :off
+        
         evaluate_ruby do
           element = React.create_element(Foo) { [React.create_element('span'), React.create_element('span')] }
           INSTANCE = React::Test::Utils.render_into_document(element)
@@ -103,7 +103,7 @@ describe 'React', js: true do
       end
 
       it "should create a valid element provided class defined `render`" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element(Foo)
           React.is_valid_element?(element)
@@ -111,7 +111,7 @@ describe 'React', js: true do
       end
 
       it "should allow creating with properties" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element(Foo, foo: "bar")
           element.props.foo
@@ -119,7 +119,7 @@ describe 'React', js: true do
       end
 
       it "should raise error if provided class doesn't defined `render`" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           begin
             React.create_element(Array)
@@ -130,7 +130,7 @@ describe 'React', js: true do
       end
 
       it "should use the same instance for the same ReactComponent" do
-        client_option deprecation_warnings: :off
+        
         mount 'Foo' do
           Foo.class_eval do
             attr_accessor :a
@@ -152,7 +152,7 @@ describe 'React', js: true do
       end
 
       it "should match the instance cycle to ReactComponent life cycle" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           Foo.class_eval do
             def initialize(native)
@@ -176,7 +176,7 @@ describe 'React', js: true do
 
     describe "create element with properties" do
       it "should enforce snake-cased property name" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element("div", class_name: "foo")
           element.props.className
@@ -184,7 +184,7 @@ describe 'React', js: true do
       end
 
       it "should allow custom property" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element("div", foo: "bar")
           element.props.foo
@@ -192,7 +192,7 @@ describe 'React', js: true do
       end
 
       it "should not camel-case custom property" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element("div", foo_bar: "foo")
           element.props.foo_bar
@@ -202,7 +202,7 @@ describe 'React', js: true do
 
     describe "class_name helpers (React.addons.classSet)" do
       it "should not alter behavior when passing a string" do
-        client_option deprecation_warnings: :off
+        
         expect_evaluate_ruby do
           element = React.create_element("div", class_name: "foo bar")
           element.props.className
@@ -213,7 +213,7 @@ describe 'React', js: true do
 
   describe "render" do
     it "should render element to DOM" do # was async, don know how to handle
-      client_option deprecation_warnings: :off
+      
       evaluate_ruby do
         DIV = JS.call(:eval, 'document.createElement("div")')
         React.render(React.create_element('span') { "lorem" }, DIV)
@@ -224,7 +224,7 @@ describe 'React', js: true do
     end
 
     it "should work without providing a block" do
-      client_option deprecation_warnings: :off
+      
       expect_evaluate_ruby do
         begin
           div = JS.call(:eval, 'document.createElement("div")')
@@ -238,7 +238,7 @@ describe 'React', js: true do
     end
 
     it "returns the actual ruby instance" do
-      client_option deprecation_warnings: :off
+      
       expect_evaluate_ruby do
         class Foo
           def render
@@ -253,7 +253,7 @@ describe 'React', js: true do
     end
 
     it "returns the actual DOM node" do
-      client_option deprecation_warnings: :off
+      
       expect_evaluate_ruby do
         div = JS.call(:eval, 'document.createElement("div")')
         node = React.render(React.create_element('span') { "lorem" }, div)
@@ -264,7 +264,7 @@ describe 'React', js: true do
 
   describe "unmount_component_at_node" do
     it "should unmount component at node" do
-      client_option deprecation_warnings: :off
+      
       # was run_async
       # unmount was passed in a block run_async which passed in a block to React.render
       # trying to emulate that failed, becasue during render, _getOpalInstance was not yet defined.
