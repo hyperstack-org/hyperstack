@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-if ruby?
 RSpec.describe ReactiveRuby::ServerRendering::ContextualRenderer do
   let(:renderer) { described_class.new({}) }
   let(:init) { Proc.new {} }
@@ -37,5 +36,4 @@ RSpec.describe ReactiveRuby::ServerRendering::ContextualRenderer do
       expect(result).to_not match(/data-reactroot/)
     end
   end
-end
 end

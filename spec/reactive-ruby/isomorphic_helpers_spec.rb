@@ -37,7 +37,6 @@ RSpec.describe React::IsomorphicHelpers do
     end
   end
 
-if ruby?
   describe 'load_context', :ruby do
     let(:v8_context) { TestV8Context.new }
     let(:controller) { double('controller') }
@@ -154,5 +153,4 @@ if ruby?
       end
     end
   end
-end
 end

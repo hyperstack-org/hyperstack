@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-if ruby?
 RSpec.describe ReactiveRuby::Rails::ComponentMount do
   let(:helper) { described_class.new }
 
@@ -62,5 +61,4 @@ RSpec.describe ReactiveRuby::Rails::ComponentMount do
   def react_props_for(html)
     JSON.parse(CGI.unescapeHTML("#{attr_value(html, 'data-react-props')}"))
   end
-end
 end
