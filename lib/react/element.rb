@@ -36,7 +36,7 @@ module React
 
     def on(*event_names, &block)
       event_names.each { |event_name| merge_event_prop!(event_name, &block) }
-      @native = `React.cloneElement(#{to_n}, #{properties.shallow_to_n})`
+      @native = `React.cloneElement(#{@native}, #{properties.shallow_to_n})`
       self
     end
 
@@ -50,7 +50,7 @@ module React
       else
         props = API.convert_props(props)
         React::RenderingContext.render(
-          Element.new(`React.cloneElement(#{to_n}, #{props.shallow_to_n})`,
+          Element.new(`React.cloneElement(#{@native}, #{props.shallow_to_n})`,
                       type, properties.merge(props), block),
         )
       end
