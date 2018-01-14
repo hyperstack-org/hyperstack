@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if opal?
+if RUBY_ENGINE == 'opal' 
 describe React::Test::Matchers::RenderHTMLMatcher do
   let(:component) {
     Class.new do
