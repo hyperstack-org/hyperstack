@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if opal?
+if RUBY_ENGINE == 'opal' 
   RSpec.describe React::Test::DSL do
     describe 'the DSL' do
       let(:session) { Class.new { include React::Test::DSL }.new }
