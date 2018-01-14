@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if opal?
+if RUBY_ENGINE == 'opal' 
   RSpec.describe React::Test::Session do
     subject { described_class.new }
     before do
