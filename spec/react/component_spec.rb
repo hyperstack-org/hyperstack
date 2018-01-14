@@ -656,6 +656,7 @@ describe 'React::Component', js: true do
     end
 
     xit 'correctly assigns refs' do
+      client_options raise_on_js_errors: :off
       expect_evaluate_ruby do
         Foo.class_eval do
           def render
@@ -673,6 +674,7 @@ describe 'React::Component', js: true do
     end
 
     xit 'accesses refs through `refs` method' do
+      client_options raise_on_js_errors: :off
       expect_evaluate_ruby do
         Foo.class_eval do
           def render
@@ -687,7 +689,8 @@ describe 'React::Component', js: true do
       end.to eq('some_stuff')
     end
 
-    xit "allows access the actual DOM node", v13_exclude: true do
+    xit "allows access the actual DOM node" do
+      client_options raise_on_js_errors: :off
       on_client do
         Foo.class_eval do
           after_mount do
