@@ -29,7 +29,7 @@ node_modules
 # Ignore bundler config.
 .bundle
 
-spec/test_app
+spec/test_app/tmp
 Gemfile.lock
 
 /gemfiles/*.lock
