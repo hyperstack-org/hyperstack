@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if opal?
+if RUBY_ENGINE == 'opal' 
   RSpec.describe 'react/test/rspec', type: :component do
     before do
       stub_const 'Greeter', Class.new
