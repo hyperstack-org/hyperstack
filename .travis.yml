@@ -9,11 +9,13 @@ before_install:
   - sudo dpkg -i google-chrome*.deb
   - gem install bundler
 before_script:
+  - cd spec/test_app
+  - bundle update
+  - rails db:setup
+  - cd ../../
   - chromedriver-update
   - ls -lR ~/.chromedriver-helper/
-script:
-  - bundle exec rake test_app
-  - bundle exec rake test
+script: bundle exec rspec
 gemfile:
   - gemfiles/opal_0_10_react-rails_2_3.gemfile
   - gemfiles/opal_0_10_react-rails_2_4.gemfile
