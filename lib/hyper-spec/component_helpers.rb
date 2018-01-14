@@ -287,12 +287,25 @@ module ComponentTestHelpers
       opts[:code] = Opal.compile(block_with_helpers)
     end
     component_name ||= 'React::Component::HyperTestDummy'
-    Rails.cache.write(test_url, [component_name, params, opts])
+    ::Rails.cache.write(test_url, [component_name, params, opts])
+    test_code_key = "hyper_spec_prerender_test_code.js"
+    @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
+    if opts[:render_on] == :both || opts[:render_on] == :server_only
+      unless opts[:code].blank?
+        ::Rails.cache.write(test_code_key, opts[:code])
+        ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files + [test_code_key]
+        ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
+      else
+        ::Rails.cache.delete(test_code_key)
+        ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files
+        ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
+      end
+    end
     visit test_url
     wait_for_ajax unless opts[:no_wait]
     page.instance_variable_set("@hyper_spec_mounted", true)
     Lolex.init(self, client_options[:time_zone], client_options[:clock_resolution])
-    end
+  end
 
   [:callback_history_for, :last_callback_for, :clear_callback_history_for, :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
     define_method(method) { |event_name| evaluate_ruby("React::TopLevelRailsComponent.#{method}('#{event_name}')") }
