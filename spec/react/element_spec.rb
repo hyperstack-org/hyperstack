@@ -8,15 +8,14 @@ describe 'React::Element', js: true do
     end.to eq("div")
   end
 
-  xit 'is renderable' do
+  it 'is renderable' do
     # dont know how to handle run_async
-    element = React.create_element('span')
-    div = `document.createElement("div")`
-    React.render(element, div) do
-      run_async {
-        expect(`div.children[0].tagName`).to eq("SPAN")
-      }
-    end
+    expect_evaluate_ruby do
+      element = React.create_element('span')
+      div = JS.call(:eval, 'document.createElement("div")')
+      React.render(element, div)
+      div.JS[:children].JS[0].JS[:tagName]
+    end.to eq("SPAN")
   end
 
   describe "Event Subscription" do
@@ -64,6 +63,7 @@ describe 'React::Element', js: true do
     end
 
     it 'will subscribe to a native components event param' do
+      
       evaluate_ruby do
         "this makes sure everything is loaded"
       end
@@ -85,6 +85,7 @@ describe 'React::Element', js: true do
     end
 
     it 'will subscribe to a component event param with a non-default name' do
+      
       evaluate_ruby do
         class Foo < React::Component::Base
           param :my_event, type: Proc, default: nil, allow_nil: true
@@ -98,6 +99,7 @@ describe 'React::Element', js: true do
     end
 
     xit 'will subscribe to a component event param using the deprecated naming convention and generate a message' do
+      # TODO propTypes dont work in react 16
       evaluate_ruby do
         class Foo < React::Component::Base
           param :_onEvent, type: Proc, default: nil, allow_nil: true
@@ -109,37 +111,40 @@ describe 'React::Element', js: true do
       end
       expect(page.body[-60..-19]).to include('<span>works!</span>')
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-          .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `on_event` not specified in spec/)
+        .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `on_event` not specified in spec/)
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-         .to match(/In future releases React::Element#on('event') will no longer respond to the '_onEvent' emitter.\nRename your emitter param to 'on_event' or use .on('<_onEvent>')/)
-      end
+        .to match(/In future releases React::Element#on('event') will no longer respond to the '_onEvent' emitter.\nRename your emitter param to 'on_event' or use .on('<_onEvent>')/)
+    end
   end
 
   describe 'Builtin Event subscription' do
-    xit 'is subscribable through `on(:event_name)` method' do
-      expect { |b|
-        element = React.create_element("div").on(:click, &b)
+    it 'is subscribable through `on(:event_name)` method' do
+      expect_evaluate_ruby do
+        element = React.create_element("div").on(:click) { |event| RESULT_C = 'clicked' if event.is_a? React::Event }
         dom_node = React::Test::Utils.render_into_document(element)
-        React::Test::Utils.simulate(:click, dom_node)
-      }.to yield_with_args(React::Event)
+        React::Test::Utils.simulate_click(dom_node)
+        RESULT_C rescue 'not clicked'
+      end.to eq('clicked')
 
-      expect { |b|
-        element = React.create_element("div").on(:key_down, &b)
+      expect_evaluate_ruby do
+        element = React.create_element("div").on(:key_down) { |event| RESULT_P = 'pressed' if event.is_a? React::Event }
         dom_node = React::Test::Utils.render_into_document(element)
-        React::Test::Utils.simulate(:keyDown, dom_node, {key: "Enter"})
-      }.to yield_control
+        React::Test::Utils.simulate_keydown(dom_node, "Enter")
+        RESULT_P rescue 'not pressed'
+      end.to eq('pressed')
 
-      expect { |b|
-        element = React.create_element("form").on(:submit, &b)
+      expect_evaluate_ruby do
+        element = React.create_element("form").on(:submit) { |event| RESULT_S = 'submitted' if event.is_a? React::Event }
         dom_node = React::Test::Utils.render_into_document(element)
-        React::Test::Utils.simulate(:submit, dom_node)
-      }.to yield_control
+        React::Test::Utils.simulate_submit(dom_node)
+        RESULT_S rescue 'not submitted'
+      end.to eq('submitted')
     end
 
     it 'returns self for `on` method' do
       expect_evaluate_ruby do
-      element = React.create_element("div")
-      element.on(:click){} == element
+        element = React.create_element("div")
+        element.on(:click){} == element
       end.to be_truthy
     end
   end
