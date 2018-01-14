@@ -459,7 +459,7 @@ describe 'React::Component', js: true do
       end
 
       xit 'should not log anything if validation pass' do
-        # see above, it should neither log or raise?
+        # TODO propTypes issue see above, it should neither log or raise?
         stub_const 'Lorem', Class.new
         Foo.class_eval do
           params do
@@ -640,6 +640,13 @@ describe 'React::Component', js: true do
   end
 
   describe '#refs' do
+    # TODO semantics changed with react 16, test cases give this error message:
+    # Warning: Element ref was specified as a string (myRefName) but no owner was set. You may have multiple copies of React loaded. (details: https://fb.me/react-refs-must-have-owner).
+    # This usually means one of three things:
+    # You are trying to add a ref to a functional component.
+    # You are trying to add a ref to an element that is being created outside of a component’s render() function.
+    # You have multiple (conflicting) copies of React loaded (eg. due to a misconfigured npm dependency)
+
     before do
       on_client do
         class Foo
@@ -649,14 +656,14 @@ describe 'React::Component', js: true do
     end
 
     xit 'correctly assigns refs' do
-      on_client do
+      expect_evaluate_ruby do
         Foo.class_eval do
           def render
-            React.create_element('input', type: :text, ref: :field)
+            React.create_element('input', type: :text, ref: :field).on(:click) do
+              refs[:field].value = 'some_stuff'
+            end
           end
         end
-      end
-      expect_evaluate_ruby do
         instance = React::Test::Utils.render_component_into_document(Foo)
         instance.refs[:field]
       end.not_to be_nil
@@ -665,8 +672,8 @@ describe 'React::Component', js: true do
       # not sure about this
     end
 
-    it 'accesses refs through `refs` method' do
-      on_client do
+    xit 'accesses refs through `refs` method' do
+      expect_evaluate_ruby do
         Foo.class_eval do
           def render
             React.create_element('input', type: :text, ref: :field).on(:click) do
@@ -674,15 +681,13 @@ describe 'React::Component', js: true do
             end
           end
         end
-      end
-      expect_evaluate_ruby do
         instance = React::Test::Utils.render_component_into_document(Foo)
         React::Test::Utils.simulate_click(instance)
         instance.refs[:field].value
       end.to eq('some_stuff')
     end
 
-    it "allows access the actual DOM node", v13_exclude: true do
+    xit "allows access the actual DOM node", v13_exclude: true do
       on_client do
         Foo.class_eval do
           after_mount do
@@ -761,28 +766,41 @@ describe 'React::Component', js: true do
       expect(page.body).to include('<div><p class="foo"></p><p></p><div>lorem ipsum</div><p id="10"></p></div>')
     end
 
-    xit 'only overrides `p` in render context' do
-      # TODO dont know how to emulate the receives here
-      stub_const 'Foo', Class.new
-      Foo.class_eval do
-        include React::Component
+    it 'only overrides `p` in render context' do
+      mount 'Foo' do
+        
+        class Foo
+          include React::Component
 
-        before_mount do
-          p 'first'
-        end
+          def self.result
+            @@result ||= 'ooopsy'
+          end
 
-        after_mount do
-          p 'second'
-        end
+          def self.result_two
+            @@result_two ||= 'ooopsy'
+          end
 
-        def render
-          div
+          before_mount do
+            @@result = p 'first'
+          end
+
+          after_mount do
+            @@result_two = p 'second'
+          end
+
+          def render
+            p do
+              'third'
+            end
+          end
         end
       end
-
-      expect(Kernel).to receive(:p).with('first')
-      expect(Kernel).to receive(:p).with('second')
-      renderToDocument(Foo)
+      expect_evaluate_ruby('Kernel.p "first"').to eq('first')
+      expect_evaluate_ruby('p "second"').to eq('second')
+      expect_evaluate_ruby('Foo.result').to eq('first')
+      expect_evaluate_ruby('Foo.result_two').to eq('second')
+      expect(page.body[-40..-10]).to include("<p>third</p>")
+      expect(page.body[-40..-10]).not_to include("<p>first</p>")
     end
   end
 
