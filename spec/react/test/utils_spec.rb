@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if opal?
+if RUBY_ENGINE == 'opal' 
   RSpec.describe React::Test::Utils do
     it 'simulates' do
       stub_const 'Foo', Class.new
