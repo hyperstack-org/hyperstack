@@ -38,14 +38,6 @@ describe React::IsomorphicHelpers do
   end
 
   describe 'load_context', :ruby do
-    class TestV8Context < Hash
-      def eval(args)
-        true
-      end
-      def attach(*args)
-        true
-      end
-    end
     let(:v8_context) { TestV8Context.new }
     let(:controller) { double('controller') }
     let(:name) { double('name') }
@@ -55,7 +47,9 @@ describe React::IsomorphicHelpers do
       expect(context.controller).to eq(controller)
     end
 
-    it 'creates a context and sets a unique_id' do
+    it 'creates a context and sets a unique_id', js: true do
+      # this tests loads the prerender context and somehow trys evaluate_ruby, works only with above js: true
+      # TODO this is triggered by TimeCop for some reason
       Timecop.freeze do
         stamp = Time.now.to_i
         context = described_class.load_context(v8_context, controller, name)
