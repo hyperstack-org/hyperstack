@@ -1,15 +1,3 @@
-# class HtmlTagWrapper
-#   def initialize(name)
-#     @name = name
-#   end
-#   def to_s
-#     @name
-#   end
-#   def method_missing(n)
-#
-# end
-
-
 module React
   module Component
     # contains the name of all HTML tags, and the mechanism to register a component
