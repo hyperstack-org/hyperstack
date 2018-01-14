@@ -152,7 +152,11 @@ if RUBY_ENGINE != 'opal'
                     .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
         puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
       end
-      raise JavaScriptError, errors.join("\n\n") if errors.present?
+      if client_options[:raise_on_js_errors] == :off
+        puts "\033[0;31;1m\nJavascript client console warnings:\n\n" + errors.join("\n\n") + "\033[0;30;21m" if erros.present?
+      else
+        raise JavaScriptError, errors.join("\n\n") if errors.present?
+      end
     end
   end
 end
