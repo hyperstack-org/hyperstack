@@ -153,7 +153,7 @@ if RUBY_ENGINE != 'opal'
         puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
       end
       if client_options[:raise_on_js_errors] == :off
-        puts "\033[0;31;1m\nJavascript client console warnings:\n\n" + errors.join("\n\n") + "\033[0;30;21m" if erros.present?
+        puts "\033[0;31;1m\nJavascript client console errors:\n\n" + errors.join("\n\n") + "\033[0;30;21m" if errors.present?
       else
         raise JavaScriptError, errors.join("\n\n") if errors.present?
       end
