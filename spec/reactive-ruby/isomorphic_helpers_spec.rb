@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe React::IsomorphicHelpers do
+describe React::IsomorphicHelpers do
   describe 'code execution context' do
     let(:klass) { Class.send(:include, described_class) }
 
@@ -38,6 +38,14 @@ RSpec.describe React::IsomorphicHelpers do
   end
 
   describe 'load_context', :ruby do
+    class TestV8Context < Hash
+      def eval(args)
+        true
+      end
+      def attach(*args)
+        true
+      end
+    end
     let(:v8_context) { TestV8Context.new }
     let(:controller) { double('controller') }
     let(:name) { double('name') }
@@ -79,8 +87,7 @@ RSpec.describe React::IsomorphicHelpers do
     end
 
     def react_context
-      if ::Rails.application.assets['react-server.js'] &&
-         !::Rails.application.assets['react-server.js'].to_s.start_with?("// A placeholder file")
+      if ::Rails.application.assets['react-server.js']
         test_context(['server_rendering.js', 'react-server.js'])
       else
         test_context(['components', 'react.js'])
