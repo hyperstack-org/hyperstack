@@ -1,4 +1,4 @@
-if opal?
+if RUBY_ENGINE == 'opal' 
 module React
   module SpecHelpers
     `var ReactTestUtils = React.addons.TestUtils`
