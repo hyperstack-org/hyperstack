@@ -9,7 +9,6 @@ describe 'React::Element', js: true do
   end
 
   it 'is renderable' do
-    # dont know how to handle run_async
     expect_evaluate_ruby do
       element = React.create_element('span')
       div = JS.call(:eval, 'document.createElement("div")')
