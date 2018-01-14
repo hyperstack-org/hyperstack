@@ -26,8 +26,8 @@ describe "Transport Tests", js: true do
     on_client do
       class TestComponent < React::Component::Base
         before_mount do
-          state.items! []
-          CreateTestModel.on_dispatch { |params| state.items! << params.test_attribute }
+          mutate.items []
+          CreateTestModel.on_dispatch { |params| mutate.items state.items + [params.test_attribute] }
           MyControllerOp.on_dispatch { |params| mutate.message params.data }
         end
         render(:div) do
@@ -330,7 +330,6 @@ describe "Transport Tests", js: true do
     it "broadcasts to the session channel" do
       Hyperloop.connect_session = true
       mount "TestComponent"
-      sleep 0.25
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
