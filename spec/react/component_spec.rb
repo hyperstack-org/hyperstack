@@ -727,7 +727,7 @@ describe 'React::Component', js: true do
           include React::Component
           def render
             div do
-              present Foo, foo: 'astring'
+              React::RenderingContext.render(Foo, foo: 'astring')
             end
           end
         end
