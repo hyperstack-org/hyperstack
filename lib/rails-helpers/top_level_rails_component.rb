@@ -23,7 +23,7 @@ module React
                     rescue Exception
                       nil
                     end
-        return present component, params.render_params if component && component.method_defined?(:render)
+        return React::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
       else
         self.class.search_path.each do |path|
           # try each path + params.controller + params.component_name
@@ -33,7 +33,7 @@ module React
                       rescue Exception
                         nil
                       end
-          return present component, params.render_params if component && component.method_defined?(:render)
+          return React::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
         end
         self.class.search_path.each do |path|
           # then try each path + params.component_name
@@ -43,7 +43,7 @@ module React
                       rescue Exception
                         nil
                       end
-          return present component, params.render_params if component && component.method_defined?(:render)
+          return React::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
         end
       end
       raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
