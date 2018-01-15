@@ -21,7 +21,6 @@ module React
     end
 
     def self.eval_native_react_component(name)
-      puts "eval_native_got name #{name}"
       component = `eval(name)`
       raise "#{name} is not defined" if `#{component} === undefined`
       is_component_class = `#{component}.prototype !== undefined` &&
