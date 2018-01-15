@@ -4,17 +4,20 @@ module React
 
     container = `container.$$class ? container[0] : container`
 
-    # experimental, also tryy requestAnimationFrame
     if block_given?
       cb = %x{
-          #{yield};
+        function(){
+          setTimeout(function(){
+            #{yield}
+          }, 0)
+        }
       }
       native = `ReactDOM.render(#{element.to_n}, container, cb)`
     else
       native = `ReactDOM.render(#{element.to_n}, container)`
     end
     
-    if `#{native}._getOpalInstance !== undefined`
+    if `#{native}._getOpalInstance !== undefined && #{native}._getOpalInstance !== null`
       `#{native}._getOpalInstance()`
     elsif `ReactDOM.findDOMNode !== undefined && #{native}.nodeType === undefined`
       `ReactDOM.findDOMNode(#{native})`
