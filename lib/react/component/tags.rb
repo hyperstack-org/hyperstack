@@ -15,12 +15,6 @@ module React
                   %w(circle clipPath defs ellipse g line linearGradient mask path pattern polygon polyline
                   radialGradient rect stop svg text tspan)
 
-      # the present method is retained as a legacy behavior
-
-      def present(component, *params, &children)
-        React::RenderingContext.render(component, *params, &children)
-      end
-
       # define each predefined tag as an instance method
 
       HTML_TAGS.each do |tag|
@@ -52,6 +46,7 @@ module React
       # where there is no preceeding scope.
 
       def method_missing(name, *params, &children)
+        puts "Tags MM #{name}"
         component = find_component(name)
         return React::RenderingContext.render(component, *params, &children) if component
         Object.method_missing(name, *params, &children)
