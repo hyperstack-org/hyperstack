@@ -21,14 +21,14 @@ module React
     end
 
     def self.eval_native_react_component(name)
+      puts "eval_native_got name #{name}"
       component = `eval(name)`
       raise "#{name} is not defined" if `#{component} === undefined`
       is_component_class = `#{component}.prototype !== undefined` &&
                             (`!!#{component}.prototype.isReactComponent` ||
                              `!!#{component}.prototype.render`)
       is_functional_component = `typeof #{component} === "function"`
-      is_not_using_react_v13 = `!Opal.global.React.version.match(/0\.13/)`
-      unless is_component_class || (is_not_using_react_v13 && is_functional_component)
+      unless is_component_class || is_functional_component
         raise 'does not appear to be a native react component'
       end
       component
