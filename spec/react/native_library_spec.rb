@@ -66,7 +66,7 @@ describe "React::NativeLibrary", js: true do
   it "will import a React.js library into the Ruby name space" do
     mount 'Foo::NativeComponent', name: "There" do
       JS.call(:eval,
-        <<~JSCODE
+        <<-JSCODE
           window.NativeLibrary = {
             NativeComponent: class extends React.Component {
             constructor(props) {
@@ -87,7 +87,7 @@ describe "React::NativeLibrary", js: true do
   it "will import a nested React.js library into the Ruby name space" do
     mount 'Foo::NestedLibrary::NativeComponent', name: "There" do
       JS.call(:eval,
-        <<~JSCODE
+        <<-JSCODE
           window.NativeLibrary = {
             NestedLibrary: {
               NativeComponent: class extends React.Component {
@@ -109,7 +109,7 @@ describe "React::NativeLibrary", js: true do
   it "will rename an imported a React.js component" do
     mount 'Foo::Bar', name: "There" do
       JS.call(:eval,
-      <<~JSCODE
+      <<-JSCODE
         window.NativeLibrary = {
           NativeComponent: class extends React.Component {
             constructor(props) {
@@ -132,7 +132,7 @@ describe "React::NativeLibrary", js: true do
     client_option raise_on_js_errors: :off
     mount 'Foo' do
       JS.call(:eval,
-        <<~JSCODE
+        <<-JSCODE
           window.NativeLibrary = {
             NativeComponent: class extends React.Component {
               constructor(props) {
@@ -156,7 +156,7 @@ describe "React::NativeLibrary", js: true do
   it "will import a single React.js component into the ruby name space" do
     mount 'Foo', name: "There" do
       JS.call(:eval,
-        <<~JSCODE
+        <<-JSCODE
           window.NativeComponent = class extends React.Component {
             constructor(props) {
               super(props);
@@ -176,7 +176,7 @@ describe "React::NativeLibrary", js: true do
   it "will import a name scoped React.js component into the ruby name space" do
     mount 'Foo', name: "There" do
       JS.call(:eval,
-        <<~JSCODE
+        <<-JSCODE
           window.NativeLibrary = {
             NativeComponent: class extends React.Component {
               constructor(props) {
@@ -224,7 +224,7 @@ describe "React::NativeLibrary", js: true do
     # TODO does not work
     mount 'Foo' do
       JS.call(:eval,
-        <<~JSCODE
+        <<-JSCODE
           window.NativeComponent = class extends React.Component {
             constructor(props) {
               super(props);
@@ -251,7 +251,7 @@ describe "React::NativeLibrary", js: true do
     it "will automatically import a React.js component when referenced in another component" do
       evaluate_ruby do
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.NativeComponent = class extends React.Component {
               constructor(props) {
                 super(props);
@@ -272,7 +272,7 @@ describe "React::NativeLibrary", js: true do
           render { NativeComponent(name: "There") }
         end
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.NativeComponent = class extends React.Component {
               constructor(props) {
                 super(props);
@@ -289,7 +289,7 @@ describe "React::NativeLibrary", js: true do
     it "will automatically import a React.js component when referenced as a constant" do
       mount 'NativeComponent', name: "There" do
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.NativeComponent = class extends React.Component {
               constructor(props) {
                 super(props);
@@ -306,7 +306,7 @@ describe "React::NativeLibrary", js: true do
     it "will automatically import a native library containing a React.js component" do
       evaluate_ruby do
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.NativeLibrary = {
               NativeNestedLibrary: {
                 NativeComponent: class extends React.Component {
@@ -326,7 +326,7 @@ describe "React::NativeLibrary", js: true do
     it "the library and components can begin with lower case letters" do
       mount 'NativeLibrary::NativeComponent', name: "There" do
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.nativeLibrary = {
               nativeComponent: class extends React.Component {
                 constructor(props) {
@@ -345,7 +345,7 @@ describe "React::NativeLibrary", js: true do
       client_option raise_on_js_errors: :off
       expect_evaluate_ruby do
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.NativeLibrary = {
               NativeNestedLibrary: { }
             }
@@ -363,7 +363,7 @@ describe "React::NativeLibrary", js: true do
       evaluate_ruby do
         module NativeComponent; end
         JS.call(:eval,
-          <<~JSCODE
+          <<-JSCODE
             window.NativeLibrary = {
               NativeNestedLibrary: {
                 NativeComponent: class extends React.Component {
