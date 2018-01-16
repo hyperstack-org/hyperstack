@@ -17,49 +17,31 @@ describe "React::NativeLibrary", js: true do
         end
       end
     end
-    evaluate_ruby do
-      "this makes sure React is loaded"
-    end
   end
 
-  # after(:each) do
-  #   %x{
-  #     delete window.NativeLibrary;
-  #     delete window.NativeComponent;
-  #     delete window.nativeLibrary;
-  #     delete window.nativeComponent;
-  #     delete window.NativeObject;
-  #   }
-  #   Object.send :remove_const, :NativeLibrary
-  #   Object.send :remove_const, :NativeComponent
-  # end
-
   describe "functional stateless component (supported in reactjs v14+ only)" do
-    xit "is detected as native React.js component by `native_react_component?`" do
-      # TODO: needs some work
+    it "is detected as native React.js component by `native_react_component?`" do
       expect_evaluate_ruby do
-        React::API.native_react_component?(JS.call(:eval, "function C(){ return null }"))
+        React::API.native_react_component?(JS.call(:eval, "(function () { return function C () { return null; }; })();"))
       end.to be_truthy
     end
 
-    xit "imports a React.js functional stateless component" do
-      # TODO: needs some work
-      page.execute_script('window.NativeLibrary = {
-            FunctionalComponent: function HelloMessage(props){
-              return React.createElement("div", null, "Hello ", props.name);
-            }
-          }')
-      evaluate_ruby do
+    it "imports a React.js functional stateless component" do        
+      mount 'Foo', name: "There" do
+        JS.call(:eval, 'window.NativeLibrary = { FunctionalComponent: function HelloMessage(props){
+          return React.createElement("div", null, "Hello ", props.name); }}')
         class Foo < React::Component::Base
           imports "NativeLibrary.FunctionalComponent"
         end
-        React::Test::Utils.render_component_into_document(Foo, name: "There")
       end
       expect(page.body[-60..-19]).to include('<div>Hello There</div>')
     end
   end
 
   it "can use native_react_component? to detect a native React.js component" do
+    evaluate_ruby do
+      "this makes sure React is loaded for this test, before js is run"
+    end
     page.execute_script('window.NativeComponent = class extends React.Component {
       constructor(props) {
         super(props);
@@ -68,31 +50,33 @@ describe "React::NativeLibrary", js: true do
       render() { return React.createElement("div", null, "Hello ", this.props.name); }
     }')
     expect_evaluate_ruby do
-      React::API.native_react_component?(JS.call(:eval, 'window.NativeComponent'))
+      React::API.native_react_component?(JS.call(:eval, '(function(){ return window.NativeComponent; })();'))
     end.to be_truthy
     expect_evaluate_ruby do
-      React::API.native_react_component?(JS.call(:eval, '{render: function render() {}}'))
+      React::API.native_react_component?(JS.call(:eval, '(function(){ return {render: function render() {}}; })();'))
     end.to be_falsy
     expect_evaluate_ruby do
-      React::API.native_react_component?(JS.call(:eval, 'window.DoesntExist'))
+      React::API.native_react_component?(JS.call(:eval, '(function(){ return window.DoesntExist; })();'))
     end.to be_falsy
     expect_evaluate_ruby do
       React::API.native_react_component?()
     end.to be_falsy
   end
 
-  xit "will import a React.js library into the Ruby name space" do
-    # TODO needs work
-    page.execute_script('window.NativeLibrary = {
-      NativeComponent: class extends React.Component {
-      constructor(props) {
-        super(props);
-        this.displayName = "HelloMessage";
-      }
-      render() { return React.createElement("div", null, "Hello ", this.props.name); }
-    }}')
-
+  it "will import a React.js library into the Ruby name space" do
     mount 'Foo::NativeComponent', name: "There" do
+      JS.call(:eval,
+        <<~JSCODE
+          window.NativeLibrary = {
+            NativeComponent: class extends React.Component {
+            constructor(props) {
+              super(props);
+              this.displayName = "HelloMessage";
+            }
+            render() { return React.createElement("div", null, "Hello ", this.props.name); }
+          }}
+        JSCODE
+      )
       class Foo < React::NativeLibrary
         imports "NativeLibrary"
       end
@@ -100,237 +84,305 @@ describe "React::NativeLibrary", js: true do
     expect(page.body[-60..-19]).to include('<div>Hello There</div>')
   end
 
-  xit "will import a nested React.js library into the Ruby name space" do
-    # TODO needs work
-    %x{
-      window.NativeLibrary = {
-        NestedLibrary: {
-          NativeComponent: React.createClass({
-            displayName: "HelloMessage",
-            render: function render() {
-              return React.createElement("div", null, "Hello ", this.props.name);
+  it "will import a nested React.js library into the Ruby name space" do
+    mount 'Foo::NestedLibrary::NativeComponent', name: "There" do
+      JS.call(:eval,
+        <<~JSCODE
+          window.NativeLibrary = {
+            NestedLibrary: {
+              NativeComponent: class extends React.Component {
+                constructor(props) {
+                  super(props);
+                  this.displayName = "HelloMessage";
+                }
+                render() { return React.createElement("div", null, "Hello ", this.props.name); }
+            }}}
+        JSCODE
+      )
+      class Foo < React::NativeLibrary
+        imports "NativeLibrary"
+      end
+    end
+    expect(page.body[-60..-19]).to include('<div>Hello There</div>')
+  end
+
+  it "will rename an imported a React.js component" do
+    mount 'Foo::Bar', name: "There" do
+      JS.call(:eval,
+      <<~JSCODE
+        window.NativeLibrary = {
+          NativeComponent: class extends React.Component {
+            constructor(props) {
+              super(props);
+              this.displayName = "HelloMessage";
             }
-        })}
-      }
-    }
-    stub_const 'Foo', Class.new(React::NativeLibrary)
-    Foo.class_eval do
-      imports "NativeLibrary"
+            render() { return React.createElement("div", null, "Hello ", this.props.name); }
+          }}
+        JSCODE
+      )
+      class Foo < React::NativeLibrary
+        imports "NativeLibrary"
+        rename "NativeComponent" => "Bar"
+      end
     end
-    expect(Foo::NestedLibrary::NativeComponent)
-      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
+    expect(page.body[-60..-19]).to include('<div>Hello There</div>')
   end
 
-  xit "will rename an imported a React.js component" do
-    # TODO needs work
-    %x{
-      window.NativeLibrary = {
-        NativeComponent: React.createClass({
-          displayName: "HelloMessage",
-          render: function render() {
-            return React.createElement("div", null, "Hello ", this.props.name);
-          }
-        })
-      }
-    }
-    stub_const 'Foo', Class.new(React::NativeLibrary)
-    Foo.class_eval do
-      imports "NativeLibrary"
-      rename "NativeComponent" => "Bar"
-    end
-    expect(Foo::Bar)
-      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
-  end
-
-  xit "will give a reasonable error when failing to import a renamed component" do
-    # TODO needs work
-    %x{
-      window.NativeLibrary = {
-        NativeComponent: React.createClass({
-          displayName: "HelloMessage",
-          render: function render() {
-            return React.createElement("div", null, "Hello ", this.props.name);
-          }
-        })
-      }
-    }
-    stub_const 'Foo', Class.new(React::NativeLibrary)
-    expect do
-      Foo.class_eval do
+  it "will give a reasonable error when failing to import a renamed component" do
+    client_option raise_on_js_errors: :off
+    mount 'Foo' do
+      JS.call(:eval,
+        <<~JSCODE
+          window.NativeLibrary = {
+            NativeComponent: class extends React.Component {
+              constructor(props) {
+                super(props);
+                this.displayName = "HelloMessage";
+              }
+              render() { return React.createElement("div", null, "Hello ", this.props.name); }
+            }}
+        JSCODE
+      )
+      class Foo < React::NativeLibrary
         imports "NativeLibrary"
         rename "MispelledComponent" => "Bar"
       end
-    end.to raise_error(/could not import MispelledComponent/)
-  end
-
-  xit "will import a single React.js component into the ruby name space" do
-    # TODO needs work
-    %x{
-      window.NativeComponent = React.createClass({
-        displayName: "HelloMessage",
-        render: function render() {
-          return React.createElement("div", null, "Hello ", this.props.name);
-        }
-      })
-    }
-    stub_const 'Foo', Class.new(React::Component::Base)
-    Foo.class_eval do
-      imports "NativeComponent"
     end
-    expect(Foo)
-      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
-
+    expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+      .to match(/NativeLibrary.MispelledComponent is undefined/)
+      # TODO was testing for cannot import, but that message gets trunkated
   end
 
-  xit "will import a name scoped React.js component into the ruby name space" do
-    # TODO needs work
-    %x{
-      window.NativeLibrary = {
-        NativeComponent: React.createClass({
-          displayName: "HelloMessage",
-          render: function render() {
-            return React.createElement("div", null, "Hello ", this.props.name);
+  it "will import a single React.js component into the ruby name space" do
+    mount 'Foo', name: "There" do
+      JS.call(:eval,
+        <<~JSCODE
+          window.NativeComponent = class extends React.Component {
+            constructor(props) {
+              super(props);
+              this.displayName = "HelloMessage";
+            }
+            render() { return React.createElement("div", null, "Hello ", this.props.name); }
           }
-        })
-      }
-    }
-    stub_const 'Foo', Class.new(React::Component::Base)
-    Foo.class_eval do
-      imports "NativeLibrary.NativeComponent"
+        JSCODE
+      )
+      class Foo < React::Component::Base
+        imports "NativeComponent"
+      end
     end
-    expect(Foo)
-      .to render_static_html('<div>Hello There</div>').with_params(name: "There")
-
+    expect(page.body[-60..-19]).to include('<div>Hello There</div>')
   end
 
-  xit "will give a meaningful error if the React.js component is invalid" do
-    %x{
-      window.NativeObject = {}
-    }
-    stub_const 'Foo', Class.new(React::Component::Base)
-    expect do
-      Foo.class_eval do
-        imports "NativeObject"
+  it "will import a name scoped React.js component into the ruby name space" do
+    mount 'Foo', name: "There" do
+      JS.call(:eval,
+        <<~JSCODE
+          window.NativeLibrary = {
+            NativeComponent: class extends React.Component {
+              constructor(props) {
+                super(props);
+                this.displayName = "HelloMessage";
+              }
+              render() { return React.createElement("div", null, "Hello ", this.props.name); }
+            }}
+        JSCODE
+      )
+      class Foo < React::Component::Base
+        imports "NativeLibrary.NativeComponent"
       end
-    end.to raise_error("Foo cannot import 'NativeObject': does not appear to be a native react component.")
-    expect do
-      Foo.class_eval do
-        imports "window.Baz"
+    end
+    expect(page.body[-60..-19]).to include('<div>Hello There</div>')
+  end
+
+  it "will give a meaningful error if the React.js component is invalid" do
+    client_option raise_on_js_errors: :off
+    evaluate_ruby do
+      JS.call(:eval, "window.NativeObject = {}")
+      class Foo < React::Component::Base; end
+    end
+    expect_evaluate_ruby do
+      begin
+        Foo.class_eval do
+          imports "NativeObject"
+        end
+      rescue Exception => e
+        e.message
       end
-    end.to raise_error(/^Foo cannot import \'window\.Baz\'\: (?!does not appear to be a native react component)..*$/)
+    end.to match(/Foo cannot import 'NativeObject': does not appear to be a native react component./)
+    expect_evaluate_ruby do
+      begin
+        Foo.class_eval do
+          imports "window.Baz"
+        end
+      rescue Exception => e
+        e.message
+      end
+    end.to match(/Foo cannot import \'window\.Baz\'\: (?!does not appear to be a native react component)./)
   end
 
   xit "allows passing native object as props" do
-    %x{
-      window.NativeComponent = React.createClass({
-        displayName: "HelloMessage",
-        render: function render() {
-          return React.createElement("div", null, "Hello ", this.props.user.name);
-        }
-      })
-    }
-    stub_const 'Foo', Class.new(React::Component::Base)
-    Foo.class_eval do
-      imports "NativeComponent"
-    end
-    stub_const 'Wrapper', Class.new(React::Component::Base)
-    Wrapper.class_eval do
-      def render
-        Foo(user: `{name: 'David'}`)
+    # TODO does not work
+    mount 'Foo' do
+      JS.call(:eval,
+        <<~JSCODE
+          window.NativeComponent = class extends React.Component {
+            constructor(props) {
+              super(props);
+              this.displayName = "HelloMessage";
+            }
+            render() { return React.createElement("div", null, "Hello ", this.props.user.name); }
+          }
+        JSCODE
+      )
+      class Foo < React::Component::Base
+        imports "NativeComponent"
+      end
+      class Wrapper < React::Component::Base
+        def render
+          Foo(user: JS.call(:eval, "(function () { return {name: 'David'}; })();"))
+        end
       end
     end
-    expect(Wrapper).to render_static_html('<div>Hello David</div>')
+    expect(page.body[-60..-19]).to include('<div>Hello David</div>')
   end
 
   context "automatic importing" do
 
-    xit "will automatically import a React.js component when referenced in another component" do
-      %x{
-        window.NativeComponent = React.createClass({
-          displayName: "HelloMessage",
-          render: function render() {
-            return React.createElement("div", null, "Hello ", this.props.name);
-          }
-        })
-      }
-      expect(React::Server.render_to_static_markup(
-        React.create_element(NativeLibraryTestModule::Component, time_stamp: Time.now))).to match(/<div>Hello There.*<\/div>/)
-    end
-
-    xit "will automatically import a React.js component when referenced in another component" do
-      stub_const 'Foo', Class.new(React::Component::Base)
-      Foo.class_eval do
-        render { NativeComponent(name: "There") }
-      end
-      %x{
-        window.NativeComponent = React.createClass({
-          displayName: "HelloMessage",
-          render: function render() {
-            return React.createElement("div", null, "Hello ", this.props.name);
-          }
-        })
-      }
-      expect(Foo).to render_static_html('<div>Hello There</div>')
-    end
-
-    xit "will automatically import a React.js component when referenced as a constant" do
-      %x{
-        window.NativeComponent = React.createClass({
-          displayName: "HelloMessage",
-          render: function render() {
-            return React.createElement("div", null, "Hello ", this.props.name);
-          }
-        })
-      }
-      expect(NativeComponent)
-        .to render_static_html('<div>Hello There</div>').with_params(name: "There")
-    end
-
-    xit "will automatically import a native library containing a React.js component" do
-      %x{
-        window.NativeLibrary = {
-          NativeNestedLibrary: {
-            NativeComponent: React.createClass({
-              displayName: "HelloMessage",
-              render: function render() {
-                return React.createElement("div", null, "Hello ", this.props.name);
+    it "will automatically import a React.js component when referenced in another component" do
+      evaluate_ruby do
+        JS.call(:eval,
+          <<~JSCODE
+            window.NativeComponent = class extends React.Component {
+              constructor(props) {
+                super(props);
+                this.displayName = "HelloMessage";
               }
-            })
-          }
-        }
-      }
-
-      expect(React::Server.render_to_static_markup(
-        React.create_element(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now))).to match(/<div>Hello There.*<\/div>/)
-    end
-
-    xit "the library and components can begin with lower case letters" do
-      %x{
-        window.nativeLibrary = {
-          nativeComponent: React.createClass({
-            displayName: "HelloMessage",
-            render: function render() {
-              return React.createElement("div", null, "Hello ", this.props.name);
+              render() { return React.createElement("div", null, "Hello ", this.props.name); }
             }
-          })
-        }
-      }
-      expect(NativeLibrary::NativeComponent)
-        .to render_static_html('<div>Hello There</div>').with_params(name: "There")
+          JSCODE
+        )
+        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::Component, time_stamp: Time.now)
+      end
+      expect(page.body[-100..-19]).to match(/<div>Hello There.*<\/div>/)
     end
 
-    xit "will produce a sensible error if the component is not in the library" do
-      %x{
-        window.NativeLibrary = {
-          NativeNestedLibrary: {
-          }
-        }
-      }
-      expect do
-        React::Server.render_to_static_markup(React.create_element(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now))
-      end.to raise_error("could not import a react component named: NativeLibrary.NativeNestedLibrary.NativeComponent")
-      
+    it "will automatically import a React.js component when referenced in another component in a different way" do
+      mount 'Foo' do
+        class Foo < React::Component::Base
+          render { NativeComponent(name: "There") }
+        end
+        JS.call(:eval,
+          <<~JSCODE
+            window.NativeComponent = class extends React.Component {
+              constructor(props) {
+                super(props);
+                this.displayName = "HelloMessage";
+              }
+              render() { return React.createElement("div", null, "Hello ", this.props.name); }
+            }
+          JSCODE
+        )
+      end
+      expect(page.body[-50..-19]).to match('<div>Hello There</div>')
     end
 
+    it "will automatically import a React.js component when referenced as a constant" do
+      mount 'NativeComponent', name: "There" do
+        JS.call(:eval,
+          <<~JSCODE
+            window.NativeComponent = class extends React.Component {
+              constructor(props) {
+                super(props);
+                this.displayName = "HelloMessage";
+              }
+              render() { return React.createElement("div", null, "Hello ", this.props.name); }
+            }
+          JSCODE
+        )
+      end
+      expect(page.body[-50..-19]).to match('<div>Hello There</div>')
+    end
+
+    it "will automatically import a native library containing a React.js component" do
+      evaluate_ruby do
+        JS.call(:eval,
+          <<~JSCODE
+            window.NativeLibrary = {
+              NativeNestedLibrary: {
+                NativeComponent: class extends React.Component {
+                  constructor(props) {
+                    super(props);
+                    this.displayName = "HelloMessage";
+                  }
+                  render() { return React.createElement("div", null, "Hello ", this.props.name); }
+              }}}
+          JSCODE
+        )
+        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now)
+      end
+      expect(page.body[-100..-19]).to match(/<div>Hello There.*<\/div>/)
+    end
+
+    it "the library and components can begin with lower case letters" do
+      mount 'NativeLibrary::NativeComponent', name: "There" do
+        JS.call(:eval,
+          <<~JSCODE
+            window.nativeLibrary = {
+              nativeComponent: class extends React.Component {
+                constructor(props) {
+                  super(props);
+                  this.displayName = "HelloMessage";
+                }
+                render() { return React.createElement("div", null, "Hello ", this.props.name); }
+            }}
+          JSCODE
+        )
+      end
+      expect(page.body[-50..-19]).to match('<div>Hello There</div>')
+    end
+
+    it "will produce a sensible error if the component is not in the library" do
+      client_option raise_on_js_errors: :off
+      expect_evaluate_ruby do
+        JS.call(:eval,
+          <<~JSCODE
+            window.NativeLibrary = {
+              NativeNestedLibrary: { }
+            }
+          JSCODE
+        )
+        begin
+          React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now)
+        rescue Exception => e
+          e.message
+        end
+      end.to match(/could not import a react component named: NativeLibrary.NativeNestedLibrary.NativeComponent/)
+    end
+
+    it "a NativeLibrary::NestedLibrary::NativeComponent() call will not resolve to a toplevel module NativeComponent (was a bug)" do
+      evaluate_ruby do
+        module NativeComponent; end
+        JS.call(:eval,
+          <<~JSCODE
+            window.NativeLibrary = {
+              NativeNestedLibrary: {
+                NativeComponent: class extends React.Component {
+                  constructor(props) {
+                    super(props);
+                    this.displayName = "HelloMessage";
+                  }
+                  render() { return React.createElement("div", null, "Hello ", this.props.name); }
+              }}}
+          JSCODE
+        )
+        class Foo < React::NativeLibrary
+          def render
+            NativeLibrary::NativeNestedLibrary::NativeComponent(name: 'Worksmaker')
+          end
+        end
+        React::Test::Utils.render_component_into_document(Foo)
+      end
+      expect(page.body[-50..-19]).to match(/<div>Hello Worksmaker<\/div>/)
+    end
   end
 end
