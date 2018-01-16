@@ -46,7 +46,7 @@ module React
       end
 
       def method_missing(method, *args, &block)
-        component_class = const_get(method) if const_defined?(method)
+        component_class = const_get(method) if const_defined?(method, false)
         component_class ||= import_const_from_native(self, method, false)
         raise 'could not import a react component named: '\
               "#{scope_native_name method}" unless component_class
