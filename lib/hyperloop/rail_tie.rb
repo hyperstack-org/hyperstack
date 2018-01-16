@@ -20,13 +20,17 @@ module Hyperloop
 
             unless Rails.env.production?
               config.autoload_paths += %W(#{config.root}/app/hyperloop/models)
+              config.autoload_paths += %W(#{config.root}/app/hyperloop/operations)
               # config.eager_load_paths += %W(#{config.root}/app/hyperloop/stores)
               # config.autoload_paths += %W(#{config.root}/app/hyperloop/stores)
-              
-              config.autoload_paths += %W(#{config.root}/app/hyperloop/operations)
               delete_first config.autoload_paths, "#{config.root}/app/hyperloop"
             end
-
+            # possible alternative way in conjunction with below
+            # %w[stores operations models components].each do |hp|
+            #   hps = ::Rails.root.join('app', 'hyperloop', hp).to_s
+            #   config.assets.paths.delete(hps)
+            #   config.assets.paths.unshift(hps)
+            # end
             config.assets.paths.unshift ::Rails.root.join('app', 'hyperloop').to_s
          else
             delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/models"
@@ -53,6 +57,10 @@ module Hyperloop
 
     config.after_initialize do |app|
       next unless [:on, 'on', true].include?(config.hyperloop.auto_config)
+      # possible alternative way
+      # %w[stores operations models components].each do |hp|
+      #   Hyperloop.import_tree('hyperloop/' + hp)
+      # end
       Hyperloop.import_tree('hyperloop')
       if config.respond_to?(:react)
         if (opts = config.react.server_renderer_options)
