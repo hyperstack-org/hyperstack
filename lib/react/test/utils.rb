@@ -8,8 +8,8 @@ module React
 
       def self.render_into_document(element)
         raise "You should pass a valid React::Element" unless React.is_valid_element?(element)
-        top_dom_el = `document.body.querySelector('div[data-react-class="React.TopLevelRailsComponent"]')`
-        React.render(element, top_dom_el)
+        dom_el = `document.body.querySelector('div[data-react-class="React.TopLevelRailsComponent"]').appendChild(document.createElement('div'))`
+        React.render(element, dom_el)
       end
 
       def self.simulate_click(element)
