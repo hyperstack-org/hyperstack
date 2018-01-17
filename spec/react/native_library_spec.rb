@@ -382,7 +382,7 @@ describe "React::NativeLibrary", js: true do
         end
         React::Test::Utils.render_component_into_document(Foo)
       end
-      expect(page.body[-50..-19]).to match(/<div>Hello Worksmaker<\/div>/)
+      expect(page.body[-80..-19]).to match(/<div>Hello Worksmaker<\/div>/)
     end
   end
 end
