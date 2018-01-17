@@ -44,7 +44,7 @@ describe 'React::Element', js: true do
         end
         React::Test::Utils.render_into_document(React.create_element(Foo).on(:event) {'works!'})
       end
-      expect(page.body[-40..-19]).to include('<span>works!</span>')
+      expect(page.body[-50..-19]).to include('<span>works!</span>')
     end
 
     it 'will subscribe to multiple component event params' do
