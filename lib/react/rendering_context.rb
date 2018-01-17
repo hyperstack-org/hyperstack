@@ -117,28 +117,28 @@ module React
       end
     end
   end
+end
 
-  class ::Object
-    [:span, :td, :th, :while_loading].each do |tag|
-      define_method(tag) do |*args, &block|
-        args.unshift(tag)
-        return send(*args, &block) if is_a? React::Component
-        React::RenderingContext.render(*args) { to_s }
-      end
-    end
-
-    def para(*args, &block)
-      args.unshift(:p)
+class Object
+  [:span, :td, :th, :while_loading].each do |tag|
+    define_method(tag) do |*args, &block|
+      args.unshift(tag)
       return send(*args, &block) if is_a? React::Component
       React::RenderingContext.render(*args) { to_s }
     end
+  end
 
-    def br
-      return send(:br) if is_a? React::Component
-      React::RenderingContext.render(:span) do
-        React::RenderingContext.render(to_s)
-        React::RenderingContext.render(:br)
-      end
+  def para(*args, &block)
+    args.unshift(:p)
+    return send(*args, &block) if is_a? React::Component
+    React::RenderingContext.render(*args) { to_s }
+  end
+
+  def br
+    return send(:br) if is_a? React::Component
+    React::RenderingContext.render(:span) do
+      React::RenderingContext.render(to_s)
+      React::RenderingContext.render(:br)
     end
   end
 end
