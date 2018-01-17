@@ -14,7 +14,7 @@ module Hyperloop
   class Component
     module Mixin
       def self.included(base)
-        base.include(Store::Mixin)
+        base.include(Hyperloop::Store::Mixin)
         base.include(React::Component::API)
         base.include(React::Callbacks)
         base.include(React::Component::Tags)
