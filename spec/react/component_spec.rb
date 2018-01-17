@@ -735,7 +735,7 @@ describe 'React::Component', js: true do
       evaluate_ruby do
         React::Test::Utils.render_component_into_document(Bar)
       end
-      expect(page.body[-65..-19]).to include("<div><div><span>astring</span></div></div>")
+      expect(page.body[-80..-19]).to include("<div><div><span>astring</span></div></div>")
     end
 
     it 'builds single node in top-level render without providing a block' do
