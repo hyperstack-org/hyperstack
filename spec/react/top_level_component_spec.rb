@@ -47,8 +47,8 @@ describe 'React::TopLevelRailsComponent', js: true do
           component_name: component_name,
           render_params: {}
         }
-        element = React.create_element(React::TopLevelRailsComponent, params)
-        React::Server.render_to_static_markup(element)
+        component = React::Test::Utils.render_component_into_document(React::TopLevelRailsComponent, params)
+        component.dom_node.JS[:outerHTML]
       end
     end
   end
