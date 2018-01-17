@@ -156,7 +156,6 @@ describe 'the React DSL', js: true do
         end
       end
     end
-    sleep 10000
     expect(page.body[-60..-19]).to include('<span>Mod::Comp</span>')
   end
 
