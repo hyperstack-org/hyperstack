@@ -152,7 +152,6 @@ describe 'React', js: true do
       end
 
       it "should match the instance cycle to ReactComponent life cycle" do
-        
         expect_evaluate_ruby do
           Foo.class_eval do
             def initialize(native)
@@ -224,17 +223,15 @@ describe 'React', js: true do
     end
 
     it "should work without providing a block" do
-      
       expect_evaluate_ruby do
         begin
-          div = JS.call(:eval, 'document.createElement("div")')
-          React::Test::Utils.render_into_document(React.create_element('span') { "lorem" }, div)
+          React::Test::Utils.render_into_document(React.create_element('span') { "lorem" })
           true
         rescue
           false
         end
       end.to be_truthy
-      expect(page.body[-60..-10]).to include('<div><span>lorem</span></div>')
+      expect(page.body[-80..-10]).to include('<div><span>lorem</span></div>')
     end
 
     it "returns the actual ruby instance" do
