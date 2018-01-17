@@ -53,7 +53,6 @@ module React
           end
         end
       end
-      puts "paths searched: #{paths_searched}"
       return React::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
       raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
     end
