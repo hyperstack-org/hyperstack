@@ -172,27 +172,6 @@ module ActiveRecord
       ReactiveRecord::Base.class_scopes(self)[:all] = collection
     end
 
-    # def server_methods(*methods)
-    #   methods.each do |method|
-    #     define_method(method) do |*args|
-    #       if args.count == 0
-    #         @backing_record.reactive_get!(method, :initialize)
-    #       else
-    #         @backing_record.reactive_get!([[method]+args], :initialize)
-    #       end
-    #     end
-    #     define_method("#{method}!") do |*args|
-    #       if args.count == 0
-    #         @backing_record.reactive_get!(method, :force)
-    #       else
-    #         @backing_record.reactive_get!([[method]+args], :force)
-    #       end
-    #     end
-    #   end
-    # end
-    #
-    # alias_method :server_method, :server_methods
-
     [:belongs_to, :has_many, :has_one].each do |macro|
       define_method(macro) do |*args| # is this a bug in opal?  saying name, scope=nil, opts={} does not work!
         name = args.first
