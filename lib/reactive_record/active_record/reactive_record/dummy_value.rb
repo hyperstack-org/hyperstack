@@ -32,7 +32,7 @@ module ReactiveRecord
         ) || 'nil'
         default_value_method = "build_default_value_for_#{column_type}"
         @object = __send__ default_value_method
-      rescue Exception
+      rescue ::Exception
       end
 
       def build_default_value_for_nil
@@ -41,7 +41,7 @@ module ReactiveRecord
 
       def build_default_value_for_datetime
         if @column_hash[:default]
-          Time.parse(@column_hash[:default].gsub(' ','T')+'+00:00')
+          ::Time.parse(@column_hash[:default].gsub(' ','T')+'+00:00')
         else
           ::ReactiveRecord::Base::DummyValue.dummy_time
         end
@@ -52,7 +52,7 @@ module ReactiveRecord
 
       def build_default_value_for_date
         if @column_hash[:default]
-          Date.parse(@column_hash[:default])
+          ::Date.parse(@column_hash[:default])
         else
           ::ReactiveRecord::Base::DummyValue.dummy_date
         end
@@ -81,9 +81,9 @@ module ReactiveRecord
       alias build_default_value_for_text build_default_value_for_string
 
       def notify
-        return if ReactiveRecord::Base.data_loading?
-        ReactiveRecord.loads_pending!
-        ReactiveRecord::WhileLoading.loading!
+        return if ::ReactiveRecord::Base.data_loading?
+        ::ReactiveRecord.loads_pending!
+        ::ReactiveRecord::WhileLoading.loading!
       end
 
       def loading?
@@ -182,23 +182,23 @@ module ReactiveRecord
       end
 
       def self.dummy_time
-        @dummy_time ||= Time.parse('2001-01-01T00:00:00.000-00:00')
+        @dummy_time ||= ::Time.parse('2001-01-01T00:00:00.000-00:00')
       end
 
       def self.dummy_date
-        @dummy_date ||= Date.parse('1/1/2001')
+        @dummy_date ||= ::Date.parse('1/1/2001')
       end
 
       def to_date
         notify
         return @object.to_date if @object
-        ReactiveRecord::Base::DummyValue.dummy_date
+        ::ReactiveRecord::Base::DummyValue.dummy_date
       end
 
       def to_time
         notify
         return @object.to_time if @object
-        ReactiveRecord::Base::DummyValue.dummy_time
+        ::ReactiveRecord::Base::DummyValue.dummy_time
       end
 
       def acts_as_string?
@@ -213,7 +213,7 @@ module ReactiveRecord
         else
           __send__(*args, &b)
         end
-      rescue
+      rescue ::Exception
         nil
       end
     end
