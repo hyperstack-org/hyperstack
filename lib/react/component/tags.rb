@@ -46,7 +46,6 @@ module React
       # where there is no preceeding scope.
 
       def method_missing(name, *params, &children)
-        puts "Tags MM #{name}"
         component = find_component(name)
         return React::RenderingContext.render(component, *params, &children) if component
         Object.method_missing(name, *params, &children)
