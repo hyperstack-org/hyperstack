@@ -297,7 +297,9 @@ module ComponentTestHelpers
           end
         end
         class React::Component::HyperTestDummy < React::Component::Base
-          #{@client_code}
+          def render; end
+        end
+        #{@client_code}
         #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
       code
       opts[:code] = Opal.compile(block_with_helpers)
