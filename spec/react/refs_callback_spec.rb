@@ -12,7 +12,7 @@ describe 'Refs callback', js: true do
     end
   end
 
-  it "is invoked with the actual Ruby instance" do
+  xit "is invoked with the actual Ruby instance" do
     expect_evaluate_ruby do
       class Bar
         include React::Component
@@ -37,7 +37,7 @@ describe 'Refs callback', js: true do
     end.to eq('Bar')
   end
 
-  it "is invoked with the actual DOM node" do
+  xit "is invoked with the actual DOM node" do
     # client_option raise_on_js_errors: :off
     expect_evaluate_ruby do
       Foo.class_eval do
