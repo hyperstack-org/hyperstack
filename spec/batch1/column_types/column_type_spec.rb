@@ -67,7 +67,7 @@ describe "column types on client", js: true do
 
     isomorphic do
       class TypeTest < ActiveRecord::Base
-        server_method :a_server_method, default: "hello" do |s|
+        server_method :a_server_method, default: "hello" do |s=""|
           s.reverse
         end
       end
