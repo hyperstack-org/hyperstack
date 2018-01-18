@@ -6,6 +6,7 @@ Hyperloop.import 'hyper-operation'
 if RUBY_ENGINE == 'opal'
   require 'active_support/core_ext/string'
   require 'mutations'
+  Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
   require 'hyper-operation/filters/outbound_filter'
   require 'hyper-component'
   require 'hyper-operation/http'
@@ -30,6 +31,7 @@ if RUBY_ENGINE == 'opal'
 else
   require 'hyperloop-config'
   require 'mutations'
+  Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
   require 'hyper-operation/filters/outbound_filter'
   require 'hyper-component'
   require 'active_record'
