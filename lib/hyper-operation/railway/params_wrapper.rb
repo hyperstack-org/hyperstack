@@ -68,9 +68,7 @@ module Hyperloop
         end
 
         def hash_filter
-          unless Mutations::HashFilter.respond_to? :duck
-            Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
-          end
+          # the :duck method is added in lib/hyper-operation.rb globally
           @hash_filter ||= Mutations::HashFilter.new
         end
 
