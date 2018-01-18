@@ -370,18 +370,18 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
   it "can define the step, async and failed callbacks many ways" do
     expect_evaluate_ruby do
 
-      operation = Class.new(Hyperloop::Operation)
+      TestOperation = Class.new(Hyperloop::Operation)
 
       class SayHelloOp < Hyperloop::Operation
         param :xxx
-        step { operation.say_hello if params.xxx == 123 }
+        step { TestOperation.say_hello if params.xxx == 123 }
       end
 
-      operation.class_eval do
+      TestOperation.class_eval do
         param :xxx
         extend HelloCounter
-        def say_hello()
-          self.class.say_hello
+        def say_hello(test = false)
+          self.class.say_hello(test)
         end
         step   { say_hello }
         step   :say_hello
@@ -401,8 +401,8 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
         failed SayHelloOp # your params will be passed along to SayHelloOp
         failed { succeed! }
       end
-      result = operation.run(xxx: 123)
-      [operation.hello_count, result.resolved?]
+      result = TestOperation.run(xxx: 123)
+      [TestOperation.hello_count, result.resolved?]
     end.to eq [15, true]
   end
 
