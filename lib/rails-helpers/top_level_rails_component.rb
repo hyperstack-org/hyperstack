@@ -19,6 +19,7 @@ module React
       component = nil
       if params.component_name.start_with?('::')
         # if absolute path of component is given, look it up and fail if not found
+        paths_searched << params.component_name
         component = begin
                       Object.const_get(params.component_name)
                     rescue NameError
