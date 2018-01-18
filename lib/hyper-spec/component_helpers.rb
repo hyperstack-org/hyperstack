@@ -83,7 +83,7 @@ module ComponentTestHelpers
         end
 
         def render
-          present component, @render_params
+          React::RenderingContext.render(component, @render_params)
         end
       end
     end
@@ -257,10 +257,12 @@ module ComponentTestHelpers
             `eval(s)`
           end
           def self.dasherize(s)
-            `s.replace(/[-_\\s]+/g, '-')
+            %x{
+              return s.replace(/[-_\\s]+/g, '-')
               .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1-$2')
               .replace(/([a-z\\d])([A-Z])/g, '$1-$2')
-              .toLowerCase()`
+              .toLowerCase()
+            }
           end
           def self.add_class(class_name, styles={})
             style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}" }.join("; ")
