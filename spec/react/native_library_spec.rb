@@ -220,9 +220,8 @@ describe "React::NativeLibrary", js: true do
     end.to match(/Foo cannot import \'window\.Baz\'\: (?!does not appear to be a native react component)./)
   end
 
-  xit "allows passing native object as props" do
-    # TODO does not work
-    mount 'Foo' do
+  it "allows passing native object as props" do
+    mount 'Wrapper' do
       JS.call(:eval,
         <<-JSCODE
           window.NativeComponent = class extends React.Component {
@@ -230,7 +229,7 @@ describe "React::NativeLibrary", js: true do
               super(props);
               this.displayName = "HelloMessage";
             }
-            render() { return React.createElement("div", null, "Hello ", this.props.user.name); }
+            render() { return React.createElement("div", null, "Hello " + this.props.user.name); }
           }
         JSCODE
       )
