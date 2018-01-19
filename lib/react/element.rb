@@ -150,19 +150,5 @@ module React
         }
       )
     end
-
-    def merge_deprecated_component_event_prop!(event_name)
-      prop_name = "_on#{event_name.event_camelize}"
-      fn = %x{function(){#{
-        React::Component.deprecation_warning(
-          type,
-          "In future releases React::Element#on('#{event_name}') will no longer respond "\
-          "to the '#{prop_name}' emitter.\n"\
-          "Rename your emitter param to 'on_#{event_name}' or use .on('<#{prop_name}>')"
-        )}
-        return #{yield(*Array(`arguments`))}
-      }}
-      @properties.merge!(prop_name => fn)
-    end
   end
 end
