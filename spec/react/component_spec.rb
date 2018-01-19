@@ -426,7 +426,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include React::Component
+            include Hyperloop::Component::Mixin
           end
         end
       end
@@ -443,8 +443,7 @@ describe 'React::Component', js: true do
         end.to have_key('_componentValidator')
       end
 
-      xit 'logs error in warning if validation failed' do
-        # TODO: seems like no logging is done in hyper-react, should maybe better raise instead
+      it 'logs error in warning if validation failed' do
         evaluate_ruby do
           class Lorem; end
           Foo.class_eval do
@@ -462,28 +461,21 @@ describe 'React::Component', js: true do
           .to match(/Warning: Failed prop( type|Type): In component `Foo`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
       end
 
-      xit 'should not log anything if validation pass' do
-        # TODO propTypes issue see above, it should neither log or raise?
-        stub_const 'Lorem', Class.new
-        Foo.class_eval do
-          params do
-            requires :foo
-            requires :lorem, type: Lorem
-            optional :bar, type: String
+      it 'should not log anything if validation pass' do
+        evaluate_ruby do
+          class Lorem; end
+          Foo.class_eval do
+            params do
+              requires :foo
+              requires :lorem, type: Lorem
+              optional :bar, type: String
+            end
+
+            def render; div; end
           end
-
-          def render; div; end
+          React::Test::Utils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
         end
-
-        %x{
-          var log = [];
-          var org_warn_console = window.console.warn;
-          var org_error_console = window.console.error;
-          window.console.warn = window.console.error = function(str){log.push(str)}
-        }
-        renderToDocument(Foo, foo: 10, bar: '10', lorem: Lorem.new)
-        `window.console.warn = org_warn_console; window.console.error = org_error_console;`
-        expect(`log`).to eq([])
+        expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n")).to_not match(/prop/)
       end
     end
 
