@@ -111,8 +111,10 @@ describe 'React', js: true do
       end
 
       it "should allow creating with properties" do
-        
         expect_evaluate_ruby do
+          Foo.class_eval do
+            param :foo
+          end
           element = React.create_element(Foo, foo: "bar")
           element.props.foo
         end.to eq("bar")
