@@ -503,22 +503,19 @@ describe 'React::Component', js: true do
   end
 
   describe 'Anonymous Component' do
-    xit "will not generate spurious warning messages" do
-      # TODO, see above
-      foo = Class.new(React::Component::Base)
-      foo.class_eval do
-        def render; "hello" end
-      end
+    it "will not generate spurious warning messages" do
+      evaluate_ruby do
+        foo = Class.new(React::Component::Base)
+        foo.class_eval do
+          def render; "hello" end
+        end
 
-      %x{
-        var log = [];
-        var org_warn_console = window.console.warn;
-        var org_error_console = window.console.error;
-        window.console.warn = window.console.error = function(str){log.push(str)}
-      }
-      renderToDocument(foo)
-      `window.console.warn = org_warn_console; window.console.error = org_error_console;`
-      expect(`log`).to eq([])
+        React::Test::Utils.render_component_into_document(foo)
+      end
+      expect(page.driver.browser.manage.logs.get(:browser)
+        .reject { |entry| entry.to_s.include?("Deprecated feature") }
+        .map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n").size)
+        .to eq(0)
     end
   end
 
@@ -632,77 +629,6 @@ describe 'React::Component', js: true do
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to_not match(/Exception raised/)
-    end
-  end
-
-  describe '#refs' do
-    # TODO semantics changed with react 16, test cases give this error message:
-    # Warning: Element ref was specified as a string (myRefName) but no owner was set. You may have multiple copies of React loaded. (details: https://fb.me/react-refs-must-have-owner).
-    # This usually means one of three things:
-    # You are trying to add a ref to a functional component.
-    # You are trying to add a ref to an element that is being created outside of a component’s render() function.
-    # You have multiple (conflicting) copies of React loaded (eg. due to a misconfigured npm dependency)
-
-    before do
-      on_client do
-        class Foo
-          include React::Component
-        end
-      end
-    end
-
-    xit 'correctly assigns refs' do
-      client_options raise_on_js_errors: :off
-      expect_evaluate_ruby do
-        Foo.class_eval do
-          def render
-            React.create_element('input', type: :text, ref: :field).on(:click) do
-              refs[:field].value = 'some_stuff'
-            end
-          end
-        end
-        instance = React::Test::Utils.render_component_into_document(Foo)
-        instance.refs[:field]
-      end.not_to be_nil
-      # TODO: original test asks for above not_to be_nil, but why should it not be nil?
-      # ref: :field is no where set to anything else
-      # not sure about this
-    end
-
-    xit 'accesses refs through `refs` method' do
-      client_options raise_on_js_errors: :off
-      expect_evaluate_ruby do
-        Foo.class_eval do
-          def render
-            React.create_element('input', type: :text, ref: :field).on(:click) do
-              refs[:field].value = 'some_stuff'
-            end
-          end
-        end
-        instance = React::Test::Utils.render_component_into_document(Foo)
-        React::Test::Utils.simulate_click(instance)
-        instance.refs[:field].value
-      end.to eq('some_stuff')
-    end
-
-    xit "allows access the actual DOM node" do
-      client_options raise_on_js_errors: :off
-      on_client do
-        Foo.class_eval do
-          after_mount do
-            dom = refs[:my_div].to_n
-            dom.JS['innerHTML'] = 'Modified'
-          end
-
-          def render
-            React.create_element('div', ref: :my_div) { "Original Content" }
-          end
-        end
-      end
-      expect_evaluate_ruby do
-        instance = React::Test::Utils.render_component_into_document(Foo)
-        instance.dom_node.JS['innerHTML']
-      end.to eq('Modified')
     end
   end
 
