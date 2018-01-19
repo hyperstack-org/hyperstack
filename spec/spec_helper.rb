@@ -64,7 +64,6 @@ if RUBY_ENGINE == 'opal'
 
 
   RSpec.configure do |config|
-    config.include React::SpecHelpers
     config.filter_run_including :opal => true
   end
 end
@@ -116,13 +115,19 @@ if RUBY_ENGINE != 'opal'
     # Fail tests on JavaScript errors in Chrome Headless
     class JavaScriptError < StandardError; end
 
-    # config.after(:each, js: true) do |spec|
-    #   errors = page.driver.browser.manage.logs.get(:browser)
-    #               .select { |e| e.level == "SEVERE" && e.message.present? }
-    #               #.map { |m| m.message.gsub(/\\n/, "\n") }.to_a
-    #               #.reject { |e| e =~ /Unexpected response code: 200/ }
-    #   raise JavaScriptError, errors.join("\n\n") if errors.present?
-    # end
+    config.after(:each, js: true) do |spec|
+      logs = page.driver.browser.manage.logs.get(:browser)
+      errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
+                  .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+      if client_options[:deprecation_warnings] == :on
+        warnings = logs.select { |e| e.level == "WARNING" && e.message.present? }
+                    .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+        puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
+      end
+      unless client_options[:raise_on_js_errors] == :off
+        raise JavaScriptError, errors.join("\n\n") if errors.present?
+      end
+    end
 
     config.filter_run_including focus: true
     config.filter_run_excluding opal: true
