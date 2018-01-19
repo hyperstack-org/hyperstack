@@ -145,9 +145,7 @@ module React
       raise "Component parameters must be a hash. Instead you sent #{properties}" unless properties.is_a? Hash
       props = {}
       properties.map do |key, value|
-        if key == "class_name" && value.is_a?(Hash)
-          props[lower_camelize(key)] = `React.addons.classSet(#{value.to_n})`
-        elsif key == "class"
+        if key == "class" || key == "class_name"
           props["className"] = value
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
