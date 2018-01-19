@@ -69,7 +69,7 @@ module ReactiveRecord
   # Adds while_loading feature to React
   # to use attach a .while_loading handler to any element for example
   # div { "displayed if everything is loaded" }.while_loading { "displayed while I'm loading" }
-  # the contents of the div will be switched (using jQuery.show/hide) depending on the state of contents of the first block
+  # the contents of the div will be switched (using javascript classes) depending on the state of contents of the first block
 
   # To notify React that something is loading use React::WhileLoading.loading!
   # once everything is loaded then do React::WhileLoading.loaded_at message (typically a time stamp just for debug purposes)
@@ -103,7 +103,7 @@ module ReactiveRecord
 
       # +: I DONT THINK WE USE opal-jquery in this module anymore - require 'opal-jquery' if opal_client?
       # -: You think wrong. add_style_sheet uses the jQuery $, after_mount too, others too
-      # -: I removed those references. 
+      # -: I removed those references. Now you think right.
 
       include Hyperloop::Component::Mixin
 
@@ -156,8 +156,8 @@ module ReactiveRecord
                                    ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none; }";
               document.head.append(style_el);
             }
+            @style_sheet_added = true
           end
-          @style_sheet_added = true
         end
 
       end
@@ -174,10 +174,9 @@ module ReactiveRecord
       after_mount do
         @waiting_on_resources = params.loading
         WhileLoading.add_style_sheet
+        node = dom_node
         %x{
-          var node = #{dom_node};
-          var nodes;
-          nodes = node.querySelectorAll(':nth-child(-1n+'+#{params.loaded_children.count}+')');
+          var nodes = node.querySelectorAll(':nth-child(-1n+'+#{params.loaded_children.count}+')');
           nodes.forEach(
             function(current_node, current_index, list_obj) {
               if (current_node.className.indexOf('reactive_record_show_when_loaded') === -1) {
@@ -282,61 +281,62 @@ if RUBY_ENGINE == 'opal'
         def reactive_record_link_to_enclosing_while_loading_container
           # Call after any component mounts - attaches the containers loading id to this component
           # Fyi, the while_loading container is responsible for setting its own link to itself
-
+          node = dom_node
           %x{
-            var node = #{dom_node};
-            var node_wl_attr = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
-            if (node_wl_attr === null || node_wl_attr === "") {
-              var while_loading_container = node.closest('[data-reactive_record_while_loading_container_id]');
-              if (while_loading_container !== null) {
-                var container_id = while_loading_container.getAttribute('data-reactive_record_while_loading_container_id');
-                node.setAttribute('data-reactive_record_enclosing_while_loading_container_id', container_id);
+              if (typeof node === "undefined" || node === null) return;
+              var node_wl_attr = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
+              if (node_wl_attr === null || node_wl_attr === "") {
+                var while_loading_container = node.closest('[data-reactive_record_while_loading_container_id]');
+                if (while_loading_container.length > 0) {
+                  var container_id = while_loading_container.getAttribute('data-reactive_record_while_loading_container_id');
+                  node.setAttribute('data-reactive_record_enclosing_while_loading_container_id', container_id);
+                }
               }
             }
-          }
         end
 
         def reactive_record_link_set_while_loading_container_class
-          %x{
-            var node = #{dom_node};    
-            var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');
-            if (#{!self.is_a?(ReactiveRecord::WhileLoading)} && while_loading_container_id !== null && while_loading_container_id !== "") {
-              return;
-            }
-            var enc_while_loading_container_id = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
-            if (enc_while_loading_container_id !== null && enc_while_loading_container_id !== "") {
-              var while_loading_container = document.body.querySelector('[data-reactive_record_while_loading_container_id="'+enc_while_loading_container_id+'"]');
-              var loading = #{!!waiting_on_resources == true};
-              if (loading) {
-                node.className = node.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
-                if (node.className.indexOf('reactive_record_is_loading') === -1) {
-                  node.className = node.className + ' reactive_record_is_loading';
-                }
-                if (while_loading_container !== null) {
-                  while_loading_container.className = while_loading_container.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
-                  if (while_loading_container.className.indexOf('reactive_record_is_loading') === -1) {
-                    while_loading_container.className = while_loading_container.className + ' reactive_record_is_loading';
+          node = dom_node
+          %x{ 
+              if (typeof node === "undefined" || node === null) return;
+              var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');
+              if (#{!self.is_a?(ReactiveRecord::WhileLoading)} && while_loading_container_id !== null && while_loading_container_id !== "") {
+                return;
+              }
+              var enc_while_loading_container_id = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
+              if (enc_while_loading_container_id !== null && enc_while_loading_container_id !== "") {
+                var while_loading_container = document.body.querySelector('[data-reactive_record_while_loading_container_id="'+enc_while_loading_container_id+'"]');
+                var loading = #{!!waiting_on_resources == true};
+                if (loading) {
+                  node.className = node.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
+                  if (node.className.indexOf('reactive_record_is_loading') === -1) {
+                    node.className = node.className + ' reactive_record_is_loading';
                   }
-                }
-              } else if (node.className.indexOf('reactive_record_is_loaded') === -1) {
-                if (while_loading_container_id === null || while_loading_container_id === "") {
-                  node.className = node.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
-                  if (node.className.indexOf('reactive_record_is_loaded') === -1) {
-                    node.className = node.className + 'reactive_record_is_loaded';
+                  if (while_loading_container !== null) {
+                    while_loading_container.className = while_loading_container.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
+                    if (while_loading_container.className.indexOf('reactive_record_is_loading') === -1) {
+                      while_loading_container.className = while_loading_container.className + ' reactive_record_is_loading';
+                    }
                   }
-                }
-                if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {
-                  var loading_children = while_loading_container.querySelectorAll('[data-reactive_record_enclosing_while_loading_container_id="'+enc_while_loading_container_id+'"].reactive_record_is_loading');
-                  if (loading_children.length === 0) {
-                    while_loading_container.className = while_loading_container.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
-                    if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {
-                      while_loading_container.className = while_loading_container.className + ' reactive_record_is_loaded';
+                } else if (node.className.indexOf('reactive_record_is_loaded') === -1) {
+                  if (while_loading_container_id === null || while_loading_container_id === "") {
+                    node.className = node.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
+                    if (node.className.indexOf('reactive_record_is_loaded') === -1) {
+                      node.className = node.className + 'reactive_record_is_loaded';
+                    }
+                  }
+                  if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {
+                    var loading_children = while_loading_container.querySelectorAll('[data-reactive_record_enclosing_while_loading_container_id="'+enc_while_loading_container_id+'"].reactive_record_is_loading');
+                    if (loading_children.length === 0) {
+                      while_loading_container.className = while_loading_container.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
+                      if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {
+                        while_loading_container.className = while_loading_container.className + ' reactive_record_is_loaded';
+                      }
                     }
                   }
                 }
-             }
+              }
             }
-          }
         end
       end
     end
