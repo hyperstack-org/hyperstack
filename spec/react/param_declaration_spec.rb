@@ -53,8 +53,7 @@ describe 'the param macro', js: true do
     end.to have_key('_componentValidator')
   end
 
-  xit "can type check params" do
-    # TODO this changed in react 16, needs attention
+  it "can type check params" do
     mount 'Foo', foo1: 12, foo2: "string" do
       class Foo < React::Component::Base
 
@@ -71,8 +70,7 @@ describe 'the param macro', js: true do
           .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo1` could not be converted to String/)
   end
 
-  xit 'logs error in warning if validation failed' do
-    # TODO this changed in react 16 needs attention
+  it 'logs error in warning if validation failed' do
     evaluate_ruby do
       class Lorem; end
       class Foo2 < React::Component::Base
@@ -113,7 +111,7 @@ describe 'the param macro', js: true do
       end
     end
 
-    xit "can use the [] notation for arrays" do
+    it "can use the [] notation for arrays" do
       mount 'Foo', foo: 10, bar: [10] do
         Foo.class_eval do
           param :foo, type: []
@@ -124,7 +122,7 @@ describe 'the param macro', js: true do
         .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to Array/)
     end
 
-    xit "can use the [xxx] notation for arrays of a specific type" do
+    it "can use the [xxx] notation for arrays of a specific type" do
       mount 'Foo', foo: [10], bar: ["10"] do
         Foo.class_eval do
           param :foo, type: [String]
@@ -135,7 +133,7 @@ describe 'the param macro', js: true do
         .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo`\[0\] could not be converted to String/)
     end
 
-    xit "can convert a json hash to a type" do
+    it "can convert a json hash to a type" do
       mount 'Foo', foo: "", bar: { bazwoggle: 1 }, baz: [{ bazwoggle: 2 }] do
         class BazWoggle
           def initialize(kind)
