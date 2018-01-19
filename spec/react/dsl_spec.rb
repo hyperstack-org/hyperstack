@@ -302,6 +302,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class X2
         include React::Component
+        param :ele
         def render
           div do
             params[:ele].render
