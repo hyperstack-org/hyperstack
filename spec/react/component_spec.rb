@@ -356,6 +356,7 @@ describe 'React::Component', js: true do
       it 'reads from parent passed properties through `params`' do
         mount 'Foo', prop: 'foobar' do
           Foo.class_eval do
+            param :prop
             def render
               React.create_element('div') { params[:prop] }
             end
@@ -367,6 +368,7 @@ describe 'React::Component', js: true do
       it 'accesses nested params as orignal Ruby object' do
         mount 'Foo', prop: [{foo: 10}] do
           Foo.class_eval do
+            param :prop
             def render
               React.create_element('div') { params[:prop][0][:foo] }
             end
@@ -388,6 +390,7 @@ describe 'React::Component', js: true do
       it '`setProps` as method `set_props` is no longer supported' do
         expect_evaluate_ruby do
           Foo.class_eval do
+            param :foo
             def render
               React.create_element('div') { params[:foo] }
             end
@@ -404,6 +407,7 @@ describe 'React::Component', js: true do
       it 'original `replaceProps` as method `set_props!` is no longer supported' do
         expect_evaluate_ruby do
           Foo.class_eval do
+            param :foo
             def render
               React.create_element('div') { params[:foo] ? 'exist' : 'null' }
             end
@@ -594,7 +598,7 @@ describe 'React::Component', js: true do
     it 'invokes handler on `this.props` using emit' do
       on_client do
         Foo.class_eval do
-          param :_onFooSubmit, type: Proc
+          param :on_foo_fubmit, type: Proc
           after_mount :setup
 
           def setup
@@ -617,7 +621,7 @@ describe 'React::Component', js: true do
     it 'invokes handler with multiple params using emit' do
       on_client do
         Foo.class_eval do
-          param :_onFooInvoked, type: Proc
+          param :on_foo_invoked, type: Proc
           after_mount :setup
 
           def setup
@@ -715,7 +719,7 @@ describe 'React::Component', js: true do
       on_client do
         class Foo
           include React::Component
-
+          param :foo
           def render
             div do
               span { params[:foo] }
