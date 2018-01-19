@@ -15,8 +15,12 @@ module React
                   %w(circle clipPath defs ellipse g line linearGradient mask path pattern polygon polyline
                   radialGradient rect stop svg text tspan)
 
-      # define each predefined tag as an instance method
+      # the present method is retained as a legacy behavior
+      def present(component, *params, &children)
+        React::RenderingContext.render(component, *params, &children)
+      end
 
+      # define each predefined tag as an instance method
       HTML_TAGS.each do |tag|
         if tag == 'p'
           define_method(tag) do |*params, &children|
