@@ -55,9 +55,9 @@ module React
           static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
           }
-          /* static get propTypes() {
+          static get propTypes() {
             return  #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`};
-          } */
+          }
           componentWillMount() {
             var instance = this._getOpalInstance.apply(this);
             return #{`instance`.component_will_mount if type.method_defined? :component_will_mount};
