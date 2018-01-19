@@ -46,7 +46,11 @@ module Hyperloop
       end
 
       def emit(event_name, *args)
-        params["_on#{event_name.to_s.event_camelize}"].call(*args)
+        if React::Event::BUILT_IN_EVENTS.include?(built_in_event_name = "on#{event_name.to_s.event_camelize}")
+          params[built_in_event_name].call(*args)
+        else
+          params["on_#{event_name}"].call(*args)
+        end
       end
 
       def component_will_mount

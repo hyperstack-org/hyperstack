@@ -127,7 +127,6 @@ module React
       elsif @type.instance_variable_get('@native_import')
         merge_component_event_prop! name, &block
       else
-        merge_deprecated_component_event_prop! event_name, &block
         merge_component_event_prop! "on_#{event_name}", &block
       end
     end
