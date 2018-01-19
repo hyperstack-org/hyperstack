@@ -96,24 +96,6 @@ describe 'React::Element', js: true do
       end
       expect(page.body[-60..-19]).to include('<span>works!</span>')
     end
-
-    xit 'will subscribe to a component event param using the deprecated naming convention and generate a message' do
-      # TODO propTypes dont work in react 16
-      evaluate_ruby do
-        class Foo < React::Component::Base
-          param :_onEvent, type: Proc, default: nil, allow_nil: true
-          def render
-            params._onEvent
-          end
-        end
-        React::Test::Utils.render_into_document(React.create_element(Foo).on(:event) {'works!'})
-      end
-      expect(page.body[-60..-19]).to include('<span>works!</span>')
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `on_event` not specified in spec/)
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/In future releases React::Element#on('event') will no longer respond to the '_onEvent' emitter.\nRename your emitter param to 'on_event' or use .on('<_onEvent>')/)
-    end
   end
 
   describe 'Builtin Event subscription' do
