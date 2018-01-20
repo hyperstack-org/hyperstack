@@ -17,7 +17,7 @@ describe 'React::Component::Base', js: true do
 
   it 'can create a simple component class' do
     mount 'Foo'
-    expect(page).to have_xpath("//span", text: "working")
+    expect(page.body[-50..-19]).to match(/<span>working<\/span>/)
   end
 
   it 'can create a simple component class that can be inherited to create another component class' do
@@ -31,6 +31,6 @@ describe 'React::Component::Base', js: true do
         end
       end
     end
-    expect(page).to have_xpath("//span", text: "working well")
+    expect(page.body[-50..-19]).to match(/<span>working well<\/span>/)
   end
 end
