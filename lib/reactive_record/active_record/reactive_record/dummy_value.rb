@@ -202,9 +202,19 @@ module ReactiveRecord
       end
 
       def acts_as_string?
-        return true if @object.is_a? String
+        return true if @object.is_a? ::String
         return @object.acts_as_string? if @object
         true
+      end
+
+      # this is a hackish way and compatible with any other rendered object
+      # to identify a DummyValue during render
+      # in ReactRenderingContext.run_child_block() and
+      # to convert it to a string, for rendering
+      # advantage over a try(:method) is, that it doesnt raise und thus is faster
+      # which is important during render
+      def respond_to?(method)
+        method == :acts_as_string?
       end
 
       def try(*args, &b)
