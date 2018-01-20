@@ -6,13 +6,18 @@ describe 'Refs callback', js: true do
       class Foo
         include React::Component
         def self.bar
-          @@bar ||= 'club'
+          @@bar
+        end
+        def self.bar=(club)
+          @@bar = club
         end
       end
     end
   end
 
   xit "is invoked with the actual Ruby instance" do
+    # see: https://github.com/facebook/react/issues/12034
+    # this sometimes failes, sometimes not
     expect_evaluate_ruby do
       class Bar
         include React::Component
@@ -23,7 +28,7 @@ describe 'Refs callback', js: true do
 
       Foo.class_eval do
         def my_bar=(bars)
-          @@bar = bars
+          Foo.bar = bars
         end
 
         def render
@@ -33,16 +38,20 @@ describe 'Refs callback', js: true do
 
       element = React.create_element(Foo)
       React::Test::Utils.render_into_document(element)
-      Foo.bar.class.name
+      begin
+        "#{Foo.bar.name}"
+      rescue
+        "Club"
+      end
     end.to eq('Bar')
   end
 
-  xit "is invoked with the actual DOM node" do
+  it "is invoked with the actual DOM node" do
     # client_option raise_on_js_errors: :off
     expect_evaluate_ruby do
       Foo.class_eval do
         def my_div=(div)
-          @@bar = div
+          Foo.bar = div
         end
 
         def render
@@ -52,7 +61,7 @@ describe 'Refs callback', js: true do
 
       element = React.create_element(Foo)
       React::Test::Utils.render_into_document(element)
-      Foo.bar.JS['nodeType']
-    end.to eq(1)
+      "#{Foo.bar.JS['nodeType']}" # aboids json serialisation errors by using "#{}"
+    end.to eq("1")
   end
 end
