@@ -52,24 +52,31 @@ describe "default_scope" do
           end
         end
       end
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("0 unscoped items")
       m1 = FactoryBot.create(:test_model, completed: false, test_attribute: nil)
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("1 unscoped items")
       m2 = FactoryBot.create(:test_model, completed: true, test_attribute: nil)
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("2 unscoped items")
       m2.update(test_attribute: 'foo')
+      wait_for_ajax
       page.should have_content("1 items")
       page.should have_content("2 unscoped items")
       m3 = FactoryBot.create(:test_model)
+      wait_for_ajax
       page.should have_content("2 items")
       page.should have_content("3 unscoped items")
       m3.update_attribute(:completed, false)
+      wait_for_ajax
       page.should have_content("1 items")
       page.should have_content("3 unscoped items")
       m2.destroy
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("2 unscoped items")
     end
@@ -91,25 +98,32 @@ describe "default_scope" do
           end
         end
       end
+      wait_for_ajax
       starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
       page.should have_content("0 items")
       page.should have_content("0 unscoped items")
       m1 = FactoryBot.create(:test_model, completed: false, test_attribute: nil)
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("1 unscoped items")
       m2 = FactoryBot.create(:test_model, completed: true, test_attribute: nil)
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("2 unscoped items")
       m2.update(test_attribute: 'foo')
+      wait_for_ajax
       page.should have_content("1 items")
       page.should have_content("2 unscoped items")
       m3 = FactoryBot.create(:test_model)
+      wait_for_ajax
       page.should have_content("2 items")
       page.should have_content("3 unscoped items")
       m3.update_attribute(:completed, false)
+      wait_for_ajax
       page.should have_content("1 items")
       page.should have_content("3 unscoped items")
       m2.destroy
+      wait_for_ajax
       page.should have_content("0 items")
       page.should have_content("2 unscoped items")
       # there should be no client fetches should replace this with a double of
