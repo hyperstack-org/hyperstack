@@ -13,11 +13,12 @@ module React
       props = self.orig_convert_props(properties)
       props.map do |key, value|
         if key == "ref" && value.is_a?(Proc)
+          puts "converting ref"
           new_proc = Proc.new do |native_inst|
             if `#{native_inst}._getOpalInstance !== undefined && #{native_inst}._getOpalInstance !== null`
               value.call(`#{native_inst}._getOpalInstance()`)
-            elsif `React.findDOMNode !== undefined && #{native_inst}.nodeType === undefined`
-              value.call(`React.findDOMNode(#{native_inst})`)
+            elsif `ReactDOM.findDOMNode !== undefined && #{native_inst}.nodeType === undefined`
+              value.call(`ReactDOM.findDOMNode(#{native_inst})`) # react >= v0.15.`)
             else
               value.call(native_inst)
             end
