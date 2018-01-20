@@ -134,14 +134,16 @@ describe 'the React DSL', js: true do
     expect(page.body[-60..-19]).to include('<div><p>hello</p></div>')
   end
 
-  xit 'can do a method call on a class name that is not a direct sibling' do
-    # this test is failing with opal 0.10.5 because Comp() is not compiled to a method call,
-    # but to a $scope.get("Comp"); which returns the Component Class Mod::Comp
-    # instead it sould compile to a $scope.$Comp();
+  it 'can do a method call on a class name that is not a direct sibling' do
+    # this test is failing because Comp() is not serialized/compiled to a method call,
+    # but instead to a $scope.get("Comp"); which returns the Component Class Mod::Comp
+    # instead it sould serialize/compile to a $scope.$Comp();
+    # this is a bug in unparser, workaround is to pass a argument to comp
     mount 'Mod::NestedMod::NestedComp' do
       module Mod
         class Comp
           include React::Component
+          param :test
           def render
              "Mod::Comp"
           end
@@ -150,7 +152,7 @@ describe 'the React DSL', js: true do
           class NestedComp
             include React::Component
             def render
-               Comp()
+              Comp(test: 'string')
             end
           end
         end
@@ -159,8 +161,7 @@ describe 'the React DSL', js: true do
     expect(page.body[-60..-19]).to include('<span>Mod::Comp</span>')
   end
 
-  xit 'raises a meaningful error if a Constant Name is not actually a component' do
-    # TODO Behaviour changed
+  it 'raises a meaningful error if a Constant Name is not actually a component' do
     client_option raise_on_js_errors: :off
     mount 'Mod::NestedMod::NestedComp' do
       module Mod
@@ -168,7 +169,7 @@ describe 'the React DSL', js: true do
           class NestedComp < React::Component::Base
             backtrace :none
             render do
-              Comp()
+              Comp(test: 'string')
             end
           end
         end
