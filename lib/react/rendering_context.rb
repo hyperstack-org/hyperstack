@@ -93,7 +93,6 @@ module React
 
       def run_child_block(is_outer_scope)
         result = yield
-        result = result.to_s.span if result.try :acts_as_string? || result.is_a?(String)
         @buffer << result if result.is_a?(String) || (result.is_a?(React::Element) && @buffer.empty?)
         raise_render_error(result) if is_outer_scope && @buffer != [result]
       end
