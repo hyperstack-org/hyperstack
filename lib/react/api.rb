@@ -150,15 +150,21 @@ module React
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
         elsif key == 'ref' && value.is_a?(Proc)
-          unless React.const_defined?(:RefsCallbackExtension)
-            %x{
-                console.error(
-                  "Warning: Using deprecated behavior of ref callback,",
-                  "require \"react/ref_callback\" to get the correct behavior."
-                );
-            }
-          end
-          props[key] = value
+          props[key] = %x{
+                          function(dom_node){
+                            console.log("ref calling");
+                            if (dom_node._getOpalInstance !== undefined && dom_node._getOpalInstance !== null) {
+                              console.log("ref has opal");
+                              #{ value.call(`dom_node._getOpalInstance()`) };
+                            } else if(ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
+                              console.log("ref has react_dom: ", ReactDOM.findDOMNode(dom_node));
+                              #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
+                            } else {
+                              console.log("ref has nothing")
+                              #{ value.call(`dom_node`) };
+                            }
+                          }
+                        }
         elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
           value.each { |k, v| props["#{key}-#{k.tr('_', '-')}"] = v.to_n }
         else
