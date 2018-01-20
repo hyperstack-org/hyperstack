@@ -287,7 +287,7 @@ if RUBY_ENGINE == 'opal'
               var node_wl_attr = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
               if (node_wl_attr === null || node_wl_attr === "") {
                 var while_loading_container = node.closest('[data-reactive_record_while_loading_container_id]');
-                if (while_loading_container.length > 0) {
+                if (while_loading_container !== null && while_loading_container.length > 0) {
                   var container_id = while_loading_container.getAttribute('data-reactive_record_while_loading_container_id');
                   node.setAttribute('data-reactive_record_enclosing_while_loading_container_id', container_id);
                 }
