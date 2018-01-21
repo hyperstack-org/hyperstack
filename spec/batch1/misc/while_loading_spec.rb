@@ -39,7 +39,7 @@ describe "while loading", js: true do
     FactoryBot.create(:user, first_name: 'Lily', last_name: 'DaDog')
   end
 
-  it "will display the while loading message" do
+  it "will display the while loading message for a fetch within a nested component" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
         class MyNestedGuy < Hyperloop::Component
@@ -57,6 +57,7 @@ describe "while loading", js: true do
           end
         end
       end
+      sleep 10000
       expect(page).to have_content('loading...')
       expect(page).not_to have_content('DaDog', wait: 0)
     end
@@ -150,7 +151,7 @@ describe "while loading", js: true do
     expect(page).not_to have_content('loading...', wait: 0)
   end
 
-  it "will display the while loading message" do
+  it "will display the while loading message on condition" do
     isomorphic do
       class FetchNow < Hyperloop::ServerOp
         dispatch_to { TestApplication }
