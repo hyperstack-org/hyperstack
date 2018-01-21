@@ -31,10 +31,8 @@ module ReactiveRecord
           @column_hash[:sql_type_metadata][:type]
         ) || 'nil'
         default_value_method = "build_default_value_for_#{column_type}"
-        puts "### DummyValue"
         @object = __send__ default_value_method
       rescue ::Exception
-        puts "### DummyValue failed"
       end
 
       def build_default_value_for_nil
