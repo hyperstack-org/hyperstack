@@ -122,6 +122,9 @@ module ReactiveRecord
 
         def loading!
           React::RenderingContext.waiting_on_resources = true
+          puts "While Loading this is: #{self}"
+          puts "While Loading this is: #{self.class}"
+          puts "While Loading this is: #{self.class.name}"
           React::State.get_state(self, :loaded_at)
           React::State.set_state(self, :quiet, false)
           @is_loading = true
@@ -240,7 +243,7 @@ module React
         buffer.dup
       end
 
-      new_element = React.create_element(
+     new_element = React.create_element(
         ReactiveRecord::WhileLoading,
         loading: waiting_on_resources,
         loading_children: loading_children,
@@ -297,6 +300,7 @@ if RUBY_ENGINE == 'opal'
 
         def reactive_record_link_set_while_loading_container_class
           node = dom_node
+          loading = (waiting_on_resources ? `true` : `false`)
           %x{ 
               if (typeof node === "undefined" || node === null) return;
               var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');
@@ -306,7 +310,6 @@ if RUBY_ENGINE == 'opal'
               var enc_while_loading_container_id = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
               if (enc_while_loading_container_id !== null && enc_while_loading_container_id !== "") {
                 var while_loading_container = document.body.querySelector('[data-reactive_record_while_loading_container_id="'+enc_while_loading_container_id+'"]');
-                var loading = #{!!waiting_on_resources == true};
                 if (loading) {
                   node.className = node.className.replace(/reactive_record_is_loaded/g, '').replace(/  /g, ' ');
                   if (node.className.indexOf('reactive_record_is_loading') === -1) {
@@ -322,7 +325,7 @@ if RUBY_ENGINE == 'opal'
                   if (while_loading_container_id === null || while_loading_container_id === "") {
                     node.className = node.className.replace(/reactive_record_is_loading/g, '').replace(/  /g, ' ');
                     if (node.className.indexOf('reactive_record_is_loaded') === -1) {
-                      node.className = node.className + 'reactive_record_is_loaded';
+                      node.className = node.className + ' reactive_record_is_loaded';
                     }
                   }
                   if (while_loading_container.className.indexOf('reactive_record_is_loaded') === -1) {

@@ -35,9 +35,8 @@ describe "while loading", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-    size_window(:small, :portrait)
+    # size_window(:small, :portrait)
     FactoryBot.create(:user, first_name: 'Lily', last_name: 'DaDog')
-
   end
 
   it "will display the while loading message" do
