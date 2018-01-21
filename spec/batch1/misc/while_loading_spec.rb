@@ -57,7 +57,6 @@ describe "while loading", js: true do
           end
         end
       end
-      sleep 10000
       expect(page).to have_content('loading...')
       expect(page).not_to have_content('DaDog', wait: 0)
     end
