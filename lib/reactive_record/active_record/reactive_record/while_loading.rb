@@ -122,9 +122,6 @@ module ReactiveRecord
 
         def loading!
           React::RenderingContext.waiting_on_resources = true
-          puts "While Loading this is: #{self}"
-          puts "While Loading this is: #{self.class}"
-          puts "While Loading this is: #{self.class.name}"
           React::State.get_state(self, :loaded_at)
           React::State.set_state(self, :quiet, false)
           @is_loading = true
