@@ -31,8 +31,10 @@ module ReactiveRecord
           @column_hash[:sql_type_metadata][:type]
         ) || 'nil'
         default_value_method = "build_default_value_for_#{column_type}"
+        puts "### DummyValue"
         @object = __send__ default_value_method
       rescue ::Exception
+        puts "### DummyValue failed"
       end
 
       def build_default_value_for_nil
@@ -203,7 +205,7 @@ module ReactiveRecord
 
       def acts_as_string?
         return true if @object.is_a? ::String
-        return @object.acts_as_string? if @object
+        return @object.acts_as_string? if @object && @object.respond_to?(:acts_as_string?)
         true
       end
 
@@ -214,7 +216,11 @@ module ReactiveRecord
       # advantage over a try(:method) is, that it doesnt raise und thus is faster
       # which is important during render
       def respond_to?(method)
-        method == :acts_as_string?
+        case method
+        when :acts_as_string? then return true
+        when :to_s then return true
+        default return false
+        end 
       end
 
       def try(*args, &b)
