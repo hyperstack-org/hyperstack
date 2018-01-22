@@ -14,10 +14,11 @@ module React
             self.waiting_on_resources = nil
             run_child_block(name.nil?, &block)
             if name
-              buffer = @buffer.dup
-              React.create_element(name, *args) { buffer }.tap do |element|
-                element.waiting_on_resources = saved_waiting_on_resources || !!buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
-                element.waiting_on_resources ||= waiting_on_resources if buffer.last.is_a?(String)
+              # why duplicate? its a new Array anyway
+              # buffer = @buffer.dup
+              React.create_element(name, *args) { @buffer }.tap do |element|
+                element.waiting_on_resources = saved_waiting_on_resources || !!@buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
+                element.waiting_on_resources ||= waiting_on_resources if @buffer.last.is_a?(String)
               end
             elsif @buffer.last.is_a? React::Element
               @buffer.last.tap { |element| element.waiting_on_resources ||= saved_waiting_on_resources }
