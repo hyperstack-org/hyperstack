@@ -152,7 +152,6 @@ module React
         elsif key == 'ref' && value.is_a?(Proc)
           props[key] = %x{
                           function(dom_node){
-                            console.log("ref calling");
                             if (dom_node._getOpalInstance !== undefined && dom_node._getOpalInstance !== null) {
                               #{ value.call(`dom_node._getOpalInstance()`) };
                             } else if(ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
