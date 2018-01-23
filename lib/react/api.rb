@@ -154,13 +154,10 @@ module React
                           function(dom_node){
                             console.log("ref calling");
                             if (dom_node._getOpalInstance !== undefined && dom_node._getOpalInstance !== null) {
-                              console.log("ref has opal");
                               #{ value.call(`dom_node._getOpalInstance()`) };
                             } else if(ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
-                              console.log("ref has react_dom: ", ReactDOM.findDOMNode(dom_node));
                               #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
                             } else {
-                              console.log("ref has nothing")
                               #{ value.call(`dom_node`) };
                             }
                           }
