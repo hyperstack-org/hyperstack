@@ -109,7 +109,7 @@ module Hyperloop
         if object
           name = "#{object.class}.#{name}" unless object == self
           set_state(
-            '***_state_updated_at-***' => Time.now.to_f,
+            '***_state_updated_at-***' => `Date.now()`,
             name => value
           )
         else
