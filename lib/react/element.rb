@@ -62,12 +62,8 @@ module React
     def delete
       React::RenderingContext.delete(self)
     end
-
     # Deprecated version of delete method
-
-    def as_node
-      React::RenderingContext.as_node(self)
-    end
+    alias as_node delete
 
     # Any other method applied to an element will be treated as class name (haml style) thus
     # div.foo.bar(id: :fred) is the same as saying div(class: "foo bar", id: :fred)
