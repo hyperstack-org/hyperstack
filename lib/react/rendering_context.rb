@@ -16,7 +16,7 @@ module React
             if name
               # why duplicate? its a new Array anyway
               # buffer = @buffer.dup
-              React.create_element(name, *args) { @buffer }.tap do |element|
+              React::API.create_element(name, *args) { @buffer }.tap do |element|
                 element.waiting_on_resources = saved_waiting_on_resources || !!@buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
                 element.waiting_on_resources ||= waiting_on_resources if @buffer.last.is_a?(String)
               end
@@ -29,7 +29,7 @@ module React
         elsif name.is_a? React::Element
           element = name
         else
-          element = React.create_element(name, *args)
+          element = React::API.create_element(name, *args)
           element.waiting_on_resources = waiting_on_resources
         end
         @buffer << element
@@ -47,13 +47,12 @@ module React
         return_val
       end
 
-      def as_node(element)
+      def delete(element)
         @buffer.delete(element)
         element
       end
 
-      alias delete as_node
-
+      alias as_node delete
       def rendered?(element)
         @buffer.include? element
       end
@@ -65,7 +64,7 @@ module React
       def remove_nodes_from_args(args)
         args[0].each do |key, value|
           begin
-            value.as_node if value.is_a?(Element)
+            value.delete if value.is_a?(Element) # deletes Element from buffer
           rescue Exception
           end
         end if args[0] && args[0].is_a?(Hash)
@@ -90,7 +89,6 @@ module React
       # outer rendering scope.  In this case react only allows us to generate 1 Element
       # so we insure that is the case, and also check to make sure that element in the buffer
       # is the element returned
-
 
       def run_child_block(is_outer_scope)
         result = yield
