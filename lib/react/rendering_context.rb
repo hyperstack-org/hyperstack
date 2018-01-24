@@ -14,16 +14,16 @@ module React
             self.waiting_on_resources = nil
             run_child_block(name.nil?, &block)
             if name
-              # why duplicate? its a new Array anyway
-              # buffer = @buffer.dup
-              React::API.create_element(name, *args) { @buffer }.tap do |element|
-                element.waiting_on_resources = saved_waiting_on_resources || !!@buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
-                element.waiting_on_resources ||= waiting_on_resources if @buffer.last.is_a?(String)
+              buffer = @buffer.dup
+              React::API.create_element(name, *args) { buffer }.tap do |element|
+                element.waiting_on_resources = saved_waiting_on_resources || !!buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
+                element.waiting_on_resources ||= waiting_on_resources if buffer.last.is_a?(String)
               end
             elsif @buffer.last.is_a? React::Element
               @buffer.last.tap { |element| element.waiting_on_resources ||= saved_waiting_on_resources }
             else
-              @buffer.last.to_s.span.tap { |element| element.waiting_on_resources = saved_waiting_on_resources }
+              buffer_s = @buffer.last.to_s
+              React::RenderingContext.render(:span) { buffer_s }.tap { |element| element.waiting_on_resources = saved_waiting_on_resources }
             end
           end
         elsif name.is_a? React::Element
@@ -51,8 +51,8 @@ module React
         @buffer.delete(element)
         element
       end
-
       alias as_node delete
+
       def rendered?(element)
         @buffer.include? element
       end
