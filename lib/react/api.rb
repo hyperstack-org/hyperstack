@@ -109,13 +109,14 @@ module React
       params = []
 
       # Component Spec, Normal DOM, String or Native Component
-      if @@component_classes[type]
-        params << @@component_classes[type]
-      elsif type.kind_of?(Class)
+      ncc = @@component_classes[type]
+      if ncc
+        params << ncc
+      elsif type.is_a?(Class)
         params << create_native_react_class(type)
-      elsif React::Component::Tags::HTML_TAGS.include?(type)
+      elsif block_given? || React::Component::Tags::HTML_TAGS.include?(type)
         params << type
-      elsif type.is_a? String
+      elsif type.is_a?(String)
         return React::Element.new(type)
       else
         raise "#{type} not implemented"
@@ -144,7 +145,7 @@ module React
     def self.convert_props(properties)
       raise "Component parameters must be a hash. Instead you sent #{properties}" unless properties.is_a? Hash
       props = {}
-      properties.map do |key, value|
+      properties.each do |key, value|
         if key == "class" || key == "class_name"
           props["className"] = value
         elsif ["style", "dangerously_set_inner_HTML"].include? key
@@ -175,8 +176,7 @@ module React
     def self.lower_camelize(snake_cased_word)
       words = snake_cased_word.split('_')
       result = [words.first]
-      result.concat(words[1..-1].map {|word| word[0].upcase + word[1..-1] })
-      result.join('')
+      result.concat(words[1..-1].map {|word| word[0].upcase + word[1..-1] }).join('')
     end
   end
 end
