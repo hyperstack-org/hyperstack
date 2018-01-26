@@ -23,13 +23,13 @@ module React
     # the need for needs_update?
     #
     module ShouldComponentUpdate
-      def should_component_update?(next_params, next_state)
+      def should_component_update?(next_props, next_state)
         State.set_state_context_to(self, false) do
           # rubocop:disable Style/DoubleNegation # we must return true/false to js land
           if respond_to?(:needs_update?)
-            !!call_needs_update(next_params, next_state)
+            !!call_needs_update(next_props, next_state)
           else
-            !!(props_changed?(next_params) || native_state_changed?(next_state))
+            (props_changed?(next_props) || native_state_changed?(next_state))
           end
           # rubocop:enable Style/DoubleNegation
         end
@@ -88,9 +88,10 @@ module React
 
       # Do a shallow compare on the two hashes. Starting in 0.9 we will do a deep compare. ???
 
-      def props_changed?(next_params)
-        (props.keys.sort != next_params.keys.sort) ||
-          next_params.detect { |k, v| `#{v} != #{@native}.props[#{k}]` }
+      def props_changed?(next_props)
+        props = Hash.new(`#{@native}.props`)
+        return true if (props.keys.sort != next_props.keys.sort)
+        !!next_props.detect(false) { |k, v| v != props[k] }
       end
     end
   end
