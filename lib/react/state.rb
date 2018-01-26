@@ -126,11 +126,7 @@ module React
       end
 
       def set_state_context_to(observer, rendering = nil) # wrap all execution that may set or get states in a block so we know which observer is executing
-        if `typeof Opal.global.reactive_ruby_timing !== 'undefined'`
-          @nesting_level = (@nesting_level || 0) + 1
-          start_time = Time.now.to_f
-          observer_name = (observer.class.respond_to?(:name) ? observer.class.name : observer.to_s) rescue "object:#{observer.object_id}"
-        end
+
         saved_current_observer = @current_observer
         @current_observer = observer
         @rendering_level += 1 if rendering
@@ -139,7 +135,6 @@ module React
       ensure
         @current_observer = saved_current_observer
         @rendering_level -= 1 if rendering
-        @nesting_level = [0, @nesting_level - 1].max if `typeof Opal.global.reactive_ruby_timing !== 'undefined'`
         return_value
       end
 
