@@ -60,7 +60,7 @@ module React
           }
           componentWillMount() {
             var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.component_will_mount if type.method_defined? :component_will_mount};
+            return #{`instance`.component_will_mount if type.method_defined? :component_will_mount};  
           }
           componentDidMount() {
             var instance = this._getOpalInstance.apply(this);
@@ -68,20 +68,28 @@ module React
             return #{`instance`.component_did_mount if type.method_defined? :component_did_mount};
           }
           componentWillReceiveProps(next_props) {
-            var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.component_will_receive_props(Hash.new(`next_props`)) if type.method_defined? :component_will_receive_props};
+            if (#{type.method_defined? :component_will_receive_props}) {
+              var instance = this._getOpalInstance.apply(this);
+              return #{`instance`.component_will_receive_props(Hash.new(`next_props`))};
+            }
           }
           shouldComponentUpdate(next_props, next_state) {
-            var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.should_component_update?(Hash.new(`next_props`), Hash.new(`next_state`)) if type.method_defined? :should_component_update?};
+            if (#{type.method_defined? :should_component_update?}) {
+              var instance = this._getOpalInstance.apply(this);
+              return #{`instance`.should_component_update?(Hash.new(`next_props`), Hash.new(`next_state`))};
+            } else { return true; }
           }
           componentWillUpdate(next_props, next_state) {
-            var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.component_will_update(Hash.new(`next_props`), Hash.new(`next_state`)) if type.method_defined? :component_will_update};
+            if (#{type.method_defined? :component_will_update}) {
+              var instance = this._getOpalInstance.apply(this);
+              return #{`instance`.component_will_update(Hash.new(`next_props`), Hash.new(`next_state`))};
+            }
           }
           componentDidUpdate(prev_props, prev_state) {
-            var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.component_did_update(Hash.new(`prev_props`), Hash.new(`prev_state`)) if type.method_defined? :component_did_update};
+            if (#{type.method_defined? :component_did_update}) {
+              var instance = this._getOpalInstance.apply(this);
+              return #{`instance`.component_did_update(Hash.new(`prev_props`), Hash.new(`prev_state`))};
+            }
           }
           componentWillUnmount() {
             var instance = this._getOpalInstance.apply(this);
@@ -91,10 +99,10 @@ module React
           _getOpalInstance() {
             if (this.__opalInstance == undefined) {
               var instance = #{type.new(`this`)};
+              this.__opalInstance = instance;
             } else {
               var instance = this.__opalInstance;
             }
-            this.__opalInstance = instance;
             return instance;
           }
           render() {
