@@ -14,8 +14,8 @@ module React
       props.map do |key, value|
         if key == "ref" && value.is_a?(Proc)
           new_proc = Proc.new do |native_inst|
-            if `#{native_inst}._getOpalInstance !== undefined && #{native_inst}._getOpalInstance !== null`
-              value.call(`#{native_inst}._getOpalInstance()`)
+            if `#{native_inst}.__opalInstance !== undefined && #{native_inst}.__opalInstance !== null`
+              value.call(`#{native_inst}.__opalInstance`)
             elsif `ReactDOM.findDOMNode !== undefined && #{native_inst}.nodeType === undefined`
               value.call(`ReactDOM.findDOMNode(#{native_inst})`) # react >= v0.15.`)
             else
