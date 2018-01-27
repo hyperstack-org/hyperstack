@@ -50,6 +50,7 @@ module React
             super(props);
             this.displayName = #{type.name};
             this.mixins = #{type.respond_to?(:native_mixins) ? type.native_mixins : `[]`};
+            this.state = {};
             this.statics = #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`};
           }
           static get defaultProps() {
