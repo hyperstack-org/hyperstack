@@ -11,7 +11,7 @@ before_install:
 before_script:
   - cd spec/test_app
   - bundle update
-  - rails db:setup
+  - bundle exec rails db:setup
   - cd ../../
   - chromedriver-update
   - ls -lR ~/.chromedriver-helper/
