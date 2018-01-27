@@ -90,8 +90,7 @@ module React
 
       def props_changed?(next_props)
         props = Hash.new(`#{@native}.props`)
-        return true if (props.keys.sort != next_props.keys.sort)
-        !!next_props.detect(false) { |k, v| v != props[k] }
+        next_props != props
       end
     end
   end
