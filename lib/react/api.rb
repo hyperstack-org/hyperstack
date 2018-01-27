@@ -50,8 +50,11 @@ module React
             super(props);
             this.displayName = #{type.name};
             this.mixins = #{type.respond_to?(:native_mixins) ? type.native_mixins : `[]`};
-            this.state = {};
             this.statics = #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`};
+            this.state = {};
+            this.__opalInstanceInitializedState = false;
+            this.__opalInstance = #{type.new(`this`)};
+            this.__opalInstanceInitializedState = true;
           }
           static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
@@ -60,55 +63,44 @@ module React
             return  #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`};
           }
           componentWillMount() {
-            var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.component_will_mount if type.method_defined? :component_will_mount};  
+            if (#{type.method_defined? :component_will_mount}) {
+              return this.__opalInstance.$component_will_mount();
+            }  
           }
           componentDidMount() {
-            var instance = this._getOpalInstance.apply(this);
-            instance.is_mounted = true
-            return #{`instance`.component_did_mount if type.method_defined? :component_did_mount};
+            this.__opalInstance.is_mounted = true
+            if (#{type.method_defined? :component_did_mount}) {
+              return this.__opalInstance.$component_did_mount();
+            }
           }
           componentWillReceiveProps(next_props) {
             if (#{type.method_defined? :component_will_receive_props}) {
-              var instance = this._getOpalInstance.apply(this);
-              return #{`instance`.component_will_receive_props(Hash.new(`next_props`))};
+              return this.__opalInstance.$component_will_receive_props(Opal.Hash.$new(next_props));
             }
           }
           shouldComponentUpdate(next_props, next_state) {
             if (#{type.method_defined? :should_component_update?}) {
-              var instance = this._getOpalInstance.apply(this);
-              return #{`instance`.should_component_update?(Hash.new(`next_props`), Hash.new(`next_state`))};
+              return this.__opalInstance["$should_component_update?"](Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
             } else { return true; }
           }
           componentWillUpdate(next_props, next_state) {
             if (#{type.method_defined? :component_will_update}) {
-              var instance = this._getOpalInstance.apply(this);
-              return #{`instance`.component_will_update(Hash.new(`next_props`), Hash.new(`next_state`))};
+              return this.__opalInstance.$component_will_update(Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
             }
           }
           componentDidUpdate(prev_props, prev_state) {
             if (#{type.method_defined? :component_did_update}) {
-              var instance = this._getOpalInstance.apply(this);
-              return #{`instance`.component_did_update(Hash.new(`prev_props`), Hash.new(`prev_state`))};
+              return this.__opalInstance.$component_did_update(Opal.Hash.$new(prev_props), Opal.Hash.$new(prev_state));
             }
           }
           componentWillUnmount() {
-            var instance = this._getOpalInstance.apply(this);
-            instance.is_mounted = false;
-            return #{`instance`.component_will_unmount if type.method_defined? :component_will_unmount};
-          }
-          _getOpalInstance() {
-            if (this.__opalInstance == undefined) {
-              var instance = #{type.new(`this`)};
-              this.__opalInstance = instance;
-            } else {
-              var instance = this.__opalInstance;
+            this.__opalInstance.is_mounted = false;
+            if (#{type.method_defined? :component_will_unmount}) {
+              return this.__opalInstance.$component_will_unmount();
             }
-            return instance;
           }
           render() {
-            var instance = this._getOpalInstance.apply(this);
-            return #{`instance`.send(render_fn).to_n};
+            return this.__opalInstance.$send(render_fn).$to_n();
           }
         }
       }
@@ -162,8 +154,8 @@ module React
         elsif key == 'ref' && value.is_a?(Proc)
           props[key] = %x{
                           function(dom_node){
-                            if (dom_node._getOpalInstance !== undefined && dom_node._getOpalInstance !== null) {
-                              #{ value.call(`dom_node._getOpalInstance()`) };
+                            if (dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
+                              #{ value.call(`dom_node.__opalInstance`) };
                             } else if(ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
                               #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
                             } else {
