@@ -6,12 +6,11 @@ require File.expand_path('../boot', __FILE__)
 # you've limited to :test, :development, or :production.
 
 Bundler.require(*Rails.groups(assets: %w(development test)))
+require 'opal'
+require 'opal-jquery'
 require 'opal-rails'
 require 'hyper-router'
 require 'hyper-component'
-
-
-
 
 module TestApp
   class Application < Rails::Application
