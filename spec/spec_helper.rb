@@ -15,8 +15,6 @@ require 'pry'
 require 'opal-browser'
 require 'timecop'
 
-Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
-
 RSpec.configure do |config|
   config.color = true
   config.fail_fast = ENV['FAIL_FAST'] || false

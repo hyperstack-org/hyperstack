@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-if RUBY_ENGINE != 'opal'
 require 'rails-controller-testing'
 Rails::Controller::Testing.install
 
@@ -33,5 +32,4 @@ RSpec.describe TestController, type: :controller do
       expect(response).to render_template(layout: :explicit_layout)
     end
   end
-end
 end
