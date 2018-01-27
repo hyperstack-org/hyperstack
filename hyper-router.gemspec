@@ -47,4 +47,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
+  spec.add_development_dependency 'webdrivers'
 end
