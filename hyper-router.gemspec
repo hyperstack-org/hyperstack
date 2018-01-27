@@ -1,7 +1,11 @@
 # coding: utf-8
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require 'hyper-router/version'
-require '../hyper-component/lib/hyperloop/component/version'
+if File.exist? '../hyper-component/lib/hyperloop/component/version'
+  require '../hyper-component/lib/hyperloop/component/version'
+else
+  require 'hyperloop/component/version'
+end
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-router'
