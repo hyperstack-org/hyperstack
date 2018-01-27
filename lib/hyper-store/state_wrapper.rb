@@ -67,7 +67,6 @@ module HyperStore
 
       def add_method(klass, method_name, opts = {})
         define_method(:"#{method_name}") do
-          #puts "**************** args = #{args}"
           from = opts[:scope] == :shared ? klass.state.__from__ : @__from__
           React::State.get_state(from, method_name.to_s)
         end
