@@ -5,9 +5,11 @@ require File.expand_path('../boot', __FILE__)
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 
+Bundler.require(*Rails.groups(assets: %w(development test)))
+require 'opal-rails'
 require 'hyper-router'
 require 'hyper-component'
-Bundler.require(*Rails.groups(assets: %w(development test)))
+
 
 
 
