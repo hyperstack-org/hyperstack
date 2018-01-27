@@ -15,9 +15,7 @@ describe 'Refs callback', js: true do
     end
   end
 
-  xit "is invoked with the actual Ruby instance" do
-    # see: https://github.com/facebook/react/issues/12034
-    # this sometimes failes, sometimes not
+  it "is invoked with the actual Ruby instance" do
     expect_evaluate_ruby do
       class Bar
         include React::Component
@@ -39,7 +37,7 @@ describe 'Refs callback', js: true do
       element = React.create_element(Foo)
       React::Test::Utils.render_into_document(element)
       begin
-        "#{Foo.bar.name}"
+        "#{Foo.bar.class.name}"
       rescue
         "Club"
       end
