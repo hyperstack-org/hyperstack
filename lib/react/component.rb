@@ -108,8 +108,12 @@ module Hyperloop
       def update_react_js_state(object, name, value)
         if object
           name = "#{object.class}.#{name}" unless object == self
+          # Date.now() has only millisecond precision, if several notifications of 
+          # observer happen within a millisecond, updates may get lost.
+          # to mitigate this the Math.random() appends some random number
+          # this way notifactions will happen as expected by the rest of hyperloop
           set_state(
-            '***_state_updated_at-***' => `Date.now()`,
+            '***_state_updated_at-***' => `Date.now() + Math.random()`,
             name => value
           )
         else
