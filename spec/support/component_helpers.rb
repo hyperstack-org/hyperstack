@@ -260,6 +260,13 @@ module ComponentTestHelpers
     mount unless page.instance_variable_get("@hyper_spec_mounted") rescue nil
   end
 
+  def client_option(opts = {})
+    @client_options ||= {}
+    @client_options.merge! opts
+  end
+
+  alias client_options client_option
+
   def mount(component_name = nil, params = nil, opts = {}, &block)
     unless params
       params = opts
