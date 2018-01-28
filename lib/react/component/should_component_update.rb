@@ -67,22 +67,24 @@ module React
 
       # rubocop:disable Metrics/MethodLength # for effeciency we want this to be one method
       def native_state_changed?(next_state_hash)
-        next_state = next_state_hash.to_n
-        %x{
-          var current_state = #{@native}.state
-          var normalized_next_state =
-            !next_state || Object.keys(next_state).length === 0 ? false : next_state
-          var normalized_current_state =
-            !current_state || Object.keys(current_state).length === 0 ? false : current_state
-          if (!normalized_current_state != !normalized_next_state) return(true)
-          if (!normalized_current_state && !normalized_next_state) return(false)
-          if (!normalized_current_state['***_state_updated_at-***'] &&
-            !normalized_next_state['***_state_updated_at-***']) return(false)
-          if (!normalized_current_state['***_state_updated_at-***'] ||
-              !normalized_next_state['***_state_updated_at-***']) return(true)
-          return (normalized_current_state['***_state_updated_at-***'] !=
-                  normalized_next_state['***_state_updated_at-***'])
-        }
+        # next_state = next_state_hash.to_n
+        # %x{
+        #   var current_state = #{@native}.state
+        #   var normalized_next_state =
+        #     !next_state || Object.keys(next_state).length === 0 ? false : next_state
+        #   var normalized_current_state =
+        #     !current_state || Object.keys(current_state).length === 0 ? false : current_state
+        #   if (!normalized_current_state != !normalized_next_state) return(true)
+        #   if (!normalized_current_state && !normalized_next_state) return(false)
+        #   if (!normalized_current_state['***_state_updated_at-***'] &&
+        #     !normalized_next_state['***_state_updated_at-***']) return(false)
+        #   if (!normalized_current_state['***_state_updated_at-***'] ||
+        #       !normalized_next_state['***_state_updated_at-***']) return(true)
+        #   return (normalized_current_state['***_state_updated_at-***'] !=
+        #           normalized_next_state['***_state_updated_at-***'])
+        # }
+        state_hash = Hash.new(`#{@native}.state`)
+        next_state_hash != state_hash
       end
       # rubocop:enable Metrics/MethodLength
 
