@@ -42,7 +42,7 @@ module React
       def build
         current = @buffer
         @buffer = []
-        return_val = yield
+        return_val = yield @buffer
         @buffer = current
         return_val
       end
