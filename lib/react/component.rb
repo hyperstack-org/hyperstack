@@ -28,6 +28,7 @@ module Hyperloop
           define_callback :before_update
           define_callback :after_update
           define_callback :before_unmount
+          define_callback :after_error
         end
         base.extend(React::Component::ClassMethods)
       end
@@ -98,6 +99,18 @@ module Hyperloop
         React::State.set_state_context_to(self) do
           self.run_callback(:before_unmount)
           React::State.remove
+        end
+      rescue Exception => e
+        self.class.process_exception(e, self)
+      end
+
+      def component_did_catch(error, info)
+        React::State.set_state_context_to(self) do
+          if self.callbacks_for(:after_error) == []
+            `console.error(error, info)`
+          else
+            self.run_callback(:after_error, error, info)
+          end
         end
       rescue Exception => e
         self.class.process_exception(e, self)
