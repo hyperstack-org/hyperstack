@@ -17,9 +17,4 @@ before_script:
   - ls -lR ~/.chromedriver-helper/
 script: bundle exec rspec
 gemfile:
-  - gemfiles/opal_0_10_react-rails_2_3.gemfile
-  - gemfiles/opal_0_10_react-rails_2_4.gemfile
   - gemfiles/opal_0_11_react-rails_2_4.gemfile
-matrix:
-  allow_failures:
-    - gemfile: gemfiles/opal_0_11_react-rails_2_4.gemfile
