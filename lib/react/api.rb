@@ -55,6 +55,7 @@ module React
             this.__opalInstanceInitializedState = false;
             this.__opalInstance = #{type.new(`this`)};
             this.__opalInstanceInitializedState = true;
+            this.__opalInstance.sync_set_state = false;
           }
           static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
@@ -64,18 +65,22 @@ module React
           }
           componentWillMount() {
             if (#{type.method_defined? :component_will_mount}) {
-              return this.__opalInstance.$component_will_mount();
+              this.__opalInstance.sync_set_state = true;
+              this.__opalInstance.$component_will_mount();
+              this.__opalInstance.sync_set_state = false;
             }  
           }
           componentDidMount() {
             this.__opalInstance.is_mounted = true
             if (#{type.method_defined? :component_did_mount}) {
-              return this.__opalInstance.$component_did_mount();
+              this.__opalInstance.$component_did_mount();
             }
           }
           componentWillReceiveProps(next_props) {
             if (#{type.method_defined? :component_will_receive_props}) {
-              return this.__opalInstance.$component_will_receive_props(Opal.Hash.$new(next_props));
+              this.__opalInstance.sync_set_state = true;
+              this.__opalInstance.$component_will_receive_props(Opal.Hash.$new(next_props));
+              this.__opalInstance.sync_set_state = false;
             }
           }
           shouldComponentUpdate(next_props, next_state) {
@@ -85,18 +90,25 @@ module React
           }
           componentWillUpdate(next_props, next_state) {
             if (#{type.method_defined? :component_will_update}) {
-              return this.__opalInstance.$component_will_update(Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
+              this.__opalInstance.$component_will_update(Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
             }
           }
           componentDidUpdate(prev_props, prev_state) {
             if (#{type.method_defined? :component_did_update}) {
-              return this.__opalInstance.$component_did_update(Opal.Hash.$new(prev_props), Opal.Hash.$new(prev_state));
+              this.__opalInstance.$component_did_update(Opal.Hash.$new(prev_props), Opal.Hash.$new(prev_state));
             }
           }
           componentWillUnmount() {
             this.__opalInstance.is_mounted = false;
             if (#{type.method_defined? :component_will_unmount}) {
-              return this.__opalInstance.$component_will_unmount();
+              this.__opalInstance.$component_will_unmount();
+            }
+          }
+          componentDidCatch(error, info) {
+            if (#{type.method_defined? :component_did_catch}) {
+              this.__opalInstance.$component_did_catch();
+            } else {
+              console.error(error, info);
             }
           }
           render() {
