@@ -47,6 +47,15 @@ module React
         states[object][name]
       end
 
+      # ReactDOM.unstable_batchedUpdates does not seem to improve things here, ill leave it here commented for reference
+      # and later investigation
+      #if `ReactDOM.unstable_batchedUpdates !== undefined`
+      #  %x{
+      #    ReactDOM.unstable_batchedUpdates(function(){
+      #      #{updates.each { |observer, args| observer.update_react_js_state(*args) }}
+      #    });
+      #  }
+      #else # run the other one
       def set_state(object, name, value, delay=ALWAYS_UPDATE_STATE_AFTER_RENDER)
         states[object][name] = value
         delay = false if `object.sync_set_state !== undefined && object.sync_set_state === true`
