@@ -158,6 +158,10 @@ module Hyperloop
       def define_state(*args, &block)
         React::State.initialize_states(self, self.class.define_state(*args, &block))
       end
+
+      def set_state_synchronously?
+        @native.JS[:__opalInstanceSyncSetState]
+      end
     end
   end
 end
