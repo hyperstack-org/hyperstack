@@ -53,9 +53,10 @@ module React
             this.statics = #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`};
             this.state = {};
             this.__opalInstanceInitializedState = false;
+            this.__opalInstanceSyncSetState = true;
             this.__opalInstance = #{type.new(`this`)};
             this.__opalInstanceInitializedState = true;
-            this.__opalInstance.sync_set_state = false;
+            this.__opalInstanceSyncSetState = false;
           }
           static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
@@ -65,9 +66,9 @@ module React
           }
           componentWillMount() {
             if (#{type.method_defined? :component_will_mount}) {
-              this.__opalInstance.sync_set_state = true;
+              this.__opalInstanceSyncSetState = true;
               this.__opalInstance.$component_will_mount();
-              this.__opalInstance.sync_set_state = false;
+              this.__opalInstanceSyncSetState = false;
             }  
           }
           componentDidMount() {
@@ -78,9 +79,9 @@ module React
           }
           componentWillReceiveProps(next_props) {
             if (#{type.method_defined? :component_will_receive_props}) {
-              this.__opalInstance.sync_set_state = true;
+              this.__opalInstanceSyncSetState = true;
               this.__opalInstance.$component_will_receive_props(Opal.Hash.$new(next_props));
-              this.__opalInstance.sync_set_state = false;
+              this.__opalInstanceSyncSetState = false;
             }
           }
           shouldComponentUpdate(next_props, next_state) {
