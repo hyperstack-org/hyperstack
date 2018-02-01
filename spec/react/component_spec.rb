@@ -101,6 +101,38 @@ describe 'React::Component', js: true do
         instance.state[:foo]
       end.to eq('bar')
     end
+
+    xit 'invokes :after_error when componentDidCatch' do
+      mount 'Foo' do
+        class ErrorFoo
+          include Hyperloop::Component::Mixin
+          def render
+            DIV { DIV { JS.call(:eval, '(function(){ throw new Error("I crashed"); })();')} }
+          end
+        end
+        Foo.class_eval do
+          def self.get_error
+            @@error
+          end
+          def self.get_info
+            @@info
+          end
+
+          def render
+            ErrorFoo()
+          end
+
+          after_error do |error, info|
+            @@error = error
+            @@info = info
+          end
+        end
+      end
+      expect_evaluate_ruby('Foo.get_error').to eq('error')
+      expect_evaluate_ruby('Foo.get_info').to eq('info')
+    end
+
+    it 'logs error when componentDidCatch and no :after_error block was specified'
   end
 
   describe 'New style setter & getter' do
@@ -340,6 +372,123 @@ describe 'React::Component', js: true do
         end
       end
       expect(page.body[-40..-19]).to include("<div>Hello</div>")
+    end
+
+    it 'sets initial state with default value in constructor in @native object state property' do
+      mount 'StateFoo' do
+        class StateFoo
+          include Hyperloop::Component::Mixin
+          state bar: 25
+
+          def initialize(native)
+            super(native)
+            @@initial_state = @native.JS[:state].JS[:bar]
+          end
+
+          def self.initial_state
+            @@initial_state ||= 0
+          end
+
+          def render
+            React.create_element('div') { 'lorem' }
+          end
+        end
+      end
+      expect_evaluate_ruby('StateFoo.initial_state').to eq(25)
+    end
+
+    it 'doesnt cause extra render when setting initial state' do
+      mount 'StateFoo' do
+        class StateFoo
+          include Hyperloop::Component::Mixin
+          state bar: 25
+
+          def self.render_count
+            @@render_count ||= 0
+          end
+          def self.incr_render_count
+            @@render_count ||= 0
+            @@render_count += 1
+          end
+
+          def render
+            StateFoo.incr_render_count
+            React.create_element('div') { 'lorem' }
+          end
+        end
+      end
+      expect_evaluate_ruby('StateFoo.render_count').to eq(1)
+    end
+
+    it 'doesnt cause extra render when setting state in :before_mount' do
+      mount 'StateFoo' do
+        class StateFoo
+          include Hyperloop::Component::Mixin
+
+          def self.render_count
+            @@render_count ||= 0
+          end
+          def self.incr_render_count
+            @@render_count ||= 0
+            @@render_count += 1
+          end
+
+          before_mount do
+            mutate.bar 50
+          end
+
+          def render
+            StateFoo.incr_render_count
+            React.create_element('div') { 'lorem' }
+          end
+        end
+      end
+      expect_evaluate_ruby('StateFoo.render_count').to eq(1)
+    end
+
+
+    it 'doesnt cause extra render when setting state in :before_receive_props' do
+      mount 'Foo' do
+        class StateFoo
+          include Hyperloop::Component::Mixin
+
+          param :drinks
+
+          def self.render_count
+            @@render_count ||= 0
+          end
+          def self.incr_render_count
+            @@render_count ||= 0
+            @@render_count += 1
+          end
+
+          before_receive_props do |new_params|
+            mutate.bar 50
+          end
+
+          def render
+            StateFoo.incr_render_count
+            React.create_element('div') { 'lorem' }
+          end
+        end
+
+        Foo.class_eval do
+          define_state :foo
+
+          before_mount do
+            state.foo 25
+          end
+
+          def render
+            div { StateFoo(drinks: state.foo) }
+          end
+
+          after_mount do
+            mutate.foo 50
+          end
+        end
+      end
+      expect_evaluate_ruby('StateFoo.render_count').to eq(2)
     end
   end
 
@@ -783,7 +932,7 @@ describe 'React::Component', js: true do
     end
   end
 
-  describe '#state_changed?' do
+  describe '#should_component_update?' do
 
     before(:each) do
       on_client do
@@ -859,6 +1008,29 @@ describe 'React::Component', js: true do
       end.to all( be_falsy )
     end
 
+    it "returns true if new state without timestamp is different from old state" do
+      expect_evaluate_ruby do
+        @foo = Foo.new(nil)
+        return_values = []
+        EMPTIES.each do |empty|
+          @foo.instance_eval { @native.JS[:state] = JS.call(:eval, "function bla(){return {'my_state': 12};}bla();") }
+          return_values << @foo.should_component_update?({}, {'my-state' => 13})
+        end
+        return_values
+      end.to all ( be_truthy )
+    end
+
+    it "returns false if new state without timestamp is the same as old state" do
+      expect_evaluate_ruby do
+        @foo = Foo.new(nil)
+        return_values = []
+        EMPTIES.each do |empty|
+          @foo.instance_eval { @native.JS[:state] = JS.call(:eval, "function bla(){return {'my_state': 12};}bla();") }
+          return_values << @foo.should_component_update?({}, {'my_state' => 12})
+        end
+        return_values
+      end.to all( be_falsy )
+    end
   end
 
   describe '#children' do
