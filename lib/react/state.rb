@@ -58,7 +58,7 @@ module React
       #else # run the other one
       def set_state(object, name, value, delay=ALWAYS_UPDATE_STATE_AFTER_RENDER)
         states[object][name] = value
-        delay = false if `object.sync_set_state !== undefined && object.sync_set_state === true`
+        delay = false if object.respond_to?(:set_state_synchronously?) && object.set_state_synchronously?
         if delay || @bulk_update_flag
           @delayed_updates ||= Hash.new { |h, k| h[k] = {} }
           @delayed_updates[object][name] = [value, Set.new]
