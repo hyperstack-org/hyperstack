@@ -1,7 +1,7 @@
 module React
   class State
 
-    ALWAYS_UPDATE_STATE_AFTER_RENDER = false # Hyperloop.on_client? # if on server then we don't wait to update the state
+    ALWAYS_UPDATE_STATE_AFTER_RENDER = Hyperloop.on_client? # if on server then we don't wait to update the state
     @rendering_level = 0
 
     class << self
@@ -22,7 +22,7 @@ module React
       def set_state2(object, name, value, updates, exclusions = nil)
         # set object's name state to value, tell all observers it has changed.
         # Observers must implement update_react_js_state
-        object_needs_notification = object.respond_to? :update_react_js_state
+        object_needs_notification = object.respond_to?(:update_react_js_state)
         observers_by_name[object][name].dup.each do |observer|
           next if exclusions && exclusions.include?(observer)
           updates[observer] += [object, name, value]
@@ -49,6 +49,7 @@ module React
 
       def set_state(object, name, value, delay=ALWAYS_UPDATE_STATE_AFTER_RENDER)
         states[object][name] = value
+        delay = false if `object.sync_set_state !== undefined && object.sync_set_state === true`
         if delay || @bulk_update_flag
           @delayed_updates ||= Hash.new { |h, k| h[k] = {} }
           @delayed_updates[object][name] = [value, Set.new]
@@ -70,25 +71,6 @@ module React
           updates.each { |observer, args| observer.update_react_js_state(*args) }
         end
         value
-      end
-
-      def notify_observers(object, name, value)
-        object_needs_notification = object.respond_to? :update_react_js_state
-        observers_by_name[object][name].dup.each do |observer|
-          observer.update_react_js_state(object, name, value)
-          object_needs_notification = false if object == observer
-        end
-        object.update_react_js_state(nil, name, value) if object_needs_notification
-      end
-
-      def notify_observers_after_thread_completes(object, name, value)
-        (@delayed_updates ||= []) << [object, name, value]
-        @delayed_updater ||= after(0) do
-          delayed_updates = @delayed_updates
-          @delayed_updates = []
-          @delayed_updater = nil
-          delayed_updates.each { |args| notify_observers(*args) }
-        end
       end
 
       def will_be_observing?(object, name, current_observer)
@@ -126,7 +108,6 @@ module React
       end
 
       def set_state_context_to(observer, rendering = nil) # wrap all execution that may set or get states in a block so we know which observer is executing
-
         saved_current_observer = @current_observer
         @current_observer = observer
         @rendering_level += 1 if rendering
