@@ -16,6 +16,15 @@ require 'opal-browser'
 require 'timecop'
 
 RSpec.configure do |config|
+  Capybara.register_driver :travis_headless_chrome do |app|
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(chromeOptions: { args: %w(headless disable-gpu no-sandbox) })
+    Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
+  end
+
+  if ENV['DRIVER'] == 'travis'
+    Capybara.javascript_driver = :travis_headless_chrome
+  end
+
   config.color = true
   config.fail_fast = ENV['FAIL_FAST'] || false
   config.fixture_path = File.join(File.expand_path(File.dirname(__FILE__)), "fixtures")
@@ -54,3 +63,4 @@ RSpec.configure do |config|
   end
 end
 
+'--no-sandbox'
