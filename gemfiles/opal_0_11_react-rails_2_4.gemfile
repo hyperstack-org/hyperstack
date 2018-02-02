@@ -3,8 +3,6 @@
 source "https://rubygems.org"
 source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 
-ruby ">= 2.4.0"
-
 # needs these until fixes are in opal and active support
 gem "opal", git: "https://github.com/janbiedermann/opal.git", branch: "master"
 gem "opal-activesupport", git: "https://github.com/janbiedermann/opal-activesupport.git", branch: "master"
