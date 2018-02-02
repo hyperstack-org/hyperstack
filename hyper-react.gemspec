@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hyper-store', React::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
-  spec.add_dependency 'opal-activesupport', '~> 0.3.0'
+  spec.add_dependency 'opal-activesupport', '~> 0.3.1'
 
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', React::VERSION
