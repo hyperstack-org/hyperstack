@@ -76,6 +76,7 @@ module React
           componentDidMount() {
             this.__opalInstance.is_mounted = true
             if (#{type.method_defined? :component_did_mount}) {
+              this.__opalInstanceSyncSetState = false;
               this.__opalInstance.$component_did_mount();
             }
           }
@@ -88,31 +89,37 @@ module React
           }
           shouldComponentUpdate(next_props, next_state) {
             if (#{type.method_defined? :should_component_update?}) {
+              this.__opalInstanceSyncSetState = false;
               return this.__opalInstance["$should_component_update?"](Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
             } else { return true; }
           }
           componentWillUpdate(next_props, next_state) {
             if (#{type.method_defined? :component_will_update}) {
+              this.__opalInstanceSyncSetState = false;
               this.__opalInstance.$component_will_update(Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
             }
           }
           componentDidUpdate(prev_props, prev_state) {
             if (#{type.method_defined? :component_did_update}) {
+              this.__opalInstanceSyncSetState = false;
               this.__opalInstance.$component_did_update(Opal.Hash.$new(prev_props), Opal.Hash.$new(prev_state));
             }
           }
           componentWillUnmount() {
             this.__opalInstance.is_mounted = false;
             if (#{type.method_defined? :component_will_unmount}) {
+              this.__opalInstanceSyncSetState = false;
               this.__opalInstance.$component_will_unmount();
             }
           }
           componentDidCatch(error, info) {
             if (#{type.method_defined? :component_did_catch}) {
+              this.__opalInstanceSyncSetState = false;
               this.__opalInstance.$component_did_catch(error, Opal.Hash.$new(info));
             }
           }
           render() {
+            this.__opalInstanceSyncSetState = false;
             return this.__opalInstance.$send(render_fn).$to_n();
           }
         }
