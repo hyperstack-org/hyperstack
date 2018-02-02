@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hyper-store', React::VERSION
-  spec.add_dependency 'opal', '>= 0.10.5', '< 0.12.0'
+  spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.0'
 
   spec.add_development_dependency 'chromedriver-helper'
@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
+  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'sqlite3'
