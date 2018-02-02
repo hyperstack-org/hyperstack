@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-spec', Hypermesh::VERSION
   spec.add_development_dependency 'hyper-trace'
   spec.add_development_dependency 'mysql2'
-  spec.add_development_dependency 'opal-activesupport', '~> 0.3.0'
+  spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'parser'
@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pusher-fake'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
+  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'reactrb-rails-generator'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'rspec-expectations'
