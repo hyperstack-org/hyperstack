@@ -48,7 +48,6 @@ module React
         class extends React.Component {
           constructor(props) {
             super(props);
-            this.displayName = #{type.name};
             this.mixins = #{type.respond_to?(:native_mixins) ? type.native_mixins : `[]`};
             this.statics = #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`};
             this.state = {};
@@ -57,6 +56,9 @@ module React
             this.__opalInstance = #{type.new(`this`)};
             this.__opalInstanceInitializedState = true;
             this.__opalInstanceSyncSetState = false;
+          }
+          static get displayName() {
+            return #{type.name};
           }
           static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
@@ -107,9 +109,7 @@ module React
           }
           componentDidCatch(error, info) {
             if (#{type.method_defined? :component_did_catch}) {
-              this.__opalInstance.$component_did_catch();
-            } else {
-              console.error(error, info);
+              this.__opalInstance.$component_did_catch(error, Opal.Hash.$new(info));
             }
           }
           render() {
