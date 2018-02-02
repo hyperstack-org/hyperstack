@@ -1,5 +1,3 @@
-dist: trusty
-sudo: required
 language: ruby
 rvm:
   - ruby
@@ -17,6 +15,8 @@ before_script:
   - cd ../../
   - chromedriver-update
   - ls -lR ~/.chromedriver-helper/
+  - chromedriver --version
+  - which chromedriver
 script: bundle exec rspec
 gemfile:
   - gemfiles/opal_0_11_react-rails_2_4.gemfile
