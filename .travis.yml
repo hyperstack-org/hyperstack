@@ -17,6 +17,6 @@ before_script:
   - ls -lR ~/.chromedriver-helper/
   - chromedriver --version
   - which chromedriver
-script: DRIVER=travis bundle exec rspec
+script: bundle exec rspec
 gemfile:
   - gemfiles/opal_0_11_react-rails_2_4.gemfile
