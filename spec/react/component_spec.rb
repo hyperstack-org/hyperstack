@@ -102,37 +102,38 @@ describe 'React::Component', js: true do
       end.to eq('bar')
     end
 
-    xit 'invokes :after_error when componentDidCatch' do
+    it 'invokes :after_error when componentDidCatch' do
+      client_option raise_on_js_errors: :off
       mount 'Foo' do
         class ErrorFoo
           include Hyperloop::Component::Mixin
+          param :just
           def render
-            DIV { DIV { JS.call(:eval, '(function(){ throw new Error("I crashed"); })();')} }
+            raise 'ErrorFoo Error'
           end
         end
         Foo.class_eval do
           def self.get_error
             @@error
           end
+          
           def self.get_info
             @@info
           end
 
           def render
-            ErrorFoo()
+            DIV { ErrorFoo(just: :a_param) }
           end
 
           after_error do |error, info|
-            @@error = error
-            @@info = info
+            @@error = error.message
+            @@info = info[:componentStack]
           end
         end
       end
-      expect_evaluate_ruby('Foo.get_error').to eq('error')
-      expect_evaluate_ruby('Foo.get_info').to eq('info')
+      expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
+      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in React::TopLevelRailsComponent")
     end
-
-    it 'logs error when componentDidCatch and no :after_error block was specified'
   end
 
   describe 'New style setter & getter' do
