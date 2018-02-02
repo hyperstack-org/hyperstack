@@ -56,11 +56,7 @@ module Hyperloop
 
       def component_will_mount
         React::IsomorphicHelpers.load_context(true) if React::IsomorphicHelpers.on_opal_client?
-        # set_state! initial_state if initial_state
-        # State.initialize_states(self, initial_state)
         React::State.set_state_context_to(self) { run_callback(:before_mount) }
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       def component_did_mount
@@ -68,22 +64,16 @@ module Hyperloop
           run_callback(:after_mount)
           React::State.update_states_to_observe
         end
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       def component_will_receive_props(next_props)
         # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
         # for now we are just using it to clear processed_params
         React::State.set_state_context_to(self) { self.run_callback(:before_receive_props, next_props) }
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       def component_will_update(next_props, next_state)
         React::State.set_state_context_to(self) { self.run_callback(:before_update, next_props, next_state) }
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       def component_did_update(prev_props, prev_state)
@@ -91,8 +81,6 @@ module Hyperloop
           self.run_callback(:after_update, prev_props, prev_state)
           React::State.update_states_to_observe
         end
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       def component_will_unmount
@@ -100,20 +88,20 @@ module Hyperloop
           self.run_callback(:before_unmount)
           React::State.remove
         end
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       def component_did_catch(error, info)
         React::State.set_state_context_to(self) do
-          if self.callbacks_for(:after_error) == []
-            `console.error(error, info)`
+          if self.class.callbacks_for(:after_error) == []
+            if `typeof error.$backtrace === "function"`
+              `console.error(error.$backtrace().$join("\n"))`
+            else
+              `console.error(error, info)`
+            end
           else
             self.run_callback(:after_error, error, info)
           end
         end
-      rescue Exception => e
-        self.class.process_exception(e, self)
       end
 
       attr_reader :waiting_on_resources
@@ -134,6 +122,10 @@ module Hyperloop
         end
       end
 
+      def set_state_synchronously?
+        @native.JS[:__opalInstanceSyncSetState]
+      end
+      
       def render
         raise 'no render defined'
       end unless method_defined?(:render)
@@ -145,10 +137,6 @@ module Hyperloop
             element.waiting_on_resources if element.respond_to? :waiting_on_resources
           element
         end
-      # rubocop:disable Lint/RescueException # we want to catch all exceptions regardless
-      rescue Exception => e
-        # rubocop:enable Lint/RescueException
-        self.class.process_exception(e, self)
       end
 
       def watch(value, &on_change)
@@ -157,10 +145,6 @@ module Hyperloop
 
       def define_state(*args, &block)
         React::State.initialize_states(self, self.class.define_state(*args, &block))
-      end
-
-      def set_state_synchronously?
-        @native.JS[:__opalInstanceSyncSetState]
       end
     end
   end
