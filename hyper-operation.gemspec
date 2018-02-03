@@ -25,13 +25,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-component', Hyperloop::Operation::VERSION
   spec.add_dependency 'hyperloop-config', Hyperloop::Operation::VERSION
   spec.add_dependency 'mutations'
-  spec.add_dependency 'opal-activesupport'
+  spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-react', Hyperloop::Operation::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperloop::Operation::VERSION
   spec.add_development_dependency 'mysql2'
-  spec.add_development_dependency 'opal', '>= 0.10.5', '< 0.12.0'
+  spec.add_development_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'puma'
@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pusher-fake'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
+  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rspec-steps', '~> 2.1.1'
   spec.add_development_dependency 'rspec-wait'
