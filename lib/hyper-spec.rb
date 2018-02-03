@@ -109,4 +109,8 @@ RSpec.configure do |_config|
     when 'travis' then :travis
     else :selenium_chrome_headless
     end
+
+  if %i[firefox_headless selenium_with_firebug firefox].include?(Capybara.javascript_driver)
+    require 'webdrivers'
+  end
 end
