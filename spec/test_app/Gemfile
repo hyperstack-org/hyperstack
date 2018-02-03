@@ -6,16 +6,16 @@ git_source(:github) do |repo_name|
 end
 
 
-gem 'rails', '~> 5.0.1'
+gem 'rails'
 gem 'sqlite3'
-gem 'puma', '~> 3.6.0'
+gem 'puma'
 
 gem 'hyperloop-config', path: '../..'
-gem 'hyper-spec', git: 'https://www.github.com/ruby-hyperloop/hyper-spec'
+gem 'hyper-spec'
 gem 'opal'
 gem 'opal-browser'
 gem 'mini_racer', platforms: :ruby
-gem 'react-rails', '>= 2.3.0', '< 2.5.0'
+gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
