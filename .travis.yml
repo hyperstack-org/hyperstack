@@ -1,3 +1,4 @@
+dist: trusty
 language: ruby
 rvm:
   - ruby
@@ -5,25 +6,27 @@ env:
   - DRIVER=travis HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
   - DRIVER=beheaded HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
 before_install:
-  - sudo apt-get install -y fonts-liberation gconf-service libappindicator1 libasound2
-  - sudo apt-get install -y libatk-bridge2.0-0 libatk1.0-0 libcairo2 libcups2 libfontconfig1
-  - sudo apt-get install -y libnspr4 libnss3 libx11-xcb1 libxss1 xdg-utils
-  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-  - sudo dpkg -i google-chrome*.deb
+  - if [[ "$DRIVER" == "travis" ]]; then wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; fi
+  - if [[ "$DRIVER" == "travis" ]]; then sudo dpkg -i google-chrome*.deb; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then tar zxf geckodriver-v0.19.1-linux64.tar.gz; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then sudo mv geckodriver /usr/local/bin/; fi
   - gem install bundler
 before_script:
   - cd spec/test_app
   - bundle update
   - bundle exec rails db:setup
   - cd ../../
-  - chromedriver-update
-  - ls -lR ~/.chromedriver-helper/
-  - which firefox
-  - firefox --version
-  - chromedriver --version
-  - google-chrome --version
-  - which chromedriver
-  - which google-chrome
+  - if [[ "$DRIVER" == "travis" ]]; then chromedriver-update; fi
+  - if [[ "$DRIVER" == "travis" ]]; then ls -lR ~/.chromedriver-helper/; fi
+  - if [[ "$DRIVER" == "travis" ]]; then chromedriver --version; fi
+  - if [[ "$DRIVER" == "travis" ]]; then google-chrome --version; fi
+  - if [[ "$DRIVER" == "travis" ]]; then which chromedriver; fi
+  - if [[ "$DRIVER" == "travis" ]]; then which google-chrome; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; firefox --version; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; geckodriver --version; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; which firefox; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; which geckodriver; fi
 script: bundle exec rspec
 gemfile:
   - gemfiles/opal_0_11_react-rails_2_4.gemfile
