@@ -86,8 +86,11 @@ RSpec.configure do |_config|
   end
 
   Capybara.register_driver :travis do |app|
+    Selenium::WebDriver::Chrome.driver_path = '/home/travis/.rvm/gems/ruby-2.4.1/bin/chromedriver'
+    Selenium::WebDriver::Chrome.path = '/usr/bin/google-chrome'
     client = Selenium::WebDriver::Remote::Http::Default.new
-    client.timeout = 360
+    client.read_timeout = 360
+    client.open_timeout = 360
     browser_options = ::Selenium::WebDriver::Chrome::Options.new
     browser_options.args << '--headless'
     browser_options.args << '--disable-gpu'
