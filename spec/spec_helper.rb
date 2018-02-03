@@ -53,5 +53,3 @@ RSpec.configure do |config|
     end
   end
 end
-
-'--no-sandbox'
