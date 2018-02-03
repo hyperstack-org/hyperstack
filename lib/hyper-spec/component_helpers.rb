@@ -197,7 +197,7 @@ module ComponentTestHelpers
     str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     if %i[ff firefox beheaded].include?(Capybara.javascript_driver)
-      # workaround because firefox is unable to find .$to_json
+      # workaround, because firefox is unable to find .$to_json
       JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
     else
      JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
