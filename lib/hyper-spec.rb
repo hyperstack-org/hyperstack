@@ -86,11 +86,13 @@ RSpec.configure do |_config|
   end
 
   Capybara.register_driver :travis do |app|
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.timeout = 360
     browser_options = ::Selenium::WebDriver::Chrome::Options.new
     browser_options.args << '--headless'
     browser_options.args << '--disable-gpu'
     browser_options.args << '--no-sandbox'
-    Capybara::Selenium::Driver.new(app, browser: :chrome, options: browser_options)
+    Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client, options: browser_options)
   end
 
   Capybara.javascript_driver =
