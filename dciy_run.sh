@@ -7,4 +7,4 @@ echo "Running with Chrome headless"
 DRIVER=headless bundle exec rspec
 echo
 echo "Running with Firefox headless"
-DRIVER=beheaded bundle exec rspec
+# DRIVER=beheaded bundle exec rspec
