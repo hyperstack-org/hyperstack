@@ -82,7 +82,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :js => true) do
-    # size_window
+    size_window
   end
 
   config.before(:each) do
