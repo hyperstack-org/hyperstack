@@ -23,10 +23,10 @@ before_script:
   - if [[ "$DRIVER" == "travis" ]]; then google-chrome --version; fi
   - if [[ "$DRIVER" == "travis" ]]; then which chromedriver; fi
   - if [[ "$DRIVER" == "travis" ]]; then which google-chrome; fi
-  - if [[ "$DRIVER" == "beheaded" ]]; firefox --version; fi
-  - if [[ "$DRIVER" == "beheaded" ]]; geckodriver --version; fi
-  - if [[ "$DRIVER" == "beheaded" ]]; which firefox; fi
-  - if [[ "$DRIVER" == "beheaded" ]]; which geckodriver; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then firefox --version; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then geckodriver --version; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then which firefox; fi
+  - if [[ "$DRIVER" == "beheaded" ]]; then which geckodriver; fi
 script: bundle exec rspec
 gemfile:
   - gemfiles/opal_0_11_react-rails_2_4.gemfile
