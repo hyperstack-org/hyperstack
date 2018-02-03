@@ -278,12 +278,13 @@ module ComponentTestHelpers
             `eval(s)`
           end
           def self.dasherize(s)
-            %x{
-              return s.replace(/[-_\\s]+/g, '-')
+            res = %x{
+              s.replace(/[-_\\s]+/g, '-')
               .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1-$2')
               .replace(/([a-z\\d])([A-Z])/g, '$1-$2')
               .toLowerCase()
             }
+            res
           end
           def self.add_class(class_name, styles={})
             style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}" }.join("; ")
