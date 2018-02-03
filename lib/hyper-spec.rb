@@ -98,9 +98,9 @@ RSpec.configure do |_config|
     when 'beheaded' then :firefox_headless
     when 'chrome' then :chrome
     when 'ff' then :selenium_with_firebug
+    when 'firefox' then :firefox
     when 'headless' then :selenium_chrome_headless
     when 'safari' then :safari
-    when 'firefox' then :firefox
     when 'travis' then :travis
     else :selenium_chrome_headless
     end
