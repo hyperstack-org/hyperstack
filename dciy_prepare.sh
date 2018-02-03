@@ -1,6 +1,6 @@
 #!/bin/bash
 export HYPER_DEV_GEM_SOURCE='https://gems.ruby-hyperloop.org'
-bundle install
+bundle update
 cd spec/test_app
 bundle update
 rails db:setup
