@@ -45,10 +45,16 @@ group :development do
   gem 'spring'
 end
 
-gem 'react-rails', '>= 2.3.0', '< 2.5.0'
-gem 'opal-rails'
+gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 gem 'mini_racer', '~> 0.1.15'
 # gem 'react-router-rails', '~> 0.13.3'
 # gem 'reactrb-router'
+
+
+# gem "opal", ">= 0.11.0"
+gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
+gem "opal-rails", git: "https://github.com/opal/opal-rails.git", branch: "master"
+gem 'hyper-react', path: '../../../hyper-react'
+gem 'hyper-store', path: '../../../hyper-store'
 gem 'hyper-operation', path: '../..'
 gem 'opal-browser'
