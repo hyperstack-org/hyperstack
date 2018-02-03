@@ -67,21 +67,41 @@ RSpec.configure do |_config|
     Capybara::Selenium::Driver.new(app, browser: :firefox)
   end
 
+  Capybara.register_driver :firefox_headless do |app|
+    options = Selenium::WebDriver::Firefox::Options.new
+    options.headless!
+    Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
+  end
+
   Capybara.register_driver :selenium_with_firebug do |app|
     profile = Selenium::WebDriver::Firefox::Profile.new
     ENV['FRAME_POSITION'] && profile.frame_position = ENV['FRAME_POSITION']
     profile.enable_firebug
-
     options = Selenium::WebDriver::Firefox::Options.new(profile: profile)
-
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
+  end
+
+  Capybara.register_driver :safari do |app|
+    Capybara::Selenium::Driver.new(app, browser: :safari)
+  end
+
+  Capybara.register_driver :travis do |app|
+    browser_options = ::Selenium::WebDriver::Chrome::Options.new
+    browser_options.args << '--headless'
+    browser_options.args << '--disable-gpu'
+    browser_options.args << '--no-sandbox'
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: browser_options)
   end
 
   Capybara.javascript_driver =
     case ENV['DRIVER']
-    when 'ff' then :selenium_with_firebug
-    when 'firefox' then :firefox
+    when 'beheaded' then :firefox_headless
     when 'chrome' then :chrome
+    when 'ff' then :selenium_with_firebug
+    when 'headless' then :selenium_chrome_headless
+    when 'safari' then :safari
+    when 'firefox' then :firefox
+    when 'travis' then :travis
     else :selenium_chrome_headless
     end
 end
