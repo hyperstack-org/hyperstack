@@ -1,5 +1,5 @@
 module Hyperloop
   class Operation
-    VERSION = '1.0.0-lap18'
+    VERSION = '1.0.0-lap19'
   end
 end
