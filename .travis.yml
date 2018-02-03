@@ -19,9 +19,7 @@ before_script:
   - chromedriver-update
   - ls -lR ~/.chromedriver-helper/
   - which firefox
-  - which geckodriver
   - firefox --version
-  - geckodriver --version
   - chromedriver --version
   - chrome --version
   - which chromedriver
