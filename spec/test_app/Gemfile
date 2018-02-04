@@ -54,7 +54,8 @@ gem 'mini_racer', '~> 0.1.15'
 # gem "opal", ">= 0.11.0"
 gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
 gem "opal-rails", git: "https://github.com/opal/opal-rails.git", branch: "master"
-gem 'hyper-react', path: '../../../hyper-react'
-gem 'hyper-store', path: '../../../hyper-store'
+require '../../lib/hyper-opeeration/version'
+gem 'hyper-react', Hyperloop::Operation::VERSION #, path: '../../../hyper-react'
+gem 'hyper-store', Hyperloop::Operation::VERSION #, path: '../../../hyper-store'
 gem 'hyper-operation', path: '../..'
 gem 'opal-browser'
