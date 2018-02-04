@@ -15,8 +15,6 @@ require 'pry'
 require 'opal-browser'
 require 'timecop'
 
-Selenium::WebDriver::Chrome.driver_path = '/home/travis/.rvm/gems/ruby-2.4.1/bin/chromedriver'
-
 RSpec.configure do |config|
   config.color = true
   config.fail_fast = ENV['FAIL_FAST'] || false
