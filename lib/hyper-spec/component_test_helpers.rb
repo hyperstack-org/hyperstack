@@ -104,12 +104,9 @@ module HyperSpec
         str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}"
       end
       js = Opal.compile(str).delete("\n").gsub('(Opal);', '(Opal)')
-      if %i[ff firefox firefox_headless].include?(Capybara.javascript_driver)
-        # workaround because firefox is unable to find .$to_json
-        JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
-      else
-        JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
-      end
+      # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
+      # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
+      JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
     end
 
     def expect_evaluate_ruby(str = '', opts = {}, &block)
