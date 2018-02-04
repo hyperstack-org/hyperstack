@@ -46,10 +46,9 @@ group :development do
 end
 
 require '../../lib/hyper-spec/version'
-gem 'react-rails', '>= 2.3.0', '< 2.5.0'
+gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 gem 'hyper-react', HyperSpec::VERSION #, path: '../../../hyper-react'
 gem 'hyper-store', HyperSpec::VERSION #, path: '../../../hyper-store'
-gem 'hike'
 gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
 gem "opal-rails", git: "https://github.com/opal/opal-rails.git", branch: "master"
 gem 'parser'
