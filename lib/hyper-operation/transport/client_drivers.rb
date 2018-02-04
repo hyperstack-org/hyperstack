@@ -78,6 +78,7 @@ module Hyperloop
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           Hyperloop::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|
             %x{
+              var fix_opal_0110 = 'return';
               #{Hyperloop.action_cable_consumer}.subscriptions.create(
                 {
                   channel: "Hyperloop::ActionCableChannel",
