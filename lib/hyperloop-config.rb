@@ -4,6 +4,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperloop/on_client'
 else
   require 'opal'
+  require 'opal-browser'
   require 'hyperloop/config_settings'
   require 'hyperloop/context'
   require 'hyperloop/imports'
