@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-react', HyperStore::VERSION
   spec.add_development_dependency 'hyper-spec', HyperStore::VERSION
   spec.add_development_dependency 'listen'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'pry-byebug'
