@@ -14,12 +14,14 @@ module Hyperloop
         Rails.configuration.tap do |config|
           if [:on, 'on', true].include?(on)
             config.eager_load_paths += %W(#{config.root}/app/hyperloop/models)
+            config.eager_load_paths += %W(#{config.root}/app/hyperloop/models/concerns)
             config.eager_load_paths += %W(#{config.root}/app/hyperloop/operations)
             # rails will add everything immediately below app to eager and auto load, so we need to remove it
             delete_first config.eager_load_paths, "#{config.root}/app/hyperloop"
 
             unless Rails.env.production?
               config.autoload_paths += %W(#{config.root}/app/hyperloop/models)
+              config.autoload_paths += %W(#{config.root}/app/hyperloop/models/concerns)
               config.autoload_paths += %W(#{config.root}/app/hyperloop/operations)
               # config.eager_load_paths += %W(#{config.root}/app/hyperloop/stores)
               # config.autoload_paths += %W(#{config.root}/app/hyperloop/stores)
@@ -34,7 +36,9 @@ module Hyperloop
             config.assets.paths.unshift ::Rails.root.join('app', 'hyperloop').to_s
          else
             delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/models"
+            delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/models/concerns"
             delete_first config.autoload_paths, "#{config.root}/app/hyperloop/models"
+            delete_first config.autoload_paths, "#{config.root}/app/hyperloop/models/concerns"
             # delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/stores"
             # delete_first config.autoload_paths, "#{config.root}/app/hyperloop/stores"
             delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/operations"
