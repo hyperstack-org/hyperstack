@@ -163,7 +163,8 @@ module Hyperloop
         channels = transport.refresh_channels
         next_refresh = refresh_started_at + transport.refresh_channels_every
         channels.each do |channel|
-          find_by(channel: channel, session: nil).update(refresh_at: next_refresh)
+          connection = find_by(channel: channel, session: nil)
+          connection.update(refresh_at: next_refresh) if connection
         end
         inactive.delete_all
       end
