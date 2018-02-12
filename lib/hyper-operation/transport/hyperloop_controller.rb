@@ -17,7 +17,7 @@ module Hyperloop
           unless method_defined? :pre_hyperloop_call
             alias pre_hyperloop_call call
             def call(env)
-              if Hyperloop.transport == :simple_poller
+              if Hyperloop.transport == :simple_poller && env['PATH_INFO'] && env['PATH_INFO'].include?('/hyperloop-read/')
                 Rails.logger.silence do
                   pre_hyperloop_call(env)
                 end
