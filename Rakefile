@@ -11,16 +11,8 @@ require 'opal/rspec/rake_task'
 
 RSpec::Core::RakeTask.new('ruby:rspec')
 
-Opal::RSpec::RakeTask.new('opal:rspec') do |s, task|
-  s.append_path 'spec/vendor'
-  s.index_path = 'spec/index.html.erb'
-  task.runner = :node
-  task.timeout = 80000 if task
-end
-
 task :test do
   Rake::Task['ruby:rspec'].invoke
-  Rake::Task['opal:rspec'].invoke
 end
 
 require 'generators/reactive_ruby/test_app/test_app_generator'
@@ -29,6 +21,10 @@ task :test_app do
   ReactiveRuby::TestAppGenerator.start
   puts "Setting up test app database..."
   system("bundle exec rake db:drop db:create db:migrate > #{File::NULL}")
+end
+
+task :test_prepare do
+  system("./dciy_prepare.sh")
 end
 
 task default: [ :test ]
