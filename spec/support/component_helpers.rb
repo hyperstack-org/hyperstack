@@ -47,25 +47,46 @@ module ComponentTestHelpers
         def component
           return @component if @component
           paths_searched = []
-          if params.component_name.start_with? "::"
-            paths_searched << params.component_name.gsub(/^\:\:/,"")
-            @component = params.component_name.gsub(/^\:\:/,"").split("::").inject(Module) { |scope, next_const| scope.const_get(next_const, false) } rescue nil
-            return @component if @component && @component.method_defined?(:render)
+          component = nil
+          if params.component_name.start_with?('::')
+            # if absolute path of component is given, look it up and fail if not found
+            paths_searched << params.component_name
+            component = begin
+                          Object.const_get(params.component_name)
+                        rescue NameError
+                          nil
+                        end
           else
-            self.class.search_path.each do |path|
-              # try each path + params.controller + params.component_name
-              paths_searched << "#{path.name + '::' unless path == Module}#{params.controller}::#{params.component_name}"
-              @component = "#{params.controller}::#{params.component_name}".split("::").inject(path) { |scope, next_const| scope.const_get(next_const, false) } rescue nil
-              return @component if @component && @component.method_defined?(:render)
+            # if relative path is given, look it up like this
+            # 1) we check each path + controller-name + component-name
+            # 2) if we can't find it there we check each path + component-name
+            # if we can't find it we just try const_get
+            # so (assuming controller name is Home)
+            # ::Foo::Bar will only resolve to some component named ::Foo::Bar
+            # but Foo::Bar will check (in this order) ::Home::Foo::Bar, ::Components::Home::Foo::Bar, ::Foo::Bar, ::Components::Foo::Bar
+            self.class.search_path.each do |scope|
+              paths_searched << "#{scope.name}::#{params.controller}::#{params.component_name}"
+              component = begin
+                            scope.const_get(params.controller, false).const_get(params.component_name, false)
+                          rescue NameError
+                            nil
+                          end
+              break if component != nil
             end
-            self.class.search_path.each do |path|
-              # then try each path + params.component_name
-              paths_searched << "#{path.name + '::' unless path == Module}#{params.component_name}"
-              @component = "#{params.component_name}".split("::").inject(path) { |scope, next_const| scope.const_get(next_const, false) } rescue nil
-              return @component if @component && @component.method_defined?(:render)
+            unless component
+              self.class.search_path.each do |scope|
+                paths_searched << "#{scope.name}::#{params.component_name}"
+                component = begin
+                              scope.const_get(params.component_name, false)
+                            rescue NameError
+                              nil
+                            end
+                break if component != nil
+              end
             end
           end
-          @component = nil
+          @component = component
+          return @component if @component && @component.method_defined?(:render)
           raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
         end
 
@@ -80,7 +101,7 @@ module ComponentTestHelpers
         end
 
         def render
-          present component, params.render_params
+          React::RenderingContext.render(component, params.render_params)
         end
       end
     end
@@ -239,6 +260,13 @@ module ComponentTestHelpers
     mount unless page.instance_variable_get("@hyper_spec_mounted") rescue nil
   end
 
+  def client_option(opts = {})
+    @client_options ||= {}
+    @client_options.merge! opts
+  end
+
+  alias client_options client_option
+
   def mount(component_name = nil, params = nil, opts = {}, &block)
     unless params
       params = opts
@@ -252,10 +280,12 @@ module ComponentTestHelpers
             `eval(s)`
           end
           def self.dasherize(s)
-            `s.replace(/[-_\\s]+/g, '-')
+            %x{
+              return s.replace(/[-_\\s]+/g, '-')
               .replace(/([A-Z\\d]+)([A-Z][a-z])/g, '$1-$2')
               .replace(/([a-z\\d])([A-Z])/g, '$1-$2')
-              .toLowerCase()`
+              .toLowerCase()
+            }
           end
           def self.add_class(class_name, styles={})
             style = styles.collect { |attr, value| "\#{dasherize(attr)}:\#{value}"}.join("; ")

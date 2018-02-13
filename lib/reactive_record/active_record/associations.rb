@@ -33,11 +33,7 @@ module ActiveRecord
         @owner_class = owner_class
         @macro =       macro
         @options =     options
-        @klass_name =  options[:class_name] || (collection? && name.camelize.gsub(/s$/, '')) || name.camelize
-        if @klass_name < ActiveRecord::Base
-          @klass = @klass_name
-          @klass_name = @klass_name.name
-        end rescue nil
+        @klass_name =  options[:class_name] || (collection? && name.camelize.sub(/s$/, '')) || name.camelize
         @association_foreign_key = options[:foreign_key] || (macro == :belongs_to && "#{name}_id") || "#{@owner_class.name.underscore}_id"
         @source = options[:source] || @klass_name.underscore if options[:through]
         @attribute = name

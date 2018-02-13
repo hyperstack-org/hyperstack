@@ -65,6 +65,7 @@ describe "authorization integration", js: true do
   end
 
   it 'will not allow access to attributes through a collection' do
+    client_option raise_on_js_errors: :off
     FactoryBot.create(:test_model, test_attribute: 'hello', completed: false)
     FactoryBot.create(:test_model, test_attribute: 'goodby', completed: true)
     mount 'TestComponent2' do
@@ -124,6 +125,7 @@ describe "authorization integration", js: true do
   end
 
   it "will fail on illegal class connections" do
+    client_option raise_on_js_errors: :off
     mount "TestComponent2"
     model1 = FactoryBot.create(:test_model, test_attribute: "hello")
     page.evaluate_ruby('Hyperloop.connect("TestApplication")')
@@ -133,6 +135,7 @@ describe "authorization integration", js: true do
   end
 
   it "will fail on illegal instance connections" do
+    client_option raise_on_js_errors: :off
     mount "TestComponent2"
     model1 = FactoryBot.create(:test_model, test_attribute: "george")
     ApplicationController.acting_user = User.new(name: "fred")

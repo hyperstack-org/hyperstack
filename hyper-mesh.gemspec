@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   spec.test_files     = `git ls-files -- {spec}/*`.split("\n")
   spec.require_paths  = ['lib']
+  spec.post_install_message = "\033[0;31;1mhyper-mesh #{Hypermesh::VERSION} currently has know security issues! Not recommended for production use!\033[0;30;21m"
 
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', Hypermesh::VERSION
@@ -36,7 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-spec', Hypermesh::VERSION
   spec.add_development_dependency 'hyper-trace'
   spec.add_development_dependency 'mysql2'
-  spec.add_development_dependency 'opal-activesupport', '~> 0.3.0'
+  spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.3'
   spec.add_development_dependency 'parser'
@@ -45,7 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pusher-fake'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
+  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'reactrb-rails-generator'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'rspec-expectations'

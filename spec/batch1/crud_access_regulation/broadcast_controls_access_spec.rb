@@ -68,7 +68,7 @@ describe "regulate access allowed" do
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :test_attribute) }.
     not_to raise_error
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :created_at) }.
-    to raise_error
+    to raise_error(ReactiveRecord::AccessViolation)
   end
 
   it "will include :id as read attribute as long as any other attribute is readable" do

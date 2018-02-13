@@ -35,12 +35,11 @@ describe "while loading", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-    size_window(:small, :portrait)
+    # size_window(:small, :portrait)
     FactoryBot.create(:user, first_name: 'Lily', last_name: 'DaDog')
-
   end
 
-  it "will display the while loading message" do
+  it "will display the while loading message for a fetch within a nested component" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
         class MyNestedGuy < Hyperloop::Component
@@ -151,7 +150,7 @@ describe "while loading", js: true do
     expect(page).not_to have_content('loading...', wait: 0)
   end
 
-  it "will display the while loading message" do
+  it "will display the while loading message on condition" do
     isomorphic do
       class FetchNow < Hyperloop::ServerOp
         dispatch_to { TestApplication }

@@ -140,17 +140,17 @@ module ReactiveRecord
           pending_fetches = @pending_fetches.uniq
           models, associations = gather_records(@pending_records, false, nil)
           log(["Server Fetching: %o", pending_fetches.to_n])
-          start_time = Time.now
+          start_time = `Date.now()`
           Operations::Fetch.run(models: models, associations: associations, pending_fetches: pending_fetches)
             .then do |response|
-              fetch_time = Time.now
-              log("       Fetched in:   #{(fetch_time - start_time).to_f}s")
+              fetch_time = `Date.now()`
+              log("       Fetched in:   #{`(fetch_time - start_time)/ 1000`}s")
               begin
                 ReactiveRecord::Base.load_from_json(response)
               rescue Exception => e
                 log("Unexpected exception raised while loading json from server: #{e}", :error)
               end
-              log("       Processed in: #{(Time.now - fetch_time).to_f}s")
+              log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
               log(["       Returned: %o", response.to_n])
               ReactiveRecord.run_blocks_to_load last_fetch_at
               ReactiveRecord::WhileLoading.loaded_at last_fetch_at
