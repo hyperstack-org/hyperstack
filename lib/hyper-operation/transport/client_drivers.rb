@@ -89,9 +89,11 @@ module Hyperloop
                 },
                 {
                   connected: function() {
+                    if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable connected to: ", channel_string); }
                     #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
                   },
                   received: function(data) {
+                    if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable received: ", data); }
                     #{ClientDrivers.sync_dispatch(JSON.parse(`JSON.stringify(data)`)['data'])}
                   }
                 }
@@ -182,6 +184,7 @@ module Hyperloop
     def self.get_queued_data(operation, channel = nil, opts = {})
       Hyperloop::HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |data|
+          `console.log("simple_poller received: ", data)` if ClientDrivers.env == 'development'
           sync_dispatch(data[1])
         end
       end
