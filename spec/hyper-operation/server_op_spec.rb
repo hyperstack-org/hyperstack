@@ -77,8 +77,17 @@ describe "isomorphic operations", js: true do
       stub_const "Operation", Class.new(Hyperloop::ServerOp)
       on_client do
         class Test < React::Component::Base
+          def self.receive_count
+            @@rc ||= 0
+            @@rc
+          end
+          def self.rc_inc
+            @@rc ||= 0
+            @@rc += 1
+          end
           before_mount do
             Operation.on_dispatch do |params|
+              self.class.rc_inc
               # password is for testing inbound param filtering
               state.message! "#{params.message}#{params.try(:password)}"
             end
@@ -191,6 +200,26 @@ describe "isomorphic operations", js: true do
       expect(page).to have_content('No messages yet')
       Operation.run(message: 'hello')
       expect(page).to have_content("The server says 'hello'!")
+    end
+
+    it 'will dispatch to channel only once on run, even if dispatched multiple times during run' do
+      isomorphic do
+        class Operation < Hyperloop::ServerOp
+          param :message
+          param :channels
+          dispatch_to { params.channels }
+          dispatch_to { params.channels }
+        end
+      end
+      stub_const "ApplicationPolicy", Class.new
+      ApplicationPolicy.always_allow_connection
+      mount 'Test'
+      expect(page).to have_content('No messages yet')
+      Operation.run(message: 'hello', channels: 'Application')
+      expect(page).to have_content("The server says 'hello'!")
+      expect_evaluate_ruby('Test.receive_count').to eq(1)
+      Operation.run(message: 'hello', channels: 'Application')
+      expect_evaluate_ruby('Test.receive_count').to eq(2)
     end
   end
 end
