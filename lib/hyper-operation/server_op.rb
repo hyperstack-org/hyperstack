@@ -135,9 +135,13 @@ module Hyperloop
         end
         regulation ||= proc { args }
         on_dispatch do |params, operation|
+          operation.instance_variable_set(:@_dispatched_channels, []) unless operation.instance_variable_get(:@_dispatched_channels)
           serialized_params = serialize_dispatch(params.to_h)
           [operation.instance_exec(*context, &regulation)].flatten.compact.uniq.each do |channel|
-            Hyperloop.dispatch(channel: Hyperloop::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
+            unless operation.instance_variable_get(:@_dispatched_channels).include?(channel)
+              operation.instance_variable_set(:@_dispatched_channels, operation.instance_variable_get(:@_dispatched_channels) << channel)
+              Hyperloop.dispatch(channel: Hyperloop::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
+            end
           end
         end
       end if RUBY_ENGINE != 'opal'
