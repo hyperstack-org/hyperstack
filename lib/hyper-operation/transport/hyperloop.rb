@@ -122,7 +122,15 @@ module Hyperloop
   end
 
   def self.on_server?
-    Rails.const_defined? 'Server'
+    if !Rails.const_defined?('Console') || Rails.const_defined?('Puma') || Rails.const_defined?('Unicorn') || Rails.const_defined?('Server')
+      true
+    elsif Rails.const_defined?('Console')
+      false
+    else
+      Rails.logger.warn "Warning: You may encounter performance problems, because your server is currently not known.\n" +
+        'Please open a server support ticket at http://github.com/ruby-hyperloop/hyper-operation.'
+      false
+    end
   end
 
   def self.pusher

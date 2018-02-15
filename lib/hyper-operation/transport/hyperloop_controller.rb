@@ -17,7 +17,7 @@ module Hyperloop
           unless method_defined? :pre_hyperloop_call
             alias pre_hyperloop_call call
             def call(env)
-              if !Hyperloop.opts[:noisy] && env['HTTP_X_HYPERLOOP_SILENT_REQUEST']
+              if Hyperloop.transport == :simple_poller && env['PATH_INFO'] && env['PATH_INFO'].include?('/hyperloop-read/')
                 Rails.logger.silence do
                   pre_hyperloop_call(env)
                 end
@@ -115,6 +115,7 @@ module Hyperloop
       end
 
       def pusher_auth
+        raise unless Hyperloop.transport == :pusher
         channel = regulate params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'').gsub('==', '::')
         response = Hyperloop.pusher.authenticate(params[:channel_name], params[:socket_id])
         render json: response
@@ -123,6 +124,7 @@ module Hyperloop
       end
 
       def action_cable_auth
+        raise unless Hyperloop.transport == :action_cable
         channel = regulate params[:channel_name].gsub(/^#{Regexp.quote(Hyperloop.channel)}\-/,'')
         salt = SecureRandom.hex
         authorization = Hyperloop.authorization(salt, channel, client_id)
@@ -154,6 +156,7 @@ module Hyperloop
       end
 
       def console_update # TODO this should just become an execute-remote-api call
+        raise unless Rails.env.development?
         authorization = Hyperloop.authorization(params[:salt], params[:channel], params[:data][1][:broadcast_id]) #params[:data].to_json)
         return head :unauthorized if authorization != params[:authorization]
         Hyperloop::Connection.send_to_channel(params[:channel], params[:data])

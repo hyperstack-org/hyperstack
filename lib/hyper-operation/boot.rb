@@ -19,6 +19,6 @@ module Hyperloop
         _run(*args)
       end
     end
-    Boot.receivers.each { |r| Boot.on_dispatch &r } if Boot.respond_to? :receivers
+    Boot.receivers.each { |r| Boot.on_dispatch(&r) } if Boot.respond_to? :receivers
   end
 end

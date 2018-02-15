@@ -7,8 +7,25 @@ module Hyperloop
   # client interface to sync_change or sync_destroy
 
   class Application
-    def self.acting_user_id
-      ClientDrivers.opts[:acting_user_id]
+    extend React::IsomorphicHelpers::ClassMethods
+    
+    if on_opal_client?
+      def self.acting_user_id
+        ClientDrivers.opts[:acting_user_id]
+      end
+    else
+      def self.acting_user_id
+        ClientDrivers.client_drivers_get_acting_user_id
+      end
+    end
+
+    def self.env
+      @env = ClientDrivers.env unless @env
+      @env
+    end
+
+    def self.production?
+      env == 'production'
     end
   end
 
@@ -59,8 +76,9 @@ module Hyperloop
           }
         elsif ClientDrivers.opts[:transport] == :action_cable
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
-          HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel)).then do |response|
+          Hyperloop::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|
             %x{
+              var fix_opal_0110 = 'return';
               #{Hyperloop.action_cable_consumer}.subscriptions.create(
                 {
                   channel: "Hyperloop::ActionCableChannel",
@@ -71,9 +89,11 @@ module Hyperloop
                 },
                 {
                   connected: function() {
+                    if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable connected to: ", channel_string); }
                     #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
                   },
                   received: function(data) {
+                    if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable received: ", data); }
                     #{ClientDrivers.sync_dispatch(JSON.parse(`JSON.stringify(data)`)['data'])}
                   }
                 }
@@ -81,7 +101,7 @@ module Hyperloop
             }
           end
         else
-          HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
+          Hyperloop::HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
         end
       end
     end
@@ -123,6 +143,7 @@ module Hyperloop
         transport: Hyperloop.transport,
         id: id,
         acting_user_id: (controller.acting_user && controller.acting_user.id),
+        env: ::Rails.env,
         client_logging: Hyperloop.client_logging,
         pusher_fake_js: pusher_fake_js,
         key: Hyperloop.key,
@@ -149,9 +170,21 @@ module Hyperloop
       attr_reader :opts
     end
 
+    isomorphic_method(:client_drivers_get_acting_user_id) do |f|
+      f.send_to_server if RUBY_ENGINE == 'opal'
+      f.when_on_server { (controller.acting_user && controller.acting_user.id) }
+    end
+
+    isomorphic_method(:env) do |f|
+      f.when_on_client { opts[:env] }
+      f.send_to_server
+      f.when_on_server { ::Rails.env }
+    end
+
     def self.get_queued_data(operation, channel = nil, opts = {})
-      HTTP.get(polling_path(operation, channel), opts).then do |response|
+      Hyperloop::HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |data|
+          `console.log("simple_poller received: ", data)` if ClientDrivers.env == 'development'
           sync_dispatch(data[1])
         end
       end
@@ -161,21 +194,24 @@ module Hyperloop
 
       if @initialized
         # 1) skip initialization if already initialized
-        # 2) if running action_cable make sure connection is up after pinging the server_up
-        #    action cable closes the connection if files change on the server
-        HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
-          `#{Hyperloop.action_cable_consumer}.connection.open()` if `#{Hyperloop.action_cable_consumer}.connection.disconnected`
-        end if Hyperloop.action_cable_consumer
+        if on_opal_client? && Hyperloop.action_cable_consumer
+          # 2) if running action_cable make sure connection is up after pinging the server_up
+          #    action cable closes the connection if files change on the server
+          Hyperloop::HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
+            `#{Hyperloop.action_cable_consumer}.connection.open()` if `#{Hyperloop.action_cable_consumer}.connection.disconnected`
+          end
+        end
         return
       end
 
       @initialized = true
-
-      if RUBY_ENGINE == 'opal'
-        @opts = Hash.new(`window.HyperloopOpts`)
-      end
+      @opts = {}
 
       if on_opal_client?
+        
+        @opts = Hash.new(`window.HyperloopOpts`)
+        
+
         if opts[:transport] == :pusher
 
           opts[:dispatch] = lambda do |data|
@@ -209,7 +245,7 @@ module Hyperloop
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection(*channel) }
           every(opts[:seconds_between_poll]) do
-            get_queued_data(:read, nil, headers: {'X-HYPERLOOP-SILENT-REQUEST' =>  true })
+            get_queued_data(:read, nil)
           end
         end
       end

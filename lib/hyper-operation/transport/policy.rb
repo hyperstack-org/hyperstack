@@ -49,11 +49,17 @@ module Hyperloop
     end
 
     def dispatch_to(*args, &regulation)
-      actual_klass = regulated_klass.is_a?(Class) ? regulated_klass : regulated_klass.constantize rescue nil
-      actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to
-      unless actual_klass.respond_to? :dispatch_to
-        raise 'you can only dispatch_to Operation classes'
-      end
+      actual_klass = if regulated_klass.is_a?(Class)
+                       regulated_klass
+                     else
+                       begin
+                         regulated_klass.constantize
+                       rescue NameError
+                         nil
+                       end
+                     end
+      raise 'you can only dispatch_to Operation classes' unless actual_klass.respond_to? :dispatch_to
+      actual_klass.dispatch_to(actual_klass)
       actual_klass.dispatch_to(*args, &regulation)
     end
 
@@ -82,14 +88,34 @@ module Hyperloop
       end
     end
 
+    def self.ar_base_descendants_map_cache
+      @ar_base_descendants_map_cache ||= ActiveRecord::Base.descendants.map(&:name)
+    end
+
     def get_ar_model(str)
-      str.is_a?(Class) ? str : Object.const_get(str)
-    rescue
-      raise "#{str} is not a class"
+      if str.is_a?(Class)
+        unless str <= ActiveRecord::Base
+          Hyperloop::InternalPolicy.raise_operation_access_violation
+        end
+        str
+      else
+        if Rails.env.production? && Hyperloop::InternalClassPolicy.ar_base_descendants_map_cache.include?(str)
+          # AR::Base.descendants is eager loaded in production -> this guard works.
+          # In development it may be empty or partially filled -> this guard may fail.
+          # Thus guarded here only in production.
+          Hyperloop::InternalPolicy.raise_operation_access_violation
+        end
+        Object.const_get(str)
+      end
+    end
+
+    def self.regulated_klasses
+      @regulated_klasses ||= Set.new
     end
 
     def regulate(regulation_klass, policy, args, &regulation)
       process_args(policy, regulation_klass.allowed_opts, args, regulation) do |regulated_klass, opts|
+        self.class.regulated_klasses << regulated_klass.to_s
         regulation_klass.add_regulation regulated_klass, opts, &regulation
       end
     end
@@ -201,8 +227,23 @@ module Hyperloop
   class ClassConnectionRegulation < Regulation
 
     def self.add_regulation(klass, opts={}, &regulation)
-      actual_klass = klass.is_a?(Class) ? klass : klass.constantize rescue nil
-      actual_klass.dispatch_to(actual_klass) if actual_klass.respond_to? :dispatch_to rescue nil
+      actual_klass = if klass.is_a?(Class)
+                       klass
+                     else
+                       begin
+                         klass.constantize
+                       rescue NameError
+                         nil
+                       end
+                     end
+      if actual_klass && actual_klass.respond_to?(:dispatch_to)
+        begin
+          actual_klass.dispatch_to(actual_klass)
+        rescue NoMethodError
+          # this is the case for ClassPolicy where the instance method :dispatch_to has been deleted.
+          nil
+        end
+      end
       super
     end
 
@@ -321,10 +362,17 @@ module Hyperloop
       @obj
     end
 
+    def self.raise_operation_access_violation
+      raise Hyperloop::AccessViolation
+    end
+
     def self.regulate_connection(acting_user, channel_string)
       channel = channel_string.split("-")
       if channel.length > 1
         id = channel[1..-1].join("-")
+        unless Hyperloop::InternalClassPolicy.regulated_klasses.include?(channel[0])
+          Hyperloop::InternalPolicy.raise_operation_access_violation
+        end
         object = Object.const_get(channel[0]).find(id)
         InstanceConnectionRegulation.connect(object, acting_user)
       else
@@ -486,7 +534,7 @@ module Hyperloop
 
   module PolicyAutoLoader
     def self.load(name, value)
-      const_get("#{name}Policy") if name && !(name =~ /Policy$/) && value.is_a?(Class)
+      const_get("#{name}Policy") if name && !name.end_with?("Policy".freeze) && value.is_a?(Class)
     rescue Exception => e
       raise e if e.is_a?(LoadError) && e.message =~ /Unable to autoload constant #{name}Policy/
     end
@@ -515,8 +563,8 @@ class Class
 
   Hyperloop::ClassPolicyMethods.instance_methods.each do |method|
     define_method method do |*args, &block|
-      if name =~ /Policy$/
-        @hyperloop_internal_policy_object = Hyperloop::InternalClassPolicy.new(name.gsub(/Policy$/,""))
+      if name.end_with?("Policy".freeze)
+        @hyperloop_internal_policy_object = Hyperloop::InternalClassPolicy.new(name.sub(/Policy$/,""))
         include Hyperloop::PolicyMethods
         send method, *args, &block
       else

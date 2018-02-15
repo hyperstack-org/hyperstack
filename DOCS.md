@@ -204,7 +204,7 @@ class QuickCheckout < Hyperloop::Operation
   param :sku, type: String
   param qty: 1, type: Integer, minimum: 1
 
-  step { AddItemToCart(params) }
+  step { AddItemToCart.run(params) }
   step ValidateUserDefaultCC
   step Checkout
 end

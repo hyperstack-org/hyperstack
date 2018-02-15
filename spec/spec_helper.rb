@@ -56,7 +56,7 @@ RSpec.configure do |config|
     #mocks.verify_partial_doubles = true
   end
 
-  config.include FactoryGirl::Syntax::Methods if defined? FactoryGirl
+  config.include FactoryBot::Syntax::Methods if defined? FactoryBot
 
   config.use_transactional_fixtures = false
 
@@ -102,6 +102,17 @@ RSpec.configure do |config|
       DatabaseCleaner.clean
     end
   end
+
+  # Fail tests on JavaScript errors in Chrome Headless
+  # class JavaScriptError < StandardError; end
+
+  # config.after(:each, js: true) do |spec|
+  #   errors = page.driver.browser.manage.logs.get(:browser)
+  #               .select { |e| e.level == "SEVERE" && e.message.present? }
+  #               #.map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+  #               #.reject { |e| e =~ /Unexpected response code: 200/ }
+  #   raise JavaScriptError, errors.join("\n\n") if errors.present?
+  # end
 end
 
 module Helpers

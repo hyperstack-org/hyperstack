@@ -1,14 +1,15 @@
-require "hyper-operation/version"
+require 'hyper-operation/version'
 require 'hyperloop-config'
-Hyperloop.import 'browser/interval', client_only: true
+
 Hyperloop.import 'hyper-operation'
 
 if RUBY_ENGINE == 'opal'
   require 'active_support/core_ext/string'
   require 'mutations'
+  Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
   require 'hyper-operation/filters/outbound_filter'
   require 'hyper-component'
-  require 'hyper-operation/call_by_class_name'
+  require 'hyper-operation/http'
   require 'hyper-operation/transport/client_drivers'
   class HashWithIndifferentAccess < Hash
   end
@@ -30,6 +31,7 @@ if RUBY_ENGINE == 'opal'
 else
   require 'hyperloop-config'
   require 'mutations'
+  Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
   require 'hyper-operation/filters/outbound_filter'
   require 'hyper-component'
   require 'active_record'
@@ -44,7 +46,6 @@ else
   require 'hyper-operation/delay_and_interval'
   require 'hyper-operation/exception'
   require 'hyper-operation/promise'
-  require 'hyper-operation/call_by_class_name'
   require 'hyper-operation/railway'
   require 'hyper-operation/api'
   require 'hyper-operation/railway/dispatcher'

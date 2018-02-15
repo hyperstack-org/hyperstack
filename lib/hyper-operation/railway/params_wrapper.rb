@@ -68,6 +68,7 @@ module Hyperloop
         end
 
         def hash_filter
+          # the :duck method is added in lib/hyper-operation.rb globally
           @hash_filter ||= Mutations::HashFilter.new
         end
 

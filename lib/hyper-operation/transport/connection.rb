@@ -58,14 +58,14 @@ module Hyperloop
     extend AutoCreate
 
     def self.build_tables
-      create_table(force: true) do |t|
+      create_table(force: :cascade) do |t|
         t.string   :channel
         t.string   :session
         t.datetime :created_at
         t.datetime :expires_at
         t.datetime :refresh_at
       end
-      QueuedMessage.create_table(force: true) do |t|
+      QueuedMessage.create_table(force: :cascade) do |t|
         t.text    :data
         t.integer :connection_id
       end
@@ -163,7 +163,8 @@ module Hyperloop
         channels = transport.refresh_channels
         next_refresh = refresh_started_at + transport.refresh_channels_every
         channels.each do |channel|
-          find_by(channel: channel, session: nil).update(refresh_at: next_refresh)
+          connection = find_by(channel: channel, session: nil)
+          connection.update(refresh_at: next_refresh) if connection
         end
         inactive.delete_all
       end

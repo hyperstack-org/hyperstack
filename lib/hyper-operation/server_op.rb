@@ -2,22 +2,68 @@ module Hyperloop
   class ServerOp < Operation
 
     class << self
-      def run(*args)
-        hash = _Railway.params_wrapper.combine_arg_array(args)
-        hash = serialize_params(hash)
-        HTTP.post(
-          "#{`window.HyperloopEnginePath`}/execute_remote",
-          payload: {json: {operation: name, params: hash}.to_json},
-          headers: {'X-CSRF-Token' => Hyperloop::ClientDrivers.opts[:form_authenticity_token] }
-          )
-        .then do |response|
-          deserialize_response response.json[:response]
-        end.fail do |response|
-          Exception.new response.json[:error]
-        end
-      end if RUBY_ENGINE == 'opal'
+      include React::IsomorphicHelpers
 
+      if RUBY_ENGINE == 'opal'
+        if on_opal_client?
+          def run(*args)
+            hash = _Railway.params_wrapper.combine_arg_array(args)
+            hash = serialize_params(hash)
+            Hyperloop::HTTP.post(
+              "#{`window.HyperloopEnginePath`}/execute_remote",
+              payload: {json: {operation: name, params: hash}.to_json},
+              headers: {'X-CSRF-Token' => Hyperloop::ClientDrivers.opts[:form_authenticity_token] }
+              )
+            .then do |response|
+              deserialize_response response.json[:response]
+            end
+            .fail do |response|
+              Exception.new response.json[:error]
+            end
+          end
+        elsif on_opal_server?
+          def run(*args)
+            promise = Promise.new
+            response = internal_iso_run(name, args)
+            if response[:json][:response]
+              promise.resolve(response[:json][:response])
+            else
+              promise.reject Exception.new response[:json][:error]
+            end
+            promise
+          end
+        end
+      end
+
+      isomorphic_method(:internal_iso_run) do |f, klass_name, op_params|
+        f.send_to_server(klass_name, op_params)
+        f.when_on_server {
+          Hyperloop::ServerOp.run_from_client(:acting_user, controller, klass_name, *op_params)
+        }
+      end
+
+      def descendants_map_cache
+        # calling descendants alone may take 10ms in a complex app, so better cache it
+        @cached_descendants ||= Hyperloop::ServerOp.descendants.map(&:to_s)
+      end
+    
       def run_from_client(security_param, controller, operation, params)
+        if Rails.env.production?
+          # in production everything is eager loaded so ServerOp.descendants is filled and can be used to guard the .constantize
+          Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants_map_cache.include?(operation)
+          # however ... 
+        else
+          # ... in development things are autoloaded on demand, thus ServerOp.descendants can be empty or partially filled and above guard
+          # would fail legal operations. To prevent this, the class has to be loaded first, what .const_get will take care of, and then
+          # its guarded, to achieve similar behaviour as in production. Doing the const_get first, before the guard, 
+          # would not be safe for production and allow for potential remote code execution!
+          begin
+            const = Object.const_get(operation)
+          rescue NameError
+            Hyperloop::InternalPolicy.raise_operation_access_violation
+          end
+          Hyperloop::InternalPolicy.raise_operation_access_violation unless const < Hyperloop::ServerOp
+        end
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
@@ -26,10 +72,14 @@ module Hyperloop
           end
           run(params)
           .then { |r| return { json: { response: serialize_response(r) } } }
-          .fail { |e| return { json: { error: e }, status: 500 } }
+          .fail do |e|
+            ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp failed when running #{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+            return { json: { error: e }, status: 500 }
+          end
         end
       rescue Exception => e
-        { json: {error: e}, status: 500 }
+        ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp exception caught when running #{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+        { json: { error: e }, status: 500 }
       end
 
       def remote(path, *args)
@@ -39,7 +89,6 @@ module Hyperloop
         request = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
         if uri.scheme == 'https'
           http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
         request.body = {
           operation: name,
@@ -86,9 +135,13 @@ module Hyperloop
         end
         regulation ||= proc { args }
         on_dispatch do |params, operation|
+          operation.instance_variable_set(:@_dispatched_channels, []) unless operation.instance_variable_get(:@_dispatched_channels)
           serialized_params = serialize_dispatch(params.to_h)
           [operation.instance_exec(*context, &regulation)].flatten.compact.uniq.each do |channel|
-            Hyperloop.dispatch(channel: Hyperloop::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
+            unless operation.instance_variable_get(:@_dispatched_channels).include?(channel)
+              operation.instance_variable_set(:@_dispatched_channels, operation.instance_variable_get(:@_dispatched_channels) << channel)
+              Hyperloop.dispatch(channel: Hyperloop::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
+            end
           end
         end
       end if RUBY_ENGINE != 'opal'

@@ -2,8 +2,8 @@
 
 <p align="center">
 
-<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
-<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
+<a href="http://ruby-hyperloop.org/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.org/images/hyperloop-github-logo.png">
 </a>
 
 </p>
@@ -12,18 +12,19 @@
 
 <br>
 
-<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
-<img src="http://ruby-hyperloop.io/images/githubhyperloopbadge.png">
+<a href="http://ruby-hyperloop.org/" alt="Hyperloop" title="Hyperloop">
+<img src="http://ruby-hyperloop.org/images/githubhyperloopbadge.png">
 </a>
 
 <a href="https://gitter.im/ruby-hyperloop/chat" alt="Gitter chat" title="Gitter chat">
-<img src="http://ruby-hyperloop.io/images/githubgitterbadge.png">
+<img src="http://ruby-hyperloop.org/images/githubgitterbadge.png">
 </a>
 
+[![Build Status](https://travis-ci.org/ruby-hyperloop/hyper-operation.svg?branch=master)](https://travis-ci.org/ruby-hyperloop/hyper-operation)
 [![Gem Version](https://badge.fury.io/rb/hyper-operation.svg)](https://badge.fury.io/rb/hyper-operation)
 
 <p align="center">
-<img src="http://ruby-hyperloop.io/images/HyperOperations.png" width="100" alt="Hyper-operation">
+<img src="http://ruby-hyperloop.org/images/HyperOperations.png" width="100" alt="Hyper-operation">
 </p>
 
 </div>
@@ -58,9 +59,9 @@ gem 'hyperloop'
 
 4. Follow the guidelines to start developing your application. You may find
    the following resources handy:
-    * [Getting Started with Hyperloop](http://ruby-hyperloop.io/start/components/)
-    * [Hyperloop Guides](http://ruby-hyperloop.io/docs/architecture)
-    * [Hyperloop Tutorial](http://ruby-hyperloop.io/tutorials)
+    * [Getting Started with Hyperloop](http://ruby-hyperloop.org/start/components/)
+    * [Hyperloop Guides](http://ruby-hyperloop.org/docs/architecture)
+    * [Hyperloop Tutorial](http://ruby-hyperloop.org/tutorials)
 
 ## Community
 
