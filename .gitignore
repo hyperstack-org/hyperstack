@@ -7,3 +7,10 @@
 /pkg/
 /spec/reports/
 /tmp/
+/spec/test_app/Gemfile.lock
+
+# ignore gems
+*.gem
+
+# ignore Idea files
+.idea

@@ -1,9 +1,6 @@
 require 'hyper-spec'
 require 'pry'
-require 'opal-rails'
 require 'hyperloop-config'
-require 'jquery-rails'
-
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../test_app/config/environment', __FILE__)

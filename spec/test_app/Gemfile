@@ -6,19 +6,20 @@ git_source(:github) do |repo_name|
 end
 
 
-gem 'rails', '~> 5.0.1'
+gem 'rails'
 gem 'sqlite3'
-gem 'puma', '~> 3.6.0'
-gem 'jquery-rails'
+gem 'puma'
 
-gem 'hyperloop-config', path: '../..'
-gem 'hyper-spec', git: 'https://www.github.com/ruby-hyperloop/hyper-spec'
-gem 'opal', '~> 0.9.0'
+gem 'opal', '>= 0.11.0'
+gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
+gem "opal-rails", git: "https://github.com/opal/opal-rails.git", branch: "master"
 gem 'opal-browser'
-gem 'opal-jquery'
-gem 'opal-rails', '~> 0.9.0'
-gem 'therubyracer', platforms: :ruby
-gem 'react-rails', '~> 1.9.0'
+gem 'hyperloop-config', path: '../..'
+require '../../lib/hyperloop/config/version'
+gem 'hyper-spec', Hyperloop::Config::VERSION
+
+gem 'mini_racer', platforms: :ruby
+gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -5,41 +5,30 @@ module Hyperloop
       @import_list ||= []
     end
 
-    def import(value, gem: nil, instead_of: nil, client_only: nil, server_only: nil, tree: nil)
-      if instead_of
-        current_spec = import_list.detect { |old_value, *_rest| instead_of == old_value }
-        if current_spec
-          current_spec[0] = value
-        else
-          raise [
-            "Could not substitute import '#{instead_of}' with '#{value}'.  '#{instead_of}' not found.",
-            'The following files are currently being imported:',
-            *import_list.collect { |old_value, *_rest| old_value }
-          ].join("\n")
-        end
-      elsif !import_list.detect { |current_value, *_rest| value == current_value }
-        kind = if tree
-                 :tree
-               else
-                 :gem
-               end
-        import_list << [value, !client_only, !server_only, kind]
+    def import(value, gem: nil, cancelled: nil, client_only: nil, server_only: nil, tree: nil)
+      unless import_list.detect { |current_value, *_rest| value == current_value }
+        import_list << [value, cancelled, !client_only, !server_only, (tree ? :tree : :gem)]
       end
     end
 
     alias imports import
 
-    def import_tree(value, instead_of: nil, client_only: nil, server_only: nil)
-      import(value, instead_of: instead_of, client_only: client_only, server_only: server_only, tree: true)
+    def import_tree(value, cancelled: nil, client_only: nil, server_only: nil)
+      import(value, cancelled: cancelled, client_only: client_only, server_only: server_only, tree: true)
     end
 
     def cancel_import(value)
-      import(nil, instead_of: value)
+      current_spec = import_list.detect { |old_value, *_rest| value == old_value }
+      if current_spec
+        current_spec[1] = true 
+      else
+        import_list << [value, true, true, true, false]
+      end
     end
 
     def generate_requires(mode, sys, file)
-      import_list.collect do |value, render_on_server, render_on_client, kind|
-        next unless value
+      import_list.collect do |value, cancelled, render_on_server, render_on_client, kind|
+        next if cancelled
         next if (sys && kind == :tree) || (!sys && kind != :tree)
         next if mode == :client && !render_on_client
         next if mode == :server && !render_on_server
@@ -89,31 +78,8 @@ module Hyperloop
       end
     end
 
-    Hyperloop.define_setting :compress_system_assets, true
-
-    def compile_and_compress(name, never_compress: false)
-      start_time = Time.now
-
-      puts "\n\n##########################################################################\n"
-      puts "      HYPERLOOP LIBRARIES PRECOMPILING AND MINIFYING\n"
-      puts "  FIRST TIME BOOTING YOUR APP IT CAN TAKE 1 OR 2 MINUTES\n"
-      puts " NB: You can force precompiling again by cleaning cache: rm -rf tmp/cache \n"
-      puts "##########################################################################\n\n"
-
-      puts "Compiling the system assets for #{name}"
-
-      compiled_code = Rails.application.assets[name].to_s
-      compilation_time = Time.now
-      compiled_code_length = compiled_code.length
-      puts "  compiled -  length: #{compiled_code_length}"
-      if Hyperloop.compress_system_assets && !never_compress
-        compiled_code = Uglifier.new.compile(compiled_code)
-        puts "  minimized - length: #{compiled_code.length}"
-        puts "  minification ratio #{(compiled_code.length*100.0/compiled_code_length).round}%"
-      end
-      puts "  total time: #{(Time.now-start_time).to_f.round(2)} seconds"
-      compiled_code
+    Hyperloop.define_setting(:compress_system_assets, true) do
+       puts "INFO: The configuration option 'compress_system_assets' is no longer used."
     end
-
   end
 end
