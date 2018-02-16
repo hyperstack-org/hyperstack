@@ -26,6 +26,6 @@ appraise "opal-master-react-15" do
   ruby '>= 2.0.0'
   gem 'opal', git: 'https://github.com/opal/opal.git'
   gem "opal-sprockets", git: 'https://github.com/opal/opal-sprockets.git'
-  gem 'opal-rails', '~> 0.9.0'
+  gem 'opal-rails', '~> 0.9.4'
   gem 'react-rails', '~> 2.4.0', require: false
 end
