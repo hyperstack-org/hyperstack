@@ -3,7 +3,7 @@ require 'test_components'
 require 'rspec-steps'
 
 
-describe "while loading", js: true do
+describe "while loading", js: true, skip: true do
 
   before(:all) do
     class ReactiveRecord::Operations::Fetch < Hyperloop::ServerOp

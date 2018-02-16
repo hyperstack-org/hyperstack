@@ -236,6 +236,9 @@ if RUBY_ENGINE != 'opal'
 
     config.before(:suite) do
       DatabaseCleaner.clean_with(:truncation)
+      Hyperloop.configuration do |config|
+        config.transport = :simple_poller
+      end
     end
 
     config.before(:each) do
@@ -296,7 +299,7 @@ if RUBY_ENGINE != 'opal'
         raise JavaScriptError, errors.join("\n\n") if errors.present?
       end
     end
-    
+
     config.include Capybara::DSL
 
     # Capybara.register_driver :chrome do |app|
