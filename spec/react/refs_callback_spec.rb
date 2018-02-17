@@ -64,7 +64,7 @@ describe 'Refs callback', js: true do
   end
 
   it "works, even when the component is unmounted" do
-    # was a bug, on umount react calls the ref method with null instead of a dom node
+    # was a bug, on unmount react calls the ref method with null instead of a dom node
     # callback failed then
     # ref is called two times, once on mount with dom_node, once on unmount with null
     mount "Foo" do
