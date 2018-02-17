@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.3'
+  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'
