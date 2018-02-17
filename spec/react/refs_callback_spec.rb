@@ -62,4 +62,33 @@ describe 'Refs callback', js: true do
       "#{Foo.bar.JS['nodeType']}" # aboids json serialisation errors by using "#{}"
     end.to eq("1")
   end
+
+  it "works, even when the component is unmounted" do
+    # was a bug, on umount react calls the ref method with null instead of a dom node
+    # callback failed then
+    # ref is called two times, once on mount with dom_node, once on unmount with null
+    mount "Foo" do
+      class Unmountable < Hyperloop::Component
+        render do
+          DIV { "This is a Component" }
+        end
+      end
+      Foo.class_eval do
+        def ref_rec(dom_node)
+          @@rec_cnt ||= 0
+          @@rec_cnt += 1
+        end
+        def self.rec_cnt
+          @@rec_cnt
+        end
+
+        after_mount { mutate.unmount true }
+
+        render do
+          Unmountable(ref: method(:ref_rec).to_proc) unless state.unmount 
+        end
+      end
+    end
+    expect_evaluate_ruby('Foo.rec_cnt').to eq(2)
+  end
 end
