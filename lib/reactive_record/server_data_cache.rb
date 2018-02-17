@@ -87,6 +87,7 @@ module ReactiveRecord
 
     class ServerDataCache
 
+      # SECURITY - SAFE
       def initialize(acting_user, preloaded_records)
         @acting_user = acting_user
         @cache = []
@@ -96,10 +97,11 @@ module ReactiveRecord
 
       if RUBY_ENGINE != 'opal'
 
+        # SECURITY - UNSAFE
         def [](*vector)
           root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
           vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
-          vector[0] = vector[0].constantize
+          vector[0] = vector[0].constantize # TODO: Security
           last_value = nil
           @cache.each do |cache_item|
             next if cache_item.root != root || @requested_cache_items.include?(cache_item)
@@ -109,6 +111,7 @@ module ReactiveRecord
           last_value
         end
 
+        # SECURITY - SAFE
         def self.[](models, associations, vectors, acting_user)
           ActiveRecord::Base.public_columns_hash
           result = nil
@@ -121,20 +124,25 @@ module ReactiveRecord
           result
         end
 
+        # SECURITY - SAFE
         def clear_requests
           @requested_cache_items = []
         end
 
+        # SECURITY - SAFE
         def as_json
           @requested_cache_items.inject({}) do |hash, cache_item|
             hash.deep_merge! cache_item.as_hash
           end
         end
 
+        # SECURITY - SAFE
         def select(&block); @cache.select(&block); end
 
+        # SECURITY - SAFE
         def detect(&block); @cache.detect(&block); end
 
+        # SECURITY - SAFE
         def inject(initial, &block); @cache.inject(initial) &block; end
 
         class CacheItem
@@ -144,24 +152,28 @@ module ReactiveRecord
           attr_reader :root
           attr_reader :acting_user
 
+          # SECURITY - SAFE
           def value
             @value # which is a ActiveRecord object
           end
 
+          # SECURITY - SAFE
           def method
             @vector.last
           end
 
+          # SECURITY - UNSAFE
           def self.new(db_cache, acting_user, klass, preloaded_records)
-            klass_constant = klass.constantize
+            klass_constant = klass.constantize # TODO: Security Risk
             if existing = db_cache.detect { |cached_item| cached_item.vector == [klass_constant] }
               return existing
             end
             super
           end
 
+          # SECURITY - UNSAFE
           def initialize(db_cache, acting_user, klass, preloaded_records)
-            klass = klass.constantize
+            klass = klass.constantize # TODO: Security
             @db_cache = db_cache
             @acting_user = acting_user
             @vector = @absolute_vector = [klass]
@@ -172,10 +184,12 @@ module ReactiveRecord
             db_cache << self
           end
 
+          # SECURITY - UNSAFE
           def apply_method_to_cache(method)
             @db_cache.inject(nil) do |representative, cache_item|
               if cache_item.vector == vector
-                if @value.class < ActiveRecord::Base and @value.attributes.has_key?(method)
+                # TODO: Security - this is the wrong check in the wrong place...
+                if @value.class < ActiveRecord::Base and @value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
                   @value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
                 end
                 if method == "*"
@@ -192,6 +206,8 @@ module ReactiveRecord
                   if !cache_item.value || cache_item.value.class == Array
                     representative
                   else
+                    # TODO: Security.  Protect the send(*method). But its complicated.. method can be an attribute, scope, relationship or actual method.
+                    #                  Each needs some protection logic.
                     begin
                       cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
                     rescue Exception => e
@@ -207,6 +223,7 @@ module ReactiveRecord
             end
           end
 
+          # SECURITY - SAFE
           def aggregation?(method)
             if method.is_a?(String) && @value.class.respond_to?(:reflect_on_aggregation)
               aggregation = @value.class.reflect_on_aggregation(method.to_sym)
@@ -216,6 +233,7 @@ module ReactiveRecord
             end
           end
 
+          # SECURITY - SAFE
           def apply_star
             if @value && @value.length > 0
               i = -1
@@ -232,6 +250,8 @@ module ReactiveRecord
             end
           end
 
+          # SECURITY - SAFE
+          # TODO replace instance_eval with a method like clone_new_child(....)
           def build_new_cache_item(new_value, method, absolute_method)
             new_parent = self
             self.clone.instance_eval do
@@ -245,6 +265,7 @@ module ReactiveRecord
             end
           end
 
+          # SECURITY - SAFE
           def apply_method(method)
             if method.is_a? Array and method.first == "find_by_id"
               method[0] = "find"
@@ -255,6 +276,7 @@ module ReactiveRecord
             @db_cache.detect { |cached_item| cached_item.vector == new_vector} || apply_method_to_cache(method)
           end
 
+          # SECURITY - SAFE
           def jsonize(method)
             # sadly standard json converts {[:foo, nil] => 123} to {"['foo', nil]": 123}
             # luckily [:foo, nil] does convert correctly
@@ -306,7 +328,7 @@ keys:
 
   'id':  if value is an array then target.id = value.first
   Example: {'id': [17]} Example the target is a record, and its id is now set to 17
-  
+
   '*count': target.set_count_state(value.first)  note: set_count_state sets the count of a collection and updates the associated state variable
   integer-like-string-or-number: target.push_and_update_belongs_to(key)  note: collection will be a has_many association, so we are doing a target << find(key), and updating both ends of the relationship
   [:new, nnn] do a ReactiveRecord::Base.find_by_object_id(target.base_class, method[1]) and that becomes the new target, with val being passed allow_change
