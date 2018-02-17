@@ -24,7 +24,8 @@ Gem::Specification.new do |spec|
   spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   spec.test_files     = `git ls-files -- {spec}/*`.split("\n")
   spec.require_paths  = ['lib']
-  spec.post_install_message = "\033[0;31;1mhyper-mesh #{Hypermesh::VERSION} is in development and has know security issues! Not recommended for production use!\033[0;30;21m"
+
+  spec.post_install_message = "\033[0;31;1mhyper-mesh #{Hypermesh::VERSION} is in development and has known security issues! Not recommended for production use!\033[0;30;21m"
 
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', Hypermesh::VERSION
@@ -39,7 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.3'
+  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'parser'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'

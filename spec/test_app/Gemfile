@@ -47,7 +47,7 @@ end
 # gem 'opal'
 gem "opal", '>= 0.11.0'
 gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
-gem "opal-rails", git: "https://github.com/opal/opal-rails.git", branch: "master"
+gem "opal-rails", '~> 0.9.4'
 gem "opal-activesupport", '~> 0.3.1'
 gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 gem 'mini_racer', platforms: :ruby
