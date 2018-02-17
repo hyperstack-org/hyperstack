@@ -59,7 +59,7 @@ describe 'Refs callback', js: true do
 
       element = React.create_element(Foo)
       React::Test::Utils.render_into_document(element)
-      "#{Foo.bar.JS['nodeType']}" # aboids json serialisation errors by using "#{}"
+      "#{Foo.bar.JS['nodeType']}" # avoids json serialisation errors by using "#{}"
     end.to eq("1")
   end
 
