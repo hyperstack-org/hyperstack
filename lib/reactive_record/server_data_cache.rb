@@ -97,11 +97,26 @@ module ReactiveRecord
 
       if RUBY_ENGINE != 'opal'
 
-        # SECURITY - UNSAFE
+        def self.get_model(str)
+          # We don't want to open a security hole by allowing some client side string to
+          # autoload a class, which would happen if we did a simple str.constantize.
+          #
+          # Because all AR models are loaded at boot time on the server to define the
+          # ActiveRecord::Base.public_columns_hash method any model which the client has
+          # access to should already be loaded.
+          #
+          # If str is not already loaded then we have an access violation.
+          unless const_defined? str
+            Hyperloop::InternalPolicy.raise_operation_access_violation
+          end
+          str.constantize
+        end
+
+        # SECURITY - NOW SAFE
         def [](*vector)
           root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
           vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
-          vector[0] = vector[0].constantize # TODO: Security
+          vector[0] = ServerDataCache.get_model(vector[0])
           last_value = nil
           @cache.each do |cache_item|
             next if cache_item.root != root || @requested_cache_items.include?(cache_item)
@@ -162,18 +177,18 @@ module ReactiveRecord
             @vector.last
           end
 
-          # SECURITY - UNSAFE
+          # SECURITY - NOW SAFE
           def self.new(db_cache, acting_user, klass, preloaded_records)
-            klass_constant = klass.constantize # TODO: Security Risk
+            klass_constant = ServerDataCache.get_model(klass)
             if existing = db_cache.detect { |cached_item| cached_item.vector == [klass_constant] }
               return existing
             end
             super
           end
 
-          # SECURITY - UNSAFE
+          # SECURITY - NOW SAFE
           def initialize(db_cache, acting_user, klass, preloaded_records)
-            klass = klass.constantize # TODO: Security
+            klass = ServerDataCache.get_model(klass)
             @db_cache = db_cache
             @acting_user = acting_user
             @vector = @absolute_vector = [klass]
