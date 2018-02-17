@@ -31,27 +31,27 @@ module React
     # Focus
     alias_native :related_target, :relatedTarget
     # Mouse
-    alias_native :alt_key, :altKey
+    # aliased above: alias_native :alt_key, :altKey
     alias_native :button, :button
     alias_native :buttons, :buttons
     alias_native :client_x, :clientX
     alias_native :client_y, :clientY
-    alias_native :ctrl_key, :ctrlKey
+    # aliased above: alias_native :ctrl_key, :ctrlKey
     alias_native :get_modifier_state, :getModifierState
-    alias_native :meta_key, :metaKey
+    # aliased above: alias_native :meta_key, :metaKey
     alias_native :page_x, :pageX
     alias_native :page_y, :pageY
-    alias_native :related_target, :relatedTarget
+    # aliased above: alias_native :related_target, :relatedTarget
     alias_native :screen_x, :screen_x
     alias_native :screen_y, :screen_y
-    alias_native :shift_key, :shift_key
+    # aliased above: alias_native :shift_key, :shift_key
     # Touch
-    alias_native :alt_key, :altKey
+    # aliased above: alias_native :alt_key, :altKey
     alias_native :changed_touches, :changedTouches
-    alias_native :ctrl_key, :ctrlKey
-    alias_native :get_modifier_state, :getModifierState
-    alias_native :meta_key, :metaKey
-    alias_native :shift_key, :shiftKey
+    # aliased above: alias_native :ctrl_key, :ctrlKey
+    # aliased above: alias_native :get_modifier_state, :getModifierState
+    # aliased above: alias_native :meta_key, :metaKey
+    # aliased above: alias_native :shift_key, :shiftKey
     alias_native :target_touches, :targetTouches
     alias_native :touches, :touches
     # UI
@@ -64,10 +64,10 @@ module React
     alias_native :delta_z, :deltaZ
 
     BUILT_IN_EVENTS = %w{onCopy onCut onPaste onKeyDown onKeyPress onKeyUp
-      onFocus onBlur onChange onInput onSubmit onClick onDoubleClick onDrag
+      onFocus onBlur onChange onInput onSubmit onClick onContextMenu onDoubleClick onDrag
       onDragEnd onDragEnter onDragExit onDragLeave onDragOver onDragStart onDrop
       onMouseDown onMouseEnter onMouseLeave onMouseMove onMouseOut onMouseOver
-      onMouseUp onTouchCancel onTouchEnd onTouchMove onTouchStart onScroll}
+      onMouseUp onSelect onTouchCancel onTouchEnd onTouchMove onTouchStart onScroll onWheel}
 
     def initialize(native_element)
       @native = native_element
