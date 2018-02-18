@@ -2,26 +2,29 @@ require 'spec_helper'
 
 describe 'opal-jquery extensions', js: true do
   describe 'Element' do
-    xit 'will reuse the wrapper componet class for the same Element' do
-      # TODO how come a def component_will_unmount will not be received
-      stub_const 'Foo', Class.new(React::Component::Base)
-      Foo.class_eval do
-        param :name
-        def render
-          "hello #{params.name}"
-        end
+    xit 'will reuse the wrapper component class for the same Element' do
+      evaluate_ruby do
+        class Foo < React::Component::Base
+          param :name
+          def render
+            "hello #{params.name}"
+          end
 
-        def component_will_unmount
-
+          def self.rec_cnt
+            @@rec_cnt ||= 0
+          end
+          before_unmount do
+            @@rec_cnt ||= 0
+            @@rec_cnt += 1
+          end
         end
       end
-
-      expect_any_instance_of(Foo).to_not receive(:component_will_unmount)
-
-      test_div = Element.new(:div)
-      test_div.render { Foo(name: 'fred') }
-      test_div.render { Foo(name: 'freddy') }
-      expect(Element[test_div].find('span').html).to eq('hello freddy')
+      expect_evaluate_ruby do
+        test_div = Element.new(:div)
+        test_div.render { Foo(name: 'fred') }
+        test_div.render { Foo(name: 'freddy') }
+        [ Element[test_div].find('span').html, Foo.rec_cnt]
+      end.to eq(['hello freddy', 0])
     end
 
     it 'renders a top level component using render with a block' do
