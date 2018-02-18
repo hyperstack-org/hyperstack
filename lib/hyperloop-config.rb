@@ -5,6 +5,7 @@ if RUBY_ENGINE == 'opal'
 else
   require 'opal'
   require 'opal-browser'
+  require 'opal-rails' if defined? Rails
   require 'hyperloop/config_settings'
   require 'hyperloop/context'
   require 'hyperloop/imports'
