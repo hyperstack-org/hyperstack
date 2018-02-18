@@ -1,5 +1,5 @@
 require 'hyperloop-config'
-Hyperloop::Context
+
 module React
   module Callbacks
     def self.included(base)
