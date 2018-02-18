@@ -50,7 +50,7 @@ gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 gem 'hyper-react', HyperSpec::VERSION #, path: '../../../hyper-react'
 gem 'hyper-store', HyperSpec::VERSION #, path: '../../../hyper-store'
 gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
-gem "opal-rails", git: "https://github.com/opal/opal-rails.git", branch: "master"
+gem "opal-rails", '~> 0.9.4'
 gem 'parser'
 gem 'opal-browser'
 gem 'timecop', '~> 0.8.1'
