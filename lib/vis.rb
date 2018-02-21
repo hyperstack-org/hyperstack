@@ -1,0 +1,8 @@
+require 'opal'
+require 'vis/native'
+require 'vis/utilities'
+require 'vis/event_support'
+require 'vis/data_common'
+require 'vis/data_set'
+require 'vis/data_view'
+require 'vis/network'
