@@ -12,4 +12,19 @@ class Object
       React::Component::Tags.html_tag_class_for(const_name) || raise(e)
     end
   end
+
+  def to_key
+    object_id
+  end
+end
+class Number
+  def to_key
+    self
+  end
+end
+
+class Boolean
+  def to_key
+    self
+  end
 end

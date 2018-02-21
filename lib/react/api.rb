@@ -71,7 +71,7 @@ module React
               this.__opalInstanceSyncSetState = true;
               this.__opalInstance.$component_will_mount();
               this.__opalInstanceSyncSetState = false;
-            }  
+            }
           }
           componentDidMount() {
             this.__opalInstance.is_mounted = true
@@ -171,6 +171,10 @@ module React
           props["className"] = value
         elsif ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
+
+        elsif key == "key"
+          props["key"] = value.to_key
+          
         elsif key == 'ref' && value.is_a?(Proc)
           props[key] = %x{
                           function(dom_node){
