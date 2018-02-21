@@ -251,7 +251,9 @@ if RUBY_ENGINE != 'opal'
           true
         end
       end
-      #puts "            RUNNING #{x.full_description}"
+      class ActiveRecord::Base
+        regulate_scope :unscoped
+      end
     end
 
     config.before(:each, :js => true) do

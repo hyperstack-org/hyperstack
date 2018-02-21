@@ -133,6 +133,7 @@ module ReactiveRecord
     end
 
     def self.schedule_fetch
+      React::State.set_state(WhileLoading, :quiet, false)  # moved from while loading module see loading! method
       @fetch_scheduled ||= after(0) do
         if @pending_fetches.count > 0  # during testing we might reset the context while there are pending fetches otherwise this would never normally happen
           last_fetch_at = @last_fetch_at
@@ -143,23 +144,29 @@ module ReactiveRecord
           start_time = `Date.now()`
           Operations::Fetch.run(models: models, associations: associations, pending_fetches: pending_fetches)
             .then do |response|
-              fetch_time = `Date.now()`
-              log("       Fetched in:   #{`(fetch_time - start_time)/ 1000`}s")
               begin
-                ReactiveRecord::Base.load_from_json(response)
-              rescue Exception => e
-                log("Unexpected exception raised while loading json from server: #{e}", :error)
+                fetch_time = `Date.now()`
+                log("       Fetched in:   #{`(fetch_time - start_time)/ 1000`}s")
+                begin
+                  ReactiveRecord::Base.load_from_json(response)
+                rescue Exception => e
+                  log("Unexpected exception raised while loading json from server: #{e}", :error)
+                end
+                log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
+                log(["       Returned: %o", response.to_n])
+                ReactiveRecord.run_blocks_to_load last_fetch_at
+              ensure
+                ReactiveRecord::WhileLoading.loaded_at last_fetch_at
+                ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
               end
-              log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
-              log(["       Returned: %o", response.to_n])
-              ReactiveRecord.run_blocks_to_load last_fetch_at
-              ReactiveRecord::WhileLoading.loaded_at last_fetch_at
-              ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
             end
             .fail do |response|
               log("Fetch failed", :error)
-              # not sure what response was supposed to look like here was response.body before conversion to operations....
-              ReactiveRecord.run_blocks_to_load(last_fetch_at, response)
+              begin
+                ReactiveRecord.run_blocks_to_load(last_fetch_at, response)
+              ensure
+                ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
+              end
             end
           @pending_fetches = []
           @pending_records = []

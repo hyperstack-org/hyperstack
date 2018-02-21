@@ -473,15 +473,19 @@ module ReactiveRecord
       @dummy_collection.loading?
     end
 
-    def empty?  # should be handled by method missing below, but opal-rspec does not deal well with method missing, so to test...
+    def empty?
+      # should be handled by method missing below, but opal-rspec does not deal well
+      # with method missing, so to test...
       all.empty?
     end
 
     def method_missing(method, *args, &block)
       if [].respond_to? method
         all.send(method, *args, &block)
-      elsif ScopeDescription.find(@target_klass, method) || (args.count == 1 && method.start_with?("find_by_"))
+      elsif ScopeDescription.find(@target_klass, method)
         apply_scope(method, *args)
+      elsif args.count == 1 && method.start_with?('find_by_')
+        apply_scope(:find_by, method.sub(/^find_by_/, '') => args.first)
       elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
         apply_scope("_#{method}", *args).first
       else

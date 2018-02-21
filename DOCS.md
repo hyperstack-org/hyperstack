@@ -617,6 +617,7 @@ Pusher.app_id = "MY_TEST_ID"      # you use the real or fake values
 Pusher.key =    "MY_TEST_KEY"
 Pusher.secret = "MY_TEST_SECRET"
 # The next line actually starts the pusher-fake server (see the Pusher-Fake readme for details.)
+# it is important this require be AFTER the above settings, as it will use these
 require 'pusher-fake/support/base' # if using pusher with rspec change this to pusher-fake/support/rspec
 # now copy over the credentials, and merge with PusherFake's config details
 Hyperloop.configuration do |config|

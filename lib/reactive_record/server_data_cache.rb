@@ -202,30 +202,39 @@ module ReactiveRecord
           # SECURITY - UNSAFE
           def apply_method_to_cache(method)
             @db_cache.inject(nil) do |representative, cache_item|
+              begin
               if cache_item.vector == vector
-                # TODO: Security - this is the wrong check in the wrong place...
-                if @value.class < ActiveRecord::Base and @value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
-                  @value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
-                end
                 if method == "*"
+                  # apply_star does the security check if value is present
                   cache_item.apply_star || representative
                 elsif method == "*all"
-                  cache_item.build_new_cache_item(cache_item.value.collect { |record| record.id }, method, method)
+                  # if we secure the collection then its probably okay to read the ids? otherwise we can check each id using view_permitted
+                  cache_item.build_new_cache_item(cache_item.value.__secure_collection_check(@acting_user).collect { |record| record.id }, method, method)
                 elsif method == "*count"
-                  cache_item.build_new_cache_item(cache_item.value.count, method, method)
+                  cache_item.build_new_cache_item(cache_item.value.__secure_collection_check(@acting_user).count, method, method)
                 elsif preloaded_value = @preloaded_records[cache_item.absolute_vector + [method]]
+                  # I think this is fine, since all it is doing is asking if we already evaluated this
                   cache_item.build_new_cache_item(preloaded_value, method, method)
                 elsif aggregation = cache_item.aggregation?(method)
+                  # I hate aggregations, and am ignoring, but actually think they get protected because in reality they
+                  # are really records.
                   cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
                 else
-                  if !cache_item.value || cache_item.value.class == Array
+                  if !cache_item.value || cache_item.value.is_a?(Array)
+                    # seeing as we just returning representative, no check is needed (its already checked)
                     representative
                   else
-                    # TODO: Security.  Protect the send(*method). But its complicated.. method can be an attribute, scope, relationship or actual method.
-                    #                  Each needs some protection logic.
                     begin
-                      cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
-                    rescue Exception => e
+                      secured_method = "__secure_remote_access_to_#{[*method].first}"
+                      if @value.class < ActiveRecord::Base and @value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
+                        @value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
+                        cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
+                      elsif cache_item.value.respond_to? secured_method
+                        cache_item.build_new_cache_item(cache_item.value.send(secured_method, @acting_user, *([*method][1..-1])), method, method)
+                      else
+                        raise "method missing"
+                      end
+                    rescue Exception => e # this check may no longer be needed as we are quite explicit now on which methods we apply
                       # ReactiveRecord::Pry::rescued(e)
                       ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel exception caught when applying #{method} to db object #{cache_item.value}: #{e}\033[0;30;21m"
                       raise e, "HyperModel fetching records failed, exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
@@ -235,7 +244,11 @@ module ReactiveRecord
               else
                 representative
               end
+            rescue Exception => e
+#              binding.pry
+              raise e
             end
+end
           end
 
           # SECURITY - SAFE
@@ -250,7 +263,7 @@ module ReactiveRecord
 
           # SECURITY - SAFE
           def apply_star
-            if @value && @value.length > 0
+            if @value && @value.__secure_collection_check(@acting_user) && @value.length > 0
               i = -1
               @value.inject(nil) do |representative, current_value|
                 i += 1

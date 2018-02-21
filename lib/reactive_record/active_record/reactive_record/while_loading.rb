@@ -123,7 +123,8 @@ module ReactiveRecord
         def loading!
           React::RenderingContext.waiting_on_resources = true
           React::State.get_state(self, :loaded_at)
-          React::State.set_state(self, :quiet, false)
+          # this was moved to where the fetch is actually pushed on to the fetch array in isomorphic base
+          # React::State.set_state(self, :quiet, false)
           @is_loading = true
         end
 
@@ -298,7 +299,7 @@ if RUBY_ENGINE == 'opal'
         def reactive_record_link_set_while_loading_container_class
           node = dom_node
           loading = (waiting_on_resources ? `true` : `false`)
-          %x{ 
+          %x{
               if (typeof node === "undefined" || node === null) return;
               var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');
               if (#{!self.is_a?(ReactiveRecord::WhileLoading)} && while_loading_container_id !== null && while_loading_container_id !== "") {

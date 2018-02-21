@@ -87,7 +87,7 @@ module ReactiveRecord
           record = @records[model].detect { |record| record.id == id}
         end
         # if we don't have a record then create one
-        (record = new(model)).vector = [model, ["find_by_#{attribute}", value]] unless record
+        (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
         # and set the value
         record.sync_attribute(attribute, value)
         # and set the primary if we have one
@@ -263,7 +263,7 @@ module ReactiveRecord
     # nil must not have any children.
     def initialize_collections
       if (!vector || vector.empty?) && id && id != ''
-        @vector = [@model, ["find_by_#{@model.primary_key}", id]]
+        @vector = [@model, [:find_by, @model.primary_key => id]]
       end
       @model.reflect_on_all_associations.each do |assoc|
         if assoc.collection? && attributes[assoc.attribute].nil?
