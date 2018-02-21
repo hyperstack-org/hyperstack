@@ -244,11 +244,11 @@ module ReactiveRecord
               else
                 representative
               end
-            rescue Exception => e
-#              binding.pry
-              raise e
-            end
-end
+#             rescue Exception => e
+# #              binding.pry
+#               raise e
+#             end
+           end
           end
 
           # SECURITY - SAFE
