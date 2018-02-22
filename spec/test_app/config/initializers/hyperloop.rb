@@ -3,6 +3,6 @@
 
 Hyperloop.configuration do |config|
   config.transport = :action_cable
-  config.import 'reactrb/auto-import'
+  # config.import 'reactrb/auto-import'
 end
 
