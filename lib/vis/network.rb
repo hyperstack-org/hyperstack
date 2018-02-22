@@ -38,8 +38,8 @@ module Vis
 
     def initialize(native_container, dataset_hash, options = {})
       native_options = options_to_native(options)
-      nodes_dataset = data[:nodes].to_n
-      edges_dataset = data[:edges].to_n
+      nodes_dataset = dataset_hash[:nodes].to_n
+      edges_dataset = dataset_hash[:edges].to_n
       native_data = `{ nodes: nodes_dataset, edges: edges_dataset }`
       @event_handlers = {}
       @native = `new vis.Network(native_container, native_data, native_options)`
@@ -185,5 +185,9 @@ module Vis
       `Opal.Hash.$new(res)`
     end
 
+    # test helper
+    def self.test_container
+      `document.body.appendChild(document.createElement('div'))`
+    end
   end
 end
