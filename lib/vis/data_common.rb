@@ -6,16 +6,7 @@ module Vis
 
     def get(*args)
       if `Opal.is_a(args.$last(), Opal.Hash)`
-        options = args.pop
-        if options[:filter]
-          block = options[:filter]
-          options[:filter] = %x{
-            function(item) {
-              return #{block.call(`Opal.Hash.$new(item)`)};
-            }
-          }
-        end
-        args.push(options_to_native(options))
+        args.push(options_to_native(args.pop))
       end
       res = `self["native"].get.apply(self["native"], Opal.to_a(args))`
       if `res !== null && Opal.is_a(res, Opal.Array)`

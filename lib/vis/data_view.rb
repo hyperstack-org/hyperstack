@@ -11,14 +11,6 @@ module Vis
     attr_reader :event_handlers
 
     def initialize(data_set_or_view, options = {})
-      if options[:filter]
-        block = options[:filter]
-        options[:filter] = %x{
-          function(item) {
-            return #{block.call(`Opal.Hash.$new(item)`)};
-          }
-        }
-      end
       native_options = options_to_native(options)
       @data_set_or_view = data_set_or_view
       @event_handlers = {}

@@ -6,8 +6,9 @@ module Vis
     include Vis::DataCommon
 
     aliases_native %i[clear distinct flush length]
+    native_method_with_options :setOptions
     alias :size :length
-
+    
     attr_reader :event_handlers
 
     def initialize(*args)
@@ -60,12 +61,12 @@ module Vis
 
     def max(field)
       res = @native.JS.max(field)
-      `res !== null ? Opal.Hash.$new(res) : res`
+      `res !== null ? Opal.Hash.$new(res) : #{nil}`
     end
     
     def min(field)
       res = @native.JS.min(field)
-      `res !== null ? Opal.Hash.$new(res) : res`
+      `res !== null ? Opal.Hash.$new(res) :  #{nil}`
     end
 
     def remove(*args)
@@ -75,10 +76,6 @@ module Vis
         args[0] = args[0].to_n
       end
       `self["native"].remove.apply(self["native"], Opal.to_a(args))`
-    end
-
-    def set_options(options)
-      @native.JS.setOptions(options.to_n)
     end
 
     def update(*args)
