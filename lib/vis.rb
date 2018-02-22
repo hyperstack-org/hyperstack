@@ -1,4 +1,5 @@
 require 'opal'
+require 'active_support/core_ext/string'
 require 'vis/native'
 require 'vis/utilities'
 require 'vis/event_support'
