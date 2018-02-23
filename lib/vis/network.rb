@@ -52,27 +52,31 @@ module Vis
       `self["native"].off(event, handler)`
       @event_handlers[event].delete(event_handler_id)
     end
-    
+
     def on(event, &block)
       event = lower_camelize(event)
       @event_handlers[event] = {} unless @event_handlers[event]
       event_handler_id = `Math.random().toString(36).substring(6)`
-      handler = %x{
-        function(event_info) {
-          #{block.call(`Opal.Hash.$new(event_info)`)};
-        }
-      }
+      handler = if %i[afterDrawing beforeDrawing blurEdge blurNode hoverEdge hoverNode showPopup].include?(event)
+        `function(param) { #{block.call(`param`)}; }`
+      elsif %i[hidePopup startStabilizing stabilizationIterationsDone initRedraw].include?(event)
+        `function() { #{block.call}; }`
+      else
+        `function(event_info) { #{block.call(`Opal.Hash.$new(event_info)`)}; }`
+      end
       @event_handlers[event][event_handler_id] = handler
       `self["native"].on(event, handler);`
       event_handler_id
     end
 
     def once(event, &block)
-      handler = %x{
-        function(event_info) {
-          #{block.call(`Opal.Hash.$new(event_info)`)};
-        }
-      }
+      handler = if %i[afterDrawing beforeDrawing blurEdge blurNode hoverEdge hoverNode showPopup].include?(event)
+        `function(param) { #{block.call(`param`)}; }`
+      elsif %i[hidePopup startStabilizing stabilizationIterationsDone initRedraw].include?(event)
+        `function() { #{block.call}; }`
+      else
+        `function(event_info) { #{block.call(`Opal.Hash.$new(event_info)`)}; }`
+      end
       `self["native"].once(event, handler);`
     end
 
