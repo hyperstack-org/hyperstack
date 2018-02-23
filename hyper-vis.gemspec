@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.email        = "jan@kursator.de"
   s.homepage     = "https://github.com/janbiedermann/hyper-vis"
   s.summary      = "Ruby bindings for Vis as a Ruby Hyperloop Component"
-  s.description  = "Write React Components in ruby to show graphics created with Vis.js"
+  s.description  = "Write React Components in ruby to show graphics created with Vis.js in the ruby way"
 
   s.files          = `git ls-files`.split("\n")
   s.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
