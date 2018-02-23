@@ -53,13 +53,16 @@ module Vis
       @event_handlers[event].delete(event_handler_id)
     end
 
+    EVENTS_NO_COVERSION = %i[afterDrawing beforeDrawing blurEdge blurNode hoverEdge hoverNode showPopup]
+    EVENTS_NO_PARAM = %i[hidePopup startStabilizing stabilizationIterationsDone initRedraw]
+    
     def on(event, &block)
       event = lower_camelize(event)
       @event_handlers[event] = {} unless @event_handlers[event]
       event_handler_id = `Math.random().toString(36).substring(6)`
-      handler = if %i[afterDrawing beforeDrawing blurEdge blurNode hoverEdge hoverNode showPopup].include?(event)
+      handler = if EVENTS_NO_COVERSION.include?(event)
         `function(param) { #{block.call(`param`)}; }`
-      elsif %i[hidePopup startStabilizing stabilizationIterationsDone initRedraw].include?(event)
+      elsif EVENTS_NO_PARAM.include?(event)
         `function() { #{block.call}; }`
       else
         `function(event_info) { #{block.call(`Opal.Hash.$new(event_info)`)}; }`
@@ -70,9 +73,9 @@ module Vis
     end
 
     def once(event, &block)
-      handler = if %i[afterDrawing beforeDrawing blurEdge blurNode hoverEdge hoverNode showPopup].include?(event)
+      handler = if EVENTS_NO_COVERSION.include?(event)
         `function(param) { #{block.call(`param`)}; }`
-      elsif %i[hidePopup startStabilizing stabilizationIterationsDone initRedraw].include?(event)
+      elsif EVENTS_NO_PARAM.include?(event)
         `function() { #{block.call}; }`
       else
         `function(event_info) { #{block.call(`Opal.Hash.$new(event_info)`)}; }`
