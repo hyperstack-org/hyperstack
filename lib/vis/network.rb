@@ -1,7 +1,6 @@
 module Vis
   class Network
     include Native
-    include Vis::EventSupport
     include Vis::Utilities
 
     aliases_native %i[
@@ -15,7 +14,7 @@ module Vis
       disableEditMode
       findNode 
       getBaseEdges 
-      getClusterEdges
+      getClusteredEdges
       getConnectedEdges
       getConnectedNodes
       getNodesInCluster
@@ -47,19 +46,39 @@ module Vis
 
     # global methods
 
-    def once(event, &block)
-      # TODO callback is called with different options depending on event
+    def off(event, event_handler_id)
+      event = lower_camelize(event)
+      handler = @event_handlers[event][event_handler_id]
+      `self["native"].off(event, handler)`
+      @event_handlers[event].delete(event_handler_id)
+    end
+    
+    def on(event, &block)
+      event = lower_camelize(event)
+      @event_handlers[event] = {} unless @event_handlers[event]
+      event_handler_id = `Math.random().toString(36).substring(6)`
       handler = %x{
-        function(event_str, properties, sender_id) {
-          #{block.call(`event_str`, `Opal.Hash.$new(properties)`, `sender_id`)};
+        function(event_info) {
+          #{block.call(`Opal.Hash.$new(event_info)`)};
         }
       }
+      @event_handlers[event][event_handler_id] = handler
       `self["native"].on(event, handler);`
+      event_handler_id
+    end
+
+    def once(event, &block)
+      handler = %x{
+        function(event_info) {
+          #{block.call(`Opal.Hash.$new(event_info)`)};
+        }
+      }
+      `self["native"].once(event, handler);`
     end
 
     def set_data(dataset_hash)
-      nodes_dataset = data[:nodes].to_n
-      edges_dataset = data[:edges].to_n
+      nodes_dataset = dataset_hash[:nodes].to_n
+      edges_dataset = dataset_hash[:edges].to_n
       native_data = `{ nodes: nodes_dataset, edges: edges_dataset }`
       @native.JS.setData(native_data)
     end
@@ -168,8 +187,8 @@ module Vis
     end
 
     # configurator module
-    def get_options_from_configuration
-      res = @native.JS.getOptionsFromConfiguration
+    def get_options_from_configurator
+      res = @native.JS.getOptionsFromConfigurator
       `Opal.Hash.$new(res)`
     end
 
