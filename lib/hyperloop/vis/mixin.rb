@@ -15,6 +15,10 @@ module Hyperloop
           def data
             @_data
           end
+
+          def document
+            `window.document`
+          end
           
           def self.render_with_dom_node(tag = 'DIV', &block)
             render do
