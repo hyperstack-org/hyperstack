@@ -8,8 +8,8 @@ require 'hyperloop/vis/version'
 if RUBY_ENGINE == 'opal'
   require 'vis'
   require 'hyper-component'
-  require 'hyperloop/vis/mixin'
-  require 'hyperloop/vis/component'
+  require 'hyperloop/vis/network/mixin'
+  require 'hyperloop/vis/network/component'
 else
   Opal.append_path __dir__.untaint
 end

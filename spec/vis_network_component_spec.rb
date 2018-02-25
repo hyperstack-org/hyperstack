@@ -5,7 +5,7 @@ describe 'Hyperloop::Vis::Component', js: true do
   it 'creates a component by using the mixin and renders it' do
     mount 'OuterComponent' do
       class VisComponent
-        include Hyperloop::Vis::Mixin
+        include Hyperloop::Vis::Network::Mixin
 
         render_with_dom_node do |dom_node, data|
           net = Vis::Network.new(dom_node, data)
@@ -23,7 +23,7 @@ describe 'Hyperloop::Vis::Component', js: true do
 
   it 'creates a component by inheriting and renders it' do
     mount 'OuterComponent' do
-      class VisComponent < Hyperloop::Vis::Component
+      class VisComponent < Hyperloop::Vis::Network::Component
         render_with_dom_node do |dom_node, data|
           net = Vis::Network.new(dom_node, data)
         end
