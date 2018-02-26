@@ -45,7 +45,22 @@ describe 'Vis::Network', js: true do
       created = dom_node.JS[:children].JS[:length]
       error = false
       begin
-        net.set_options(autoresize: true)
+        net.set_options({
+          :autoResize => true,
+          :locale => 'en',
+          :nodes => {
+            :scaling => {
+              :min => 16,
+              :max => 32
+            },
+            :shadow => true
+          },
+          :edges => {
+            :color => "#ff0000",
+            :smooth => false,
+            :shadow => true
+          }
+        })
       rescue
         error = true
       end

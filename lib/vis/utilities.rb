@@ -171,33 +171,33 @@ module Vis
         end
       end
     end
-  end
 
-  def _rubyfy_nodes_options(options)
-    if options[:nodes].has_key?(:chosen)
-      chosen = options[:nodes][:chosen]
-      [:node, :label].each do |key|
-        if chosen.has_key?(key)
-          block = chosen[key]
-          if `typeof block === "function"`
-            options[:nodes][:chosen][key] = %x{
-              function(values, id, selected, hovering) {
-                return #{block.call(`Opal.Hash.$new(values)`, `id`, `selected`, `hovering`)};
+    def _rubyfy_nodes_options(options)
+      if options[:nodes].has_key?(:chosen)
+        chosen = options[:nodes][:chosen]
+        [:node, :label].each do |key|
+          if chosen.has_key?(key)
+            block = chosen[key]
+            if `typeof block === "function"`
+              options[:nodes][:chosen][key] = %x{
+                function(values, id, selected, hovering) {
+                  return #{block.call(`Opal.Hash.$new(values)`, `id`, `selected`, `hovering`)};
+                }
               }
-            }
+            end
           end
         end
       end
-    end
-    if options[:nodes].has_key?(:scaling)
-      if options[:nodes][:scaling].has_key?(:custom_scaling_function)
-        block = options[:nodes][:scaling][:custom_scaling_function]
-        if `typeof block === "function"`
-          options[:nodes][:scaling][:custom_scaling_function] = %x{
-            function(min, max, total, value) {
-              return #{block.call(`min`, `max`, `total`, `value`)};
+      if options[:nodes].has_key?(:scaling)
+        if options[:nodes][:scaling].has_key?(:custom_scaling_function)
+          block = options[:nodes][:scaling][:custom_scaling_function]
+          if `typeof block === "function"`
+            options[:nodes][:scaling][:custom_scaling_function] = %x{
+              function(min, max, total, value) {
+                return #{block.call(`min`, `max`, `total`, `value`)};
+              }
             }
-          }
+          end
         end
       end
     end
