@@ -14,13 +14,14 @@ gem 'hyper-vis'
 and `bundle update`
 hyper-vis depends on `hyper-component` from (ruby-hyperloop)[http://ruby-hyperloop.org]
 
-### Usage
-
 vis.js is automatically imported. If you use webpacker, you may need to cancel the import in your config/intializers/hyperloop.rb
 ```
   config.cancel_import 'vis/source/vis.js'
 ```
+The wrapper expects a global `vis' (not `Vis`) to be availabe in javascript. 
 stylesheets are includes in 'vis/source/vis.css', images are there too.
+
+### Usage
 
 #### The Vis part
 ```
