@@ -50,18 +50,34 @@ describe 'Hyperloop::Vis::Component', js: true do
         render_with_dom_node do |dom_node, data, options|
           @@passed_data = data
           @@passed_options = options
-          net = Vis::Network.new(dom_node, data)
+          net = Vis::Network.new(dom_node, data, options)
         end
       end
       class OuterComponent < Hyperloop::Component
         render do
           data = Vis::DataSet.new([{id: 1, name: 'foo'}, {id: 2, name: 'bar'}, {id: 3, name: 'pub'}])
-          DIV { VisComponent(vis_data: {nodes: data}, options: {autoresize: true})}
+          options = {
+            :auto_resize => true,
+            :locale => 'en',
+            :nodes => {
+              :scaling => {
+                :min => 16,
+                :max => 32
+              },
+              :shadow => true
+            },
+            :edges => {
+              :color => "#ff0000",
+              :smooth => false,
+              :shadow => true
+            }
+          }
+          DIV { VisComponent(vis_data: {nodes: data}, options: options)}
         end
       end
     end
     expect(page.body).to include('<canvas')
     expect_evaluate_ruby('VisComponent.passed_data.has_key?(:nodes)').to eq(true)
-    expect_evaluate_ruby('VisComponent.passed_options.has_key?(:autoresize)').to eq(true)
+    expect_evaluate_ruby('VisComponent.passed_options.has_key?(:auto_resize)').to eq(true)
   end
 end
