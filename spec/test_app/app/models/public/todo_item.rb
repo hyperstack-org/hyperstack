@@ -1,4 +1,4 @@
-class TodoItem < ActiveRecord::Base
+class TodoItem < ApplicationRecord
 
   def view_permitted?(attribute)
     !acting_user or user_is? acting_user

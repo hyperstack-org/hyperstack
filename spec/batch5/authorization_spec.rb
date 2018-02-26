@@ -56,7 +56,7 @@ describe "authorization integration", js: true do
     stub_const 'TestApplicationPolicy', Class.new
     stub_const 'TestApplication', Class.new
     TestApplicationPolicy.class_eval do
-      regulate_class_connection { self } # was { self  }
+      regulate_class_connection { self }
       regulate_instance_connections(TestModel) { TestModel.find_by_test_attribute(name) }
       regulate_all_broadcasts { |policy| policy.send_all_but(:completed, :test_attribute)}
       regulate_broadcast(TestModel) { |policy| policy.send_all_but(:created_at).to(self) }

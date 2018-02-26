@@ -78,7 +78,6 @@ describe "example scopes", js: true do
                   end; end; end; end; end; end; end
       class ManagerComments < React::Component::Base
         render(DIV) do
-          puts "managers have made comments: #{!!Todo.with_managers_comments.any?}"
           if Todo.with_managers_comments.any?
             DIV { "managers comments" }
             UL do

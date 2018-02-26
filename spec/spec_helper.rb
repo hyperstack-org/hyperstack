@@ -251,6 +251,9 @@ if RUBY_ENGINE != 'opal'
           true
         end
       end
+    end
+
+    config.before(:each) do |ex|
       class ActiveRecord::Base
         regulate_scope :unscoped
       end

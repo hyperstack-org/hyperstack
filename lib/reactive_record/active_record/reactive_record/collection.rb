@@ -252,7 +252,7 @@ module ReactiveRecord
         elsif filter?
           @collection = filter_records(@parent.collection)
         end
-      elsif @parent.count.zero?
+      elsif @parent._count_internal(false).zero?  # just changed this from count.zero?
         @count = 0
       end
     end
@@ -289,16 +289,24 @@ module ReactiveRecord
       @count = val
     end
 
-    def count
+
+
+    def _count_internal(load_from_client)
+      # when count is called on a leaf, count_internal is called for each
+      # ancestor.  Only the outermost count has load_from_client == true
       observed
       if @collection
         @collection.count
       elsif @count ||= ReactiveRecord::Base.fetch_from_db([*@vector, "*count"])
         @count
       else
-        ReactiveRecord::Base.load_from_db(nil, *@vector, "*count")
+        ReactiveRecord::Base.load_from_db(nil, *@vector, "*count") if load_from_client
         @count = 1
       end
+    end
+
+    def count
+      _count_internal(true)
     end
 
     alias_method :length, :count

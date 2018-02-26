@@ -60,6 +60,7 @@ module ActiveRecord
     # ignore any of these methods if they get called on the client.   This list should be trimmed down to include only
     # methods to be called as "macros" such as :after_create, etc...
     SERVER_METHODS = [
+      :regulate_relationship, :regulate_scope,
       :attribute_type_decorations, :defined_enums, :_validators, :timestamped_migrations, :lock_optimistically, :lock_optimistically=,
       :local_stored_attributes=, :lock_optimistically?, :attribute_aliases?, :attribute_method_matchers?, :defined_enums?,
       :has_many_without_reactive_record_add_changed_method, :has_many_with_reactive_record_add_changed_method,

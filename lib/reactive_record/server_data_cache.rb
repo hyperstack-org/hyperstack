@@ -202,22 +202,20 @@ module ReactiveRecord
           # SECURITY - UNSAFE
           def apply_method_to_cache(method)
             @db_cache.inject(nil) do |representative, cache_item|
-              begin
               if cache_item.vector == vector
                 if method == "*"
                   # apply_star does the security check if value is present
                   cache_item.apply_star || representative
                 elsif method == "*all"
-                  # if we secure the collection then its probably okay to read the ids? otherwise we can check each id using view_permitted
+                  # if we secure the collection then we assume its okay to read the ids
                   cache_item.build_new_cache_item(cache_item.value.__secure_collection_check(@acting_user).collect { |record| record.id }, method, method)
                 elsif method == "*count"
                   cache_item.build_new_cache_item(cache_item.value.__secure_collection_check(@acting_user).count, method, method)
                 elsif preloaded_value = @preloaded_records[cache_item.absolute_vector + [method]]
-                  # I think this is fine, since all it is doing is asking if we already evaluated this
+                  # no security check needed since we already evaluated this
                   cache_item.build_new_cache_item(preloaded_value, method, method)
                 elsif aggregation = cache_item.aggregation?(method)
-                  # I hate aggregations, and am ignoring, but actually think they get protected because in reality they
-                  # are really records.
+                  # aggregations are not protected
                   cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
                 else
                   if !cache_item.value || cache_item.value.is_a?(Array)
@@ -244,11 +242,7 @@ module ReactiveRecord
               else
                 representative
               end
-#             rescue Exception => e
-# #              binding.pry
-#               raise e
-#             end
-           end
+            end
           end
 
           # SECURITY - SAFE
@@ -261,7 +255,7 @@ module ReactiveRecord
             end
           end
 
-          # SECURITY - SAFE
+          # SECURITY - NOW SAFE
           def apply_star
             if @value && @value.__secure_collection_check(@acting_user) && @value.length > 0
               i = -1
