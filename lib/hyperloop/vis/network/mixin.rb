@@ -7,7 +7,7 @@ module Hyperloop
         def self.included(base)
           base.include(Hyperloop::Component::Mixin)
           base.class_eval do
-            param data: nil
+            param vis_data: nil
             param options: nil
 
             def _set_dom_node(dom_node)
@@ -29,7 +29,7 @@ module Hyperloop
             def self.render_with_dom_node(tag = 'DIV', &block)
               render do
                 @_vis_render_block = block
-                @_data = params.data
+                @_data = params.vis_data
                 @_options = params.options
                 send(tag, ref: method(:_set_dom_node).to_proc)
               end
@@ -47,8 +47,8 @@ module Hyperloop
 
             before_receive_props do |new_props|
               changed = false
-              if new_props[:data] != @_data
-                @_data = new_props[:data]
+              if new_props[:vis_data] != @_data
+                @_data = new_props[:vis_data]
                 changed = true
               end
               if new_props[:options] != @_options

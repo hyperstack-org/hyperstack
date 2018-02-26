@@ -5,7 +5,7 @@ module Hyperloop
         include Hyperloop::Vis::Network::Mixin
         def self.inherited(base)
           base.class_eval do
-            param data: nil
+            param vis_data: nil
             param options: nil
           end
         end

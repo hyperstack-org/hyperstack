@@ -57,7 +57,7 @@ class AOuterComponent < Hyperloop::Component
 
     data = Vis::DataSet.new([{id: 1, name: 'foo'}, {id: 2, name: 'bar'}, {id: 3, name: 'pub'}])
     
-    DIV { MyVisNetworkComponent(data: data, otions: options)}
+    DIV { MyVisNetworkComponent(vis_data: data, otions: options)}
   end
 end
 ```
