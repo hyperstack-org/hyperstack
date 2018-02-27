@@ -41,7 +41,7 @@ module Hyperloop
 
             after_mount do
               if @_dom_node && @_vis_render_block
-                @_vis_render_block.call(@_dom_node, @_data, @_options)
+                instance_exec(@_dom_node, @_data, @_options, &@_vis_render_block)
               end
             end
 
@@ -56,7 +56,7 @@ module Hyperloop
                 changed = true
               end
               if changed && @_dom_node && @_vis_render_block
-                @_vis_render_block.call(@_dom_node, @_data, @_options)
+                instance_exec(@_dom_node, @_data, @_options, &@_vis_render_block)
               end
             end
           end
