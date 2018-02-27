@@ -4,7 +4,7 @@ require "rspec/core/rake_task"
 
 
 task :spec do
-  (1..5).each { |batch| Rake::Task["spec:batch#{batch}"].invoke }
+  (1..6).each { |batch| Rake::Task["spec:batch#{batch}"].invoke }
 end
 
 namespace :spec do
@@ -12,7 +12,7 @@ namespace :spec do
     sh %{bundle update}
     sh %{cd spec/test_app; bundle update; bundle exec rails db:setup} # may need ;bundle exec rails db:setup as well
   end
-  (1..5).each do |batch|
+  (1..6).each do |batch|
     RSpec::Core::RakeTask.new(:"batch#{batch}") do |t|
       t.pattern = "spec/batch#{batch}/**/*_spec.rb"
     end

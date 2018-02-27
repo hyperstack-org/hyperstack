@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
   spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   spec.test_files     = `git ls-files -- {spec}/*`.split("\n")
   spec.require_paths  = ['lib']
-  spec.post_install_message = "\033[0;31;1mhyper-mesh #{Hypermesh::VERSION} is in development and has know security issues! Not recommended for production use!\033[0;30;21m"
 
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', Hypermesh::VERSION
@@ -64,4 +63,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-rescue'
 end

@@ -1,108 +1,90 @@
-module ReactiveRecord
-  class PsuedoRelationArray < Array
-    # allows us to easily handle scopes and finder_methods which return arrays of items (instead of ActiveRecord::Relations - see below)
-    attr_accessor :__synchromesh_permission_granted
-    attr_accessor :acting_user
-    def __secure_collection_check(acting_user)
-      self
-    end
-  end
-end
-
+# Monkey patches to ActiveRecord for scoping, security, and to synchronize models
 module ActiveRecord
-  class Relation
-    attr_accessor :__synchromesh_permission_granted
-    attr_accessor :acting_user
-    def __secure_collection_check(acting_user)
-      return self if __synchromesh_permission_granted
-      return self if __secure_remote_access_to_unscoped(acting_user).__synchromesh_permission_granted
-      denied!
+  # hyperloop adds new features to scopes to allow for computing scopes on client side
+  # and for hinting at what joins are involved in a scope.  _synchromesh_scope_args_check
+  # processes these arguments, and the will always leave the true server side scoping
+  # proc in the `:server` opts.   This method is common to client and server.
+  class Base
+    def self._synchromesh_scope_args_check(args)
+      opts = if args.count == 2 && args[1].is_a?(Hash)
+               args[1].merge(server: args[0])
+             elsif args[0].is_a? Hash
+               args[0]
+             else
+               { server: args[0] }
+             end
+      return opts if opts && opts[:server].respond_to?(:call)
+      raise 'must provide either a proc as the first arg or by the '\
+            '`:server` option to scope and default_scope methods'
     end
   end
+  if RUBY_ENGINE != 'opal'
+    # __synchromesh_permission_granted indicates if permission has been given to return a scope
+    # The acting_user attribute is set to the current acting_user so regulation methods can check it
+    # The __secure_collection_check method is called at the end of a scope chain and will fail if
+    # no scope in the chain has positively granted access.
 
-  class Base
-    class << self
-      def _synchromesh_scope_args_check(args)
-        opts = if args.count == 2 && args[1].is_a?(Hash)
-                 args[1].merge(server: args[0])
-               elsif args[0].is_a? Hash
-                 args[0]
-               else
-                 { server: args[0] }
-               end
-        return opts if opts.is_a?(Hash) && opts[:server].respond_to?(:call)
-        raise 'must provide either a proc as the first arg or by the '\
-              '`:server` option to scope and default_scope methods'
+    # allows us to easily handle scopes and finder_methods which return arrays of items
+    # (instead of ActiveRecord::Relations - see below)
+    class ReactiveRecordPsuedoRelationArray < Array
+      attr_accessor :__synchromesh_permission_granted
+      attr_accessor :acting_user
+      def __secure_collection_check(_acting_user)
+        self
       end
+    end
 
-      alias pre_synchromesh_scope scope
-
-      def do_not_synchronize
-        @do_not_synchronize = true
+    # add the __synchromesh_permission_granted, acting_user and __secure_collection_check
+    # methods to Relation
+    class Relation
+      attr_accessor :__synchromesh_permission_granted
+      attr_accessor :acting_user
+      def __secure_collection_check(acting_user)
+        return self if __synchromesh_permission_granted
+        return self if __secure_remote_access_to_unscoped(acting_user).__synchromesh_permission_granted
+        denied!
       end
+    end
+    # Monkey patches and extensions to base
+    class Base
+      class << self
+        # every method call that is legal from the client has a wrapper method prefixed with
+        # __secure_remote_access_to_
 
-      def do_not_synchronize?
-        @do_not_synchronize
-      end
-
-      if RUBY_ENGINE != 'opal'
-
-        def __secure_remote_access_to_all(acting_user)
-          all
-        end
-
-        def __secure_remote_access_to_unscoped(acting_user)
-          unscoped
-        end
+        # The wrapper method may simply return the normal result or may act to secure the data.
+        # The simpliest case is for the method to call `denied!` which will raise a Hyperloop
+        # access protection fault.
 
         def denied!
           Hyperloop::InternalPolicy.raise_operation_access_violation
         end
 
-        alias pre_synchromesh_default_scope default_scope
+        # Here we set up the base `all` and `unscoped` methods.  See below for more on how
+        # access protection works on relationships.
 
-        def scope(name, *args, &block)
-          __synchromesh_regulate_from_macro(
-            (opts = _synchromesh_scope_args_check(args)),
-            name,
-            respond_to?(:"__secure_remote_access_to_#{name}"),
-            &method(:regulate_scope)
-          )
-          pre_synchromesh_scope(name, opts[:server], &block)
+        def __secure_remote_access_to_all(_acting_user)
+          all
         end
 
-        def __set_synchromesh_permission_granted(r, obj, acting_user, args = [], &block)
-          r.__synchromesh_permission_granted = try(:__synchromesh_permission_granted) || !block
-          unless r.__synchromesh_permission_granted
-            old = acting_user
-            obj.acting_user = acting_user
-            r.__synchromesh_permission_granted = obj.instance_exec(*args, &block)
-          end
-          r
-        ensure
-          obj.acting_user = old
+        def __secure_remote_access_to_unscoped(_acting_user, *args)
+          unscoped(*args)
         end
 
-        def regulate_scope(name, &block)
-          name, block = __synchromesh_parse_regulator_params(name, block)
-          singleton_class.send(:define_method, :"__secure_remote_access_to_#{name}") do |acting_user, *args|
-            r = send(name, *args)
-            r = ReactiveRecord::PsuedoRelationArray.new(r) if r.is_a? Array
-            __set_synchromesh_permission_granted(r, r, acting_user, args, &block)
-          end
-        end
+        # finder_method and server_method provide secure RPCs against AR relations and records.
+        # The block is called in context with the object, and acting_user is set to the
+        # current acting user.  The block may interogate acting_user to insure security as needed.
 
-        def regulate_default_scope(&block)
-          regulate_scope(:all, &block)
-        end
+        # For finder_method we have to preapply `all` so that we always have a relationship
 
         def finder_method(name, &block)
           singleton_class.send(:define_method, :"__secure_remote_access_to__#{name}") do |acting_user, *args|
-            this = self.respond_to?(:acting_user) ? self : all
+            this = respond_to?(:acting_user) ? self : all
             begin
               old = this.acting_user
               this.acting_user = acting_user
-              ReactiveRecord::PsuedoRelationArray.new([this.instance_exec(*args, &block)])
+              # returns a PsuedoRelationArray which will respond to the
+              # __secure_collection_check method
+              ReactiveRecordPsuedoRelationArray.new([this.instance_exec(*args, &block)])
             ensure
               this.acting_user = old
             end
@@ -112,45 +94,7 @@ module ActiveRecord
           end
         end
 
-        def __synchromesh_parse_regulator_params(name, block)
-          if name.is_a? Hash
-            name, block = name.first
-            if %i[denied! deny denied].include? block
-              block = ->(*_args) { denied! }
-            elsif !block.is_a? Proc
-              value = block
-              block = ->(*_args) { value }
-            end
-          end
-          [name, block || ->(*_args) { true }]
-        end
-
-        def regulate_relationship(name, &block)
-          name, block = __synchromesh_parse_regulator_params(name, block)
-          define_method(:"__secure_remote_access_to_#{name}") do |acting_user, *args|
-            self.class.__set_synchromesh_permission_granted(send(name, *args), self, acting_user, &block)
-          end
-        end
-
-        def __synchromesh_regulate_from_macro(opts, name, already_defined)
-          if opts.key?(:regulate)
-            yield name => opts[:regulate]
-          elsif !already_defined
-            yield name => ->(*_args) {}
-          end
-        end
-
-        def default_scope(*args, &block)
-          __synchromesh_regulate_from_macro(
-            (opts = _synchromesh_scope_args_check([*block, *args])),
-            :all,
-            respond_to?(:__secure_remote_access_to_all),
-            &method(:regulate_scope)
-          )
-          pre_synchromesh_default_scope(opts[:server], &block)
-        end
-
-        def server_method(name, opts = {}, &block)
+        def server_method(name, _opts = {}, &block)
           # callable from the server internally
           define_method(name, &block)
           # callable remotely from the client
@@ -165,16 +109,131 @@ module ActiveRecord
           end
         end
 
-        def __secure_remote_access_to_find(acting_user, *args)
-          find(*args)
+        # relationships (and scopes) are regulated using a tri-state system.  Each
+        # remote access method will return the relationship as normal but will also set
+        # the value of __secure_remote_access_granted using the application defined regulation.
+        # Each regulation can explicitly allow the scope to be chained by returning a truthy
+        # value from the regulation.  Or each regulation can explicitly deny the scope to
+        # be chained by called `denied!`.  Otherwise each regulation can return a falsy
+        # value meaning the scope can be changed, but unless some other scope (before or
+        # after) in the chain explicitly allows the scope, the entire chain will fail.
+
+        # In otherwords within a chain of relationships and scopes, at least one Regulation
+        # must be return a truthy value otherwise the whole chain fails.  Likewise if any
+        # regulation called `deined!` the whole chain fails.
+
+        # If no regulation is defined, the regulation is inherited from the superclass, and if
+        # no regulation is defined anywhere in the class heirarchy then the regulation will
+        # return a falsy value.
+
+        # regulations on scopes are inheritable.  That is if a superclass defines a regulation
+        # for a scope, subclasses will inherit the regulation (but can override)
+
+        # helper method to sort out the options on the regulate_scope, regulate_relationship macros.
+
+        # We allow three forms:
+        # regulate_xxx name &block  : the block is the regulation
+        # regulate_xxx name: const  : const can be denied!, deny, denied, or any other truthy or
+        #                             falsy value
+        # regulate_xxx name: proc   : the proc is the regulation
+
+        def __synchromesh_parse_regulator_params(name, block)
+          if name.is_a? Hash
+            name, block = name.first
+            if %i[denied! deny denied].include? block
+              block = ->(*_args) { denied! }
+            elsif !block.is_a? Proc
+              value = block
+              block = ->(*_args) { value }
+            end
+          end
+          [name, block || ->(*_args) { true }]
         end
 
-        def __secure_remote_access_to_find_by(acting_user, *args)
-          find_by(*args)
+        # helper method for providing a regulation in line with a scope or relationship
+        # this is done using the `regulate` key on the opts.
+        # if no regulate key is provided and there is no regulation already defined for
+        # this name, then we create one that returns nil (don't care)
+        # once we have things figured out, we yield to the provided proc which is either
+        # regulate_scope or regulate_relationship
+
+        def __synchromesh_regulate_from_macro(opts, name, already_defined)
+          if opts.key?(:regulate)
+            yield name => opts[:regulate]
+          elsif !already_defined
+            yield name => ->(*_args) {}
+          end
         end
 
-        def __secure_remote_access_to_unscoped(acting_user, *args)
-          unscoped(*args)
+        # helper method to set the value of __synchromesh_permission_granted on the relationship
+        # Get the current value of __synchromesh_permission_granted, set acting_user on the
+        # object, and or in the result of running the block in context of the obj
+
+        def __set_synchromesh_permission_granted(r, obj, acting_user, args = [], &block)
+          r.__synchromesh_permission_granted = try(:__synchromesh_permission_granted)
+          old = acting_user
+          obj.acting_user = acting_user
+          r.__synchromesh_permission_granted ||= obj.instance_exec(*args, &block)
+          r
+        ensure
+          obj.acting_user = old
+        end
+
+        # regulate scope has to deal with the special case that the scope returns an
+        # an array instead of a relationship.  In this case we wrap the array and go on
+
+        def regulate_scope(name, &block)
+          name, block = __synchromesh_parse_regulator_params(name, block)
+          singleton_class.send(:define_method, :"__secure_remote_access_to_#{name}") do |acting_user, *args|
+            r = send(name, *args)
+            r = ReactiveRecordPsuedoRelationArray.new(r) if r.is_a? Array
+            __set_synchromesh_permission_granted(r, r, acting_user, args, &block)
+          end
+        end
+
+        # regulate_default_scope
+
+        def regulate_default_scope(&block)
+          regulate_scope(:all, &block)
+        end
+
+        # monkey patch scope and default_scope macros to process hyperloop special opts,
+        # and add regulations if present
+
+        alias pre_synchromesh_scope scope
+
+        def scope(name, *args, &block)
+          __synchromesh_regulate_from_macro(
+            (opts = _synchromesh_scope_args_check(args)),
+            name,
+            respond_to?(:"__secure_remote_access_to_#{name}"),
+            &method(:regulate_scope)
+          )
+          pre_synchromesh_scope(name, opts[:server], &block)
+        end
+
+        alias pre_synchromesh_default_scope default_scope
+
+        def default_scope(*args, &block)
+          __synchromesh_regulate_from_macro(
+            (opts = _synchromesh_scope_args_check([*block, *args])),
+            :all,
+            respond_to?(:__secure_remote_access_to_all),
+            &method(:regulate_scope)
+          )
+          pre_synchromesh_default_scope(opts[:server], &block)
+        end
+
+        # add regulate_relationship method and monkey patch monkey patch has_many macro
+        # to add regulations if present
+
+        def regulate_relationship(name, &block)
+          name, block = __synchromesh_parse_regulator_params(name, block)
+          define_method(:"__secure_remote_access_to_#{name}") do |acting_user, *args|
+            self.class.__set_synchromesh_permission_granted(
+              send(name, *args), self, acting_user, &block
+            )
+          end
         end
 
         alias pre_syncromesh_has_many has_many
@@ -189,87 +248,45 @@ module ActiveRecord
           pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
         end
 
-        [:belongs_to, :has_one].each do |macro|
+        # add secure access for find, find_by, and belongs_to and has_one relations.
+        # No explicit security checks are needed here, as the data returned by these objects
+        # will be further processedand checked before returning.  I.e. it is not possible to
+        # simply return `find(1)` but if you try returning `find(1).name` the permission system
+        # will check to see if the name attribute can be legally sent to the current acting user.
+
+        def __secure_remote_access_to_find(_acting_user, *args)
+          find(*args)
+        end
+
+        def __secure_remote_access_to_find_by(_acting_user, *args)
+          find_by(*args)
+        end
+
+        %i[belongs_to has_one].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
           define_method(macro) do |name, scope = nil, opts = {}, &block|
-            define_method(:"__secure_remote_access_to_#{name}") do |_acting_user, *args, &block|
-              send(name, *args, &block)
+            define_method(:"__secure_remote_access_to_#{name}") do |_acting_user, *args|
+              send(name, *args)
             end
             send(:"pre_syncromesh_#{macro}", name, scope, opts, &block)
           end
         end
-
-      else
-
-        alias pre_synchromesh_method_missing method_missing
-
-        def method_missing(name, *args, &block)
-          return all.send(name, *args, &block) if [].respond_to?(name)
-          if name.end_with?('!')
-            return send(name.chop, *args, &block).send(:reload_from_db) rescue nil
-          end
-          pre_synchromesh_method_missing(name, *args, &block)
-        end
-
-        def create(*args, &block)
-          new(*args).save(&block)
-        end
-
-        def scope(name, *args)
-          opts = _synchromesh_scope_args_check(args)
-          scope_description = ReactiveRecord::ScopeDescription.new(self, name, opts)
-          singleton_class.send(:define_method, name) do |*vargs|
-            all.build_child_scope(scope_description, *name, *vargs)
-          end
-          # singleton_class.send(:define_method, "#{name}=") do |_collection|
-          #   raise 'NO LONGER IMPLEMENTED - DOESNT PLAY WELL WITH SYNCHROMESH'
-          # end
-        end
-
-        def default_scope(*args, &block)
-          opts = _synchromesh_scope_args_check([*block, *args])
-          @_default_scopes ||= []
-          @_default_scopes << opts
-        end
-
-        def all
-          ReactiveRecord::Base.default_scope[self] ||=
-            begin
-            root = ReactiveRecord::Collection
-                   .new(self, nil, nil, self, 'all')
-                   .extend(ReactiveRecord::UnscopedCollection)
-            (@_default_scopes || [{ client: -> () { true } }]).inject(root) do |scope, opts|
-              scope.build_child_scope(ReactiveRecord::ScopeDescription.new(self, :all, opts))
-            end
-          end
-        end
-
-        # def all=(_collection)
-        #   raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
-        # end
-
-        def unscoped
-          ReactiveRecord::Base.unscoped[self] ||=
-            ReactiveRecord::Collection
-            .new(self, nil, nil, self, 'unscoped')
-            .extend(ReactiveRecord::UnscopedCollection)
-        end
-
-        def finder_method(name)
-          ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
-          [name, "#{name}!"].each do |method|
-            singleton_class.send(:define_method, method) do |*vargs|
-              all.apply_scope("_#{method}", *vargs).first
-            end
-          end
-        end
       end
-    end
-
-    if RUBY_ENGINE != 'opal'
 
       def denied!
         Hyperloop::InternalPolicy.raise_operation_access_violation
+      end
+
+      # call do_not_synchronize to block synchronization of a model
+
+      def self.do_not_synchronize
+        @do_not_synchronize = true
+      end
+
+      # used by the broadcast mechanism to determine if this model is to be synchronized
+
+      def self.do_not_synchronize?
+        @do_not_synchronize
       end
 
       def do_not_synchronize?
@@ -294,27 +311,8 @@ module ActiveRecord
         return if do_not_synchronize?
         ReactiveRecord::Broadcast.after_commit :destroy, self
       end
-    else
-
-      scope :limit, ->() {}
-      scope :offset, ->() {}
-
-      def update_attribute(attr, value, &block)
-        send("#{attr}=", value)
-        save(validate: false, &block)
-      end
-
-      def update(attrs = {}, &block)
-        attrs.each { |attr, value| send("#{attr}=", value) }
-        save(&block)
-      end
-
-      def <=>(other)
-        id.to_i <=> other.id.to_i
-      end
     end
   end
 
   InternalMetadata.do_not_synchronize if defined? InternalMetadata
-
 end

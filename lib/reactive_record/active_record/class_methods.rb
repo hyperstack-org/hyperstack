@@ -79,7 +79,7 @@ module ActiveRecord
       :_find_callbacks, :_find_callbacks?, :_find_callbacks=, :_touch_callbacks, :_touch_callbacks?, :_touch_callbacks=, :_save_callbacks,
       :_save_callbacks?, :_save_callbacks=, :_create_callbacks, :_create_callbacks?, :_create_callbacks=, :_update_callbacks,
       :_update_callbacks?, :_update_callbacks=, :_destroy_callbacks, :_destroy_callbacks?, :_destroy_callbacks=, :record_timestamps?,
-      :_synchromesh_scope_args_check, :pre_synchromesh_scope, :pre_synchromesh_default_scope, :do_not_synchronize, :do_not_synchronize?,
+      :pre_synchromesh_scope, :pre_synchromesh_default_scope, :do_not_synchronize, :do_not_synchronize?,
       :logger=, :maintain_test_schema, :maintain_test_schema=, :scope, :time_zone_aware_attributes, :time_zone_aware_attributes=,
       :default_timezone, :default_timezone=, :_attr_readonly, :warn_on_records_fetched_greater_than, :configurations, :configurations=,
       :_attr_readonly?, :table_name_prefix=, :table_name_suffix=, :schema_migrations_table_name=, :internal_metadata_table_name,
@@ -146,8 +146,82 @@ module ActiveRecord
     def method_missing(name, *args, &block)
       if args.count == 1 && name.start_with?("find_by_") && !block
         find_by(name.sub(/^find_by_/, "") => args[0])
+      elsif [].respond_to?(name)
+        all.send(name, *args, &block)
+      elsif name.end_with?('!')
+        send(name.chop, *args, &block).send(:reload_from_db) rescue nil
       elsif !SERVER_METHODS.include?(name)
         raise "#{self.name}.#{name}(#{args}) (called class method missing)"
+      end
+    end
+
+    # client side AR
+
+    # Any method that can be applied to an array will be applied to the result
+    # of all instead.
+    # Any method ending with ! just means apply the method after forcing a reload
+    # from the DB.
+
+    # alias pre_synchromesh_method_missing method_missing
+    #
+    # def method_missing(name, *args, &block)
+    #   return all.send(name, *args, &block) if [].respond_to?(name)
+    #   if name.end_with?('!')
+    #     return send(name.chop, *args, &block).send(:reload_from_db) rescue nil
+    #   end
+    #   pre_synchromesh_method_missing(name, *args, &block)
+    # end
+
+    def create(*args, &block)
+      new(*args).save(&block)
+    end
+
+    def scope(name, *args)
+      opts = _synchromesh_scope_args_check(args)
+      scope_description = ReactiveRecord::ScopeDescription.new(self, name, opts)
+      singleton_class.send(:define_method, name) do |*vargs|
+        all.build_child_scope(scope_description, *name, *vargs)
+      end
+      # singleton_class.send(:define_method, "#{name}=") do |_collection|
+      #   raise 'NO LONGER IMPLEMENTED - DOESNT PLAY WELL WITH SYNCHROMESH'
+      # end
+    end
+
+    def default_scope(*args, &block)
+      opts = _synchromesh_scope_args_check([*block, *args])
+      @_default_scopes ||= []
+      @_default_scopes << opts
+    end
+
+    def all
+      ReactiveRecord::Base.default_scope[self] ||=
+        begin
+        root = ReactiveRecord::Collection
+               .new(self, nil, nil, self, 'all')
+               .extend(ReactiveRecord::UnscopedCollection)
+        (@_default_scopes || [{ client: -> () { true } }]).inject(root) do |scope, opts|
+          scope.build_child_scope(ReactiveRecord::ScopeDescription.new(self, :all, opts))
+        end
+      end
+    end
+
+    # def all=(_collection)
+    #   raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
+    # end
+
+    def unscoped
+      ReactiveRecord::Base.unscoped[self] ||=
+        ReactiveRecord::Collection
+        .new(self, nil, nil, self, 'unscoped')
+        .extend(ReactiveRecord::UnscopedCollection)
+    end
+
+    def finder_method(name)
+      ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
+      [name, "#{name}!"].each do |method|
+        singleton_class.send(:define_method, method) do |*vargs|
+          all.apply_scope("_#{method}", *vargs).first
+        end
       end
     end
 
@@ -155,23 +229,23 @@ module ActiveRecord
       @abstract_class = val
     end
 
-    def scope(name, body)
-      singleton_class.send(:define_method, name) do | *args |
-        args = (args.count == 0) ? name : [name, *args]
-        ReactiveRecord::Base.class_scopes(self)[args] ||= ReactiveRecord::Collection.new(self, nil, nil, self, args)
-      end
-      singleton_class.send(:define_method, "#{name}=") do |collection|
-        ReactiveRecord::Base.class_scopes(self)[name] = collection
-      end
-    end
+    # def scope(name, body)
+    #   singleton_class.send(:define_method, name) do | *args |
+    #     args = (args.count == 0) ? name : [name, *args]
+    #     ReactiveRecord::Base.class_scopes(self)[args] ||= ReactiveRecord::Collection.new(self, nil, nil, self, args)
+    #   end
+    #   singleton_class.send(:define_method, "#{name}=") do |collection|
+    #     ReactiveRecord::Base.class_scopes(self)[name] = collection
+    #   end
+    # end
 
-    def all
-      ReactiveRecord::Base.class_scopes(self)[:all] ||= ReactiveRecord::Collection.new(self, nil, nil, self, "all")
-    end
-
-    def all=(collection)
-      ReactiveRecord::Base.class_scopes(self)[:all] = collection
-    end
+    # def all
+    #   ReactiveRecord::Base.class_scopes(self)[:all] ||= ReactiveRecord::Collection.new(self, nil, nil, self, "all")
+    # end
+    #
+    # def all=(collection)
+    #   ReactiveRecord::Base.class_scopes(self)[:all] = collection
+    # end
 
     [:belongs_to, :has_many, :has_one].each do |macro|
       define_method(macro) do |*args| # is this a bug in opal?  saying name, scope=nil, opts={} does not work!

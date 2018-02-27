@@ -116,7 +116,7 @@ module ActiveRecord
         # for rails auto generated methods for booleans, remove '?' to get the attribute
         name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
         @backing_record.reactive_get!(name, force_update)
-      elsif !block 
+      elsif !block
         # for rails auto generated methods for booleans, remove '?' to get the attribute
         name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
         @backing_record.reactive_get!([[name]+args], force_update)
@@ -165,6 +165,20 @@ module ActiveRecord
     def errors
       React::State.get_state(@backing_record, @backing_record)
       @backing_record.errors
+    end
+
+    def update_attribute(attr, value, &block)
+      send("#{attr}=", value)
+      save(validate: false, &block)
+    end
+
+    def update(attrs = {}, &block)
+      attrs.each { |attr, value| send("#{attr}=", value) }
+      save(&block)
+    end
+
+    def <=>(other)
+      id.to_i <=> other.id.to_i
     end
 
   end

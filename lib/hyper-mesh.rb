@@ -22,12 +22,12 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/reactive_record/collection"
   require "reactive_record/active_record/reactive_record/scoped_collection"
   require "reactive_record/active_record/reactive_record/unscoped_collection"
+  require "reactive_record/interval"
+  require_relative 'active_record_base'
+  require_relative 'reactive_record/scope_description'
   require "reactive_record/active_record/class_methods"
   require "reactive_record/active_record/instance_methods"
   require "reactive_record/active_record/base"
-  require "reactive_record/interval"
-  require_relative 'reactive_record/scope_description'
-  require_relative 'active_record_base'
   require_relative 'hypermesh/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'
