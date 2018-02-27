@@ -407,6 +407,99 @@ class MessagePolicy
 end
 ```
 
+## Regulating Scopes
+
+Consider the following expression (evaluated on the client)
+
+```ruby
+  Order.for_vip_customers.count
+```
+
+Even though the policy system will prevent us from looking into the actual attributes of any record, a malicioius hacker can find private information about our data if the above expression is not secured.  Moreover a DOS attack could be formed by repeatedly attempting to perform a variant of `Order.all`.
+
+To prevent this scopes and relationships can also be regulated.   A scope and relationship regulation is a proc that will return either a truthy or falsy value or calls the `denied!` method.   The proc is evaluated in the context of the relationship object, and the `acting_user` method is available for the proc's use in making decisions.
+
+All the scopes in a chain are evaluated together, and permission is granted or denied as follows:
+
++ If *any* of the regulations in a chain of scopes calls `denied!` then the remote request is aborted;
++ If *any* of the regulations in a chain of scopes returns a truthy value then access is granted to the entire chain;
++ If *none* of the regulations in a chain of scopes returns a truthy value then the request is aborted.
+
+Example:
+
+```ruby
+class Order < ApplicationRecord
+  regulate_scope(:for_vip_customers) { denied! unless acting_user.admin? }
+  regulate_scope(:active) { acting_user.admin? } 
+end
+
+class User < ApplicationRecord 
+  regulate_relationship(:orders) { self == acting_user }
+end
+
+ # in component code
+ 
+   user.orders.count              # valid if user is the acting user because the orders regulation returned true
+                                  # but will raise error if acting_user is not == user
+   user.orders.active.count       # valid if user is the acting user or if current user is an administrator
+   user.orders.for_vip_customers  # fails unless acting user is an admin
+```
+
+By default all relationships and scopes (including `all` and `unscoped` have a regulation that returns nil, so unless you explicitly provide a regulation that returns true, the client can not access any scopes.
+
+There are some short hand ways to define regulations as well:
+
+#### Constant Regulations
+
+If the regulation always does the same thing you can specify what to do without the block:
+
+```ruby
+  regulate_scope my_scope: :always_allow        # any truthy value works
+  regulate_scope my_scope: :denied!             # :deny or :denied work as well
+  regulate_relationship many_of_those: :denied! # works the same on relationships
+```
+
+Always denying a regulation effectively makes it inaccessible except on the server.
+
+Likewise be careful of always returning true for a scope, as this means that a hacker only needs
+to include this scope in the chain to gain access to the chain.  So just make sure that scopes that return
+true, narrow the scope down to something you would not mind anybody seeing.
+
+For development you can easily access everything (except regulations that explicitly invoke denied!) simply by doing this:
+
+```ruby
+class ApplicationRecord < ActiveRecord::Base
+  regulate_scope all: :always_allow if Rails.env.development?
+  regulate_scope unscoped: :always_allow if Rails.env.development?
+end
+```
+
+#### Regulations directly on scopes and has_many relationships
+
+You can also directly add the regulation where you declare the scope or relationship using the `regulate:` option.
+
+```ruby
+  # here is a handy scope to add to ApplicationRecord that you can attach to 
+  # any scope chain to give admin's full access
+  scope :admin, ->() {}, regulate: -> () { acting_user.admin? || denied! }
+  
+  # customers can always see their orders, otherwise we return nil meaning "don't know yet"
+  has_many :orders, regulate: -> () { acting_user == self } 
+```
+
+## Regulating server_method and finder_method methods
+
+The server or finder method proc will be executed in the context of the appropriate object (a record for server_method, and a relationship collection for finder_method.) Attached to this object will be the current `acting_user` method, and a `denied!` method.
+
+You can use these methods to restrict access to server and finder methods.
+
+```ruby
+  server_method :unit_cost do
+    denied! unless acting_user.admin? # only admin's can see this
+    # continue on calculating the unit cost
+  end
+```
+
 ## Browser Initiated Change policies
 
 To allow code in the browser to create, update or destroy a model, there must be a change access policy defined for that operation.
