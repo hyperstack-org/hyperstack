@@ -151,7 +151,8 @@ module Vis
           if `typeof block === "function"`
             options[:manipulation][key] = %x{
               function(nodeData, callback) {
-                return #{block.call(`Opal.Hash.$new(nodeData)`, `callback`)};
+                var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n())` }}
+                return block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
               }
             }
           end
@@ -164,7 +165,8 @@ module Vis
           if `typeof block === "function"`
             options[:manipulation][key] = %x{
               function(nodeData, callback) {
-                return #{block.call(`Opal.Hash.$new(nodeData)`, `callback`)};
+                var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n())` }}
+                return block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
               }
             }
           end
