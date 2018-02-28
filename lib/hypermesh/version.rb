@@ -1,3 +1,3 @@
 module Hypermesh
-  VERSION = '1.0.0.lap23'
+  VERSION = '1.0.0.lap24'
 end
