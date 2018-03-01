@@ -1,5 +1,5 @@
 if RUBY_ENGINE != 'opal'
-  require "react/config/server"
-else
-  require "react/config/client"
+  module Hyperloop
+    define_setting :prerendering, :off
+  end
 end

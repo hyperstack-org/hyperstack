@@ -11,6 +11,7 @@ if RUBY_ENGINE == 'opal'
 else
   require "react/config"
   require "react/rails/asset_variant"
-  react_directory = React::Rails::AssetVariant.new(React::Config.config).react_directory
+  variant = Hyperloop.env.production? ? 'production' : 'development'
+  react_directory = React::Rails::AssetVariant.new({environment: variant}).react_directory
   Opal.append_path react_directory.untaint
 end

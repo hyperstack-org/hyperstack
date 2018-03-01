@@ -37,9 +37,7 @@ module React
     def self.log(message, message_type = :info)
       message = [message] unless message.is_a? Array
 
-      is_production = React::Config.config[:environment] == 'production'
-
-      if (message_type == :info || message_type == :warning) && is_production
+      if (message_type == :info || message_type == :warning) && Hyperloop.env.production?
         return
       end
 

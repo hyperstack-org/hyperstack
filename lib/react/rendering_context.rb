@@ -80,7 +80,7 @@ module React
       #   3 an element that is NOT yet pushed on the rendering buffer
       #   4 or the last element pushed on the buffer
       #
-      # in case 1 we change the object to a string, and then it becomes case 2
+      # in case 1 we render a span
       # in case 2 we automatically push the string onto the buffer
       # in case 3 we also push the Element onto the buffer IF the buffer is empty
       # case 4 requires no special processing
@@ -93,7 +93,10 @@ module React
       def run_child_block(is_outer_scope)
         result = yield
         if result.respond_to?(:acts_as_string?) && result.acts_as_string?
-          @buffer << result.to_s
+          # hyper-mesh DummyValues respond to acts_as_string, and must
+          # be converted to spans INSIDE the parent, otherwise the waiting_on_resources
+          # flag will get set in the wrong context
+          React::RenderingContext.render(:span) { result.to_s }
         elsif result.is_a?(String) || (result.is_a?(React::Element) && @buffer.empty?)
           @buffer << result
         end
