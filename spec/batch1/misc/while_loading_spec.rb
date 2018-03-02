@@ -3,7 +3,7 @@ require 'test_components'
 require 'rspec-steps'
 
 
-describe "while loading", js: true, skip: true do
+describe "while loading", js: true do
 
   before(:all) do
     class ReactiveRecord::Operations::Fetch < Hyperloop::ServerOp
@@ -44,23 +44,24 @@ describe "while loading", js: true, skip: true do
       mount "WhileLoadingTester", {}, no_wait: true do
         class MyNestedGuy < Hyperloop::Component
           render(SPAN) do
-            User.find_by_first_name('Lily').last_name
+            "#{User.find_by_first_name('Lily').last_name} is a dog"
           end
         end
         class WhileLoadingTester < Hyperloop::Component
           render do
             DIV do
               MyNestedGuy {}
-            end.while_loading do
+            end
+            .while_loading do
               SPAN { 'loading...' }
             end
           end
         end
       end
       expect(page).to have_content('loading...')
-      expect(page).not_to have_content('DaDog', wait: 0)
+      expect(page).not_to have_content('is a dog', wait: 0)
     end
-    expect(page).to have_content('DaDog')
+    expect(page).to have_content('DaDog is a dog')
     expect(page).not_to have_content('loading...', wait: 0)
   end
 

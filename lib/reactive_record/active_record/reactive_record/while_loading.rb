@@ -224,10 +224,8 @@ module React
   class Element
 
     def while_loading(display = "", &loading_display_block)
-
       loaded_children = []
       loaded_children = block.call.dup if block
-
       if display.respond_to? :as_node
         display = display.as_node
         loading_display_block = lambda { display.render }
@@ -288,7 +286,7 @@ if RUBY_ENGINE == 'opal'
               var node_wl_attr = node.getAttribute('data-reactive_record_enclosing_while_loading_container_id');
               if (node_wl_attr === null || node_wl_attr === "") {
                 var while_loading_container = node.closest('[data-reactive_record_while_loading_container_id]');
-                if (while_loading_container !== null && while_loading_container.length > 0) {
+                if (while_loading_container !== null) {
                   var container_id = while_loading_container.getAttribute('data-reactive_record_while_loading_container_id');
                   node.setAttribute('data-reactive_record_enclosing_while_loading_container_id', container_id);
                 }
@@ -299,6 +297,7 @@ if RUBY_ENGINE == 'opal'
         def reactive_record_link_set_while_loading_container_class
           node = dom_node
           loading = (waiting_on_resources ? `true` : `false`)
+          #puts "******* reactive_record_link_set_while_loading_container_class #{self} #{node} #{loading}"
           %x{
               if (typeof node === "undefined" || node === null) return;
               var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');
