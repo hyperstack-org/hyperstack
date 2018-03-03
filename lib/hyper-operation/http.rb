@@ -187,7 +187,7 @@ module Hyperloop
         xhr.onreadystatechange = function() {
           if(xhr.readyState === XMLHttpRequest.DONE) {
             self.$class().$decr_active_requests();
-            if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
               return #{succeed(`xhr.responseText`, `xhr.status`, `xhr`)};
             } else {
               return #{fail(`xhr`, `xhr.status`, `xhr.statusText`)};
@@ -271,9 +271,13 @@ module Hyperloop
 
       @promise = Promise.new.tap { |promise|
         @handler = proc { |res|
+          `console.log("in promise, res: ", res)`
+          `console.log("res ok?", res['$ok?']())`
           if res.ok?
+            `console.log('in success')`
             promise.resolve res
           else
+            `console.log('in failure')`
             promise.reject res
           end
         }
