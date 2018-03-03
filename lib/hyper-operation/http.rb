@@ -271,13 +271,9 @@ module Hyperloop
 
       @promise = Promise.new.tap { |promise|
         @handler = proc { |res|
-          `console.log("in promise, res: ", res)`
-          `console.log("res ok?", res['$ok?']())`
           if res.ok?
-            `console.log('in success')`
             promise.resolve res
           else
-            `console.log('in failure')`
             promise.reject res
           end
         }
