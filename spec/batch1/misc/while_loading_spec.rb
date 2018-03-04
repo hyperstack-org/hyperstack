@@ -6,7 +6,7 @@ require 'rspec-steps'
 describe "while loading", js: true do
 
   before(:all) do
-    class ReactiveRecord::Operations::Fetch < Hyperloop::ServerOp
+    ReactiveRecord::Operations::Fetch.class_eval do
       def self.semaphore
         @semaphore ||= Mutex.new
       end

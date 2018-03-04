@@ -1,7 +1,12 @@
 module ReactiveRecord
+  # redefine if you want to process errors (i.e. logging, rollbar, etc)
+  def self.on_fetch_error(e, params); end
+
   module Operations
-  # fetch queued up records from the server
-    class Fetch < Hyperloop::ServerOp
+    # fetch queued up records from the server
+    # subclass of ControllerOp so we can pass the controller
+    # along to on_fetch_error
+    class Fetch < Hyperloop::ControllerOp
       param :acting_user, nils: true
       param models: []
       param associations: []
@@ -13,6 +18,10 @@ module ReactiveRecord
           params.pending_fetches,
           params.acting_user
         ]
+      end
+      failed do |e|
+        ReactiveRecord.on_fetch_error(e, params.to_h)
+        raise e
       end
     end
 
