@@ -153,8 +153,6 @@ module Vis
         if `typeof block === "function"`
           options[:manipulation][key] = %x{
             function(nodeData, callback) {
-              console.log("callback got nodeData 1", nodeData);
-              console.log(key);
               var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n());` }};
               block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
             }
