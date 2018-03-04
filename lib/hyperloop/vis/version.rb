@@ -1,5 +1,5 @@
 module Hyperloop
   module Vis
-    VERSION = '1.0.0.lap30'
+    VERSION = '1.0.0.lap31'
   end
 end
