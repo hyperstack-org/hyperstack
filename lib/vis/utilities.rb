@@ -43,15 +43,17 @@ module Vis
 
     def options_to_native(options)
       return unless options
-      _rubyfy_configure_options(options) if options.has_key?(:configure)
-      _rubyfy_edges_options(options) if options.has_key?(:edges)
-      _rubyfy_manipulation_options(options) if options.has_key?(:manipulation)
-      _rubyfy_nodes_options(options) if options.has_key?(:nodes)
-      
-      if options.has_key?(:join_condition)
-        block = options[:join_condition]
+      # options must be duplicated, so callbacks dont get wrapped twice
+      new_opts = options.dup
+      _rubyfy_configure_options(new_opts) if new_opts.has_key?(:configure)
+      _rubyfy_edges_options(new_opts) if new_opts.has_key?(:edges)
+      _rubyfy_manipulation_options(new_opts) if new_opts.has_key?(:manipulation)
+      _rubyfy_nodes_options(new_opts) if new_opts.has_key?(:nodes)
+
+      if new_opts.has_key?(:join_condition)
+        block = new_opts[:join_condition]
         if `typeof block === "function"`
-          options[:join_condition] = %x{
+          new_opts[:join_condition] = %x{
             function(node_options, child_options) {
               if (child_options !== undefined && child_options !== null) {
                 return #{block.call(`Opal.Hash.$new(node_options)`, `Opal.Hash.$new(child_options)`)};
@@ -63,10 +65,10 @@ module Vis
         end
       end
 
-      if options.has_key?(:process_properties)
-        block = options[:process_properties]
+      if new_opts.has_key?(:process_properties)
+        block = new_opts[:process_properties]
         if `typeof block === "function"`
-          options[:process_properties] = %x{
+          new_opts[:process_properties] = %x{
             function(item) {
               var res = #{block.call(`Opal.Hash.$new(item)`)};
               return res.$to_n();
@@ -75,10 +77,10 @@ module Vis
         end
       end
 
-      if options.has_key?(:filter)
-        block = options[:filter]
+      if new_opts.has_key?(:filter)
+        block = new_opts[:filter]
         if `typeof block === "function"`
-          options[:filter] = %x{
+          new_opts[:filter] = %x{
             function(item) {
               return #{block.call(`Opal.Hash.$new(item)`)};
             }
@@ -86,7 +88,7 @@ module Vis
         end
       end
 
-      lower_camelize_hash(options).to_n
+      lower_camelize_hash(new_opts).to_n
     end
 
     def _rubyfy_configure_options(options)
@@ -146,30 +148,30 @@ module Vis
 
     def _rubyfy_manipulation_options(options)
       [:add_edge, :add_node, :edit_edge, :edit_node].each do |key|
-        if options[:manipulation].has_key?(key)
-          block = options[:manipulation][key]
-          if `typeof block === "function"`
-            options[:manipulation][key] = %x{
-              function(nodeData, callback) {
-                var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n())` }}
-                return block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
-              }
+        next unless options[:manipulation].has_key?(key)
+        block = options[:manipulation][key]
+        if `typeof block === "function"`
+          options[:manipulation][key] = %x{
+            function(nodeData, callback) {
+              console.log("callback got nodeData 1", nodeData);
+              console.log(key);
+              var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n());` }};
+              block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
             }
-          end
+          }
         end
       end
       # for delete the order of args for the callback is not clear
       [:delete_edge, :delete_node].each do |key|
-        if options[:manipulation].has_key?(key)
-          block = options[:manipulation][key]
-          if `typeof block === "function"`
-            options[:manipulation][key] = %x{
-              function(nodeData, callback) {
-                var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n())` }}
-                return block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
-              }
+        next unless options[:manipulation].has_key?(key)
+        block = options[:manipulation][key]
+        if `typeof block === "function"`
+          options[:manipulation][key] = %x{
+            function(nodeData, callback) {
+              var wrapped_callback = #{ proc { |new_node_data| `callback(new_node_data.$to_n());` }};
+              block.$call(Opal.Hash.$new(nodeData), wrapped_callback);
             }
-          end
+          }
         end
       end
     end
