@@ -17,6 +17,7 @@ class Object
     object_id
   end
 end
+
 class Number
   def to_key
     self
