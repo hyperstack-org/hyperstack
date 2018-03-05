@@ -24,7 +24,6 @@ if RUBY_ENGINE == 'opal'
       "   add 'react' to your webpack manifest."
     ].join("\n")
   end
-  require 'react/hash'
   require 'react/top_level'
   require 'react/top_level_render'
   require 'react/observable'
