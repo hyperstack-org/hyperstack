@@ -47,11 +47,6 @@ module ReactiveRecord
         end if response.is_a?(Hash) && response[:saved_models]
         response
       end
-
-      # TODO remove following monkey patch once ttps://github.com/ruby-hyperloop/hyper-operation/issues/17 is fixed
-      def self.run(params)
-        super deserialize_params(params)
-      end unless RUBY_ENGINE=='opal'
     end
     # fetch queued up records from the server
     # subclass of ControllerOp so we can pass the controller

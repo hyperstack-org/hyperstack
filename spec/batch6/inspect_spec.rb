@@ -20,6 +20,12 @@ RSpec::Steps.steps 'ActiveRecord::Base.inspect displays', js: true do
     TodoItem.do_not_synchronize
   end
 
+  after(:all) do
+    ['TodoItem'].each do |klass|
+      Object.send(:remove_const, klass.to_sym) && load("#{klass.underscore}.rb") rescue nil
+    end
+  end
+
   before(:step) do
     stub_const 'ApplicationPolicy', Class.new
     ApplicationPolicy.class_eval do
