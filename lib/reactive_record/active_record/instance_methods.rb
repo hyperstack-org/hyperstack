@@ -3,7 +3,7 @@ module ActiveRecord
   module InstanceMethods
 
     def inspect
-      "<#{model_name}:#{ReactiveRecord::Operations::Base::FORMAT % backing_record.object_id} "\
+      "<#{model_name}:#{ReactiveRecord::Operations::Base::FORMAT % to_key} "\
       "(#{ReactiveRecord::Operations::Base::FORMAT % object_id}) "\
       "#{backing_record.inspection_details} >"
     end
@@ -171,6 +171,10 @@ module ActiveRecord
     def errors
       React::State.get_state(@backing_record, @backing_record)
       @backing_record.errors
+    end
+
+    def to_key
+      @backing_record.object_id
     end
 
     def update_attribute(attr, value, &block)
