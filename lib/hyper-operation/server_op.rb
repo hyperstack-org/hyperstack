@@ -72,15 +72,21 @@ module Hyperloop
           end
           run(deserialize_params(params))
           .then { |r| return { json: { response: serialize_response(r) } } }
-          .fail do |e|
-            ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp failed when running #{operation} with params \"#{params}\": #{e}\033[0;30;21m"
-            return { json: { error: e }, status: 500 }
-          end
+          .fail { |e| return handle_exception(e, operation, params) }
         end
       rescue Exception => e
-        ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp exception caught when running #{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+        handle_exception(e, operation, params)
+      end
+
+      def handle_exception(e, operation, params)
+        if defined? ::Rails
+          params.delete(:controller)
+          ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp exception caught when running "\
+                               "#{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+        end
         { json: { error: e }, status: 500 }
       end
+
 
       def remote(path, *args)
         promise = Promise.new
