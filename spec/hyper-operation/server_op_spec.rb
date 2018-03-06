@@ -1,6 +1,36 @@
 require 'spec_helper'
 
 describe "isomorphic operations", js: true do
+
+  before(:each) do
+    on_client do
+      class Test < React::Component::Base
+        def self.receive_count
+          @@rc ||= 0
+          @@rc
+        end
+        def self.rc_inc
+          @@rc ||= 0
+          @@rc += 1
+        end
+        before_mount do
+          Operation.on_dispatch do |params|
+            self.class.rc_inc
+            # password is for testing inbound param filtering
+            state.message! "#{params.message}#{params.try(:password)}"
+          end
+        end
+        render do
+          if state.message
+            "The server says '#{state.message}'!"
+          else
+            "No messages yet"
+          end
+        end
+      end
+    end
+  end
+
   context 'uplinking' do
     before(:each) do
       stub_const "ServerFacts", Class.new(Hyperloop::ServerOp)
@@ -75,32 +105,6 @@ describe "isomorphic operations", js: true do
 
     before(:each) do
       stub_const "Operation", Class.new(Hyperloop::ServerOp)
-      on_client do
-        class Test < React::Component::Base
-          def self.receive_count
-            @@rc ||= 0
-            @@rc
-          end
-          def self.rc_inc
-            @@rc ||= 0
-            @@rc += 1
-          end
-          before_mount do
-            Operation.on_dispatch do |params|
-              self.class.rc_inc
-              # password is for testing inbound param filtering
-              state.message! "#{params.message}#{params.try(:password)}"
-            end
-          end
-          render do
-            if state.message
-              "The server says '#{state.message}'!"
-            else
-              "No messages yet"
-            end
-          end
-        end
-      end
     end
 
     it 'will dispatch to the client' do
@@ -220,6 +224,66 @@ describe "isomorphic operations", js: true do
       expect_evaluate_ruby('Test.receive_count').to eq(1)
       Operation.run(message: 'hello', channels: 'Application')
       expect_evaluate_ruby('Test.receive_count').to eq(2)
+    end
+  end
+
+  context "serialization overrides" do
+
+    before(:all) do
+      require 'pusher'
+      require 'pusher-fake'
+      Pusher.app_id = "MY_TEST_ID"
+      Pusher.key =    "MY_TEST_KEY"
+      Pusher.secret = "MY_TEST_SECRET"
+      require "pusher-fake/support/base"
+
+      Hyperloop.configuration do |config|
+        config.transport = :pusher
+        config.channel_prefix = "synchromesh"
+        config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
+      end
+    end
+
+    it 'calls the subclasses serializer and deserializer methods' do
+      isomorphic do
+        class Operation < Hyperloop::ServerOp
+          param :acting_user, nils: true
+          param :counter
+          outbound :message
+          step {params.message = 'hello'}
+          step {params.counter + 1}
+          def self.serialize_params(hash)
+            hash['counter'] += 1
+            hash
+          end
+          def self.deserialize_params(hash)
+            hash['counter'] += 1
+            hash
+          end
+          def self.serialize_response(response)
+            response + 1
+          end
+          def self.deserialize_response(response)
+            response + 1
+          end
+          def self.serialize_dispatch(hash)
+            hash[:message] += ' serialized'
+            hash
+          end
+          def self.deserialize_dispatch(hash)
+            hash[:message] += ' deserialized'
+            hash
+          end
+        end
+      end
+      stub_const "OperationPolicy", Class.new
+      OperationPolicy.always_allow_connection
+      mount 'Test'
+
+      expect_promise do
+        Operation.run(counter: 1)
+      end.to eq(6)
+      expect(page).to have_content("The server says 'hello serialized deserialized'!")
     end
   end
 end
