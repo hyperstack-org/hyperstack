@@ -255,7 +255,7 @@ module ReactiveRecord
     end
 
     def errors
-      @errors ||= ActiveModel::Error.new
+      @errors ||= ActiveModel::Errors.new(self)
     end
 
     # called when we have a newly created record, to initialize
@@ -282,7 +282,7 @@ module ReactiveRecord
       @synced_attributes.each { |attribute, value| sync_attribute(key, value) }
       @changed_attributes = []
       @saving = false
-      @errors = nil
+      errors.clear
       # set the vector and clear collections - this only happens when a new record is saved
       initialize_collections if (!vector || vector.empty?) && id && id != ''
       self
@@ -335,7 +335,7 @@ module ReactiveRecord
         @attributes.delete(attribute) unless @synced_attributes.key?(attribute)
       end
       @changed_attributes = []
-      @errors = nil
+      errors.clear
     end
 
     def saving!
@@ -345,12 +345,16 @@ module ReactiveRecord
 
     def errors!(errors)
       @saving = false
-      @errors = errors && ActiveModel::Error.new(errors)
+      errors.each do |attribute, messages|
+        messages.each do |message|
+          self.errors.add(attribute, message: message)
+        end
+      end
     end
 
     def saved!  # sets saving to false AND notifies
       @saving = false
-      if !@errors or @errors.empty?
+      if errors.empty?
         React::State.set_state(self, self, :saved)
       elsif !data_loading?
         React::State.set_state(self, self, :error)
