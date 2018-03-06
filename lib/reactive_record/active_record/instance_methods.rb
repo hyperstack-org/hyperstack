@@ -2,6 +2,12 @@ module ActiveRecord
 
   module InstanceMethods
 
+    def inspect
+      "<#{model_name}:#{ReactiveRecord::Operations::Base::FORMAT % backing_record.object_id} "\
+      "(#{ReactiveRecord::Operations::Base::FORMAT % object_id}) "\
+      "#{backing_record.inspection_details} >"
+    end
+
     attr_reader :backing_record
 
     def attributes

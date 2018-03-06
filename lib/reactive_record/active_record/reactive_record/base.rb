@@ -1,5 +1,6 @@
 module ReactiveRecord
   class Base
+    include BackingRecordInspector
 
     # Its all about lazy loading. This prevents us from grabbing enormous association collections, or large attributes
     # unless they are explicitly requested.
@@ -344,7 +345,7 @@ module ReactiveRecord
 
     def errors!(errors)
       @saving = false
-      @errors = errors and ActiveModel::Error.new(errors)
+      @errors = errors && ActiveModel::Error.new(errors)
     end
 
     def saved!  # sets saving to false AND notifies
@@ -363,7 +364,7 @@ module ReactiveRecord
     end
 
     def new?
-      !id and !vector
+      !id && !vector
     end
 
     def find_association(association, id)

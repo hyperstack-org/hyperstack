@@ -491,7 +491,7 @@ module ReactiveRecord
         end
 
       rescue Exception => e
-        ReactiveRecord::Pry.rescued(e)
+        #ReactiveRecord::Pry.rescued(e)
         if save
           {success: false, saved_models: saved_models, message: e}
         else
@@ -554,7 +554,7 @@ module ReactiveRecord
         {success: true, attributes: {}}
 
       rescue Exception => e
-        ReactiveRecord::Pry.rescued(e)
+        #ReactiveRecord::Pry.rescued(e)
         {success: false, record: record, message: e}
       end
     end
