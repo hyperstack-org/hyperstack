@@ -90,6 +90,26 @@ describe "authorization integration", js: true do
     expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
   end
 
+  it 'will only return authorized attributes on creation' do
+    client_option raise_on_js_errors: :off
+    TestModel.class_eval do
+      def create_permitted?
+        true
+      end
+    end
+    mount 'TestComponent2'
+    wait_for_ajax
+    ApplicationController.acting_user = User.new(name: 'fred')
+    page.evaluate_ruby('Hyperloop.connect("TestApplication")')
+    TestModel.before_save { self.test_attribute ||= 'top secret' }
+    expect_promise do
+      model = TestModel.new(updated_at: 12)
+      model.save.then do
+        model.attributes.keys
+      end
+    end.to contain_exactly("id", "created_at", "updated_at", "child_models")
+  end
+
   it "will only synchronize the connected channels" do
     mount "TestComponent2"
     model1 = FactoryBot.create(:test_model, test_attribute: "hello")

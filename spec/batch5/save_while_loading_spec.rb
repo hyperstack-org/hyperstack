@@ -22,18 +22,18 @@ describe "save while loading", js: true do
     expect_promise do
       TodoItem.create(user: User.find_by_first_name('Ima'))
     end.to include('success' => true)
-    # strangely sometimes AR does not seem to be updated even though promise has returned
-    # huh?
-    wait_for(user.todo_items).to match_array([TodoItem.first])
+    expect(user.todo_items.to_a).to match_array([TodoItem.first])
   end
+
   it "with push" do
     user = FactoryBot.create(:user, first_name: 'Ima')
     expect_promise do
       User.find(1).todo_items << TodoItem.new
       User.find(1).save
     end.to include('success' => true)
-    wait_for(user.todo_items).to match_array([TodoItem.first])
+    expect(user.todo_items).to match_array([TodoItem.first])
   end
+  
   it "with assignment" do
     user = FactoryBot.create(:user, first_name: 'Ima')
     expect_promise do
@@ -41,6 +41,6 @@ describe "save while loading", js: true do
       todo.user = User.find_by_first_name('Ima')
       todo.save
     end.to include('success' => true)
-    wait_for(user.todo_items).to match_array([TodoItem.first])
+    expect(user.todo_items).to match_array([TodoItem.first])
   end
 end

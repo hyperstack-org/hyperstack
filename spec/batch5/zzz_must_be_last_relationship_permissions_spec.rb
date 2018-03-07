@@ -1,14 +1,17 @@
+# Something about this spec can cause havoc on specs following.
+# somehow in the following specs AR objects are getting created in two different classes
+# so when you compare for example User.first.todos.first == Todos.first  they are NOT equal huh!
+# I suspect that its to with the fact that we remove and reload the classes
+# but I got as far as proving that you have to actually create a todoitem and an associated comment
+# once you do that the tests after will fail on stmts like this expect(user.todo_items.to_a).to match_array([TodoItem.first])
+# because the class of user.todo_items.class != TodoItems.first even though they look exactly the same!!!
+
 require 'spec_helper'
 require 'test_components'
 
 describe "relationship permissions" do#, dont_override_default_scope_permissions: true do
 
   before(:all) do
-    # Hyperloop.configuration do |config|
-    #   config.transport = :simple_poller
-    #   # slow down the polling so wait_for_ajax works
-    #   config.opts = { seconds_between_poll: 2 }
-    # end
 
     require 'pusher'
     require 'pusher-fake'
@@ -39,6 +42,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
 
   before(:each) do
     ActiveRecord::Base.regulate_scope unscoped: nil
+    ActiveRecord::Base.regulate_default_scope nil
   end
 
   after(:each) do
@@ -244,7 +248,6 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       end
     end
   end
-
   context 'integration test', js: true do
     before(:each) do
       client_option raise_on_js_errors: :off

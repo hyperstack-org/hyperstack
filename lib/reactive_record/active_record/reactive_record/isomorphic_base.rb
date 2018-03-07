@@ -447,23 +447,23 @@ module ReactiveRecord
 
           saved_models = reactive_records.collect do |reactive_record_id, model|
             #puts "saving rr_id: #{reactive_record_id} model.object_id: #{model.object_id} frozen? <#{model.frozen?}>"
-            if model and (model.frozen? or dont_save_list.include?(model) or model.changed.include?(model.class.primary_key))
+            if model && (model.frozen? || dont_save_list.include?(model) || model.changed.include?(model.class.primary_key))
               # the above check for changed including the private key happens if you have an aggregate that includes its own id
-              #puts "validating frozen model #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
+              # puts "validating frozen model #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
               valid = model.valid?
-              #puts "has_errors before = #{has_errors}, validate= #{validate}, !valid= #{!valid}  (validate and !valid) #{validate and !valid}"
+              # puts "has_errors before = #{has_errors}, validate= #{validate}, !valid= #{!valid}  (validate and !valid) #{validate and !valid}"
               has_errors ||= (validate and !valid)
-              #puts "validation complete errors = <#{!valid}>, #{model.errors.messages} has_errors #{has_errors}"
+              # puts "validation complete errors = <#{!valid}>, #{model.errors.messages} has_errors #{has_errors}"
               error_messages << [model, model.errors.messages] unless valid
-              [reactive_record_id, model.class.name, model.attributes,  (valid ? nil : model.errors.messages)]
+              [reactive_record_id, model.class.name, model.__hyperloop_secure_attributes(acting_user), (valid ? nil : model.errors.messages)]
             elsif model and (!model.id or model.changed?)
-              #puts "saving #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
+              # puts "saving #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
               saved = model.check_permission_with_acting_user(acting_user, new_models.include?(model) ? :create_permitted? : :update_permitted?).save(validate: validate)
               has_errors ||= !saved
               messages = model.errors.messages if (validate and !saved) or (!validate and !model.valid?)
               error_messages << [model, messages] if messages
-              #puts "saved complete errors = <#{!saved}>, #{messages} has_errors #{has_errors}"
-              [reactive_record_id, model.class.name, model.attributes, messages]
+              # puts "saved complete errors = <#{!saved}>, #{messages} has_errors #{has_errors}"
+              [reactive_record_id, model.class.name, model.__hyperloop_secure_attributes(acting_user), messages]
             end
           end.compact
 

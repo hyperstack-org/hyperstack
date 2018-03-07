@@ -193,7 +193,8 @@ module ActiveRecord
 
         # regulate_default_scope
 
-        def regulate_default_scope(&block)
+        def regulate_default_scope(*args, &block)
+          block = __synchromesh_parse_regulator_params({ all: args[0] }, block).last unless args.empty?
           regulate_scope(:all, &block)
         end
 
@@ -310,6 +311,12 @@ module ActiveRecord
       def synchromesh_after_destroy
         return if do_not_synchronize?
         ReactiveRecord::Broadcast.after_commit :destroy, self
+      end
+
+      def __hyperloop_secure_attributes(acting_user)
+        accessible_attributes =
+          Hyperloop::InternalPolicy.accessible_attributes_for(self, acting_user)
+        attributes.select { |attr| accessible_attributes.include? attr.to_sym }
       end
     end
   end

@@ -103,7 +103,7 @@ class ActiveRecord::Base
       self.acting_user = old
       self
     else
-      raise ReactiveRecord::AccessViolation, "for #{permission}(#{args})"
+      raise Hyperloop::AccessViolation, "for #{permission}(#{args})"
     end
   end
 
