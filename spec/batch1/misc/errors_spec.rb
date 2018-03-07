@@ -1,13 +1,6 @@
 require 'spec_helper'
 
 describe ActiveModel::Errors, js: true do
-  # my spec
-  it 'instantiates and passes through messages attribute' do
-    expect_evaluate_ruby do
-      ActiveModel::Errors.new(foo: ['missing']).messages
-    end.to eq('foo' => ['missing'])
-  end
-
   # Start of ported Rails tests
   it 'delete' do
     expect_evaluate_ruby do

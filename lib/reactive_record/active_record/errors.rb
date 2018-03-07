@@ -9,10 +9,16 @@ module ActiveModel
 
     attr_reader :messages, :details
 
+    # Pass in the instance of the object that is using the errors object.
+    #
+    #   class Person
+    #     def initialize
+    #       @errors = ActiveModel::Errors.new(self)
+    #     end
+    #   end
     def initialize(base = {})
       @base = base
-      @messages = apply_default_array(base.is_a?(Hash) ? base : {})
-      @messages.each { |attribute, messages| @messages[attribute] = messages.uniq }
+      @messages = apply_default_array({})
       @details = apply_default_array({})
     end
 

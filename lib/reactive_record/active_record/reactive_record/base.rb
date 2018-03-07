@@ -343,11 +343,12 @@ module ReactiveRecord
       @saving = true
     end
 
-    def errors!(errors)
+    def errors!(hash)
       @saving = false
-      errors.each do |attribute, messages|
+      errors.clear && return unless hash
+      hash.each do |attribute, messages|
         messages.each do |message|
-          self.errors.add(attribute, message: message)
+          errors.add(attribute, message: message)
         end
       end
     end
