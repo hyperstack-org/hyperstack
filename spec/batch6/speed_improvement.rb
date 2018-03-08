@@ -21,7 +21,8 @@ describe "speed tests", js: true do
     end
   end
 
-  def measure(test, users, todos_per_user, comments_per_user)
+  def measure(test, users, todos_per_user, comments_per_user, prerender_fix = true)
+    ReactiveRecord::ServerDataCache.use_request_cache = !prerender_fix
     build_records(users, todos_per_user, comments_per_user)
     evaluate_promise("SpeedTester.load_all(#{test})")
   end
@@ -117,10 +118,7 @@ describe "speed tests", js: true do
     size_window(:large, :landscape)
   end
 
-
   it "can display 9 items" do
-    build_records(3, 3, 3)
-    #mount "SpeedTester"
     binding.pry
   end
 end

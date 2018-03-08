@@ -1,6 +1,11 @@
 require 'set'
 module ReactiveRecord
 
+  # requested cache items I think is there just so prerendering with multiple components works.
+  # because we have to dump the cache after each component render (during prererender) but
+  # we want to keep the larger cache alive (is this important???) we keep track of what got added
+  # to the cache during this cycle
+
   # the point is to collect up a all records needed, with whatever attributes were required + primary key, and inheritance column
   # or get all scope arrays, with the record ids
 
@@ -85,15 +90,33 @@ module ReactiveRecord
   # [Todo, [find, 119], owner, todos, active, *all]
   # -> [[Todo, [find, 119], owner, todos, active, *all], [119, 123], 119, 12]
 
-
+=begin
+requested_cache_items contains unique cache items beginning at ones that are at the root...
+we have to search the entire cache everytime
+=end
     class ServerDataCache
+
+      class << self
+        attr_accessor :use_request_cache
+      end
 
       # SECURITY - SAFE
       def initialize(acting_user, preloaded_records)
         @acting_user = acting_user
         @cache = []
-        @requested_cache_items = Set.new
+        @cache_reps = {}
+        @requested_cache_items = ServerDataCache.use_request_cache ? Set.new : []
         @preloaded_records = preloaded_records
+      end
+
+      attr_reader :cache
+      attr_reader :cache_reps
+      attr_reader :requested_cache_items
+
+      def add_item_to_cache(item)
+        cache << item
+        cache_reps[item.vector] = item
+        requested_cache_items << item
       end
 
       if RUBY_ENGINE != 'opal'
@@ -116,17 +139,18 @@ module ReactiveRecord
         # SECURITY - NOW SAFE
         def [](*vector)
           root = nil
-          timing('building cache_items') do
-            root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
-            vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
-            vector[0] = ServerDataCache.get_model(vector[0])
-          end
           last_value = nil
-          timing('saving in requested_cache_items') do
-            @cache.each do |cache_item|
-              next if cache_item.root != root #|| @requested_cache_items.include?(cache_item)
-              @requested_cache_items << cache_item
-              last_value = cache_item
+          timing('building cache_items') do
+            root = CacheItem.new(self, @acting_user, vector[0], @preloaded_records)
+            last_value = vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
+          end
+          if ServerDataCache.use_request_cache
+            timing('saving in requested_cache_items') do
+              @cache.each do |cache_item|
+                next if cache_item.root != root #|| @requested_cache_items.include?(cache_item)
+                @requested_cache_items << cache_item
+                last_value = cache_item
+              end
             end
           end
           last_value
@@ -177,7 +201,7 @@ module ReactiveRecord
 
         # SECURITY - SAFE
         def clear_requests
-          @requested_cache_items = Set.new
+          @requested_cache_items = ServerDataCache.use_request_cache ? Set.new : []
         end
 
         # SECURITY - SAFE
@@ -215,8 +239,8 @@ module ReactiveRecord
 
           # SECURITY - NOW SAFE
           def self.new(db_cache, acting_user, klass, preloaded_records)
-            klass_constant = ServerDataCache.get_model(klass)
-            if existing = ServerDataCache.timing(:root_lookup) { db_cache.detect { |cached_item| cached_item.vector == [klass_constant] } }
+            klass = ServerDataCache.get_model(klass)
+            if existing = ServerDataCache.timing(:root_lookup) { db_cache.cache.detect { |cached_item| cached_item.vector == [klass] } }
               return existing
             end
             super
@@ -224,7 +248,6 @@ module ReactiveRecord
 
           # SECURITY - NOW SAFE
           def initialize(db_cache, acting_user, klass, preloaded_records)
-            klass = ServerDataCache.get_model(klass)
             @db_cache = db_cache
             @acting_user = acting_user
             @vector = @absolute_vector = [klass]
@@ -232,7 +255,7 @@ module ReactiveRecord
             @parent = nil
             @root = self
             @preloaded_records = preloaded_records
-            db_cache << self
+            @db_cache.add_item_to_cache self
           end
 
           def start_timing(&block)
@@ -245,7 +268,7 @@ module ReactiveRecord
 
           # SECURITY - UNSAFE
           def apply_method_to_cache(method)
-            @db_cache.inject(nil) do |representative, cache_item|
+            @db_cache.cache.inject(nil) do |representative, cache_item|
               if cache_item.vector == vector
                 if method == "*"
                   # apply_star does the security check if value is present
@@ -326,7 +349,7 @@ module ReactiveRecord
               @vector = @vector + [method]  # don't push it on since you need a new vector!
               @absolute_vector = @absolute_vector + [absolute_method]
               @value = new_value
-              @db_cache << self
+              @db_cache.add_item_to_cache self
               @parent = new_parent
               @root = new_parent.root
               self
@@ -342,7 +365,7 @@ module ReactiveRecord
               method = "*"
             end
             new_vector = vector + [method]
-            timing('apply_method lookup') { @db_cache.detect { |cached_item| cached_item.vector == new_vector} } || apply_method_to_cache(method)
+            timing('apply_method lookup') { @db_cache.cache_reps[new_vector] } || apply_method_to_cache(method)
           end
 
           # SECURITY - SAFE
