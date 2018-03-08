@@ -216,7 +216,7 @@ module ComponentTestHelpers
     "#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.first.children.last}"
   end
 
-  def expect_promise(str = '', opts = {}, &block)
+  def evaluate_promise(str = '', opts = {}, &block)
     insure_mount
     str = add_opal_block(str, block)
     str = "#{str}.then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
@@ -229,7 +229,11 @@ module ComponentTestHelpers
         break if page.evaluate_script("!!window.hyper_spec_promise_result")
       end
     end
-    expect(JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first)
+    JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first
+  end
+
+  def expect_promise(*args, &block)
+    expect(evaluate_promise(*args, &block))
   end
 
   def ppr(str)

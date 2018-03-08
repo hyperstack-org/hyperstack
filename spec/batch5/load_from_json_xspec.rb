@@ -30,13 +30,14 @@ RSpec::Steps.steps 'Load From Json', js: true do
     evaluate_ruby do
       User.all.count
     end
-    # {'User': {'unscoped': {'*count': [0]}}}
+    # ["User", "all", "*count"] -> {'User': {'unscoped': {'*count': [4]}}}
     evaluate_ruby do
       User.collect { |user| user.id }
     end
+    # ["User", "all", "*all"], ["User", "all", "*0", "id"] ->
     # {
     #   'User': {
-    #     'unscoped': {
+    #     'all': {
     #       1: {id: [1]}},
     #       2: {id: [2]}},
     #       3: {id: [3]}},
@@ -46,9 +47,13 @@ RSpec::Steps.steps 'Load From Json', js: true do
     #   }
     # }
     evaluate_ruby('User.collect { |x| x.first_name }')
+    # [["User", ["find_by", {"id":1}], "first_name"], ["User", ["find_by", {"id":2}], "first_name"], ["User", ["find_by", {"id":3}], "first_name"], ["User", ["find_by", {"id":4}], "first_name"]]
+    # {"User":{"[\"find_by\",{\"id\":1}]":{"first_name":["Mitch"],"id":[1],"type":[null]},"[\"find_by\",{\"id\":2}]":{"first_name":["Todd"],"id":[2],"type":[null]},"[\"find_by\",{\"id\":3}]":{"first_name":["Adam"],"id":[3],"type":[null]},"[\"find_by\",{\"id\":4}]":{"first_name":["Test1"],"id":[4],"type":[null]}}}}
+
+    # [["User", "all", "*all"], ["User", "all", "*0", "first_name"]] ->
     # {
     #   'User': {
-    #     'unscoped': {
+    #     'all': {
     #       1: {first_name: ['Mitch']}},
     #       2: {first_name: ['Todd']}},
     #       3: {first_name: ['Adam']}},

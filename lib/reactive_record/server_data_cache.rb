@@ -1,3 +1,4 @@
+require 'set'
 module ReactiveRecord
 
   # the point is to collect up a all records needed, with whatever attributes were required + primary key, and inheritance column
@@ -91,7 +92,7 @@ module ReactiveRecord
       def initialize(acting_user, preloaded_records)
         @acting_user = acting_user
         @cache = []
-        @requested_cache_items = []
+        @requested_cache_items = Set.new
         @preloaded_records = preloaded_records
       end
 
@@ -114,34 +115,69 @@ module ReactiveRecord
 
         # SECURITY - NOW SAFE
         def [](*vector)
-          root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
-          vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
-          vector[0] = ServerDataCache.get_model(vector[0])
+          root = nil
+          timing('building cache_items') do
+            root = CacheItem.new(@cache, @acting_user, vector[0], @preloaded_records)
+            vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
+            vector[0] = ServerDataCache.get_model(vector[0])
+          end
           last_value = nil
-          @cache.each do |cache_item|
-            next if cache_item.root != root || @requested_cache_items.include?(cache_item)
-            @requested_cache_items << cache_item
-            last_value = cache_item
+          timing('saving in requested_cache_items') do
+            @cache.each do |cache_item|
+              next if cache_item.root != root #|| @requested_cache_items.include?(cache_item)
+              @requested_cache_items << cache_item
+              last_value = cache_item
+            end
           end
           last_value
         end
 
+        def start_timing(&block)
+          ServerDataCache.start_timing(&block)
+        end
+
+        def timing(tag, &block)
+          ServerDataCache.timing(tag, &block)
+        end
+
+        def self.start_timing(&block)
+          @timings = Hash.new { |h, k| h[k] = 0 }
+          start_time = Time.now
+          yield.tap do
+            ::Rails.logger.debug "********* Total Time #{total = Time.now - start_time} ***********************"
+            sum = 0
+            @timings.sort_by(&:last).reverse.each do |tag, time|
+              ::Rails.logger.debug "            #{tag}: #{time} (#{(time/total*100).to_i})%"
+              sum += time
+            end
+            ::Rails.logger.debug "********* Other Time ***********************"
+          end
+        end
+
+        def self.timing(tag, &block)
+          start_time = Time.now
+          tag = tag.to_sym
+          yield.tap { @timings[tag] += (Time.now - start_time)}
+        end
+
         # SECURITY - SAFE
         def self.[](models, associations, vectors, acting_user)
-          ActiveRecord::Base.public_columns_hash
-          result = nil
-          ActiveRecord::Base.transaction do
-            cache = new(acting_user, ReactiveRecord::Base.save_records(models, associations, acting_user, false, false))
-            vectors.each { |vector| cache[*vector] }
-            result = cache.as_json
-            raise ActiveRecord::Rollback, "This Rollback is intentional!"
+          start_timing do
+            timing(:public_columns_hash) { ActiveRecord::Base.public_columns_hash }
+            result = nil
+            ActiveRecord::Base.transaction do
+              cache = new(acting_user, timing(:save_records) { ReactiveRecord::Base.save_records(models, associations, acting_user, false, false) })
+              timing(:process_vectors) { vectors.each { |vector| cache[*vector] } }
+              timing(:as_json) { result = cache.as_json }
+              raise ActiveRecord::Rollback, "This Rollback is intentional!"
+            end
+            result
           end
-          result
         end
 
         # SECURITY - SAFE
         def clear_requests
-          @requested_cache_items = []
+          @requested_cache_items = Set.new
         end
 
         # SECURITY - SAFE
@@ -180,7 +216,7 @@ module ReactiveRecord
           # SECURITY - NOW SAFE
           def self.new(db_cache, acting_user, klass, preloaded_records)
             klass_constant = ServerDataCache.get_model(klass)
-            if existing = db_cache.detect { |cached_item| cached_item.vector == [klass_constant] }
+            if existing = ServerDataCache.timing(:root_lookup) { db_cache.detect { |cached_item| cached_item.vector == [klass_constant] } }
               return existing
             end
             super
@@ -199,6 +235,14 @@ module ReactiveRecord
             db_cache << self
           end
 
+          def start_timing(&block)
+            ServerDataCache.class.start_timing(&block)
+          end
+
+          def timing(tag, &block)
+            ServerDataCache.timing(tag, &block)
+          end
+
           # SECURITY - UNSAFE
           def apply_method_to_cache(method)
             @db_cache.inject(nil) do |representative, cache_item|
@@ -208,9 +252,11 @@ module ReactiveRecord
                   cache_item.apply_star || representative
                 elsif method == "*all"
                   # if we secure the collection then we assume its okay to read the ids
-                  cache_item.build_new_cache_item(cache_item.value.__secure_collection_check(@acting_user).collect { |record| record.id }, method, method)
+                  secured_value = cache_item.value.__secure_collection_check(@acting_user)
+                  cache_item.build_new_cache_item(timing(:active_record) { secured_value.collect { |record| record.id } }, method, method)
                 elsif method == "*count"
-                  cache_item.build_new_cache_item(cache_item.value.__secure_collection_check(@acting_user).count, method, method)
+                  secured_value = cache_item.value.__secure_collection_check(@acting_user)
+                  cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.__secure_collection_check(@acting_user).count }, method, method)
                 elsif preloaded_value = @preloaded_records[cache_item.absolute_vector + [method]]
                   # no security check needed since we already evaluated this
                   cache_item.build_new_cache_item(preloaded_value, method, method)
@@ -224,11 +270,11 @@ module ReactiveRecord
                   else
                     begin
                       secured_method = "__secure_remote_access_to_#{[*method].first}"
-                      if cache_item.value.class < ActiveRecord::Base and cache_item.value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
+                      if cache_item.value.class < ActiveRecord::Base && cache_item.value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
                         cache_item.value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
-                        cache_item.build_new_cache_item(cache_item.value.send(*method), method, method)
+                        cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(*method) }, method, method)
                       elsif cache_item.value.respond_to? secured_method
-                        cache_item.build_new_cache_item(cache_item.value.send(secured_method, @acting_user, *([*method][1..-1])), method, method)
+                        cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(secured_method, @acting_user, *([*method][1..-1])) }, method, method)
                       else
                         raise "method missing"
                       end
@@ -289,14 +335,14 @@ module ReactiveRecord
 
           # SECURITY - SAFE
           def apply_method(method)
-            
+
             if method.is_a? Array and method.first == "find_by_id"
               method[0] = "find"
             elsif method.is_a? String and method =~ /^\*[0-9]+$/
               method = "*"
             end
             new_vector = vector + [method]
-            @db_cache.detect { |cached_item| cached_item.vector == new_vector} || apply_method_to_cache(method)
+            timing('apply_method lookup') { @db_cache.detect { |cached_item| cached_item.vector == new_vector} } || apply_method_to_cache(method)
           end
 
           # SECURITY - SAFE
