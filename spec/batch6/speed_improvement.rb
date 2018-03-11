@@ -133,7 +133,7 @@ measure(1, 9, 9, 9)
             root_lookup: 0.009902000000000168 (0)%
             public_columns_hash: 0.003181 (0)%
 ********* Other Time ***********************
-measure(1, 7, 7, 7) (1372 data points fetched)
+measure(1, 7, 7, 7) (1372 data points fetched) vs 107 seconds w/o fixes
 ********* Total Time 3.230448 ***********************
             process_vectors: 1.854479 (57)%
             building cache_items: 1.847171 (57)%

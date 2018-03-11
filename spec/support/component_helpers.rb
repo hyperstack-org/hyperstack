@@ -218,7 +218,7 @@ module ComponentTestHelpers
 
   def evaluate_promise(str = '', opts = {}, &block)
     insure_mount
-    str = add_opal_block(str, block)
+    str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
     str = "#{str}.then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     page.evaluate_script("window.hyper_spec_promise_result = false")
@@ -232,8 +232,9 @@ module ComponentTestHelpers
     JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first
   end
 
-  def expect_promise(*args, &block)
-    expect(evaluate_promise(*args, &block))
+  def expect_promise(str = '', opts = {}, &block)
+    insure_mount
+    expect(evaluate_promise(add_opal_block(str, block), opts))
   end
 
   def ppr(str)

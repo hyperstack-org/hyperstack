@@ -24,7 +24,10 @@ module ActiveRecord
         @backing_record = ReactiveRecord::Base.new(self.class, {}, self)
         @backing_record.instance_eval do
           h = Hash.new
-          hash.each { |a, v| h[a] = convert(a, v).itself }
+          hash.each do |a, v|
+            a = model._dealias_attribute(a)
+            h[a] = convert(a, v).itself
+          end
           self.class.load_data do
             h.each do |attribute, value|
               unless attribute == primary_key
