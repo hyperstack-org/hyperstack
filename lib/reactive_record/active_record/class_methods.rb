@@ -2,6 +2,13 @@ module ActiveRecord
 
   module ClassMethods
 
+    def inherited(subclass)
+      ['_attribute_aliases'].each do |inheritable_attribute|
+        instance_var = "@#{inheritable_attribute}"
+        subclass.instance_variable_set(instance_var, instance_variable_get(instance_var))
+      end
+    end
+
     def base_class
 
       unless self < Base
@@ -46,7 +53,7 @@ module ActiveRecord
     end
 
     def find_by(opts = {})
-      base_class.instance_eval {ReactiveRecord::Base.find(self, opts.first.first, opts.first.last)}
+      base_class.instance_eval {ReactiveRecord::Base.find(self, _dealias_attribute(opts.first.first), opts.first.last)}
     end
 
     def enum(*args)
@@ -55,6 +62,21 @@ module ActiveRecord
 
     def serialize(attr, *args)
       ReactiveRecord::Base.serialized?[self][attr] = true
+    end
+
+    def _dealias_attribute(new)
+      _attribute_aliases[new] || new
+    end
+
+    def _attribute_aliases
+      @_attribute_aliases ||= {}
+    end
+
+    def alias_attribute(new_name, old_name)
+      ['', '=', '_changed?'].each do |variant|
+        define_method("#{new_name}#{variant}") { |*args, &block| send("#{old_name}#{variant}", *args, &block) }
+      end
+      _attribute_aliases[new_name] = old_name
     end
 
     # ignore any of these methods if they get called on the client.   This list should be trimmed down to include only
@@ -145,7 +167,7 @@ module ActiveRecord
 
     def method_missing(name, *args, &block)
       if args.count == 1 && name.start_with?("find_by_") && !block
-        find_by(name.sub(/^find_by_/, "") => args[0])
+        find_by(_dealias_attribute(name.sub(/^find_by_/, "")) => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
       elsif name.end_with?('!')
