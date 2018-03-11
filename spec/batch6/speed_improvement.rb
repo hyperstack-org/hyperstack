@@ -21,8 +21,7 @@ describe "speed tests", js: true do
     end
   end
 
-  def measure(test, users, todos_per_user, comments_per_user, prerender_fix = true)
-    ReactiveRecord::ServerDataCache.use_request_cache = !prerender_fix
+  def measure(test, users, todos_per_user, comments_per_user)
     build_records(users, todos_per_user, comments_per_user)
     evaluate_promise("SpeedTester.load_all(#{test})")
   end
@@ -31,9 +30,6 @@ describe "speed tests", js: true do
     Hyperloop.configuration do |config|
       config.transport = :crud_only
     end
-    #seed_database
-    # spec_helper resets the policy system after each test so we have to setup
-    # before each test
   end
 
   before(:each) do
@@ -122,3 +118,30 @@ describe "speed tests", js: true do
     binding.pry
   end
 end
+
+=begin
+results:
+with improvements:
+measure(1, 9, 9, 9)
+********* Total Time 10.760204 ***********************
+            process_vectors: 7.729447 (71)%
+            building cache_items: 7.713941 (71)%
+            save_records: 2.569092 (23)%
+            as_json: 0.457144 (4)%
+            active_record: 0.44621399999999695 (4)%
+            apply_method lookup: 0.06301599999999652 (0)%
+            root_lookup: 0.009902000000000168 (0)%
+            public_columns_hash: 0.003181 (0)%
+********* Other Time ***********************
+measure(1, 7, 7, 7) (1372 data points fetched)
+********* Total Time 3.230448 ***********************
+            process_vectors: 1.854479 (57)%
+            building cache_items: 1.847171 (57)%
+            save_records: 1.197451 (37)%
+            active_record: 0.19789300000000268 (6)%
+            as_json: 0.175386 (5)%
+            apply_method lookup: 0.030857000000000908 (0)%
+            root_lookup: 0.004622000000000015 (0)%
+            public_columns_hash: 0.001442 (0)%
+********* Other Time ***********************
+=end

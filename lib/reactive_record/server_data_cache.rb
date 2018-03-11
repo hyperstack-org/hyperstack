@@ -90,22 +90,14 @@ module ReactiveRecord
   # [Todo, [find, 119], owner, todos, active, *all]
   # -> [[Todo, [find, 119], owner, todos, active, *all], [119, 123], 119, 12]
 
-=begin
-requested_cache_items contains unique cache items beginning at ones that are at the root...
-we have to search the entire cache everytime
-=end
     class ServerDataCache
-
-      class << self
-        attr_accessor :use_request_cache
-      end
 
       # SECURITY - SAFE
       def initialize(acting_user, preloaded_records)
         @acting_user = acting_user
         @cache = []
         @cache_reps = {}
-        @requested_cache_items = ServerDataCache.use_request_cache ? Set.new : []
+        @requested_cache_items = Set.new
         @preloaded_records = preloaded_records
       end
 
@@ -138,22 +130,10 @@ we have to search the entire cache everytime
 
         # SECURITY - NOW SAFE
         def [](*vector)
-          root = nil
-          last_value = nil
           timing('building cache_items') do
             root = CacheItem.new(self, @acting_user, vector[0], @preloaded_records)
-            last_value = vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
+            vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
           end
-          if ServerDataCache.use_request_cache
-            timing('saving in requested_cache_items') do
-              @cache.each do |cache_item|
-                next if cache_item.root != root #|| @requested_cache_items.include?(cache_item)
-                @requested_cache_items << cache_item
-                last_value = cache_item
-              end
-            end
-          end
-          last_value
         end
 
         def start_timing(&block)
@@ -201,7 +181,7 @@ we have to search the entire cache everytime
 
         # SECURITY - SAFE
         def clear_requests
-          @requested_cache_items = ServerDataCache.use_request_cache ? Set.new : []
+          @requested_cache_items = Set.new
         end
 
         # SECURITY - SAFE
