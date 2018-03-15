@@ -99,7 +99,13 @@ module Hyperloop
         end
         str
       else
-        if Rails.env.production? && Hyperloop::InternalClassPolicy.ar_base_descendants_map_cache.include?(str)
+        # we used to cache this here, but during eager loading the cache may get partially filled and never updated
+        # so this guard will fail, now performance will be suckish, as this guard, required for security, takes some ms
+        # def self.ar_base_descendants_map_cache
+        #   @ar_base_descendants_map_cache ||= ActiveRecord::Base.descendants.map(&:name)
+        # end
+        # if Rails.env.production? && !Hyperloop::InternalClassPolicy.ar_base_descendants_map_cache.include?(str)
+        if Rails.application.config.eager_load && !ActiveRecord::Base.descendants.map(&:name).include?(str)
           # AR::Base.descendants is eager loaded in production -> this guard works.
           # In development it may be empty or partially filled -> this guard may fail.
           # Thus guarded here only in production.
