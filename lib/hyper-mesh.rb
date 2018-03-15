@@ -7,6 +7,7 @@ if RUBY_ENGINE == 'opal'
   require 'time'
   require 'date'
   require 'kernel/itself' unless Object.instance_methods.include?(:itself)
+  require 'object/tap'
   require "reactive_record/active_record/error"
   require "reactive_record/server_data_cache"
   require "reactive_record/active_record/reactive_record/while_loading"
@@ -18,6 +19,7 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/aggregations"
   require "reactive_record/active_record/associations"
   require "reactive_record/active_record/reactive_record/backing_record_inspector"
+  require "reactive_record/active_record/reactive_record/getters"
   require "reactive_record/active_record/reactive_record/base"
   require "reactive_record/active_record/reactive_record/reactive_set_relationship_helpers"
   require "reactive_record/active_record/reactive_record/collection"

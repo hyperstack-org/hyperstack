@@ -46,7 +46,7 @@ module ActiveRecord
     end
 
     def type
-      @backing_record.reactive_get!(:type, nil)
+      @backing_record.get_attr_value(:type, nil)
     end
 
     def type=(val)
@@ -54,7 +54,7 @@ module ActiveRecord
     end
 
     def id
-      @backing_record.reactive_get!(primary_key)
+      @backing_record.get_primary_key_value
     end
 
     def id=(value)
@@ -90,49 +90,51 @@ module ActiveRecord
       send("#{attr}=", val)
     end
 
-    def method_missing_warning(name)
-      @backing_record.deprecation_warning("Server side method #{name} must be defined using the 'server_method' macro.")
-    end
-
-    def method_missing(name, *args, &block)
-      original_name = name
-
-      if name.end_with?('!')
-        name = name.chop # remove '!'
-        force_update = true
-      end
-
-      chopped_name = name.end_with?('=') ? name.chop : name
-      is_server_method = self.class.server_methods.has_key?(chopped_name)
-      chopped_name = chopped_name.end_with?('?') ? chopped_name.chop : name
-      is_attribute = attributes.has_key?(chopped_name)
-
-      unless is_server_method || is_attribute
-        if ReactiveRecord::Base.public_columns_hash.has_key?(self.class.name) && ReactiveRecord::Base.public_columns_hash[self.class.name].has_key?(chopped_name)
-          is_attribute = true
-        end
-        method_missing_warning("#{original_name}(#{args})") unless is_attribute
-      end
-
-      if name.end_with?('_changed?')
-        @backing_record.changed?(name[0...-9]) # remove '_changed?'
-      elsif args.count == 1 && name.end_with?('=') && !block
-        attribute_name = name.chop # remove '='
-        # for rails auto generated methods for booleans, remove '?' to get the attribute
-        attribute_name = attribute_name.chop if !is_server_method && is_attribute && attribute_name.end_with?('?')
-        @backing_record.reactive_set!(attribute_name, backing_record.convert(attribute_name, args[0]))
-      elsif args.count.zero? && !block
-        # for rails auto generated methods for booleans, remove '?' to get the attribute
-        name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
-        @backing_record.reactive_get!(name, force_update)
-      elsif !block
-        # for rails auto generated methods for booleans, remove '?' to get the attribute
-        name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
-        @backing_record.reactive_get!([[name]+args], force_update)
-      else
-        super
-      end
-    end
+    # def method_missing_warning(name)
+    #   @backing_record.deprecation_warning("Server side method #{name} must be defined using the 'server_method' macro.")
+    # end
+    #
+    # def method_missing(name, *args, &block)
+    #   original_name = name
+    #
+    #   if name.end_with?('!')
+    #     name = name.chop # remove '!'
+    #     force_update = true
+    #   end
+    #
+    #   chopped_name = name.end_with?('=') ? name.chop : name
+    #   is_server_method = self.class.server_methods.has_key?(chopped_name)
+    #   chopped_name = chopped_name.end_with?('?') ? chopped_name.chop : name
+    #   is_attribute = attributes.has_key?(chopped_name)
+    #
+    #   unless is_server_method || is_attribute
+    #     if ReactiveRecord::Base.public_columns_hash.has_key?(self.class.name) && ReactiveRecord::Base.public_columns_hash[self.class.name].has_key?(chopped_name)
+    #       is_attribute = true
+    #     end
+    #     method_missing_warning("#{original_name}(#{args})") unless is_attribute
+    #   end
+    #
+    #   if name.end_with?('_changed?')
+    #     @backing_record.changed?(name[0...-9]) # remove '_changed?'
+    #   elsif args.count == 1 && name.end_with?('=') && !block
+    #     attribute_name = name.chop # remove '='
+    #     # for rails auto generated methods for booleans, remove '?' to get the attribute
+    #     attribute_name = attribute_name.chop if !is_server_method && is_attribute && attribute_name.end_with?('?')
+    #     @backing_record.reactive_set!(attribute_name, backing_record.convert(attribute_name, args[0]))
+    #   elsif args.count.zero? && !block
+    #     super # shold never get here any more
+    #     # for rails auto generated methods for booleans, remove '?' to get the attribute
+    #     name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
+    #     @backing_record.reactive_get!(name, force_update)
+    #   elsif !block
+    #     super # should never get here any more
+    #     # for rails auto generated methods for booleans, remove '?' to get the attribute
+    #     name = name.chop if !is_server_method && is_attribute && name.end_with?('?')
+    #     @backing_record.reactive_get!([[name]+args], force_update)
+    #   else
+    #     super
+    #   end
+    # end
 
     def itself
       # this is useful when you just want to get a handle on record instance
@@ -144,7 +146,7 @@ module ActiveRecord
     def load(*attributes, &block)
       first_time = true
       ReactiveRecord.load do
-        results = attributes.collect { |attr| @backing_record.reactive_get!(attr, first_time) }
+        results = attributes.collect { |attr| send(attr, first_time) }
         results = yield(*results) if block
         first_time = false
         block.nil? && results.count == 1 ? results.first : results

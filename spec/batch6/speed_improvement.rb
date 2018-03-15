@@ -144,4 +144,5 @@ measure(1, 7, 7, 7) (1372 data points fetched) vs 107 seconds w/o fixes
             root_lookup: 0.004622000000000015 (0)%
             public_columns_hash: 0.001442 (0)%
 ********* Other Time ***********************
+processed in 2.449s with getters fixed
 =end

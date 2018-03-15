@@ -1,6 +1,7 @@
 module ReactiveRecord
   class Base
     include BackingRecordInspector
+    include Getters
 
     # Its all about lazy loading. This prevents us from grabbing enormous association collections, or large attributes
     # unless they are explicitly requested.
@@ -170,19 +171,105 @@ module ReactiveRecord
       @attributes
     end
 
-    def reactive_get!(attribute, reload = nil)
-      @virgin = false unless data_loading?
-      unless @destroyed
-        if @attributes.has_key? attribute
-          attributes[attribute].notify if @attributes[attribute].is_a? DummyValue
-          apply_method(attribute) if reload
-        else
-          apply_method(attribute)
-        end
-        React::State.get_state(self, attribute) unless data_loading?
-        attributes[attribute]
-      end
-    end
+    # directly called from belongs_to, has_many and has_one relationships with reload=nil
+    # directly called from composed_of aggregate with reload=nil
+    # directly called from server_method with the [name, *args] and reload=nil and with reload=true for the ! version
+    # called by the attribute getter (with reload=nil) (see define_attribute_methods) and ! getter (with reload=true)
+    # called by #type
+    # should have methods for booleans as well currently handled by method missing
+
+    # turn each of the above cases into a methods implementing that specific case for example
+    # get_belongs_to(attr, reload=nil) which will have the specific logic from apply method for that case
+    # This method will be called directly from the getters
+    # we can also directly define methods for load_from_json to call, so load_from_json just executes a giant
+    # expression.
+
+    # def reactive_get!(attribute, reload = nil)
+    #   @virgin = false unless data_loading?
+    #   unless @destroyed
+    #     if @attributes.has_key? attribute
+    #       attributes[attribute].notify if @attributes[attribute].is_a? DummyValue
+    #       apply_method(attribute) if reload
+    #     else
+    #       apply_method(attribute)
+    #     end
+    #     React::State.get_state(self, attribute) unless data_loading?
+    #     attributes[attribute]
+    #   end
+    # end
+
+    # def apply_method(method)
+    #   # Fills in the value returned by sending "method" to the corresponding server side db instance
+    #   if on_opal_server? and changed?
+    #     log("Warning fetching virtual attributes (#{model.name}.#{method}) during prerendering on a changed or new model is not implemented.", :warning)
+    #     # to implement this we would have to sync up any changes during prererendering with a set the cached models (see server_data_cache)
+    #     # right now server_data cache is read only, BUT we could change this.  However it seems like a tails case.  Why would we create or update
+    #     # a model during prerendering???
+    #   end
+    #   if !new?
+    #     new_value = if association = @model.reflect_on_association(method)
+    #       if association.collection?
+    #         Collection.new(association.klass, @ar_instance, association, *vector, method)
+    #       else
+    #         find_association(association, (id and id != "" and self.class.fetch_from_db([@model, [:find, id], method, @model.primary_key])))
+    #       end
+    #     elsif aggregation = @model.reflect_on_aggregation(method) and (aggregation.klass < ActiveRecord::Base)
+    #       new_from_vector(aggregation.klass, self, *vector, method)
+    #     elsif id and id != ''
+    #       self.class.fetch_from_db([@model, [:find, id], *method]) || self.class.load_from_db(self, *(vector ? vector : [nil]), method)
+    #     else  # its a attribute in an aggregate or we are on the client and don't know the id
+    #       self.class.fetch_from_db([*vector, *method]) || self.class.load_from_db(self, *(vector ? vector : [nil]), method)
+    #     end
+    #     new_value = @attributes[method] if new_value.is_a? DummyValue and @attributes.has_key?(method)
+    #     sync_attribute(method, new_value)
+    #   elsif association = @model.reflect_on_association(method) and association.collection?
+    #     @attributes[method] = Collection.new(association.klass, @ar_instance, association)
+    #   elsif aggregation = @model.reflect_on_aggregation(method) and (aggregation.klass < ActiveRecord::Base)
+    #     @attributes[method] = aggregation.klass.new.tap do |aggregate|
+    #       backing_record = aggregate.backing_record
+    #       backing_record.aggregate_owner = self
+    #       backing_record.aggregate_attribute = method
+    #     end
+    #   elsif !aggregation and method != model.primary_key
+    #     if model.columns_hash[method]
+    #       new_value = convert(method, model.columns_hash[method][:default])
+    #     else
+    #       unless @attributes.key?(method)
+    #         log("Warning: reading from new #{model.name}.#{method} before assignment.  Will fetch value from server.  This may not be what you expected!!", :warning)
+    #       end
+    #       new_value = self.class.load_from_db(self, *(vector ? vector : [nil]), method)
+    #       new_value = @attributes[method] if new_value.is_a?(DummyValue) && @attributes.key?(method)
+    #     end
+    #     sync_attribute(method, new_value)
+    #   end
+    # end
+    #
+    # def find_association(association, id)
+    #   inverse_of = association.inverse_of
+    #   instance = if id
+    #     find(association.klass, association.klass.primary_key, id)
+    #   else
+    #     new_from_vector(association.klass, nil, *vector, association.attribute)
+    #   end
+    #   instance_backing_record_attributes = instance.backing_record.attributes
+    #   inverse_association = association.klass.reflect_on_association(inverse_of)
+    #   if inverse_association.collection?
+    #     instance_backing_record_attributes[inverse_of] = if id and id != ""
+    #       Collection.new(@model, instance, inverse_association, association.klass, ["find", id], inverse_of)
+    #     else
+    #       Collection.new(@model, instance, inverse_association, *vector, association.attribute, inverse_of)
+    #     end unless instance_backing_record_attributes[inverse_of]
+    #     instance_backing_record_attributes[inverse_of].replace [@ar_instance]
+    #   else
+    #     instance_backing_record_attributes[inverse_of] = @ar_instance
+    #   end unless association.through_association? || instance_backing_record_attributes.key?(inverse_of)
+    #   instance
+    # end
+
+    # belongs_to, :has_many, :has_one, :composed_of
+    # attribute setters
+    # directly from initialize ?!? probably because it was before access from []= method?
+    # type=
 
     def reactive_set!(attribute, value)
       @virgin = false unless data_loading?
@@ -201,6 +288,7 @@ module ReactiveRecord
     end
 
     def update_attribute(attribute, *args)
+      puts "update_attribute(#{attribute}, #{args})"
       value = args[0]
       if args.count != 0 and data_loading?
         if (aggregation = model.reflect_on_aggregation(attribute)) and !(aggregation.klass < ActiveRecord::Base)
@@ -367,73 +455,6 @@ module ReactiveRecord
       !id && !vector
     end
 
-    def find_association(association, id)
-      inverse_of = association.inverse_of
-      instance = if id
-        find(association.klass, association.klass.primary_key, id)
-      else
-        new_from_vector(association.klass, nil, *vector, association.attribute)
-      end
-      instance_backing_record_attributes = instance.backing_record.attributes
-      inverse_association = association.klass.reflect_on_association(inverse_of)
-      if inverse_association.collection?
-        instance_backing_record_attributes[inverse_of] = if id and id != ""
-          Collection.new(@model, instance, inverse_association, association.klass, ["find", id], inverse_of)
-        else
-          Collection.new(@model, instance, inverse_association, *vector, association.attribute, inverse_of)
-        end unless instance_backing_record_attributes[inverse_of]
-        instance_backing_record_attributes[inverse_of].replace [@ar_instance]
-      else
-        instance_backing_record_attributes[inverse_of] = @ar_instance
-      end unless association.through_association? || instance_backing_record_attributes.key?(inverse_of)
-      instance
-    end
-
-    def apply_method(method)
-      # Fills in the value returned by sending "method" to the corresponding server side db instance
-      if on_opal_server? and changed?
-        log("Warning fetching virtual attributes (#{model.name}.#{method}) during prerendering on a changed or new model is not implemented.", :warning)
-        # to implement this we would have to sync up any changes during prererendering with a set the cached models (see server_data_cache)
-        # right now server_data cache is read only, BUT we could change this.  However it seems like a tails case.  Why would we create or update
-        # a model during prerendering???
-      end
-      if !new?
-        new_value = if association = @model.reflect_on_association(method)
-          if association.collection?
-            Collection.new(association.klass, @ar_instance, association, *vector, method)
-          else
-            find_association(association, (id and id != "" and self.class.fetch_from_db([@model, [:find, id], method, @model.primary_key])))
-          end
-        elsif aggregation = @model.reflect_on_aggregation(method) and (aggregation.klass < ActiveRecord::Base)
-          new_from_vector(aggregation.klass, self, *vector, method)
-        elsif id and id != ''
-          self.class.fetch_from_db([@model, [:find, id], *method]) || self.class.load_from_db(self, *(vector ? vector : [nil]), method)
-        else  # its a attribute in an aggregate or we are on the client and don't know the id
-          self.class.fetch_from_db([*vector, *method]) || self.class.load_from_db(self, *(vector ? vector : [nil]), method)
-        end
-        new_value = @attributes[method] if new_value.is_a? DummyValue and @attributes.has_key?(method)
-        sync_attribute(method, new_value)
-      elsif association = @model.reflect_on_association(method) and association.collection?
-        @attributes[method] = Collection.new(association.klass, @ar_instance, association)
-      elsif aggregation = @model.reflect_on_aggregation(method) and (aggregation.klass < ActiveRecord::Base)
-        @attributes[method] = aggregation.klass.new.tap do |aggregate|
-          backing_record = aggregate.backing_record
-          backing_record.aggregate_owner = self
-          backing_record.aggregate_attribute = method
-        end
-      elsif !aggregation and method != model.primary_key
-        if model.columns_hash[method]
-          new_value = convert(method, model.columns_hash[method][:default])
-        else
-          unless @attributes.key?(method)
-            log("Warning: reading from new #{model.name}.#{method} before assignment.  Will fetch value from server.  This may not be what you expected!!", :warning)
-          end
-          new_value = self.class.load_from_db(self, *(vector ? vector : [nil]), method)
-          new_value = @attributes[method] if new_value.is_a?(DummyValue) && @attributes.key?(method)
-        end
-        sync_attribute(method, new_value)
-      end
-    end
 
     def self.infer_type_from_hash(klass, hash)
       klass = klass.base_class

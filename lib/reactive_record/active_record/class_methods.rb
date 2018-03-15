@@ -272,7 +272,11 @@ module ActiveRecord
     [:belongs_to, :has_many, :has_one].each do |macro|
       define_method(macro) do |*args| # is this a bug in opal?  saying name, scope=nil, opts={} does not work!
         name = args.first
-        define_method(name) { @backing_record.reactive_get!(name, nil) }
+        if macro == :has_many
+          define_method(name) { @backing_record.get_has_many(name, nil) }
+        else
+          define_method(name) { @backing_record.get_belongs_to(name, nil) }
+        end
         define_method("#{name}=") do |val|
           @backing_record.reactive_set!(name, backing_record.convert(name, val).itself)
         end
@@ -282,8 +286,12 @@ module ActiveRecord
     end
 
     def composed_of(name, opts = {})
-      Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
-      define_method(name) { @backing_record.reactive_get!(name, nil) }
+      reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
+      if reflection.klass < ActiveRecord::Base
+        define_method(name) { @backing_record.get_ar_aggregate(name, nil) }
+      else
+        define_method(name) { @backing_record.get_non_ar_aggregate(name, nil) }
+      end
       define_method("#{name}=") do |val|
         @backing_record.reactive_set!(name, backing_record.convert(name, val))
       end
@@ -304,20 +312,20 @@ module ActiveRecord
     def server_method(name, default: nil)
       server_methods[name] = { default: default }
       define_method(name) do |*args|
-        vector = args.count.zero? ? name : [[name]+args]
-        @backing_record.reactive_get!(vector, nil)
+        vector = args.count.zero? ? name : [[name] + args]
+        @backing_record.get_server_method(vector, nil)
       end
       define_method("#{name}!") do |*args|
-        vector = args.count.zero? ? name : [[name]+args]
-        @backing_record.reactive_get!(vector, true)
+        vector = args.count.zero? ? name : [[name] + args]
+        @backing_record.get_server_method!(vector, true)
       end
     end
 
     def define_attribute_methods
       columns_hash.keys.each do |name|
-        next if name == :id
-        define_method(name) { @backing_record.reactive_get!(name, nil) }
-        define_method("#{name}!") { @backing_record.reactive_get!(name, true) }
+        next if name == primary_key
+        define_method(name) { @backing_record.get_attr_value(name, nil) }
+        define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
         define_method("#{name}=") do |val|
           @backing_record.reactive_set!(name, backing_record.convert(name, val))
         end

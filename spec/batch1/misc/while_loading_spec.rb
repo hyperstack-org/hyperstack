@@ -78,10 +78,11 @@ describe "while loading", js: true do
           end
         end
       end
-      expect(page).to have_content('loading...')
-      expect(page).not_to have_content('DaDog', wait: 0)
-      sleep 1
+      #expect(page).to have_content('loading...')
+      #expect(page).not_to have_content('DaDog', wait: 0)
+      #sleep 1
     end
+    binding.pry
     expect(page).to have_content('DaDog')
     expect(page).not_to have_content('loading...', wait: 0)
     sleep 1

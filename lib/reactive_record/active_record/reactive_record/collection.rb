@@ -99,7 +99,7 @@ module ReactiveRecord
     attr_reader   :pre_sync_related_records
 
     def to_s
-      "<Coll-#{object_id} - #{vector}>"
+      "<Coll-#{object_id} owner: #{@owner}, parent: #{@parent} - #{vector}>"
     end
 
     class << self
@@ -340,8 +340,10 @@ module ReactiveRecord
     end
 
     def set_belongs_to(child)
+      puts "#{self}.set_belongs_to(#{child}) association: #{@association} inverse_of: #{@association.inverse_of if @association}"
       if @owner
-        child.send("#{@association.inverse_of}=", @owner) if @association
+        # TODO this is major broken...current
+        child.send("#{@association.inverse_of}=", @owner) if @association && !@association.through_association
       elsif @parent
         @parent.set_belongs_to(child)
       end
