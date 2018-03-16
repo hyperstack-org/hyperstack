@@ -460,7 +460,10 @@ keys:
           !(aggregation.klass < ActiveRecord::Base)
             target.send "#{method}=", aggregation.deserialize(value.first)
           elsif value.is_a? Array
-            target.send "#{method}=", value.first unless method == "id" # we handle ids first so things sync nicely
+            # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
+            # a better fix might be something like target._internal_attribute_hash[method] =  ...
+            target.backing_record.reactive_set!(method, target.backing_record.convert(method, value.first)) unless method == :id
+            #target.send "#{method}=", value.first unless method == "id" # we handle ids first so things sync nicely
           elsif value.is_a? Hash and value[:id] and value[:id].first and association = target.class.reflect_on_association(method)
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
             new_target = association.klass.find(value[:id].first)

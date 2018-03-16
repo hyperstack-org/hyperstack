@@ -18,6 +18,14 @@ describe "saving during commit", js: true do
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
     end
 
+    class ActiveRecord::Base
+      class << self
+        def public_columns_hash
+          @public_columns_hash ||= {}
+        end
+      end
+    end
+
     class CommitIssue < ActiveRecord::Base
       def self.build_tables
         connection.create_table :commit_issues, force: true do |t|
@@ -25,6 +33,7 @@ describe "saving during commit", js: true do
           t.timestamps
         end
       end
+      ActiveRecord::Base.public_columns_hash[name] = columns_hash
     end
 
     isomorphic do

@@ -375,7 +375,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       it 'will allow server_methods to control access' do
         todo_item1 = TodoItem.create(user: ApplicationController.acting_user)
         todo_item2 = TodoItem.create(user: User.create(first_name: 'fred'))
-
+binding.pry
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).pow }").to eq('fred')
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item2.id}).pow }").not_to eq('fred')
         expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
