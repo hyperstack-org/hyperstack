@@ -153,6 +153,11 @@ module ReactiveRecord
         ''
       end
 
+      def tap
+        yield self
+        self
+      end
+
       alias inspect to_s
 
       `#{self}.$$proto.toString = Opal.Object.$$proto.toString`
