@@ -1,6 +1,6 @@
 # hyper-vis
 
-A Opal Ruby wraper for (Vis.js)[visjs.org] with a Ruby-Hyperloop Component.
+A Opal Ruby wraper for [Vis.js](http://visjs.org) with a Ruby-Hyperloop Component.
 Currently supports the complete API for:
 - Vis Dataset
 - Vis Dataview
@@ -12,7 +12,7 @@ for a rails app:
 gem 'hyper-vis'
 ```
 and `bundle update`
-hyper-vis depends on `hyper-component` from (ruby-hyperloop)[http://ruby-hyperloop.org]
+hyper-vis depends on `hyper-component` from [Ruby-Hyperloop](http://ruby-hyperloop.org)
 
 vis.js is automatically imported. If you use webpacker, you may need to cancel the import in your config/intializers/hyperloop.rb
 ```
@@ -38,6 +38,8 @@ Vis::Network can be used within the render_with_dom_node.
 ```
 class MyVisNetworkComponent
   include Hyperloop::Vis::Network::Mixin
+
+  automatic_refresh true # thats the default, may set to false
 
   render_with_dom_node do |dom_node, data, options|
 
