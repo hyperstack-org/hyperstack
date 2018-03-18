@@ -26,6 +26,16 @@ module Hyperloop
               @_options
             end
 
+            def automatic_refresh
+              true
+            end
+            
+            def self.automatic_refresh(value)
+              define_method(:automatic_refresh) do
+                value
+              end
+            end
+            
             def self.render_with_dom_node(tag = 'DIV', &block)
               render do
                 @_vis_render_block = block
@@ -36,7 +46,7 @@ module Hyperloop
             end
 
             def should_component_update?
-              false
+              `false`
             end
 
             after_mount do
@@ -46,17 +56,19 @@ module Hyperloop
             end
 
             before_receive_props do |new_props|
-              changed = false
-              if new_props[:vis_data] != @_data
-                @_data = new_props[:vis_data]
-                changed = true
-              end
-              if new_props[:options] != @_options
-                @_options = new_props[:options]
-                changed = true
-              end
-              if changed && @_dom_node && @_vis_render_block
-                instance_exec(@_dom_node, @_data, @_options, &@_vis_render_block)
+              if automatic_refresh && @_dom_node && @_vis_render_block
+                changed = false
+                if new_props[:vis_data] != @_data
+                  @_data = new_props[:vis_data]
+                  changed = true
+                end
+                if new_props[:options] != @_options
+                  @_options = new_props[:options]
+                  changed = true
+                end
+                if changed
+                  instance_exec(@_dom_node, @_data, @_options, &@_vis_render_block)
+                end
               end
             end
           end
