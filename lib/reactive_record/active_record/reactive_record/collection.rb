@@ -339,7 +339,6 @@ module ReactiveRecord
     end
 
     def set_belongs_to(child)
-      puts "#{self}.set_belongs_to(#{child}) association: #{@association} inverse_of: #{@association.inverse_of if @association}"
       if @owner
         # TODO this is major broken...current
         child.send("#{@association.inverse_of}=", @owner) if @association && !@association.through_association

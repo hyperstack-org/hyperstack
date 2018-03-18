@@ -41,6 +41,12 @@ describe "speed tests", js: true do
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
     on_client do
+      # class React::State
+      #   def self.get_state(*args, &block)
+      #   end
+      #   def self.set_state(*args, &block)
+      #   end
+      # end
 
       class SpeedTester < Hyperloop::Component
         def self.load_all(id)
@@ -145,4 +151,6 @@ measure(1, 7, 7, 7) (1372 data points fetched) vs 107 seconds w/o fixes
             public_columns_hash: 0.001442 (0)%
 ********* Other Time ***********************
 processed in 2.449s with getters fixed
+processed in 2.420s with setters fixed
+processed in 2.392s without React set or get state
 =end

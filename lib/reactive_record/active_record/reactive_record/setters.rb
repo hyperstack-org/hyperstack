@@ -54,12 +54,10 @@ module ReactiveRecord
     end
 
     def sync_has_many(attr)
-      puts "sync_has_many(#{attr})"
       set_change_status_and_notify_only attr, attributes[attr] != @synced_attributes[attr]
     end
 
     def update_simple_attribute(attr, value)
-      puts "update_simple_attribute(#{attr}, #{value})"
       @synced_attributes[attr] = value if data_loading?
       changed = !@synced_attributes.key?(attr) || @synced_attributes[attr] != value
       set_attribute_change_status_and_notify attr, changed, value
@@ -71,7 +69,6 @@ module ReactiveRecord
     private
 
     def set_common(attr, value)
-      puts "set_common(#{attr}, #{value})"
       value = convert(attr, value)
       @virgin = false unless data_loading?
       if !@destroyed && (
@@ -81,8 +78,6 @@ module ReactiveRecord
         yield value, attr
       end
       value
-    ensure
-      puts "returning from set_common(#{attr}, #{value})"
     end
 
     def set_attribute_change_status_and_notify(attr, changed, new_value)

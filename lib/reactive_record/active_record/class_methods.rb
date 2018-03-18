@@ -275,10 +275,10 @@ module ActiveRecord
         opts = (args.count > 1 and args.last.is_a? Hash) ? args.last : {}
         assoc = Associations::AssociationReflection.new(self, macro, name, opts)
         if macro == :has_many
-          define_method(name) { @backing_record.get_has_many(name, nil) }
+          define_method(name) { @backing_record.get_has_many(assoc, nil) }
           define_method("#{name}=") { |val| @backing_record.set_has_many(assoc, val) }
         else
-          define_method(name) { @backing_record.get_belongs_to(name, nil) }
+          define_method(name) { @backing_record.get_belongs_to(assoc, nil) }
           define_method("#{name}=") { |val| @backing_record.set_belongs_to(assoc, val) }
         end
         assoc
@@ -288,7 +288,7 @@ module ActiveRecord
     def composed_of(name, opts = {})
       reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
       if reflection.klass < ActiveRecord::Base
-        define_method(name) { @backing_record.get_ar_aggregate(name, nil) }
+        define_method(name) { @backing_record.get_ar_aggregate(reflection, nil) }
         define_method("#{name}=") { |val| @backing_record.set_ar_aggregate(reflection, val) }
       else
         define_method(name) { @backing_record.get_non_ar_aggregate(name, nil) }

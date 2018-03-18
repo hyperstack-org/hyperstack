@@ -442,9 +442,7 @@ keys:
           elsif method == "*count"
             target.set_count_state(value.first)
           elsif method.is_a? Integer or method =~ /^[0-9]+$/
-            puts "push_and_update"
             new_target = target.push_and_update_belongs_to(method)
-            puts "push_and_update done"
             #target << (new_target = target.proxy_association.klass.find(method))
           elsif method.is_a? Array
             if method[0] == "new"

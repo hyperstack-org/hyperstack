@@ -2,8 +2,8 @@ module ReactiveRecord
   # creates getters for various method types
   # TODO replace sync_attribute calls with direct logic
   module Getters
-    def get_belongs_to(attr, reload = nil)
-      getter_common(attr, reload) do |has_key|
+    def get_belongs_to(assoc, reload = nil)
+      getter_common(assoc.attribute, reload) do |has_key, attr|
         # original code... why would we ever fetch from server on new?
         # if new?
         #   read_before_assignment_warning unless has_key
@@ -14,14 +14,13 @@ module ReactiveRecord
         # end
         return if new?
         value = Base.fetch_from_db([@model, [:find, id], attr, @model.primary_key]) if id.present?
-        value = find_association(@model.reflect_on_association(attr), value)
+        value = find_association(assoc, value)
         sync_ignore_dummy attr, value, has_key
       end
     end
 
-    def get_has_many(attr, reload = nil)
-      getter_common(attr, reload) do
-        assoc = @model.reflect_on_association(attr)
+    def get_has_many(assoc, reload = nil)
+      getter_common(assoc.attribute, reload) do |_has_key, attr|
         if new?
           @attributes[attr] = Collection.new(assoc.klass, @ar_instance, assoc)
         else
@@ -41,19 +40,17 @@ module ReactiveRecord
     end
 
     def get_server_method(attr, reload = nil)
-      puts "get_server_method(#{attr}, #{reload})"
       non_relationship_getter_common(attr, reload) do |has_key|
         sync_ignore_dummy attr, Base.load_from_db(self, *(vector ? vector : [nil]), attr), has_key
-      end.tap { |v| puts "get_server_method(#{attr}) => #{v}"}
+      end
     end
 
-    def get_ar_aggregate(attr, reload = nil)
-      getter_common(attr, reload) do |has_key|
-        aggr = @model.reflect_on_aggregation(method)
+    def get_ar_aggregate(aggr, reload = nil)
+      getter_common(aggr.attribute, reload) do |has_key, attr|
         if new?
           @attributes[attr] = aggr.klass.new.backing_record.link_aggregate(attr, self)
         else
-          sync_ignore_dummy attr, new_from_vector(aggregation.klass, self, *vector, method), has_key
+          sync_ignore_dummy attr, new_from_vector(aggr.klass, self, *vector, method), has_key
         end
       end
     end
@@ -96,9 +93,6 @@ module ReactiveRecord
     end
 
     def getter_common(attribute, reload)
-      assoc = @model.reflect_on_association(attribute)
-      puts "in getter(#{attribute}) assoc? #{assoc} collection? #{assoc && assoc.collection?}"
-
       @virgin = false unless data_loading?
       return if @destroyed
       if attributes.key? attribute # attribute method adds time stamp
@@ -106,14 +100,14 @@ module ReactiveRecord
         current_value.notify if current_value.is_a? Base::DummyValue
         if reload
           virtual_fetch_on_server_warning if on_opal_server? && changed?
-          yield true
+          yield true, attribute
         else
           current_value
         end
       else
         virtual_fetch_on_server_warning if on_opal_server? && changed?
-        yield false
-      end.tap { |value| React::State.get_state(self, attribute) unless data_loading?; puts "returning from getter(#{attribute}) #{value}"}
+        yield false, attribute
+      end.tap { |value| React::State.get_state(self, attribute) unless data_loading? }
     end
     #
     # def read_before_assignment_warning
