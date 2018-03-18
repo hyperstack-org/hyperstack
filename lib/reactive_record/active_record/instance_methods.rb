@@ -1,7 +1,5 @@
 module ActiveRecord
-
   module InstanceMethods
-
     def inspect
       "<#{model_name}:#{ReactiveRecord::Operations::Base::FORMAT % to_key} "\
       "(#{ReactiveRecord::Operations::Base::FORMAT % object_id}) "\
@@ -15,7 +13,6 @@ module ActiveRecord
     end
 
     def initialize(hash = {})
-
       if hash.is_a? ReactiveRecord::Base
         @backing_record = hash
       else
@@ -31,7 +28,7 @@ module ActiveRecord
           self.class.load_data do
             h.each do |attribute, value|
               unless attribute == primary_key
-                reactive_set!(attribute, value)
+                @ar_instance[attribute] = value
                 changed_attributes << attribute
               end
             end
@@ -50,7 +47,7 @@ module ActiveRecord
     end
 
     def type=(val)
-      @backing_record.reactive_set!(:type, backing_record.convert(:type, val))
+      @backing_record.set_attr_value(:type, val)
     end
 
     def id

@@ -16,7 +16,6 @@ module ReactiveRecord
         @unsaved_children ||= Set.new
         unless @uc_already_being_called
           @uc_already_being_called = true
-          #@owner.backing_record.update_attribute(@association.attribute)
         end
       else
         @unsaved_children ||= DummySet.new
@@ -356,16 +355,17 @@ module ReactiveRecord
     # means appointment.doctor_value.patients << appointment.patient
     # and we have to appointment.doctor(current value).patients.delete(appointment.patient)
 
-
     def update_child(item)
       backing_record = item.backing_record
       if backing_record && @owner && @association && !@association.through_association? && item.attributes[@association.inverse_of] != @owner
         inverse_of = @association.inverse_of
         current_association = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
-        backing_record.update_attribute(inverse_of, @owner)
-        current_association.attributes[@association.attribute].delete(item) if current_association and current_association.attributes[@association.attribute]
-        @owner.backing_record.update_attribute(@association.attribute) # forces a check if association contents have changed from synced values
+        backing_record.update_belongs_to(inverse_of, @owner)
+        if current_association && current_association.attributes[@association.attribute]
+          current_association.attributes[@association.attribute].delete(item)
+        end
+        @owner.backing_record.sync_has_many(@association.attribute)
       end
     end
 
@@ -376,7 +376,7 @@ module ReactiveRecord
       else
         unsaved_children << item
         update_child(item)
-        @owner.backing_record.update_attribute(@association.attribute) if @owner && @association
+        @owner.backing_record.sync_has_many(@association.attribute) if @owner && @association
         if !@count.nil?
           @count += item.destroyed? ? -1 : 1
           notify_of_change self
@@ -458,10 +458,9 @@ module ReactiveRecord
           inverse_of = @association.inverse_of
           if (backing_record = item.backing_record) && backing_record.attributes[inverse_of] == @owner
             # the if prevents double update if delete is being called from << (see << above)
-            backing_record.update_attribute(inverse_of, nil)
+            backing_record.update_belongs_to(inverse_of, nil)
           end
-          # forces a check if association contents have changed from synced values
-          delete_internal(item) { @owner.backing_record.update_attribute(@association.attribute) }
+          delete_internal(item) { @owner.backing_record.sync_has_many(@association.attribute) }
         else
           delete_internal(item)
         end
@@ -474,7 +473,7 @@ module ReactiveRecord
       elsif !@count.nil?
         @count -= 1
       end
-      yield item if block_given?
+      yield if block_given? # was yield item, but item is not used
       item
     end
 

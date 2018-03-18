@@ -297,6 +297,7 @@ module ReactiveRecord
         end
         promise
       rescue Exception => e
+        debugger
         log("Exception raised while saving - #{e}", :error)
         yield false, e.message, [] if block
         promise.resolve({success: false, message: e.message, models: []})

@@ -272,16 +272,16 @@ module ActiveRecord
     [:belongs_to, :has_many, :has_one].each do |macro|
       define_method(macro) do |*args| # is this a bug in opal?  saying name, scope=nil, opts={} does not work!
         name = args.first
+        opts = (args.count > 1 and args.last.is_a? Hash) ? args.last : {}
+        assoc = Associations::AssociationReflection.new(self, macro, name, opts)
         if macro == :has_many
           define_method(name) { @backing_record.get_has_many(name, nil) }
+          define_method("#{name}=") { |val| @backing_record.set_has_many(assoc, val) }
         else
           define_method(name) { @backing_record.get_belongs_to(name, nil) }
+          define_method("#{name}=") { |val| @backing_record.set_belongs_to(assoc, val) }
         end
-        define_method("#{name}=") do |val|
-          @backing_record.reactive_set!(name, backing_record.convert(name, val).itself)
-        end
-        opts = (args.count > 1 and args.last.is_a? Hash) ? args.last : {}
-        Associations::AssociationReflection.new(self, macro, name, opts)
+        assoc
       end
     end
 
@@ -289,11 +289,10 @@ module ActiveRecord
       reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
       if reflection.klass < ActiveRecord::Base
         define_method(name) { @backing_record.get_ar_aggregate(name, nil) }
+        define_method("#{name}=") { |val| @backing_record.set_ar_aggregate(reflection, val) }
       else
         define_method(name) { @backing_record.get_non_ar_aggregate(name, nil) }
-      end
-      define_method("#{name}=") do |val|
-        @backing_record.reactive_set!(name, backing_record.convert(name, val))
+        define_method("#{name}=") { |val| @backing_record.set_non_ar_aggregate(reflection, val) }
       end
     end
 
@@ -326,9 +325,7 @@ module ActiveRecord
         next if name == primary_key
         define_method(name) { @backing_record.get_attr_value(name, nil) }
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
-        define_method("#{name}=") do |val|
-          @backing_record.reactive_set!(name, backing_record.convert(name, val))
-        end
+        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }
         define_method("#{name}_changed?") { @backing_record.changed?(name) }
       end
     end
