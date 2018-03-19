@@ -153,11 +153,8 @@ measure(1, 7, 7, 7) (1372 data points fetched) vs 107 seconds w/o fixes
             root_lookup: 0.004622000000000015 (0)%
             public_columns_hash: 0.001442 (0)%
 ********* Other Time ***********************
-<<<<<<< HEAD
 processed in 2.449s with getters fixed
 processed in 2.420s with setters fixed
 processed in 2.392s without React set or get state
 processed in 1.551s with hashing used instead of detects
-=======
->>>>>>> edge
 =end
