@@ -7,7 +7,7 @@ module ReactiveRecord
       return error_details    unless errors.empty?
       return new_details      if new?
       return destroyed_details if destroyed
-      return loading_details  unless attributes.key? primary_key
+      return loading_details  unless @attributes.key? primary_key
       return dirty_details    unless changed_attributes.empty?
       "[loaded id: #{id}]"
     end
@@ -31,7 +31,7 @@ module ReactiveRecord
 
     def dirty_details
       changes = Hash[changed_attributes.collect do |attr|
-        [attr, [@synced_attributes[attr], attributes[attr]]] if column_type(attr)
+        [attr, [@synced_attributes[attr], @attributes[attr]]] if column_type(attr)
       end.compact]
       "[changed id: #{id} #{changes}]"
     end

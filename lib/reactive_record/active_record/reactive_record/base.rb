@@ -3,6 +3,7 @@ module ReactiveRecord
     include BackingRecordInspector
     include Setters
     include Getters
+    extend  LookupTables
 
     # Its all about lazy loading. This prevents us from grabbing enormous association collections, or large attributes
     # unless they are explicitly requested.
@@ -10,7 +11,8 @@ module ReactiveRecord
     # During prerendering we get each attribute as its requested and fill it in both on the javascript side, as well as
     # remember that the attribute needs to be part of the download to client.
 
-    # On the client we fill in the record data with empty values (nil, or one element collections) but only as the attribute
+    # On the client we fill in the record data with empty values (the default value for the attribute,
+    # or one element collections) but only as the attribute
     # is requested.  Each request queues up a request to get the real data from the server.
 
     # The ReactiveRecord class serves two purposes.  First it is the unique data corresponding to the last known state of a
@@ -39,9 +41,10 @@ module ReactiveRecord
     attr_accessor :updated_during
     attr_accessor :synced_attributes
     attr_accessor :virgin
+    attr_reader   :attributes
 
     # While data is being loaded from the server certain internal behaviors need to change
-    # for example records all record changes are synced as they happen.
+    # for example all record changes are synced as they happen.
     # This is implemented this way so that the ServerDataCache class can use pure active
     # record methods in its implementation
 
@@ -64,20 +67,9 @@ module ReactiveRecord
       load_data { ServerDataCache.load_from_json(json, target) }
     end
 
-    def self.class_scopes(model)
-      @class_scopes[model.base_class]
-    end
-
-    # def self.sync_blocks
-    #   # @sync_blocks[watch_model][sync_model][scope_name][...array of blocks...]
-    #   @sync_blocks ||= Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = Hash.new { |hash, key| hash[key] = [] } } }
-    # end
-
-
     def self.find(model, attribute, value)
       # will return the unique record with this attribute-value pair
       # value cannot be an association or aggregation
-
       model = model.base_class
       # already have a record with this attribute-value pair?
       record = @records[model].detect { |record| record.attributes[attribute] == value}
@@ -86,11 +78,15 @@ module ReactiveRecord
         # so find the id of of record with the attribute-value pair, and see if that is loaded.
         # find_in_db returns nil if we are not prerendering which will force us to create a new record
         # because there is no way of knowing the id.
-        if attribute != model.primary_key and id = find_in_db(model, attribute, value)
-          record = @records[model].detect { |record| record.id == id}
+        if attribute != model.primary_key && (id = find_in_db(model, attribute, value))
+          record = lookup_by_id(model, id) #@records[model].detect { |record| record.id == id}
         end
         # if we don't have a record then create one
-        (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
+        # (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
+        unless record
+          record = new(model)
+          set_vector_lookup(record, [model, [:find_by, attribute => value]])
+        end
         # and set the value
         record.sync_attribute(attribute, value)
         # and set the primary if we have one
@@ -98,10 +94,6 @@ module ReactiveRecord
       end
       # finally initialize and return the ar_instance
       record.ar_instance ||= infer_type_from_hash(model, record.attributes).new(record)
-    end
-
-    def self.find_by_object_id(model, object_id)
-      @records[model].detect { |record| record.object_id == object_id }.ar_instance
     end
 
     def self.new_from_vector(model, aggregate_owner, *vector)
@@ -112,10 +104,11 @@ module ReactiveRecord
 
       # do we already have a record with this vector?  If so return it, otherwise make a new one.
 
-      record = @records[model].detect { |record| record.vector == vector }
+      # record = @records[model].detect { |record| record.vector == vector }
+      record = lookup_by_vector(vector)
       unless record
         record = new model
-        record.vector = vector
+        set_vector_lookup(record, vector)
       end
 
       record.ar_instance ||= infer_type_from_hash(model, record.attributes).new(record)
@@ -127,7 +120,6 @@ module ReactiveRecord
       end
 
       record.ar_instance
-
     end
 
     def initialize(model, hash = {}, ar_instance = nil)
@@ -138,6 +130,7 @@ module ReactiveRecord
       @changed_attributes = []
       @virgin = true
       records[model] << self
+      Base.set_object_id_lookup(self)
     end
 
     def find(*args)
@@ -153,13 +146,15 @@ module ReactiveRecord
     end
 
     def id
-      attributes[primary_key]
+      @attributes[primary_key]
     end
 
     def id=(value)
       # value can be nil if we are loading an aggregate otherwise check if it already exists
-      if !(value and existing_record = records[@model].detect { |record| record.attributes[primary_key] == value})
-        attributes[primary_key] = value
+      # if !(value && (existing_record = records[@model].detect { |record| record.attributes[primary_key] == value}))
+      if !(value && (existing_record = Base.lookup_by_id(model, value)))
+        @attributes[primary_key] = value
+        Base.set_id_lookup(self)
       else
         @ar_instance.instance_variable_set(:@backing_record, existing_record)
         existing_record.attributes.merge!(attributes) { |key, v1, v2| v1 }
@@ -167,12 +162,6 @@ module ReactiveRecord
       value
     end
 
-    def attributes
-      @last_access_at = Time.now
-      @attributes
-    end
-
-    
     def changed?(*args)
       if args.count == 0
         React::State.get_state(self, "!CHANGED!")
@@ -191,12 +180,13 @@ module ReactiveRecord
     # any nil collections to empty arrays.  We can do this because
     # if its a brand new record, then any collections that are still
     # nil must not have any children.
+
     def initialize_collections
       if (!vector || vector.empty?) && id && id != ''
-        @vector = [@model, [:find_by, @model.primary_key => id]]
+        Base.set_vector_lookup(self, [@model, [:find_by, @model.primary_key => id]])
       end
       @model.reflect_on_all_associations.each do |assoc|
-        if assoc.collection? && attributes[assoc.attribute].nil?
+        if assoc.collection? && @attributes[assoc.attribute].nil?
           ar_instance.send("#{assoc.attribute}=", [])
         end
       end
@@ -234,7 +224,8 @@ module ReactiveRecord
 
     def sync_attribute(attribute, value)
 
-      @synced_attributes[attribute] = attributes[attribute] = value
+      @synced_attributes[attribute] = @attributes[attribute] = value
+      Base.set_id_lookup(self) if attribute == primary_key
 
       #@synced_attributes[attribute] = value.dup if value.is_a? ReactiveRecord::Collection
 
@@ -255,7 +246,7 @@ module ReactiveRecord
     # helper so we can tell if model exists.  We need this so we can detect
     # if a record has local changes that are out of sync.
     def self.exists?(model, id)
-      @records[model].detect { |record| record.attributes[model.primary_key] == id }
+      Base.lookup_by_id(model, id)
     end
 
     def revert
@@ -296,21 +287,20 @@ module ReactiveRecord
       !id && !vector
     end
 
-
-    def self.infer_type_from_hash(klass, hash)
-      klass = klass.base_class
-      return klass unless hash
-      type = hash[klass.inheritance_column]
-      begin
-        return Object.const_get(type)
-      rescue Exception => e
-        message = "Could not subclass #{@model_klass.model_name} as #{type}.  Perhaps #{type} class has not been required. Exception: #{e}"
-        `console.error(#{message})`
-      end if type
-      klass
-    end
-
     class << self
+      def infer_type_from_hash(klass, hash)
+        klass = klass.base_class
+        return klass unless hash
+        type = hash[klass.inheritance_column]
+        begin
+          return Object.const_get(type)
+        rescue Exception => e
+          message = "Could not subclass #{@model_klass.model_name} as #{type}.  Perhaps #{type} class has not been required. Exception: #{e}"
+          `console.error(#{message})`
+        end if type
+        klass
+      end
+
       attr_reader :outer_scopes
 
       def default_scope
@@ -324,29 +314,27 @@ module ReactiveRecord
       def add_to_outer_scopes(item)
         @outer_scopes << item
       end
-    end
 
-    # when_not_saving will wait until reactive-record is not saving a model.
-    # Currently there is no easy way to do this without polling.
-    def self.when_not_saving(model)
-      if @records[model].detect(&:saving?)
-        poller = every(0.1) do
-          unless @records[model].detect(&:saving?)
-            poller.stop
-            yield model
+      # when_not_saving will wait until reactive-record is not saving a model.
+      # Currently there is no easy way to do this without polling.
+      def when_not_saving(model)
+        if @records[model].detect(&:saving?)
+          poller = every(0.1) do
+            unless @records[model].detect(&:saving?)
+              poller.stop
+              yield model
+            end
           end
+        else
+          yield model
         end
-      else
-        yield model
       end
-    end
 
-    # While evaluating scopes we want to catch any requests
-    # to the server.  Once we catch any requests to the server
-    # then all the further scopes in that chain will be made
-    # at the server.
+      # While evaluating scopes we want to catch any requests
+      # to the server.  Once we catch any requests to the server
+      # then all the further scopes in that chain will be made
+      # at the server.
 
-    class << self
       class DbRequestMade < RuntimeError; end
 
       def catch_db_requests(return_val = nil)
@@ -371,13 +359,12 @@ module ReactiveRecord
       @destroyed = false
       model.reflect_on_all_associations.each do |association|
         if association.collection?
-          attributes[association.attribute].replace([]) if attributes[association.attribute]
+          @attributes[association.attribute].replace([]) if @attributes[association.attribute]
         else
           @ar_instance.send("#{association.attribute}=", nil)
         end
       end
       @destroyed = true
     end
-
   end
 end

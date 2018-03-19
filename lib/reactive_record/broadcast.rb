@@ -140,7 +140,7 @@ module ReactiveRecord
       @record.merge!(id: record.id) if record.id
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
-      attributes = record.backing_record.attributes
+      attributes = record.attributes
       data.each do |k, v|
         next if klass.reflect_on_association(k) || attributes[k] == v
         @previous_changes[k] = [attributes[k], v]

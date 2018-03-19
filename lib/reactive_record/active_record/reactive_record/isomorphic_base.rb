@@ -14,8 +14,7 @@ module ReactiveRecord
         define_attribute_methods
         @outer_scopes = Set.new
         @fetch_scheduled = nil
-        @records = Hash.new { |hash, key| hash[key] = [] }
-        @class_scopes = Hash.new { |hash, key| hash[key] = {} }
+        initialize_lookup_tables
         if on_opal_client?
           @pending_fetches = []
           @pending_records = []

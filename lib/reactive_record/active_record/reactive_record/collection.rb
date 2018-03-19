@@ -71,7 +71,7 @@ module ReactiveRecord
       if (@collection || all).length <= index and @dummy_collection
         (@collection.length..index).each do |i|
           new_dummy_record = ReactiveRecord::Base.new_from_vector(@target_klass, nil, *@vector, "*#{i}")
-          new_dummy_record.backing_record.attributes[@association.inverse_of] = @owner if @association && !@association.through_association?
+          new_dummy_record.attributes[@association.inverse_of] = @owner if @association && !@association.through_association?
           @collection << new_dummy_record
         end
       end
@@ -164,7 +164,7 @@ module ReactiveRecord
 
     def related_records_for(record)
       return [] unless @association
-      attrs = record.backing_record.attributes
+      attrs = record.attributes
       return [] unless attrs[@association.inverse_of] == @owner
       if !@association.through_association
         [record]
@@ -455,7 +455,7 @@ module ReactiveRecord
       notify_of_change(
         if @owner && @association && !@association.through_association?
           inverse_of = @association.inverse_of
-          if (backing_record = item.backing_record) && backing_record.attributes[inverse_of] == @owner
+          if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner
             # the if prevents double update if delete is being called from << (see << above)
             backing_record.update_belongs_to(inverse_of, nil)
           end

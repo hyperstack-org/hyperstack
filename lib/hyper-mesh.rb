@@ -21,6 +21,7 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/reactive_record/backing_record_inspector"
   require "reactive_record/active_record/reactive_record/getters"
   require "reactive_record/active_record/reactive_record/setters"
+  require "reactive_record/active_record/reactive_record/lookup_tables"
   require "reactive_record/active_record/reactive_record/base"
   require "reactive_record/active_record/reactive_record/collection"
   require "reactive_record/active_record/reactive_record/scoped_collection"

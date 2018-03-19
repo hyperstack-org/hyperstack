@@ -424,9 +424,7 @@ keys:
         # we leave the "*all" key in just for debugging purposes, and then skip it below
 
         if sorted_collection = tree["*all"]
-          puts "adding sorted collection"
           target.replace sorted_collection.collect { |id| target.proxy_association.klass.find(id) }
-          puts "done"
         end
 
         if id_value = tree["id"] and id_value.is_a? Array
@@ -446,7 +444,7 @@ keys:
             #target << (new_target = target.proxy_association.klass.find(method))
           elsif method.is_a? Array
             if method[0] == "new"
-              new_target = ReactiveRecord::Base.find_by_object_id(target.base_class, method[1])
+              new_target = ReactiveRecord::Base.lookup_by_object_id(method[1])
             elsif !(target.class < ActiveRecord::Base)
               new_target = target.send(*method)
               # value is an array if scope returns nil, so we destroy the bogus record
@@ -470,7 +468,6 @@ keys:
             # value is an array if scope returns nil, so we destroy the bogus record
             new_target.destroy and new_target = nil if value.is_a? Array
           else
-            puts "doing assignment of #{target}.#{method}= #{target}.#{method}"
             new_target = target.send("#{method}=", target.send(method))
           end
           load_from_json(value, new_target) if new_target

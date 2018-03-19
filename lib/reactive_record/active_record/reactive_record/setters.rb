@@ -6,14 +6,14 @@ module ReactiveRecord
 
     def set_ar_aggregate(aggr, raw_value)
       set_common(aggr.attribute, raw_value) do |value, attr|
-        attributes[attr] ||= aggr.klass.new if new?
-        abr = attributes[attr].backing_record
+        @attributes[attr] ||= aggr.klass.new if new?
+        abr = @attributes[attr].backing_record
         abr.virgin = false
-        map = value.backing_record.attributes if value
+        map = value.attributes if value
         aggr.mapped_attributes.each do |mapped_attr|
           abr.update_aggregate_attribute mapped_attr, map && map[mapped_attr]
         end
-        return attributes[attr]
+        return @attributes[attr]
       end
     end
 
@@ -54,7 +54,7 @@ module ReactiveRecord
     end
 
     def sync_has_many(attr)
-      set_change_status_and_notify_only attr, attributes[attr] != @synced_attributes[attr]
+      set_change_status_and_notify_only attr, @attributes[attr] != @synced_attributes[attr]
     end
 
     def update_simple_attribute(attr, value)
@@ -72,16 +72,16 @@ module ReactiveRecord
       value = convert(attr, value)
       @virgin = false unless data_loading?
       if !@destroyed && (
-           !attributes.key?(attr) ||
-           attributes[attr].is_a?(Base::DummyValue) ||
-           attributes[attr] != value)
+           !@attributes.key?(attr) ||
+           @attributes[attr].is_a?(Base::DummyValue) ||
+           @attributes[attr] != value)
         yield value, attr
       end
       value
     end
 
     def set_attribute_change_status_and_notify(attr, changed, new_value)
-      attributes[attr] = new_value
+      @attributes[attr] = new_value
       change_status_and_notify_helper(attr, changed) do |had_key, current_value|
         if !data_loading? ||
            (on_opal_client? && had_key && current_value.loaded? && current_value != new_value)
@@ -104,14 +104,14 @@ module ReactiveRecord
       elsif !changed_attributes.include?(attr)
         changed_attributes << attr
       end
-      yield attributes.key?(attr), attributes[attr]
+      yield @attributes.key?(attr), @attributes[attr]
       return unless empty_before != changed_attributes.empty?
       if on_opal_client? && !data_loading?
         React::State.set_state(self, '!CHANGED!', !changed_attributes.empty?, true)
       end
       return unless aggregate_owner
       aggregate_owner.set_change_status_and_notify_only(
-        attr, !attributes[attr].backing_record.changed_attributes.empty?
+        attr, !@attributes[attr].backing_record.changed_attributes.empty?
       )
     end
 
@@ -119,7 +119,7 @@ module ReactiveRecord
       # when updating the inverse attribute of a belongs_to that is itself a belongs_to
       # (i.e. 1-1 relationship) we clear the existing inverse value and then
       # write the current record to the new value
-      current_value = attributes[association.attribute]
+      current_value = @attributes[association.attribute]
       inverse_attr = association.inverse.attribute
       current_value.attributes[inverse_attr] = nil unless current_value.nil?
       return if value.nil?
@@ -132,7 +132,7 @@ module ReactiveRecord
       # when updating an inverse attribute of a belongs_to that is a has_many (i.e. a collection)
       # we need to first remove the current associated value (if non-nil), then add the new
       # value to the collection.  If the inverse collection is not yet initialized we do it here.
-      current_value = attributes[association.attribute]
+      current_value = @attributes[association.attribute]
       inverse_attr = association.inverse.attribute
       if value.nil?
         current_value.attributes[inverse_attr].delete(@ar_instance) unless current_value.nil?
@@ -142,8 +142,8 @@ module ReactiveRecord
     end
 
     def push_onto_collection(model, association, ar_instance)
-      attributes[association.attribute] ||= Collection.new(model, @ar_instance, association)
-      attributes[association.attribute] << ar_instance
+      @attributes[association.attribute] ||= Collection.new(model, @ar_instance, association)
+      @attributes[association.attribute] << ar_instance
     end
 
     def update_has_many_through_associations(association, value)
@@ -155,8 +155,8 @@ module ReactiveRecord
       # appointment.doctor = doctor_new_value (i.e. through association is changing)
       # means appointment.doctor_new_value.patients << appointment.patient
       # and we have to appointment.doctor_current_value.patients.delete(appointment.patient)
-      source_value = attributes[ta.source]
-      current_belongs_to_value = attributes[ta.inverse.attribute]
+      source_value = @attributes[ta.source]
+      current_belongs_to_value = @attributes[ta.inverse.attribute]
       return unless source_value
       unless current_belongs_to_value.nil? || current_belongs_to_value.attributes[ta.attribute].nil?
         current_belongs_to_value.attributes[ta.attribute].delete(source_value)
@@ -170,8 +170,8 @@ module ReactiveRecord
       # appointment.patient = patient_value (i.e. source is changing)
       # means appointment.doctor.patients.delete(appointment.patient)
       # means appointment.doctor.patients << patient_value
-      belongs_to_value = attributes[sa.inverse.attribute]
-      current_source_value = attributes[sa.source]
+      belongs_to_value = @attributes[sa.inverse.attribute]
+      current_source_value = @attributes[sa.source]
       return unless belongs_to_value
       unless belongs_to_value.attributes[sa.attribute].nil? || current_source_value.nil?
         belongs_to_value.attributes[sa.attribute].delete(current_source_value)

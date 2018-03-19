@@ -4,14 +4,6 @@ module ReactiveRecord
   module Getters
     def get_belongs_to(assoc, reload = nil)
       getter_common(assoc.attribute, reload) do |has_key, attr|
-        # original code... why would we ever fetch from server on new?
-        # if new?
-        #   read_before_assignment_warning unless has_key
-        #   value = Base.load_from_db(self, *(vector ? vector : [nil]), attr)
-        # else
-        #   value = Base.fetch_from_db([@model, [:find, id], attr, @model.primary_key]) if id && id != ''
-        #   value = find_association(association, value)
-        # end
         return if new?
         value = Base.fetch_from_db([@model, [:find, id], attr, @model.primary_key]) if id.present?
         value = find_association(assoc, value)
@@ -95,7 +87,7 @@ module ReactiveRecord
     def getter_common(attribute, reload)
       @virgin = false unless data_loading?
       return if @destroyed
-      if attributes.key? attribute # attribute method adds time stamp
+      if @attributes.key? attribute
         current_value = @attributes[attribute]
         current_value.notify if current_value.is_a? Base::DummyValue
         if reload
@@ -109,14 +101,6 @@ module ReactiveRecord
         yield false, attribute
       end.tap { |value| React::State.get_state(self, attribute) unless data_loading? }
     end
-    #
-    # def read_before_assignment_warning
-    #   log(
-    #     "Warning: reading from new #{model.name}.#{method} before assignment.  "\
-    #     'Will fetch value from server.  This may not be what you expected!!',
-    #     :warning
-    #   )
-    # end
 
     def find_association(association, id)
       inverse_of = association.inverse_of
@@ -125,7 +109,7 @@ module ReactiveRecord
       else
         new_from_vector(association.klass, nil, *vector, association.attribute)
       end
-      instance_backing_record_attributes = instance.backing_record.attributes
+      instance_backing_record_attributes = instance.attributes
       inverse_association = association.klass.reflect_on_association(inverse_of)
       if inverse_association.collection?
         instance_backing_record_attributes[inverse_of] = if id and id != ""
