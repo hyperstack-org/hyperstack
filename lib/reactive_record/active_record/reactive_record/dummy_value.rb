@@ -26,10 +26,7 @@ module ReactiveRecord
         column_hash ||= {}
         notify
         @column_hash = column_hash
-        column_type = (
-          @column_hash[:sql_type_metadata] &&
-          @column_hash[:sql_type_metadata][:type]
-        ) || 'nil'
+        column_type = Base.column_type(@column_hash) || 'nil'
         default_value_method = "build_default_value_for_#{column_type}"
         @object = __send__ default_value_method
       rescue ::Exception

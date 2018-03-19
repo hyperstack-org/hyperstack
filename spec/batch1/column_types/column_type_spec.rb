@@ -235,6 +235,14 @@ describe "column types on client", js: true do
     end.to eq([false, false, false, false, true, true, true, true])
   end
 
+  it 'booleans also have a ? accessor method' do
+    expect_evaluate_ruby do
+      [true, false].collect do |val|
+        TypeTest.new(boolean: val).boolean?
+      end
+    end.to eq([true, false])
+  end
+
   it 'converts other dates just like time' do
     expect_evaluate_ruby do
       [:datetime, :time, :timestamp].collect do |attr|

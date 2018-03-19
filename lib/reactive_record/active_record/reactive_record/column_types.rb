@@ -5,10 +5,12 @@ module ReactiveRecord
       model.columns_hash
     end
 
+    def self.column_type(column_hash)
+      column_hash && column_hash[:sql_type_metadata] && column_hash[:sql_type_metadata][:type]
+    end
+
     def column_type(attr)
-      column_hash = columns_hash[attr]
-      return nil unless column_hash
-      column_hash[:sql_type_metadata] && column_hash[:sql_type_metadata][:type]
+      Base.column_type(columns_hash[attr])
     end
 
     def convert_datetime(val)

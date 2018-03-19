@@ -321,12 +321,14 @@ module ActiveRecord
     end
 
     def define_attribute_methods
-      columns_hash.keys.each do |name|
+      columns_hash.each do |name, column_hash|
         next if name == primary_key
         define_method(name) { @backing_record.get_attr_value(name, nil) }
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
         define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }
         define_method("#{name}_changed?") { @backing_record.changed?(name) }
+        next unless ReactiveRecord::Base.column_type(column_hash) == :boolean
+        define_method("#{name}?") { @backing_record.get_attr_value(name, nil) }
       end
     end
 

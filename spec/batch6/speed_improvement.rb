@@ -41,16 +41,6 @@ describe "speed tests", js: true do
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
     on_client do
-<<<<<<< HEAD
-      # class React::State
-      #   def self.get_state(*args, &block)
-      #   end
-      #   def self.set_state(*args, &block)
-      #   end
-      # end
-=======
->>>>>>> edge
-
       class SpeedTester < Hyperloop::Component
         def self.load_all(id)
           React::IsomorphicHelpers.load_context
