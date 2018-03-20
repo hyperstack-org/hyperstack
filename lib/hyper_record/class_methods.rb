@@ -386,7 +386,7 @@ module HyperRecord
     end
 
     def _rest_method_get_or_patch(name, id, *args)
-      uri = "#{resource_base_uri}/#{id}/methods/#{name}.json"
+      uri = "#{resource_base_uri}/#{id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}" # timestamp to invalidate browser caches
       if args && args.size > 0
         payload = { params: args }
         _promise_patch(uri, payload).then do |result|
