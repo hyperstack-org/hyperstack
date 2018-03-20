@@ -45,6 +45,7 @@ describe "speed tests", js: true do
         def self.load_all(id)
           React::IsomorphicHelpers.load_context
           start_time = Time.now
+          timer_promise = Promise.new
           case id
           when 1
             ReactiveRecord.load do
@@ -78,12 +79,17 @@ describe "speed tests", js: true do
                 end
               end
             end
-          end.then{ Time.now-start_time }
+            # puts gets clock to sync otherwise its slightly inaccurate
+          end.then do
+            after(0) { timer_promise.resolve(Time.now-start_time) }
+          end
+          timer_promise
         end
 
         after_mount do
           @start_time = Time.now
         end
+
         render(DIV) do
           DIV { "fetched in #{Time.now-@start_time} seconds"} if @start_time
           User.each do |user|

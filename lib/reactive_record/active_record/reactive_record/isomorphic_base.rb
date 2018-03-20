@@ -146,13 +146,16 @@ module ReactiveRecord
               begin
                 fetch_time = `Date.now()`
                 log("       Fetched in:   #{`(fetch_time - start_time)/ 1000`}s")
+                timer = after(0) do
+                  log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
+                  log(['       Returned: %o', response.to_n])
+                end
                 begin
                   ReactiveRecord::Base.load_from_json(response)
                 rescue Exception => e
+                  `clearTimeout(#{timer})`
                   log("Unexpected exception raised while loading json from server: #{e}", :error)
                 end
-                log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
-                log(["       Returned: %o", response.to_n])
                 ReactiveRecord.run_blocks_to_load last_fetch_at
               ensure
                 ReactiveRecord::WhileLoading.loaded_at last_fetch_at
