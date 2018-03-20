@@ -66,15 +66,6 @@ module HyperRecord
       @destroyed
     end
 
-    def rest_method_force_updates(method_name)
-      @rest_methods_hash[method_name][:force] = true
-    end
-
-    def rest_method_unforce_updates(method_name)
-      @rest_methods_hash[method_name][:force] = false
-    end
-
-
     def link(other_record)
       link_record(other_record, observer)
       self
@@ -91,10 +82,6 @@ module HyperRecord
       end
     end
 
-    def resource_base_uri
-      self.class.resource_base_uri
-    end
-
     def reflections
       self.class.reflections
     end
@@ -104,6 +91,18 @@ module HyperRecord
       @changed_properties_hash = {}
     end
     
+    def resource_base_uri
+      self.class.resource_base_uri
+    end
+    
+    def rest_method_force_updates(method_name)
+      @rest_methods_hash[method_name][:force] = true
+    end
+
+    def rest_method_unforce_updates(method_name)
+      @rest_methods_hash[method_name][:force] = false
+    end
+
     def save
       save_record(observer)
       self
