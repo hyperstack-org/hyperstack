@@ -35,7 +35,7 @@ module Vis
       event_handler_id = `Math.random().toString(36).substring(6)`
       handler = %x{
         function(event, properties, sender_id) {
-          return block.$call(Opal.Hash.$new(event_info),Opal.Hash.$new(properties), sender_id);
+          return block.$call(Opal.Hash.$new(event),Opal.Hash.$new(properties), sender_id);
         }
       }
       @event_handlers[event][event_handler_id] = handler
