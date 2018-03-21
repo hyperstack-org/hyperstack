@@ -11,13 +11,13 @@ Implements the complete API for:
 
 Includes vis.js version 4.21.0
 
-### Demo
+## Demo
 
 Reactive hyper-vis in action:
 
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
 
-### Quality
+## Quality
 [![Build Status](https://semaphoreci.com/api/v1/janbiedermann/hyper-vis/branches/master/shields_badge.svg)](https://semaphoreci.com/janbiedermann/hyper-vis)
 [![GitHub issues](https://img.shields.io/github/issues/janbiedermann/hyper-vis.svg)](https://github.com/janbiedermann/hyper-vis/issues)
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/janbiedermann/hyper-vis.svg)](http://isitmaintained.com/project/janbiedermann/hyper-vis "Percentage of issues still open")
@@ -39,7 +39,7 @@ cd ../..
 bundle exec rspec
 ```
 
-### Installation
+## Installation
 for a Rails app:
 ```ruby
 gem 'hyper-vis'
@@ -61,7 +61,7 @@ In your `application.css` add:
 ```
 For other frameworks vis.js, stylesheets and images are available in the gems `lib/vis/source/` directory.
 
-### Usage
+## Usage
 
 Hint: also see specs in the `specs` directory
 
