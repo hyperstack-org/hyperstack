@@ -29,7 +29,7 @@ Tests:
 Finished in 1 minute 58.6 seconds (files took 2.75 seconds to load)
 93 examples, 0 failures, 8 pending
 ```
-To try: clone repo, then:
+To run tests: clone repo, then
 ```bash
 bundle update
 cd spec/test_app
