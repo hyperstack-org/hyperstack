@@ -18,6 +18,7 @@ Reactive hyper-vis in action:
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
 
 ### Quality
+![Build Status](https://semaphoreci.com/api/v1/janbiedermann/hyper-vis/branches/master/shields_badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/janbiedermann/hyper-vis.svg)
 ![Percentage of issues still open](http://isitmaintained.com/badge/open/janbiedermann/hyper-vis.svg)
 ![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/janbiedermann/hyper-vis.svg)
