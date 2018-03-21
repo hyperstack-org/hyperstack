@@ -5,9 +5,9 @@ Implements the complete API for:
 - [Vis Dataset](http://visjs.org/docs/data/dataset.html)
 - [Vis Dataview](http://visjs.org/docs/data/dataview.html)
 - [Vis Graph2d](http://visjs.org/docs/graph2d/)
-- [Vis Graph3d](http://visjs.org/docs/graph3d/)
+- [Vis Graph3d](http://visjs.org/docs/graph3d/), wip
 - [Vis Network](http://visjs.org/docs/network/)
-- [Vis Timeline](http://visjs.org/docs/timeline/)
+- [Vis Timeline](http://visjs.org/docs/timeline/), wip
 
 Includes vis.js version 4.21.0
 
@@ -16,6 +16,14 @@ Includes vis.js version 4.21.0
 Reactive hyper-vis in action:
 
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
+
+### Quality
+
+```
+Finished in 1 minute 58.6 seconds (files took 2.75 seconds to load)
+93 examples, 0 failures, 8 pending
+```
+To try: clone repo, `bundle update` and `bundle exec rspec`
 
 ### Installation
 for a Rails app:
@@ -30,10 +38,18 @@ vis.js is automatically imported for Ruby-Hyperloop. If you use webpacker, you m
 ```ruby
   config.cancel_import 'vis/source/vis.js'
 ```
-The wrapper expects a global `vis` (not `Vis`) to be availabe in javascript. 
-stylesheets are includes in 'vis/source/vis.css', images are there too.
+The wrapper expects a global `vis` (not `Vis`) to be availabe in javascript.
+For Vis to function as expected the stylesheets must be included.
+For a Rails app, the asset path is automatically added. 
+In your `application.css` add:
+```
+  *= require vis.css
+```
+For other frameworks vis.js, stylesheets and images are available in the gems `lib/vis/source/` directory.
 
 ### Usage
+
+Hint: also see specs in the `specs` directory
 
 #### The Vis part
 ```ruby
