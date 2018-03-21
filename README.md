@@ -29,7 +29,14 @@ Tests:
 Finished in 1 minute 58.6 seconds (files took 2.75 seconds to load)
 93 examples, 0 failures, 8 pending
 ```
-To try: clone repo, `bundle update` and `bundle exec rspec`
+To try: clone repo, then:
+```bash
+bundle update
+cd spec/test_app
+bundle update
+cd ../..
+bundle exec rspec
+```
 
 ### Installation
 for a Rails app:
