@@ -11,6 +11,12 @@ module Vis
     
     attr_reader :event_handlers
 
+    def self.wrap(native)
+      instance = allocate
+      instance.instance_variable_set(:@native, native)
+      instance
+    end
+
     def initialize(*args)
       if args[0] && `Opal.is_a(args[0], Opal.Hash)`
         hash_array = []
@@ -86,6 +92,5 @@ module Vis
       end
       `self["native"].update.apply(self["native"], Opal.to_a(args))`
     end
-
   end
 end
