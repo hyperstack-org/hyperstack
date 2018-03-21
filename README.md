@@ -6,6 +6,10 @@ Currently supports the complete API for:
 - Vis Dataview
 - Vis Network
 
+### Demo
+
+[![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
+
 ### Installation
 for a rails app:
 ```
