@@ -11,5 +11,6 @@ if RUBY_ENGINE == 'opal'
   require 'hyperloop/vis/network/mixin'
   require 'hyperloop/vis/network/component'
 else
+  require 'vis/railtie' if defined?(Rails)
   Opal.append_path __dir__.untaint
 end
