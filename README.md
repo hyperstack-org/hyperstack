@@ -1,6 +1,6 @@
 # hyper-vis
 
-A Opal Ruby wraper for [Vis.js](http://visjs.org) with a Ruby-Hyperloop Component.
+A Opal Ruby wrapper for [Vis.js](http://visjs.org) with a Ruby-Hyperloop Component.
 Implements the complete API for:
 - [Vis Dataset](http://visjs.org/docs/data/dataset.html)
 - [Vis Dataview](http://visjs.org/docs/data/dataview.html)
