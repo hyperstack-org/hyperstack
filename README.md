@@ -24,12 +24,13 @@ Reactive hyper-vis in action:
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/janbiedermann/hyper-vis.svg)](http://isitmaintained.com/project/janbiedermann/hyper-vis "Average time to resolve an issue")
 [![Pending Pull-Requests](http://githubbadges.herokuapp.com/janbiedermann/hyper-vis/pulls.svg)](https://github.com/janbiedermann/hyper-vis/pulls)
 
-Tests:
+##### Tests
 ```
 Finished in 1 minute 58.6 seconds (files took 2.75 seconds to load)
 93 examples, 0 failures, 8 pending
 ```
-To run tests: clone repo, then
+##### To runTtests
+Clone repo, then:
 ```bash
 bundle update
 cd spec/test_app
