@@ -222,20 +222,6 @@ module Vis
       _rubyfy_manipulation_options(new_opts) if new_opts.has_key?(:manipulation)
       _rubyfy_nodes_options(new_opts) if new_opts.has_key?(:nodes)
 
-      if new_opts.has_key?(:filter)
-        block = new_opts[:filter]
-        if `typeof block === "function"`
-          unless new_opts[:filter].JS[:hyper_wrapped]
-            new_opts[:filter] = %x{
-              function(item) {
-                return #{block.call(`Opal.Hash.$new(item)`)};
-              }
-            }
-            new_opts[:filter].JS[:hyper_wrapped] = true
-          end
-        end
-      end
-
       if new_opts.has_key?(:join_condition)
         block = new_opts[:join_condition]
         if `typeof block === "function"`
