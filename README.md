@@ -13,6 +13,8 @@ Includes vis.js version 4.21.0
 
 ### Demo
 
+Reactive hyper-vis in action:
+
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
 
 ### Installation
