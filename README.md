@@ -16,19 +16,19 @@ Includes vis.js version 4.21.0
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
 
 ### Installation
-for a rails app:
+for a Rails app:
 ```
 gem 'hyper-vis'
 ```
 and `bundle update`.
 
-hyper-vis depends on `hyper-component` from [Ruby-Hyperloop](http://ruby-hyperloop.org)
+hyper-vis depends on `hyper-component` from [Ruby-Hyperloop](http://ruby-hyperloop.org).
 
 vis.js is automatically imported for Ruby-Hyperloop. If you use webpacker, you may need to cancel the import in your config/intializers/hyperloop.rb
 ```
   config.cancel_import 'vis/source/vis.js'
 ```
-The wrapper expects a global `vis' (not `Vis`) to be availabe in javascript. 
+The wrapper expects a global `vis` (not `Vis`) to be availabe in javascript. 
 stylesheets are includes in 'vis/source/vis.css', images are there too.
 
 ### Usage
