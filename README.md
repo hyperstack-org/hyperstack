@@ -35,7 +35,7 @@ and `bundle update`.
 
 hyper-vis depends on `hyper-component` from [Ruby-Hyperloop](http://ruby-hyperloop.org) but can be used without it.
 
-vis.js is automatically imported for Ruby-Hyperloop. If you use webpacker, you may need to cancel the import in your config/intializers/hyperloop.rb
+vis.js is automatically imported for Ruby-Hyperloop. If you get vis.js with webpacker, you may need to cancel the import in your config/intializers/hyperloop.rb
 ```ruby
   config.cancel_import 'vis/source/vis.js'
 ```
