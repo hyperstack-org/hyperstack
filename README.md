@@ -21,7 +21,7 @@ Reactive hyper-vis in action:
 ![GitHub issues](https://img.shields.io/github/issues/janbiedermann/hyper-vis.svg)
 ![Percentage of issues still open](http://isitmaintained.com/badge/open/janbiedermann/hyper-vis.svg)
 ![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/janbiedermann/hyper-vis.svg)
-![Pending Pull-Requests](http://githubbadges.herokuapp.com/janbiedermann/hyper-vis.svg)
+![Pending Pull-Requests](http://githubbadges.herokuapp.com/janbiedermann/hyper-vis/pulls.svg)
 Tests:
 ```
 Finished in 1 minute 58.6 seconds (files took 2.75 seconds to load)
