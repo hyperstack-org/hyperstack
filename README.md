@@ -9,6 +9,8 @@ Implements the complete API for:
 - [Vis Network](http://visjs.org/docs/network/)
 - [Vis Timeline](http://visjs.org/docs/timeline/)
 
+Includes vis.js version 4.21.0
+
 ### Demo
 
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
