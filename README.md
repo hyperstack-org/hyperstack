@@ -81,12 +81,33 @@ Vis::Network can be used within the render_with_dom_node.
 class MyVisNetworkComponent
   include Hyperloop::Vis::Network::Mixin
 
-  automatic_refresh true # thats the default, may set to false
+  # the component automatically calls the render_with_dom_node block every
+  # time new data or options are received
+
+  # however
+  # setting automatic_refresh false turns that off ...
+  # (default is true, so this is optional):
+  automatic_refresh false
+
+  # ... and with automatic_refresh false refresh can
+  # be handled in the before_receive_props callback
+  # for example (this is also optional):
+  before_receive_props do |new_props|
+    if new_props[:vis_data] != @data
+      @net.set_data(new_props[:vis_data])
+    end
+  end
 
   render_with_dom_node do |dom_node, data, options|
+    # its important to use the data as passed in as 'data' argument
+    # to get the latests passed data for each new render
+    @net = Vis::Network.new(dom_node, data, options)
 
-    net = Vis::Network.new(dom_node, data, options)
+    # save data for later or usage, for example
+    # in before_receive_props for comparison
+    @data = data
 
+    # example of using the document helper
     canvas = document.JS.querySelector('canvas')
   end
 end
@@ -95,12 +116,15 @@ class AOuterComponent < Hyperloop::Component
   render do
     received_data = []
 
+    # example of using a callback in the options
     options = { manipulation: {
         edit_node: proc { |node_data, callback| received_data << node_data }
       }}
 
+    # initialize a dataset
     data = Vis::DataSet.new([{id: 1, name: 'foo'}, {id: 2, name: 'bar'}, {id: 3, name: 'pub'}])
     
+    # call the component
     DIV { MyVisNetworkComponent(vis_data: data, otions: options)}
   end
 end
