@@ -53,7 +53,7 @@ vis.js is automatically imported for Ruby-Hyperloop. If you get vis.js with webp
   config.cancel_import 'vis/source/vis.js'
 ```
 The wrapper expects a global `vis` (not `Vis`) to be availabe in javascript.
-For Vis to function as expected the stylesheets must be included.
+For Vis to function as expected, the stylesheets must be included.
 For a Rails app, the asset path is automatically added. 
 In your `application.css` add:
 ```
@@ -63,7 +63,7 @@ For other frameworks vis.js, stylesheets and images are available in the gems `l
 
 ## Usage
 
-The wrapper follows vis 1 to 1, conforming to ruby standards, instead of `setSize` in javascript, you would use `set_size`. Also see specs in the `specs` directory for usage or the vis documentation (linked above).
+The wrapper follows vis.js 1 to 1, conforming to ruby standards, instead of `setSize` in javascript, you would use `set_size`. Also see specs in the `specs` directory for usage or the vis documentation (linked above).
 All arguments or return values are 'rubyfied' as much as possible, so you can just use ruby.
 
 ### The Vis part
@@ -73,6 +73,10 @@ edge_dataset = Vis::DataSet.new([{from: 1, to: 2}, {from: 2, to: 3}])
 dom_node = Vis::Network.test_container
 net = Vis::Network.new(dom_node, {nodes: dataset, edges: edge_dataset})
 xy = net.canvas_to_dom({x: 10, y: 10})
+# there also are
+Vis::Graph2d
+Vis::Graph3d
+Vis::Timeline
 ```
 ### The Component part
 The Components takes care about all the things necessary to make Vis.js play nice with React.
