@@ -297,6 +297,7 @@ describe 'Vis::Graph2d', js: true do
     end.to eq([true, 1])
   end
 
+  xit 'get_event_properties'
   xit 'is_group_visible'
   xit 'set_groups'
   xit 'get_legend'
