@@ -7,7 +7,7 @@ Implements the complete API for:
 - [Vis Graph2d](http://visjs.org/docs/graph2d/)
 - [Vis Graph3d](http://visjs.org/docs/graph3d/)
 - [Vis Network](http://visjs.org/docs/network/)
-- [Vis Timeline](http://visjs.org/docs/timeline/), wip
+- [Vis Timeline](http://visjs.org/docs/timeline/)
 
 Includes vis.js version 4.21.0
 

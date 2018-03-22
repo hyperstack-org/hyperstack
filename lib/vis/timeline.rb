@@ -1,5 +1,5 @@
 module Vis
-  class Network
+  class Timeline
     include Native
     include Vis::Utilities
 
@@ -33,8 +33,6 @@ module Vis
         @native = `new vis.Timeline(native_container, native_data, native_group_data, native_options)`
       end
     end
-
-    # global methods
 
     def off(event, event_handler_id)
       event = lower_camelize(event)
@@ -81,8 +79,6 @@ module Vis
       @native.JS.setOptions(options_to_native(options))
     end
 
-    # timeline methods
-
     def fit(options = {})
       @native.JS.fit(options_to_native(options))
     end
@@ -106,8 +102,8 @@ module Vis
       `Opal.Hash.$new(res)`
     end
     
-    def mode_to(time, options = {})
-      @native.JS.modeTo(time, options_to_native(options))
+    def move_to(time, options = {})
+      @native.JS.moveTo(time, options_to_native(options))
     end
 
     def set_selection(id_or_ids, options = {})
