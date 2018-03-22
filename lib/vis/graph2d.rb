@@ -4,12 +4,14 @@ module Vis
     include Vis::Utilities
 
     aliases_native %i[
+      addCustomTime
       destroy
       fit
       getCurrentTime
       getCustomTime
       isGroupVisible
       redraw
+      removeCustomTime
       setCurrentTime
       setCustomTime
       setWindow

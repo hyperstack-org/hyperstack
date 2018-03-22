@@ -199,7 +199,7 @@ describe 'Vis::Graph2d', js: true do
     end.to eq([true, 1, true, true])
   end
 
-  xit 'can set and get custom time' do
+  it 'can set and get custom time' do
     # option showCustomTime is deprecated in vis, throws error
     expect_evaluate_ruby do
       items = [
@@ -210,17 +210,19 @@ describe 'Vis::Graph2d', js: true do
         {x: '2014-06-15', y: 15},
         {x: '2014-06-16', y: 30}
       ]
-      options = { start: '2014-06-10', end: '2014-06-18', show_custom_time: true }
+      options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
       g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       now = Time.now
-      time_get = g2d.get_custom_time
+      g2d.add_custom_time(now, 'time 1')
+      time_get = g2d.get_custom_time('time 1')
       same_get_year = time_get.year == now.year
-      g2d.set_custom_time(Time.now + 1.year)
-      time_set = g2d.get_custom_time
+      g2d.set_custom_time(Time.now + 1.year, 'time 1')
+      time_set = g2d.get_custom_time('time 1')
       same_set_year = time_set.year == (now + 1.year).year
+      g2d.remove_custom_time('time 1')
       [g2d.is_a?(Vis::Graph2d), created, same_get_year, same_set_year]
     end.to eq([true, 1, true, true])
   end
