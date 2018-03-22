@@ -26,8 +26,8 @@ Reactive hyper-vis in action:
 
 #### Tests
 ```
-Finished in 1 minute 58.6 seconds (files took 2.75 seconds to load)
-93 examples, 0 failures, 8 pending
+Finished in 2 minutes 39.7 seconds (files took 3.18 seconds to load)
+132 examples, 0 failures, 15 pending
 ```
 #### To run Tests
 Clone repo, then:
