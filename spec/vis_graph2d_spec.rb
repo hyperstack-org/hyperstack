@@ -15,7 +15,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       [g2d.is_a?(Vis::Graph2d), dom_node.JS[:children].JS[:length]]
     end.to eq([true, 1])
   end
@@ -33,7 +33,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       g2d.destroy
       [g2d.is_a?(Vis::Graph2d), created, dom_node.JS[:children].JS[:length]]
@@ -53,7 +53,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       new_items = [
         {x: '2014-06-12', y: 20},
@@ -82,7 +82,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       error = false
       begin
@@ -110,7 +110,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       received = []
       handler_id = g2d.on(:changed) do
@@ -145,7 +145,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       g2d.redraw
       redrawn = dom_node.JS[:children].JS[:length]
@@ -166,7 +166,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       g2d.fit
       fitted = dom_node.JS[:children].JS[:length]
@@ -187,7 +187,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18', show_current_time: true }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       now = Time.now
       time_get = g2d.get_current_time
@@ -213,7 +213,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18', show_custom_time: true }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       now = Time.now
       time_get = g2d.get_custom_time
@@ -238,7 +238,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       data_range = g2d.get_data_range
       min = data_range[:min].strftime('%Y-%m-%d')
@@ -260,7 +260,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       window = g2d.get_window
       gws = window[:start].strftime('%Y-%m-%d')
@@ -288,7 +288,7 @@ describe 'Vis::Graph2d', js: true do
       options = { start: '2014-06-10', end: '2014-06-18' }
       dataset = Vis::DataSet.new(items)
       dom_node = Vis::Graph2d.test_container
-      g2d = Vis::Graph2d.new(dom_node, dataset,options)
+      g2d = Vis::Graph2d.new(dom_node, dataset, options)
       created = dom_node.JS[:children].JS[:length]
       g2d.move_to('2014-06-12')
       [g2d.is_a?(Vis::Graph2d), created]
