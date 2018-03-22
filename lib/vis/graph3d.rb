@@ -17,7 +17,22 @@ module Vis
       @native = `new vis.Graph3d(native_container, native_data, native_options)`
     end
 
-    # global methods
+    def off(event, event_handler_id)
+      event = lower_camelize(event)
+      handler = @event_handlers[event][event_handler_id]
+      `self["native"].off(event, handler)`
+      @event_handlers[event].delete(event_handler_id)
+    end
+    
+    def on(event, &block)
+      event = lower_camelize(event)
+      @event_handlers[event] = {} unless @event_handlers[event]
+      event_handler_id = `Math.random().toString(36).substring(6)`
+      handler = `function(event_info) { block.$call(Opal.Hash.$new(event_info)); }`
+      @event_handlers[event][event_handler_id] = handler
+      `self["native"].on(event, handler)`
+      event_handler_id
+    end
 
     def set_data(dataset)
       native_data = dataset.to_n
@@ -29,16 +44,14 @@ module Vis
       @native.JS.setOptions(native_options)
     end
 
-    # graph3d methods
-
-    def get_camera_position(dis_hor_ver)
-      res = @native.JS.getCameraPosition(dis_hor_ver.to_n)
-      `Opal.Hasg.$new(res)`
+    def get_camera_position
+      res = @native.JS.getCameraPosition()
+      `Opal.Hash.$new(res)`
     end
 
     def set_camera_position(dis_hor_ver)
       res = @native.JS.setCameraPosition(dis_hor_ver.to_n)
-      `Opal.Hasg.$new(res)`
+      `Opal.Hash.$new(res)`
     end
 
     def options_to_native(options)
