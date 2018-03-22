@@ -1,6 +1,6 @@
 # hyper-vis
 
-A [Opal](http://opalrb.com) Ruby wrapper for [Vis.js](http://visjs.org) with a [Ruby-Hyperloop](http://ruby-hyperloop.org) Component.
+A [Opal](http://opalrb.com) Ruby wrapper for [Vis.js](http://visjs.org) with [Ruby-Hyperloop](http://ruby-hyperloop.org) Components.
 Implements the complete API for:
 - [Vis Dataset](http://visjs.org/docs/data/dataset.html)
 - [Vis Dataview](http://visjs.org/docs/data/dataview.html)
