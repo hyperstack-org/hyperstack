@@ -2,20 +2,25 @@ require 'react/component'
 
 module Hyperloop
   module Vis
-    module Network
+    module Timeline
       module Mixin
         def self.included(base)
           base.include(Hyperloop::Component::Mixin)
           base.class_eval do
-            param vis_data: nil
+            param items: nil
+            param groups: nil
             param options: nil
 
             def _set_dom_node(dom_node)
               @_dom_node = dom_node
             end
 
-            def vis_data
-              @_data
+            def items
+              @_items
+            end
+
+            def groups
+              @_groups
             end
 
             def document
@@ -39,7 +44,8 @@ module Hyperloop
             def self.render_with_dom_node(tag = 'DIV', &block)
               render do
                 @_vis_render_block = block
-                @_data = params.vis_data
+                @_items = params.items
+                @_groups = params.groups
                 @_options = params.options
                 send(tag, ref: method(:_set_dom_node).to_proc)
               end
@@ -51,15 +57,19 @@ module Hyperloop
 
             after_mount do
               if @_dom_node && @_vis_render_block
-                instance_exec(@_dom_node, @_data, @_options, &@_vis_render_block)
+                instance_exec(@_dom_node, @_items, @_groups, @_options, &@_vis_render_block)
               end
             end
 
             before_receive_props do |new_props|
               if automatic_refresh && @_dom_node && @_vis_render_block
                 changed = false
-                if new_props[:vis_data] != @_data
-                  @_data = new_props[:vis_data]
+                if new_props[:items] != @_items
+                  @_items = new_props[:items]
+                  changed = true
+                end
+                if new_props[:groups] != @_groups
+                  @_items = new_props[:groups]
                   changed = true
                 end
                 if new_props[:options] != @_options
@@ -67,7 +77,7 @@ module Hyperloop
                   changed = true
                 end
                 if changed
-                  instance_exec(@_dom_node, @_data, @_options, &@_vis_render_block)
+                  instance_exec(@_dom_node, @_items, @_groups, @_options, &@_vis_render_block)
                 end
               end
             end

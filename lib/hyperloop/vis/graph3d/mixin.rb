@@ -2,7 +2,7 @@ require 'react/component'
 
 module Hyperloop
   module Vis
-    module Network
+    module Graph3d
       module Mixin
         def self.included(base)
           base.include(Hyperloop::Component::Mixin)

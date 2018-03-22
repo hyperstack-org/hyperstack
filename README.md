@@ -66,7 +66,7 @@ For other frameworks vis.js, stylesheets and images are available in the gems `l
 The wrapper follows vis 1 to 1, conforming to ruby standards, instead of `setSize` in javascript, you would use `set_size`. Also see specs in the `specs` directory for usage or the vis documentation (linked above).
 All arguments or return values are 'rubyfied' as much as possible, so you can just use ruby.
 
-#### The Vis part
+### The Vis part
 ```ruby
 dataset = Vis::DataSet.new([{id: 1, name: 'foo'}, {id: 2, name: 'bar'}, {id: 3, name: 'pub'}])
 edge_dataset = Vis::DataSet.new([{from: 1, to: 2}, {from: 2, to: 3}])
@@ -74,9 +74,11 @@ dom_node = Vis::Network.test_container
 net = Vis::Network.new(dom_node, {nodes: dataset, edges: edge_dataset})
 xy = net.canvas_to_dom({x: 10, y: 10})
 ```
-#### The Component part
-The Component takes care about all the things necessary to make Vis.js play nice with React.
-The Component also provides a helper to access the document.
+### The Component part
+The Components takes care about all the things necessary to make Vis.js play nice with React.
+The Components also provide a helper to access the document: `document`.
+
+#### Vis::Network::Mixin
 Vis::Network can be used within the render_with_dom_node.
 ```ruby
 class MyVisNetworkComponent
@@ -94,7 +96,8 @@ class MyVisNetworkComponent
   # be handled in the before_receive_props callback
   # for example (this is also optional):
   before_receive_props do |new_props|
-    if new_props[:vis_data] != @data
+    # data can be accessed using the helper vis_data
+    if new_props[:vis_data] != vis_data
       @net.set_data(new_props[:vis_data])
     end
   end
@@ -103,10 +106,9 @@ class MyVisNetworkComponent
     # its important to use the data as passed in as 'data' argument
     # to get the latests passed data for each new render
     @net = Vis::Network.new(dom_node, data, options)
-
-    # save data for later or usage, for example
-    # in before_receive_props for comparison
-    @data = data
+    
+    # data is also atomatically saved and available using the helper
+    vis_data
 
     # example of using the document helper
     canvas = document.JS.querySelector('canvas')
@@ -130,3 +132,63 @@ class AOuterComponent < Hyperloop::Component
   end
 end
 ```
+#### Vis::Graph3d::Mixin
+Works the same as Vis::Network::Mixin
+
+#### Vis::Timeline::Mixin
+Similar to Vis::Network, mostly params and helpers are different:
+```ruby
+class MyVisTimelineComponent
+  include Hyperloop::Vis::Timeline::Mixin
+
+  # the component automatically calls the render_with_dom_node block every
+  # time new data or options are received
+
+  # however
+  # setting automatic_refresh false turns that off ...
+  # (default is true, so this is optional):
+  automatic_refresh false
+
+  # ... and with automatic_refresh false refresh can
+  # be handled in the before_receive_props callback
+  # for example (this is also optional):
+  before_receive_props do |new_props|
+    # data can be accessed using the helpers:
+    items
+    groups
+    options
+  end
+
+  render_with_dom_node do |dom_node, items, groups, options|
+    # its important to use the data as passed in as 'data' argument
+    # to get the latests passed data for each new render
+    @net = Vis::Timeline.new(dom_node, items, groups, options)
+    
+    # data is also atomatically saved and available using the helpers
+    items
+    groups
+    options
+  end
+end
+
+class AOuterComponent < Hyperloop::Component
+  render do
+    options = { align: 'left' }
+
+    # initialize a dataset
+    data = Vis::DataSet.new([
+            {id: 1, content: 'item 1', start: '2013-04-20'},
+            {id: 2, content: 'item 2', start: '2013-04-14'},
+            {id: 3, content: 'item 3', start: '2013-04-18'},
+            {id: 4, content: 'item 4', start: '2013-04-16', end: '2013-04-19'},
+            {id: 5, content: 'item 5', start: '2013-04-25'},
+            {id: 6, content: 'item 6', start: '2013-04-27'}
+          ])
+    
+    # call the component
+    DIV { MyVisTimelineComponent(items: data, otions: options)}
+  end
+end
+```
+#### Vis::Graph2d::Mixin
+Works the same as Vis::Timeline::Mixin
