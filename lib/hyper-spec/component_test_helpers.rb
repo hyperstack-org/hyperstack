@@ -1,9 +1,8 @@
 # see component_test_helpers_spec.rb for examples
-
 require 'parser/current'
 require 'unparser'
 require 'method_source'
-require_relative '../../vendor/assets/javascripts/time_cop' # 'hyper-spec/time_cop'
+require_relative '../../lib/assets/javascripts/time_cop.js.rb'
 
 module HyperSpec
   module ComponentTestHelpers
@@ -50,9 +49,11 @@ module HyperSpec
             page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
 
             page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
-
-            page = "<%= javascript_include_tag 'time_cop' %>\n#{page}" if render_on != :server_only  || Lolex.initialized?
-
+            if render_on != :server_only || Lolex.initialized?
+              page = "<script type='text/javascript'>\n"\
+                     "<%= Rails.application.assets['time_cop.js'].source.html_safe %>\n"\
+                     "</script>\n#{page}"
+            end
             if (render_on != :server_only && !render_params[:layout]) || javascript
               page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n#{page}"
             end
