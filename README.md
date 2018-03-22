@@ -1,6 +1,6 @@
 # hyper-vis
 
-A Opal Ruby wrapper for [Vis.js](http://visjs.org) with a Ruby-Hyperloop Component.
+A [Opal](http://opalrb.com) Ruby wrapper for [Vis.js](http://visjs.org) with a [Ruby-Hyperloop](http://ruby-hyperloop.org) Component.
 Implements the complete API for:
 - [Vis Dataset](http://visjs.org/docs/data/dataset.html)
 - [Vis Dataview](http://visjs.org/docs/data/dataview.html)
@@ -46,7 +46,7 @@ gem 'hyper-vis'
 ```
 and `bundle update`.
 
-hyper-vis depends on `hyper-component` from [Ruby-Hyperloop](http://ruby-hyperloop.org) but can be used without it.
+hyper-vis depends on `hyper-component` from Ruby-Hyperloop but can be used without it.
 
 vis.js is automatically imported for Ruby-Hyperloop. If you get vis.js with webpacker, you may need to cancel the import in your config/intializers/hyperloop.rb
 ```ruby
@@ -63,7 +63,8 @@ For other frameworks vis.js, stylesheets and images are available in the gems `l
 
 ## Usage
 
-Hint: also see specs in the `specs` directory
+The wrapper follows vis 1 to 1, conforming to ruby standards, instead of `setSize` in javascript, you would use `set_size`. Also see specs in the `specs` directory for usage or the vis documentation (linked above).
+All arguments or return values are 'rubyfied' as much as possible, so you can just use ruby.
 
 #### The Vis part
 ```ruby
