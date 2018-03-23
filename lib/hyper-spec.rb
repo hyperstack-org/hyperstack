@@ -3,7 +3,6 @@ require 'opal'
 require 'selenium-webdriver'
 
 require 'hyper-spec/component_test_helpers'
-require 'hyper-spec/rails/engine'
 require 'hyper-spec/version'
 require 'hyper-spec/wait_for_ajax'
 require 'selenium/web_driver/firefox/profile'

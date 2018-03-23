@@ -2,27 +2,30 @@
 require 'parser/current'
 require 'unparser'
 require 'method_source'
-require_relative '../../lib/assets/javascripts/time_cop.js.rb'
+require_relative '../../lib/hyper-spec/time_cop.rb'
 
 module HyperSpec
   module ComponentTestHelpers
     TOP_LEVEL_COMPONENT_PATCH =
       Opal.compile(File.read(File.expand_path('../../react/top_level_rails_component.rb', __FILE__)))
+    TIME_COP_CLIENT_PATCH =
+      Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
+      "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
 
     class << self
       attr_accessor :current_example
       attr_accessor :description_displayed
 
       def display_example_description
-        "<script type='text/javascript'>console.log(console.log('%c#{current_example.description}'"\
-        ",'color:green; font-weight:bold; font-size: 200%'))</script>"
+        "<script type='text/javascript'>console.log('%c#{current_example.description}'"\
+        ",'color:green; font-weight:bold; font-size: 200%')</script>"
       end
     end
 
     def build_test_url_for(controller)
       unless controller
         unless defined?(::ReactTestController)
-          Object.const_set('ReactTestController', Class.new(ActionController::Base))
+          Object.const_set('ReactTestController', Class.new(::ActionController::Base))
         end
 
         controller = ::ReactTestController
@@ -49,11 +52,11 @@ module HyperSpec
             page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
 
             page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
+
             if render_on != :server_only || Lolex.initialized?
-              page = "<script type='text/javascript'>\n"\
-                     "<%= Rails.application.assets['time_cop.js'].source.html_safe %>\n"\
-                     "</script>\n#{page}"
+              page = "<script type='text/javascript'>\n#{TIME_COP_CLIENT_PATCH}\n</script>\n#{page}"
             end
+
             if (render_on != :server_only && !render_params[:layout]) || javascript
               page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n#{page}"
             end
@@ -67,8 +70,8 @@ module HyperSpec
             title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
             title = "#{title}...continued." if ComponentTestHelpers.description_displayed
 
-            page = "<script type='text/javascript'>console.log(console.log('%c#{title}',"\
-                   "'color:green; font-weight:bold; font-size: 200%'))</script>\n#{page}"
+            page = "<script type='text/javascript'>console.log('%c#{title}',"\
+                   "'color:green; font-weight:bold; font-size: 200%')</script>\n#{page}"
 
             ComponentTestHelpers.description_displayed = true
             render_params[:inline] = page
@@ -124,25 +127,25 @@ module HyperSpec
       "#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.first.children.last}"
     end
 
-    def expect_promise(str = '', opts = {}, &block)
+    def evaluate_promise(str = '', opts = {}, &block)
       insure_mount
-
-      str = add_opal_block(str, block)
+      str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
       str = "#{str}.then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
-      js = Opal.compile(str).delete("\n").gsub('(Opal);', '(Opal)')
-      page.evaluate_script('window.hyper_spec_promise_result = false')
+      js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
+      page.evaluate_script("window.hyper_spec_promise_result = false")
       page.execute_script(js)
-
       Timeout.timeout(Capybara.default_max_wait_time) do
         loop do
           sleep 0.25
-          break if page.evaluate_script('!!window.hyper_spec_promise_result')
+          break if page.evaluate_script("!!window.hyper_spec_promise_result")
         end
       end
+      JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first
+    end
 
-      result =
-        JSON.parse(page.evaluate_script('window.hyper_spec_promise_result.$to_json()'), opts).first
-      expect(result)
+    def expect_promise(str = '', opts = {}, &block)
+      insure_mount
+      expect(evaluate_promise(add_opal_block(str, block), opts))
     end
 
     def ppr(str)
@@ -236,10 +239,10 @@ module HyperSpec
           ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
         end
       end
+      Lolex.init(self, client_options[:time_zone], client_options[:clock_resolution])
       visit test_url
       wait_for_ajax unless opts[:no_wait]
       page.instance_variable_set('@hyper_spec_mounted', true)
-      Lolex.init(self, client_options[:time_zone], client_options[:clock_resolution])
     end
 
     [:callback_history_for, :last_callback_for, :clear_callback_history_for,
