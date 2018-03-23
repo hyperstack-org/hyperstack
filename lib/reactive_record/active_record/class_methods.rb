@@ -316,7 +316,7 @@ module ActiveRecord
       end
       define_method("#{name}!") do |*args|
         vector = args.count.zero? ? name : [[name] + args]
-        @backing_record.get_server_method!(vector, true)
+        @backing_record.get_server_method(vector, true)
       end
     end
 
@@ -327,8 +327,7 @@ module ActiveRecord
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
         define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }
         define_method("#{name}_changed?") { @backing_record.changed?(name) }
-        next unless ReactiveRecord::Base.column_type(column_hash) == :boolean
-        define_method("#{name}?") { @backing_record.get_attr_value(name, nil) }
+        define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? }
       end
     end
 

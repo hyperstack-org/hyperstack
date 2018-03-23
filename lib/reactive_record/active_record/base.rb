@@ -1,9 +1,8 @@
 module ActiveRecord
   # client side ActiveRecord::Base proxy
   class Base
-    extend  ClassMethods
-
     include InstanceMethods
+    extend  ClassMethods
 
     scope :limit, ->() {}
     scope :offset, ->() {}
