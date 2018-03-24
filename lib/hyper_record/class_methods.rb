@@ -220,8 +220,11 @@ module HyperRecord
       define_method(name) do
         _register_observer
         if @properties_hash[:id]
-          return @changed_properties_hash[name] if @changed_properties_hash.has_key?(name)
-          @properties_hash[name]
+          if @changed_properties_hash.has_key?(name)
+            @changed_properties_hash[name]
+          else
+            @properties_hash[name]
+          end
         else
           # record has not been fetched or is new and not yet saved
           if @properties_hash[name].nil?
@@ -252,9 +255,7 @@ module HyperRecord
       rest_methods[name] = options
       define_method(name) do |*args|
         _register_observer
-        if @rest_methods_hash[name].has_key?(:result) && !@rest_methods_hash[name][:force]
-          @rest_methods_hash[name][:result]
-        elsif self.id
+        if self.id && (@rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
           self.class._rest_method_get_or_patch(name, self.id, *args).then do |result|
             @rest_methods_hash[name][:result] = result # result is parsed json 
             _notify_observers
@@ -264,9 +265,10 @@ module HyperRecord
             `console.log(error_string)`
             response
           end
-          self.class.rest_methods[name][:default_result]
+        end
+        if @rest_methods_hash[name].has_key?(:result)
+          @rest_methods_hash[name][:result]
         else
-          # record has not been loaded yet or not been saved yet
           self.class.rest_methods[name][:default_result]
         end
       end
@@ -322,7 +324,11 @@ module HyperRecord
         record_klass.new(record_hash[klass_key])
       else
         record = record_klass._record_cache[record_hash[klass_key][:id]]
-        record = record_klass.new(record_hash[klass_key]) if record.nil?
+        if record.nil?
+          record = record_klass.new(record_hash[klass_key])
+        else
+          record._initialize_from_hash(record_hash[klass_key])
+        end
         record
       end
     end

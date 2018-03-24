@@ -36,12 +36,14 @@ module HyperRecord
             @relations[relation] = record_hash[relation]
           end
         else
-          if reflections[relation][:kind] == :has_many
-            @relations[relation] = HyperRecord::Collection.new([], self, relation)
-          else
-            @relations[relation] = nil
+          unless @fetch_states[collection] == 'f'
+            if reflections[relation][:kind] == :has_many
+              @relations[relation] = HyperRecord::Collection.new([], self, relation)
+            else
+              @relations[relation] = nil
+            end
+            @fetch_states[relation] = 'n' # not fetched
           end
-          @fetch_states[relation] = 'n' # not fetched
         end
         record_hash.delete(relation)
       end
@@ -77,8 +79,11 @@ module HyperRecord
         @changed_properties_hash[method.chop] = arg
       else
         _register_observer
-        return @changed_properties_hash[method] if @changed_properties_hash.has_key?(method)
-        @properties_hash[method]
+        if @changed_properties_hash.has_key?(method)
+          @changed_properties_hash[method]
+        else
+          @properties_hash[method]
+        end
       end
     end
 
@@ -110,7 +115,9 @@ module HyperRecord
 
     def to_hash
       _register_observer
-      @properties_hash.dup
+      res = @properties_hash.dup
+      res.merge!(@changed_properties_hash)
+      res
     end
 
     def to_s
