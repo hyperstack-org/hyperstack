@@ -279,7 +279,7 @@ module HyperRecord
     end
 
     def resource_base_uri
-      @resource ||= "/api/#{self.to_s.underscore + 's'}"
+      @resource ||= "#{Hyperloop::Resource::ClientDrivers.opts[:resource_api_base_bath]}/#{self.to_s.underscore.pluralize}"
     end
 
     def scope(name, options)

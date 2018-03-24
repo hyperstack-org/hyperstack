@@ -7,7 +7,7 @@ if RUBY_ENGINE != 'opal'
 else
   module Hyperloop
     def self.current_user_id
-      HyperRecord::ClientDrivers.opts[:current_user_id]
+      Hyperloop::Resource::ClientDrivers.opts[:current_user_id]
     end
   end
 end
