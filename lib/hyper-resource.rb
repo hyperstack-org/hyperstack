@@ -11,5 +11,6 @@ if RUBY_ENGINE == 'opal'
   require 'hyper_record'
 else
   require 'hyper_record/client_drivers'
+  require 'hyperloop/resource/pub_sub'
   Opal.append_path __dir__.untaint
 end
