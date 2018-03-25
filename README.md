@@ -8,7 +8,7 @@ HyperResource is an affective way of moving data between your server and clients
 
 + To co-exist with a resource based REST API
 + To have ActiveRecord type Models shared by both the client and server code
-+ To be ORM/database agnostic (tested with ActiveRecord on Postgres and Neo4j.rb on Noe4j)
++ To be ORM/database agnostic (tested with ActiveRecord on Postgres and Neo4j.rb on Neo4j)
 + To fit the 'Rails way' as far as possible (under the covers, HyperResource is a traditional REST API)
 + To keep all Policy checking and authorisation logic in the Rails Controllers
 + To allow a stages implementation
@@ -16,6 +16,14 @@ HyperResource is an affective way of moving data between your server and clients
 ## Staged implementation
 
 HyperResource is designed to be implemented in stages and each stage delivers value in its own right, so the developer only needs to go as far as they like.
+
+A record can be of any ORM but the ORM must implement:
+```ruby
+record_class.find(id) # to get a record
+record.id # a identifier
+record.updated_at # a time stamp
+record.destroyed? # to identify if its scheduled for destruction
+```
 
 ### Stage 1 - Wrap a REST API with Ruby classes to represent Models
 
@@ -90,15 +98,7 @@ class ApplicationController
 end
 ```
 
-A record can be of any ORM or whatever but must implement:
-```ruby
-record.id # a identifier
-record.updated_at # a time stamp
-record.destroyed? # to identify if its scheduled for destruction
-```
-
 EXAMPLE
-
 
 ## Implementation
 
