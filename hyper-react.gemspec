@@ -18,7 +18,6 @@ Gem::Specification.new do |spec|
   # }
 
   spec.files         = `git ls-files`.split("\n").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
-  spec.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
@@ -26,6 +25,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'hyperloop-config', React::VERSION
+  spec.add_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', React::VERSION
@@ -39,10 +40,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
 end
