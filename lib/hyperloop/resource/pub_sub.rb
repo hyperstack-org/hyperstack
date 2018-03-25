@@ -16,14 +16,14 @@ module Hyperloop
         end
       end
 
-      def publish_collection(baserecord, collection_name, record = nil)
-        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}")
+      def publish_collection(base_record, collection_name, record = nil)
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{base_record.class}__#{base_record.id}__#{collection_name}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
         message = {
-          record_type: baserecord.class.to_s,
-          id: baserecord.id,
-          updated_at: baserecord.updated_at,
+          record_type: base_record.class.to_s,
+          id: base_record.id,
+          updated_at: base_record.updated_at,
           collection: collection_name
         }
         if record
@@ -34,7 +34,7 @@ module Hyperloop
         end
         subscribers.each do |session_id, last_requested|
           if last_requested.to_f < scrub_time
-            Hyperloop.redis_instance.hdel("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id)
+            Hyperloop.redis_instance.hdel("HRPS__#{base_record.class}__#{base_record.id}__#{collection_name}", session_id)
             next
           end
           if Hyperloop.resource_transport == :pusher
@@ -71,17 +71,17 @@ module Hyperloop
         Hyperloop.redis_instance.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
       end
     
-      def publish_scope(klass, scope_name)
-        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{klass}__scope__#{scope_name}")
+      def publish_scope(record_class, scope_name)
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record_class}__scope__#{scope_name}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
         subscribers.each do |session_id, last_requested|
           if last_requested.to_f < scrub_time
-            Hyperloop.redis_instance.hdel("HRPS__#{klass}__scope__#{scope_name}", session_id)
+            Hyperloop.redis_instance.hdel("HRPS__#{record_class}__scope__#{scope_name}", session_id)
             next
           end
           message = {
-            record_type: klass.to_s,
+            record_type: record_class.to_s,
             scope: scope_name
           }
           if Hyperloop.resource_transport == :pusher
@@ -90,7 +90,7 @@ module Hyperloop
         end
       end
 
-      def subscribe_collection(collection, baserecord = nil, collection_name = nil)
+      def subscribe_collection(collection, base_record = nil, collection_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
         session_id = session.id.to_s
@@ -104,7 +104,7 @@ module Hyperloop
             # has_one, belongs_to
             Hyperloop.redis_instance.hset("HRPS__#{collection.class}__#{collection.id}", session_id, time_now)
           end
-          Hyperloop.redis_instance.hset("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id, time_now) if baserecord && collection_name
+          Hyperloop.redis_instance.hset("HRPS__#{base_record.class}__#{base_record.id}__#{collection_name}", session_id, time_now) if base_record && collection_name
         end
       end
     
@@ -113,7 +113,7 @@ module Hyperloop
         Hyperloop.redis_instance.hset "HRPS__#{record.class}__#{record.id}", session.id.to_s, Time.now.to_f.to_s
       end
     
-      def subscribe_scope(collection, klass = nil, scope_name = nil)
+      def subscribe_scope(collection, record_class = nil, scope_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
         session_id = session.id.to_s
@@ -123,13 +123,13 @@ module Hyperloop
               Hyperloop.redis_instance.hset("HRPS__#{record.class}__#{record.id}", session_id, time_now)
             end
           end
-          Hyperloop.redis_instance.hset("HRPS__#{klass}__scope__#{scope_name}", session_id, time_now) if klass && scope_name
+          Hyperloop.redis_instance.hset("HRPS__#{record_class}__scope__#{scope_name}", session_id, time_now) if record_class && scope_name
         end
       end
     
-      def pub_sub_collection(collection, baserecord, collection_name, causing_record = nil)
-        subscribe_collection(collection, baserecord, collection_name)
-        publish_collection(baserecord, collection_name, causing_record)
+      def pub_sub_collection(collection, base_record, collection_name, causing_record = nil)
+        subscribe_collection(collection, base_record, collection_name)
+        publish_collection(base_record, collection_name, causing_record)
       end
     
       def pub_sub_record(record)
@@ -137,9 +137,9 @@ module Hyperloop
         publish_record(record)
       end
     
-      def pub_sub_scope(collection, klass, scope_name)
-        subscribe_scope(collection, klass, scope_name)
-        publish_scope(klass, scope_name)
+      def pub_sub_scope(collection, record_class, scope_name)
+        subscribe_scope(collection, record_class, scope_name)
+        publish_scope(record_class, scope_name)
       end
     end
   end
