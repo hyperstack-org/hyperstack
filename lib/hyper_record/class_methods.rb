@@ -13,8 +13,8 @@ module HyperRecord
     end
 
     def all
-      _register_klass_observer
-      if _klass_fetch_states[:all] == 'f'
+      _register_class_observer
+      if _class_fetch_states[:all] == 'f'
         record_collection = HyperRecord::Collection.new
         _record_cache.each_value { |record| record_collection.push(record) }
         return record_collection
@@ -25,8 +25,8 @@ module HyperRecord
         response.json[klass_key].each do |record_json|
           self.new(record_json[klass_name])
         end
-        _klass_fetch_states[:all] = 'f'
-        _notify_klass_observers
+        _class_fetch_states[:all] = 'f'
+        _notify_class_observers
         record_collection = HyperRecord::Collection.new
         _record_cache.each_value { |record| record_collection.push(record) }
         record_collection
@@ -285,14 +285,14 @@ module HyperRecord
     def scope(name, options)
       scopes[name] = HyperRecord::Collection.new
       define_singleton_method(name) do
-        if _klass_fetch_states[name] == 'f'
+        if _class_fetch_states[name] == 'f'
           scopes[name]
         else
-          _register_klass_observer
+          _register_class_observer
           self._promise_get("#{resource_base_uri}/scopes/#{name}.json").then do |response|
             scopes[name] = _convert_array_to_collection(response.json[self.to_s.underscore][name])
-            _klass_fetch_states[name] = 'f'
-            _notify_klass_observers
+            _class_fetch_states[name] = 'f'
+            _notify_class_observers
             scopes[name]
           end.fail do |response|
             error_message = "#{self.class.to_s}.#{name}, a scope, failed to fetch records!"
@@ -319,13 +319,13 @@ module HyperRecord
 
     def _convert_json_hash_to_record(record_hash)
       klass_key = record_hash.keys.first
-      record_klass = klass_key.camelize.constantize
+      record_class = klass_key.camelize.constantize
       if record_hash[klass_key][:id].nil?
-        record_klass.new(record_hash[klass_key])
+        record_class.new(record_hash[klass_key])
       else
-        record = record_klass._record_cache[record_hash[klass_key][:id]]
+        record = record_class._record_cache[record_hash[klass_key][:id]]
         if record.nil?
-          record = record_klass.new(record_hash[klass_key])
+          record = record_class.new(record_hash[klass_key])
         else
           record._initialize_from_hash(record_hash[klass_key])
         end
@@ -333,26 +333,26 @@ module HyperRecord
       end
     end
 
-    def _klass_fetch_states
-      @_klass_fetch_states ||= { all: 'n' }
-      @_klass_fetch_states
+    def _class_fetch_states
+      @_class_fetch_states ||= { all: 'n' }
+      @_class_fetch_states
     end
 
-    def _klass_observers
-      @_klass_observers ||= Set.new
-      @_klass_observers
+    def _class_observers
+      @_class_observers ||= Set.new
+      @_class_observers
     end
 
-    def _klass_state_key
-      @_klass_state_key ||= self.to_s
-      @_klass_state_key
+    def _class_state_key
+      @_class_state_key ||= self.to_s
+      @_class_state_key
     end
     
-    def _notify_klass_observers
-      _klass_observers.each do |observer|
-        React::State.set_state(observer, _klass_state_key, `Date.now() + Math.random()`)
+    def _notify_class_observers
+      _class_observers.each do |observer|
+        React::State.set_state(observer, _class_state_key, `Date.now() + Math.random()`)
       end
-      _klass_observers = Set.new
+      _class_observers = Set.new
     end
 
     def _promise_get(uri)
@@ -383,11 +383,11 @@ module HyperRecord
       @record_cache ||= {}
     end
 
-    def _register_klass_observer
+    def _register_class_observer
       observer = React::State.current_observer
       if observer
-        React::State.get_state(observer, _klass_state_key)
-        _klass_observers << observer # @observers is a set, observers get added only once
+        React::State.get_state(observer, _class_state_key)
+        _class_observers << observer # @observers is a set, observers get added only once
       end
     end
 

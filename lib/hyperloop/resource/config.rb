@@ -6,9 +6,10 @@ if RUBY_ENGINE == 'opal'
   end
 else
   module Hyperloop
+    define_setting(:pusher, {})
     define_setting(:redis_instance, nil)
     define_setting(:resource_api_base_path, '/api')
     define_setting(:resource_transport, :pusher)
-    define_setting(:pusher, {})
+    define_setting(:valid_record_class_params, [])
   end
 end

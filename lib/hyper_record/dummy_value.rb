@@ -1,6 +1,6 @@
 module HyperRecord
   class DummyValue
-    def intialize(type_klass)
+    def intialize(type_class)
       @backing_value = type_class.new
     end
 

@@ -23,6 +23,10 @@ record_class.find(id) # to get a record
 record.id # a identifier
 record.updated_at # a time stamp
 record.destroyed? # to identify if its scheduled for destruction
+
+# when using relations controller
+record.touch # to update updated_at, identicating that something about that record changed
+             # for example it has been added to a relation
 ```
 
 ### Stage 1 - Wrap a REST API with Ruby classes to represent Models

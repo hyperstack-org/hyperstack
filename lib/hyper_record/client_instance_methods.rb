@@ -227,7 +227,7 @@ module HyperRecord
         React::State.set_state(observer, @state_key, `Date.now() + Math.random()`)
       end
       @observers = Set.new
-      self.class._notify_klass_observers
+      self.class._notify_class_observers
     end
 
     def _register_collection(collection)
