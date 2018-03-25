@@ -16,6 +16,33 @@ module Hyperloop
         end
       end
 
+      def publish_collection(baserecord, collection_name, record = nil)
+        subscribers = $redis.hgetall("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}")
+        time_now = Time.now.to_f
+        scrub_time = time_now - 24.hours.to_f
+        message = {
+          record_type: baserecord.class.to_s,
+          id: baserecord.id,
+          updated_at: baserecord.updated_at,
+          collection: collection_name
+        }
+        if record
+          message[:cause] = {}
+          message[:cause][:record_type] = record.class.to_s
+          message[:cause][:id] = record.id
+          message[:cause][:updated_at] = record.updated_at
+        end
+        subscribers.each do |session_id, last_requested|
+          if last_requested.to_f < scrub_time
+            $redis.hdel("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id)
+            next
+          end
+          if Hyperloop.resource_transport == :pusher
+            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+          end
+        end
+      end
+
       def publish_record(record)
         subscribers = $redis.hgetall("HRPS__#{record.class}__#{record.id}")
         time_now = Time.now.to_f
@@ -44,6 +71,25 @@ module Hyperloop
         $redis.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
       end
     
+      def publish_scope(klass, scope_name)
+        subscribers = $redis.hgetall("HRPS__#{klass}__scope__#{scope_name}")
+        time_now = Time.now.to_f
+        scrub_time = time_now - 24.hours.to_f
+        subscribers.each do |session_id, last_requested|
+          if last_requested.to_f < scrub_time
+            $redis.hdel("HRPS__#{klass}__scope__#{scope_name}", session_id)
+            next
+          end
+          message = {
+            record_type: klass.to_s,
+            scope: scope_name
+          }
+          if Hyperloop.resource_transport == :pusher
+            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+          end
+        end
+      end
+
       def subscribe_collection(collection, baserecord = nil, collection_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
@@ -81,65 +127,19 @@ module Hyperloop
         end
       end
     
-      def publish_scope(klass, scope_name)
-        subscribers = $redis.hgetall("HRPS__#{klass}__scope__#{scope_name}")
-        time_now = Time.now.to_f
-        scrub_time = time_now - 24.hours.to_f
-        subscribers.each do |session_id, last_requested|
-          if last_requested.to_f < scrub_time
-            $redis.hdel("HRPS__#{klass}__scope__#{scope_name}", session_id)
-            next
-          end
-          message = {
-            record_type: klass.to_s,
-            scope: scope_name
-          }
-          if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
-          end
-        end
-      end
-    
-      def publish_collection(baserecord, collection_name, record = nil)
-        subscribers = $redis.hgetall("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}")
-        time_now = Time.now.to_f
-        scrub_time = time_now - 24.hours.to_f
-        message = {
-          record_type: baserecord.class.to_s,
-          id: baserecord.id,
-          updated_at: baserecord.updated_at,
-          collection: collection_name
-        }
-        if record
-          message[:cause] = {}
-          message[:cause][:record_type] = record.class.to_s
-          message[:cause][:id] = record.id
-          message[:cause][:updated_at] = record.updated_at
-        end
-        subscribers.each do |session_id, last_requested|
-          if last_requested.to_f < scrub_time
-            $redis.hdel("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id)
-            next
-          end
-          if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
-          end
-        end
-      end
-    
       def pub_sub_collection(collection, baserecord, collection_name, causing_record = nil)
-        hyper_sub_collection(collection, baserecord, collection_name)
-        hyper_pub_collection(baserecord, collection_name, causing_record)
+        subscribe_collection(collection, baserecord, collection_name)
+        publish_collection(baserecord, collection_name, causing_record)
       end
     
       def pub_sub_record(record)
-        hyper_sub_record(record)
-        hyper_pub_record(record)
+        subscribe_record(record)
+        publish_record(record)
       end
     
       def pub_sub_scope(collection, klass, scope_name)
-        hyper_sub_scope(collection, klass, scope_name)
-        hyper_pub_scope(klass, scope_name)
+        subscribe_scope(collection, klass, scope_name)
+        publish_scope(klass, scope_name)
       end
     end
   end

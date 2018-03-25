@@ -70,7 +70,27 @@ end
 ### Stage 3 - Implement a Redis based pub-sub mechanism so the client code is notified when the server data changes
 
 EXAMPLE
+```ruby
 
+class ApplicationController
+  include Hyperloop::Resource::PubSub
+
+  def my_action
+    # available methods for pubsub
+    publish_collection(baserecord, collection_name, record = nil)
+    publish_record(record)
+    publish_scope(klass, scope_name)
+
+    subscribe_collection(collection, baserecord = nil, collection_name = nil)
+    subscribe_record(record)
+    subscribe_scope(collection, klass = nil, scope_name = nil)
+
+    pub_sub_collection(collection, baserecord, collection_name, causing_record = nil)
+    pub_sub_record(record)
+    pub_sub_scope(collection, klass, scope_name)
+  end
+end
+```
 ## Implementation
 
 How to install....
