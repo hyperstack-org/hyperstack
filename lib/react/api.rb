@@ -56,9 +56,13 @@ module React
             this.__opalInstance = #{type.new(`this`)};
             this.__opalInstanceInitializedState = true;
             this.__opalInstanceSyncSetState = false;
+            this.__name = #{type.name}
           }
           static get displayName() {
-            return #{type.name};
+            return this.__name;
+          }
+          static set displayName(name) {
+            this.__name = name;
           }
           static get defaultProps() {
             return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
@@ -106,11 +110,11 @@ module React
             }
           }
           componentWillUnmount() {
-            this.__opalInstance.is_mounted = false;
             if (#{type.method_defined? :component_will_unmount}) {
               this.__opalInstanceSyncSetState = false;
               this.__opalInstance.$component_will_unmount();
             }
+            this.__opalInstance.is_mounted = false;
           }
           componentDidCatch(error, info) {
             if (#{type.method_defined? :component_did_catch}) {
