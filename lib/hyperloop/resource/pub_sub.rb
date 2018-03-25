@@ -17,7 +17,7 @@ module Hyperloop
       end
 
       def publish_collection(baserecord, collection_name, record = nil)
-        subscribers = $redis.hgetall("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}")
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
         message = {
@@ -34,7 +34,7 @@ module Hyperloop
         end
         subscribers.each do |session_id, last_requested|
           if last_requested.to_f < scrub_time
-            $redis.hdel("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id)
+            Hyperloop.redis_instance.hdel("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id)
             next
           end
           if Hyperloop.resource_transport == :pusher
@@ -44,7 +44,7 @@ module Hyperloop
       end
 
       def publish_record(record)
-        subscribers = $redis.hgetall("HRPS__#{record.class}__#{record.id}")
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record.class}__#{record.id}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
         
@@ -59,7 +59,7 @@ module Hyperloop
           channel_array= []
           slice.each do |session_id, last_requested|
             if last_requested.to_f < scrub_time
-              $redis.hdel("HRPS__#{record.class}__#{record.id}", session_id)
+              Hyperloop.redis_instance.hdel("HRPS__#{record.class}__#{record.id}", session_id)
               next
             end
             channel_array << "hyper-record-update-channel-#{session_id}"
@@ -68,16 +68,16 @@ module Hyperloop
             self.class._pusher_client.trigger(channel_array, 'update', message)
           end
         end
-        $redis.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
+        Hyperloop.redis_instance.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
       end
     
       def publish_scope(klass, scope_name)
-        subscribers = $redis.hgetall("HRPS__#{klass}__scope__#{scope_name}")
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{klass}__scope__#{scope_name}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
         subscribers.each do |session_id, last_requested|
           if last_requested.to_f < scrub_time
-            $redis.hdel("HRPS__#{klass}__scope__#{scope_name}", session_id)
+            Hyperloop.redis_instance.hdel("HRPS__#{klass}__scope__#{scope_name}", session_id)
             next
           end
           message = {
@@ -94,36 +94,36 @@ module Hyperloop
         return unless session.id
         time_now = Time.now.to_f.to_s
         session_id = session.id.to_s
-        $redis.pipelined do
+        Hyperloop.redis_instance.pipelined do
           if collection.is_a?(Enumerable)
             # has_many
             collection.each do |record|
-              $redis.hset("HRPS__#{record.class}__#{record.id}", session_id, time_now)
+              Hyperloop.redis_instance.hset("HRPS__#{record.class}__#{record.id}", session_id, time_now)
             end
           else
             # has_one, belongs_to
-            $redis.hset("HRPS__#{collection.class}__#{collection.id}", session_id, time_now)
+            Hyperloop.redis_instance.hset("HRPS__#{collection.class}__#{collection.id}", session_id, time_now)
           end
-          $redis.hset("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id, time_now) if baserecord && collection_name
+          Hyperloop.redis_instance.hset("HRPS__#{baserecord.class}__#{baserecord.id}__#{collection_name}", session_id, time_now) if baserecord && collection_name
         end
       end
     
       def subscribe_record(record)
         return unless session.id
-        $redis.hset "HRPS__#{record.class}__#{record.id}", session.id.to_s, Time.now.to_f.to_s
+        Hyperloop.redis_instance.hset "HRPS__#{record.class}__#{record.id}", session.id.to_s, Time.now.to_f.to_s
       end
     
       def subscribe_scope(collection, klass = nil, scope_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
         session_id = session.id.to_s
-        $redis.pipelined do
+        Hyperloop.redis_instance.pipelined do
           if collection.is_a?(Enumerable)
             collection.each do |record|
-              $redis.hset("HRPS__#{record.class}__#{record.id}", session_id, time_now)
+              Hyperloop.redis_instance.hset("HRPS__#{record.class}__#{record.id}", session_id, time_now)
             end
           end
-          $redis.hset("HRPS__#{klass}__scope__#{scope_name}", session_id, time_now) if klass && scope_name
+          Hyperloop.redis_instance.hset("HRPS__#{klass}__scope__#{scope_name}", session_id, time_now) if klass && scope_name
         end
       end
     
