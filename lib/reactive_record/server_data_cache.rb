@@ -161,7 +161,7 @@ module ReactiveRecord
         def self.timing(tag, &block)
           start_time = Time.now
           tag = tag.to_sym
-          yield.tap { @timings[tag] += (Time.now - start_time)}
+          yield.tap { @timings[tag] += (Time.now - start_time) if @timings }
         end
 
         # SECURITY - SAFE
