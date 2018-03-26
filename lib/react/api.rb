@@ -56,10 +56,14 @@ module React
             this.__opalInstance = #{type.new(`this`)};
             this.__opalInstanceInitializedState = true;
             this.__opalInstanceSyncSetState = false;
-            this.__name = #{type.name}
+            this.__name = #{type.name};
           }
           static get displayName() {
-            return this.__name;
+            if (typeof this.__name != "undefined") {
+              return this.__name;
+            } else {
+              return #{type.name};
+            }
           }
           static set displayName(name) {
             this.__name = name;
