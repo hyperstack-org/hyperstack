@@ -243,13 +243,13 @@ module ReactiveRecord
         [models, associations, backing_records]
       end
 
-      def save(validate, force, &block)
+      def save_or_validate(save, validate, force, &block)
         if data_loading?
           sync!
-        elsif force or changed?
+        elsif force || changed?
           HyperMesh.load do
             ReactiveRecord.loads_pending! unless self.class.pending_fetches.empty?
-          end.then { save_to_server(validate, force, &block) }
+          end.then { send_save_to_server(save, validate, force, &block) }
           #save_to_server(validate, force, &block)
         else
           promise = Promise.new
@@ -259,15 +259,16 @@ module ReactiveRecord
         end
       end
 
-      def save_to_server(validate, force, &block)
+      def send_save_to_server(save, validate, force, &block)
         models, associations, backing_records = self.class.gather_records([self], force, self)
 
         backing_records.each { |id, record| record.saving! }
 
         promise = Promise.new
-        Operations::Save.run(models: models, associations: associations, validate: validate)
+        Operations::Save.run(models: models, associations: associations, save: save, validate: validate)
         .then do |response|
           begin
+            puts "***************** save = #{!!save} and validate = #{!!validate} ************"
             response[:models] = response[:saved_models].collect do |item|
               backing_records[item[0]].ar_instance
             end
@@ -294,12 +295,13 @@ module ReactiveRecord
             backing_records.each { |id, record| record.saved! }
 
           rescue Exception => e
+            # debugger
             log("Exception raised while saving - #{e}", :error)
           end
         end
         promise
       rescue Exception => e
-        debugger
+        # debugger
         log("Exception raised while saving - #{e}", :error)
         yield false, e.message, [] if block
         promise.resolve({success: false, message: e.message, models: []})
@@ -360,7 +362,7 @@ module ReactiveRecord
               method
             end
           end
-          reactive_records[model_to_save[:id]] = vectors[vector] = record = find_record(model, id, vector, save)
+          reactive_records[model_to_save[:id]] = vectors[vector] = record = find_record(model, id, vector, save) # ??? || validate ???
           if record and record.respond_to?(:id) and record.id
             # we have an already exising activerecord model
             keys = record.attributes.keys
@@ -480,7 +482,7 @@ module ReactiveRecord
             raise "HyperModel saving records failed!"
           end
 
-          if save
+          if save || validate
 
             {success: true, saved_models: saved_models }
 

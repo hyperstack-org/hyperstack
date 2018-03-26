@@ -151,7 +151,11 @@ module ActiveRecord
     end
 
     def save(opts = {}, &block)
-      @backing_record.save(opts.has_key?(:validate) ? opts[:validate] : true, opts[:force], &block)
+      @backing_record.save_or_validate(true, opts.has_key?(:validate) ? opts[:validate] : true, opts[:force], &block)
+    end
+
+    def validate(opts = {}, &block)
+      @backing_record.save_or_validate(false, true, opts[:force], &block)
     end
 
     def saving?
