@@ -41,7 +41,7 @@ module ActiveRecord
       attr_accessor :acting_user
       def __secure_collection_check(acting_user)
         return self if __synchromesh_permission_granted
-        return self if __secure_remote_access_to_unscoped(acting_user).__synchromesh_permission_granted
+        return self if __secure_remote_access_to_unscoped(self, acting_user).__synchromesh_permission_granted
         denied!
       end
     end
@@ -62,11 +62,11 @@ module ActiveRecord
         # Here we set up the base `all` and `unscoped` methods.  See below for more on how
         # access protection works on relationships.
 
-        def __secure_remote_access_to_all(_acting_user)
+        def __secure_remote_access_to_all(_self, _acting_user)
           all
         end
 
-        def __secure_remote_access_to_unscoped(_acting_user, *args)
+        def __secure_remote_access_to_unscoped(_self, _acting_user, *args)
           unscoped(*args)
         end
 
@@ -77,8 +77,8 @@ module ActiveRecord
         # For finder_method we have to preapply `all` so that we always have a relationship
 
         def finder_method(name, &block)
-          singleton_class.send(:define_method, :"__secure_remote_access_to__#{name}") do |acting_user, *args|
-            this = respond_to?(:acting_user) ? self : all
+          singleton_class.send(:define_method, :"__secure_remote_access_to__#{name}") do |this, acting_user, *args|
+            this = respond_to?(:acting_user) ? this : all
             begin
               old = this.acting_user
               this.acting_user = acting_user
@@ -98,7 +98,7 @@ module ActiveRecord
           # callable from the server internally
           define_method(name, &block)
           # callable remotely from the client
-          define_method("__secure_remote_access_to_#{name}") do |acting_user, *args|
+          define_method("__secure_remote_access_to_#{name}") do |_self, acting_user, *args|
             begin
               old = self.acting_user
               self.acting_user = acting_user
@@ -166,17 +166,17 @@ module ActiveRecord
         end
 
         # helper method to set the value of __synchromesh_permission_granted on the relationship
-        # Get the current value of __synchromesh_permission_granted, set acting_user on the
-        # object, and or in the result of running the block in context of the obj
+        # Set acting_user on the object, then or in the result of running the block in context
+        # of the obj with the current value of __synchromesh_permission_granted
 
-        def __set_synchromesh_permission_granted(r, obj, acting_user, args = [], &block)
-          r.__synchromesh_permission_granted = try(:__synchromesh_permission_granted)
-          old = acting_user
+        def __set_synchromesh_permission_granted(old_rel, new_rel, obj, acting_user, args = [], &block)
+          saved_acting_user = obj.acting_user
           obj.acting_user = acting_user
-          r.__synchromesh_permission_granted ||= obj.instance_exec(*args, &block)
-          r
+          new_rel.__synchromesh_permission_granted =
+            obj.instance_exec(*args, &block) || (old_rel && old_rel.try(:__synchromesh_permission_granted))
+          new_rel
         ensure
-          obj.acting_user = old
+          obj.acting_user = saved_acting_user
         end
 
         # regulate scope has to deal with the special case that the scope returns an
@@ -184,10 +184,10 @@ module ActiveRecord
 
         def regulate_scope(name, &block)
           name, block = __synchromesh_parse_regulator_params(name, block)
-          singleton_class.send(:define_method, :"__secure_remote_access_to_#{name}") do |acting_user, *args|
-            r = send(name, *args)
+          singleton_class.send(:define_method, :"__secure_remote_access_to_#{name}") do |this, acting_user, *args|
+            r = this.send(name, *args)
             r = ReactiveRecordPsuedoRelationArray.new(r) if r.is_a? Array
-            __set_synchromesh_permission_granted(r, r, acting_user, args, &block)
+            __set_synchromesh_permission_granted(this, r, r, acting_user, args, &block)
           end
         end
 
@@ -230,9 +230,9 @@ module ActiveRecord
 
         def regulate_relationship(name, &block)
           name, block = __synchromesh_parse_regulator_params(name, block)
-          define_method(:"__secure_remote_access_to_#{name}") do |acting_user, *args|
-            self.class.__set_synchromesh_permission_granted(
-              send(name, *args), self, acting_user, &block
+          define_method(:"__secure_remote_access_to_#{name}") do |this, acting_user, *args|
+            this.class.__set_synchromesh_permission_granted(
+              nil, this.send(name, *args), this, acting_user, &block
             )
           end
         end
@@ -255,19 +255,19 @@ module ActiveRecord
         # simply return `find(1)` but if you try returning `find(1).name` the permission system
         # will check to see if the name attribute can be legally sent to the current acting user.
 
-        def __secure_remote_access_to_find(_acting_user, *args)
+        def __secure_remote_access_to_find(_self, _acting_user, *args)
           find(*args)
         end
 
-        def __secure_remote_access_to_find_by(_acting_user, *args)
+        def __secure_remote_access_to_find_by(_self, _acting_user, *args)
           find_by(*args)
         end
 
         %i[belongs_to has_one].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
           define_method(macro) do |name, scope = nil, opts = {}, &block|
-            define_method(:"__secure_remote_access_to_#{name}") do |_acting_user, *args|
-              send(name, *args)
+            define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|
+              this.send(name, *args)
             end
             send(:"pre_syncromesh_#{macro}", name, scope, opts, &block)
           end

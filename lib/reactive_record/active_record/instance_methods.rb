@@ -151,7 +151,21 @@ module ActiveRecord
     end
 
     def save(opts = {}, &block)
-      @backing_record.save(opts.has_key?(:validate) ? opts[:validate] : true, opts[:force], &block)
+      @backing_record.save_or_validate(true, opts.has_key?(:validate) ? opts[:validate] : true, opts[:force], &block)
+    end
+
+    def validate(opts = {}, &block)
+      @backing_record.save_or_validate(false, true, opts[:force]).tap { |p| puts "save or validate returns promose #{p}"}.then do
+        puts "resolved into validate, about to return the record"
+        if block
+          yield @backing_record.ar_instance
+        else
+          @backing_record.ar_instance
+        end
+      end.tap { |p| puts "validate is returning #{p}"}
+    rescue Exception => e
+      puts "got an exception here #{e}"
+      raise e
     end
 
     def saving?
