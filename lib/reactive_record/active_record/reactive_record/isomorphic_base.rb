@@ -273,26 +273,29 @@ module ReactiveRecord
               backing_records[item[0]].ar_instance
             end
 
-            if response[:success]
-              response[:saved_models].each do | item |
-                Broadcast.to_self backing_records[item[0]].ar_instance, item[2]
-              end
-            else
-              log("Reactive Record Save Failed: #{response[:message]}", :error)
-              response[:saved_models].each do | item |
-                log("  Model: #{item[1]}[#{item[0]}]  Attributes: #{item[2]}  Errors: #{item[3]}", :error) if item[3]
+            if save
+              if response[:success]
+                response[:saved_models].each do | item |
+                  Broadcast.to_self backing_records[item[0]].ar_instance, item[2]
+                end
+              else
+                log("Reactive Record Save Failed: #{response[:message]}", :error)
+                response[:saved_models].each do | item |
+                  log("  Model: #{item[1]}[#{item[0]}]  Attributes: #{item[2]}  Errors: #{item[3]}", :error) if item[3]
+                end
               end
             end
 
             response[:saved_models].each do | item |
-              backing_records[item[0]].sync_unscoped_collection!
+              backing_records[item[0]].sync_unscoped_collection! if save
               backing_records[item[0]].errors! item[3]
             end
 
             yield response[:success], response[:message], response[:models]  if block
+            puts "about to resolve!"
             promise.resolve response  # TODO this could be problematic... there was no .json here, so .... what's to do?
 
-            backing_records.each { |id, record| record.saved! }
+            backing_records.each { |id, record| record.saved! } if save
 
           rescue Exception => e
             # debugger
@@ -344,6 +347,7 @@ module ReactiveRecord
       end
 
       def self.save_records(models, associations, acting_user, validate, save)
+        puts "save_records(..validate: #{!!validate}, save: #{!!save})"
         reactive_records = {}
         vectors = {}
         new_models = []
@@ -472,7 +476,7 @@ module ReactiveRecord
             end
           end.compact
 
-          if has_errors
+          if has_errors && save
             ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel saving records failed:\033[0;30;21m"
             error_messages.each do |model, messages|
               messages.each do |message|
@@ -487,7 +491,6 @@ module ReactiveRecord
             {success: true, saved_models: saved_models }
 
           else
-
             # vectors.each { |vector, model| model.reload unless model.nil? or model.new_record? or model.frozen? }
             vectors
 

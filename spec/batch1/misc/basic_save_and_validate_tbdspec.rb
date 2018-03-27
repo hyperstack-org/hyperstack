@@ -35,13 +35,10 @@ RSpec::Steps.steps "access like a hash", js: true do
 
   it "can validate only" do
     expect_promise do
-      HyperMesh.load do
-        User.find_by_first_name('Lily')
-      end.then do |lily|
-        lily[:last_name] = 'f**k'
-        lily.validate
+      User.new(last_name: 'f**k').validate.tap { |p| puts "got the promise in spec" }.then do |new_user|
+        puts "promise resolved in spec"
+        new_user.errors.messages
       end
-    end.to be_truthy
-    expect(User.find_by_first_name('Lily')[:last_name]).to eq('DerDog')
+    end.to eq("last_name" => ["no swear words allowed"])
   end
 end
