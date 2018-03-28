@@ -96,7 +96,7 @@ RSpec::Steps.steps 'ActiveRecord::Base.inspect displays', js: true do
       todo.save.then do
         todo.inspect
       end
-    end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors {\"title\"=>\[\"can't be blank\"\]}\] >/
+    end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors {\"title\"=>\[{\"message\"=>\"can't be blank\"}\]}\] >/
   end
 
   it 'updated records with the errors after attempting to save' do
@@ -108,7 +108,7 @@ RSpec::Steps.steps 'ActiveRecord::Base.inspect displays', js: true do
       end.then do
         todo.inspect
       end
-    end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors id: #{TodoItem.find_by_title('test4').id} {\"title\"=>\[\"can't be blank\"\]}\] >/
+    end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors id: #{TodoItem.find_by_title('test4').id} {\"title\"=>\[{\"message\"=>\"can't be blank\"}\]}\] >/
   end
 
 end

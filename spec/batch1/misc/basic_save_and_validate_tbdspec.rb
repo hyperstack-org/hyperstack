@@ -39,6 +39,6 @@ RSpec::Steps.steps "access like a hash", js: true do
         puts "promise resolved in spec"
         new_user.errors.messages
       end
-    end.to eq("last_name" => ["no swear words allowed"])
+    end.to eq("last_name"=>[{"message"=>"no swear words allowed"}])
   end
 end

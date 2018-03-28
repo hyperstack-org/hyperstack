@@ -268,7 +268,6 @@ module ReactiveRecord
         Operations::Save.run(models: models, associations: associations, save: save, validate: validate)
         .then do |response|
           begin
-            puts "***************** save = #{!!save} and validate = #{!!validate} ************"
             response[:models] = response[:saved_models].collect do |item|
               backing_records[item[0]].ar_instance
             end
@@ -292,7 +291,6 @@ module ReactiveRecord
             end
 
             yield response[:success], response[:message], response[:models]  if block
-            puts "about to resolve!"
             promise.resolve response  # TODO this could be problematic... there was no .json here, so .... what's to do?
 
             backing_records.each { |id, record| record.saved! } if save
@@ -347,7 +345,6 @@ module ReactiveRecord
       end
 
       def self.save_records(models, associations, acting_user, validate, save)
-        puts "save_records(..validate: #{!!validate}, save: #{!!save})"
         reactive_records = {}
         vectors = {}
         new_models = []
