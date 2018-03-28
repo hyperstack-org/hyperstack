@@ -54,7 +54,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
 
   context 'on the server side' do
     it 'ActiveRecord::Base with by default leave unscoped and all scopes in a dont care state' do
-      expect { TodoItem.__secure_remote_access_to_all(nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
@@ -62,7 +62,16 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_scope :all
       end
-      expect { TodoItem.__secure_remote_access_to_all(nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
+      .not_to raise_error
+    end
+
+    it 'will allow access to chained scopes' do
+      TodoItem.class_eval do
+        regulate_scope :all
+      end
+      r1 = TodoItem.__secure_remote_access_to_all(TodoItem,nil)
+      expect { r1.__secure_remote_access_to_important(r1, nil).__secure_collection_check(nil) }
       .not_to raise_error
     end
 
@@ -70,7 +79,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_scope(:all) { denied! }
       end
-      expect { TodoItem.__secure_remote_access_to_all(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
@@ -78,7 +87,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }
       end
-      test_scope = TodoItem.__secure_remote_access_to_test(nil)
+      test_scope = TodoItem.__secure_remote_access_to_test(TodoItem, nil)
       expect { test_scope.__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
@@ -87,7 +96,8 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_relationship :comments
       end
-      expect { TodoItem.new.__secure_remote_access_to_comments(nil).__secure_collection_check(nil) }
+      new_todo = TodoItem.new
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
       .not_to raise_error
     end
 
@@ -95,12 +105,14 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_relationship(:comments) { denied! }
       end
-      expect { TodoItem.new.__secure_remote_access_to_comments(nil) }
+      new_todo = TodoItem.new
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
     it "will leave the has_many relationship in a don't care state" do
-      comments = TodoItem.new.__secure_remote_access_to_comments(nil)
+      new_todo = TodoItem.new
+      comments = new_todo.__secure_remote_access_to_comments(new_todo, nil)
       expect { comments.__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
@@ -112,7 +124,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }
       end
-      expect { TodoItem.__secure_remote_access_to_test(nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
       .not_to raise_error
     end
 
@@ -120,7 +132,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_scope(:find_string) { |s| denied! if s == 'doa'}
       end
-      expect { TodoItem.__secure_remote_access_to_find_string(nil, 'doa') }
+      expect { TodoItem.__secure_remote_access_to_find_string(TodoItem, nil, 'doa') }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
@@ -128,9 +140,9 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_scope(:all) { acting_user }
       end
-      expect { TodoItem.__secure_remote_access_to_all(nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
-      expect { TodoItem.__secure_remote_access_to_all(true).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, true).__secure_collection_check(nil) }
       .not_to raise_error
     end
 
@@ -138,7 +150,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         finder_method(:pow) { denied! }
       end
-      expect { TodoItem.__secure_remote_access_to__pow(nil) }
+      expect { TodoItem.__secure_remote_access_to__pow(TodoItem, nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
@@ -146,7 +158,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         server_method(:pow) { acting_user }
       end
-      expect(TodoItem.new.__secure_remote_access_to_pow('Omar'))
+      expect(TodoItem.new.__secure_remote_access_to_pow(TodoItem, 'Omar'))
       .to eq('Omar')
     end
 
@@ -154,7 +166,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         server_method(:pow) { denied! }
       end
-      expect { TodoItem.new.__secure_remote_access_to_pow('Omar') }
+      expect { TodoItem.new.__secure_remote_access_to_pow(TodoItem, 'Omar') }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
@@ -162,9 +174,9 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }, regulate: -> () { acting_user }
       end
-      expect { TodoItem.__secure_remote_access_to_test(true).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, true).__secure_collection_check(nil) }
       .not_to raise_error
-      expect { TodoItem.__secure_remote_access_to_test(nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
@@ -172,9 +184,9 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         default_scope -> () { all }, regulate: -> () { denied! if acting_user }
       end
-      expect { TodoItem.__secure_remote_access_to_all(true) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, true) }
       .to raise_error(Hyperloop::AccessViolation)
-      expect { TodoItem.__secure_remote_access_to_all(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil) }
       .not_to raise_error
     end
 
@@ -182,9 +194,9 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_default_scope { denied! if acting_user }
       end
-      expect { TodoItem.__secure_remote_access_to_all(true) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, true) }
       .to raise_error(Hyperloop::AccessViolation)
-      expect { TodoItem.__secure_remote_access_to_all(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil) }
       .not_to raise_error
     end
 
@@ -192,7 +204,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }, regulate: :always_allow
       end
-      expect { TodoItem.__secure_remote_access_to_test(nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
       .not_to raise_error
     end
 
@@ -200,7 +212,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }, regulate: nil
       end
-      test_scope = TodoItem.__secure_remote_access_to_test(nil)
+      test_scope = TodoItem.__secure_remote_access_to_test(TodoItem, nil)
       expect { test_scope.__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
@@ -210,7 +222,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         TodoItem.class_eval do
           scope :test, -> () { all }, regulate: value
         end
-        expect { TodoItem.__secure_remote_access_to_test(nil) }
+        expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil) }
         .to raise_error(Hyperloop::AccessViolation)
       end
     end
@@ -218,23 +230,27 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     it "can set the policy directly on the scope with a proc" do
       stub_const 'TodoItem', Class.new(ApplicationRecord)
       TodoItem.has_many :comments, regulate: -> () { acting_user }
-      expect { TodoItem.new.__secure_remote_access_to_comments(true).__secure_collection_check(nil) }
+      new_todo = TodoItem.new
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, true).__secure_collection_check(nil) }
       .not_to raise_error
-      expect { TodoItem.new.__secure_remote_access_to_comments(nil).__secure_collection_check(nil) }
+      new_todo = TodoItem.new
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
 
     it "can use 'regulate: truthy-value' to allow access directly on the scope" do
       stub_const 'TodoItem', Class.new(ApplicationRecord)
       TodoItem.has_many :comments, regulate: :always_allow
-      expect { TodoItem.new.__secure_remote_access_to_comments(nil).__secure_collection_check(nil) }
+      new_todo = TodoItem.new
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
       .not_to raise_error
     end
 
     it "can treat 'regulate: falsy-value' as don't care if directly on the scope" do
       stub_const 'TodoItem', Class.new(ApplicationRecord)
       TodoItem.has_many :comments, regulate: nil
-      comments = TodoItem.new.__secure_remote_access_to_comments(nil)
+      new_todo = TodoItem.new
+      comments = new_todo.__secure_remote_access_to_comments(new_todo, nil)
       expect { comments.__secure_collection_check(nil) }
       .to raise_error(Hyperloop::AccessViolation)
     end
@@ -243,7 +259,8 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       it "can use 'regulate: #{value}' to allow access directly on the scope" do
         stub_const 'TodoItem', Class.new(ApplicationRecord)
         TodoItem.has_many :comments, regulate: value
-        expect { TodoItem.new.__secure_remote_access_to_comments(nil) }
+        new_todo = TodoItem.new
+        expect { new_todo.__secure_remote_access_to_comments(new_todo, nil) }
         .to raise_error(Hyperloop::AccessViolation)
       end
     end

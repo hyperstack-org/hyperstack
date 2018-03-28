@@ -74,6 +74,7 @@ module ReactiveRecord
       param :acting_user, nils: true
       param models: []
       param associations: []
+      param :save, type: :boolean
       param :validate, type: :boolean
 
       step do
@@ -82,7 +83,7 @@ module ReactiveRecord
           params.associations.map(&:with_indifferent_access),
           params.acting_user,
           params.validate,
-          true
+          params.save
         )
       end
     end

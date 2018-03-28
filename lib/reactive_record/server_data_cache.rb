@@ -273,11 +273,13 @@ module ReactiveRecord
                   else
                     begin
                       secured_method = "__secure_remote_access_to_#{[*method].first}"
-                      if cache_item.value.class < ActiveRecord::Base && cache_item.value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
+
+                      # order is important.  This check must be first since scopes can have same name as attributes!
+                      if cache_item.value.respond_to? secured_method
+                        cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(secured_method, cache_item.value, @acting_user, *([*method][1..-1])) }, method, method)
+                      elsif (cache_item.value.class < ActiveRecord::Base) && cache_item.value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
                         cache_item.value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
                         cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(*method) }, method, method)
-                      elsif cache_item.value.respond_to? secured_method
-                        cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(secured_method, @acting_user, *([*method][1..-1])) }, method, method)
                       else
                         raise "method missing"
                       end
@@ -473,7 +475,7 @@ keys:
           load_from_json(value, new_target) if new_target
         end
       rescue Exception => e
-        debugger
+        # debugger
         raise e
       end
 
