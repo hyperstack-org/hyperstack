@@ -41,20 +41,16 @@ module ActiveRecord
       self.class.primary_key
     end
 
-    def type
-      @backing_record.get_attr_value(:type, nil)
-    end
-
-    def type=(val)
-      @backing_record.set_attr_value(:type, val)
-    end
-
     def id
       @backing_record.get_primary_key_value
     end
 
     def id=(value)
       @backing_record.id = value
+    end
+
+    def id?
+      id.present?
     end
 
     def model_name
@@ -90,13 +86,17 @@ module ActiveRecord
       # this is useful when you just want to get a handle on record instance
       # in the ReactiveRecord.load method
       id # force load of id...
-      self
+      if (klass = self[self.class.inheritance_column]).loaded?
+        const_get(klass).new(self)
+      else
+        self
+      end
     end
 
     def load(*attributes, &block)
       first_time = true
       ReactiveRecord.load do
-        results = attributes.collect { |attr| send(attr, first_time) }
+        results = attributes.collect { |attr| send("#{attr}#{'!' if first_time}") }
         results = yield(*results) if block
         first_time = false
         block.nil? && results.count == 1 ? results.first : results
