@@ -42,7 +42,7 @@ module ReactiveRecord
         if new?
           @attributes[attr] = aggr.klass.new.backing_record.link_aggregate(attr, self)
         else
-          sync_ignore_dummy attr, new_from_vector(aggr.klass, self, *vector, method), has_key
+          sync_ignore_dummy attr, new_from_vector(aggr.klass, self, *vector, attr), has_key
         end
       end
     end
@@ -53,9 +53,9 @@ module ReactiveRecord
 
     private
 
-    def virtual_fetch_on_server_warning(attribute)
+    def virtual_fetch_on_server_warning(attr)
       log(
-        "Warning fetching virtual attributes (#{model.name}.#{attribute}) during prerendering "\
+        "Warning fetching virtual attributes (#{model.name}.#{attr}) during prerendering "\
         'on a changed or new model is not implemented.',
         :warning
       )
