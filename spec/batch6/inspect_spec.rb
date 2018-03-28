@@ -111,4 +111,34 @@ RSpec::Steps.steps 'ActiveRecord::Base.inspect displays', js: true do
     end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors id: #{TodoItem.find_by_title('test4').id} {\"title\"=>\[{\"message\"=>\"can't be blank\"}\]}\] >/
   end
 
+  it 'new records with the errors after attempting to save (deprecated error handler)' do
+
+    evaluate_ruby do
+      class ReactiveRecord::Base
+        def errors
+          @errors ||= ActiveModel::Error.new
+        end
+      end
+    end
+
+    TodoItem.validates :title, presence: true
+    expect_promise do
+      todo = TodoItem.new(description: 'this has no title')
+      todo.save.then do
+        todo.inspect
+      end
+    end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors {\"title\"=>\[\"can't be blank\"\]}\] >/
+  end
+
+  it 'updated records with the errors after attempting to save (deprecated error handler)' do
+    expect_promise do
+      todo = TodoItem.new(title: 'test5')
+      todo.save.then do
+        todo.title = nil
+        todo.save
+      end.then do
+        todo.inspect
+      end
+    end.to match /<TodoItem:0x[0-9a-f]+ \(0x[0-9a-f]+\) \[errors id: #{TodoItem.find_by_title('test5').id} {\"title\"=>\[\"can't be blank\"\]}\] >/
+  end
 end

@@ -20,6 +20,7 @@ module ActiveModel
       @base = base
       @messages = apply_default_array({})
       @details = apply_default_array({})
+      reactive_empty! true
     end
 
     # When passed a symbol or a name of a method, returns an array of errors
@@ -208,6 +209,10 @@ module ActiveModel
     end
     alias :blank? :empty?
 
+    def reactive_empty?
+      React::State.get_state(self, 'ERRORS?')
+    end
+
     # Clear the error messages.
     #
     #   person.errors.full_messages # => ["name cannot be nil"]
@@ -215,7 +220,7 @@ module ActiveModel
     #   person.errors.full_messages # => []
     def clear
       messages.clear
-      details.clear
+      details.clear.tap { reactive_empty! true }
     end
 
     # Merges the errors from <tt>other</tt>.
@@ -227,7 +232,7 @@ module ActiveModel
     #   person.errors.merge!(other)
     def merge!(other)
       @messages.merge!(other.messages) { |_, ary1, ary2| ary1 + ary2 }
-      @details.merge!(other.details) { |_, ary1, ary2| ary1 + ary2 }
+      @details.merge!(other.details) { |_, ary1, ary2| ary1 + ary2 }.tap { reactive_empty! }
     end
 
     # Returns +true+ if the error messages include an error for the given key
@@ -294,9 +299,8 @@ module ActiveModel
       #   exception = ActiveModel::StrictValidationFailed if exception == true
       #   raise exception, full_message(attribute, message)
       # end
-
       details[attribute.to_sym]  << detail
-      messages[attribute.to_sym] << message
+      (messages[attribute.to_sym] << message).tap { reactive_empty! false }
     end
 
     # NOTE: Due to Opal not supporting Symbol this isn't identical,
@@ -361,6 +365,10 @@ module ActiveModel
       hash.dup.tap do |new_h|
         new_h.default_proc = nil
       end
+    end
+
+    def reactive_empty!(state = empty?)
+      React::State.set_state(self, 'ERRORS?', state) unless ReactiveRecord::Base.data_loading?
     end
   end
 end
