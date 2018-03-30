@@ -133,11 +133,12 @@ module ActiveRecord
       # this is useful when you just want to get a handle on record instance
       # in the ReactiveRecord.load method
       id # force load of id...
-      if (klass = self[self.class.inheritance_column]).loaded?
-        const_get(klass).new(self)
-      else
+      # if self.class.columns_hash.keys.include?(self.class.inheritance_column) &&
+      #    (klass = self[self.class.inheritance_column]).loaded?
+      #   Object.const_get(klass).new(attributes)
+      # else
         self
-      end
+      # end
     end
 
     def load(*attributes, &block)
@@ -192,7 +193,5 @@ module ActiveRecord
     def <=>(other)
       id.to_i <=> other.id.to_i
     end
-
   end
-
 end

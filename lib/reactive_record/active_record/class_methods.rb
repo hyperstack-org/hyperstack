@@ -10,17 +10,17 @@ module ActiveRecord
     end
 
     def base_class
-
       unless self < Base
-        raise ActiveRecordError, "#{name} doesn't belong in a hierarchy descending from ActiveRecord"
+        raise ActiveRecordError, "#{name} doesn't descend from ActiveRecord"
       end
 
       if superclass == Base || superclass.abstract_class?
         self
-      else
+      elsif respond_to?(:each)
         superclass.base_class
+      else
+        self
       end
-
     end
 
     def abstract_class?
@@ -32,15 +32,15 @@ module ActiveRecord
     end
 
     def primary_key=(val)
-     base_class.instance_eval {  @primary_key_value = val }
+      base_class.instance_eval { @primary_key_value = val }
     end
 
     def inheritance_column
-      base_class.instance_eval {@inheritance_column_value || "type"}
+      base_class.instance_eval { @inheritance_column_value || "type" }
     end
 
     def inheritance_column=(name)
-      base_class.instance_eval {@inheritance_column_value = name}
+      base_class.instance_eval { @inheritance_column_value = name }
     end
 
     def model_name
@@ -49,11 +49,15 @@ module ActiveRecord
     end
 
     def find(id)
-      base_class.instance_eval {ReactiveRecord::Base.find(self, primary_key, id)}
+      klass = self
+      base_class.instance_eval { ReactiveRecord::Base.find(klass, primary_key, id) }
     end
 
     def find_by(opts = {})
-      base_class.instance_eval {ReactiveRecord::Base.find(self, _dealias_attribute(opts.first.first), opts.first.last)}
+      klass = self
+      base_class.instance_eval do
+        ReactiveRecord::Base.find(klass, _dealias_attribute(opts.first.first), opts.first.last)
+      end
     end
 
     def enum(*args)
@@ -334,49 +338,51 @@ module ActiveRecord
     def _react_param_conversion(param, opt = nil)
       param = Native(param)
       param = JSON.from_object(param.to_n) if param.is_a? Native::Object
-      result = if param.is_a? self
-        param
-      elsif param.is_a? Hash
-        if opt == :validate_only
-          klass = ReactiveRecord::Base.infer_type_from_hash(self, param)
-          klass == self or klass < self
-        else
-          if param[primary_key]
-            target = find(param[primary_key])
+      result =
+        if param.is_a? self
+          param
+        elsif param.is_a? Hash
+          if opt == :validate_only
+            klass = ReactiveRecord::Base.infer_type_from_hash(self, param)
+            klass == self || klass < self
           else
-            target = new
-          end
-          associations = reflect_on_all_associations
-          param = param.collect do |key, value|
-            assoc = reflect_on_all_associations.detect do |assoc|
-              assoc.association_foreign_key == key
-            end
-            if assoc
-              if value
-                [assoc.attribute, {id: [value], type: [nil]}]
+            target =
+              if param[primary_key]
+                find(param[primary_key])
               else
-                [assoc.attribute, [nil]]
+                new
               end
-            else
-              [key, [value]]
+
+            associations = reflect_on_all_associations
+
+            param = param.collect do |key, value|
+              assoc = associations.detect do |association|
+                association.association_foreign_key == key
+              end
+
+              if assoc
+                if value
+                  [assoc.attribute, { id: [value] }]
+                else
+                  [assoc.attribute, [nil]]
+                end
+              else
+                [key, [value]]
+              end
             end
+
+            # We do want to be doing something like this, but this breaks other stuff...
+            #
+            # ReactiveRecord::Base.load_data do
+            #   ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
+            # end
+
+            ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
+            target
           end
-
-          # We do want to be doing something like this, but this breaks other stuff...
-          #
-          # ReactiveRecord::Base.load_data do
-          #   ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
-          # end
-
-          ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
-          target
         end
-      else
-        nil
-      end
+
       result
     end
-
   end
-
 end

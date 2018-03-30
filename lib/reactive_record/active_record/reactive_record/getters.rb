@@ -42,7 +42,7 @@ module ReactiveRecord
         if new?
           @attributes[attr] = aggr.klass.new.backing_record.link_aggregate(attr, self)
         else
-          sync_ignore_dummy attr, new_from_vector(aggr.klass, self, *vector, method), has_key
+          sync_ignore_dummy attr, new_from_vector(aggr.klass, self, *vector, attr), has_key
         end
       end
     end
@@ -53,9 +53,9 @@ module ReactiveRecord
 
     private
 
-    def virtual_fetch_on_server_warning
+    def virtual_fetch_on_server_warning(attr)
       log(
-        "Warning fetching virtual attributes (#{model.name}.#{method}) during prerendering "\
+        "Warning fetching virtual attributes (#{model.name}.#{attr}) during prerendering "\
         'on a changed or new model is not implemented.',
         :warning
       )
@@ -91,13 +91,13 @@ module ReactiveRecord
         current_value = @attributes[attribute]
         current_value.notify if current_value.is_a? Base::DummyValue
         if reload
-          virtual_fetch_on_server_warning if on_opal_server? && changed?
+          virtual_fetch_on_server_warning(attribute) if on_opal_server? && changed?
           yield true, attribute
         else
           current_value
         end
       else
-        virtual_fetch_on_server_warning if on_opal_server? && changed?
+        virtual_fetch_on_server_warning(attribute) if on_opal_server? && changed?
         yield false, attribute
       end.tap { |value| React::State.get_state(self, attribute) unless data_loading? }
     end
