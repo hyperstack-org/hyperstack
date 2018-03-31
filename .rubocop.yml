@@ -4,8 +4,8 @@ Metrics/LineLength:
 Style/MutableConstant:
   Enabled: false
 
-Lint/LiteralInCondition:
-  Enabled: false
+# Lint/LiteralInCondition:
+#   Enabled: false
 
 Style/CommandLiteral:
   EnforcedStyle: mixed

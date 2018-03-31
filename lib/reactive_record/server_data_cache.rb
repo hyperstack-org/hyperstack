@@ -435,6 +435,7 @@ keys:
         tree.each do |method, value|
           method = JSON.parse(method) rescue method
           new_target = nil
+
           if method == "*all"
             next # its already been processed above
           elsif !target
@@ -454,9 +455,12 @@ keys:
             else
               target.backing_record.update_simple_attribute([method], target.backing_record.convert(method, value.first))
             end
-          elsif target.class.respond_to?(:reflect_on_aggregation) and aggregation = target.class.reflect_on_aggregation(method) and
-          !(aggregation.klass < ActiveRecord::Base)
-            target.send "#{method}=", aggregation.deserialize(value.first)
+          elsif target.class.respond_to?(:reflect_on_aggregation) &&
+                (aggregation = target.class.reflect_on_aggregation(method)) &&
+                !(aggregation.klass < ActiveRecord::Base)
+            value = [aggregation.deserialize(value.first)] unless value.first.is_a?(aggregation.klass)
+
+            target.send "#{method}=", value.first
           elsif value.is_a? Array
             # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
             # a better fix might be something like target._internal_attribute_hash[method] =  ...
@@ -478,7 +482,5 @@ keys:
         # debugger
         raise e
       end
-
-
     end
   end
