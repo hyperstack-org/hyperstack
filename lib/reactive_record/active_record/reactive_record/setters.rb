@@ -81,23 +81,27 @@ module ReactiveRecord
     end
 
     def set_attribute_change_status_and_notify(attr, changed, new_value)
-      @attributes[attr] = new_value
-      change_status_and_notify_helper(attr, changed) do |had_key, current_value|
-        if !data_loading? ||
-           (on_opal_client? && had_key && current_value.loaded? && current_value != new_value)
-          React::State.set_state(self, attr, new_value, data_loading?)
+      if @virgin
+        @attributes[attr] = new_value
+      else
+        change_status_and_notify_helper(attr, changed) do |had_key, current_value|
+          @attributes[attr] = new_value
+          if !data_loading? ||
+             (on_opal_client? && had_key && current_value.loaded? && current_value != new_value)
+            React::State.set_state(self, attr, new_value, data_loading?)
+          end
         end
       end
     end
 
     def set_change_status_and_notify_only(attr, changed)
+      return if @virgin
       change_status_and_notify_helper(attr, changed) do
         React::State.set_state(self, attr, nil) unless data_loading?
       end
     end
 
     def change_status_and_notify_helper(attr, changed)
-      return if @virgin
       empty_before = changed_attributes.empty?
       if !changed
         changed_attributes.delete(attr)

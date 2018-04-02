@@ -3,7 +3,7 @@ require 'test_components'
 require 'rspec-steps'
 
 
-RSpec::Steps.steps "access like a hash", js: true do
+RSpec::Steps.steps "validate and valid? methods", js: true do
 
   before(:step) do
     # spec_helper resets the policy system after each test so we have to setup
