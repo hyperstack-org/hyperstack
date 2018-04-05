@@ -15,7 +15,7 @@ module HyperRecord
       @state_key = "#{self.class.to_s}_#{self.object_id}"
       @observers = Set.new
       @registered_collections = Set.new
-      
+
       _initialize_from_hash(record_hash)
 
       # for reactivity
@@ -60,7 +60,7 @@ module HyperRecord
     ### reactive api
 
     def destroy
-      destroy_record(observer)
+      destroy_record
       nil
     end
 
@@ -69,7 +69,7 @@ module HyperRecord
     end
 
     def link(other_record)
-      link_record(other_record, observer)
+      link_record(other_record)
       self
     end
 
@@ -95,11 +95,11 @@ module HyperRecord
       _register_observer
       @changed_properties_hash = {}
     end
-    
+
     def resource_base_uri
       self.class.resource_base_uri
     end
-    
+
     def rest_method_force_updates(method_name)
       @rest_methods_hash[method_name][:force] = true
     end
@@ -109,7 +109,7 @@ module HyperRecord
     end
 
     def save
-      save_record(observer)
+      save_record
       self
     end
 
@@ -129,7 +129,7 @@ module HyperRecord
       unlink_record(other_record, observer)
       self
     end
-    
+
     ### promise api
 
     def destroy_record
@@ -146,9 +146,14 @@ module HyperRecord
     def link_record(other_record, relation_name = nil)
       _register_observer
       called_from_collection = relation_name ? true : false
-      relation_name = other_record.class.to_s.underscore.pluralize unless relation_name 
-      raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
-      self.send(relation_name).push(other_record) unless called_from_collection
+      relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
+      if reflections.has_key?(relation_name)
+        self.send(relation_name).push(other_record) unless called_from_collection
+      else
+        relation_name = other_record.class.to_s.underscore
+        raise "No collection for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
+        self.send("#{relation_name}=", other_record) unless called_from_collection
+      end
       payload_hash = other_record.to_hash
       self.class._promise_post("#{resource_base_uri}/#{self.id}/relations/#{relation_name}.json", { data: payload_hash }).then do |response|
         other_record.instance_variable_get(:@properties_hash).merge!(response.json[other_record.class.to_s.underscore])
@@ -203,7 +208,7 @@ module HyperRecord
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
-        `console.log(error_message)`
+        `console.error(error_message)`
         response
       end
     end
@@ -220,7 +225,7 @@ module HyperRecord
       @registered_collections = Set.new
       _notify_observers
     end
-    
+
     def _notify_observers
       mutate.record_state(`Date.now() + Math.random()`)
       @observers.each do |observer|
@@ -257,7 +262,7 @@ module HyperRecord
             c_record = c_record_class.find(data[:cause][:id])
             if `Date.parse(#{c_record.updated_at}) >= Date.parse(#{data[:cause][:updated_at]})`
               if @fetch_states[data[:relation]] == 'f'
-                if send(data[:relation]).include?(c_record) 
+                if send(data[:relation]).include?(c_record)
                   return
                 end
               end
@@ -287,7 +292,7 @@ module HyperRecord
         self
       end.fail do |response|
         error_message = "#{self} failed to update!"
-        `console.log(error_message)`
+        `console.error(error_message)`
         response
       end
     end

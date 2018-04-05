@@ -1,5 +1,5 @@
 class Hyperloop::Resource::RelationsController < ApplicationController
-  
+
   def index
     # introspect available relations
     record_class = guarded_record_class_from_param(record_class_param)
@@ -20,7 +20,11 @@ class Hyperloop::Resource::RelationsController < ApplicationController
     @collection_name = params[:id].to_sym
     @collection = nil
     if @record && @record.class.reflections.has_key?(@collection_name) # guard, :id is the collection name
-      right_class_param = params[:id].chop # remove the s at the end
+      right_class_param = if @record.class.reflections[@collection_name].association.type == :has_many
+                            params[:id].chop # remove the s at the end if its there
+                          else
+                            params[:id]
+                          end
       right_model = guarded_record_class_from_param(right_class_param)
       @right_record = if collection_params(right_model)[:id]
                         right_model.find(collection_params(right_model)[:id])
@@ -28,8 +32,12 @@ class Hyperloop::Resource::RelationsController < ApplicationController
                         right_model.create(collection_params(right_model))
                       end
       if @right_record
-        @collection = @record.send(@collection_name) # send is guarded above
-        @collection << @right_record
+        if @record.class.reflections[@collection_name].association.type == :has_one
+          @record.send("#{@collection_name}=", @right_record)
+        else
+          @collection = @record.send(@collection_name) # send is guarded above
+          @collection << @right_record
+        end
       end
     end
     respond_to do |format|
@@ -50,7 +58,7 @@ class Hyperloop::Resource::RelationsController < ApplicationController
     @record, @id = guarded_record_from_params(params)
     # collection result may be nil, so we need have_collection to make sure the collection is valid
     @collection = nil
-    have_collection = false 
+    have_collection = false
     @collection_name = params[:id].to_sym
     if @record
       # guard, :id is the collection name
@@ -78,8 +86,8 @@ class Hyperloop::Resource::RelationsController < ApplicationController
       right_class_param = params[:id].chop # remove the s at the end
       right_model = guarded_record_class_from_param(right_class_param)
       @right_record = right_model.find(params[:record_id])
-      
-     if @right_record
+
+      if @right_record
         @collection = @record.send(@collection_name) # send is guarded above
         @collection.delete(@right_record)
       end

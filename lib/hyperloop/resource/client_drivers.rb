@@ -6,9 +6,9 @@ module Hyperloop
       class << self
         attr_reader :opts
       end
-      
+
       if RUBY_ENGINE != 'opal'
-        
+
         prerender_footer do |controller|
           # next if Hyperloop.transport == :none
           # if defined?(PusherFake)
@@ -21,7 +21,7 @@ module Hyperloop
           #     authEndpoint: "#{path}/hyperloop-pusher-auth"
           #   )
           # end
-          
+
           config_hash = {
             resource_transport: Hyperloop.resource_transport,
             api_base_path: Hyperloop.resource_api_base_path,
@@ -46,7 +46,7 @@ module Hyperloop
             "Opal.Hyperloop.$const_get('Resource').$const_get('ClientDrivers').$initialize_client_drivers_on_boot();\n"\
           "</script>\n"
         end
-      
+
       else
 
         def self.initialize_client_drivers_on_boot
@@ -57,7 +57,7 @@ module Hyperloop
           @opts = {}
 
           if on_opal_client?
-            
+
             @opts = Hash.new(`window.HyperloopOpts`)
             @opts[:hyper_record_update_channel] = "hyper-record-update-channel-#{@opts[:session_id]}"
             case @opts[:resource_transport]
@@ -65,7 +65,7 @@ module Hyperloop
               if @opts[:pusher][:client_logging] && `window.console && window.console.log`
                 `Pusher.log = function(message) {window.console.log(message);}`
               end
-              
+
               h = nil
               pusher_api = nil
               %x{

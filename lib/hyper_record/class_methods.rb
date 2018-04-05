@@ -1,6 +1,6 @@
 module HyperRecord
   module ClassMethods
-    
+
     def new(record_hash = {})
       if record_hash.has_key?(:id)
         record = _record_cache[record_hash[:id]]
@@ -32,7 +32,7 @@ module HyperRecord
         record_collection
       end.fail do |response|
         error_message = "#{self.to_s}.all failed to fetch records!"
-        `console.log(error_message)`
+        `console.error(error_message)`
         response
       end
       HyperRecord::Collection.new
@@ -58,8 +58,8 @@ module HyperRecord
             _notify_observers
             @relations[name]
           end.fail do |response|
-            error_string = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
-            `console.log(error_string)`
+            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
+            `console.error(error_message)`
             response
           end
           @relations[name]
@@ -74,7 +74,7 @@ module HyperRecord
         @relations[name]
       end
     end
-    
+
     def create(record_hash = {})
       record = new(record_hash)
       record.save
@@ -104,7 +104,7 @@ module HyperRecord
         record_in_progress
       end.fail do |response|
         error_message = "#{self.to_s}.find(#{id}) failed to fetch record!"
-        `console.log(error_message)`
+        `console.error(error_message)`
         response
       end
 
@@ -150,7 +150,7 @@ module HyperRecord
             @relations[name]
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_many association, failed to fetch records!"
-            `console.log(error_message)`
+            `console.error(error_message)`
             response
           end
           @relations[name]
@@ -193,8 +193,8 @@ module HyperRecord
             _notify_observers
             @relations[name]
           end.fail do |response|
-            error_string = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
-            `console.log(error_string)`
+            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
+            `console.error(error_message)`
             response
           end
           @relations[name]
@@ -257,12 +257,12 @@ module HyperRecord
         _register_observer
         if self.id && (@rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
           self.class._rest_method_get_or_patch(name, self.id, *args).then do |result|
-            @rest_methods_hash[name][:result] = result # result is parsed json 
+            @rest_methods_hash[name][:result] = result # result is parsed json
             _notify_observers
             @rest_methods_hash[name][:result]
           end.fail do |response|
-            error_string = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to fetch records!"
-            `console.log(error_string)`
+            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to fetch records!"
+            `console.error(error_message)`
             response
           end
         end
@@ -296,7 +296,7 @@ module HyperRecord
             scopes[name]
           end.fail do |response|
             error_message = "#{self.class.to_s}.#{name}, a scope, failed to fetch records!"
-            `console.log(error_message)`
+            `console.error(error_message)`
             response
           end
           scopes[name]
@@ -318,7 +318,11 @@ module HyperRecord
     end
 
     def _convert_json_hash_to_record(record_hash)
+      return nil if !record_hash
       klass_key = record_hash.keys.first
+      return nil if klass_key == "nil_class"
+      return nil if !record_hash[klass_key]
+      return nil if record_hash[klass_key].keys.size == 0
       record_class = klass_key.camelize.constantize
       if record_hash[klass_key][:id].nil?
         record_class.new(record_hash[klass_key])
@@ -347,7 +351,7 @@ module HyperRecord
       @_class_state_key ||= self.to_s
       @_class_state_key
     end
-    
+
     def _notify_class_observers
       _class_observers.each do |observer|
         React::State.set_state(observer, _class_state_key, `Date.now() + Math.random()`)
