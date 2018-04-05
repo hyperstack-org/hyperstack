@@ -2,7 +2,7 @@ require_relative "lib/hyperloop/resource/version"
 
 Gem::Specification.new do |s|
   s.name         = "hyper-resource"
-  s.version      = Hyperloop::Vis::VERSION
+  s.version      = Hyperloop::Resource::VERSION
   s.author       = "Jan Biedermann"
   s.email        = "jan@kursator.de"
   s.homepage     = "https://github.com/janbiedermann/hyper-resource"
