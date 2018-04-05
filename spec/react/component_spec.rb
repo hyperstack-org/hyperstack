@@ -116,7 +116,7 @@ describe 'React::Component', js: true do
           def self.get_error
             @@error
           end
-          
+
           def self.get_info
             @@info
           end
@@ -885,7 +885,6 @@ describe 'React::Component', js: true do
 
     it 'only overrides `p` in render context' do
       mount 'Foo' do
-
         class Foo
           include React::Component
 
