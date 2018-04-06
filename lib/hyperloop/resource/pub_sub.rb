@@ -16,15 +16,15 @@ module Hyperloop
         end
       end
 
-      def publish_collection(base_record, collection_name, record = nil)
-        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{base_record.class}__#{base_record.id}__#{collection_name}")
+      def publish_relation(base_record, relation_name, record = nil)
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{base_record.class}__#{base_record.id}__#{relation_name}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
         message = {
           record_type: base_record.class.to_s,
           id: base_record.id,
           updated_at: base_record.updated_at,
-          collection: collection_name
+          relation: relation_name
         }
         if record
           message[:cause] = {}
@@ -34,7 +34,7 @@ module Hyperloop
         end
         subscribers.each do |session_id, last_requested|
           if last_requested.to_f < scrub_time
-            Hyperloop.redis_instance.hdel("HRPS__#{base_record.class}__#{base_record.id}__#{collection_name}", session_id)
+            Hyperloop.redis_instance.hdel("HRPS__#{base_record.class}__#{base_record.id}__#{relation_name}", session_id)
             next
           end
           if Hyperloop.resource_transport == :pusher
@@ -47,14 +47,14 @@ module Hyperloop
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record.class}__#{record.id}")
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
-        
+
         message = {
           record_type: record.class.to_s,
           id: record.id,
           updated_at: record.updated_at
         }
         message[:destroyed] = true if record.destroyed?
-    
+
         subscribers.each_slice(50) do |slice|
           channel_array= []
           slice.each do |session_id, last_requested|
@@ -70,7 +70,7 @@ module Hyperloop
         end
         Hyperloop.redis_instance.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
       end
-    
+
       def publish_scope(record_class, scope_name)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record_class}__scope__#{scope_name}")
         time_now = Time.now.to_f
@@ -90,29 +90,29 @@ module Hyperloop
         end
       end
 
-      def subscribe_collection(collection, base_record = nil, collection_name = nil)
+      def subscribe_relation(relation, base_record = nil, relation_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
         session_id = session.id.to_s
         Hyperloop.redis_instance.pipelined do
-          if collection.is_a?(Enumerable)
+          if relation.is_a?(Enumerable)
             # has_many
-            collection.each do |record|
+            relation.each do |record|
               Hyperloop.redis_instance.hset("HRPS__#{record.class}__#{record.id}", session_id, time_now)
             end
-          else
+          elsif !relation.nil?
             # has_one, belongs_to
-            Hyperloop.redis_instance.hset("HRPS__#{collection.class}__#{collection.id}", session_id, time_now)
+            Hyperloop.redis_instance.hset("HRPS__#{relation.class}__#{relation.id}", session_id, time_now)
           end
-          Hyperloop.redis_instance.hset("HRPS__#{base_record.class}__#{base_record.id}__#{collection_name}", session_id, time_now) if base_record && collection_name
+          Hyperloop.redis_instance.hset("HRPS__#{base_record.class}__#{base_record.id}__#{relation_name}", session_id, time_now) if base_record && relation_name
         end
       end
-    
+
       def subscribe_record(record)
         return unless session.id
         Hyperloop.redis_instance.hset "HRPS__#{record.class}__#{record.id}", session.id.to_s, Time.now.to_f.to_s
       end
-    
+
       def subscribe_scope(collection, record_class = nil, scope_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
@@ -126,17 +126,17 @@ module Hyperloop
           Hyperloop.redis_instance.hset("HRPS__#{record_class}__scope__#{scope_name}", session_id, time_now) if record_class && scope_name
         end
       end
-    
-      def pub_sub_collection(collection, base_record, collection_name, causing_record = nil)
-        subscribe_collection(collection, base_record, collection_name)
-        publish_collection(base_record, collection_name, causing_record)
+
+      def pub_sub_relation(relation, base_record, relation_name, causing_record = nil)
+        subscribe_relation(relation, base_record, relation_name)
+        publish_relation(base_record, relation_name, causing_record)
       end
-    
+
       def pub_sub_record(record)
         subscribe_record(record)
         publish_record(record)
       end
-    
+
       def pub_sub_scope(collection, record_class, scope_name)
         subscribe_scope(collection, record_class, scope_name)
         publish_scope(record_class, scope_name)

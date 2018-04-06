@@ -279,7 +279,7 @@ module HyperRecord
     end
 
     def resource_base_uri
-      @resource ||= "#{Hyperloop::Resource::ClientDrivers.opts[:resource_api_base_bath]}/#{self.to_s.underscore.pluralize}"
+      @resource ||= "#{Hyperloop::Resource::ClientDrivers.opts[:resource_api_base_path]}/#{self.to_s.underscore.pluralize}"
     end
 
     def scope(name, options)
@@ -360,21 +360,21 @@ module HyperRecord
     end
 
     def _promise_get(uri)
-      HyperRecord::HTTP.get(uri, headers: { 'Content-Type' => 'application/json' })
+      Hyperloop::Resource::HTTP.get(uri, headers: { 'Content-Type' => 'application/json' })
     end
 
     def _promise_delete(uri)
-      HyperRecord::HTTP.delete(uri, headers: { 'Content-Type' => 'application/json' })
+      Hyperloop::Resource::HTTP.delete(uri, headers: { 'Content-Type' => 'application/json' })
     end
 
     def _promise_patch(uri, payload)
-      HyperRecord::HTTP.patch(uri, payload: payload,
+      Hyperloop::Resource::HTTP.patch(uri, payload: payload,
                                  headers: { 'Content-Type' => 'application/json' },
                                  dataType: :json)
     end
 
     def _promise_post(uri, payload)
-      HyperRecord::HTTP.post(uri, payload: payload,
+      Hyperloop::Resource::HTTP.post(uri, payload: payload,
                                 headers: { 'Content-Type' => 'application/json' },
                                 dataType: :json)
     end

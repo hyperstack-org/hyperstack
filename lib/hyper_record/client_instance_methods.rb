@@ -33,7 +33,7 @@ module HyperRecord
               @relations[relation] = self.class._convert_array_to_collection(record_hash[relation], self, relation)
             end
           else
-            @relations[relation] = record_hash[relation]
+            @relations[relation] = self.class._convert_json_hash_to_record(record_hash[relation])
           end
         else
           unless @fetch_states[collection] == 'f'

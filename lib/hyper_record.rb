@@ -3,10 +3,8 @@ if RUBY_ENGINE == 'opal'
   require 'hyper_record/collection'
   require 'hyper_record/class_methods'
   require 'hyper_record/client_instance_methods'
-end
 
-module HyperRecord
-  if RUBY_ENGINE == 'opal'
+  module HyperRecord
     def self.included(base)
       base.include(Hyperloop::Store::Mixin)
       base.extend(HyperRecord::ClassMethods)
@@ -16,4 +14,8 @@ module HyperRecord
       end
     end
   end
+else
+  require 'hyper_record/server_class_methods'
 end
+
+

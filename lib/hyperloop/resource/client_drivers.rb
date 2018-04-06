@@ -24,9 +24,9 @@ module Hyperloop
 
           config_hash = {
             resource_transport: Hyperloop.resource_transport,
-            api_base_path: Hyperloop.resource_api_base_path,
+            resource_api_base_path: Hyperloop.resource_api_base_path,
             session_id: controller.session.id,
-            current_user_id: (controller.current_user && controller.current_user.id),
+            current_user_id: (controller.current_user.id if controller.current_user),
             form_authenticity_token: controller.send(:form_authenticity_token)
           }
           case Hyperloop.resource_transport
