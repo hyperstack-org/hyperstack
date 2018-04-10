@@ -26,7 +26,7 @@ module HyperRecord
       reflections.keys.each do |relation|
         if record_hash.has_key?(relation)
           @fetch_states[relation] = 'f' # fetched
-          if reflections[relation][:kind] == :has_many
+          if %i[has_many has_and_belongs_to_many].inlcude?(reflections[relation][:kind])
             if record_hash[relation].nil?
               @relations[relation] = HyperRecord::Collection.new([], self, relation)
             else
@@ -37,7 +37,7 @@ module HyperRecord
           end
         else
           unless @fetch_states[collection] == 'f'
-            if reflections[relation][:kind] == :has_many
+            if %i[has_many has_and_belongs_to_many].inlcude?(reflections[relation][:kind])
               @relations[relation] = HyperRecord::Collection.new([], self, relation)
             else
               @relations[relation] = nil

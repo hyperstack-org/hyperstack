@@ -128,6 +128,51 @@ module HyperRecord
       end
     end
 
+    def has_and_belongs_to_many(direction, name = nil, options = { type: nil })
+      if name.is_a?(Hash)
+        options.merge(name)
+        name = direction
+        direction = nil
+      elsif name.nil?
+        name = direction
+      end
+      reflections[name] = { direction: direction, type: options[:type], kind: :has_and_belongs_to_many }
+      define_method(name) do
+        _register_observer
+        if @fetch_states[name] == 'f'
+          @relations[name]
+        elsif self.id
+          self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+            collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
+            @relations[name] = collection
+            @fetch_states[name] = 'f'
+            _notify_observers
+            @relations[name]
+          end.fail do |response|
+            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_and_belongs_to_many association, failed to fetch records!"
+            `console.error(error_message)`
+            response
+          end
+          @relations[name]
+        else
+          @relations[name]
+        end
+      end
+      define_method("#{name}=") do |arg|
+        _register_observer
+        collection = if arg.is_a?(Array)
+                       HyperRecord::Collection.new(arg, self, name)
+                     elsif arg.is_a?(HyperRecord::Collection)
+                       arg
+                     else
+                       raise "Argument must be a HyperRecord::Collection or a Array"
+                     end
+        @relations[name] = collection
+        @fetch_states[name] == 'f'
+        @relations[name]
+      end
+    end
+
     def has_many(direction, name = nil, options = { type: nil })
       if name.is_a?(Hash)
         options.merge(name)
