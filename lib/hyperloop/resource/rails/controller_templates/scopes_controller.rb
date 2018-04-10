@@ -17,8 +17,8 @@ class Hyperloop::Resource::ScopesController < ApplicationController
     @record_class = guarded_record_class_from_param(mc_param)
     @scope_name = params[:id].to_sym # :id is the scope name
     @collection = nil
-    if @record_class && @record_class.scopes.has_key?(@scope_name)  # guard  
-      @collection = @record_class.send(@scope_name) 
+    if @record_class && @record_class.scopes.has_key?(@scope_name) # guard
+      @collection = @record_class.send(@scope_name)
     end
     respond_to do |format|
       if @record_class && @collection
@@ -29,8 +29,26 @@ class Hyperloop::Resource::ScopesController < ApplicationController
     end
   end
 
+  def update
+    mc_param = record_class_param
+    mc_param = mc_param.chop if mc_param.end_with?('s')
+    @model_klass = guarded_record_class_from_param(mc_param)
+    @scope_name = params[:id].to_sym # :id is the scope name
+    @collection = nil
+    if @model_klass && @model_klass.scopes.has_key?(@scope_name) # guard
+      @collection = @model_klass.send(@scope_name, params[:params])
+    end
+    respond_to do |format|
+      if @model_klass && @collection
+        format.json
+      else
+        format.json { render json: {}, status: :unprocessable_entity }
+      end
+    end
+  end
+
   private
-  
+
   def record_class_param
     params.require(:record_class)
   end

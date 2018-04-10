@@ -301,7 +301,7 @@ module HyperRecord
       define_method(name) do |*args|
         _register_observer
         if self.id && (@rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
-          self.class._rest_method_get_or_patch(name, self.id, *args).then do |result|
+          self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |result|
             @rest_methods_hash[name][:result] = result # result is parsed json
             _notify_observers
             @rest_methods_hash[name][:result]
@@ -329,12 +329,12 @@ module HyperRecord
 
     def scope(name, options)
       scopes[name] = HyperRecord::Collection.new
-      define_singleton_method(name) do
+      define_singleton_method(name) do |*args|
         if _class_fetch_states[name] == 'f'
           scopes[name]
         else
           _register_class_observer
-          self._promise_get("#{resource_base_uri}/scopes/#{name}.json").then do |response|
+          self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response|
             scopes[name] = _convert_array_to_collection(response.json[self.to_s.underscore][name])
             _class_fetch_states[name] = 'f'
             _notify_class_observers
@@ -408,6 +408,19 @@ module HyperRecord
       Hyperloop::Resource::HTTP.get(uri, headers: { 'Content-Type' => 'application/json' })
     end
 
+    def _promise_get_or_patch(uri, *args)
+      if args && args.size > 0
+        payload = { params: args }
+        _promise_patch(uri, payload).then do |result|
+          result.json[:result]
+        end
+      else
+        _promise_get(uri).then do |result|
+          result.json[:result]
+        end
+      end
+    end
+
     def _promise_delete(uri)
       Hyperloop::Resource::HTTP.delete(uri, headers: { 'Content-Type' => 'application/json' })
     end
@@ -437,20 +450,6 @@ module HyperRecord
       if observer
         React::State.get_state(observer, _class_state_key)
         _class_observers << observer # @observers is a set, observers get added only once
-      end
-    end
-
-    def _rest_method_get_or_patch(name, id, *args)
-      uri = "#{resource_base_uri}/#{id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}" # timestamp to invalidate browser caches
-      if args && args.size > 0
-        payload = { params: args }
-        _promise_patch(uri, payload).then do |result|
-          result.json[:result]
-        end
-      else
-        _promise_get(uri).then do |result|
-          result.json[:result]
-        end
       end
     end
   end
