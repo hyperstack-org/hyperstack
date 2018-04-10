@@ -20,7 +20,7 @@ class Hyperloop::Resource::RelationsController < ApplicationController
     @collection_name = params[:id].to_sym
     @collection = nil
     if @record && @record.class.reflections.has_key?(@collection_name) # guard, :id is the collection name
-      right_class_param = if @record.class.reflections[@collection_name].association.type == :has_many
+      right_class_param = if %i[has_many has_and_belongs_to_many].include?(@record.class.reflections[@collection_name].association.type)
                             params[:id].chop # remove the s at the end if its there
                           else
                             params[:id]
