@@ -279,7 +279,7 @@ module HyperRecord
             elsif self.class._property_options[name].has_key?(:type)
               HyperRecord::DummyValue.new(self.class._property_options[name][:type])
             else
-              HyperRecord::DummyValue.new(Nil)
+              HyperRecord::DummyValue.new(NilClass)
             end
           else
             @properties_hash[name]
