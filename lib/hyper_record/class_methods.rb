@@ -87,13 +87,12 @@ module HyperRecord
       record_in_progress = if _record_cache.has_key?(id)
                              _record_cache[id]
                            else
-                             self.new
+                             self.new(id: id)
                            end
       record_in_progress_key = "#{self.to_s}_#{record_in_progress.object_id}"
       React::State.get_state(observer, record_in_progress_key) if observer
-      return _record_cache[id] if _record_cache.has_key?(id)
-      _record_cache[id] = record_in_progress
-      _find_record(id, record_in_progress, record_in_progress_key).then do
+      return _record_cache[id] if _record_cache.has_key?(id) && _class_fetch_states["record_#{id}"] == 'i'
+      _find_record(id, record_in_progress).then do
         React::State.set_state(observer, record_in_progress_key, `Date.now() + Math.random()`) if observer
       end
       record_in_progress
@@ -103,11 +102,9 @@ module HyperRecord
       record_in_progress = if _record_cache.has_key?(id)
                              _record_cache[id]
                            else
-                             self.new
+                             self.new(id: id)
                            end
-      record_in_progress_key = "#{self.to_s}_#{record_in_progress.object_id}"
-      _record_cache[id] = record_in_progress unless _record_cache.has_key?(id)
-      _find_record(id, record_in_progress, record_in_progress_key)
+      _find_record(id, record_in_progress)
     end
 
     def find_record_by(hash)
@@ -395,17 +392,19 @@ module HyperRecord
       @_class_state_key
     end
 
-    def _find_record(id, record_in_progress, record_in_progress_key)
+    def _find_record(id, record_in_progress)
+      _class_fetch_states["record_#{id}"] = 'i'
       _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
         klass_key = self.to_s.underscore
-        reflections.keys.each do |relation|
-          if response.json[klass_key].has_key?(relation)
-            response.json[klass_key][r_or_s] = _convert_array_to_collection(response.json[klass_key][relation])
-            record_in_progress.instance_variable_get(:@fetch_states)[relation] = 'f'
-          end
-        end
+        # optimization for fetching relations with records
+        # reflections.keys.each do |relation|
+        #   if response.json[klass_key].has_key?(relation)
+        #     response.json[klass_key][r_or_s] = _convert_array_to_collection(response.json[klass_key][relation])
+        #     record_in_progress.instance_variable_get(:@fetch_states)[relation] = 'f'
+        #   end
+        # end
         record_in_progress._initialize_from_hash(response.json[klass_key]) if response.json[klass_key]
-        _class_fetch_states["record_#{id}"] == 'f'
+        _class_fetch_states["record_#{id}"] = 'f'
         record_in_progress
       end.fail do |response|
         error_message = "#{self.to_s}.find(#{id}) failed to fetch record!"
