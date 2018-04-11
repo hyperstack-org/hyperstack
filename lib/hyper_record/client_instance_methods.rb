@@ -69,7 +69,10 @@ module HyperRecord
     end
 
     def link(other_record)
-      link_record(other_record)
+      _register_observer
+      link_record(other_record).then do
+        _notify_observers
+      end
       self
     end
 
@@ -109,7 +112,10 @@ module HyperRecord
     end
 
     def save
-      save_record
+      _register_observer
+      save_record.then do
+        _notify_observers
+      end
       self
     end
 
@@ -126,7 +132,10 @@ module HyperRecord
     end
 
     def unlink(other_record)
-      unlink_record(other_record, observer)
+      _register_observer
+      unlink_record(other_record).then do
+        _notify_observers
+      end
       self
     end
 
@@ -144,7 +153,6 @@ module HyperRecord
     end
 
     def link_record(other_record, relation_name = nil)
-      _register_observer
       called_from_collection = relation_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       if reflections.has_key?(relation_name)
@@ -157,7 +165,6 @@ module HyperRecord
       payload_hash = other_record.to_hash
       self.class._promise_post("#{resource_base_uri}/#{self.id}/relations/#{relation_name}.json", { data: payload_hash }).then do |response|
         other_record.instance_variable_get(:@properties_hash).merge!(response.json[other_record.class.to_s.underscore])
-        _notify_observers
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -167,8 +174,7 @@ module HyperRecord
     end
 
     def save_record
-      _register_observer
-      payload_hash =  @properties_hash.merge(@changed_properties_hash) # copy hash, becasue we need to delete some keys
+      payload_hash = @properties_hash.merge(@changed_properties_hash) # copy hash, because we need to delete some keys
       (%i[id created_at updated_at] + reflections.keys).each do |key|
         payload_hash.delete(key)
       end
@@ -176,7 +182,6 @@ module HyperRecord
         reset
         self.class._promise_patch("#{resource_base_uri}/#{@properties_hash[:id]}", { data: payload_hash }).then do |response|
           @properties_hash.merge!(response.json[self.class.to_s.underscore])
-          _notify_observers
           self
         end.fail do |response|
           error_message = "Saving record #{self} failed!"
@@ -187,7 +192,6 @@ module HyperRecord
         reset
         self.class._promise_post(resource_base_uri, { data: payload_hash }).then do |response|
           @properties_hash.merge!(response.json[self.class.to_s.underscore])
-          _notify_observers
           self
         end.fail do |response|
           error_message = "Creating record #{self} failed!"
@@ -198,13 +202,11 @@ module HyperRecord
     end
 
     def unlink_record(other_record, relation_name = nil)
-      _register_observer
       called_from_collection = collection_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       self.send(relation_name).delete_if { |cr| cr == other_record } unless called_from_collection
       self.class._promise_delete("#{resource_base_uri}/#{@properties_hash[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
-        _notify_observers
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"

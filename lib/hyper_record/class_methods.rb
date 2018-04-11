@@ -82,41 +82,32 @@ module HyperRecord
     end
 
     def find(id)
-      return _record_cache[id] if _record_cache.has_key?(id)
-
+      return _record_cache[id] if _record_cache.has_key?(id) && _class_fetch_states["record_#{id}"] == 'f'
       observer = React::State.current_observer
-      record_in_progress = self.new
-
+      record_in_progress = if _record_cache.has_key?(id)
+                             _record_cache[id]
+                           else
+                             self.new
+                           end
       record_in_progress_key = "#{self.to_s}_#{record_in_progress.object_id}"
       React::State.get_state(observer, record_in_progress_key) if observer
-
-      _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
-        klass_key = self.to_s.underscore
-        reflections.keys.each do |relation|
-          if response.json[klass_key].has_key?(relation)
-            response.json[klass_key][r_or_s] = _convert_array_to_collection(response.json[klass_key][relation])
-            record_in_progress.instance_variable_get(:@fetch_states)[relation] = 'f'
-          end
-        end
-        record_in_progress._initialize_from_hash(response.json[klass_key]) if response.json[klass_key]
-        _record_cache[record_in_progress.id] = record_in_progress
+      return _record_cache[id] if _record_cache.has_key?(id)
+      _record_cache[id] = record_in_progress
+      _find_record(id, record_in_progress, record_in_progress_key).then do
         React::State.set_state(observer, record_in_progress_key, `Date.now() + Math.random()`) if observer
-        record_in_progress
-      end.fail do |response|
-        error_message = "#{self.to_s}.find(#{id}) failed to fetch record!"
-        `console.error(error_message)`
-        response
       end
-
       record_in_progress
     end
 
     def find_record(id)
-      # TODO this is bogus, needs some attention
-      _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
-        klass_name = self.to_s.underscore
-        self.new(response.json[klass_name])
-      end
+      record_in_progress = if _record_cache.has_key?(id)
+                             _record_cache[id]
+                           else
+                             self.new
+                           end
+      record_in_progress_key = "#{self.to_s}_#{record_in_progress.object_id}"
+      _record_cache[id] = record_in_progress unless _record_cache.has_key?(id)
+      _find_record(id, record_in_progress, record_in_progress_key)
     end
 
     def find_record_by(hash)
@@ -301,8 +292,8 @@ module HyperRecord
       define_method(name) do |*args|
         _register_observer
         if self.id && (@rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
-          self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |result|
-            @rest_methods_hash[name][:result] = result # result is parsed json
+          self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
+            @rest_methods_hash[name][:result] = response_json[:result] # result is parsed json
             _notify_observers
             @rest_methods_hash[name][:result]
           end.fail do |response|
@@ -328,23 +319,30 @@ module HyperRecord
     end
 
     def scope(name, options)
-      scopes[name] = HyperRecord::Collection.new
       define_singleton_method(name) do |*args|
-        if _class_fetch_states[name] == 'f'
-          scopes[name]
+        name_args = if args.size > 0
+                      "#{name}_#{args.to_json}"
+                    else
+                      name
+                    end
+        scopes[name_args] = HyperRecord::Collection.new unless scopes.has_key?(name_args)
+        if _class_fetch_states[name_args] == 'f'
+          scopes[name_args]
         else
           _register_class_observer
-          self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response|
-            scopes[name] = _convert_array_to_collection(response.json[self.to_s.underscore][name])
-            _class_fetch_states[name] = 'f'
+          self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
+            ch = response_json[self.to_s.underscore]
+            nh = ch[name]
+            scopes[name_args] = _convert_array_to_collection(nh)
+            _class_fetch_states[name_args] = 'f'
             _notify_class_observers
-            scopes[name]
+            scopes[name_args]
           end.fail do |response|
-            error_message = "#{self.class.to_s}.#{name}, a scope, failed to fetch records!"
+            error_message = "#{self.to_s}.#{name_args}, a scope, failed to fetch records!"
             `console.error(error_message)`
             response
           end
-          scopes[name]
+          scopes[name_args]
         end
       end
     end
@@ -397,6 +395,25 @@ module HyperRecord
       @_class_state_key
     end
 
+    def _find_record(id, record_in_progress, record_in_progress_key)
+      _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
+        klass_key = self.to_s.underscore
+        reflections.keys.each do |relation|
+          if response.json[klass_key].has_key?(relation)
+            response.json[klass_key][r_or_s] = _convert_array_to_collection(response.json[klass_key][relation])
+            record_in_progress.instance_variable_get(:@fetch_states)[relation] = 'f'
+          end
+        end
+        record_in_progress._initialize_from_hash(response.json[klass_key]) if response.json[klass_key]
+        _class_fetch_states["record_#{id}"] == 'f'
+        record_in_progress
+      end.fail do |response|
+        error_message = "#{self.to_s}.find(#{id}) failed to fetch record!"
+        `console.error(error_message)`
+        response
+      end
+    end
+
     def _notify_class_observers
       _class_observers.each do |observer|
         React::State.set_state(observer, _class_state_key, `Date.now() + Math.random()`)
@@ -411,12 +428,12 @@ module HyperRecord
     def _promise_get_or_patch(uri, *args)
       if args && args.size > 0
         payload = { params: args }
-        _promise_patch(uri, payload).then do |result|
-          result.json[:result]
+        _promise_patch(uri, payload).then do |response|
+          response.json
         end
       else
-        _promise_get(uri).then do |result|
-          result.json[:result]
+        _promise_get(uri).then do |response|
+          response.json
         end
       end
     end
