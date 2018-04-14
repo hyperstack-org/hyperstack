@@ -54,7 +54,7 @@ module HyperRecord
       _mutate_state
 
       # cache in global cache
-      self.class._record_cache[@properties_hash[:id]] = self if @properties_hash.has_key?(:id)
+      self.class._record_cache[@properties_hash[:id].to_s] = self if @properties_hash.has_key?(:id)
     end
 
     ### reactive api
@@ -77,11 +77,10 @@ module HyperRecord
     end
 
     def method_missing(method, arg)
+      _register_observer
       if method.end_with?('=')
-        _register_observer
         @changed_properties_hash[method.chop] = arg
       else
-        _register_observer
         if @changed_properties_hash.has_key?(method)
           @changed_properties_hash[method]
         else
@@ -220,7 +219,7 @@ module HyperRecord
     def _local_destroy
       _register_observer
       @destroyed = true
-      self.class._record_cache.delete(@properties_hash[:id])
+      self.class._record_cache.delete(@properties_hash[:id].to_s)
       @registered_collections.dup.each do |collection|
         collection.delete(self)
       end
@@ -260,7 +259,7 @@ module HyperRecord
           # are a workaround for safari, to get it updating correctly
           klass_name = data[:cause][:record_type]
           c_record_class = Object.const_get(klass_name)
-          if c_record_class._record_cache.has_key?(data[:cause][:id])
+          if c_record_class._record_cache.has_key?(data[:cause][:id].to_s)
             c_record = c_record_class.find(data[:cause][:id])
             if `Date.parse(#{c_record.updated_at}) >= Date.parse(#{data[:cause][:updated_at]})`
               if @fetch_states[data[:relation]] == 'f'

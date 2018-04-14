@@ -3,7 +3,7 @@ module HyperRecord
 
     def new(record_hash = {})
       if record_hash.has_key?(:id)
-        record = _record_cache[record_hash[:id]]
+        record = _record_cache[record_hash[:id].to_s]
         if record
           record.instance_variable_get(:@properties_hash).merge!(record_hash)
           return record
@@ -15,21 +15,15 @@ module HyperRecord
     def all
       _register_class_observer
       if _class_fetch_states[:all] == 'f'
-        record_collection = HyperRecord::Collection.new
-        _record_cache.each_value { |record| record_collection.push(record) }
-        return record_collection
+        collection = HyperRecord::Collection.new
+        _record_cache.each_value { |record| collection.push(record) }
+        return collection
       end
       _promise_get("#{resource_base_uri}.json").then do |response|
-        klass_name = self.to_s.underscore
-        klass_key = klass_name.pluralize
-        response.json[klass_key].each do |record_json|
-          self.new(record_json[klass_name])
-        end
+        collection = _convert_array_to_collection(response.json[self.to_s.underscore.pluralize])
         _class_fetch_states[:all] = 'f'
         _notify_class_observers
-        record_collection = HyperRecord::Collection.new
-        _record_cache.each_value { |record| record_collection.push(record) }
-        record_collection
+        collection
       end.fail do |response|
         error_message = "#{self.to_s}.all failed to fetch records!"
         `console.error(error_message)`
@@ -82,16 +76,17 @@ module HyperRecord
     end
 
     def find(id)
-      return _record_cache[id] if _record_cache.has_key?(id) && _class_fetch_states["record_#{id}"] == 'f'
+      sid = id.to_s
+      return _record_cache[sid] if _record_cache.has_key?(sid) && _class_fetch_states["record_#{id}"] == 'f'
       observer = React::State.current_observer
-      record_in_progress = if _record_cache.has_key?(id)
-                             _record_cache[id]
+      record_in_progress = if _record_cache.has_key?(sid)
+                             _record_cache[sid]
                            else
                              self.new(id: id)
                            end
       record_in_progress_key = "#{self.to_s}_#{record_in_progress.object_id}"
       React::State.get_state(observer, record_in_progress_key) if observer
-      return _record_cache[id] if _record_cache.has_key?(id) && _class_fetch_states["record_#{id}"] == 'i'
+      return _record_cache[sid] if _record_cache.has_key?(sid) && _class_fetch_states["record_#{id}"] == 'i'
       _find_record(id, record_in_progress).then do
         React::State.set_state(observer, record_in_progress_key, `Date.now() + Math.random()`) if observer
       end
@@ -99,8 +94,9 @@ module HyperRecord
     end
 
     def find_record(id)
-      record_in_progress = if _record_cache.has_key?(id)
-                             _record_cache[id]
+      sid = id.to_s
+      record_in_progress = if _record_cache.has_key?(sid)
+                             _record_cache[sid]
                            else
                              self.new(id: id)
                            end
@@ -108,11 +104,20 @@ module HyperRecord
     end
 
     def find_record_by(hash)
-      return _record_cache[hash] if _record_cache.has_key?(hash)
+      if hash.has_key?[:id] && _record_cache.has_key?(hash[:id].to_s)
+        record = _record_cache[hash[:id].to_s]
+        found = true
+        hash.each do |k,v|
+          if record.send(k) != v
+            found = false
+            break
+          end
+        end
+        return record if found
+      end
       # TODO needs clarification about how to call the endpoint
-      _promise_get("#{resource_base_uri}/#{id}.json").then do |reponse|
-        record = self.new(response.json[self.to_s.underscore])
-        _record_cache[hash] = record
+      _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
+        self.new(response.json[self.to_s.underscore])
       end
     end
 
@@ -244,7 +249,7 @@ module HyperRecord
     end
 
     def record_cached?(id)
-      _record_cache.has_key?(id)
+      _record_cache.has_key?(id.to_s)
     end
 
     def property(name, options = {})
@@ -328,9 +333,7 @@ module HyperRecord
         else
           _register_class_observer
           self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
-            ch = response_json[self.to_s.underscore]
-            nh = ch[name]
-            scopes[name_args] = _convert_array_to_collection(nh)
+            scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
             _class_fetch_states[name_args] = 'f'
             _notify_class_observers
             scopes[name_args]
@@ -367,7 +370,7 @@ module HyperRecord
       if record_hash[klass_key][:id].nil?
         record_class.new(record_hash[klass_key])
       else
-        record = record_class._record_cache[record_hash[klass_key][:id]]
+        record = record_class._record_cache[record_hash[klass_key][:id].to_s]
         if record.nil?
           record = record_class.new(record_hash[klass_key])
         else
