@@ -289,6 +289,38 @@ module HyperRecord
       @reflections ||= {}
     end
 
+    def rest_class_method(name, options = { default_result: '...' })
+      rest_methods[name] = options
+      rest_methods[name][:class_method] = true
+      singleton_class.send(:define_method, name) do |*args|
+        _register_class_observer
+        if rest_methods[name][:force] || !rest_methods[name].has_key?(:result)
+          _promise_get_or_patch("#{resource_base_uri}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
+            rest_methods[name][:result] = response_json[:result] # result is parsed json
+            _notify_class_observers
+            rest_methods[name][:result]
+          end.fail do |response|
+            error_message = "#{self.to_s}.#{name}, a rest_method, failed to fetch records!"
+            `console.error(error_message)`
+            response
+          end
+        end
+        if rest_methods[name].has_key?(:result)
+          rest_methods[name][:result]
+        else
+          rest_methods[name][:default_result]
+        end
+      end
+    end
+
+    def rest_class_method_force_updates(method_name)
+      rest_methods[method_name][:force] = true
+    end
+
+    def rest_class_method_unforce_updates(method_name)
+      rest_methods[method_name][:force] = false
+    end
+
     def rest_method(name, options = { default_result: '...' })
       rest_methods[name] = options
       define_method(name) do |*args|
