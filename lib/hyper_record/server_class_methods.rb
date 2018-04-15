@@ -15,5 +15,14 @@ module HyperRecord
     def rest_methods
       @rest_methods_hash ||= {}
     end
+
+    def resource_scopes
+      @resource_scopes ||= []
+    end
+
+    def scope(name, *args)
+      resource_scopes << name
+      super(name, *args)
+    end
   end
 end
