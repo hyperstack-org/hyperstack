@@ -130,8 +130,17 @@ module React
     def merge_built_in_event_prop!(prop_name)
       @properties.merge!(
         prop_name => %x{
-          function(event){
-            return #{yield(React::Event.new(`event`))}
+          function(){
+            var react_event = arguments[0];
+            var all_args;
+            var other_args;
+            if (arguments.length > 1) {
+              all_args = Array.prototype.slice.call(arguments);
+              other_args = all_args.slice(1, arguments.length);
+              return #{yield(React::Event.new(`react_event`), *(`other_args`))};
+            } else {
+              return #{yield(React::Event.new(`react_event`))};
+            }
           }
         }
       )
