@@ -203,7 +203,6 @@ module ComponentTestHelpers
   end
 
   def expect_evaluate_ruby(str = '', opts = {}, &block)
-    insure_mount
     expect(evaluate_ruby(add_opal_block(str, block), opts))
   end
 
@@ -223,7 +222,7 @@ module ComponentTestHelpers
     js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
     page.evaluate_script("window.hyper_spec_promise_result = false")
     page.execute_script(js)
-    Timeout.timeout(Capybara.default_max_wait_time) do
+    Timeout.timeout(100) do #Capybara.default_max_wait_time) do
       loop do
         sleep 0.25
         break if page.evaluate_script("!!window.hyper_spec_promise_result")

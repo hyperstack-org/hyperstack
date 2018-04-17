@@ -128,7 +128,9 @@ module ReactiveRecord
           unless dont_gather
             related_records = collection.gather_related_records(record)
           end
+          puts "about to do #{collection}.#{method}(#{related_records.count}, record) (collection.send)"
           collection.send method, related_records, record
+          puts "done"
         end
       end
     end
@@ -142,9 +144,12 @@ module ReactiveRecord
     end
 
     def merge_related_records(record, related_records)
+      puts "#{self}.merge_related_records(#{record}, #{related_records.count})"
       if filter? && joins_with?(record)
+        puts "merging #{self}"
         related_records.merge(related_records_for(record))
       end
+      puts "merge_related_records returns #{related_records.count}"
       related_records
     end
 
@@ -155,14 +160,22 @@ module ReactiveRecord
     # is it necessary to check @association in the next 2 methods???
 
     def joins_with?(record)
-      if @association && @association.through_association
+      klass = record.class
+      if @association&.through_association
         @association.through_association.klass == record.class
-      else
-        @target_klass == record.class
-      end
+      elsif @target_klass == klass
+        true
+      elsif !klass.inheritance_column
+        false
+      elsif klass.base_class == @target_class
+        klass < @target_klass
+      elsif klass.base_class == klass
+        @target_klass < klass
+      end.tap { |x| puts "#{self}.joins_with?(#{record}) returns #{x}"}
     end
 
     def related_records_for(record)
+      puts "#{self}.related_records_for(#{record}), @association = #{@association}"
       return [] unless @association
       attrs = record.attributes
       return [] unless attrs[@association.inverse_of] == @owner
@@ -195,6 +208,7 @@ module ReactiveRecord
       live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
+    # NOTE sync_scopes is overridden in scope_description.rb
     def sync_scopes(related_records, record, filtering = true)
       #related_records = related_records.intersection([*@collection])
       #related_records = in_this_collection related_records

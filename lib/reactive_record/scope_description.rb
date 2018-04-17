@@ -34,16 +34,33 @@ module ReactiveRecord
 
     def joins_with?(record)
       @joins.detect do |klass, vector|
-        vector.any? && (klass == :all || record.class == klass || record.class < klass)
-      end
+        # added klass < record.class to handle STI case... should check to see if this could ever cause a
+        # problem.   Probably not a problem.
+        vector.any? && (klass == :all || record.class == klass || record.class < klass || klass < record.class)
+      end.tap { |x| puts "scope description - #{self}.joins_with?(#{record}) returns #{x}"}
+    end
+
+    def get_joins(klass)
+      puts "***** get_joins(#{klass}), @joins.key?(klass): #{@joins.key? klass}, @joins[klass]: #{@joins[klass]}, klass.base_class: #{klass.base_class} @joins.key?(klass.base_class): #{@joins.key?(klass.base_class)}"
+      puts "***** @joins = #{@joins.inspect}"
+      joins = @joins[klass] if @joins.key? klass
+      puts "joins = #{joins} as a result of @joins[klass]"
+      joins ||= @joins[klass.base_class] if @joins.key?(klass.base_class)
+      puts "joins = #{joins} as a result of @joins[klass.base_class]"
+      puts "@joins[:all] = #{@joins[:all]}"
+      (joins || @joins[:all]).tap { |x| puts "#{self}.get_joins(#{klass}) = #{x.to_s} count: #{x.count}"}
+    rescue Exception => e
+      puts "pow! #{e}"
+      raise e
     end
 
     def related_records_for(record)
+      puts "#{self}.related_records_for(#{record})"
       ReactiveRecord::Base.catch_db_requests([]) do
-        (@joins[record.class.base_class] || @joins[:all]).collect do |vector|
+        get_joins(record.class).collect do |vector|
           crawl(record, *vector)
         end.flatten.compact
-      end
+      end.tap { |x| puts "#{self}.related_records_for returns #{x}"}
     end
 
     def filter_records(related_records, args)
@@ -70,7 +87,8 @@ module ReactiveRecord
       if !@filter_proc || joins_list == []
         @joins = { all: [] }
       elsif joins_list.nil?
-        @joins = { @model => [[]], all: [] }
+        klass = @model < ActiveRecord::Base ? @model.base_class : @model
+        @joins = { klass => [[]], all: [] }
       elsif joins_list == :all
         @joins = { all: [[]] }
       else

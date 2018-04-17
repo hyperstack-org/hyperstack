@@ -102,7 +102,7 @@ describe "example scopes", js: true do
     #   ReactiveRecord::Collection.hypertrace instrument: :all
     #   UserTodos.hypertrace instrument: :all
     # end
-    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
     #pause "about to add the boss"
     boss = FactoryBot.create(:user, first_name: :boss)
     #pause "about to add the employee"
@@ -110,7 +110,7 @@ describe "example scopes", js: true do
     #pause "about to add the todo"
     todo = FactoryBot.create(:todo, title: "joe's todo", owner: employee)
     wait_for_ajax
-    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
     #pause "adding a comment from the boss"
     comment = FactoryBot.create(:comment, comment: "The Boss Speaks", author: boss, todoz: todo)
     page.should have_content('The Boss Speaks')
@@ -161,6 +161,6 @@ describe "example scopes", js: true do
     user1.update_attribute(:manager, mgr)
     page.should have_content('MANAGER SAYS: Me BOSS')
     page.should have_content('BOSS SAYS: Me BOSS')
-    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
   end
 end

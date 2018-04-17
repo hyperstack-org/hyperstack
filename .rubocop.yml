@@ -1,3 +1,4 @@
+
 Metrics/LineLength:
   Max: 100
 
@@ -9,3 +10,6 @@ Style/MutableConstant:
 
 Style/CommandLiteral:
   EnforcedStyle: mixed
+
+AllCops:
+  TargetRubyVersion: 2.4.1

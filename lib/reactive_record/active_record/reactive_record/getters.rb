@@ -8,7 +8,7 @@ module ReactiveRecord
         value = Base.fetch_from_db([@model, [:find, id], attr, @model.primary_key]) if id.present?
         value = find_association(assoc, value)
         sync_ignore_dummy attr, value, has_key
-      end
+      end&.cast_to_current_sti_type
     end
 
     def get_has_many(assoc, reload = nil)

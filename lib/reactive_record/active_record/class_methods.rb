@@ -2,11 +2,10 @@ module ActiveRecord
 
   module ClassMethods
 
-    def inherited(subclass)
-      ['_attribute_aliases'].each do |inheritable_attribute|
-        instance_var = "@#{inheritable_attribute}"
-        subclass.instance_variable_set(instance_var, instance_variable_get(instance_var))
-      end
+    alias _new_without_sti_type_cast new
+
+    def new(*args, &block)
+      _new_without_sti_type_cast(*args, &block).cast_to_current_sti_type
     end
 
     def base_class
@@ -16,10 +15,8 @@ module ActiveRecord
 
       if superclass == Base || superclass.abstract_class?
         self
-      elsif respond_to?(:each)
-        superclass.base_class
       else
-        self
+        superclass.base_class
       end
     end
 
@@ -28,19 +25,26 @@ module ActiveRecord
     end
 
     def primary_key
-      base_class.instance_eval { @primary_key_value || :id }
+      @primary_key_value ||= (self == base_class) ? :id : base_class.primary_key
     end
 
     def primary_key=(val)
-      base_class.instance_eval { @primary_key_value = val }
+      @primary_key_value = val.to_s
     end
 
     def inheritance_column
-      base_class.instance_eval { @inheritance_column_value || "type" }
+      return nil if @no_inheritance_column
+      @inheritance_column_value ||=
+        if self == base_class
+          @inheritance_column_value || 'type'
+        else
+          superclass.inheritance_column.tap { |v| @no_inheritance_column = !v }
+        end
     end
 
     def inheritance_column=(name)
-      base_class.instance_eval { @inheritance_column_value = name }
+      @no_inheritance_column = !name
+      @inheritance_column_value = name
     end
 
     def model_name
@@ -49,15 +53,11 @@ module ActiveRecord
     end
 
     def find(id)
-      klass = self
-      base_class.instance_eval { ReactiveRecord::Base.find(klass, primary_key, id) }
+      ReactiveRecord::Base.find(self, primary_key, id)
     end
 
     def find_by(opts = {})
-      klass = self
-      base_class.instance_eval do
-        ReactiveRecord::Base.find(klass, _dealias_attribute(opts.first.first), opts.first.last)
-      end
+      ReactiveRecord::Base.find(self, _dealias_attribute(opts.first.first), opts.first.last)
     end
 
     def enum(*args)
@@ -69,7 +69,11 @@ module ActiveRecord
     end
 
     def _dealias_attribute(new)
-      _attribute_aliases[new] || new
+      if self == base_class
+        _attribute_aliases[new] || new
+      else
+        _attribute_aliases[new] ||= superclass._dealias_attribute(new)
+      end
     end
 
     def _attribute_aliases
@@ -80,7 +84,7 @@ module ActiveRecord
       ['', '=', '_changed?'].each do |variant|
         define_method("#{new_name}#{variant}") { |*args, &block| send("#{old_name}#{variant}", *args, &block) }
       end
-      _attribute_aliases[new_name] = old_name
+      @_attribute_aliases[new_name] = old_name
     end
 
     # ignore any of these methods if they get called on the client.   This list should be trimmed down to include only
@@ -222,13 +226,41 @@ module ActiveRecord
     def all
       ReactiveRecord::Base.default_scope[self] ||=
         begin
+        puts "defining all for #{self}"
         root = ReactiveRecord::Collection
                .new(self, nil, nil, self, 'all')
                .extend(ReactiveRecord::UnscopedCollection)
-        (@_default_scopes || [{ client: -> () { true } }]).inject(root) do |scope, opts|
+        (@_default_scopes || [{ client: _all_filter }]).inject(root) do |scope, opts|
           scope.build_child_scope(ReactiveRecord::ScopeDescription.new(self, :all, opts))
         end
       end
+    end
+
+    def _all_filter
+      # provides a filter for the all scopes taking into account STI subclasses
+      # note: within the lambda `self` will be the model instance
+      defining_class_is_base_class = base_class == self
+      defining_model_name = model_name
+      lambda do
+        # have to delay computation of inheritance column since it might
+        # not be defined when class is first defined
+        ic = self.class.inheritance_column
+        (defining_class_is_base_class || !ic || self[ic] == defining_model_name).tap do |x|
+          puts "_all_filter(#{self}) returns: #{x} defining_model_name: #{defining_model_name}, is base: #{defining_class_is_base_class}, ic: #{ic}, self[ic]: #{self[ic]}"
+        end
+      end
+      #
+      # if base_class == self || !inheritance_column
+      #   puts "creating a base filter: #{model_name} #{base_class} #{self} #{inheritance_column}"
+      #   # always return true for the base_class (or if there is no inheritance column)
+      #   -> () { puts "#{model_name} #{self.class.base_class} #{self.class} #{self.class.inheritance_column} base all filter"; true }
+      # else
+      #   # otherwise we are in a STI subclass so inheritance column name must match model name
+      #   # optimize by capturing the inheritance column and model_name as local vars
+      #   klass_inheritance_column = inheritance_column
+      #   klass_model_name = model_name
+      #   -> () { puts "subclass all filter #{klass_inheritance_column} #{klass_model_name} #{self[klass_inheritance_column] == klass_model_name}"; self[klass_inheritance_column] == klass_model_name }
+      # end
     end
 
     # def all=(_collection)
@@ -333,6 +365,7 @@ module ActiveRecord
         define_method("#{name}_changed?") { @backing_record.changed?(name) }
         define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? }
       end
+      self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
     end
 
     def _react_param_conversion(param, opt = nil)

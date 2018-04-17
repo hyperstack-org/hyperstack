@@ -99,7 +99,7 @@ describe "default_scope" do
         end
       end
       wait_for_ajax
-      starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+      starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
       page.should have_content("0 items")
       page.should have_content("0 unscoped items")
       m1 = FactoryBot.create(:test_model, completed: false, test_attribute: nil)
@@ -129,7 +129,7 @@ describe "default_scope" do
       # there should be no client fetches should replace this with a double of
       # ServerDataCache[] which should not be called
       wait_for_ajax
-      starting_fetch_time.should eq(evaluate_ruby("ReactiveRecord::Base.last_fetch_at"))
+      starting_fetch_time.should eq(evaluate_ruby("ReactiveRecord::Base.current_fetch_id"))
     end
   end
 end

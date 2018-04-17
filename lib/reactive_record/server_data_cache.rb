@@ -92,7 +92,6 @@ module ReactiveRecord
 
     class ServerDataCache
 
-      # SECURITY - SAFE
       def initialize(acting_user, preloaded_records)
         @acting_user = acting_user
         @cache = []
@@ -128,7 +127,6 @@ module ReactiveRecord
           str.constantize
         end
 
-        # SECURITY - NOW SAFE
         def [](*vector)
           timing('building cache_items') do
             root = CacheItem.new(self, @acting_user, vector[0], @preloaded_records)
@@ -164,7 +162,6 @@ module ReactiveRecord
           yield.tap { @timings[tag] += (Time.now - start_time) if @timings }
         end
 
-        # SECURITY - SAFE
         def self.[](models, associations, vectors, acting_user)
           start_timing do
             timing(:public_columns_hash) { ActiveRecord::Base.public_columns_hash }
@@ -179,25 +176,20 @@ module ReactiveRecord
           end
         end
 
-        # SECURITY - SAFE
         def clear_requests
           @requested_cache_items = Set.new
         end
 
-        # SECURITY - SAFE
         def as_json
           @requested_cache_items.inject({}) do |hash, cache_item|
             hash.deep_merge! cache_item.as_hash
           end
         end
 
-        # SECURITY - SAFE
         def select(&block); @cache.select(&block); end
 
-        # SECURITY - SAFE
         def detect(&block); @cache.detect(&block); end
 
-        # SECURITY - SAFE
         def inject(initial, &block); @cache.inject(initial) &block; end
 
         class CacheItem
@@ -207,17 +199,14 @@ module ReactiveRecord
           attr_reader :root
           attr_reader :acting_user
 
-          # SECURITY - SAFE
           def value
             @value # which is a ActiveRecord object
           end
 
-          # SECURITY - SAFE
           def method
             @vector.last
           end
 
-          # SECURITY - NOW SAFE
           def self.new(db_cache, acting_user, klass, preloaded_records)
             klass = ServerDataCache.get_model(klass)
             if existing = ServerDataCache.timing(:root_lookup) { db_cache.cache.detect { |cached_item| cached_item.vector == [klass] } }
@@ -226,7 +215,6 @@ module ReactiveRecord
             super
           end
 
-          # SECURITY - NOW SAFE
           def initialize(db_cache, acting_user, klass, preloaded_records)
             @db_cache = db_cache
             @acting_user = acting_user
@@ -246,7 +234,6 @@ module ReactiveRecord
             ServerDataCache.timing(tag, &block)
           end
 
-          # SECURITY - UNSAFE
           def apply_method_to_cache(method)
             @db_cache.cache.inject(nil) do |representative, cache_item|
               if cache_item.vector == vector
@@ -296,7 +283,6 @@ module ReactiveRecord
             end
           end
 
-          # SECURITY - SAFE
           def aggregation?(method)
             if method.is_a?(String) && @value.class.respond_to?(:reflect_on_aggregation)
               aggregation = @value.class.reflect_on_aggregation(method.to_sym)
@@ -306,7 +292,6 @@ module ReactiveRecord
             end
           end
 
-          # SECURITY - NOW SAFE
           def apply_star
             if @value && @value.__secure_collection_check(@acting_user) && @value.length > 0
               i = -1
@@ -323,7 +308,6 @@ module ReactiveRecord
             end
           end
 
-          # SECURITY - SAFE
           # TODO replace instance_eval with a method like clone_new_child(....)
           def build_new_cache_item(new_value, method, absolute_method)
             new_parent = self
@@ -338,9 +322,7 @@ module ReactiveRecord
             end
           end
 
-          # SECURITY - SAFE
           def apply_method(method)
-
             if method.is_a? Array and method.first == "find_by_id"
               method[0] = "find"
             elsif method.is_a? String and method =~ /^\*[0-9]+$/
@@ -350,7 +332,6 @@ module ReactiveRecord
             timing('apply_method lookup') { @db_cache.cache_reps[new_vector] } || apply_method_to_cache(method)
           end
 
-          # SECURITY - SAFE
           def jsonize(method)
             # sadly standard json converts {[:foo, nil] => 123} to {"['foo', nil]": 123}
             # luckily [:foo, nil] does convert correctly
@@ -366,22 +347,24 @@ module ReactiveRecord
             if @parent
               if method == "*"
                 if @value.is_a? Array  # this happens when a scope is empty there is test case, but
-                  @parent.as_hash({})      # does it work for all edge cases?
+                  @parent.as_hash({})  # does it work for all edge cases?
                 else
                   @parent.as_hash({@value.id => children})
                 end
-              elsif @value.class < ActiveRecord::Base and children.is_a? Hash
-                @parent.as_hash({jsonize(method) => children.merge({
-                  :id => (method.is_a?(Array) && method.first == "new") ? [nil] : [@value.id],
-                  @value.class.inheritance_column => [@value[@value.class.inheritance_column]],
-                  })})
-              elsif method == "*all"
-                @parent.as_hash({jsonize(method) => children.first})
+              elsif (@value.class < ActiveRecord::Base) && children.is_a?(Hash)
+                id = method.is_a?(Array) && method.first == "new" ? [nil] : [@value.id]
+                c = children.merge(id: id)
+                if @value.attributes.key? @value.class.inheritance_column
+                  c[@value.class.inheritance_column] = [@value[@value.class.inheritance_column]]
+                end
+                @parent.as_hash(jsonize(method) => c)
+              elsif method == '*all'
+                @parent.as_hash('*all' => children.first)
               else
-                @parent.as_hash({jsonize(method) => children})
+                @parent.as_hash(jsonize(method) => children)
               end
             else
-              {method.name => children}
+              { method.name => children }
             end
           end
 

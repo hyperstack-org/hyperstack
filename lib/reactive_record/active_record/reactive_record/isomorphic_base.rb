@@ -18,7 +18,7 @@ module ReactiveRecord
         if on_opal_client?
           @pending_fetches = []
           @pending_records = []
-          @last_fetch_at = Time.now
+          #@current_fetch_id = nil
           unless `typeof window.ReactiveRecordInitialData === 'undefined'`
             log(["Reactive record prerendered data being loaded: %o", `window.ReactiveRecordInitialData`])
             JSON.from_object(`window.ReactiveRecordInitialData`).each do |hash|
@@ -127,53 +127,55 @@ module ReactiveRecord
     class << self
 
       attr_reader :pending_fetches
-      attr_reader :last_fetch_at
+      attr_reader :current_fetch_id
 
     end
 
     def self.schedule_fetch
-      React::State.set_state(WhileLoading, :quiet, false)  # moved from while loading module see loading! method
-      @fetch_scheduled ||= after(0) do
-        if @pending_fetches.count > 0  # during testing we might reset the context while there are pending fetches otherwise this would never normally happen
-          last_fetch_at = @last_fetch_at
-          @last_fetch_at = Time.now
-          pending_fetches = @pending_fetches.uniq
-          models, associations = gather_records(@pending_records, false, nil)
-          log(["Server Fetching: %o", pending_fetches.to_n])
-          start_time = `Date.now()`
-          Operations::Fetch.run(models: models, associations: associations, pending_fetches: pending_fetches)
-            .then do |response|
-              begin
-                fetch_time = `Date.now()`
-                log("       Fetched in:   #{`(fetch_time - start_time)/ 1000`}s")
-                timer = after(0) do
-                  log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
-                  log(['       Returned: %o', response.to_n])
-                end
-                begin
-                  ReactiveRecord::Base.load_from_json(response)
-                rescue Exception => e
-                  `clearTimeout(#{timer})`
-                  log("Unexpected exception raised while loading json from server: #{e}", :error)
-                end
-                ReactiveRecord.run_blocks_to_load last_fetch_at
-              ensure
-                ReactiveRecord::WhileLoading.loaded_at last_fetch_at
-                ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
-              end
+      React::State.set_state(WhileLoading, :quiet, false) # moved from while loading module see loading! method
+      return if @fetch_scheduled
+      @current_fetch_id = Time.now
+      @fetch_scheduled = after(0) do
+        # Skip the fetch if there are no pending_fetches. This would never normally happen
+        # but during testing we might reset the context while there are pending fetches
+        next unless @pending_fetches.count > 0
+        saved_current_fetch_id = @current_fetch_id
+        saved_pending_fetches = @pending_fetches.uniq
+        models, associations = gather_records(@pending_records, false, nil)
+        log(["Server Fetching: %o", saved_pending_fetches.to_n])
+        start_time = `Date.now()`
+        Operations::Fetch.run(models: models, associations: associations, pending_fetches: saved_pending_fetches)
+        .then do |response|
+          begin
+            fetch_time = `Date.now()`
+            log("       Fetched in:   #{`(fetch_time - start_time)/ 1000`}s")
+            timer = after(0) do
+              log("       Processed in: #{`(Date.now() - fetch_time) / 1000`}s")
+              log(['       Returned: %o', response.to_n])
             end
-            .fail do |response|
-              log("Fetch failed", :error)
-              begin
-                ReactiveRecord.run_blocks_to_load(last_fetch_at, response)
-              ensure
-                ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
-              end
+            begin
+              ReactiveRecord::Base.load_from_json(response)
+            rescue Exception => e
+              `clearTimeout(#{timer})`
+              log("Unexpected exception raised while loading json from server: #{e}", :error)
             end
-          @pending_fetches = []
-          @pending_records = []
-          @fetch_scheduled = nil
+            ReactiveRecord.run_blocks_to_load saved_current_fetch_id
+          ensure
+            ReactiveRecord::WhileLoading.loaded_at saved_current_fetch_id
+            ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
+          end
         end
+        .fail do |response|
+          log("Fetch failed", :error)
+          begin
+            ReactiveRecord.run_blocks_to_load(saved_current_fetch_id, response)
+          ensure
+            ReactiveRecord::WhileLoading.quiet! if @pending_fetches.empty?
+          end
+        end
+        @pending_fetches = []
+        @pending_records = []
+        @fetch_scheduled = nil
       end
     end
 
@@ -453,7 +455,8 @@ module ReactiveRecord
 
           saved_models = reactive_records.collect do |reactive_record_id, model|
             #puts "saving rr_id: #{reactive_record_id} model.object_id: #{model.object_id} frozen? <#{model.frozen?}>"
-            if model && (model.frozen? || dont_save_list.include?(model) || model.changed.include?(model.class.primary_key))
+            next unless model
+            if !save|| model.frozen? || dont_save_list.include?(model) || model.changed.include?(model.class.primary_key)
               # the above check for changed including the private key happens if you have an aggregate that includes its own id
               # puts "validating frozen model #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
               valid = model.valid?
@@ -462,7 +465,7 @@ module ReactiveRecord
               # puts "validation complete errors = <#{!valid}>, #{model.errors.messages} has_errors #{has_errors}"
               error_messages << [model, model.errors.messages] unless valid
               [reactive_record_id, model.class.name, model.__hyperloop_secure_attributes(acting_user), (valid ? nil : model.errors.messages)]
-            elsif model and (!model.id or model.changed?)
+            elsif !model.id || model.changed?
               # puts "saving #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
               saved = model.check_permission_with_acting_user(acting_user, new_models.include?(model) ? :create_permitted? : :update_permitted?).save(validate: validate)
               has_errors ||= !saved

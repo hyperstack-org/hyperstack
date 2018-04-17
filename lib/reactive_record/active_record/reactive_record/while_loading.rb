@@ -17,7 +17,7 @@ module ReactiveRecord
     result = block.call.itself
     if @loads_pending
       @blocks_to_load ||= []
-      @blocks_to_load << [Base.last_fetch_at, promise, block]
+      @blocks_to_load << [Base.current_fetch_id, promise, block]
     else
       promise.resolve result
     end
@@ -36,7 +36,7 @@ module ReactiveRecord
       if Base.pending_fetches.count > 0
         true
       else  # this happens when for example loading foo.x results in somebody looking at foo.y while foo.y is still being loaded
-        ReactiveRecord::WhileLoading.loaded_at Base.last_fetch_at
+        ReactiveRecord::WhileLoading.loaded_at Base.current_fetch_id
         ReactiveRecord::WhileLoading.quiet!
         false
       end
@@ -53,8 +53,8 @@ module ReactiveRecord
         @load_stack << @loads_pending
         @loads_pending = nil
         result = block.call(failure)
-        if check_loads_pending and !failure
-          @blocks_to_load << [Base.last_fetch_at, promise, block]
+        if check_loads_pending && !failure
+          @blocks_to_load << [Base.current_fetch_id, promise, block]
         else
           promise.resolve result
         end
@@ -297,7 +297,6 @@ if RUBY_ENGINE == 'opal'
         def reactive_record_link_set_while_loading_container_class
           node = dom_node
           loading = (waiting_on_resources ? `true` : `false`)
-          #puts "******* reactive_record_link_set_while_loading_container_class #{self} #{node} #{loading}"
           %x{
               if (typeof node === "undefined" || node === null) return;
               var while_loading_container_id = node.getAttribute('data-reactive_record_while_loading_container_id');

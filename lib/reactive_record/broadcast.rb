@@ -152,7 +152,6 @@ module ReactiveRecord
       @destroyed = params.operation == :destroy
       @is_new = params.operation == :create
       @channels ||= Hyperloop::IncomingBroadcast.open_channels.intersection params.channels
-      #raise 'synchromesh security violation' unless @channels.include? params.channels
       @received << params.channel
       @klass ||= params.klass
       @record.merge! params.record

@@ -410,7 +410,7 @@ describe "synchronized scopes", js: true do
         end
       end
     end
-    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
     m1 = FactoryBot.create(:test_model)
     page.should have_content('.count = 0')
     page.should have_content('rendered 2 times')
@@ -431,11 +431,11 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 3')
     page.should have_content('rendered 5 times')
     page.should have_content('test attributes: A, N, Z')
-    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
     evaluate_ruby("TestComponent2.dir! :desc")
     page.should have_content('test attributes: Z, N, A')
     page.should have_content('rendered 7 times')
-    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
     m1.destroy
     page.should have_content('.count = 2')
     page.should have_content('rendered 8 times')
@@ -444,17 +444,17 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 1')
     page.should have_content('rendered 9 times')
     page.should have_content('test attributes: A')
-    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
     evaluate_ruby('TestComponent2.pat! :bar')
     page.should have_content('.count = 1')
     page.should have_content('test attributes: Z')
     page.should have_content('rendered 11 times')
-    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
     m2.update_attribute(:test_attribute, 'A is also a bar')
     page.should have_content('.count = 2')
     page.should have_content('rendered 12 times')
     page.should have_content('test attributes: Z, A')
-    evaluate_ruby("ReactiveRecord::Base.last_fetch_at").should eq(starting_fetch_time)
+    evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
   end
 
   it 'the joins array can be combined with the client proc' do

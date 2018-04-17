@@ -19,18 +19,20 @@ module ActiveRecord
         # standard active_record new -> creates a new instance, primary key is ignored if present
         # we have to build the backing record first then initialize it so associations work correctly
         @backing_record = ReactiveRecord::Base.new(self.class, {}, self)
+        if self.class.inheritance_column && !hash.key?(self.class.inheritance_column)
+          hash[self.class.inheritance_column] = self.class.name
+        end
         @backing_record.instance_eval do
-          h = Hash.new
+          h = {}
           hash.each do |a, v|
             a = model._dealias_attribute(a)
             h[a] = convert(a, v).itself
           end
           self.class.load_data do
             h.each do |attribute, value|
-              unless attribute == primary_key
-                @ar_instance[attribute] = value
-                changed_attributes << attribute
-              end
+              next if attribute == primary_key
+              @ar_instance[attribute] = value
+              changed_attributes << attribute
             end
           end
         end
@@ -159,6 +161,19 @@ module ActiveRecord
 
     def <=>(other)
       id.to_i <=> other.id.to_i
+    end
+
+    def becomes(klass)
+      klass._new_without_sti_type_cast(backing_record)
+    end
+
+    def becomes!(klass)
+      self[self.class.inheritance_column] = klass.name
+      becomes(klass)
+    end
+
+    def cast_to_current_sti_type
+      @backing_record.set_ar_instance!
     end
   end
 end

@@ -93,7 +93,7 @@ module ReactiveRecord
         record.sync_attribute(model.primary_key, id) if id
       end
       # finally initialize and return the ar_instance
-      record.ar_instance ||= infer_type_from_hash(model, record.attributes).new(record)
+      record.set_ar_instance!
     end
 
     def self.new_from_vector(model, aggregate_owner, *vector)
@@ -111,7 +111,7 @@ module ReactiveRecord
         set_vector_lookup(record, vector)
       end
 
-      record.ar_instance ||= infer_type_from_hash(model, record.attributes).new(record)
+      record.set_ar_instance!
 
       if aggregate_owner
         record.aggregate_owner = aggregate_owner
@@ -292,6 +292,12 @@ module ReactiveRecord
       !id && !vector
     end
 
+    def set_ar_instance!
+      klass = self.class.infer_type_from_hash(model, @attributes)
+      @ar_instance = klass._new_without_sti_type_cast(self) unless @ar_instance.class == klass
+      @ar_instance
+    end
+
     class << self
       def infer_type_from_hash(klass, hash)
         klass = klass.base_class
@@ -300,9 +306,9 @@ module ReactiveRecord
         begin
           return Object.const_get(type)
         rescue Exception => e
-          message = "Could not subclass #{@model_klass.model_name} as #{type}.  Perhaps #{type} class has not been required. Exception: #{e}"
+          message = "Could not subclass #{klass} as #{type}.  Perhaps #{type} class has not been required. Exception: #{e}"
           `console.error(#{message})`
-        end if type
+        end unless !type || type == ''
         klass
       end
 

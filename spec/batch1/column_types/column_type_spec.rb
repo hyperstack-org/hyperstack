@@ -284,14 +284,14 @@ describe "column types on client", js: true do
   end
 
   it 'uses the default value when initializing a new record & can be saved' do
-    starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.last_fetch_at")
+    starting_fetch_id = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
     expect_promise do
       record = DefaultTest.new
       record.string = record.string.reverse
       record.save
     end.to be_truthy
     expect(DefaultTest.find(1).string).to eq("!gnirts a m'I")
-    expect_evaluate_ruby("ReactiveRecord::Base.last_fetch_at").to eq(starting_fetch_time)
+    expect_evaluate_ruby("ReactiveRecord::Base.current_fetch_id").to eq(starting_fetch_id)
   end
 
   it 'handles a serialized attribute properly' do
