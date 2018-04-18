@@ -175,6 +175,7 @@ module Hyperloop
         %x{
           var payload_to_send = null;
           var content_type = null;
+
           if (typeof(this.payload) === 'string') {
             payload_to_send = this.payload;
           }
@@ -184,6 +185,11 @@ module Hyperloop
           }
 
           var xhr = new XMLHttpRequest();
+          var csrf_elements = document.getElementsByName("csrf-token");
+
+          if (csrf_elements.length > 0) {
+            xhr.setRequestHeader("X-CSRF-Token", csrf_elements[0]["content"]);
+          }
 
           xhr.onreadystatechange = function() {
             if(xhr.readyState === XMLHttpRequest.DONE) {
