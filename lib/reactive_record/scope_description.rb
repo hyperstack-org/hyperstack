@@ -18,7 +18,7 @@ module ReactiveRecord
     attr_reader :name
 
     def self.find(target_model, name)
-      name = name.gsub(/!$/,'')
+      name = name.gsub(/!$/, '')
       target_model.send "_#{name}_synchromesh_scope_description_"
     rescue
       nil
@@ -34,33 +34,25 @@ module ReactiveRecord
 
     def joins_with?(record)
       @joins.detect do |klass, vector|
-        # added klass < record.class to handle STI case... should check to see if this could ever cause a
-        # problem.   Probably not a problem.
-        vector.any? && (klass == :all || record.class == klass || record.class < klass || klass < record.class)
-      end.tap { |x| puts "scope description - #{self}.joins_with?(#{record}) returns #{x}"}
+        # added klass < record.class to handle STI case... should check to see if this could ever
+        # cause a problem.   Probably not a problem.
+        next unless vector.any?
+        (klass == :all || record.class == klass || record.class < klass || klass < record.class)
+      end
     end
 
     def get_joins(klass)
-      puts "***** get_joins(#{klass}), @joins.key?(klass): #{@joins.key? klass}, @joins[klass]: #{@joins[klass]}, klass.base_class: #{klass.base_class} @joins.key?(klass.base_class): #{@joins.key?(klass.base_class)}"
-      puts "***** @joins = #{@joins.inspect}"
       joins = @joins[klass] if @joins.key? klass
-      puts "joins = #{joins} as a result of @joins[klass]"
       joins ||= @joins[klass.base_class] if @joins.key?(klass.base_class)
-      puts "joins = #{joins} as a result of @joins[klass.base_class]"
-      puts "@joins[:all] = #{@joins[:all]}"
-      (joins || @joins[:all]).tap { |x| puts "#{self}.get_joins(#{klass}) = #{x.to_s} count: #{x.count}"}
-    rescue Exception => e
-      puts "pow! #{e}"
-      raise e
+      joins || @joins[:all]
     end
 
     def related_records_for(record)
-      puts "#{self}.related_records_for(#{record})"
       ReactiveRecord::Base.catch_db_requests([]) do
         get_joins(record.class).collect do |vector|
           crawl(record, *vector)
         end.flatten.compact
-      end.tap { |x| puts "#{self}.related_records_for returns #{x}"}
+      end
     end
 
     def filter_records(related_records, args)
@@ -69,8 +61,6 @@ module ReactiveRecord
       else
         Set.new(related_records.select { |r| r.instance_exec(*args, &@filter_proc) })
       end
-    rescue Exception => e
-      raise "Client side scope #{@model}.#{@name} raised error: #{e.message}"
     end
 
     # private methods

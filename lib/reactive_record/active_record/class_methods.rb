@@ -84,7 +84,7 @@ module ActiveRecord
       ['', '=', '_changed?'].each do |variant|
         define_method("#{new_name}#{variant}") { |*args, &block| send("#{old_name}#{variant}", *args, &block) }
       end
-      @_attribute_aliases[new_name] = old_name
+      _attribute_aliases[new_name] = old_name
     end
 
     # ignore any of these methods if they get called on the client.   This list should be trimmed down to include only
@@ -226,7 +226,6 @@ module ActiveRecord
     def all
       ReactiveRecord::Base.default_scope[self] ||=
         begin
-        puts "defining all for #{self}"
         root = ReactiveRecord::Collection
                .new(self, nil, nil, self, 'all')
                .extend(ReactiveRecord::UnscopedCollection)
@@ -245,22 +244,8 @@ module ActiveRecord
         # have to delay computation of inheritance column since it might
         # not be defined when class is first defined
         ic = self.class.inheritance_column
-        (defining_class_is_base_class || !ic || self[ic] == defining_model_name).tap do |x|
-          puts "_all_filter(#{self}) returns: #{x} defining_model_name: #{defining_model_name}, is base: #{defining_class_is_base_class}, ic: #{ic}, self[ic]: #{self[ic]}"
-        end
+        (defining_class_is_base_class || !ic || self[ic] == defining_model_name)
       end
-      #
-      # if base_class == self || !inheritance_column
-      #   puts "creating a base filter: #{model_name} #{base_class} #{self} #{inheritance_column}"
-      #   # always return true for the base_class (or if there is no inheritance column)
-      #   -> () { puts "#{model_name} #{self.class.base_class} #{self.class} #{self.class.inheritance_column} base all filter"; true }
-      # else
-      #   # otherwise we are in a STI subclass so inheritance column name must match model name
-      #   # optimize by capturing the inheritance column and model_name as local vars
-      #   klass_inheritance_column = inheritance_column
-      #   klass_model_name = model_name
-      #   -> () { puts "subclass all filter #{klass_inheritance_column} #{klass_model_name} #{self[klass_inheritance_column] == klass_model_name}"; self[klass_inheritance_column] == klass_model_name }
-      # end
     end
 
     # def all=(_collection)

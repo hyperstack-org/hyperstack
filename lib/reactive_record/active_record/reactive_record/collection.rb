@@ -128,9 +128,7 @@ module ReactiveRecord
           unless dont_gather
             related_records = collection.gather_related_records(record)
           end
-          puts "about to do #{collection}.#{method}(#{related_records.count}, record) (collection.send)"
           collection.send method, related_records, record
-          puts "done"
         end
       end
     end
@@ -144,12 +142,9 @@ module ReactiveRecord
     end
 
     def merge_related_records(record, related_records)
-      puts "#{self}.merge_related_records(#{record}, #{related_records.count})"
       if filter? && joins_with?(record)
-        puts "merging #{self}"
         related_records.merge(related_records_for(record))
       end
-      puts "merge_related_records returns #{related_records.count}"
       related_records
     end
 
@@ -171,11 +166,10 @@ module ReactiveRecord
         klass < @target_klass
       elsif klass.base_class == klass
         @target_klass < klass
-      end.tap { |x| puts "#{self}.joins_with?(#{record}) returns #{x}"}
+      end
     end
 
     def related_records_for(record)
-      puts "#{self}.related_records_for(#{record}), @association = #{@association}"
       return [] unless @association
       attrs = record.attributes
       return [] unless attrs[@association.inverse_of] == @owner
