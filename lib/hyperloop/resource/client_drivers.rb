@@ -96,7 +96,13 @@ module Hyperloop
             scope_fetch_state = record_class._class_fetch_states[data[:scope]]
             if scope_fetch_state == 'f'
               record_class._class_fetch_states[data[:scope]] = 'u'
-              record_class.send(data[:scope])
+              scope_name, scope_params = data[:scope].split('_[')
+              if scope_params
+                scope_params = '[' + scope_params
+                record_class.send(data[:scope], JSON.parse(scope_params))
+              else
+                record_class.send(data[:scope])
+              end
             end
           elsif record_class.record_cached?(data[:id])
             record = record_class.find(data[:id])
