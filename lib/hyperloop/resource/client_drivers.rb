@@ -99,7 +99,7 @@ module Hyperloop
               scope_name, scope_params = data[:scope].split('_[')
               if scope_params
                 scope_params = '[' + scope_params
-                record_class.send(data[:scope], JSON.parse(scope_params))
+                record_class.send(scope_name, JSON.parse(scope_params))
               else
                 record_class.send(data[:scope])
               end
