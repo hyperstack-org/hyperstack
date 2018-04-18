@@ -72,7 +72,11 @@ module HyperRecord
     def create(record_hash = {})
       record = new(record_hash)
       record.save
-      record
+    end
+
+    def create_record(record_hash = {})
+      record = new(record_hash)
+      record.save_record
     end
 
     def find(id)
