@@ -187,10 +187,6 @@ module Hyperloop
           var xhr = new XMLHttpRequest();
           var csrf_elements = document.getElementsByName("csrf-token");
 
-          if (csrf_elements.length > 0) {
-            xhr.setRequestHeader("X-CSRF-Token", csrf_elements[0]["content"]);
-          }
-
           xhr.onreadystatechange = function() {
             if(xhr.readyState === XMLHttpRequest.DONE) {
               self.$class().$decr_active_requests();
@@ -202,6 +198,9 @@ module Hyperloop
             }
           }
           xhr.open(this.method.toUpperCase(), this.url);
+          if (csrf_elements.length > 0) {
+            xhr.setRequestHeader("X-CSRF-Token", csrf_elements[0]["content"]);
+          }
           if (payload_to_send !== null && content_type !== null) {
             xhr.setRequestHeader("Content-Type", content_type);
           }
