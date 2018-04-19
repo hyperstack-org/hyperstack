@@ -45,6 +45,7 @@ describe "synchronized scopes", js: true do
     TestApplicationPolicy.class_eval do
       always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
+      allow_update(TestModel) { true }
     end
     size_window(:small, :portrait)
   end
@@ -298,6 +299,17 @@ describe "synchronized scopes", js: true do
     page.should have_content('.count = 1')
     page.should have_content('rendered 5 times')
     TestModel.quicker_count.should eq(1)
+    evaluate_promise do
+      ReactiveRecord.load do
+        # causes 2 evaluations of the quicker scope on the server
+        TestModel.quicker.last.itself
+      end.then do |model|
+        model.update(completed: false)
+      end
+    end
+    page.should have_content('.count = 0')
+    page.should have_content('rendered 6 times')
+    TestModel.quicker_count.should eq(3)
   end
 
   it 'can have a client collector method' do
@@ -463,7 +475,7 @@ describe "synchronized scopes", js: true do
         scope :has_children,
               joins: 'child_models',
               server: -> { joins(:child_models).distinct },
-              client: -> { child_models.count > 0 }
+              client: -> { puts "filtering #{self.inspect} #{child_models.count}"; child_models.count > 0 }
       end
     end
     mount 'TestComponent2' do

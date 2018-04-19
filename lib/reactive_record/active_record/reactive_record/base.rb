@@ -172,6 +172,18 @@ module ReactiveRecord
       end
     end
 
+    def changed_attributes_and_values
+      Hash[changed_attributes.collect do |attr|
+        [attr, @attributes[attr]] if column_type(attr)
+      end.compact]
+    end
+
+    def changes
+      Hash[changed_attributes.collect do |attr|
+        [attr, [@synced_attributes[attr], @attributes[attr]]] if column_type(attr)
+      end.compact]
+    end
+
     def errors
       @errors ||= ActiveModel::Errors.new(self)
     end
@@ -185,8 +197,9 @@ module ReactiveRecord
       if (!vector || vector.empty?) && id && id != ''
         Base.set_vector_lookup(self, [@model, [:find_by, @model.primary_key => id]])
       end
-      @model.reflect_on_all_associations.each do |assoc|
-        if assoc.collection? && @attributes[assoc.attribute].nil?
+      Base.load_data do
+        @model.reflect_on_all_associations.each do |assoc|
+          next if !assoc.collection? || @attributes[assoc.attribute]
           ar_instance.send("#{assoc.attribute}=", [])
         end
       end
@@ -273,8 +286,9 @@ module ReactiveRecord
       end
     end
 
-    def saved!  # sets saving to false AND notifies
+    def saved!(save_only = nil) # sets saving to false AND notifies
       @saving = false
+      return self if save_only
       if errors.empty?
         React::State.set_state(self, self, :saved)
       elsif !data_loading?

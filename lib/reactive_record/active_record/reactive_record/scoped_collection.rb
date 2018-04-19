@@ -53,7 +53,7 @@ module ReactiveRecord
         else
           @count += (after - before).count
           @count -= (before - after).count
-          notify_of_change self  # TODO remove self .... and retest
+          notify_of_change self # TODO: remove self .... and retest
         end
       end
       after

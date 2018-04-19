@@ -21,8 +21,9 @@ module ReactiveRecord
       set_common(aggregation.attribute, raw_value) do |value, attr|
         if data_loading?
           @synced_attributes[attr] = aggregation.deserialize(aggregation.serialize(value))
+        else
+          changed = !@synced_attributes.key?(attr) || @synced_attributes[attr] != value
         end
-        changed = !@synced_attributes.key?(attr) || @synced_attributes[attr] != value
         set_attribute_change_status_and_notify attr, changed, value
       end
     end
@@ -58,8 +59,11 @@ module ReactiveRecord
     end
 
     def update_simple_attribute(attr, value)
-      @synced_attributes[attr] = value if data_loading?
-      changed = !@synced_attributes.key?(attr) || @synced_attributes[attr] != value
+      if data_loading?
+        @synced_attributes[attr] = value
+      else
+        changed = !@synced_attributes.key?(attr) || @synced_attributes[attr] != value
+      end
       set_attribute_change_status_and_notify attr, changed, value
     end
 
@@ -103,7 +107,9 @@ module ReactiveRecord
 
     def change_status_and_notify_helper(attr, changed)
       empty_before = changed_attributes.empty?
-      if !changed
+      # TODO: confirm this works:
+      # || data_loading? added so that model.new can be wrapped in a ReactiveRecord.load_data
+      if !changed || data_loading?
         changed_attributes.delete(attr)
       elsif !changed_attributes.include?(attr)
         changed_attributes << attr

@@ -364,12 +364,16 @@ module ActiveRecord
             klass = ReactiveRecord::Base.infer_type_from_hash(self, param)
             klass == self || klass < self
           else
+            # TODO: investigate saving .changes here and then replacing the
+            # TODO: changes after the load is complete.  In other words preserve the
+            # TODO: changed values as changes while just updating the synced values.
             target =
               if param[primary_key]
                 find(param[primary_key])
               else
                 new
               end
+              puts "_react_param_conversion(#{param}) target = #{target.inspect}"
 
             associations = reflect_on_all_associations
 
@@ -388,15 +392,11 @@ module ActiveRecord
                 [key, [value]]
               end
             end
-
-            # We do want to be doing something like this, but this breaks other stuff...
-            #
-            # ReactiveRecord::Base.load_data do
-            #   ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
-            # end
-
-            ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
-            target
+            # TODO: verify wrapping with load_data was added so broadcasting works in 1.0.0.lap28
+            ReactiveRecord::Base.load_data do
+              ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
+            end
+            target.cast_to_current_sti_type
           end
         end
 

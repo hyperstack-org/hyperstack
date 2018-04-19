@@ -30,9 +30,6 @@ module ReactiveRecord
     end
 
     def dirty_details
-      changes = Hash[changed_attributes.collect do |attr|
-        [attr, [@synced_attributes[attr], @attributes[attr]]] if column_type(attr)
-      end.compact]
       "[changed id: #{id} #{changes}]"
     end
   end

@@ -339,6 +339,13 @@ module ReactiveRecord
             method.is_a?(Array) ? method.to_json : method
           end
 
+          def merge_inheritance_column(children)
+            if @value.attributes.key? @value.class.inheritance_column
+              children[@value.class.inheritance_column] = [@value[@value.class.inheritance_column]]
+            end
+            children
+          end
+
           def as_hash(children = nil)
             unless children
               return {} if @value.is_a?(Class) and (@value < ActiveRecord::Base)
@@ -353,11 +360,11 @@ module ReactiveRecord
                 end
               elsif (@value.class < ActiveRecord::Base) && children.is_a?(Hash)
                 id = method.is_a?(Array) && method.first == "new" ? [nil] : [@value.id]
-                c = children.merge(id: id)
-                if @value.attributes.key? @value.class.inheritance_column
-                  c[@value.class.inheritance_column] = [@value[@value.class.inheritance_column]]
-                end
-                @parent.as_hash(jsonize(method) => c)
+                # c = children.merge(id: id)
+                # if @value.attributes.key? @value.class.inheritance_column
+                #   c[@value.class.inheritance_column] = [@value[@value.class.inheritance_column]]
+                # end
+                @parent.as_hash(jsonize(method) => merge_inheritance_column(children.merge(id: id)))
               elsif method == '*all'
                 @parent.as_hash('*all' => children.first)
               else
@@ -447,6 +454,7 @@ keys:
           elsif value.is_a? Array
             # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
             # a better fix might be something like target._internal_attribute_hash[method] =  ...
+            puts "calling set_attr_value(#{method}, #{value.first})"
             target.backing_record.set_attr_value(method, value.first) unless method == :id
           elsif value.is_a? Hash and value[:id] and value[:id].first and association = target.class.reflect_on_association(method)
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?

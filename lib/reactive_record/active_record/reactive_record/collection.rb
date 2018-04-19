@@ -102,6 +102,31 @@ module ReactiveRecord
     end
 
     class << self
+
+=begin
+sync_scopes takes a newly broadcasted record change and updates all relevant currently active scopes
+This is particularly hard when the client proc is specified.  For example consider this scope:
+
+class TestModel < ApplicationRecord
+  scope :quicker, -> { where(completed: true) }, client: -> { completed }
+end
+
+and this slice of reactive code:
+
+   DIV { "quicker.count = #{TestModel.quicker.count}" }
+
+then on the server this code is executed:
+
+  TestModel.last.update(completed: false)
+
+This will result in the changes being broadcast to the client, which may cauase the value of
+TestModel.quicker.count to increase or decrease.  Of course we may not actually have the all the records,
+perhaps we just have the aggregate count.
+
+To determine this sync_scopes first asks if the record being changed is in the scope given its value
+
+
+=end
       def sync_scopes(broadcast)
         # record_with_current_values will return nil if data between
         # the broadcast record and the value on the client is out of sync

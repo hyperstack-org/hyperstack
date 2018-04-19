@@ -6,13 +6,24 @@ module ActiveRecord
       base_class.instance_eval { @associations ||= superclass.instance_eval { (@associations && @associations.dup) || [] } }
     end
 
-    def self.reflect_on_association(attribute)
-      if found = reflect_on_all_associations.detect { |association| association.attribute == attribute and association.owner_class == self }
+    def self.reflect_on_association(attr)
+      reflection_finder { |assoc| assoc.attribute == attr }
+    end
+
+    def self.reflect_on_association_by_foreign_key(key)
+      reflection_finder { |assoc| assoc.association_foreign_key == key }
+    end
+
+    def self.reflection_finder(&block)
+      found = reflect_on_all_associations.detect do |assoc|
+        assoc.owner_class == self && yield(assoc)
+      end
+      if found
         found
       elsif superclass == Base
         nil
       else
-        superclass.reflect_on_association(attribute)
+        superclass.reflection_finder(&block)
       end
     end
 

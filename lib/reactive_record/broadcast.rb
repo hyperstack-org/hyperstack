@@ -55,7 +55,7 @@ module ReactiveRecord
           ReactiveRecord::Collection.sync_scopes broadcast
         else
           ReactiveRecord::Base.when_not_saving(broadcast.klass) do
-            ReactiveRecord::Collection.sync_scopes broadcast
+            ReactiveRecord::Collection.sync_scopes broadcast.process_previous_changes
           end
         end
       end
@@ -70,6 +70,7 @@ module ReactiveRecord
                   else
                     :change
                   end
+                  puts "self.to_self(#{operation}, #{record}, #{data}) changes: #{record.changes}"
       dummy_broadcast = new.local(operation, record, data)
       record.backing_record.sync! data unless operation == :destroy
       ReactiveRecord::Collection.sync_scopes dummy_broadcast
@@ -81,13 +82,14 @@ module ReactiveRecord
         if destroyed?
           backing_record.ar_instance
         else
-          merge_current_values(backing_record)
+          merge_current_values(backing_record).tap { |r| puts "record with current values = #{r.inspect}" }
         end
       end
     end
 
     def record_with_new_values
       klass._react_param_conversion(record).tap do |ar_instance|
+        puts "record with new_values = #{ar_instance.inspect}"
         if destroyed?
           ar_instance.backing_record.destroy_associations
         elsif new?
@@ -137,14 +139,15 @@ module ReactiveRecord
       @klass = record.class.name
       @record = data
       record.backing_record.destroyed = false
-      @record.merge!(id: record.id) if record.id
+      @record[:id] = record.id if record.id
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
-      attributes = record.attributes
-      data.each do |k, v|
-        next if klass.reflect_on_association(k) || attributes[k] == v
-        @previous_changes[k] = [attributes[k], v]
-      end
+      @previous_changes = record.changes
+      # attributes = record.attributes
+      # data.each do |k, v|
+      #   next if klass.reflect_on_association(k) || attributes[k] == v
+      #   @previous_changes[k] = [attributes[k], v]
+      # end
       self
     end
 
@@ -164,19 +167,56 @@ module ReactiveRecord
       self.class.in_transit.delete @id
     end
 
+    def value_changed?(attr, value)
+      attrs = @backing_record.synced_attributes
+      return true if attr == @backing_record.primary_key
+      return attrs[attr] != @backing_record.convert(attr, value) if attrs.key?(attr)
+
+      assoc = klass.reflect_on_association_by_foreign_key attr
+
+      return value unless assoc
+      child = attrs[assoc.attribute]
+      return value != child.id if child
+      value
+    end
+
+    def integrity_check
+      @previous_changes.each do |attr, value|
+        next if @record.key?(attr) && @record[attr] == value.last
+        React::IsomorphicHelpers.log "Broadcast contained change to #{attr} -> #{value.last} "\
+                                     "without corresponding value in attributes (#{@record}).\n",
+                                     :error
+        raise "Broadcast Integrity Error"
+      end
+    end
+
+    def process_previous_changes
+      return self unless @backing_record
+      integrity_check
+      return self if destroyed?
+      @record.dup.each do |attr, value|
+        next if value_changed?(attr, value)
+        @record.delete(attr)
+        @previous_changes.delete(attr)
+      end
+      self
+    end
+
     def merge_current_values(br)
       current_values = Hash[*@previous_changes.collect do |attr, values|
         value = attr == :id ? record[:id] : values.first
         if br.attributes.key?(attr) &&
            br.attributes[attr] != br.convert(attr, value) &&
            br.attributes[attr] != br.convert(attr, values.last)
-          puts "warning #{attr} has changed locally - will force a reload.\n"\
-               "local value: #{br.attributes[attr]} remote value: #{br.convert(attr, value)}->#{br.convert(attr, values.last)}"
+          React::IsomorphicHelpers.log "warning #{attr} has changed locally - will force a reload.\n"\
+               "local value: #{br.attributes[attr]} remote value: #{br.convert(attr, value)}->#{br.convert(attr, values.last)}",
+               :warning
           return nil
         end
         [attr, value]
-      end.compact.flatten].merge(br.attributes)
-      klass._react_param_conversion(current_values)
+      end.compact.flatten]
+      # TODO: verify - it used to be current_values.merge(br.attributes)
+      klass._react_param_conversion(br.attributes.merge(current_values))
     end
   end
 end

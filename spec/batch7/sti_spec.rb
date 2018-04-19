@@ -73,6 +73,7 @@ RSpec::Steps.steps "class inheritance", js: true do
             ActiveRecord::Base.public_columns_hash[name] = columns_hash
           end
           scope :a_scope, -> () {}, regulate: :always_allow
+          scope :is_subclass1, -> () { where(type: 'Sti::SubClass1') }, regulate: :always_allow, client: -> { type == 'Base::SubClass1' }
         end
 
         class SubClass1 < Base
@@ -127,10 +128,6 @@ RSpec::Steps.steps "class inheritance", js: true do
 
   end
 
-  # it "test" do
-  #   #binding.pry
-  # end
-
   it "will use the subclass name to set the type" do
     evaluate_ruby('Sti::SubClass1.create(data: "record 1")')
     expect_promise('Sti::Base.last.load(:type)').to eq('Sti::SubClass1')
@@ -162,6 +159,36 @@ RSpec::Steps.steps "class inheritance", js: true do
     expect_evaluate_ruby("Sti::NoSyncSubClass1.count").to eq(Sti::NoSyncSubClass1.count)
   end
 
+  it "will scope STI classes when the type changes" do
+
+    # evaluate_ruby "Sti::NoSyncSubClass1.count"
+    # wait_for_ajax
+    # evaluate_ruby "Sti::NoSyncSubClass1.first.type"
+    # wait_for_ajax
+    # evaluate_ruby "Sti::NoSyncSubClass1.first.type = 'Sti::NoSyncSubClass2'"
+    # evaluate_ruby "Sti::NoSyncSubClass1.first.save"
+    # wait_for_ajax
+    # binding.pry
+    x =
+    evaluate_promise do
+      ReactiveRecord.load do
+        puts "loading"
+        Sti::NoSyncSubClass1.first.data
+        #Sti::NoSyncSubClass1.first.itself.tap { |x| puts "during load: #{x.inspect}"}
+      end.then do |record|
+        record = Sti::NoSyncSubClass1.first
+        puts record.inspect
+        record.type = 'Sti::NoSyncSubClass2'
+        puts "about to save"
+        record.save
+      end.then do
+        puts "saved"
+        Sti::NoSyncSubClass1.count
+      end
+    end#.to eq(Sti::NoSyncSubClass1.count)
+    #expect(x).to eq(Sti::NoSyncSubClass1.count)
+    binding.pry
+  end
 
   it "STI classes can inherit scopes" do
     expect_promise do
@@ -175,6 +202,4 @@ RSpec::Steps.steps "class inheritance", js: true do
       ReactiveRecord.load { SubClass.a_scope.count }
     end.to eq(SubClass.a_scope.count)
   end
-
-
 end

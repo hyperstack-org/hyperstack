@@ -12,6 +12,14 @@ module ActiveRecord
       @backing_record.attributes
     end
 
+    def changed_attributes
+      backing_record.changed_attributes_and_values
+    end
+
+    def changes
+      backing_record.changes
+    end
+
     def initialize(hash = {})
       if hash.is_a? ReactiveRecord::Base
         @backing_record = hash
@@ -32,6 +40,7 @@ module ActiveRecord
             h.each do |attribute, value|
               next if attribute == primary_key
               @ar_instance[attribute] = value
+              puts "#{self.class}.new : changed_attributes << #{attribute}"
               changed_attributes << attribute
             end
           end
