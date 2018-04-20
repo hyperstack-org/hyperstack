@@ -348,7 +348,7 @@ module ReactiveRecord
 
           def as_hash(children = nil)
             unless children
-              return {} if @value.is_a?(Class) and (@value < ActiveRecord::Base)
+              return {} if @value.is_a?(Class) && (@value < ActiveRecord::Base)
               children = [@value.is_a?(BigDecimal) ? @value.to_f : @value]
             end
             if @parent
@@ -410,7 +410,6 @@ keys:
 
 
       def self.load_from_json(tree, target = nil)
-        ignore_all = nil
 
         # have to process *all before any other items
         # we leave the "*all" key in just for debugging purposes, and then skip it below

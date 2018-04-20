@@ -70,7 +70,6 @@ module ReactiveRecord
                   else
                     :change
                   end
-                  puts "self.to_self(#{operation}, #{record}, #{data}) changes: #{record.changes}"
       dummy_broadcast = new.local(operation, record, data)
       record.backing_record.sync! data unless operation == :destroy
       ReactiveRecord::Collection.sync_scopes dummy_broadcast
@@ -82,14 +81,13 @@ module ReactiveRecord
         if destroyed?
           backing_record.ar_instance
         else
-          merge_current_values(backing_record).tap { |r| puts "record with current values = #{r.inspect}" }
+          merge_current_values(backing_record)
         end
       end
     end
 
     def record_with_new_values
       klass._react_param_conversion(record).tap do |ar_instance|
-        puts "record with new_values = #{ar_instance.inspect}"
         if destroyed?
           ar_instance.backing_record.destroy_associations
         elsif new?

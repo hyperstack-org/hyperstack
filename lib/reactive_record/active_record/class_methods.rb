@@ -53,11 +53,13 @@ module ActiveRecord
     end
 
     def find(id)
-      ReactiveRecord::Base.find(self, primary_key, id)
+      ReactiveRecord::Base.find(self, primary_key => id)
     end
 
     def find_by(opts = {})
-      ReactiveRecord::Base.find(self, _dealias_attribute(opts.first.first), opts.first.last)
+      dealiased_opts = {}
+      opts.each { |attr, value| dealiased_opts[_dealias_attribute(attr)] = value }
+      ReactiveRecord::Base.find(self, dealiased_opts)
     end
 
     def enum(*args)
@@ -244,7 +246,7 @@ module ActiveRecord
         # have to delay computation of inheritance column since it might
         # not be defined when class is first defined
         ic = self.class.inheritance_column
-        (defining_class_is_base_class || !ic || self[ic] == defining_model_name)
+        defining_class_is_base_class || !ic || self[ic] == defining_model_name
       end
     end
 
@@ -373,7 +375,6 @@ module ActiveRecord
               else
                 new
               end
-              puts "_react_param_conversion(#{param}) target = #{target.inspect}"
 
             associations = reflect_on_all_associations
 

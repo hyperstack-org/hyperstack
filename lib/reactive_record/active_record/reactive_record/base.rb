@@ -67,30 +67,45 @@ module ReactiveRecord
       load_data { ServerDataCache.load_from_json(json, target) }
     end
 
-    def self.find(model, attribute, value)
+    def self.find(model, attrs)
       # will return the unique record with this attribute-value pair
       # value cannot be an association or aggregation
+
+      # add the inheritance column if this is an STI subclass
+
+      inher_col = model.inheritance_column
+      if inher_col && model < model.base_class && !attrs.key?(inher_col)
+        attrs = attrs.merge(inher_col => model.model_name)
+      end
+
       model = model.base_class
-      # already have a record with this attribute-value pair?
-      record = @records[model].detect { |record| record.attributes[attribute] == value}
+      primary_key = model.primary_key
+
+      # already have a record with these attribute-value pairs?
+
+      record =
+        if (id_to_find = attrs[primary_key])
+          lookup_by_id(model, id_to_find)
+        else
+          @records[model].detect do |r|
+            !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
+          end
+        end
+
       unless record
         # if not, and then the record may be loaded, but not have this attribute set yet,
         # so find the id of of record with the attribute-value pair, and see if that is loaded.
         # find_in_db returns nil if we are not prerendering which will force us to create a new record
         # because there is no way of knowing the id.
-        if attribute != model.primary_key && (id = find_in_db(model, attribute, value))
-          record = lookup_by_id(model, id) #@records[model].detect { |record| record.id == id}
+        if !attrs.key?(primary_key) && (id = find_in_db(model, attrs))
+          record = lookup_by_id(model, vector_id) # @records[model].detect { |record| record.id == id}
+          attrs = attrs.merge primary_key => id
         end
         # if we don't have a record then create one
         # (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
-        unless record
-          record = new(model)
-          set_vector_lookup(record, [model, [:find_by, attribute => value]])
-        end
-        # and set the value
-        record.sync_attribute(attribute, value)
-        # and set the primary if we have one
-        record.sync_attribute(model.primary_key, id) if id
+        record ||= set_vector_lookup(new(model), [model, [:find_by, attrs]])
+        # and set the values
+        attrs.each { |attr, value| record.sync_attribute(attr, value) }
       end
       # finally initialize and return the ar_instance
       record.set_ar_instance!
@@ -107,6 +122,7 @@ module ReactiveRecord
       # record = @records[model].detect { |record| record.vector == vector }
       record = lookup_by_vector(vector)
       unless record
+
         record = new model
         set_vector_lookup(record, vector)
       end
@@ -207,11 +223,11 @@ module ReactiveRecord
 
     # sync! now will also initialize any nil collections
     def sync!(hash = {}) # does NOT notify (see saved! for notification)
-      hash.each do |attr, value|
-        @attributes[attr] = convert(attr, value)
-      end
+      # hash.each do |attr, value|
+      #   @attributes[attr] = convert(attr, value)
+      # end
       @synced_attributes = {}
-      @synced_attributes.each { |attribute, value| sync_attribute(key, value) }
+      hash.each { |attr, value| sync_attribute(attr, convert(attr, value)) }
       @changed_attributes = []
       @saving = false
       errors.clear
@@ -366,7 +382,7 @@ module ReactiveRecord
         @catch_db_requests = true
         yield
       rescue DbRequestMade => e
-        puts "Warning request for server side data during scope evaluation: #{e.message}"
+        React::IsomorphicHelpers.log "Warning: request for server side data during scope evaluation: #{e.message}", :warning
         return_val
       ensure
         @catch_db_requests = false

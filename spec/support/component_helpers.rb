@@ -379,6 +379,13 @@ module ComponentTestHelpers
     end
   end
 
+  def check_errors
+    logs = page.driver.browser.manage.logs.get(:browser)
+    errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
+                .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+    binding.pry if errors.present?
+  end
+
 end
 
 RSpec.configure do |config|

@@ -97,12 +97,14 @@ describe "column types on client", js: true do
     expect_evaluate_ruby do
       TypeTest.columns_hash
     end.to eq(TypeTest.columns_hash.as_json)
+    check_errors
   end
 
   it 'defines the server method with a default value' do
     expect_evaluate_ruby do
       TypeTest.new.a_server_method()
     end.to eq('hello')
+    check_errors
   end
 
   it 'loads the server method' do
@@ -110,6 +112,7 @@ describe "column types on client", js: true do
     expect_promise do
       ReactiveRecord.load { TypeTest.find(1).a_server_method('hello') }
     end.to eq('olleh')
+    check_errors
   end
 
   it 'creates a dummy value of the appropriate type' do
@@ -135,6 +138,7 @@ describe "column types on client", js: true do
       'Number', 'NilClass', 'Boolean', 'Date', 'Time', 'Number', 'Number', 'Number',
       'Number', 'String', 'String', 'Time', 'Time'
     ])
+    check_errors
   end
 
   it 'loads and converts the value' do
@@ -174,6 +178,7 @@ describe "column types on client", js: true do
       'Time', t.time_only.as_json, # date is indeterminate for active record time
       'Time', t.as_json
     ])
+    check_errors
   end
 
   it 'while loading the dummy value delegates the correct type with operators etc' do
@@ -201,6 +206,7 @@ describe "column types on client", js: true do
       true, "2001-01-02", (Timex.sqlmin+2.days).as_json, 5, 6, 7,
       8, 0, 0, (Timex.sqlmin+3.days).as_json, (Timex.sqlmin+4.days).as_json
     ])
+    check_errors
   end
 
   it 'converts a time string to a time on writing' do
@@ -217,6 +223,7 @@ describe "column types on client", js: true do
       test.datetime = 12
       test.datetime + 60.seconds
     end.to eq((Timex.at(12)+60.seconds).as_json)
+    check_errors
   end
 
   it 'converts a float to a time on writing' do
@@ -225,6 +232,7 @@ describe "column types on client", js: true do
       test.datetime = 12.2
       test.datetime + 60.9
     end.to eq((Timex.at(12.2)+60.9).as_json)
+    check_errors
   end
 
   it 'converts a 0, "false" false and nil to a boolean false, everything else is true' do
@@ -233,6 +241,7 @@ describe "column types on client", js: true do
         TypeTest.new(boolean: val).boolean
       end
     end.to eq([false, false, false, false, true, true, true, true])
+    check_errors
   end
 
   it 'booleans also have a ? accessor method' do
@@ -241,6 +250,7 @@ describe "column types on client", js: true do
         TypeTest.new(boolean: val).boolean?
       end
     end.to eq([true, false])
+    check_errors
   end
 
   it 'converts other dates just like time' do
@@ -259,6 +269,7 @@ describe "column types on client", js: true do
         TypeTest.new(attr => -12.2).send(attr)
       end.uniq
     end.to eq([12.5, 12])
+    check_errors
   end
 
   it 'converts strings and text' do
@@ -267,6 +278,7 @@ describe "column types on client", js: true do
         [TypeTest.new(attr => 12).send(attr), TypeTest.new(attr => '12').send(attr)]
       end.flatten.uniq
     end.to eq(['12'])
+    check_errors
   end
 
   it 'uses the default value if specified for the dummy value' do
@@ -275,12 +287,14 @@ describe "column types on client", js: true do
       t = DefaultTest.find(1)
       [t.string, t.date, t.datetime]
     end.to eq(["I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json])
+    check_errors
   end
 
   it 'uses the default value if specified when initializing a new record' do
     expect_evaluate_ruby do
       DefaultTest.new.string
     end.to eq("I'm a string!")
+    check_errors
   end
 
   it 'uses the default value when initializing a new record & can be saved' do

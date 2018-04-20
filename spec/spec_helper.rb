@@ -300,11 +300,14 @@ if RUBY_ENGINE != 'opal'
                     .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
         puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
       end
-      unless client_options[:raise_on_js_errors] == :off
-        binding.pry if errors.present?
-        raise JavaScriptError, errors.join("\n\n") if errors.present?
+      if client_options[:raise_on_js_errors] == :show && errors.present?
+        puts "\033[031m\nJavascript client console errors:\n\n" + errors.join("\n\n") + "\033[0;30;21m"
+      elsif client_options[:raise_on_js_errors] == :debug && errors.present?
+        binding.pry
+      elsif client_options[:raise_on_js_errors] != :off && errors.present?
+        raise JavaScriptError, errors.join("\n\n")
       end
-    end
+    end 
 
     config.include Capybara::DSL
 

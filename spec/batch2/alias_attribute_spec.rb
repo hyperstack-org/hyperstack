@@ -43,10 +43,23 @@ RSpec::Steps.steps 'alias_attribute', js: true do
     end
   end
 
+  it "implements find_by" do
+    @user = User.create(first_name: "Mitch", last_name: "VanDuyn")
+    expect_promise do
+      ReactiveRecord.load { User.find_by(first_name: "Mitch", surname: "VanDuyn").id }
+    end.to eq(@user.id)
+  end
+
   it "implements the finder" do
     @user = User.create(first_name: "M.", last_name: "Pantel")
     expect_promise do
       ReactiveRecord.load { User.find_by_surname('Pantel').id }
+    end.to eq(@user.id)
+  end
+
+  it "works with find_by without fetching from the DB" do
+    expect_evaluate_ruby do
+      User.find_by(first_name: 'M.', last_name: 'Pantel').id
     end.to eq(@user.id)
   end
 

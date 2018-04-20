@@ -82,7 +82,7 @@ RSpec::Steps.steps 'ActiveRecord::Base.inspect displays', js: true do
 
   it 'destroyed records with the primary key value' do
     expect_promise do
-      todo = TodoItem.find_by_title('new title')
+      todo = TodoItem.find_by_title('test3')
       todo.destroy.then do
         todo.inspect
       end

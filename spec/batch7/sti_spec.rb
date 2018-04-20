@@ -160,34 +160,15 @@ RSpec::Steps.steps "class inheritance", js: true do
   end
 
   it "will scope STI classes when the type changes" do
-
-    # evaluate_ruby "Sti::NoSyncSubClass1.count"
-    # wait_for_ajax
-    # evaluate_ruby "Sti::NoSyncSubClass1.first.type"
-    # wait_for_ajax
-    # evaluate_ruby "Sti::NoSyncSubClass1.first.type = 'Sti::NoSyncSubClass2'"
-    # evaluate_ruby "Sti::NoSyncSubClass1.first.save"
-    # wait_for_ajax
-    # binding.pry
-    x =
-    evaluate_promise do
+    expect_promise do
       ReactiveRecord.load do
-        puts "loading"
-        Sti::NoSyncSubClass1.first.data
-        #Sti::NoSyncSubClass1.first.itself.tap { |x| puts "during load: #{x.inspect}"}
+        Sti::NoSyncSubClass1.first.itself
       end.then do |record|
-        record = Sti::NoSyncSubClass1.first
-        puts record.inspect
-        record.type = 'Sti::NoSyncSubClass2'
-        puts "about to save"
-        record.save
+        record.update(type: 'Sti::NoSyncSubClass2')
       end.then do
-        puts "saved"
         Sti::NoSyncSubClass1.count
       end
-    end#.to eq(Sti::NoSyncSubClass1.count)
-    #expect(x).to eq(Sti::NoSyncSubClass1.count)
-    binding.pry
+    end.to eq(Sti::NoSyncSubClass1.count)
   end
 
   it "STI classes can inherit scopes" do

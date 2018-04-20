@@ -33,9 +33,9 @@ module ReactiveRecord
     end
 
     def set_vector_lookup(record, vector)
+      record.vector = vector
       `delete #{@records_by_vector}[#{record.vector}]`
       `#{@records_by_vector}[#{vector}] = record`
-      record.vector = vector
     end
   end
 end
