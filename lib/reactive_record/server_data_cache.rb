@@ -453,7 +453,6 @@ keys:
           elsif value.is_a? Array
             # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
             # a better fix might be something like target._internal_attribute_hash[method] =  ...
-            puts "calling set_attr_value(#{method}, #{value.first})"
             target.backing_record.set_attr_value(method, value.first) unless method == :id
           elsif value.is_a? Hash and value[:id] and value[:id].first and association = target.class.reflect_on_association(method)
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?

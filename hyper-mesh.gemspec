@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   # }
 
   spec.files          = `git ls-files`.split("\n").reject { |f| f.match(%r{^(examples|gemfiles|pkg|reactive_record_test_app|spec)/}) }
-  spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
+  # spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   spec.test_files     = `git ls-files -- {spec}/*`.split("\n")
   spec.require_paths  = ['lib']
 
