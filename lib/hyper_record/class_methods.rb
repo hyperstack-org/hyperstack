@@ -52,7 +52,7 @@ module HyperRecord
             _notify_observers
             @relations[name]
           end.fail do |response|
-            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
+            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a belongs_to association, failed to fetch records!"
             `console.error(error_message)`
             response
           end
