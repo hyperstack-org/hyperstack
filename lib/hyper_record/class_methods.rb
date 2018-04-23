@@ -64,7 +64,7 @@ module HyperRecord
       define_method("#{name}=") do |arg|
         _register_observer
         @relations[name] = arg
-        @fetch_states[name] == 'f'
+        @fetch_states[name] = 'f'
         @relations[name]
       end
     end
@@ -165,7 +165,7 @@ module HyperRecord
                        raise "Argument must be a HyperRecord::Collection or a Array"
                      end
         @relations[name] = collection
-        @fetch_states[name] == 'f'
+        @fetch_states[name] = 'f'
         @relations[name]
       end
     end
@@ -210,7 +210,7 @@ module HyperRecord
           raise "Argument must be a HyperRecord::Collection or a Array"
         end
         @relations[name] = collection
-        @fetch_states[name] == 'f'
+        @fetch_states[name] = 'f'
         @relations[name]
       end
     end
@@ -247,7 +247,7 @@ module HyperRecord
       define_method("#{name}=") do |arg|
         _register_observer
         @relations[name] = arg
-        @fetch_states[name] == 'f'
+        @fetch_states[name] = 'f'
         @relations[name]
       end
     end
