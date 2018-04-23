@@ -37,6 +37,9 @@ module HyperRecord
         options.merge(name)
         name = direction
         direction = nil
+      elsif name.is_a?(Proc)
+        name = direction
+        direction = nil
       elsif name.nil?
         name = direction
       end
@@ -130,6 +133,9 @@ module HyperRecord
         options.merge(name)
         name = direction
         direction = nil
+      elsif name.is_a?(Proc)
+        name = direction
+        direction = nil
       elsif name.nil?
         name = direction
       end
@@ -175,6 +181,9 @@ module HyperRecord
         options.merge(name)
         name = direction
         direction = nil
+      elsif name.is_a?(Proc)
+        name = direction
+        direction = nil
       elsif name.nil?
         name = direction
       end
@@ -218,6 +227,9 @@ module HyperRecord
     def has_one(direction, name, options = { type: nil })
       if name.is_a?(Hash)
         options.merge(name)
+        name = direction
+        direction = nil
+      elsif name.is_a?(Proc)
         name = direction
         direction = nil
       elsif name.nil?
