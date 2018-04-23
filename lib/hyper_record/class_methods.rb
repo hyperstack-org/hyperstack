@@ -308,18 +308,21 @@ module HyperRecord
     def rest_class_method(name, options = { default_result: '...' })
       rest_methods[name] = options
       rest_methods[name][:class_method] = true
+      singleton_class.send(:define_method, "promise_#{name}") do |*args|
+        _promise_get_or_patch("#{resource_base_uri}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
+          rest_methods[name][:result] = response_json[:result] # result is parsed json
+          _notify_class_observers
+          rest_methods[name][:result]
+        end.fail do |response|
+          error_message = "#{self.to_s}.#{name}, a rest_method, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       singleton_class.send(:define_method, name) do |*args|
         _register_class_observer
         if rest_methods[name][:force] || !rest_methods[name].has_key?(:result)
-          _promise_get_or_patch("#{resource_base_uri}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
-            rest_methods[name][:result] = response_json[:result] # result is parsed json
-            _notify_class_observers
-            rest_methods[name][:result]
-          end.fail do |response|
-            error_message = "#{self.to_s}.#{name}, a rest_method, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          self.send("promise_#{name}", *args)
         end
         if rest_methods[name].has_key?(:result)
           rest_methods[name][:result]
@@ -339,18 +342,21 @@ module HyperRecord
 
     def rest_method(name, options = { default_result: '...' })
       rest_methods[name] = options
+      define_method("promise_#{name}") do |*args|
+        self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
+          @rest_methods_hash[name][:result] = response_json[:result] # result is parsed json
+          _notify_observers
+          @rest_methods_hash[name][:result]
+        end.fail do |response|
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       define_method(name) do |*args|
         _register_observer
         if self.id && (@rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
-          self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
-            @rest_methods_hash[name][:result] = response_json[:result] # result is parsed json
-            _notify_observers
-            @rest_methods_hash[name][:result]
-          end.fail do |response|
-            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          self.send("promise_#{name}", *args)
         end
         if @rest_methods_hash[name].has_key?(:result)
           @rest_methods_hash[name][:result]
