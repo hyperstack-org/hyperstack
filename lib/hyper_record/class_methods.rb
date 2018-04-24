@@ -326,7 +326,7 @@ module HyperRecord
           _notify_class_observers
           rest_methods[name][:result]
         end.fail do |response|
-          error_message = "#{self.to_s}.#{name}, a rest_method, failed to fetch records!"
+          error_message = "#{self.to_s}.#{name}, a rest_method, failed to execute!"
           `console.error(error_message)`
           response
         end
@@ -360,14 +360,14 @@ module HyperRecord
           _notify_observers
           @rest_methods_hash[name][:result]
         end.fail do |response|
-          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to fetch records!"
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to execute!"
           `console.error(error_message)`
           response
         end
       end
       define_method(name) do |*args|
         _register_observer
-        if self.id && (@rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
+        if self.id && (self.class.rest_methods[name][:force] || @rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
           self.send("promise_#{name}", *args)
         end
         if @rest_methods_hash[name].has_key?(:result)

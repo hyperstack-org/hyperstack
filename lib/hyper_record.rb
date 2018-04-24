@@ -16,6 +16,7 @@ if RUBY_ENGINE == 'opal'
   end
 else
   require 'hyper_record/server_class_methods'
+  require 'hyper_record/pub_sub'
 end
 
 

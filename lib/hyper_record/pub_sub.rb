@@ -1,19 +1,17 @@
-module Hyperloop
-  module Resource
-    module PubSub
-      def self.included(base)
-        base.extend(Hyperloop::Resource::PubSub::ClassMethods)
-      end
+module HyperRecord
+  module PubSub
+    def self.included(base)
+      base.extend(HyperRecord::PubSub::ClassMethods)
+    end
 
-      module ClassMethods
-        def _pusher_client
-          Hyperloop.pusher_instance ||= Pusher::Client.new(
-            app_id: Hyperloop.pusher[:app_id],
-            key: Hyperloop.pusher[:key],
-            secret: Hyperloop.pusher[:secret],
-            cluster: Hyperloop.pusher[:cluster]
-          )
-        end
+    module ClassMethods
+      def _pusher_client
+        Hyperloop.pusher_instance ||= Pusher::Client.new(
+          app_id: Hyperloop.pusher[:app_id],
+          key: Hyperloop.pusher[:key],
+          secret: Hyperloop.pusher[:secret],
+          cluster: Hyperloop.pusher[:cluster]
+        )
       end
 
       def publish_relation(base_record, relation_name, record = nil)
@@ -38,7 +36,7 @@ module Hyperloop
             next
           end
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+            _pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
           end
         end
       end
@@ -65,7 +63,7 @@ module Hyperloop
             channel_array << "hyper-record-update-channel-#{session_id}"
           end
           if Hyperloop.resource_transport == :pusher && channel_array.size > 0
-            self.class._pusher_client.trigger(channel_array, 'update', message)
+            _pusher_client.trigger(channel_array, 'update', message)
           end
         end
         Hyperloop.redis_instance.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
@@ -85,7 +83,7 @@ module Hyperloop
             scope: scope_name
           }
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+            _pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
           end
         end
       end
@@ -141,6 +139,48 @@ module Hyperloop
         subscribe_scope(collection, record_class, scope_name)
         publish_scope(record_class, scope_name)
       end
+
+      def session
+        @_hyper_resource_session
+      end
+    end
+
+    # instance methods
+
+    def publish_relation(base_record, relation_name, record = nil)
+      self.class.publish_relation(base_record, relation_name, record)
+    end
+
+    def publish_record(record)
+      self.class.publish_record(record)
+    end
+
+    def publish_scope(record_class, scope_name)
+      self.class.publish_scope(record_class, scope_name)
+    end
+
+    def subscribe_relation(relation, base_record = nil, relation_name = nil)
+      self.class.subscribe_relation(relation, base_record, relation_name)
+    end
+
+    def subscribe_record(record)
+      self.class.subscribe_record(record)
+    end
+
+    def subscribe_scope(collection, record_class = nil, scope_name = nil)
+      self.class.subscribe_scope(collection, record_class, scope_name)
+    end
+
+    def pub_sub_relation(relation, base_record, relation_name, causing_record = nil)
+      self.class.pub_sub_relation(relation, base_record, relation_name, causing_record)
+    end
+
+    def pub_sub_record(record)
+      self.class.pub_sub_record(record)
+    end
+
+    def pub_sub_scope(collection, record_class, scope_name)
+      self.class.pub_sub_scope(collection, record_class, scope_name)
     end
   end
 end
