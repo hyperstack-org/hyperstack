@@ -64,6 +64,9 @@ module HyperRecord
           @relations[name]
         end
       end
+      define_method("update_#{name}") do
+        @fetch_states[name] = 'u'
+      end
       define_method("#{name}=") do |arg|
         _register_observer
         @relations[name] = arg
@@ -161,6 +164,9 @@ module HyperRecord
           @relations[name]
         end
       end
+      define_method("update_#{name}") do
+        @fetch_states[name] = 'u'
+      end
       define_method("#{name}=") do |arg|
         _register_observer
         collection = if arg.is_a?(Array)
@@ -209,6 +215,9 @@ module HyperRecord
           @relations[name]
         end
       end
+      define_method("update_#{name}") do
+        @fetch_states[name] = 'u'
+      end
       define_method("#{name}=") do |arg|
         _register_observer
         collection = if arg.is_a?(Array)
@@ -255,6 +264,9 @@ module HyperRecord
         else
           @relations[name]
         end
+      end
+      define_method("update_#{name}") do
+        @fetch_states[name] = 'u'
       end
       define_method("#{name}=") do |arg|
         _register_observer
@@ -375,6 +387,23 @@ module HyperRecord
     end
 
     def scope(name, options)
+      define_singleton_method("promise_#{name}") do |*args|
+        name_args = if args.size > 0
+                      "#{name}_#{args.to_json}"
+                    else
+                      name
+                    end
+        self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
+          scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
+          _class_fetch_states[name_args] = 'f'
+          _notify_class_observers
+          scopes[name_args]
+        end.fail do |response|
+          error_message = "#{self.to_s}.#{name_args}, a scope, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       define_singleton_method(name) do |*args|
         name_args = if args.size > 0
                       "#{name}_#{args.to_json}"
@@ -386,18 +415,17 @@ module HyperRecord
           scopes[name_args]
         else
           _register_class_observer
-          self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
-            scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
-            _class_fetch_states[name_args] = 'f'
-            _notify_class_observers
-            scopes[name_args]
-          end.fail do |response|
-            error_message = "#{self.to_s}.#{name_args}, a scope, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          self.send("promise_#{name}", *args)
           scopes[name_args]
         end
+      end
+      define_singleton_method("update_#{name}") do |*args|
+        name_args = if args.size > 0
+                      "#{name}_#{args.to_json}"
+                    else
+                      name
+                    end
+        _class_fetch_states[name_args] = 'u'
       end
     end
 
