@@ -29,6 +29,7 @@ module HyperRecord
           message[:cause][:record_type] = record.class.to_s
           message[:cause][:id] = record.id
           message[:cause][:updated_at] = record.updated_at
+          message[:cause][:destroyed] = true if record.destroyed?
         end
         subscribers.each do |session_id, last_requested|
           if last_requested.to_f < scrub_time

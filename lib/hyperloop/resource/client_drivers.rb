@@ -97,7 +97,7 @@ module Hyperloop
             if scope_params
               scope_params = '[' + scope_params
               record_class._class_fetch_states[data[:scope]] = 'u'
-              record_class.send(scope_name, JSON.parse(scope_params))
+              record_class.send(scope_name, *JSON.parse(scope_params))
             else
               record_class._class_fetch_states[data[:scope]] = 'u'
               record_class.send(data[:scope])
@@ -105,6 +105,8 @@ module Hyperloop
           elsif record_class.record_cached?(data[:id])
             record = record_class.find(data[:id])
             record._update_record(data)
+          elsif data[:destroyed]
+            return
           end
         end
       end

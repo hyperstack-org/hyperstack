@@ -143,7 +143,7 @@ module HyperRecord
     def promise_destroy
       _local_destroy
       self.class._promise_delete("#{resource_base_uri}/#{@properties_hash[:id]}").then do |response|
-        nil
+        self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
         `console.error(error_message)`
@@ -261,10 +261,14 @@ module HyperRecord
           c_record_class = Object.const_get(klass_name)
           if c_record_class._record_cache.has_key?(data[:cause][:id].to_s)
             c_record = c_record_class.find(data[:cause][:id])
+            if data[:cause][:destroyed]
+              c_record.instance_variable_set(:@remotely_destroyed, true)
+              c_record._local_destroy
+            end
             if `Date.parse(#{c_record.updated_at}) >= Date.parse(#{data[:cause][:updated_at]})`
               if @fetch_states[data[:relation]] == 'f'
                 if send(data[:relation]).include?(c_record)
-                  return
+                  return unless data[:cause][:destroyed]
                 end
               end
             end
