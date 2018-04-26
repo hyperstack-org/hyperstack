@@ -14,7 +14,7 @@ module HyperRecord
 
     def all
       _register_class_observer
-      if 'fi'.include?(_class_fetch_states[:all]) # if f_etched or i_n progress of fetching
+      if _class_fetch_states.has_key?(:all) && 'fi'.include?(_class_fetch_states[:all]) # if f_etched or i_n progress of fetching
         collection = HyperRecord::Collection.new
         _record_cache.each_value { |record| collection.push(record) }
         return collection
@@ -170,7 +170,7 @@ module HyperRecord
       end
       define_method(name) do
         _register_observer
-        if 'fi'.include?(@fetch_states[name])
+        if @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
           send("promise_#{name}")
@@ -226,7 +226,7 @@ module HyperRecord
       end
       define_method(name) do
         _register_observer
-        if 'fi'.include?(@fetch_states[name])
+        if @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
           send("promise_#{name}")
@@ -280,7 +280,7 @@ module HyperRecord
       end
       define_method(name) do
         _register_observer
-        if 'fi'.include?(@fetch_states[name])
+        if @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
           send("promise_#{name}")
@@ -436,7 +436,7 @@ module HyperRecord
                       name
                     end
         scopes[name_args] = HyperRecord::Collection.new unless scopes.has_key?(name_args)
-        if 'fi'.include?(_class_fetch_states[name_args])
+        if _class_fetch_states.has_key?(name_args) && 'fi'.include?(_class_fetch_states[name_args])
           scopes[name_args]
         else
           _register_class_observer

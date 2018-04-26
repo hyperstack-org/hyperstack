@@ -254,27 +254,24 @@ module HyperRecord
 
     def _update_record(data)
       if data.has_key?(:relation)
-        if data.has_key?(:cause)
-          # this creation of variables for things that could be done in one line
-          # are a workaround for safari, to get it updating correctly
-          klass_name = data[:cause][:record_type]
-          c_record_class = Object.const_get(klass_name)
-          if c_record_class._record_cache.has_key?(data[:cause][:id].to_s)
-            c_record = c_record_class.find(data[:cause][:id])
-            if `Date.parse(#{c_record.updated_at}) >= Date.parse(#{data[:cause][:updated_at]})`
-              if @fetch_states[data[:relation]] == 'f'
-                if send(data[:relation]).include?(c_record)
-                  return
-                end
-              end
-            end
-          end
-        end
-        relation_fetch_state = @fetch_states[data[:relation]]
-        if relation_fetch_state == 'f'
-          @fetch_states[data[:relation]] = 'u'
-          send(data[:relation])
-        end
+        # if data.has_key?(:cause)
+        #   # this creation of variables for things that could be done in one line
+        #   # are a workaround for safari, to get it updating correctly
+        #   klass_name = data[:cause][:record_type]
+        #   c_record_class = Object.const_get(klass_name)
+        #   if c_record_class._record_cache.has_key?(data[:cause][:id].to_s)
+        #     c_record = c_record_class.find(data[:cause][:id])
+        #     if `Date.parse(#{c_record.updated_at}) >= Date.parse(#{data[:cause][:updated_at]})`
+        #       if @fetch_states[data[:relation]] == 'f'
+        #         if send(data[:relation]).include?(c_record)
+        #           return
+        #         end
+        #       end
+        #     end
+        #   end
+        # end
+        @fetch_states[data[:relation]] = 'u'
+        send(data[:relation])
         return
       end
       if data[:destroyed]

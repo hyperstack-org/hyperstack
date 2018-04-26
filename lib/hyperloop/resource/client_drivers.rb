@@ -93,16 +93,14 @@ module Hyperloop
         def self.process_notification(data)
           record_class = Object.const_get(data[:record_type])
           if data[:scope]
-            scope_fetch_state = record_class._class_fetch_states[data[:scope]]
-            if scope_fetch_state == 'f'
+            scope_name, scope_params = data[:scope].split('_[')
+            if scope_params
+              scope_params = '[' + scope_params
               record_class._class_fetch_states[data[:scope]] = 'u'
-              scope_name, scope_params = data[:scope].split('_[')
-              if scope_params
-                scope_params = '[' + scope_params
-                record_class.send(scope_name, JSON.parse(scope_params))
-              else
-                record_class.send(data[:scope])
-              end
+              record_class.send(scope_name, JSON.parse(scope_params))
+            else
+              record_class._class_fetch_states[data[:scope]] = 'u'
+              record_class.send(data[:scope])
             end
           elsif record_class.record_cached?(data[:id])
             record = record_class.find(data[:id])
