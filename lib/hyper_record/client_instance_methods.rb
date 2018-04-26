@@ -60,7 +60,7 @@ module HyperRecord
     ### reactive api
 
     def destroy
-      destroy_record
+      promise_destroy
       nil
     end
 
@@ -140,7 +140,7 @@ module HyperRecord
 
     ### promise api
 
-    def destroy_record
+    def promise_destroy
       _local_destroy
       self.class._promise_delete("#{resource_base_uri}/#{@properties_hash[:id]}").then do |response|
         nil
