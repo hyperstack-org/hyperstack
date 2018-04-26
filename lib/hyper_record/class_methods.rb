@@ -14,11 +14,17 @@ module HyperRecord
 
     def all
       _register_class_observer
-      if _class_fetch_states[:all] == 'f'
+      if 'fi'.include?(_class_fetch_states[:all]) # if f_etched or i_n progress of fetching
         collection = HyperRecord::Collection.new
         _record_cache.each_value { |record| collection.push(record) }
         return collection
       end
+      promise_all
+      HyperRecord::Collection.new
+    end
+
+    def promise_all
+      _class_fetch_states[:all] = 'i'
       _promise_get("#{resource_base_uri}.json").then do |response|
         collection = _convert_array_to_collection(response.json[self.to_s.underscore.pluralize])
         _class_fetch_states[:all] = 'f'
@@ -29,7 +35,6 @@ module HyperRecord
         `console.error(error_message)`
         response
       end
-      HyperRecord::Collection.new
     end
 
     def belongs_to(direction, name = nil, options = { type: nil })
@@ -44,21 +49,25 @@ module HyperRecord
         name = direction
       end
       reflections[name] = { direction: direction, type: options[:type], kind: :belongs_to }
+      define_method("promise_#{name}") do
+        @fetch_states[name] = 'i'
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+          @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
+          @fetch_states[name] = 'f'
+          _notify_observers
+          @relations[name]
+        end.fail do |response|
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a belongs_to association, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       define_method(name) do
         _register_observer
-        if @fetch_states[name] == 'f'
+        if 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
-          self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
-            @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
-            @fetch_states[name] = 'f'
-            _notify_observers
-            @relations[name]
-          end.fail do |response|
-            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a belongs_to association, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          send("promise_#{name}")
           @relations[name]
         else
           @relations[name]
@@ -67,12 +76,13 @@ module HyperRecord
       define_method("update_#{name}") do
         @fetch_states[name] = 'u'
       end
-      define_method("#{name}=") do |arg|
-        _register_observer
-        @relations[name] = arg
-        @fetch_states[name] = 'f'
-        @relations[name]
-      end
+      # TODO
+      # define_method("#{name}=") do |arg|
+      #   _register_observer
+      #   @relations[name] = arg
+      #   @fetch_states[name] = 'f'
+      #   @relations[name]
+      # end
     end
 
     def create(record_hash = {})
@@ -80,9 +90,9 @@ module HyperRecord
       record.save
     end
 
-    def create_record(record_hash = {})
+    def promise_create(record_hash = {})
       record = new(record_hash)
-      record.save_record
+      record.promise_save
     end
 
     def find(id)
@@ -97,39 +107,40 @@ module HyperRecord
       record_in_progress_key = "#{self.to_s}_#{record_in_progress.object_id}"
       React::State.get_state(observer, record_in_progress_key) if observer
       return _record_cache[sid] if _record_cache.has_key?(sid) && _class_fetch_states["record_#{id}"] == 'i'
-      _find_record(id, record_in_progress).then do
+      _promise_find(id, record_in_progress).then do
         React::State.set_state(observer, record_in_progress_key, `Date.now() + Math.random()`) if observer
       end
       record_in_progress
     end
 
-    def find_record(id)
+    def promise_find(id)
       sid = id.to_s
       record_in_progress = if _record_cache.has_key?(sid)
                              _record_cache[sid]
                            else
                              self.new(id: id)
                            end
-      _find_record(id, record_in_progress)
+      _promise_find(id, record_in_progress)
     end
 
-    def find_record_by(hash)
-      if hash.has_key?[:id] && _record_cache.has_key?(hash[:id].to_s)
-        record = _record_cache[hash[:id].to_s]
-        found = true
-        hash.each do |k,v|
-          if record.send(k) != v
-            found = false
-            break
-          end
-        end
-        return record if found
-      end
-      # TODO needs clarification about how to call the endpoint
-      _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
-        self.new(response.json[self.to_s.underscore])
-      end
-    end
+    # TODO find_by
+    # def promise_find_by(hash)
+    #   if hash.has_key?[:id] && _record_cache.has_key?(hash[:id].to_s)
+    #     record = _record_cache[hash[:id].to_s]
+    #     found = true
+    #     hash.each do |k,v|
+    #       if record.send(k) != v
+    #         found = false
+    #         break
+    #       end
+    #     end
+    #     return record if found
+    #   end
+    #   # TODO needs clarification about how to call the endpoint
+    #   _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
+    #     self.new(response.json[self.to_s.underscore])
+    #   end
+    # end
 
     def has_and_belongs_to_many(direction, name = nil, options = { type: nil })
       if name.is_a?(Hash)
@@ -143,22 +154,26 @@ module HyperRecord
         name = direction
       end
       reflections[name] = { direction: direction, type: options[:type], kind: :has_and_belongs_to_many }
+      define_method("promise_#{name}") do
+        @fetch_states[name] = 'i'
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+          collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
+          @relations[name] = collection
+          @fetch_states[name] = 'f'
+          _notify_observers
+          @relations[name]
+        end.fail do |response|
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_and_belongs_to_many association, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       define_method(name) do
         _register_observer
-        if @fetch_states[name] == 'f'
+        if 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
-          self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
-            collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
-            @relations[name] = collection
-            @fetch_states[name] = 'f'
-            _notify_observers
-            @relations[name]
-          end.fail do |response|
-            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_and_belongs_to_many association, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          send("promise_#{name}")
           @relations[name]
         else
           @relations[name]
@@ -167,19 +182,20 @@ module HyperRecord
       define_method("update_#{name}") do
         @fetch_states[name] = 'u'
       end
-      define_method("#{name}=") do |arg|
-        _register_observer
-        collection = if arg.is_a?(Array)
-                       HyperRecord::Collection.new(arg, self, name)
-                     elsif arg.is_a?(HyperRecord::Collection)
-                       arg
-                     else
-                       raise "Argument must be a HyperRecord::Collection or a Array"
-                     end
-        @relations[name] = collection
-        @fetch_states[name] = 'f'
-        @relations[name]
-      end
+      # TODO
+      # define_method("#{name}=") do |arg|
+      #   _register_observer
+      #   collection = if arg.is_a?(Array)
+      #                  HyperRecord::Collection.new(arg, self, name)
+      #                elsif arg.is_a?(HyperRecord::Collection)
+      #                  arg
+      #                else
+      #                  raise "Argument must be a HyperRecord::Collection or a Array"
+      #                end
+      #   @relations[name] = collection
+      #   @fetch_states[name] = 'f'
+      #   @relations[name]
+      # end
     end
 
     def has_many(direction, name = nil, options = { type: nil })
@@ -194,22 +210,26 @@ module HyperRecord
         name = direction
       end
       reflections[name] = { direction: direction, type: options[:type], kind: :has_many }
+      define_method("promise_#{name}") do
+        @fetch_states[name] = 'i'
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+          collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
+          @relations[name] = collection
+          @fetch_states[name] = 'f'
+          _notify_observers
+          @relations[name]
+        end.fail do |response|
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_many association, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       define_method(name) do
         _register_observer
-        if @fetch_states[name] == 'f'
+        if 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
-          self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
-            collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
-            @relations[name] = collection
-            @fetch_states[name] = 'f'
-            _notify_observers
-            @relations[name]
-          end.fail do |response|
-            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_many association, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          send("promise_#{name}")
           @relations[name]
         else
           @relations[name]
@@ -218,19 +238,19 @@ module HyperRecord
       define_method("update_#{name}") do
         @fetch_states[name] = 'u'
       end
-      define_method("#{name}=") do |arg|
-        _register_observer
-        collection = if arg.is_a?(Array)
-          HyperRecord::Collection.new(arg, self, name)
-        elsif arg.is_a?(HyperRecord::Collection)
-          arg
-        else
-          raise "Argument must be a HyperRecord::Collection or a Array"
-        end
-        @relations[name] = collection
-        @fetch_states[name] = 'f'
-        @relations[name]
-      end
+      # define_method("#{name}=") do |arg|
+      #   _register_observer
+      #   collection = if arg.is_a?(Array)
+      #     HyperRecord::Collection.new(arg, self, name)
+      #   elsif arg.is_a?(HyperRecord::Collection)
+      #     arg
+      #   else
+      #     raise "Argument must be a HyperRecord::Collection or a Array"
+      #   end
+      #   @relations[name] = collection
+      #   @fetch_states[name] = 'f'
+      #   @relations[name]
+      # end
     end
 
     def has_one(direction, name, options = { type: nil })
@@ -245,21 +265,25 @@ module HyperRecord
         name = direction
       end
       reflections[name] = { direction: direction, type: options[:type], kind: :has_one }
+      define_method("promise_#{name}") do
+        @fetch_states[name] = 'i'
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+          @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
+          @fetch_states[name] = 'f'
+          _notify_observers
+          @relations[name]
+        end.fail do |response|
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
+          `console.error(error_message)`
+          response
+        end
+      end
       define_method(name) do
         _register_observer
-        if @fetch_states[name] == 'f'
+        if 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
-          self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
-            @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
-            @fetch_states[name] = 'f'
-            _notify_observers
-            @relations[name]
-          end.fail do |response|
-            error_message = "#{self.class.to_s}[#{self.id}].#{name}, a has_one association, failed to fetch records!"
-            `console.error(error_message)`
-            response
-          end
+          send("promise_#{name}")
           @relations[name]
         else
           @relations[name]
@@ -268,12 +292,12 @@ module HyperRecord
       define_method("update_#{name}") do
         @fetch_states[name] = 'u'
       end
-      define_method("#{name}=") do |arg|
-        _register_observer
-        @relations[name] = arg
-        @fetch_states[name] = 'f'
-        @relations[name]
-      end
+      # define_method("#{name}=") do |arg|
+      #   _register_observer
+      #   @relations[name] = arg
+      #   @fetch_states[name] = 'f'
+      #   @relations[name]
+      # end
     end
 
     def record_cached?(id)
@@ -393,6 +417,7 @@ module HyperRecord
                     else
                       name
                     end
+        _class_fetch_states[name_args] = 'i'
         self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
           scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
           _class_fetch_states[name_args] = 'f'
@@ -411,7 +436,7 @@ module HyperRecord
                       name
                     end
         scopes[name_args] = HyperRecord::Collection.new unless scopes.has_key?(name_args)
-        if _class_fetch_states[name_args] == 'f'
+        if 'fi'.include?(_class_fetch_states[name_args])
           scopes[name_args]
         else
           _register_class_observer
@@ -477,7 +502,7 @@ module HyperRecord
       @_class_state_key
     end
 
-    def _find_record(id, record_in_progress)
+    def _promise_find(id, record_in_progress)
       _class_fetch_states["record_#{id}"] = 'i'
       _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
         klass_key = self.to_s.underscore

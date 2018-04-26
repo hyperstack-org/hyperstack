@@ -70,7 +70,7 @@ module HyperRecord
 
     def link(other_record)
       _register_observer
-      link_record(other_record).then do
+      promise_link(other_record).then do
         _notify_observers
       end
       self
@@ -112,7 +112,7 @@ module HyperRecord
 
     def save
       _register_observer
-      save_record.then do
+      promise_save.then do
         _notify_observers
       end
       self
@@ -132,7 +132,7 @@ module HyperRecord
 
     def unlink(other_record)
       _register_observer
-      unlink_record(other_record).then do
+      promise_unlink(other_record).then do
         _notify_observers
       end
       self
@@ -151,7 +151,7 @@ module HyperRecord
       end
     end
 
-    def link_record(other_record, relation_name = nil)
+    def promise_link(other_record, relation_name = nil)
       called_from_collection = relation_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       if reflections.has_key?(relation_name)
@@ -172,7 +172,7 @@ module HyperRecord
       end
     end
 
-    def save_record
+    def promise_save
       payload_hash = @properties_hash.merge(@changed_properties_hash) # copy hash, because we need to delete some keys
       (%i[id created_at updated_at] + reflections.keys).each do |key|
         payload_hash.delete(key)
@@ -200,7 +200,7 @@ module HyperRecord
       end
     end
 
-    def unlink_record(other_record, relation_name = nil)
+    def promise_unlink(other_record, relation_name = nil)
       called_from_collection = collection_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)

@@ -14,7 +14,7 @@ module HyperRecord
 
     def <<(other_record)
       if @record && @relation_name
-        @record.link_record(other_record, @relation_name)
+        @record.promise_link(other_record, @relation_name)
       end
       other_record._register_collection(self)
       @record._notify_observers if @record
@@ -23,7 +23,7 @@ module HyperRecord
 
     def delete(other_record)
       if @record && @relation_name && !other_record.instance_variable_get(:@remotely_destroyed)
-        @record.unlink_record(other_record, @relation_name)
+        @record.promise_unlink(other_record, @relation_name)
       end
       other_record._unregister_collection(self)
       @record._notify_observers if @record
