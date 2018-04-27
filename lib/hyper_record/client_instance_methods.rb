@@ -204,7 +204,7 @@ module HyperRecord
       called_from_collection = collection_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
-      self.send(relation_name).delete_if { |cr| cr == other_record } unless called_from_collection
+      self.send(relation_name).delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
       self.class._promise_delete("#{resource_base_uri}/#{@properties_hash[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
         self
       end.fail do |response|
