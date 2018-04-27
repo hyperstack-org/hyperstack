@@ -155,11 +155,11 @@ module HyperRecord
       called_from_collection = relation_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       if reflections.has_key?(relation_name)
-        self.send(relation_name).push(other_record) unless called_from_collection
+        self.send(relation_name).push(other_record) if !called_from_collection && @fetch_states[relation_name] == 'f'
       else
         relation_name = other_record.class.to_s.underscore
         raise "No collection for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
-        self.send("#{relation_name}=", other_record) unless called_from_collection
+        self.send("#{relation_name}=", other_record) if !called_from_collection && @fetch_states[relation_name] == 'f'
       end
       payload_hash = other_record.to_hash
       self.class._promise_post("#{resource_base_uri}/#{self.id}/relations/#{relation_name}.json", { data: payload_hash }).then do |response|
