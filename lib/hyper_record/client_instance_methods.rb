@@ -267,7 +267,7 @@ module HyperRecord
           end
         end
         @fetch_states[data[:relation]] = 'u'
-        send("prommise_#{data[:relation]}").then do |collection|
+        send("promise_#{data[:relation]}").then do |collection|
           _notify_observers
         end.fail do |response|
           error_message = "#{self}[#{self.id}].#{data[:relation]} failed to update!"
