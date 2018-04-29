@@ -97,11 +97,24 @@ module Hyperloop
             if scope_params
               scope_params = '[' + scope_params
               record_class._class_fetch_states[data[:scope]] = 'u'
-              record_class.send(scope_name, *JSON.parse(scope_params))
+              record_class.send("promise_#{scope_name}", *JSON.parse(scope_params)).then do |collection|
+                record_class._notify_class_observers
+              end.fail do |response|
+                error_message = "#{record_class}.#{scope_name}(#{scope_params}), a scope failed to update!"
+                `console.error(error_message)`
+              end
             else
               record_class._class_fetch_states[data[:scope]] = 'u'
-              record_class.send(data[:scope])
+              record_class.send(data[:scope]).then do |collection|
+                record_class._notify_class_observers
+              end.fail do |response|
+                error_message = "#{record_class}.#{scope_name}, a scope failed to update!"
+                `console.error(error_message)`
+              end
             end
+          elsif data[:rest_class_method]
+            record_class._class_fetch_states[data[:rest_class_method]] = 'u'
+            record_class._notify_class_observers
           elsif record_class.record_cached?(data[:id])
             record = record_class.find(data[:id])
             record._update_record(data)
