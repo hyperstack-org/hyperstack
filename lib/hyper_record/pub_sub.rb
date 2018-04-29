@@ -1,10 +1,14 @@
 module HyperRecord
   module PubSub
     def self.included(base)
+      attr_accessor :current_rest_method_params
+
       base.extend(HyperRecord::PubSub::ClassMethods)
     end
 
     module ClassMethods
+      attr_accessor :current_rest_method_params
+
       def _pusher_client
         Hyperloop.pusher_instance ||= Pusher::Client.new(
           app_id: Hyperloop.pusher[:app_id],
