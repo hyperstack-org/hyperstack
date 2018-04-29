@@ -1,5 +1,5 @@
 module Hyperloop
   module Resource
-    VERSION = '1.0.0.lap62'
+    VERSION = '1.0.0.lap63'
   end
 end

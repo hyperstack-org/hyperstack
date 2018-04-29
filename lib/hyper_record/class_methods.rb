@@ -64,7 +64,7 @@ module HyperRecord
       end
       define_method(name) do
         _register_observer
-        if 'fi'.include?(@fetch_states[name])
+        if @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
           @relations[name]
         elsif self.id
           send("promise_#{name}")
@@ -362,7 +362,7 @@ module HyperRecord
         name_args = _name_args(name, *args)
         _register_class_observer
         rest_class_methods[name_args] = { result: options[:default_result] } unless rest_methods.has_key?(name_args)
-        unless 'fi'.include?(_class_fetch_states[name_args])
+        unless _class_fetch_states.has_key?(name_args) && 'fi'.include?(_class_fetch_states[name_args])
           self.send("promise_#{name}", *args)
         end
         rest_class_methods[name_args][:result]
@@ -395,7 +395,7 @@ module HyperRecord
         name_args = self.class._name_args(name, *args)
         @rest_methods[name] = options unless @rest_methods.has_key?(name)
         @rest_methods[name_args] = { result: options[:default_result] } unless @rest_methods.has_key?(name_args)
-        unless 'fi'.include?(@fetch_states[name_args])
+        unless @fetch_states.has_key?(name_args) && 'fi'.include?(@fetch_states[name_args])
           self.send("promise_#{name}", *args)
         end
         @rest_methods[name_args][:result]
@@ -432,7 +432,7 @@ module HyperRecord
         name_args = _name_args(name, *args)
         scopes[name_args] = HyperRecord::Collection.new unless scopes.has_key?(name_args)
         _register_class_observer
-        unless 'fi'.include?(_class_fetch_states[name_args])
+        unless _class_fetch_states.has_key?(name_args) && 'fi'.include?(_class_fetch_states[name_args])
           self.send("promise_#{name}", *args)
         end
         scopes[name_args]
