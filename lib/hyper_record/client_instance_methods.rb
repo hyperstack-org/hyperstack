@@ -259,7 +259,7 @@ module HyperRecord
             end
             if `Date.parse(#{c_record.updated_at}) >= Date.parse(#{data[:cause][:updated_at]})`
               if @fetch_states[data[:relation]] == 'f'
-                if send(data[:relation]).include?(c_record)
+                if @relations[data[:relation]].include?(c_record)
                   return unless data[:cause][:destroyed]
                 end
               end
@@ -267,7 +267,10 @@ module HyperRecord
           end
         end
         @fetch_states[data[:relation]] = 'u'
-        send(data[:relation])
+        return
+      end
+      if data.has_key?(:rest_method)
+        @fetch_states[data[:rest_method]] = 'u'
         return
       end
       if data[:destroyed]
@@ -279,9 +282,8 @@ module HyperRecord
       if @properties[:updated_at] && data[:updated_at]
         return if `Date.parse(#{@properties[:updated_at]}) >= Date.parse(#{data[:updated_at]})`
       end
-      self.class._promise_get("#{resource_base_uri}/#{@properties[:id]}.json").then do |response|
-        klass_key = self.class.to_s.underscore
-        self._initialize_from_hash(response.json[klass_key]) if response.json[klass_key]
+      self.class._class_fetch_states["record_#{id}"] = 'u'
+      self.class._promise_find(@properties[:id], self).then do |record|
         _notify_observers
         self
       end.fail do |response|

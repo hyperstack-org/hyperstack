@@ -70,6 +70,26 @@ module HyperRecord
         Hyperloop.redis_instance.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
       end
 
+      def publish_rest_method(record, method_name)
+        subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record.class}__#{record.id}__rest_method__#{method_name}")
+        time_now = Time.now.to_f
+        scrub_time = time_now - 24.hours.to_f
+        subscribers.each do |session_id, last_requested|
+          if last_requested.to_f < scrub_time
+            Hyperloop.redis_instance.hdel("HRPS__#{record.class}__#{record.id}__rest_method__#{method_name}", session_id)
+            next
+          end
+          message = {
+            record_type: record_class.to_s,
+            id: record.id,
+            rest_method: method_name
+          }
+          if Hyperloop.resource_transport == :pusher
+            _pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+          end
+        end
+      end
+
       def publish_scope(record_class, scope_name)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record_class}__scope__#{scope_name}")
         time_now = Time.now.to_f
@@ -110,6 +130,13 @@ module HyperRecord
       def subscribe_record(record)
         return unless session.id
         Hyperloop.redis_instance.hset "HRPS__#{record.class}__#{record.id}", session.id.to_s, Time.now.to_f.to_s
+      end
+
+      def subscribe_rest_method(record, method_name)
+        return unless session.id
+        time_now = Time.now.to_f.to_s
+        session_id = session.id.to_s
+        Hyperloop.redis_instance.hset("HRPS__#{record.class}__#{record.id}__rest_method__#{method_name}", session_id, time_now)
       end
 
       def subscribe_scope(collection, record_class = nil, scope_name = nil)
