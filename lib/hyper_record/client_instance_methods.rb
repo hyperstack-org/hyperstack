@@ -277,7 +277,18 @@ module HyperRecord
       end
       if data.has_key?(:rest_method)
         @fetch_states[data[:rest_method]] = 'u'
-        _notify_observers
+        if data[:rest_method].include?('_[')
+          # rest_method with params
+          _notify_observers
+        else
+          # rest_method without params
+          send("promise_#{data[:rest_method]}").then do |result|
+            _notify_observers
+          end.fail do |response|
+            error_message = "#{self}[#{self.id}].#{data[:rest_method]} failed to update!"
+            `console.error(error_message)`
+          end
+        end
         return
       end
       if data[:destroyed]

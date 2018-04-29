@@ -114,7 +114,16 @@ module Hyperloop
             end
           elsif data[:rest_class_method]
             record_class._class_fetch_states[data[:rest_class_method]] = 'u'
-            record_class._notify_class_observers
+            if data[:rest_class_method].include?('_[')
+              record_class._notify_class_observers
+            else
+              send("promise_#{data[:rest_class_method]}").then do |result|
+                _notify_observers
+              end.fail do |response|
+                error_message = "#{self}[#{self.id}].#{data[:rest_class_method]} failed to update!"
+                `console.error(error_message)`
+              end
+            end
           elsif record_class.record_cached?(data[:id])
             record = record_class.find(data[:id])
             record._update_record(data)
