@@ -100,7 +100,7 @@ module Hyperloop
             next
           end
           message = {
-            record_type: record_class.to_s,
+            record_type: record.class.to_s,
             id: record.id,
             rest_method: method_name
           }
