@@ -39,7 +39,7 @@ module HyperRecord
             @relations[relation] = self.class._convert_json_hash_to_record(record_hash[relation])
           end
         else
-          unless @fetch_states[collection] == 'f'
+          unless @fetch_states[relation] == 'f'
             if %i[has_many has_and_belongs_to_many].include?(reflections[relation][:kind])
               @relations[relation] = HyperRecord::Collection.new([], self, relation)
             else
