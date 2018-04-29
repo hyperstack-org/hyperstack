@@ -85,7 +85,7 @@ module Hyperloop
             rest_class_method: rest_class_method_name
           }
           if Hyperloop.resource_transport == :pusher
-            _pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
           end
         end
       end
@@ -105,7 +105,7 @@ module Hyperloop
             rest_method: method_name
           }
           if Hyperloop.resource_transport == :pusher
-            _pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
+            self.class._pusher_client.trigger("hyper-record-update-channel-#{session_id}", 'update', message)
           end
         end
       end
