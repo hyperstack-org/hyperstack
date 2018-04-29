@@ -5,7 +5,7 @@ module HyperRecord
       if record_hash.has_key?(:id)
         record = _record_cache[record_hash[:id].to_s]
         if record
-          record.instance_variable_get(:@properties_hash).merge!(record_hash)
+          record.instance_variable_get(:@properties).merge!(record_hash)
           return record
         end
       end
@@ -309,15 +309,15 @@ module HyperRecord
       _property_options[name] = options
       define_method(name) do
         _register_observer
-        if @properties_hash[:id]
-          if @changed_properties_hash.has_key?(name)
-            @changed_properties_hash[name]
+        if @properties[:id]
+          if @changed_properties.has_key?(name)
+            @changed_properties[name]
           else
-            @properties_hash[name]
+            @properties[name]
           end
         else
           # record has not been fetched or is new and not yet saved
-          if @properties_hash[name].nil?
+          if @properties[name].nil?
             # TODO move default to initializer?
             if self.class._property_options[name].has_key?(:default)
               self.class._property_options[name][:default]
@@ -327,13 +327,13 @@ module HyperRecord
               HyperRecord::DummyValue.new(NilClass)
             end
           else
-            @properties_hash[name]
+            @properties[name]
           end
         end
       end
       define_method("#{name}=") do |value|
         _register_observer
-        @changed_properties_hash[name] = value
+        @changed_properties[name] = value
       end
     end
 
@@ -342,47 +342,48 @@ module HyperRecord
     end
 
     def rest_class_method(name, options = { default_result: '...' })
-      rest_methods[name] = options
-      rest_methods[name][:class_method] = true
-      singleton_class.send(:define_method, "promise_#{name}") do |*args|
+      rest_class_methods[name] = options
+      define_singleton_method("promise_#{name}") do |*args|
+        name_args = _name_args(name, *args)
+        _class_fetch_states[name_args] = 'i'
+        rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
         _promise_get_or_patch("#{resource_base_uri}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
-          rest_methods[name][:result] = response_json[:result] # result is parsed json
+          rest_class_methods[name_args][:result] = response_json[:result] # result is parsed json
+          _class_fetch_states[name_args] = 'f'
           _notify_class_observers
-          rest_methods[name][:result]
+          rest_class_methods[name_args][:result]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}, a rest_method, failed to execute!"
           `console.error(error_message)`
           response
         end
       end
-      singleton_class.send(:define_method, name) do |*args|
+      define_singleton_method(name) do |*args|
+        name_args = _name_args(name, *args)
         _register_class_observer
-        if rest_methods[name][:force] || !rest_methods[name].has_key?(:result)
+        rest_class_methods[name_args] = { result: options[:default_result] } unless rest_methods.has_key?(name_args)
+        unless 'fi'.include?(_class_fetch_states[name_args])
           self.send("promise_#{name}", *args)
         end
-        if rest_methods[name].has_key?(:result)
-          rest_methods[name][:result]
-        else
-          rest_methods[name][:default_result]
-        end
+        rest_class_methods[name_args][:result]
+      end
+      define_singleton_method("update_#{name}") do |*args|
+        _class_fetch_states[_name_args(name, *args)] = 'u'
       end
     end
 
-    def rest_class_method_force_updates(method_name)
-      rest_methods[method_name][:force] = true
-    end
-
-    def rest_class_method_unforce_updates(method_name)
-      rest_methods[method_name][:force] = false
-    end
-
     def rest_method(name, options = { default_result: '...' })
-      rest_methods[name] = options
       define_method("promise_#{name}") do |*args|
+        name_args = self.class._name_args(name, *args)
+        @fetch_states[name_args] = 'i'
+        @rest_methods[name] = options unless @rest_methods.has_key?(name)
+        @rest_methods[name_args] = { result: options[:default_result] } unless @rest_methods.has_key?(name_args)
+        raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance rest_method without id!" unless self.id
         self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
-          @rest_methods_hash[name][:result] = response_json[:result] # result is parsed json
+          @rest_methods[name_args][:result] = response_json[:result] # result is parsed json
+          @fetch_states[name_args] = 'f'
           _notify_observers
-          @rest_methods_hash[name][:result]
+          @rest_methods[name_args][:result]
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to execute!"
           `console.error(error_message)`
@@ -391,19 +392,21 @@ module HyperRecord
       end
       define_method(name) do |*args|
         _register_observer
-        if self.id && (self.class.rest_methods[name][:force] || @rest_methods_hash[name][:force] || !@rest_methods_hash[name].has_key?(:result))
+        name_args = self.class._name_args(name, *args)
+        @rest_methods[name] = options unless @rest_methods.has_key?(name)
+        @rest_methods[name_args] = { result: options[:default_result] } unless @rest_methods.has_key?(name_args)
+        unless 'fi'.include?(@fetch_states[name_args])
           self.send("promise_#{name}", *args)
         end
-        if @rest_methods_hash[name].has_key?(:result)
-          @rest_methods_hash[name][:result]
-        else
-          self.class.rest_methods[name][:default_result]
-        end
+        @rest_methods[name_args][:result]
+      end
+      define_method("update_#{name}") do |*args|
+        @fetch_states[self.class._name_args(name, *args)] = 'u'
       end
     end
 
-    def rest_methods
-      @rest_methods_hash ||= {}
+    def rest_class_methods
+      @rest_class_methods ||= {}
     end
 
     def resource_base_uri
@@ -412,11 +415,7 @@ module HyperRecord
 
     def scope(name, options)
       define_singleton_method("promise_#{name}") do |*args|
-        name_args = if args.size > 0
-                      "#{name}_#{args.to_json}"
-                    else
-                      name
-                    end
+        name_args = _name_args(name, *args)
         _class_fetch_states[name_args] = 'i'
         self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
           scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
@@ -430,27 +429,16 @@ module HyperRecord
         end
       end
       define_singleton_method(name) do |*args|
-        name_args = if args.size > 0
-                      "#{name}_#{args.to_json}"
-                    else
-                      name
-                    end
+        name_args = _name_args(name, *args)
         scopes[name_args] = HyperRecord::Collection.new unless scopes.has_key?(name_args)
-        if _class_fetch_states.has_key?(name_args) && 'fi'.include?(_class_fetch_states[name_args])
-          scopes[name_args]
-        else
-          _register_class_observer
+        _register_class_observer
+        unless 'fi'.include?(_class_fetch_states[name_args])
           self.send("promise_#{name}", *args)
-          scopes[name_args]
         end
+        scopes[name_args]
       end
       define_singleton_method("update_#{name}") do |*args|
-        name_args = if args.size > 0
-                      "#{name}_#{args.to_json}"
-                    else
-                      name
-                    end
-        _class_fetch_states[name_args] = 'u'
+        _class_fetch_states[_name_args(name, *args)] = 'u'
       end
     end
 
@@ -500,6 +488,14 @@ module HyperRecord
     def _class_state_key
       @_class_state_key ||= self.to_s
       @_class_state_key
+    end
+
+    def _name_args(name, *args)
+      if args.size > 0
+        "#{name}_#{args.to_json}"
+      else
+        name
+      end
     end
 
     def _promise_find(id, record_in_progress)

@@ -26,7 +26,7 @@ module HyperRecord
     end
 
     def rest_methods
-      @rest_methods_hash ||= {}
+      @rest_methods ||= {}
     end
 
     def resource_scopes

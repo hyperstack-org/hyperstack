@@ -4,13 +4,16 @@ module HyperRecord
     def initialize(record_hash = {})
       # initalize internal data structures
       record_hash = {} if record_hash.nil?
-      @properties_hash = {}
-      @changed_properties_hash = {}
+      @properties = {}
+      @changed_properties = {}
       @relations = {}
-      @rest_methods_hash = {}
-      self.class.rest_methods.keys.each { |method| @rest_methods_hash[method] = {} }
+      @rest_methods = {}
       @destroyed = false
-      # for reactivity
+      # for reactivity, possible @fetch_states:
+      # n - not fetched
+      # f - fetched
+      # i - fetch in progress
+      # u - update needed, fetch on next usage
       @fetch_states = {}
       @state_key = "#{self.class.to_s}_#{self.object_id}"
       @observers = Set.new
@@ -42,19 +45,16 @@ module HyperRecord
             else
               @relations[relation] = nil
             end
-            @fetch_states[relation] = 'n' # not fetched
+            @fetch_states[relation] = 'n'
           end
         end
         record_hash.delete(relation)
       end
 
-      @properties_hash = record_hash
-
-      # change state
-      _mutate_state
+      @properties = record_hash
 
       # cache in global cache
-      self.class._record_cache[@properties_hash[:id].to_s] = self if @properties_hash.has_key?(:id)
+      self.class._record_cache[@properties[:id].to_s] = self if @properties.has_key?(:id)
     end
 
     ### reactive api
@@ -79,12 +79,12 @@ module HyperRecord
     def method_missing(method, arg)
       _register_observer
       if method.end_with?('=')
-        @changed_properties_hash[method.chop] = arg
+        @changed_properties[method.chop] = arg
       else
-        if @changed_properties_hash.has_key?(method)
-          @changed_properties_hash[method]
+        if @changed_properties.has_key?(method)
+          @changed_properties[method]
         else
-          @properties_hash[method]
+          @properties[method]
         end
       end
     end
@@ -95,19 +95,11 @@ module HyperRecord
 
     def reset
       _register_observer
-      @changed_properties_hash = {}
+      @changed_properties = {}
     end
 
     def resource_base_uri
       self.class.resource_base_uri
-    end
-
-    def rest_method_force_updates(method_name)
-      @rest_methods_hash[method_name][:force] = true
-    end
-
-    def rest_method_unforce_updates(method_name)
-      @rest_methods_hash[method_name][:force] = false
     end
 
     def save
@@ -120,14 +112,14 @@ module HyperRecord
 
     def to_hash
       _register_observer
-      res = @properties_hash.dup
-      res.merge!(@changed_properties_hash)
+      res = @properties.dup
+      res.merge!(@changed_properties)
       res
     end
 
     def to_s
       _register_observer
-      @properties_hash.to_s
+      @properties.to_s
     end
 
     def unlink(other_record)
@@ -142,7 +134,7 @@ module HyperRecord
 
     def promise_destroy
       _local_destroy
-      self.class._promise_delete("#{resource_base_uri}/#{@properties_hash[:id]}").then do |response|
+      self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}").then do |response|
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -155,15 +147,15 @@ module HyperRecord
       called_from_collection = relation_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       if reflections.has_key?(relation_name)
-        self.send(relation_name).push(other_record) if !called_from_collection && @fetch_states[relation_name] == 'f'
+        @relations[relation_name].push(other_record) if !called_from_collection && @fetch_states[relation_name] == 'f'
       else
         relation_name = other_record.class.to_s.underscore
         raise "No collection for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
-        self.send("#{relation_name}=", other_record) if !called_from_collection && @fetch_states[relation_name] == 'f'
+        @relations[relation_name].push(other_record) if !called_from_collection && @fetch_states[relation_name] == 'f'
       end
       payload_hash = other_record.to_hash
       self.class._promise_post("#{resource_base_uri}/#{self.id}/relations/#{relation_name}.json", { data: payload_hash }).then do |response|
-        other_record.instance_variable_get(:@properties_hash).merge!(response.json[other_record.class.to_s.underscore])
+        other_record.instance_variable_get(:@properties).merge!(response.json[other_record.class.to_s.underscore])
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -173,14 +165,14 @@ module HyperRecord
     end
 
     def promise_save
-      payload_hash = @properties_hash.merge(@changed_properties_hash) # copy hash, because we need to delete some keys
+      payload_hash = @properties.merge(@changed_properties) # copy hash, because we need to delete some keys
       (%i[id created_at updated_at] + reflections.keys).each do |key|
         payload_hash.delete(key)
       end
-      if @properties_hash[:id] && ! (@changed_properties_hash.has_key?(:id) && @changed_properties_hash[:id].nil?)
+      if @properties[:id] && ! (@changed_properties.has_key?(:id) && @changed_properties[:id].nil?)
         reset
-        self.class._promise_patch("#{resource_base_uri}/#{@properties_hash[:id]}", { data: payload_hash }).then do |response|
-          @properties_hash.merge!(response.json[self.class.to_s.underscore])
+        self.class._promise_patch("#{resource_base_uri}/#{@properties[:id]}", { data: payload_hash }).then do |response|
+          @properties.merge!(response.json[self.class.to_s.underscore])
           self
         end.fail do |response|
           error_message = "Saving record #{self} failed!"
@@ -190,7 +182,7 @@ module HyperRecord
       else
         reset
         self.class._promise_post(resource_base_uri, { data: payload_hash }).then do |response|
-          @properties_hash.merge!(response.json[self.class.to_s.underscore])
+          @properties.merge!(response.json[self.class.to_s.underscore])
           self
         end.fail do |response|
           error_message = "Creating record #{self} failed!"
@@ -204,8 +196,8 @@ module HyperRecord
       called_from_collection = collection_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
-      self.send(relation_name).delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
-      self.class._promise_delete("#{resource_base_uri}/#{@properties_hash[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
+      @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
+      self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
@@ -219,7 +211,7 @@ module HyperRecord
     def _local_destroy
       _register_observer
       @destroyed = true
-      self.class._record_cache.delete(@properties_hash[:id].to_s)
+      self.class._record_cache.delete(@properties[:id].to_s)
       @registered_collections.dup.each do |collection|
         collection.delete(self)
       end
@@ -284,10 +276,10 @@ module HyperRecord
         _local_destroy
         return
       end
-      if @properties_hash[:updated_at] && data[:updated_at]
-        return if `Date.parse(#{@properties_hash[:updated_at]}) >= Date.parse(#{data[:updated_at]})`
+      if @properties[:updated_at] && data[:updated_at]
+        return if `Date.parse(#{@properties[:updated_at]}) >= Date.parse(#{data[:updated_at]})`
       end
-      self.class._promise_get("#{resource_base_uri}/#{@properties_hash[:id]}.json").then do |response|
+      self.class._promise_get("#{resource_base_uri}/#{@properties[:id]}.json").then do |response|
         klass_key = self.class.to_s.underscore
         self._initialize_from_hash(response.json[klass_key]) if response.json[klass_key]
         _notify_observers
