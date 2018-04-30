@@ -3,10 +3,13 @@ module HyperRecord
 
     def new(record_hash = {})
       if record_hash.has_key?(:id)
-        record = _record_cache[record_hash[:id].to_s]
-        if record
-          record.instance_variable_get(:@properties).merge!(record_hash)
-          return record
+        if _record_cache.has_key?(record_hash[:id].to_s)
+          record = _record_cache.find(record_hash[:id])
+          if record
+            record._initialize_from_hash(record_hash)
+            record._register_observer
+            return record
+          end
         end
       end
       super(record_hash)
