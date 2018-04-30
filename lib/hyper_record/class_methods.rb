@@ -361,7 +361,7 @@ module HyperRecord
       define_singleton_method(name) do |*args|
         name_args = _name_args(name, *args)
         _register_class_observer
-        rest_class_methods[name_args] = { result: options[:default_result] } unless rest_methods.has_key?(name_args)
+        rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
         unless _class_fetch_states.has_key?(name_args) && 'fi'.include?(_class_fetch_states[name_args])
           self.send("promise_#{name}", *args)
         end
