@@ -25,7 +25,7 @@ module HyperRecord
 
     def promise_all
       _class_fetch_states[:all] = 'i'
-      _promise_get("#{resource_base_uri}.json").then do |response|
+      _promise_get("#{resource_base_uri}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
         collection = _convert_array_to_collection(response.json[self.to_s.underscore.pluralize])
         _class_fetch_states[:all] = 'f'
         _notify_class_observers
@@ -51,7 +51,7 @@ module HyperRecord
       reflections[name] = { direction: direction, type: options[:type], kind: :belongs_to }
       define_method("promise_#{name}") do
         @fetch_states[name] = 'i'
-        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
           @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
           @fetch_states[name] = 'f'
           _notify_observers
@@ -156,7 +156,7 @@ module HyperRecord
       reflections[name] = { direction: direction, type: options[:type], kind: :has_and_belongs_to_many }
       define_method("promise_#{name}") do
         @fetch_states[name] = 'i'
-        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
           collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
           @relations[name] = collection
           @fetch_states[name] = 'f'
@@ -212,7 +212,7 @@ module HyperRecord
       reflections[name] = { direction: direction, type: options[:type], kind: :has_many }
       define_method("promise_#{name}") do
         @fetch_states[name] = 'i'
-        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
           collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][name], self, name)
           @relations[name] = collection
           @fetch_states[name] = 'f'
@@ -267,7 +267,7 @@ module HyperRecord
       reflections[name] = { direction: direction, type: options[:type], kind: :has_one }
       define_method("promise_#{name}") do
         @fetch_states[name] = 'i'
-        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json").then do |response|
+        self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
           @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
           @fetch_states[name] = 'f'
           _notify_observers
@@ -417,7 +417,7 @@ module HyperRecord
       define_singleton_method("promise_#{name}") do |*args|
         name_args = _name_args(name, *args)
         _class_fetch_states[name_args] = 'i'
-        self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json", *args).then do |response_json|
+        self._promise_get_or_patch("#{resource_base_uri}/scopes/#{name}.json?timestamp=#{`Date.now() + Math.random()`}", *args).then do |response_json|
           scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
           _class_fetch_states[name_args] = 'f'
           _notify_class_observers
