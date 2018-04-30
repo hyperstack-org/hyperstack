@@ -148,15 +148,23 @@ module HyperRecord
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       if reflections.has_key?(relation_name)
         if !called_from_collection && @fetch_states[relation_name] == 'f'
-          @relations[relation_name] = HyperRecord::Collection.new([], self, relation_name) if @relations[relation_name].nil?
-          @relations[relation_name].push(other_record)
+          if %i[has_many has_and_belongs_to_many].include?(reflections[relation_name][:kind])
+            @relations[relation_name] = HyperRecord::Collection.new([], self, relation_name) if @relations[relation_name].nil?
+            @relations[relation_name].push(other_record)
+          else
+            @relations[relation_name] = other_record
+          end
         end
       else
         relation_name = other_record.class.to_s.underscore
         raise "No collection for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
         if !called_from_collection && @fetch_states[relation_name] == 'f'
-          @relations[relation_name] = HyperRecord::Collection.new([], self, relation_name) if @relations[relation_name].nil?
-          @relations[relation_name].push(other_record)
+          if %i[has_many has_and_belongs_to_many].include?(reflections[relation_name][:kind])
+            @relations[relation_name] = HyperRecord::Collection.new([], self, relation_name) if @relations[relation_name].nil?
+            @relations[relation_name].push(other_record)
+          else
+            @relations[relation_name] = other_record
+          end
         end
       end
       payload_hash = other_record.to_hash
