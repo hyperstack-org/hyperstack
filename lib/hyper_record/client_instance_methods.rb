@@ -220,7 +220,6 @@ module HyperRecord
     end
 
     def _notify_observers
-      mutate.record_state(`Date.now() + Math.random()`)
       @observers.each do |observer|
         React::State.set_state(observer, @state_key, `Date.now() + Math.random()`)
       end
