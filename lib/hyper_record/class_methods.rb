@@ -503,7 +503,7 @@ module HyperRecord
 
     def _promise_find(id, record_in_progress)
       _class_fetch_states["record_#{id}"] = 'i'
-      _promise_get("#{resource_base_uri}/#{id}.json").then do |response|
+      _promise_get("#{resource_base_uri}/#{id}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
         klass_key = self.to_s.underscore
         # optimization for fetching relations with records
         # reflections.keys.each do |relation|
