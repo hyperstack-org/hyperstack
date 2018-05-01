@@ -105,7 +105,7 @@ module ReactiveRecord
     def find_association(association, id)
       inverse_of = association.inverse_of
       instance = if id
-        find(association.klass, association.klass.primary_key, id)
+        find(association.klass, association.klass.primary_key => id)
       else
         new_from_vector(association.klass, nil, *vector, association.attribute)
       end

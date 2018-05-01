@@ -98,7 +98,7 @@ module ReactiveRecord
         # find_in_db returns nil if we are not prerendering which will force us to create a new record
         # because there is no way of knowing the id.
         if !attrs.key?(primary_key) && (id = find_in_db(model, attrs))
-          record = lookup_by_id(model, vector_id) # @records[model].detect { |record| record.id == id}
+          record = lookup_by_id(model, id) # @records[model].detect { |record| record.id == id}
           attrs = attrs.merge primary_key => id
         end
         # if we don't have a record then create one
