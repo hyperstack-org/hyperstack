@@ -1,6 +1,6 @@
 module Hyperloop
   define_setting :add_hyperloop_paths, true
-  
+
   define_setting :prerendering_files, ['hyperloop-prerender-loader.js']
 
   class Railtie < ::Rails::Railtie
@@ -34,6 +34,11 @@ module Hyperloop
             #   config.assets.paths.unshift(hps)
             # end
             config.assets.paths.unshift ::Rails.root.join('app', 'hyperloop').to_s
+            if Rails.const_defined? 'Hyperloop::Console'
+              config.assets.precompile += %w( hyper-console-client.css )
+              config.assets.precompile += %w( hyper-console-client.min.js )
+              config.assets.precompile += %w( action_cable.js ) if Rails.const_defined? 'ActionCable'
+            end
          else
             delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/models"
             delete_first config.eager_load_paths, "#{config.root}/app/hyperloop/models/concerns"
