@@ -100,6 +100,7 @@ module HyperRecord
 
     def find(id)
       sid = id.to_s
+      return nil if sid == ''
       return _record_cache[sid] if _record_cache.has_key?(sid) && _class_fetch_states["record_#{id}"] == 'f'
       observer = React::State.current_observer
       record_in_progress = if _record_cache.has_key?(sid)
