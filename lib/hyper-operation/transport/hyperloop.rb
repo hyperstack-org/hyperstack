@@ -122,6 +122,7 @@ module Hyperloop
   end
 
   def self.on_server?
+    return !Rails.const_defined?('Console')
     if !Rails.const_defined?('Console') || Rails.const_defined?('Puma') || Rails.const_defined?('Unicorn') || Rails.const_defined?('Server')
       true
     elsif Rails.const_defined?('Console')

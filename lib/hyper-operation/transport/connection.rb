@@ -4,17 +4,22 @@ module Hyperloop
       return false if Hyperloop.transport == :none
       return true if connection.respond_to?(:data_sources) && !connection.data_sources.include?(table_name)
       return true if !connection.respond_to?(:data_sources) && !connection.tables.include?(table_name)
-      return false unless Hyperloop.on_server?
-      return true if defined?(Rails::Server)
-      return true unless Connection.root_path
-      uri = URI("#{Connection.root_path}server_up")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Get.new(uri.path)
-      if uri.scheme == 'https'
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      http.request(request) && return rescue true
+      Hyperloop.on_server?
+      # the above line appears equivilent to the following two original lines
+      # the only
+      #   return false unless Hyperloop.on_server?
+      #   return true if defined?(Rails::Server)
+      # the following lines appeared to be unreachable but perhaps because on_server uses Rails.const_defined? it has some
+      # subtle difference.
+      #   return true unless Connection.root_path
+      #   uri = URI("#{Connection.root_path}server_up")
+      #   http = Net::HTTP.new(uri.host, uri.port)
+      #   request = Net::HTTP::Get.new(uri.path)
+      #   if uri.scheme == 'https'
+      #     http.use_ssl = true
+      #     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      #   end
+      #   http.request(request) && return rescue true
     end
 
     def create_table(*args, &block)
