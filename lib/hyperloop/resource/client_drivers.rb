@@ -82,7 +82,7 @@ module Hyperloop
                 return Opal.Hyperloop.$const_get('Resource').$const_get('ClientDrivers').$process_notification(Opal.Hash.$new(data));
               }`)
 
-            when opts[:resource_transport] == :action_cable
+            when :action_cable
               opts[:action_cable_consumer] =
                 `ActionCable.createConsumer.apply(ActionCable, #{[*opts[:action_cable_consumer_url]]})`
               Hyperloop.connect(*opts[:auto_connect])
@@ -125,8 +125,7 @@ module Hyperloop
               end
             end
           elsif record_class.record_cached?(data[:id])
-            record = record_class.find(data[:id])
-            record._update_record(data)
+            record_class._record_cache[data[:id].to_s]._update_record(data)
           elsif data[:destroyed]
             return
           end

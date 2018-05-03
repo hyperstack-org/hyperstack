@@ -70,9 +70,7 @@ module HyperRecord
 
     def link(other_record)
       _register_observer
-      promise_link(other_record).then do
-        _notify_observers
-      end
+      promise_link(other_record)
       self
     end
 
@@ -104,9 +102,7 @@ module HyperRecord
 
     def save
       _register_observer
-      promise_save.then do
-        _notify_observers
-      end
+      promise_save
       self
     end
 
@@ -124,9 +120,7 @@ module HyperRecord
 
     def unlink(other_record)
       _register_observer
-      promise_unlink(other_record).then do
-        _notify_observers
-      end
+      promise_unlink(other_record)
       self
     end
 
@@ -170,6 +164,8 @@ module HyperRecord
       payload_hash = other_record.to_hash
       self.class._promise_post("#{resource_base_uri}/#{self.id}/relations/#{relation_name}.json", { data: payload_hash }).then do |response|
         other_record.instance_variable_get(:@properties).merge!(response.json[other_record.class.to_s.underscore])
+        _notify_observers
+        other_record._notify_observers
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -187,6 +183,7 @@ module HyperRecord
         reset
         self.class._promise_patch("#{resource_base_uri}/#{@properties[:id]}", { data: payload_hash }).then do |response|
           @properties.merge!(response.json[self.class.to_s.underscore])
+          _notify_observers
           self
         end.fail do |response|
           error_message = "Saving record #{self} failed!"
@@ -212,6 +209,7 @@ module HyperRecord
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
       self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
+        _notify_observers
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
