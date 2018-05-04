@@ -265,11 +265,11 @@ module ActiveRecord
 
         %i[belongs_to has_one].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
-          define_method(macro) do |name, scope = nil, opts = {}, &block|
+          define_method(macro) do |name, *aargs, &block|
             define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|
               this.send(name, *args)
             end
-            send(:"pre_syncromesh_#{macro}", name, scope, opts, &block)
+            send(:"pre_syncromesh_#{macro}", name, *aargs, &block)
           end
         end
       end

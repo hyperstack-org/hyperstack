@@ -23,7 +23,7 @@ module ReactiveRecord
         operation: operation,
         salt: salt,
         authorization: authorization
-      )
+      ).tap { |p| raise p.error if p.rejected? }
     end unless RUBY_ENGINE == 'opal'
 
     class SendPacket < Hyperloop::ServerOp
@@ -54,9 +54,7 @@ module ReactiveRecord
         if params.operation == :destroy
           ReactiveRecord::Collection.sync_scopes broadcast
         else
-          ReactiveRecord::Base.when_not_saving(broadcast.klass) do
-            ReactiveRecord::Collection.sync_scopes broadcast.process_previous_changes
-          end
+          ReactiveRecord::Collection.sync_scopes broadcast.process_previous_changes
         end
       end
     end
@@ -151,14 +149,16 @@ module ReactiveRecord
 
     def receive(params)
       @destroyed = params.operation == :destroy
-      @is_new = params.operation == :create
       @channels ||= Hyperloop::IncomingBroadcast.open_channels.intersection params.channels
       @received << params.channel
       @klass ||= params.klass
       @record.merge! params.record
       @previous_changes.merge! params.previous_changes
-      @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
-      yield complete! if @channels == @received
+      ReactiveRecord::Base.when_not_saving(klass) do
+        @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
+        @is_new = params.operation == :create && !@backing_record
+        yield complete! if @channels == @received
+      end
     end
 
     def complete!

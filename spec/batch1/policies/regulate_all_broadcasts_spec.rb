@@ -38,7 +38,7 @@ describe "regulate_all_broadcasts" do
   it "will broadcast to a single channel" do
     stub_const "ApplicationPolicy", Class.new
     ApplicationPolicy.class_eval do
-      regulate_all_broadcasts do | policy |
+      regulate_all_broadcasts do |policy|
         policy.send_all
       end
     end

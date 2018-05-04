@@ -88,10 +88,11 @@ class ActiveRecord::Base
     alias belongs_to_without_reactive_record_add_is_method belongs_to
 
     def belongs_to(attr_name, scope = nil, options = {})
-      define_method "#{attr_name}_is?".to_sym do |model|
-        send(options[:foreign_key] || "#{attr_name}_id") == model.id
+      belongs_to_without_reactive_record_add_is_method(attr_name, scope, options).tap do
+        define_method "#{attr_name}_is?".to_sym do |model|
+          self.class.reflections[attr_name].foreign_key == model.id
+        end
       end
-      belongs_to_without_reactive_record_add_is_method(attr_name, scope, options)
     end
   end
 

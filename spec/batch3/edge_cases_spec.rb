@@ -33,6 +33,7 @@ describe "reactive-record edge cases", js: true do
     TestApplicationPolicy.class_eval do
       always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
+      allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
     size_window(:small, :portrait)
   end
@@ -51,21 +52,35 @@ describe "reactive-record edge cases", js: true do
     end.to contain_exactly('0', '1', '2', '4')
   end
 
+  it "does not double count local saves" do
+    expect_promise do
+      HyperMesh.load do
+        Todo.count
+      end.then do |count|
+        Todo.create(title: 'test todo')
+      end.then do
+        Todo.count
+      end
+    end.to eq(1)
+  end
+
   xit "fetches data during prerendering" do # server_only not working!
     # test for fix in prerendering fetch which was causing security violations
     5.times do |i|
       FactoryBot.create(:todo, title: "Todo #{i}")
     end
-    mount "TestComponent2", {}, render_on: :server_only do
-      class TestComponent2 < React::Component::Base
+    mount "TestComponent77", {}, render_on: :both do
+      class TestComponent77 < Hyperloop::Component
         render(UL) do
-          Todo.each do |todo|
-            # try Todo.find_by_title ... as well
-            LI { todo.title }
-          end
+          puts "Todo defined? #{defined? Todo} class? #{Todo.class}"
+          LI { "fred" }
+          #Todo.each do |todo|
+          #   # try Todo.find_by_title ... as well
+          #   LI { todo.title }
+          # end
         end
       end
     end
-
+    binding.pry
   end
 end

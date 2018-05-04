@@ -124,12 +124,12 @@ module ComponentTestHelpers
           @component_name = test_params[0]
           @component_params = test_params[1]
           render_params = test_params[2]
-          render_on = render_params.delete(:render_on) || :both
+          render_on = render_params.delete(:render_on) || :client_only
           mock_time = render_params.delete(:mock_time)
           style_sheet = render_params.delete(:style_sheet)
           javascript = render_params.delete(:javascript)
           code = render_params.delete(:code)
-          page = "<%= react_component @component_name, @component_params, { prerender: false } %>"  # false should be:  "#{render_on != :client_only} } %>" but its not working in the gem testing harness
+          page = "<%= react_component @component_name, @component_params, { prerender: #{render_on != :client_only} } %>"  # false should be:  "#{render_on != :client_only} } %>" but its not working in the gem testing harness
           page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
 
           if code
@@ -316,11 +316,29 @@ module ComponentTestHelpers
       opts[:code] = Opal.compile(block_with_helpers)
     end
     component_name ||= 'React::Component::HyperTestDummy'
-    Rails.cache.write(test_url, [component_name, params, opts])
+    ::Rails.cache.write(test_url, [component_name, params, opts])
+
+    # this code copied from latest hyper-spec
+    test_code_key = "hyper_spec_prerender_test_code.js"
+    #::Rails.configuration.react.server_renderer_options[:files] ||= ['hyperloop-prerender-loader.js']
+    @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files] || [] #'hyperloop-prerender-loader.js']
+    if opts[:render_on] == :both || opts[:render_on] == :server_only
+      unless opts[:code].blank?
+        ::Rails.cache.write(test_code_key, opts[:code])
+        ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files + [test_code_key]
+        ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
+      else
+        ::Rails.cache.delete(test_code_key)
+        ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files
+        ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
+      end
+    end
+    # end of copied code
+
     visit test_url
     wait_for_ajax unless opts[:no_wait]
     page.instance_variable_set("@hyper_spec_mounted", true)
-    end
+  end
 
   [:callback_history_for, :last_callback_for, :clear_callback_history_for, :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
     define_method(method) { |event_name| evaluate_script("Opal.React.TopLevelRailsComponent.$#{method}('#{event_name}')") }

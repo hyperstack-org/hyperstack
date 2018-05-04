@@ -293,7 +293,7 @@ module ReactiveRecord
     end
 
     def errors!(hash)
-      @saving = false
+      notify_waiting_for_save
       errors.clear && return unless hash
       hash.each do |attribute, messages|
         messages.each do |message|
@@ -303,7 +303,7 @@ module ReactiveRecord
     end
 
     def saved!(save_only = nil) # sets saving to false AND notifies
-      @saving = false
+      notify_waiting_for_save
       return self if save_only
       if errors.empty?
         React::State.set_state(self, self, :saved)
@@ -311,6 +311,26 @@ module ReactiveRecord
         React::State.set_state(self, self, :error)
       end
       self
+    end
+
+    def self.when_not_saving(model, &block)
+      if @records[model].detect(&:saving?)
+        wait_for_save(model, &block)
+      else
+        yield model
+      end
+    end
+
+    def notify_waiting_for_save
+      @saving = false
+      self.class.notify_waiting_for_save(model)
+    end
+
+    def self.notify_waiting_for_save(model)
+      waiters = waiting_for_save(model)
+      return if waiters.empty? || @records[model].detect(&:saving?)
+      waiters.each { |waiter| waiter.call model }
+      clear_waiting_for_save(model)
     end
 
     def saving?
@@ -354,21 +374,6 @@ module ReactiveRecord
 
       def add_to_outer_scopes(item)
         @outer_scopes << item
-      end
-
-      # when_not_saving will wait until reactive-record is not saving a model.
-      # Currently there is no easy way to do this without polling.
-      def when_not_saving(model)
-        if @records[model].detect(&:saving?)
-          poller = every(0.1) do
-            unless @records[model].detect(&:saving?)
-              poller.stop
-              yield model
-            end
-          end
-        else
-          yield model
-        end
       end
 
       # While evaluating scopes we want to catch any requests

@@ -26,6 +26,12 @@ module TestApp
 
     config.assets.cache_store = :null_store
     config.hyperloop.auto_config = false
+
+    config.react.server_renderer_options = {
+      files: ['server_rendering.js']
+    }
+    config.react.server_renderer_directories = ['/app/assets/javascripts']
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

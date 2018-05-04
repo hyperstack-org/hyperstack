@@ -40,7 +40,6 @@ module ActiveRecord
             h.each do |attribute, value|
               next if attribute == primary_key
               @ar_instance[attribute] = value
-              puts "#{self.class}.new : changed_attributes << #{attribute}"
               changed_attributes << attribute
             end
           end
