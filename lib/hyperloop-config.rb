@@ -1,4 +1,5 @@
 if RUBY_ENGINE == 'opal'
+  require 'hyperloop/string'
   require 'hyperloop/client_stubs'
   require 'hyperloop/context'
   require 'hyperloop/on_client'
