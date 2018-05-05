@@ -130,10 +130,9 @@ module ComponentTestHelpers
           javascript = render_params.delete(:javascript)
           code = render_params.delete(:code)
           page = "<%= react_component @component_name, @component_params, { prerender: #{render_on != :client_only} } %>"  # false should be:  "#{render_on != :client_only} } %>" but its not working in the gem testing harness
-          page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
-
-          if code
-            page = "<script type='text/javascript'>\n#{code}\n</script>\n"+page
+          unless render_on == :server_only
+            page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
+            page = "<script type='text/javascript'>\n#{code}\n</script>\n"+page if code
           end
 
           #TODO figure out how to auto insert this line????  something like:
@@ -159,7 +158,7 @@ module ComponentTestHelpers
           page = "<script type='text/javascript'>go = function() {window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
           title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
           title = "#{title}...continued." if ComponentTestHelpers.description_displayed
-          page = "<script type='text/javascript'>console.log(console.log('%c#{title}','color:green; font-weight:bold; font-size: 200%'))</script>\n#{page}"
+          page = "<script type='text/javascript'>console.log('%c#{title}','color:green; font-weight:bold; font-size: 200%')</script>\n#{page}"
           ComponentTestHelpers.description_displayed = true
           render_params[:inline] = page
           render render_params

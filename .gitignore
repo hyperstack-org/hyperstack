@@ -17,6 +17,7 @@ spec/test_app/Gemfile.lock
 /Gemfile.lock
 /examples/action-cable/rails_cache_dir/
 rails_cache_dir/
+react_prerendering_src.js
 
 .bundle/
 log/*.log

@@ -135,7 +135,7 @@ if RUBY_ENGINE != 'opal'
 
   module React
     module IsomorphicHelpers
-      def self.load_context(ctx, controller, name = nil)
+      def self.xxxload_context(ctx, controller, name = nil)
         @context = Context.new("#{controller.object_id}-#{Time.now.to_i}", ctx, controller, name)
       end
     end
@@ -307,7 +307,7 @@ if RUBY_ENGINE != 'opal'
       elsif client_options[:raise_on_js_errors] != :off && errors.present?
         raise JavaScriptError, errors.join("\n\n")
       end
-    end 
+    end
 
     config.include Capybara::DSL
 

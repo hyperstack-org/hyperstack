@@ -64,23 +64,54 @@ describe "reactive-record edge cases", js: true do
     end.to eq(1)
   end
 
-  xit "fetches data during prerendering" do # server_only not working!
-    # test for fix in prerendering fetch which was causing security violations
+  it "fetches data during prerendering" do
     5.times do |i|
       FactoryBot.create(:todo, title: "Todo #{i}")
     end
+    # cause spec to fail if there are attempts to fetch data after prerendering
+    hide_const 'ReactiveRecord::Operations::Fetch'
     mount "TestComponent77", {}, render_on: :both do
       class TestComponent77 < Hyperloop::Component
         render(UL) do
-          puts "Todo defined? #{defined? Todo} class? #{Todo.class}"
-          LI { "fred" }
-          #Todo.each do |todo|
-          #   # try Todo.find_by_title ... as well
-          #   LI { todo.title }
-          # end
+          Todo.each do |todo|
+            LI { todo.title }
+          end
         end
       end
     end
-    binding.pry
+    Todo.all.each do |todo|
+      page.should have_content(todo.title)
+    end
+  end
+
+  it "prerenders a belongs to relationship" do
+    user_item = User.create(name: 'Fred')
+    todo_item = TodoItem.create(title: 'test-todo', user: user_item)
+    mount "PrerenderTest", {}, render_on: :server_only do
+      class PrerenderTest < Hyperloop::Component
+        render(DIV) do
+          TodoItem.first.user.name
+        end
+      end
+    end
+    page.should have_content("Fred")
+  end
+
+  it "the limit and offset predefined scopes work" do
+    5.times do |i|
+      FactoryBot.create(:todo, title: "Todo #{i}")
+    end
+    mount "TestComponent77" do
+      class TestComponent77 < Hyperloop::Component
+        render(UL) do
+          Todo.limit(2).offset(3).each do |todo|
+            LI { todo.title }
+          end
+        end
+      end
+    end
+    Todo.limit(2).offset(3).each do |todo|
+      page.should have_content(todo.title)
+    end
   end
 end

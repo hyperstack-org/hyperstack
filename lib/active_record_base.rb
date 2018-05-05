@@ -318,6 +318,11 @@ module ActiveRecord
           Hyperloop::InternalPolicy.accessible_attributes_for(self, acting_user)
         attributes.select { |attr| accessible_attributes.include? attr.to_sym }
       end
+
+      # regulate built in scopes so they are accesible from the client
+      %i[limit offset].each do |scope|
+        regulate_scope(scope) {}
+      end
     end
   end
 
