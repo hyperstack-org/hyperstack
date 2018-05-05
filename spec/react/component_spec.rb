@@ -116,7 +116,7 @@ describe 'React::Component', js: true do
           def self.get_error
             @@error
           end
-          
+
           def self.get_info
             @@info
           end
@@ -133,6 +133,48 @@ describe 'React::Component', js: true do
       end
       expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
       expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in React::TopLevelRailsComponent")
+    end
+  end
+
+  describe 'Misc Methods' do
+    it 'has a force_update! method' do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          class << self
+            attr_accessor :render_counter
+            attr_accessor :instance
+          end
+          before_mount do
+            Foo.render_counter = 0
+            Foo.instance = self
+          end
+          def render
+            Foo.render_counter += 1
+            DIV { "I have been rendered #{Foo.render_counter} times" }
+          end
+        end
+      end
+      expect_evaluate_ruby do
+        Foo.instance.force_update!
+        Foo.render_counter
+      end.to eq(2)
+    end
+
+    it 'has its force_update! method return itself' do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          class << self
+            attr_accessor :instance
+          end
+          before_mount do
+            Foo.instance = self
+          end
+          def render
+            DIV { "I have been rendered" }
+          end
+        end
+      end
+      expect_evaluate_ruby('Foo.instance == Foo.instance.force_update!').to be_truthy
     end
   end
 
@@ -843,7 +885,6 @@ describe 'React::Component', js: true do
 
     it 'only overrides `p` in render context' do
       mount 'Foo' do
-        
         class Foo
           include React::Component
 

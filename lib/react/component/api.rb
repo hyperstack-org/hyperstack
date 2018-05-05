@@ -11,6 +11,7 @@ module React
 
       def force_update!
         `#{self}.native.forceUpdate()`
+        self
       end
 
       def set_props(prop, &block)
