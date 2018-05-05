@@ -103,7 +103,7 @@ describe 'the React DSL', js: true do
         end
       end
     end
-    expect(page.body[-80..-19]).to match(/(<div data-reactroot=""|<div)><span>hello<(br|br\/|br \/)><\/span><\/div>/)
+    expect(page.body[-285..-233]).to match(/(<div data-reactroot=""|<div)><span>hello<(br|br\/|br \/)><\/span><\/div>/)
   end
 
   it "has a .td short hand String method" do
@@ -197,7 +197,7 @@ describe 'the React DSL', js: true do
         'raised for sure!'
       end
     end.to eq('raised for sure!')
-      
+
   end
 
   it "will treat the component class name as a first class component name" do

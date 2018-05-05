@@ -28,7 +28,7 @@ describe 'React::Element', js: true do
           end
         end
       end
-      expect(page.body[-80..-19]).to match(/<input (type="text" value=""|value="" type="text").*\/>/)
+      expect(page.body[-285..-233]).to match(/<input (type="text" value=""|value="" type="text").*\/>/)
     end
   end
 
@@ -62,7 +62,7 @@ describe 'React::Element', js: true do
     end
 
     it 'will subscribe to a native components event param' do
-      
+
       evaluate_ruby do
         "this makes sure everything is loaded"
       end
@@ -84,7 +84,7 @@ describe 'React::Element', js: true do
     end
 
     it 'will subscribe to a component event param with a non-default name' do
-      
+
       evaluate_ruby do
         class Foo < React::Component::Base
           param :my_event, type: Proc, default: nil, allow_nil: true

@@ -12,9 +12,9 @@ module ReactiveRuby
           options = context_initializer_options(options, name)
         end
         props = serialized_props(props, name, controller)
-        super(top_level_name, props, options, &block).gsub("\n","")
-          .gsub(/(<script>.*<\/script>)<\/div>$/,'</div>\1').html_safe +
-          footers
+        result = super(top_level_name, props, options, &block).gsub("\n","")
+        result = result.gsub(/(<script.*<\/script>)<\/div>$/,'</div>\1').html_safe
+        result + footers
       end
 
       private

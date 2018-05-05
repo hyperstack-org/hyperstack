@@ -23,4 +23,15 @@ Element.instance_eval do
 
     React.render(React.create_element(`#{self.to_n}._reactrb_component_class`), self)
   end
+
+  # mount_components is useful for dynamically generated page segments for example
+  # see react-rails documentation for more details
+
+  %x{
+    $.fn.mount_components = function() {
+      this.each(function(e) { ReactRailsUJS.mountComponents(e[0]) })
+      return this;
+    }
+  }
+  Element.expose :mount_components
 end if Object.const_defined?('Element')

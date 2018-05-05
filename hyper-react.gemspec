@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rake'

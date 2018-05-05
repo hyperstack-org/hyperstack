@@ -67,5 +67,28 @@ describe 'opal-jquery extensions', js: true do
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
           .not_to match(/Exception|Error/)
     end
+
+    it "can dynamically mount components" do
+      on_client do
+        class DynoMount < Hyperloop::Component
+          render(DIV) { 'I got rendered' }
+        end
+      end
+      mount 'MountPoint' do
+        class MountPoint < Hyperloop::Component
+          render(DIV) do
+            # simulate what react-rails render_component output
+            DIV(
+              'data-react-class' => 'React.TopLevelRailsComponent',
+              'data-react-props' => '{"render_params": {}, "component_name": "DynoMount", "controller": ""}'
+            )
+          end
+        end
+      end
+      evaluate_ruby do
+        Element['body'].mount_components
+      end
+      expect(page).to have_content('I got rendered')
+    end
   end
 end

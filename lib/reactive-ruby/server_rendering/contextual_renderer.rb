@@ -14,6 +14,11 @@ module ReactiveRuby
         ComponentLoader.new(v8_context).load
       end
 
+      def before_render(*args)
+        # the base class clears the log history... we don't want that as it is taken
+        # care of in IsomorphicHelpers.load_context
+      end
+
       def render(component_name, props, prerender_options)
         if prerender_options.is_a?(Hash)
           if !v8_runtime? && prerender_options[:context_initializer]
