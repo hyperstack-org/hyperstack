@@ -1,25 +1,16 @@
 module Hyperloop
   module AutoCreate
+    def table_exists?
+      # works with both rails 4 and 5 without deprecation warnings
+      if connection.respond_to?(:data_sources)
+        connection.data_sources.include?(table_name)
+      else
+        connection.tables.include?(table_name)
+      end
+    end
+
     def needs_init?
-      return false if Hyperloop.transport == :none
-      return true if connection.respond_to?(:data_sources) && !connection.data_sources.include?(table_name)
-      return true if !connection.respond_to?(:data_sources) && !connection.tables.include?(table_name)
-      Hyperloop.on_server?
-      # the above line appears equivilent to the following two original lines
-      # the only
-      #   return false unless Hyperloop.on_server?
-      #   return true if defined?(Rails::Server)
-      # the following lines appeared to be unreachable but perhaps because on_server uses Rails.const_defined? it has some
-      # subtle difference.
-      #   return true unless Connection.root_path
-      #   uri = URI("#{Connection.root_path}server_up")
-      #   http = Net::HTTP.new(uri.host, uri.port)
-      #   request = Net::HTTP::Get.new(uri.path)
-      #   if uri.scheme == 'https'
-      #     http.use_ssl = true
-      #     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      #   end
-      #   http.request(request) && return rescue true
+      Hyperloop.transport != :none && Hyperloop.on_server? && !table_exists?
     end
 
     def create_table(*args, &block)
@@ -111,6 +102,10 @@ module Hyperloop
       attr_accessor :transport
 
       def active
+        # if table doesn't exist then we are either calling from within
+        # a migration or from a console before the server has ever started
+        # in these cases there are no channels so we return nothing
+        return [] unless table_exists?
         if Hyperloop.on_server?
           expired.delete_all
           refresh_connections if needs_refresh?
@@ -158,9 +153,10 @@ module Hyperloop
       end
 
       def root_path
-        QueuedMessage.root_path
-      rescue
-        nil
+        # if the QueuedMessage table doesn't exist then we are either calling from within
+        # a migration or from a console before the server has ever started
+        # in these cases there is no root path to the server
+        QueuedMessage.root_path if QueuedMessage.table_exists?
       end
 
       def refresh_connections

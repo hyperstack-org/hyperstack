@@ -1,3 +1,5 @@
+require 'net/http' unless RUBY_ENGINE == 'opal'
+
 module Hyperloop
   class ServerOp < Operation
 
