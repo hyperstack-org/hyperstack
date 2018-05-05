@@ -49,9 +49,10 @@ module HyperSpec
 
             page = '<%= react_component @component_name, @component_params, '\
                    "{ prerender: #{render_on != :client_only} } %>"
-            page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
-
-            page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
+            unless render_on == :server_only
+              page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}"
+              page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
+            end
 
             if render_on != :server_only || Lolex.initialized?
               page = "<script type='text/javascript'>\n#{TIME_COP_CLIENT_PATCH}\n</script>\n#{page}"
