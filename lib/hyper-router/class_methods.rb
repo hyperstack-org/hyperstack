@@ -38,7 +38,7 @@ module HyperRouter
 
     def render_router(&block)
       define_method(:render) do
-        raise(HyperRouter::NoHistoryError, 'A history must be defined') unless history
+        self.class.history :browser unless history
 
         React::Router::Router(history: history.to_n) do
           instance_eval(&block)

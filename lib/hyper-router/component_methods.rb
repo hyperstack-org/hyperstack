@@ -16,6 +16,9 @@ module HyperRouter
       opts[:activeClassName] = opts.delete(:active_class).to_n if opts[:active_class]
       opts[:activeStyle] = opts.delete(:active_style).to_n if opts[:active_style]
       opts[:isActive] = opts.delete(:active).to_n if opts[:active]
+      if (%i[activeClassName activeStyle isActive] & opts.keys).any?
+        React::State.get_state(HyperRouter, :location)
+      end
       React::Router::DOM::NavLink(opts, &children)
     end
 
