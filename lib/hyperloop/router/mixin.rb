@@ -22,16 +22,6 @@ module Hyperloop
             define_method(:history) do
               params.history
             end
-
-            before_mount do
-              @_react_router_unlisten = history.listen do |location, action|
-                React::State.set_state(HyperRouter, :location, location)
-              end if history
-            end
-
-            before_unmount do
-              @_react_router_unlisten.call if @_react_router_unlisten
-            end
           end
         end
       end
