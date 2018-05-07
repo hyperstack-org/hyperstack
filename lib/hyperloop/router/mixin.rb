@@ -26,7 +26,7 @@ module Hyperloop
             before_mount do
               @_react_router_unlisten = history.listen do |location, action|
                 React::State.set_state(HyperRouter, :location, location)
-              end
+              end if history
             end
 
             before_unmount do
