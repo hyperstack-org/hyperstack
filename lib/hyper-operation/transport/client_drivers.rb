@@ -8,7 +8,7 @@ module Hyperloop
 
   class Application
     extend React::IsomorphicHelpers::ClassMethods
-    
+
     if on_opal_client?
       def self.acting_user_id
         ClientDrivers.opts[:acting_user_id]
@@ -90,7 +90,7 @@ module Hyperloop
                 {
                   connected: function() {
                     if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable connected to: ", channel_string); }
-                    #{ClientDrivers.get_queued_data("connect-to-transport", channel_string)}
+                    #{ClientDrivers.notify_of_connection(channel_string)}
                   },
                   received: function(data) {
                     if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable received: ", data); }
@@ -181,6 +181,12 @@ module Hyperloop
       f.when_on_server { ::Rails.env }
     end
 
+    def self.notify_of_connection(channel, retries = 10)
+      get_queued_data('connect-to-transport', channel).fail do
+        after(0.2) { notify_of_connection(channel, retries - 1) } unless retries.zero?
+      end
+    end
+
     def self.get_queued_data(operation, channel = nil, opts = {})
       Hyperloop::HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |data|
@@ -208,9 +214,9 @@ module Hyperloop
       @opts = {}
 
       if on_opal_client?
-        
+
         @opts = Hash.new(`window.HyperloopOpts`)
-        
+
 
         if opts[:transport] == :pusher
 
