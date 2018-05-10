@@ -2,28 +2,10 @@
 
 require 'hyper-component'
 
-Hyperloop.import 'hyper-router/react-router-source'
+Hyperloop.js_import 'hyper-router/react-router-source', defines: ['ReactRouter', 'ReactRouterDOM', 'History']
 Hyperloop.import 'hyper-router'
 
 if RUBY_ENGINE == 'opal'
-  no_router_source = `Opal.global.ReactRouter === undefined`
-  no_router_dom_source = `Opal.global.ReactRouterDOM === undefined`
-  if no_router_source || no_router_dom_source
-    error = <<-ERROR
-  No react-router.js or react-router-dom.js Available.
-
-  A global 'ReactRouter' and 'ReactRouterDOM' must be defined before requiring 'hyper-router'.
-
-  To USE THE BUILT-IN SOURCE:
-    add 'require \"hyper-router/react-router-source\"'
-    immediately before the 'require \"hyper-router\" directive.
-
-  IF USING NPM/WEBPACK:
-    add '\"react-router\": \"^4.1.1\"' and '\"react-router-dom\": \"^4.1.1\"' to your package.json.)
-    ERROR
-    raise error
-  end
-
   require 'react/router'
   require 'react/router/dom'
   require 'react/router/history'
