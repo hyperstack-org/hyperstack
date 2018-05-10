@@ -1,28 +1,15 @@
 require 'hyperloop-config'
 Hyperloop.import 'hyper-store'
-Hyperloop.import 'react/react-source-browser', client_only: true
-Hyperloop.import 'react/react-source-server', server_only: true
+Hyperloop.js_import 'react/react-source-browser', client_only: true, defines: ['ReactDOM', 'React']
+Hyperloop.js_import 'react/react-source-server', server_only: true, defines: 'React'
 Hyperloop.import 'browser/delay', client_only: true
 Hyperloop.import 'hyper-react'
-Hyperloop.import 'react_ujs'
+Hyperloop.js_import 'react_ujs', defines: 'ReactRailsUJS'
 
 if RUBY_ENGINE == 'opal'
   module Hyperloop
     class Component
     end
-  end
-
-  if `Opal.global.React === undefined || Opal.global.React.version === undefined`
-    raise [
-      "No React.js Available",
-      "",
-      "A global `React` must be defined before requiring 'hyper-react'",
-      "",
-      "To USE THE BUILT-IN SOURCE: ",
-      "   add 'require \"react/react-source-browser\"' immediately before the 'require \"hyper-react\" directive.",
-      "IF USING WEBPACK:",
-      "   add 'react' to your webpack manifest."
-    ].join("\n")
   end
   require 'react/top_level'
   require 'react/top_level_render'
