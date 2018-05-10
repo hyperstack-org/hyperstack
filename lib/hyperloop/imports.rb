@@ -5,9 +5,9 @@ module Hyperloop
       @import_list ||= []
     end
 
-    def import(value, gem: nil, cancelled: nil, client_only: nil, server_only: nil, tree: nil)
+    def import(value, gem: nil, cancelled: nil, client_only: nil, server_only: nil, tree: nil, js_import: nil)
       unless import_list.detect { |current_value, *_rest| value == current_value }
-        import_list << [value, cancelled, !client_only, !server_only, (tree ? :tree : :gem)]
+        import_list << [value, cancelled, !client_only, !server_only, (tree ? :tree : :gem), js_import]
       end
     end
 
@@ -18,15 +18,32 @@ module Hyperloop
     end
 
     def cancel_import(value)
+      return unless value
       current_spec = import_list.detect { |old_value, *_rest| value == old_value }
       if current_spec
-        current_spec[1] = true 
+        current_spec[1] = true
       else
         import_list << [value, true, true, true, false]
       end
     end
 
+    def cancel_webpack_imports
+      import_list.collect { |name, _c, _co, _so, _t, js_import, *_rest| js_import && name }
+                 .each { |name| cancel_import name }
+    end
+
+    def handle_webpack
+      return unless defined? Webpacker
+      client_only_manifest = Webpacker.manifest.lookup("client_only.js")
+      client_and_server_manifest = Webpacker.manifest.lookup("client_and_server.js")
+      return unless client_only_manifest || client_and_server_manifest
+      cancel_webpack_imports
+      import client_only_manifest.split("/").last, client_only: true if client_only_manifest
+      import client_and_server_manifest.split("/").last if client_and_server_manifest
+    end
+
     def generate_requires(mode, sys, file)
+      handle_webpack
       import_list.collect do |value, cancelled, render_on_server, render_on_client, kind|
         next if cancelled
         next if (sys && kind == :tree) || (!sys && kind != :tree)

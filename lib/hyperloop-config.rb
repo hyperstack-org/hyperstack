@@ -2,16 +2,21 @@ if RUBY_ENGINE == 'opal'
   require 'hyperloop/string'
   require 'hyperloop/client_stubs'
   require 'hyperloop/context'
+  require 'hyperloop/js_imports'
   require 'hyperloop/on_client'
   require 'hyperloop/active_support_string_inquirer.rb'
   require 'hyperloop_env'
 else
   require 'opal'
   require 'opal-browser'
-  require 'opal-rails' if defined? Rails
+  begin
+    require 'opal-rails' if defined? Rails
+  rescue LoadError
+  end
   require 'hyperloop/config_settings'
   require 'hyperloop/context'
   require 'hyperloop/imports'
+  require 'hyperloop/js_imports'
   require 'hyperloop/client_readers'
   require 'hyperloop/on_client'
   require 'hyperloop/rail_tie' if defined? Rails
