@@ -240,10 +240,10 @@ module HyperSpec
           ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
         end
       end
-      Lolex.init(self, client_options[:time_zone], client_options[:clock_resolution])
       visit test_url
       wait_for_ajax unless opts[:no_wait]
       page.instance_variable_set('@hyper_spec_mounted', true)
+      Lolex.init(self, client_options[:time_zone], client_options[:clock_resolution])
     end
 
     [:callback_history_for, :last_callback_for, :clear_callback_history_for,
