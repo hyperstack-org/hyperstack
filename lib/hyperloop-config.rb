@@ -22,6 +22,7 @@ else
   require 'hyperloop/rail_tie' if defined? Rails
   require 'hyperloop/active_support_string_inquirer.rb' unless defined? ActiveSupport
   require 'hyperloop/env'
+  require 'hyperloop/on_error'
   Hyperloop.import 'opal', gem: true
   Hyperloop.import 'browser', client_only: true
   Hyperloop.import 'hyperloop-config', gem: true
