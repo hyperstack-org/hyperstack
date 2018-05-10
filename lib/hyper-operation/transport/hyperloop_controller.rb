@@ -136,6 +136,8 @@ module Hyperloop
       def connect_to_transport
         root_path = request.original_url.gsub(/hyperloop-connect-to-transport.*$/, '')
         render json: Hyperloop::Connection.connect_to_transport(params[:channel], client_id, root_path)
+      rescue Exception => e
+        render status: :service_unavailable, json: {error: e}
       end
 
       def execute_remote

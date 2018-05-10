@@ -52,7 +52,9 @@ module Hyperloop
       def run_from_client(security_param, controller, operation, params)
         if Rails.env.production?
           # in production everything is eager loaded so ServerOp.descendants is filled and can be used to guard the .constantize
-          Hyperloop::InternalPolicy.raise_operation_access_violation unless Hyperloop::ServerOp.descendants_map_cache.include?(operation)
+          unless Hyperloop::ServerOp.descendants_map_cache.include?(operation)
+            Hyperloop::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (in production)")
+          end
           # however ...
         else
           # ... in development things are autoloaded on demand, thus ServerOp.descendants can be empty or partially filled and above guard
@@ -62,9 +64,11 @@ module Hyperloop
           begin
             const = Object.const_get(operation)
           rescue NameError
-            Hyperloop::InternalPolicy.raise_operation_access_violation
+            Hyperloop::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (const not found)")
           end
-          Hyperloop::InternalPolicy.raise_operation_access_violation unless const < Hyperloop::ServerOp
+          unless const < Hyperloop::ServerOp
+            Hyperloop::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (not a ServerOp subclass)")
+          end
         end
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)

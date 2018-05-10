@@ -90,7 +90,7 @@ module Hyperloop
                 {
                   connected: function() {
                     if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable connected to: ", channel_string); }
-                    #{ClientDrivers.notify_of_connection(channel_string)}
+                    #{ClientDrivers.complete_connection(channel_string)}
                   },
                   received: function(data) {
                     if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable received: ", data); }
@@ -181,9 +181,9 @@ module Hyperloop
       f.when_on_server { ::Rails.env }
     end
 
-    def self.notify_of_connection(channel, retries = 10)
+    def self.complete_connection(channel, retries = 10)
       get_queued_data('connect-to-transport', channel).fail do
-        after(0.2) { notify_of_connection(channel, retries - 1) } unless retries.zero?
+        after(0.25) { complete_connection(channel, retries - 1) } unless retries.zero?
       end
     end
 

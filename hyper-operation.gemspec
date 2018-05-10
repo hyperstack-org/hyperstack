@@ -46,4 +46,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-wait'
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
+  spec.add_development_dependency 'pry-rescue'
 end

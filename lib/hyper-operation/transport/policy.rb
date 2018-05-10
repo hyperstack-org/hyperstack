@@ -95,7 +95,7 @@ module Hyperloop
     def get_ar_model(str)
       if str.is_a?(Class)
         unless str <= ActiveRecord::Base
-          Hyperloop::InternalPolicy.raise_operation_access_violation
+          Hyperloop::InternalPolicy.raise_operation_access_violation(:non_ar_class, "#{str} is not a subclass of ActiveRecord::Base")
         end
         str
       else
@@ -109,7 +109,7 @@ module Hyperloop
           # AR::Base.descendants is eager loaded in production -> this guard works.
           # In development it may be empty or partially filled -> this guard may fail.
           # Thus guarded here only in production.
-          Hyperloop::InternalPolicy.raise_operation_access_violation
+          Hyperloop::InternalPolicy.raise_operation_access_violation(:non_ar_class, "#{str} is either not defined or is not a subclass of ActiveRecord::Base")
         end
         Object.const_get(str)
       end
@@ -368,7 +368,8 @@ module Hyperloop
       @obj
     end
 
-    def self.raise_operation_access_violation
+    def self.raise_operation_access_violation(message, details)
+      Hyperloop.on_error(Hyperloop::AccessViolation, message, details)
       raise Hyperloop::AccessViolation
     end
 
@@ -377,7 +378,7 @@ module Hyperloop
       if channel.length > 1
         id = channel[1..-1].join("-")
         unless Hyperloop::InternalClassPolicy.regulated_klasses.include?(channel[0])
-          Hyperloop::InternalPolicy.raise_operation_access_violation
+          Hyperloop::InternalPolicy.raise_operation_access_violation(:not_a_channel, "#{channel[0]} is not regulated channel class")
         end
         object = Object.const_get(channel[0]).find(id)
         InstanceConnectionRegulation.connect(object, acting_user)
