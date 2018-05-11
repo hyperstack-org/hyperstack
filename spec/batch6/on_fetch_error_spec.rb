@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'test_components'
 
-describe "ReactiveRecord.on_fetch_error", js: true do
+describe "Hyperloop.on_error (for fetches) ", js: true do
 
   before(:all) do
     require 'pusher'
@@ -39,7 +39,7 @@ describe "ReactiveRecord.on_fetch_error", js: true do
     ApplicationController.acting_user = nil
   end
 
-  it 'call ReactiveRecord.on_fetch_error for access violations' do
+  it 'call Hyperloop.on_error for access violations' do
     TodoItem.class_eval do
       TodoItem.regulate_relationship(:comments) { acting_user == user }
     end
@@ -47,13 +47,19 @@ describe "ReactiveRecord.on_fetch_error", js: true do
     todo_item2 = TodoItem.create(user: nil)
     Comment.create(todo_item: todo_item1)
     Comment.create(todo_item: todo_item1)
-    expect(ReactiveRecord).to receive(:on_fetch_error).once.with(
+    # expect(Hyperloop).to receive(:on_error).once.with(
+    #   Hyperloop::AccessViolation,
+    #   :fetch_error,
+    #   'acting_user' => ApplicationController.acting_user,
+    #   'controller' => kind_of(ActionController::Base),
+    #   'pending_fetches' => [['TodoItem', ['find_by', { 'id' => 2 }], 'comments', '*count']],
+    #   'models' => [],
+    #   'associations' => []
+    # )
+    expect(Hyperloop).to receive(:on_error).once.with(
       Hyperloop::AccessViolation,
-      'acting_user' => ApplicationController.acting_user,
-      'controller' => kind_of(ActionController::Base),
-      'pending_fetches' => [['TodoItem', ['find_by', { 'id' => 2 }], 'comments', '*count']],
-      'models' => [],
-      'associations' => []
+      :scoped_permission_not_granted,
+      anything
     )
     expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).comments.count }")
       .to eq(2)
@@ -68,8 +74,9 @@ describe "ReactiveRecord.on_fetch_error", js: true do
       end
     end
     TodoItem.create(user: nil)
-    expect(ReactiveRecord).to receive(:on_fetch_error).once.with(
+    expect(Hyperloop).to receive(:on_error).once.with(
       Exception,
+      :fetch_error,
       hash_including(:acting_user, :controller, :pending_fetches, :models, :associations)
     )
     evaluate_ruby('TodoItem.find(1).title')

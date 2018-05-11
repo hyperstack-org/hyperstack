@@ -42,7 +42,7 @@ module ActiveRecord
       def __secure_collection_check(acting_user)
         return self if __synchromesh_permission_granted
         return self if __secure_remote_access_to_unscoped(self, acting_user).__synchromesh_permission_granted
-        denied!
+        Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_permission_not_granted, "Last relation: #{self}, acting_user: #{acting_user}")
       end
     end
     # Monkey patches and extensions to base
@@ -56,7 +56,7 @@ module ActiveRecord
         # access protection fault.
 
         def denied!
-          Hyperloop::InternalPolicy.raise_operation_access_violation
+          Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self} regulation denies scope access.  Called from #{caller_locations(1)}")
         end
 
         # Here we set up the base `all` and `unscoped` methods.  See below for more on how
@@ -275,7 +275,7 @@ module ActiveRecord
       end
 
       def denied!
-        Hyperloop::InternalPolicy.raise_operation_access_violation
+        Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self.class} regulation denies scope access.  Called from #{caller_locations(1)}")
       end
 
       # call do_not_synchronize to block synchronization of a model

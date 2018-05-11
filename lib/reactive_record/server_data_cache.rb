@@ -122,7 +122,7 @@ module ReactiveRecord
           #
           # If str is not already loaded then we have an access violation.
           unless const_defined? str
-            Hyperloop::InternalPolicy.raise_operation_access_violation
+            Hyperloop::InternalPolicy.raise_operation_access_violation(:undefined_const, "#{str} is not a loaded constant")
           end
           str.constantize
         end

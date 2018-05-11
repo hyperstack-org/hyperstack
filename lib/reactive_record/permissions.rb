@@ -96,7 +96,6 @@ class ActiveRecord::Base
     end
   end
 
-
   def check_permission_with_acting_user(user, permission, *args)
     old = acting_user
     self.acting_user = user
@@ -104,7 +103,7 @@ class ActiveRecord::Base
       self.acting_user = old
       self
     else
-      raise Hyperloop::AccessViolation, "for #{permission}(#{args})"
+      Hyperloop::InternalPolicy.raise_operation_access_violation(:crud_access_violation, "for #{permission}(#{args}) acting_user: #{user}")
     end
   end
 

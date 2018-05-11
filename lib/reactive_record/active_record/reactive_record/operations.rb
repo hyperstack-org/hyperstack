@@ -50,7 +50,7 @@ module ReactiveRecord
     end
     # fetch queued up records from the server
     # subclass of ControllerOp so we can pass the controller
-    # along to on_fetch_error
+    # along to on_error
     class Fetch < Base
       param :acting_user, nils: true
       param models: []
@@ -65,7 +65,8 @@ module ReactiveRecord
         ]
       end
       failed do |e|
-        ReactiveRecord.on_fetch_error(e, params.to_h)
+        # AccessViolations are already sent to on_error
+        Hyperloop.on_error(e, :fetch_error, params.to_h) unless e.is_a? Hyperloop::AccessViolation
         raise e
       end
     end
