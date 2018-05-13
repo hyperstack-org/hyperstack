@@ -69,8 +69,8 @@ module React
       onMouseDown onMouseEnter onMouseLeave onMouseMove onMouseOut onMouseOver
       onMouseUp onSelect onTouchCancel onTouchEnd onTouchMove onTouchStart onScroll onWheel}
 
-    def initialize(native_element)
-      @native = native_element
+    def initialize(native_event)
+      @native = native_event
     end
   end
 end
