@@ -7,8 +7,6 @@ require File.expand_path('../boot', __FILE__)
 
 Bundler.require(*Rails.groups(assets: %w(development test)))
 require 'opal'
-require 'opal-jquery'
-require 'opal-rails'
 require 'hyper-router'
 require 'hyper-component'
 
