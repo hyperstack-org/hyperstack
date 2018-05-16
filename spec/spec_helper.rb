@@ -2,7 +2,6 @@ ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
 require 'opal-rspec'
-require 'opal-jquery'
 
 begin
   require File.expand_path('../test_app/config/environment', __FILE__)
