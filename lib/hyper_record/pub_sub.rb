@@ -9,6 +9,7 @@ module HyperRecord
     module ClassMethods
       attr_accessor :policy_params
 
+      # @private
       def _pusher_client
         Hyperloop.pusher_instance ||= Pusher::Client.new(
           app_id: Hyperloop.pusher[:app_id],
@@ -18,6 +19,13 @@ module HyperRecord
         )
       end
 
+      # send message about record change to all subscribers of this record
+      #
+      # @param record of ORM specific type
+      #   record must respond to:
+      #     id
+      #     updated_at
+      #     destroyed?
       def publish_record(record)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record.class}__#{record.id}")
         time_now = Time.now.to_f
@@ -47,6 +55,19 @@ module HyperRecord
         Hyperloop.redis_instance.del("HRPS__#{record.class}__#{record.id}") if record.destroyed?
       end
 
+      # send message about relation change to all subscribers of this record
+      #
+      # @param base_record of ORM specific type
+      #   base_record must respond to:
+      #     id
+      #     updated_at
+      #     destroyed?
+      # @param relation_name [String]
+      # @param record of ORM specific type the record who causes the change
+      #   record must respond to:
+      #     id
+      #     updated_at
+      #     destroyed?
       def publish_relation(base_record, relation_name, record = nil)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{base_record.class}__#{base_record.id}__#{relation_name}")
         time_now = Time.now.to_f
@@ -79,6 +100,10 @@ module HyperRecord
         end
       end
 
+      # send message to notify clients that they should call the rest_class_method again
+      #
+      # @param record_class ORM specific
+      # @param rest_class_method_name [String]
       def publish_rest_class_method(record_class, rest_class_method_name)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record_class}__rest_class_method__#{rest_class_method_name}")
         time_now = Time.now.to_f
@@ -102,6 +127,10 @@ module HyperRecord
         end
       end
 
+      # send message to notify clients that they should call the rest_method again
+      #
+      # @param record of ORM specific type
+      # @param rest_method_name [String]
       def publish_rest_method(record, method_name)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record.class}__#{record.id}__rest_method__#{method_name}")
         time_now = Time.now.to_f
@@ -126,6 +155,10 @@ module HyperRecord
         end
       end
 
+      # send message about scope change to all subscribers
+      #
+      # @param record_class ORM specific
+      # @param scope_name [String]
       def publish_scope(record_class, scope_name)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record_class}__scope__#{scope_name}")
         time_now = Time.now.to_f
@@ -149,11 +182,19 @@ module HyperRecord
         end
       end
 
+      # subscribe to record changes
+      #
+      # @param record of ORM specific type
       def subscribe_record(record)
         return unless session.id
         Hyperloop.redis_instance.hset "HRPS__#{record.class}__#{record.id}", session.id.to_s, Time.now.to_f.to_s
       end
 
+      # subscribe to relation changes
+      #
+      # @param relation [Enumarable] or record of ORM specific type, subscribe to each member of relation
+      # @param base_record optional, of ORM specific type, subscribe to this record too
+      # @param relation_name [String] optional name of the relation
       def subscribe_relation(relation, base_record = nil, relation_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
@@ -172,6 +213,10 @@ module HyperRecord
         end
       end
 
+      # subscribe to rest_class_method updates
+      #
+      # @param record_class ORM specific
+      # @param rest_class_method_name [String] name of the rest_class_method
       def subscribe_rest_class_method(record_class, rest_class_method_name)
         return unless session.id
         time_now = Time.now.to_f.to_s
@@ -181,6 +226,10 @@ module HyperRecord
         end
       end
 
+      # subscribe to rest_method updates
+      #
+      # @param record of ORM specific type
+      # @param rest_method_name [String] name of the rest_method
       def subscribe_rest_method(record, rest_method_name)
         return unless session.id
         time_now = Time.now.to_f.to_s
@@ -188,6 +237,11 @@ module HyperRecord
         Hyperloop.redis_instance.hset("HRPS__#{record.class}__#{record.id}__rest_method__#{rest_method_name}", session_id, time_now)
       end
 
+      # subscribe to scope updates
+      #
+      # @param collection [Enumerable] subscribe to each member of collection
+      # @param record_class optional, ORM specific
+      # @param scope_name [String] optional
       def subscribe_scope(collection, record_class = nil, scope_name = nil)
         return unless session.id
         time_now = Time.now.to_f.to_s
@@ -202,26 +256,58 @@ module HyperRecord
         end
       end
 
+      # subscribe to record and then publish
+      #
+      # @param record of ORM psecific type
       def pub_sub_record(record)
         subscribe_record(record)
         publish_record(record)
       end
 
+      # subscribe to relation changes and then publish them
+      #
+      # @param relation [Enumarable] or record of ORM specific type, subscribe to each member of relation
+      # @param base_record of ORM specific type
+      #   base_record must respond to:
+      #     id
+      #     updated_at
+      #     destroyed?
+      # @param relation_name [String]
+      # @param record of ORM specific type the record who causes the change
+      #   record must respond to:
+      #     id
+      #     updated_at
+      #     destroyed?
       def pub_sub_relation(relation, base_record, relation_name, causing_record = nil)
         subscribe_relation(relation, base_record, relation_name)
         publish_relation(base_record, relation_name, causing_record)
       end
 
+      # subscribe to rest_class_method and then send message to notify clients that
+      # they should call the rest_class_method again
+      #
+      # @param record_class ORM specific
+      # @param rest_class_method_name [String]
       def pub_sub_rest_class_method(record_class, rest_class_method_name)
         subscribe_rest_class_method(record_class, rest_class_method_name)
         publish_rest_class_method(record_class, rest_class_method_name)
       end
 
+      # subscribe to rest_method and then send message to notify clients that
+      # they should call the rest_method again
+      #
+      # @param record_class ORM specific
+      # @param rest_method_name [String]
       def pub_sub_rest_method(record, rest_method_name)
         subscribe_rest_method(record, rest_method_name)
         publish_rest_method(record, rest_method_name)
       end
 
+      # subscribe to scope changes and send message about scope change to all subscribers
+      #
+      # @param collection [Enumerable] subscribe to each member of collection
+      # @param record_class ORM specific
+      # @param scope_name [String]
       def pub_sub_scope(collection, record_class, scope_name)
         subscribe_scope(collection, record_class, scope_name)
         publish_scope(record_class, scope_name)
@@ -232,8 +318,7 @@ module HyperRecord
       end
     end
 
-    # instance methods
-
+    # (see ClassMethods#get)
     def publish_record(record)
       self.class.publish_record(record)
     end

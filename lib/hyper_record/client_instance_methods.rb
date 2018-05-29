@@ -1,6 +1,9 @@
 module HyperRecord
   module ClientInstanceMethods
 
+    # initialize a new instance of current HyperRecord class
+    #
+    # @param [Hash] inital values for properties
     def initialize(record_hash = {})
       # initalize internal data structures
       record_hash = {} if record_hash.nil?
@@ -57,23 +60,42 @@ module HyperRecord
       self.class._record_cache[@properties[:id].to_s] = self if @properties.has_key?(:id)
     end
 
-    ### reactive api
+    ### high level api
 
+    # destroy record, success is assumed
+    #
+    # @return nil
     def destroy
       promise_destroy
       nil
     end
 
+    # check if record has been destroyed
+    #
+    # @return [Boolean]
     def destroyed?
       @destroyed
     end
 
+    # link the two records using a relation determined by other_record.class, success is assumed
+    #
+    # @param other_record [HyperRecord]
+    # @return self [HyperRecord]
     def link(other_record)
       _register_observer
       promise_link(other_record)
       self
     end
 
+    # method_missing is used for undeclared properties like in ActiveRecord models
+    #
+    # Two call signatures:
+    # 1. the getter:
+    # @param method [String] the property (attribute) name
+    # @return value
+    # 2. the setter:
+    # @param method= [String] the property (attribute) name
+    # @return value
     def method_missing(method, arg)
       _register_observer
       if method.end_with?('=')
@@ -87,25 +109,40 @@ module HyperRecord
       end
     end
 
+    # introspection
+    # @return [Hash]
     def reflections
       self.class.reflections
     end
 
+    # reset properties to last saved value
+    #
+    # @return self [HyperRecord]
     def reset
       _register_observer
       @changed_properties = {}
+      self
     end
 
+    # get the resource base uri that is used for api calls, used internally
+    #
+    # @result [String]
     def resource_base_uri
       self.class.resource_base_uri
     end
 
+    # save record to db, success is assumed
+    #
+    # @return self [HyperRecord]
     def save
       _register_observer
       promise_save
       self
     end
 
+    # return record properties as Hash
+    #
+    # @return [Hash]
     def to_hash
       _register_observer
       res = @properties.dup
@@ -113,11 +150,17 @@ module HyperRecord
       res
     end
 
+    # return record properties as String
+    #
+    # @return [String]
     def to_s
       _register_observer
       @properties.to_s
     end
 
+    # unlink the two records using a relation determined by other_record.class, success is assumed
+    #
+    # @return self [HyperRecord]
     def unlink(other_record)
       _register_observer
       promise_unlink(other_record)
@@ -126,9 +169,13 @@ module HyperRecord
 
     ### promise api
 
+    # destroy record
+    #
+    # @return [Promise] on success the record is passed to the .then block
+    #   on failure the HTTP response is passed to the .fail block
     def promise_destroy
       _local_destroy
-      self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}").then do |response|
+      self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}").then do |record|
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -137,6 +184,11 @@ module HyperRecord
       end
     end
 
+    # link the two records using a relation determined by other_record.class
+    #
+    # @param other_record [HyperRecord]
+    # @return [Promise] on success the record is passed to the .then block
+    #   on failure the HTTP response is passed to the .fail block
     def promise_link(other_record, relation_name = nil)
       called_from_collection = relation_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
@@ -174,6 +226,10 @@ module HyperRecord
       end
     end
 
+    # save record
+    #
+    # @return [Promise] on success the record is passed to the .then block
+    #   on failure the HTTP response is passed to the .fail block
     def promise_save
       payload_hash = @properties.merge(@changed_properties) # copy hash, because we need to delete some keys
       (%i[id created_at updated_at] + reflections.keys).each do |key|
@@ -203,6 +259,11 @@ module HyperRecord
       end
     end
 
+    # unlink the two records using a relation determined by other_record.class
+    #
+    # @param other_record [HyperRecord]
+    # @return [Promise] on success the record is passed to the .then block
+    #   on failure the HTTP response is passed to the .fail block
     def promise_unlink(other_record, relation_name = nil)
       called_from_collection = collection_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
@@ -210,6 +271,7 @@ module HyperRecord
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
       self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
         _notify_observers
+        other_record._notify_observers
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
@@ -219,7 +281,7 @@ module HyperRecord
     end
 
     ### internal
-
+    # @private
     def _local_destroy
       _register_observer
       @destroyed = true
@@ -231,6 +293,7 @@ module HyperRecord
       _notify_observers
     end
 
+    # @private
     def _notify_observers
       @observers.each do |observer|
         React::State.set_state(observer, @state_key, `Date.now() + Math.random()`)
@@ -239,10 +302,12 @@ module HyperRecord
       self.class._notify_class_observers
     end
 
+    # @private
     def _register_collection(collection)
       @registered_collections << collection
     end
 
+    # @private
     def _register_observer
       observer = React::State.current_observer
       if observer
@@ -251,10 +316,12 @@ module HyperRecord
       end
     end
 
+    # @private
     def _unregister_collection(collection)
       @registered_collections.delete(collection)
     end
 
+    # @private
     def _update_record(data)
       if data.has_key?(:relation)
         if data.has_key?(:cause)
