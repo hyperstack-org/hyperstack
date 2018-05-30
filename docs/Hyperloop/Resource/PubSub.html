@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Hyperloop::Resource::PubSub
+  
+    &mdash; Documentation by YARD 0.9.13
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Hyperloop::Resource::PubSub";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Resource.html" title="Hyperloop::Resource (module)">Resource</a></span></span>
+     &raquo; 
+    <span class="title">PubSub</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Hyperloop::Resource::PubSub
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/hyperloop/resource/pub_sub.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="PubSub/ClassMethods.html" title="Hyperloop::Resource::PubSub::ClassMethods (module)">ClassMethods</a></span>
+    
+  
+    
+  
+</p>
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pub_sub_record-instance_method" title="#pub_sub_record (instance method)">#<strong>pub_sub_record</strong>(record)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pub_sub_relation-instance_method" title="#pub_sub_relation (instance method)">#<strong>pub_sub_relation</strong>(relation, base_record, relation_name, causing_record = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pub_sub_rest_class_method-instance_method" title="#pub_sub_rest_class_method (instance method)">#<strong>pub_sub_rest_class_method</strong>(record_class, rest_class_method_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pub_sub_rest_method-instance_method" title="#pub_sub_rest_method (instance method)">#<strong>pub_sub_rest_method</strong>(record, rest_method_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pub_sub_scope-instance_method" title="#pub_sub_scope (instance method)">#<strong>pub_sub_scope</strong>(collection, record_class, scope_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#publish_record-instance_method" title="#publish_record (instance method)">#<strong>publish_record</strong>(record)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#publish_relation-instance_method" title="#publish_relation (instance method)">#<strong>publish_relation</strong>(base_record, relation_name, record = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#publish_rest_class_method-instance_method" title="#publish_rest_class_method (instance method)">#<strong>publish_rest_class_method</strong>(record_class, rest_class_method_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#publish_rest_method-instance_method" title="#publish_rest_method (instance method)">#<strong>publish_rest_method</strong>(record, method_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#publish_scope-instance_method" title="#publish_scope (instance method)">#<strong>publish_scope</strong>(record_class, scope_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe_record-instance_method" title="#subscribe_record (instance method)">#<strong>subscribe_record</strong>(record)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe_relation-instance_method" title="#subscribe_relation (instance method)">#<strong>subscribe_relation</strong>(relation, base_record = nil, relation_name = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe_rest_class_method-instance_method" title="#subscribe_rest_class_method (instance method)">#<strong>subscribe_rest_class_method</strong>(record_class, rest_class_method_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe_rest_method-instance_method" title="#subscribe_rest_method (instance method)">#<strong>subscribe_rest_method</strong>(record, rest_method_name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#subscribe_scope-instance_method" title="#subscribe_scope (instance method)">#<strong>subscribe_scope</strong>(collection, record_class = nil, scope_name = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="pub_sub_record-instance_method">
+  
+    #<strong>pub_sub_record</strong>(record)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+205
+206
+207
+208</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 205</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pub_sub_record'>pub_sub_record</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribe_record'>subscribe_record</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_publish_record'>publish_record</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pub_sub_relation-instance_method">
+  
+    #<strong>pub_sub_relation</strong>(relation, base_record, relation_name, causing_record = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+210
+211
+212
+213</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 210</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pub_sub_relation'>pub_sub_relation</span><span class='lparen'>(</span><span class='id identifier rubyid_relation'>relation</span><span class='comma'>,</span> <span class='id identifier rubyid_base_record'>base_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span><span class='comma'>,</span> <span class='id identifier rubyid_causing_record'>causing_record</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribe_relation'>subscribe_relation</span><span class='lparen'>(</span><span class='id identifier rubyid_relation'>relation</span><span class='comma'>,</span> <span class='id identifier rubyid_base_record'>base_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_publish_relation'>publish_relation</span><span class='lparen'>(</span><span class='id identifier rubyid_base_record'>base_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span><span class='comma'>,</span> <span class='id identifier rubyid_causing_record'>causing_record</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pub_sub_rest_class_method-instance_method">
+  
+    #<strong>pub_sub_rest_class_method</strong>(record_class, rest_class_method_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+215
+216
+217
+218</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 215</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pub_sub_rest_class_method'>pub_sub_rest_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribe_rest_class_method'>subscribe_rest_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_publish_rest_class_method'>publish_rest_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pub_sub_rest_method-instance_method">
+  
+    #<strong>pub_sub_rest_method</strong>(record, rest_method_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+220
+221
+222
+223</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 220</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pub_sub_rest_method'>pub_sub_rest_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_method_name'>rest_method_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribe_rest_method'>subscribe_rest_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_method_name'>rest_method_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_publish_rest_method'>publish_rest_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_method_name'>rest_method_name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pub_sub_scope-instance_method">
+  
+    #<strong>pub_sub_scope</strong>(collection, record_class, scope_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+225
+226
+227
+228</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 225</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pub_sub_scope'>pub_sub_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='comma'>,</span> <span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_scope_name'>scope_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribe_scope'>subscribe_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='comma'>,</span> <span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_scope_name'>scope_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_publish_scope'>publish_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_scope_name'>scope_name</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="publish_record-instance_method">
+  
+    #<strong>publish_record</strong>(record)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 21</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_publish_record'>publish_record</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hgetall'>hgetall</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_scrub_time'>scrub_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>-</span> <span class='int'>24</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>record_type:</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>id:</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+    <span class='label'>updated_at:</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_updated_at'>updated_at</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_message'>message</span><span class='lbracket'>[</span><span class='symbol'>:destroyed</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_destroyed?'>destroyed?</span>
+
+  <span class='comment'># can only trigger to max 10 channels at once on pusher
+</span>  <span class='id identifier rubyid_subscribers'>subscribers</span><span class='period'>.</span><span class='id identifier rubyid_each_slice'>each_slice</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slice'>slice</span><span class='op'>|</span>
+    <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_scrub_time'>scrub_time</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hdel'>hdel</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='rparen'>)</span>
+        <span class='kw'>next</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hyper-record-update-channel-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_session_id'>session_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resource_transport'>resource_transport</span> <span class='op'>==</span> <span class='symbol'>:pusher</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_channel_array'>channel_array</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__pusher_client'>_pusher_client</span><span class='period'>.</span><span class='id identifier rubyid_trigger_async'>trigger_async</span><span class='lparen'>(</span><span class='id identifier rubyid_channel_array'>channel_array</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_del'>del</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_destroyed?'>destroyed?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="publish_relation-instance_method">
+  
+    #<strong>publish_relation</strong>(base_record, relation_name, record = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_publish_relation'>publish_relation</span><span class='lparen'>(</span><span class='id identifier rubyid_base_record'>base_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hgetall'>hgetall</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_scrub_time'>scrub_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>-</span> <span class='int'>24</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>record_type:</span> <span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>id:</span> <span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+    <span class='label'>updated_at:</span> <span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_updated_at'>updated_at</span><span class='comma'>,</span>
+    <span class='label'>relation:</span> <span class='id identifier rubyid_relation_name'>relation_name</span>
+  <span class='rbrace'>}</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span>
+    <span class='id identifier rubyid_message'>message</span><span class='lbracket'>[</span><span class='symbol'>:cause</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_message'>message</span><span class='lbracket'>[</span><span class='symbol'>:cause</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:record_type</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+    <span class='id identifier rubyid_message'>message</span><span class='lbracket'>[</span><span class='symbol'>:cause</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='id identifier rubyid_message'>message</span><span class='lbracket'>[</span><span class='symbol'>:cause</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:updated_at</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_updated_at'>updated_at</span>
+    <span class='id identifier rubyid_message'>message</span><span class='lbracket'>[</span><span class='symbol'>:cause</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:destroyed</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_destroyed?'>destroyed?</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span><span class='period'>.</span><span class='id identifier rubyid_each_slice'>each_slice</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slice'>slice</span><span class='op'>|</span>
+    <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_scrub_time'>scrub_time</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hdel'>hdel</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='rparen'>)</span>
+        <span class='kw'>next</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hyper-record-update-channel-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_session_id'>session_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resource_transport'>resource_transport</span> <span class='op'>==</span> <span class='symbol'>:pusher</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__pusher_client'>_pusher_client</span><span class='period'>.</span><span class='id identifier rubyid_trigger_async'>trigger_async</span><span class='lparen'>(</span><span class='id identifier rubyid_channel_array'>channel_array</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="publish_rest_class_method-instance_method">
+  
+    #<strong>publish_rest_class_method</strong>(record_class, rest_class_method_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 82</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_publish_rest_class_method'>publish_rest_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hgetall'>hgetall</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record_class'>record_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__rest_class_method__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_scrub_time'>scrub_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>-</span> <span class='int'>24</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>record_type:</span> <span class='id identifier rubyid_record_class'>record_class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>rest_class_method:</span> <span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span><span class='period'>.</span><span class='id identifier rubyid_each_slice'>each_slice</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slice'>slice</span><span class='op'>|</span>
+    <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_scrub_time'>scrub_time</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hdel'>hdel</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record_class'>record_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__rest_class_method__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='rparen'>)</span>
+        <span class='kw'>next</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hyper-record-update-channel-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_session_id'>session_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resource_transport'>resource_transport</span> <span class='op'>==</span> <span class='symbol'>:pusher</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__pusher_client'>_pusher_client</span><span class='period'>.</span><span class='id identifier rubyid_trigger_async'>trigger_async</span><span class='lparen'>(</span><span class='id identifier rubyid_channel_array'>channel_array</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="publish_rest_method-instance_method">
+  
+    #<strong>publish_rest_method</strong>(record, method_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_publish_rest_method'>publish_rest_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='comma'>,</span> <span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hgetall'>hgetall</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>__rest_method__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_scrub_time'>scrub_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>-</span> <span class='int'>24</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>record_type:</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>id:</span> <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+    <span class='label'>rest_method:</span> <span class='id identifier rubyid_method_name'>method_name</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span><span class='period'>.</span><span class='id identifier rubyid_each_slice'>each_slice</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slice'>slice</span><span class='op'>|</span>
+    <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_scrub_time'>scrub_time</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hdel'>hdel</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>__rest_method__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method_name'>method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='rparen'>)</span>
+        <span class='kw'>next</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hyper-record-update-channel-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_session_id'>session_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resource_transport'>resource_transport</span> <span class='op'>==</span> <span class='symbol'>:pusher</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__pusher_client'>_pusher_client</span><span class='period'>.</span><span class='id identifier rubyid_trigger_async'>trigger_async</span><span class='lparen'>(</span><span class='id identifier rubyid_channel_array'>channel_array</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="publish_scope-instance_method">
+  
+    #<strong>publish_scope</strong>(record_class, scope_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 129</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_publish_scope'>publish_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_scope_name'>scope_name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hgetall'>hgetall</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record_class'>record_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__scope__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_scope_name'>scope_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_scrub_time'>scrub_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>-</span> <span class='int'>24</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+  <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>record_type:</span> <span class='id identifier rubyid_record_class'>record_class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>scope:</span> <span class='id identifier rubyid_scope_name'>scope_name</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_subscribers'>subscribers</span><span class='period'>.</span><span class='id identifier rubyid_each_slice'>each_slice</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_slice'>slice</span><span class='op'>|</span>
+    <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_last_requested'>last_requested</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_scrub_time'>scrub_time</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hdel'>hdel</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record_class'>record_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__scope__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_scope_name'>scope_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='rparen'>)</span>
+        <span class='kw'>next</span>
+      <span class='kw'>end</span>
+      <span class='id identifier rubyid_channel_array'>channel_array</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hyper-record-update-channel-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_session_id'>session_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resource_transport'>resource_transport</span> <span class='op'>==</span> <span class='symbol'>:pusher</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__pusher_client'>_pusher_client</span><span class='period'>.</span><span class='id identifier rubyid_trigger_async'>trigger_async</span><span class='lparen'>(</span><span class='id identifier rubyid_channel_array'>channel_array</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>update</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe_record-instance_method">
+  
+    #<strong>subscribe_record</strong>(record)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+152
+153
+154
+155</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 152</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe_record'>subscribe_record</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe_relation-instance_method">
+  
+    #<strong>subscribe_relation</strong>(relation, base_record = nil, relation_name = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 157</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe_relation'>subscribe_relation</span><span class='lparen'>(</span><span class='id identifier rubyid_relation'>relation</span><span class='comma'>,</span> <span class='id identifier rubyid_base_record'>base_record</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_session_id'>session_id</span> <span class='op'>=</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_pipelined'>pipelined</span> <span class='kw'>do</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_relation'>relation</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Enumerable</span><span class='rparen'>)</span>
+      <span class='comment'># has_many
+</span>      <span class='id identifier rubyid_relation'>relation</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_record'>record</span><span class='op'>|</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>elsif</span> <span class='op'>!</span><span class='id identifier rubyid_relation'>relation</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='comment'># has_one, belongs_to
+</span>      <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation'>relation</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation'>relation</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+    <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base_record'>base_record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_base_record'>base_record</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_relation_name'>relation_name</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe_rest_class_method-instance_method">
+  
+    #<strong>subscribe_rest_class_method</strong>(record_class, rest_class_method_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+175
+176
+177
+178
+179
+180
+181
+182</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 175</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe_rest_class_method'>subscribe_rest_class_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record_class'>record_class</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_session_id'>session_id</span> <span class='op'>=</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_pipelined'>pipelined</span> <span class='kw'>do</span>
+    <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record_class'>record_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__rest_class_method_name__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rest_class_method_name'>rest_class_method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe_rest_method-instance_method">
+  
+    #<strong>subscribe_rest_method</strong>(record, rest_method_name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+184
+185
+186
+187
+188
+189</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 184</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe_rest_method'>subscribe_rest_method</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='comma'>,</span> <span class='id identifier rubyid_rest_method_name'>rest_method_name</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_session_id'>session_id</span> <span class='op'>=</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>__rest_method__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rest_method_name'>rest_method_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="subscribe_scope-instance_method">
+  
+    #<strong>subscribe_scope</strong>(collection, record_class = nil, scope_name = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyperloop/resource/pub_sub.rb', line 191</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_subscribe_scope'>subscribe_scope</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='comma'>,</span> <span class='id identifier rubyid_record_class'>record_class</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_scope_name'>scope_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid_time_now'>time_now</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_session_id'>session_id</span> <span class='op'>=</span> <span class='id identifier rubyid_session'>session</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_pipelined'>pipelined</span> <span class='kw'>do</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Enumerable</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_record'>record</span><span class='op'>|</span>
+        <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='const'><span class='object_link'><a href="../../Hyperloop.html" title="Hyperloop (module)">Hyperloop</a></span></span><span class='period'>.</span><span class='id identifier rubyid_redis_instance'>redis_instance</span><span class='period'>.</span><span class='id identifier rubyid_hset'>hset</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HRPS__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_record_class'>record_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>__scope__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_scope_name'>scope_name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_session_id'>session_id</span><span class='comma'>,</span> <span class='id identifier rubyid_time_now'>time_now</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_record_class'>record_class</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_scope_name'>scope_name</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Wed May 30 15:19:48 2018 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.13 (ruby-2.5.1).
+</div>
+
+    </div>
+  </body>
+</html>

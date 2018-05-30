@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: PubSub
+  
+    &mdash; Documentation by YARD 0.9.13
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "PubSub";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: PubSub</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<h2 id="label-PubSub+with+HyperResource">PubSub with HyperResource</h2>
+
+<p>PubSub is handled in the controller. In your controller: <code> include
+Hyperloop::Resource::PubSub </code></p>
+
+<p>Then you can use the PubSub methods of Hyperloop::Resource::PubSub.</p>
+
+<p>For example, a record has been requested, subscribe to it in the show
+action of the controller: <code>   subscribe_record(my_record) </code></p>
+
+<p>When somebody updates the record, in the update action for example: <code> 
+publish_record(record) </code></p>
+
+<p>All subscribers will receive a message indicating, that the record has been
+updated.</p>
+</div></div>
+
+      <div id="footer">
+  Generated on Wed May 30 15:19:48 2018 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.13 (ruby-2.5.1).
+</div>
+
+    </div>
+  </body>
+</html>
