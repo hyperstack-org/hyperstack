@@ -138,6 +138,8 @@ module Hyperloop
         @ok = true
       end
 
+      # check if requests are still active
+      # return [Boolean]
       def self.active?
         jquery_active_requests = 0
         %x{
@@ -148,16 +150,19 @@ module Hyperloop
         (jquery_active_requests + @active_requests) > 0
       end
 
+      # @private
       def self.active_requests
         @active_requests ||= 0
         @active_requests
       end
 
+      # @private
       def self.incr_active_requests
         @active_requests ||= 0
         @active_requests += 1
       end
 
+      # @private
       def self.decr_active_requests
         @active_requests ||= 0
         @active_requests -= 1
@@ -167,6 +172,7 @@ module Hyperloop
         end
       end
 
+      # @private
       def send(method, url, options, block)
         @method   = method
         @url      = url
@@ -266,12 +272,15 @@ module Hyperloop
         }
       end
 
+      # inspect on request
+      # @return [String]
       def inspect
         "#<HTTP @url=#{@url} @method=#{@method}>"
       end
 
       private
 
+      # @private
       def promise
         return @promise if @promise
 
@@ -286,6 +295,7 @@ module Hyperloop
         }
       end
 
+      # @private
       def succeed(data, status, xhr)
         %x{
           #@body = data;
@@ -300,6 +310,7 @@ module Hyperloop
         @handler.call self if @handler
       end
 
+      # @private
       def fail(xhr, status, error)
         %x{
           #@body = xhr.responseText;

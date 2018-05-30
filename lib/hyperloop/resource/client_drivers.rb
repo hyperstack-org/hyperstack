@@ -49,6 +49,7 @@ module Hyperloop
 
       else
 
+        # @private
         def self.initialize_client_drivers_on_boot
 
           return if @initialized
@@ -90,6 +91,7 @@ module Hyperloop
           end
         end
 
+        # @private
         def self.process_notification(data)
           record_class = Object.const_get(data[:record_type])
           if data[:scope]

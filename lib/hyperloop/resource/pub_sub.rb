@@ -6,6 +6,7 @@ module Hyperloop
       end
 
       module ClassMethods
+        # @private
         def _pusher_client
           Hyperloop.pusher_instance ||= Pusher::Client.new(
             app_id: Hyperloop.pusher[:app_id],
@@ -16,6 +17,7 @@ module Hyperloop
         end
       end
 
+      # (see HyperRecord::ClassMethods#publish_record)
       def publish_record(record)
         subscribers = Hyperloop.redis_instance.hgetall("HRPS__#{record.class}__#{record.id}")
         time_now = Time.now.to_f
