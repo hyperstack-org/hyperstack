@@ -1,6 +1,7 @@
 # hyper-resource
 
 [Github Repo](https://github.com/janbiedermann/hyper-resource "Github Repo")
+
 HyperResource is an affective way of moving data between your server and clients when using Hyperloop and Rails.
 
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
