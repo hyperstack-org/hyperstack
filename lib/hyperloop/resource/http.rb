@@ -1,11 +1,11 @@
 module Hyperloop
   module Resource
-    # {HTTP} is used to perform a `XMLHttpRequest` in ruby. It is a simple wrapper
+    # HTTP is used to perform a `XMLHttpRequest` in ruby. It is a simple wrapper
     # around `XMLHttpRequest`
     #
     # # Making requests
     #
-    # To create a simple request, {HTTP} exposes class level methods to specify
+    # To create a simple request, HTTP exposes class level methods to specify
     # the HTTP action you wish to perform. Each action accepts the url for the
     # request, as well as optional arguments passed as a hash:
     #
@@ -14,17 +14,17 @@ module Hyperloop
     #
     # The supported `HTTP` actions are:
     #
-    # * {HTTP.get}
-    # * {HTTP.post}
-    # * {HTTP.put}
-    # * {HTTP.delete}
-    # * {HTTP.patch}
-    # * {HTTP.head}
+    # * HTTP.get
+    # * HTTP.post
+    # * HTTP.put
+    # * HTTP.delete
+    # * HTTP.patch
+    # * HTTP.head
     #
     # # Handling responses
     #
     # Responses can be handled using either a simple block callback, or using a
-    # {Promise} returned by the request.
+    # Promise returned by the request.
     #
     # ## Using a block
     #
@@ -36,8 +36,8 @@ module Hyperloop
     #       puts "the request has completed!"
     #     end
     #
-    # This `request` object will simply be the instance of the {HTTP} class which
-    # wraps the native `XMLHttpRequest`. {HTTP#ok?} can be used to quickly determine
+    # This `request` object will simply be the instance of the HTTP class which
+    # wraps the native `XMLHttpRequest`. HTTP#ok? can be used to quickly determine
     # if the request was successful.
     #
     #     HTTP.get("/users/1") do |request|
@@ -48,11 +48,11 @@ module Hyperloop
     #       end
     #     end
     #
-    # The {HTTP} instance will always be the only object passed to the block.
+    # The HTTP instance will always be the only object passed to the block.
     #
     # ## Using a Promise
     #
-    # If no block is given to one of the action methods, then a {Promise} is
+    # If no block is given to one of the action methods, then a Promise is
     # returned instead. See the standard library for more information on Promises.
     #
     #     HTTP.get("/users/1").then do |req|
@@ -61,20 +61,20 @@ module Hyperloop
     #       puts "response was not ok"
     #     end
     #
-    # When using a {Promise}, both success and failure handlers will be passed the
-    # {HTTP} instance.
+    # When using a Promise, both success and failure handlers will be passed the
+    # HTTP instance.
     #
     # # Accessing Response Data
     #
-    # All data returned from an HTTP request can be accessed via the {HTTP} object
+    # All data returned from an HTTP request can be accessed via the HTTP object
     # passed into the block or promise handlers.
     #
-    # - {#ok?} - returns `true` or `false`, if request was a success (or not).
-    # - {#body} - returns the raw text response of the request
-    # - {#status_code} - returns the raw {HTTP} status code as integer
-    # - {#json} - tries to convert the body response into a JSON object
+    # - #ok? - returns `true` or `false`, if request was a success (or not).
+    # - #body - returns the raw text response of the request
+    # - #status_code - returns the raw {HTTP} status code as integer
+    # - #json - tries to convert the body response into a JSON object
     class HTTP
-      # All valid {HTTP} action methods this class accepts.
+      # All valid HTTP action methods this class accepts.
       #
       # @see HTTP.get
       # @see HTTP.post
@@ -112,7 +112,7 @@ module Hyperloop
       # @param url [String] url for request
       # @param options [Hash] optional request options
       # @yield [self] optional block to yield for response
-      # @return [Promise, nil] returns a {Promise} unless block given
+      # @return [Promise, nil] returns a Promise unless block given
 
       # @!method self.put(url, options = {}, &block)
 

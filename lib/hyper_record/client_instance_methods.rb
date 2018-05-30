@@ -3,7 +3,7 @@ module HyperRecord
 
     # initialize a new instance of current HyperRecord class
     #
-    # @param [Hash] inital values for properties
+    # @param record_hash [Hash] optional, initial values for properties
     def initialize(record_hash = {})
       # initalize internal data structures
       record_hash = {} if record_hash.nil?
@@ -80,7 +80,7 @@ module HyperRecord
     # link the two records using a relation determined by other_record.class, success is assumed
     #
     # @param other_record [HyperRecord]
-    # @return self [HyperRecord]
+    # @return [HyperRecord] self
     def link(other_record)
       _register_observer
       promise_link(other_record)
@@ -91,11 +91,9 @@ module HyperRecord
     #
     # Two call signatures:
     # 1. the getter:
-    # @param method [String] the property (attribute) name
-    # @return value
+    # a_model.a_undeclared_property, returns the value of a_undeclared_property
     # 2. the setter:
-    # @param method= [String] the property (attribute) name
-    # @return value
+    # a_model.a_undeclared_property = value, set a_undeclared_property to value, returns value
     def method_missing(method, arg)
       _register_observer
       if method.end_with?('=')
@@ -117,7 +115,7 @@ module HyperRecord
 
     # reset properties to last saved value
     #
-    # @return self [HyperRecord]
+    # @return [HyperRecord] self
     def reset
       _register_observer
       @changed_properties = {}
@@ -126,14 +124,14 @@ module HyperRecord
 
     # get the resource base uri that is used for api calls, used internally
     #
-    # @result [String]
+    # @return [String]
     def resource_base_uri
       self.class.resource_base_uri
     end
 
     # save record to db, success is assumed
     #
-    # @return self [HyperRecord]
+    # @return [HyperRecord] self
     def save
       _register_observer
       promise_save
@@ -160,7 +158,7 @@ module HyperRecord
 
     # unlink the two records using a relation determined by other_record.class, success is assumed
     #
-    # @return self [HyperRecord]
+    # @return [HyperRecord] self
     def unlink(other_record)
       _register_observer
       promise_unlink(other_record)

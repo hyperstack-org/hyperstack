@@ -196,8 +196,8 @@ module HyperRecord
     # DSL macro to declare a has_and_belongs_many relationship
     # options are for the server side ORM, on the client side options are ignored
     #
-    # @param direction_or_name [String] or [Symbol] for ORMs like Neo4j: the direction of the graph edge, for ORMs like ActiveRecord: the name of the relation
-    # @param name or options [String] or [Symbol] or [Hash] for ORMs like Neo4j: the name of the relation, for ORMs like ActiveRecord: further options
+    # @param direction [String] or [Symbol] for ORMs like Neo4j: the direction of the graph edge, for ORMs like ActiveRecord: the name of the relation
+    # @param name [String] or [Symbol] or [Hash] for ORMs like Neo4j: the name of the relation, for ORMs like ActiveRecord: further options
     # @param options [Hash] further options for ORMs like Neo4j
     #
     # This macro defines additional methods:
@@ -269,8 +269,8 @@ module HyperRecord
     # DSL macro to declare a has_many relationship
     # options are for the server side ORM, on the client side options are ignored
     #
-    # @param direction_or_name [String] or [Symbol] for ORMs like Neo4j: the direction of the graph edge, for ORMs like ActiveRecord: the name of the relation
-    # @param name or options [String] or [Symbol] or [Hash] for ORMs like Neo4j: the name of the relation, for ORMs like ActiveRecord: further options
+    # @param direction [String] or [Symbol] for ORMs like Neo4j: the direction of the graph edge, for ORMs like ActiveRecord: the name of the relation
+    # @param name [String] or [Symbol] or [Hash] for ORMs like Neo4j: the name of the relation, for ORMs like ActiveRecord: further options
     # @param options [Hash] further options for ORMs like Neo4j
     #
     # This macro defines additional methods:
@@ -341,8 +341,8 @@ module HyperRecord
     # DSL macro to declare a has_one relationship
     # options are for the server side ORM, on the client side options are ignored
     #
-    # @param direction_or_name [String] or [Symbol] for ORMs like Neo4j: the direction of the graph edge, for ORMs like ActiveRecord: the name of the relation
-    # @param name or options [String] or [Symbol] or [Hash] for ORMs like Neo4j: the name of the relation, for ORMs like ActiveRecord: further options
+    # @param direction [String] or [Symbol] for ORMs like Neo4j: the direction of the graph edge, for ORMs like ActiveRecord: the name of the relation
+    # @param name [String] or [Symbol] or [Hash] for ORMs like Neo4j: the name of the relation, for ORMs like ActiveRecord: further options
     # @param options [Hash] further options for ORMs like Neo4j
     #
     # This macro defines additional methods:
@@ -557,7 +557,7 @@ module HyperRecord
     end
 
     # get the resource base uri that is used for api calls, used internally
-    # @result [String]
+    # @return [String]
     def resource_base_uri
       @resource ||= "#{Hyperloop::Resource::ClientDrivers.opts[:resource_api_base_path]}/#{self.to_s.underscore.pluralize}"
     end
