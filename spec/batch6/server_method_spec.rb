@@ -42,6 +42,7 @@ RSpec::Steps.steps 'server_method', js: true do
         end
         server_method(:test, default: 0) { TodoItem.server_method_count += 1 }
       end
+      TestModel.server_method(:test) { child_models.count }
     end
     TodoItem.create
     mount 'ServerMethodTester' do
@@ -74,5 +75,17 @@ RSpec::Steps.steps 'server_method', js: true do
         new_todo.test
       end
     end.to eq(5)
+  end
+
+  it "the server method can access any unsaved associations" do
+    expect_promise do
+      test_model = TestModel.new
+      ChildModel.new(test_model: test_model)
+      ReactiveRecord.load do
+        test_model.test
+      end
+    end.to eq(1)
+    expect(TestModel.count).to be_zero
+    expect(ChildModel.count).to be_zero
   end
 end

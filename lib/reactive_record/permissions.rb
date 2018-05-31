@@ -103,7 +103,7 @@ class ActiveRecord::Base
       self.acting_user = old
       self
     else
-      Hyperloop::InternalPolicy.raise_operation_access_violation(:crud_access_violation, "for #{permission}(#{args}) acting_user: #{user}")
+      Hyperloop::InternalPolicy.raise_operation_access_violation(:crud_access_violation, "for #{self} - #{permission}(#{args}) acting_user: #{user}")
     end
   end
 

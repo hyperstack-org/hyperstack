@@ -15,14 +15,28 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-    size_window(:large, :landscape)
+    #size_window(:large, :landscape)
     User.validates :last_name, exclusion: { in: %w[f**k], message: 'no swear words allowed' }
+    TestModel.validates_presence_of :child_models
     client_option raise_on_js_errors: :off
+  end
+
+  it "can validate the presence of an association" do
+    expect_promise do
+      @test_model = TestModel.new
+      @test_model.validate.then { |test_model| test_model.errors.messages }
+    end.not_to be_empty
+    expect_promise do
+      @test_model.child_models << ChildModel.new
+      @test_model.validate.then { |test_model| test_model.errors.messages }
+    end.to be_empty
+    expect(TestModel.count).to be_zero
+    expect(ChildModel.count).to be_zero
   end
 
   it "can validate only using the validate method" do
     expect_promise do
-      User.new(last_name: 'f**k').validate.tap { |p| puts "got the promise in spec" }.then do |new_user|
+      User.new(last_name: 'f**k').validate.then do |new_user|
         new_user.errors.messages
       end
     end.to eq("last_name"=>[{"message"=>"no swear words allowed"}])
@@ -93,4 +107,5 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     end
     expect(page).to have_content('.valid? true')
   end
+
 end

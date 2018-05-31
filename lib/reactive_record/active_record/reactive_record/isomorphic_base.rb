@@ -248,7 +248,7 @@ module ReactiveRecord
       def save_or_validate(save, validate, force, &block)
         if data_loading?
           sync!
-        elsif force || changed?
+        elsif force || changed? || (validate && new?)
           HyperMesh.load do
             ReactiveRecord.loads_pending! unless self.class.pending_fetches.empty?
           end.then { send_save_to_server(save, validate, force, &block) }
@@ -370,25 +370,26 @@ module ReactiveRecord
             end
           end
           reactive_records[model_to_save[:id]] = vectors[vector] = record = find_record(model, id, vector, save) # ??? || validate ???
-          if record and record.respond_to?(:id) and record.id
+          next unless record
+          if record.respond_to?(:id) && record.id
             # we have an already exising activerecord model
             keys = record.attributes.keys
             attributes.each do |key, value|
               if is_enum?(record, key)
-                record.send("#{key}=",value)
+                record.send("#{key}=", value)
               elsif keys.include? key
                 record[key] = value
-              elsif !value.nil? and aggregation = record.class.reflect_on_aggregation(key.to_sym) and !(aggregation.klass < ActiveRecord::Base)
+              elsif value && (aggregation = record.class.reflect_on_aggregation(key.to_sym)) && !(aggregation.klass < ActiveRecord::Base)
                 aggregation.mapping.each_with_index do |pair, i|
                   record[pair.first] = value[i]
                 end
               elsif record.respond_to? "#{key}="
-                record.send("#{key}=",value)
+                record.send("#{key}=", value)
               else
                 # TODO once reading schema.rb on client is implemented throw an error here
               end
             end
-          elsif record
+          else
             # either the model is new, or its not even an active record model
             dont_save_list << record unless save
             keys = record.attributes.keys
@@ -436,12 +437,12 @@ module ReactiveRecord
             elsif parent.class.reflect_on_association(association[:attribute].to_sym).collection?
               #puts ">>>>>>>>>> #{parent.class.name}.send('#{association[:attribute]}') << #{reactive_records[association[:child_id]]})"
               dont_save_list.delete(parent)
-              if false and parent.new?
-                parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]] if parent.new?
-                #puts "updated"
-              else
+              #if false and parent.new?
+                #parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]]
+                # puts "updated"
+              #else
                 #puts "skipped"
-              end
+              #end
             else
               #puts ">>>>ASSOCIATION>>>> #{parent.class.name}.send('#{association[:attribute]}=', #{reactive_records[association[:child_id]]})"
               parent.send("#{association[:attribute]}=", reactive_records[association[:child_id]])
@@ -450,61 +451,59 @@ module ReactiveRecord
             end
           end if associations
 
-          #puts "!!!!!!!!!!!!associations updated"
+          # get rid of any records that don't require further processing, as a side effect
+          # we also save any records that need to be saved (these may be rolled back later.)
 
-          has_errors = false
-          error_messages = []
-
-          #puts "ready to start saving... dont_save_list = #{dont_save_list}"
-
-          saved_models = reactive_records.collect do |reactive_record_id, model|
-            #puts "saving rr_id: #{reactive_record_id} model.object_id: #{model.object_id} frozen? <#{model.frozen?}>"
-            next unless model
-            if !save|| model.frozen? || dont_save_list.include?(model) || model.changed.include?(model.class.primary_key)
-              # the above check for changed including the private key happens if you have an aggregate that includes its own id
-              # puts "validating frozen model #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
-              valid = model.valid?
-              # puts "has_errors before = #{has_errors}, validate= #{validate}, !valid= #{!valid}  (validate and !valid) #{validate and !valid}"
-              has_errors ||= (validate and !valid)
-              # puts "validation complete errors = <#{!valid}>, #{model.errors.messages} has_errors #{has_errors}"
-              error_messages << [model, model.errors.messages] unless valid
-              [reactive_record_id, model.class.name, model.__hyperloop_secure_attributes(acting_user), (valid ? nil : model.errors.messages)]
-            elsif !model.id || model.changed?
-              # puts "saving #{model.class.name} #{model} (reactive_record_id = #{reactive_record_id})"
-              saved = model.check_permission_with_acting_user(acting_user, new_models.include?(model) ? :create_permitted? : :update_permitted?).save(validate: validate)
-              has_errors ||= !saved
-              messages = model.errors.messages if (validate and !saved) or (!validate and !model.valid?)
-              error_messages << [model, messages] if messages
-              # puts "saved complete errors = <#{!saved}>, #{messages} has_errors #{has_errors}"
-              [reactive_record_id, model.class.name, model.__hyperloop_secure_attributes(acting_user), messages]
-            end
-          end.compact
-
-          if has_errors && save
-            ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel saving records failed:\033[0;30;21m"
-            error_messages.each do |model, messages|
-              messages.each do |message|
-                ::Rails.logger.debug "\033[0;31;1m\t#{model}: #{message}\033[0;30;21m"
-              end
-            end
-            raise "HyperModel saving records failed!"
+          reactive_records.keep_if do |reactive_record_id, record|
+            next false unless record # throw out items where we couldn't find a record
+            next true  if record.frozen?  # skip (but process later) frozen records
+            next true  if dont_save_list.include?(record) # skip if the record is on the don't save list
+            next true  if record.changed.include?(record.class.primary_key)  # happens on an aggregate
+            next false if record.id && !record.changed? # throw out any existing records with no changes
+            # if we get to here save the record and return true to keep it
+            op = new_models.include?(record) ? :create_permitted? : :update_permitted?
+            record.check_permission_with_acting_user(acting_user, op).save(validate: false) || true
           end
 
-          if save || validate
+          # if called from ServerDataCache then save and validate are both false, and we just return the
+          # vectors.  ServerDataCache has its own transaction which it will rollback when its done
 
-            {success: true, saved_models: saved_models }
+          return vectors unless save || validate
 
-          else
-            # vectors.each { |vector, model| model.reload unless model.nil? or model.new_record? or model.frozen? }
-            vectors
+          # otherwise either save or validate or both are true, so we convert the remaining react_records into
+          # arrays with the id, model name, legal attributes, and any error messages.  We also accumulate
+          # the all the error messages during a save so we can dump them to the server log.
 
+          all_messages = []
+
+          saved_models = reactive_records.collect do |reactive_record_id, model|
+            messages = model.errors.messages if validate && !model.valid?
+            all_messages << messages if save && messages
+            attributes = model.__hyperloop_secure_attributes(acting_user)
+            [reactive_record_id, model.class.name, attributes, messages]
+          end
+
+          # if we are not saving (i.e. just validating) then we rollback the transaction
+
+          raise ActiveRecord::Rollback, 'This Rollback is intentional!' unless save
+
+          # if there are error messages then we dump them to the server log, and raise an error
+          # to roll back the transaction and set success to false.
+
+          unless all_messages.empty?
+            ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel saving records failed:\033[0;30;21m"
+            all_messages.each do |message|
+              ::Rails.logger.debug "\033[0;31;1m\t#{model}: #{message}\033[0;30;21m"
+            end
+            raise 'HyperModel saving records failed!'
           end
 
         end
 
+        { success: true, saved_models: saved_models }
+
       rescue Exception => e
-        #ReactiveRecord::Pry.rescued(e)
-        if save
+        if save || validate
           {success: false, saved_models: saved_models, message: e}
         else
           {}
