@@ -72,7 +72,7 @@ module React
                 set_state2(object, name, value_and_set[0], updates, value_and_set[1])
               end
             end
-            updates.each { |observer, args| observer.update_react_js_state(*args) }
+            updates.each { |observer, args| observer.update_react_js_state(*args) if current_observers.key?(observer) }
           end
         elsif @rendering_level == 0
           updates = Hash.new { |hash, key| hash[key] = Array.new }
