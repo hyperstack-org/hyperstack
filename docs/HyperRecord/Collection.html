@@ -167,7 +167,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(collection, record = nil, relation_name = nil)  &#x21d2; Collection </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(collection = [], record = nil, relation_name = nil)  &#x21d2; Collection </a>
     
 
     
@@ -224,7 +224,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(collection, record = nil, relation_name = nil)  &#x21d2; <tt><span class='object_link'><a href="" title="HyperRecord::Collection (class)">Collection</a></span></tt> 
+    #<strong>initialize</strong>(collection = [], record = nil, relation_name = nil)  &#x21d2; <tt><span class='object_link'><a href="" title="HyperRecord::Collection (class)">Collection</a></span></tt> 
   
 
   
@@ -249,6 +249,8 @@
       
         <span class='type'>(<tt><span class='object_link'><a href="" title="HyperRecord::Collection (class)">HyperRecord::Collection</a></span></tt>)</span>
       
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
       
       
         &mdash;
@@ -318,7 +320,7 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/hyper_record/collection.rb', line 9</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_record'>record</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@record</span> <span class='op'>=</span> <span class='id identifier rubyid_record'>record</span>
   <span class='ivar'>@relation_name</span> <span class='op'>=</span> <span class='id identifier rubyid_relation_name'>relation_name</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_collection'>collection</span>
@@ -327,7 +329,7 @@
     <span class='kw'>end</span>
   <span class='kw'>end</span>
   <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
-  <span class='id identifier rubyid_array'>array</span> <span class='op'>?</span> <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_array'>array</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>super</span>
+  <span class='id identifier rubyid_collection'>collection</span> <span class='op'>?</span> <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>super</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -552,7 +554,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed May 30 15:23:11 2018 by
+  Generated on Tue Jun  5 23:13:52 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>
