@@ -6,7 +6,7 @@ module HyperRecord
     # @param collection [HyperRecord::Collection] or [Array] of records or empty [Array]
     # @param record [HyperRecord] optional base record this collection belongs to
     # @param relation_name [String] optional base record relation name this collection represents
-    def initialize(collection, record = nil, relation_name = nil)
+    def initialize(collection = [], record = nil, relation_name = nil)
       @record = record
       @relation_name = relation_name
       if collection
@@ -15,7 +15,7 @@ module HyperRecord
         end
       end
       @record._notify_observers if @record
-      array ? super(array) : super
+      collection ? super(collection) : super
     end
 
     # add record to collection, record is saved to db, success assumed
