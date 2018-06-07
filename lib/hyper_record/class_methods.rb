@@ -78,7 +78,11 @@ module HyperRecord
       define_method("promise_#{name}") do
         @fetch_states[name] = 'i'
         self.class._promise_get("#{self.class.resource_base_uri}/#{self.id}/relations/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
-          @relations[name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
+          @relations[name] = if response.json[self.class.to_s.underscore][name]
+                               self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][name])
+                             else
+                               nil
+                             end
           @fetch_states[name] = 'f'
           _notify_observers
           @relations[name]
