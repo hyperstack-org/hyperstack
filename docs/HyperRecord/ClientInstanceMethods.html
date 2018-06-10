@@ -123,6 +123,30 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#changed%3F-instance_method" title="#changed? (instance method)">#<strong>changed?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>check if record has been changed.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#destroy-instance_method" title="#destroy (instance method)">#<strong>destroy</strong>  &#x21d2; Object </a>
     
 
@@ -557,21 +581,21 @@ returns value</p>
       <pre class="lines">
 
 
-97
-98
-99
-100
-101
-102
-103
 104
 105
 106
 107
-108</pre>
+108
+109
+110
+111
+112
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 104</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -684,6 +708,65 @@ returns value</p>
 </div>
     
       <div class="method_details ">
+  <h3 class="signature " id="changed?-instance_method">
+  
+    #<strong>changed?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>check if record has been changed</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>boolean</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+68
+69
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 68</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_changed?'>changed?</span>
+  <span class='ivar'>@changed_properties</span> <span class='op'>!=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
   <h3 class="signature " id="destroy-instance_method">
   
     #<strong>destroy</strong>  &#x21d2; <tt>Object</tt> 
@@ -727,13 +810,13 @@ returns value</p>
       <pre class="lines">
 
 
-68
-69
-70
-71</pre>
+75
+76
+77
+78</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 75</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span>
   <span class='id identifier rubyid_promise_destroy'>promise_destroy</span>
@@ -783,12 +866,12 @@ returns value</p>
       <pre class="lines">
 
 
-76
-77
-78</pre>
+83
+84
+85</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 83</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroyed?'>destroyed?</span>
   <span class='ivar'>@destroyed</span>
@@ -961,14 +1044,14 @@ success is assumed</p>
       <pre class="lines">
 
 
-84
-85
-86
-87
-88</pre>
+91
+92
+93
+94
+95</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_link'>link</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1025,19 +1108,19 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-174
-175
-176
-177
-178
-179
-180
 181
 182
-183</pre>
+183
+184
+185
+186
+187
+188
+189
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 174</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 181</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_destroy'>promise_destroy</span>
   <span class='id identifier rubyid__local_destroy'>_local_destroy</span>
@@ -1114,13 +1197,6 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-190
-191
-192
-193
-194
-195
-196
 197
 198
 199
@@ -1149,10 +1225,17 @@ response is passed to the .fail block</p>
 222
 223
 224
-225</pre>
+225
+226
+227
+228
+229
+230
+231
+232</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 190</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 197</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_link'>promise_link</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_called_from_collection'>called_from_collection</span> <span class='op'>=</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
@@ -1240,13 +1323,6 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-231
-232
-233
-234
-235
-236
-237
 238
 239
 240
@@ -1267,10 +1343,17 @@ response is passed to the .fail block</p>
 255
 256
 257
-258</pre>
+258
+259
+260
+261
+262
+263
+264
+265</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 238</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_save'>promise_save</span>
   <span class='id identifier rubyid_payload_hash'>payload_hash</span> <span class='op'>=</span> <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='rparen'>)</span> <span class='comment'># copy hash, because we need to delete some keys
@@ -1365,13 +1448,6 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-265
-266
-267
-268
-269
-270
-271
 272
 273
 274
@@ -1379,10 +1455,17 @@ response is passed to the .fail block</p>
 276
 277
 278
-279</pre>
+279
+280
+281
+282
+283
+284
+285
+286</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 265</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 272</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_unlink'>promise_unlink</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_called_from_collection'>called_from_collection</span> <span class='op'>=</span> <span class='id identifier rubyid_collection_name'>collection_name</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
@@ -1443,12 +1526,12 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-112
-113
-114</pre>
+119
+120
+121</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reflections'>reflections</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_reflections'>reflections</span>
@@ -1502,14 +1585,14 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-119
-120
-121
-122
-123</pre>
+126
+127
+128
+129
+130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1560,12 +1643,12 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-128
-129
-130</pre>
+135
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 128</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 135</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span>
@@ -1619,14 +1702,14 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-135
-136
-137
-138
-139</pre>
+142
+143
+144
+145
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 142</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_save'>save</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1677,15 +1760,15 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-144
-145
-146
-147
-148
-149</pre>
+151
+152
+153
+154
+155
+156</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 151</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1737,13 +1820,13 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-154
-155
-156
-157</pre>
+161
+162
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 154</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 161</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1799,14 +1882,14 @@ success is assumed</p>
       <pre class="lines">
 
 
-162
-163
-164
-165
-166</pre>
+169
+170
+171
+172
+173</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 169</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unlink'>unlink</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1823,7 +1906,7 @@ success is assumed</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Jun  5 23:13:52 2018 by
+  Generated on Sun Jun 10 23:18:42 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>
