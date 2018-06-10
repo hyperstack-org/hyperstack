@@ -62,7 +62,7 @@ module HyperRecord
 
     ### high level api
 
-    # check if record has been changed
+    # Check if record has been changed since last save.
     #
     # @return boolean
     def changed?
@@ -77,7 +77,7 @@ module HyperRecord
       nil
     end
 
-    # check if record has been destroyed
+    # Check if record has been destroyed.
     #
     # @return [Boolean]
     def destroyed?
