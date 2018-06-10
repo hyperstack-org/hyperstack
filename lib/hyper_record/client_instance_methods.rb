@@ -62,6 +62,13 @@ module HyperRecord
 
     ### high level api
 
+    # check if record has been changed
+    #
+    # @return boolean
+    def changed?
+      @changed_properties != {}
+    end
+
     # destroy record, success is assumed
     #
     # @return nil
