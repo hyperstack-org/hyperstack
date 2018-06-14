@@ -645,7 +645,7 @@ module HyperRecord
         else
           record._initialize_from_hash(record_hash[klass_key])
         end
-        _class_fetch_states["record_#{record.id}"] = 'f'
+        record.class._class_fetch_states["record_#{record.id}"] = 'f'
         record
       end
     end
