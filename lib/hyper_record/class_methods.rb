@@ -7,8 +7,9 @@ module HyperRecord
     # @return [HyperRecord] the new instance or the existing one for a given id
     def new(record_hash = {})
       if record_hash.has_key?(:id)
-        if _record_cache.has_key?(record_hash[:id].to_s)
-          record = _record_cache.find(record_hash[:id])
+        sid = record_hash[:id].to_s
+        if _record_cache.has_key?(sid)
+          record = _record_cache[sid]
           if record
             record._initialize_from_hash(record_hash)
             record._register_observer
@@ -643,8 +644,8 @@ module HyperRecord
           record = record_class.new(record_hash[klass_key])
         else
           record._initialize_from_hash(record_hash[klass_key])
-          _class_fetch_states["record_#{record.id}"] = 'f'
         end
+        _class_fetch_states["record_#{record.id}"] = 'f'
         record
       end
     end
