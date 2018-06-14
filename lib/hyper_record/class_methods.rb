@@ -643,6 +643,7 @@ module HyperRecord
           record = record_class.new(record_hash[klass_key])
         else
           record._initialize_from_hash(record_hash[klass_key])
+          _class_fetch_states["record_#{record.id}"] = 'f'
         end
         record
       end
@@ -676,6 +677,14 @@ module HyperRecord
     end
 
     # @private
+    def _notify_class_observers
+      _class_observers.each do |observer|
+        React::State.set_state(observer, _class_state_key, `Date.now() + Math.random()`)
+      end
+      _class_observers = Set.new
+    end
+
+    # @private
     def _promise_find(id, record_in_progress)
       _class_fetch_states["record_#{id}"] = 'i'
       _promise_get("#{resource_base_uri}/#{id}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response|
@@ -695,14 +704,6 @@ module HyperRecord
         `console.error(error_message)`
         response
       end
-    end
-
-    # @private
-    def _notify_class_observers
-      _class_observers.each do |observer|
-        React::State.set_state(observer, _class_state_key, `Date.now() + Math.random()`)
-      end
-      _class_observers = Set.new
     end
 
     # @private
