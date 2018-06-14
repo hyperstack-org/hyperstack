@@ -46,7 +46,7 @@ module HyperRecord
           end
           return if channel_array.size == 0
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger_async(channel_array, 'update', message)
+            _pusher_client.trigger_async(channel_array, 'update', message)
           elsif Hyperloop.resource_transport == :action_cable
             channel_array.each do |channel|
               ActionCable.server.broadcast(channel, message)
@@ -88,7 +88,7 @@ module HyperRecord
             channel_array << "hyper-record-update-channel-#{session_id}"
           end
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger_async(channel_array, 'update', message)
+            _pusher_client.trigger_async(channel_array, 'update', message)
           elsif Hyperloop.resource_transport == :action_cable
             channel_array.each do |channel|
               ActionCable.server.broadcast(channel, message)
@@ -119,7 +119,7 @@ module HyperRecord
             channel_array << "hyper-record-update-channel-#{session_id}"
           end
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger_async(channel_array, 'update', message)
+            _pusher_client.trigger_async(channel_array, 'update', message)
           elsif Hyperloop.resource_transport == :action_cable
             channel_array.each do |channel|
               ActionCable.server.broadcast(channel, message)
@@ -151,7 +151,7 @@ module HyperRecord
             channel_array << "hyper-record-update-channel-#{session_id}"
           end
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger_async(channel_array, 'update', message)
+            _pusher_client.trigger_async(channel_array, 'update', message)
           elsif Hyperloop.resource_transport == :action_cable
             channel_array.each do |channel|
               ActionCable.server.broadcast(channel, message)
@@ -182,7 +182,7 @@ module HyperRecord
             channel_array << "hyper-record-update-channel-#{session_id}"
           end
           if Hyperloop.resource_transport == :pusher
-            self.class._pusher_client.trigger_async(channel_array, 'update', message)
+            _pusher_client.trigger_async(channel_array, 'update', message)
           elsif Hyperloop.resource_transport == :action_cable
             channel_array.each do |channel|
               ActionCable.server.broadcast(channel, message)
