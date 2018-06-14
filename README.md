@@ -6,6 +6,10 @@ HyperResource is an affective way of moving data between your server and clients
 
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
 
+[Documentation](https://janbiedermann.github.io/hyper-resource "Github Repo")
+
+Supports Pusher and ActionCable (thanks @gabrielrios)
+
 ## Motivation
 
 + To co-exist with a resource based REST API
