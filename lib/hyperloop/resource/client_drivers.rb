@@ -86,7 +86,13 @@ module Hyperloop
             when :action_cable
               opts[:action_cable_consumer] =
                 `ActionCable.createConsumer.apply(ActionCable, #{[*opts[:action_cable_consumer_url]]})`
-              Hyperloop.connect(*opts[:auto_connect])
+              %x{
+                #{opts[:action_cable_consumer]}.subscriptions.create({ channel: 'ResourceChannel', channel_id: #{@opts[:hyper_record_update_channel]} }, {
+                    received: function(data) {
+                      return Opal.Hyperloop.$const_get('Resource').$const_get('ClientDrivers').$process_notification(Opal.Hash.$new(data));
+                    }
+                  })
+                }
             end
           end
         end
