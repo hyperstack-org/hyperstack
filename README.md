@@ -112,4 +112,209 @@ EXAMPLE
 
 ## Implementation
 
-How to install....
+## Implementation
+
+Hyperloop needs to be installed and working before you install HyperResource. These instructions are likely to change/be simplified as this Gem matures.
+
++ Add the gems (make sure its the latest version)
+
+`gem 'hyper-resource', '1.0.0.lap86'`
+`gem 'opal-jquery', github: 'janbiedermann/opal-jquery', branch: 'why_to_n'`
+`gem 'opal-activesupport', github: 'opal/opal-activesupport', branch: 'master'`
+
++ Require HyperResource in your `hyperloop_webpack_loader.rb` file
+
+`require 'hyper-resource'`
+`require 'opal-jquery'`
+
+ + Update your `application_record.rb` file and move it to the `hyperloop/models` folder
+
+ ```
+# application_record.rb
+if RUBY_ENGINE == 'opal'
+  class ApplicationRecord
+    def self.inherited(base)
+      base.include(HyperRecord)
+    end
+  end
+else
+  class ApplicationRecord < ActiveRecord::Base
+    # when updating this part, also update the ApplicationRecord in app/models/application_record.rb
+    # for rails eager loading in production, so production doesn't fail
+    self.abstract_class = true
+    extend HyperRecord::ServerClassMethods
+    include HyperRecord::PubSub
+  end
+end
+ ```
+
++ Move the models you want on the client to the `hyperloop/models` folder
+
++ Make sure you guard anything in your model which you do not want on the client:
+
+```
+unless RUBY_ENGINE == 'opal'
+  # herein stuff that you do not want on the client (Devise, etc)
+end
+```
+
++ Add Pusher to your gemfile
+
+`gem pusher`
+
++ Add it with Yarn
+
+`yarn add pusher-js`
+
++ Then import in your `app.js`
+
+`import Pusher from 'pusher-js';`
+`global.Pusher = Pusher;`
+
++ Add your api endpoint to `hyperloop.rb`
+
+`config.resource_api_base_path = '/api'`
+
++ Create you API controllers as normal - ensure they return JSON in this format
+
+```
+{
+  "members":[
+    {"member":{"id":1,"email":"a@b.com","first_name":"John","last_name":"Smith"}},
+    {"member":{"id":2,"email":"b@c.com","first_name":null,"last_name":null}}
+  ]
+}
+```
+
+Rabl gem example view:
+
+```
+collection @members, root: :members
+attributes :id,
+  :email,
+  :first_name,
+  :last_name
+```
+
++ Create your API controller and make sure to implement `show` as this is called by HyperResource. Please see the example controller below for details on pub_sub
+
+```ruby
+module Api
+  class PersonasController < ApplicationController
+    # GET /api/personas.json
+    def index
+      authorize(Persona)
+
+      @personas = Persona.all
+      subscribe_scope(@personas, Persona, :all)
+      respond_to do |format|
+        format.json {}
+      end
+    end
+
+    # GET /api/personas/123.json
+    def show
+      @persona = Persona.find(params[:id])
+
+      authorize(@persona)
+
+      subscribe_record(@persona)
+      respond_to do |format|
+        format.json {}
+      end
+    end
+
+    # POST /api/plans/1/personas.json
+    def create
+      authorize(Persona)
+
+      @persona = Persona.new(persona_params)
+
+      subscribe_record(@persona)
+      respond_to do |format|
+        if @persona.save
+          subscribe_record(@persona)
+          publish_scope(Persona, :all)
+          format.json { render :show, status: :created }
+        else
+          format.json { render json: @persona.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+
+    # PATCH/PUT /api/personas/1.json
+    def update
+      @persona = Persona.find(params[:id])
+      @persona.assign_attributes(persona_params)
+
+      authorize(@persona)
+
+      respond_to do |format|
+        if @persona.update(persona_params)
+          pub_sub_record(@persona)
+          format.json { render :show, status: :ok }
+        else
+          format.json { render json: @persona.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+
+    # DELETE /personas/1.json
+    def destroy
+      @persona = Persona.find(params[:id])
+      # authorize @persona
+
+      @persona.destroy
+      publish_record(@persona)
+      respond_to do |format|
+        format.json { head :no_content }
+      end
+    end
+
+    private
+
+    def persona_params
+      permitted_keys = Persona.attribute_names.map(&:to_sym)
+      %i[id created_at updated_at].each do |key|
+        permitted_keys.delete(key)
+      end
+      params.require(:data).permit(permitted_keys)
+    end
+  end
+end
+```
+
++ Install Redis and add the following to your `hyperloop.rb`
+
+```ruby
+config.redis_instance = if ENV['REDIS_URL']
+                            Redis.new(url: ENV['REDIS_URL'])
+                          else
+                            Redis.new
+                          end
+```
+
++ Add the following to your `ApplicationController`
+
+```
+include Hyperloop::Resource::PubSub
+```
+
++ Add these routes:
+
+```
+namespace :api, defaults: { format: :json } do
+
+    # introspection
+    # get '/:model_klass/relations', to: 'relations#index'
+    # get '/:model_klass/methods', to: 'methods#index'
+    # get '/:model_klass/methods/:id', to: 'methods#show'
+    # patch '/:model_klass/methods/:id', to: 'methods#update'
+    # get '/:model_klass/properties', to: 'properties#index'
+    get '/:model_klass/scopes', to: 'scopes#index'
+    get '/:model_klass/scopes/:id', to: 'scopes#show'
+    patch '/:model_klass/scopes/:id', to: 'scopes#update'
+
+```
+
++ Add the `ScopesController` as per the example in this Gem
