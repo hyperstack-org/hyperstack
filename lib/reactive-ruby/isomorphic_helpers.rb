@@ -1,4 +1,4 @@
-require "react/config"
+require 'hyperloop/config'
 
 module React
   module IsomorphicHelpers

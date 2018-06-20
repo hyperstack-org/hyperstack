@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-require 'reactive-ruby/version'
+require 'hyperloop/component/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-react'
-  spec.version       = React::VERSION
+  spec.version       = Hyperloop::Component::VERSION
 
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
@@ -21,26 +21,15 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyper-store', React::VERSION
+  spec.add_dependency 'hyper-store', Hyperloop::Component::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
-  spec.add_dependency 'hyperloop-config', React::VERSION
-  spec.add_dependency 'mini_racer', '~> 0.1.15'
-  spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
-  spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'hyper-spec', React::VERSION
-  spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
-  spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'puma'
-  spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'rails', '>= 4.0.0'
-  spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'timecop', '~> 0.8.1'

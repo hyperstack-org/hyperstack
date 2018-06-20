@@ -4,7 +4,7 @@ require 'active_support/core_ext/class/attribute'
 require 'react/callbacks'
 require 'react/rendering_context'
 require 'hyper-store'
-require 'react/state_wrapper'
+require 'hyper-store/state_wrapper'
 require 'react/component/api'
 require 'react/component/class_methods'
 require 'react/component/props_wrapper'
@@ -109,7 +109,7 @@ module Hyperloop
       def update_react_js_state(object, name, value)
         if object
           name = "#{object.class}.#{name}" unless object == self
-          # Date.now() has only millisecond precision, if several notifications of 
+          # Date.now() has only millisecond precision, if several notifications of
           # observer happen within a millisecond, updates may get lost.
           # to mitigate this the Math.random() appends some random number
           # this way notifactions will happen as expected by the rest of hyperloop
@@ -125,7 +125,7 @@ module Hyperloop
       def set_state_synchronously?
         @native.JS[:__opalInstanceSyncSetState]
       end
-      
+
       def render
         raise 'no render defined'
       end unless method_defined?(:render)

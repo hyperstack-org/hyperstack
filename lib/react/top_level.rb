@@ -1,4 +1,4 @@
-require "native"
+require 'native'
 require 'active_support/core_ext/object/try'
 require 'react/component/tags'
 require 'react/component/base'
@@ -16,7 +16,7 @@ module React
                 readOnly rel required role rows rowSpan sandbox scope scrolling seamless
                 selected shape size sizes span spellCheck src srcDoc srcSet start step style
                 tabIndex target title type useMap value width wmode dangerouslySetInnerHTML) +
-                #SVG ATTRIBUTES
+                # SVG ATTRIBUTES
                 %w(clipPath cx cy d dx dy fill fillOpacity fontFamily
                 fontSize fx fy gradientTransform gradientUnits markerEnd
                 markerMid markerStart offset opacity patternContentUnits
