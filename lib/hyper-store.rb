@@ -1,13 +1,5 @@
 require 'set'
-require 'hyperloop-config'
-Hyperloop.import 'hyper-store'
-
-
-module HyperStore # allows us to easily turn off BasicObject for debug
-  class BaseStoreClass < BasicObject
-  end
-end
-
+require 'hyper-store/base_store_class'
 require 'hyper-store/class_methods'
 require 'hyper-store/dispatch_receiver'
 require 'hyper-store/instance_methods'

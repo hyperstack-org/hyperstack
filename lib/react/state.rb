@@ -1,7 +1,7 @@
 module React
   class State
-
-    ALWAYS_UPDATE_STATE_AFTER_RENDER = Hyperloop.on_client? # if on server then we don't wait to update the state
+    # TODO: find new solution for new prerendering, for now only support browser rendering
+    ALWAYS_UPDATE_STATE_AFTER_RENDER = true # if on server then we don't wait to update the state
     @rendering_level = 0
 
     class << self

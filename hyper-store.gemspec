@@ -21,18 +21,13 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyperloop-config', HyperStore::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'hyper-react', HyperStore::VERSION
-  spec.add_development_dependency 'hyper-spec', HyperStore::VERSION
   spec.add_development_dependency 'listen'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'pry-byebug'
-  spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec', '~> 3.7.0'
   spec.add_development_dependency 'rspec-steps', '~> 2.1.1'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
