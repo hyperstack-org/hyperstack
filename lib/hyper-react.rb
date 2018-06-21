@@ -25,6 +25,7 @@ else
   require 'opal'
   require 'hyper-store'
   require 'opal-activesupport'
+  require 'opal-browser'
   require 'reactive-ruby/isomorphic_helpers'
   require 'reactive-ruby/serializers'
   require 'hyperloop/component/version'
