@@ -1,5 +1,3 @@
-require 'hyperloop-config'
-
 module React
   module Callbacks
     def self.included(base)
