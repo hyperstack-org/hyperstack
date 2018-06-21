@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-store', Hyperloop::Component::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
+  spec.add_dependency 'browser', '~> 2.5.3'
 
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
