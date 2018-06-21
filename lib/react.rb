@@ -55,21 +55,30 @@ module React
   end
 
   def self.render(element, container)
-    %x{
-        console.error(
-          "Warning: Using deprecated behavior of `React.render`,",
-          "require \"react/top_level_render\" to get the correct behavior."
-        );
-    }
+    raise "ReactDOM.render is not defined.  In React >= v15 you must import it with ReactDOM" if (`typeof ReactDOM === 'undefined'`)
+
     container = `container.$$class ? container[0] : container`
-    if !(`typeof ReactDOM === 'undefined'`)
-      component = Native(`ReactDOM.render(#{element.to_n}, container, function(){#{yield if block_given?}})`) # v0.15+
+
+    if block_given?
+      cb = %x{
+      function(){
+        setTimeout(function(){
+          #{yield}
+        }, 0)
+      }
+    }
+      native = `ReactDOM.render(#{element.to_n}, container, cb)`
     else
-      raise "render is not defined.  In React >= v15 you must import it with ReactDOM"
+      native = `ReactDOM.render(#{element.to_n}, container)`
     end
 
-    component.class.include(React::Component::API)
-    component
+    if `#{native}.__opalInstance !== undefined && #{native}.__opalInstance !== null`
+      `#{native}.__opalInstance`
+    elsif `ReactDOM.findDOMNode !== undefined && #{native}.nodeType === undefined`
+      `ReactDOM.findDOMNode(#{native})`
+    else
+      native
+    end
   end
 
   def self.is_valid_element(element)

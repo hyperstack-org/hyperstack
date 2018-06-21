@@ -1,8 +1,7 @@
 if RUBY_ENGINE == 'opal'
   require 'browser/delay'
   require 'hyper-store'
-  require 'react/top_level'
-  require 'react/top_level_render'
+  require 'react'
   require 'react/observable'
   require 'react/validator'
 
