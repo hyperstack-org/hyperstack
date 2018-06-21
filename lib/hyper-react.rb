@@ -29,4 +29,7 @@ else
   require 'reactive-ruby/serializers'
   require 'hyperloop/component/version'
   Opal.append_path File.expand_path('../', __FILE__).untaint
+  unless defined?(Rails)
+    Opal.append_path File.expand_path('hyperloop').untaint
+  end
 end
