@@ -371,7 +371,7 @@ module ReactiveRecord
           end
           reactive_records[model_to_save[:id]] = vectors[vector] = record = find_record(model, id, vector, save) # ??? || validate ???
           next unless record
-          if record.attributes.empty?
+          if attributes.empty?
             dont_save_list << record unless save
           elsif record.respond_to?(:id) && record.id
             # we have an already exising activerecord model
