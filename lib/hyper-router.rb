@@ -1,9 +1,6 @@
 # rubocop:disable Style/FileName
 
-require 'hyper-component'
-
-Hyperloop.js_import 'hyper-router/react-router-source', defines: ['ReactRouter', 'ReactRouterDOM', 'History']
-Hyperloop.import 'hyper-router'
+require 'hyper-react'
 
 if RUBY_ENGINE == 'opal'
   require 'react/router'

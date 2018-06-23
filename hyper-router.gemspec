@@ -18,10 +18,8 @@ Gem::Specification.new do |spec|
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   spec.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
 
-  spec.add_dependency 'hyper-component', HyperRouter::HYPERLOOP_VERSION
   spec.add_dependency 'hyper-react', HyperRouter::HYPERLOOP_VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
