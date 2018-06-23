@@ -20,6 +20,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperloop/component/mixin'
   require 'hyperloop/component'
   require 'hyperloop/component/version'
+  require 'hyperloop/top_level'
 else
   require 'opal'
   require 'hyper-store'

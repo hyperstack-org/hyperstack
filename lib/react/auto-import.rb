@@ -1,5 +1,5 @@
 # rubocop:disable Style/FileName
-# require 'reactrb/auto-import' to automatically
+# require 'react/auto-import' to automatically
 # import JS libraries and components when they are detected
 if RUBY_ENGINE == 'opal'
   # modifies const and method_missing so that they will attempt
@@ -18,8 +18,9 @@ if RUBY_ENGINE == 'opal'
       end
 
       def method_missing(method, *args, &block)
+        # ToDo: call import_const_from_natve only, if methods starts with capital letter
         component_class = React::NativeLibrary.import_const_from_native(self, method, false)
-        _reactrb_original_method_missing(method, *args, &block) unless component_class
+        return _reactrb_original_method_missing(method, *args, &block) unless component_class
         React::RenderingContext.render(component_class, *args, &block)
       end
     end
