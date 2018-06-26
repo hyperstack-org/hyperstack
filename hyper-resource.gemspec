@@ -15,16 +15,11 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'opal', '~> 0.11.0'
   s.add_runtime_dependency 'opal-activesupport', '~> 0.3.1'
-  s.add_runtime_dependency 'hyper-component' , '~> 1.0.0.lap27'
+  s.add_runtime_dependency 'hyper-react' , '~> 1.0.0.lap27'
   s.add_runtime_dependency 'hyper-store' , '~> 1.0.0.lap27'
-  s.add_runtime_dependency 'hyperloop-config', '~> 1.0.0.lap27'
-  s.add_development_dependency 'hyperloop', '~> 1.0.0.lap27'
-  s.add_development_dependency 'hyper-spec', '~> 1.0.0.lap27'
   s.add_development_dependency 'listen'
   s.add_development_dependency 'rake', '>= 11.3.0'
-  s.add_development_dependency 'rails', '>= 5.1.0'
   s.add_development_dependency 'redis'
-  s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'yard', '~> 0.9.13'
 end
