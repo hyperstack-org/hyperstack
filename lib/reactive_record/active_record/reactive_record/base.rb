@@ -297,7 +297,7 @@ module ReactiveRecord
       errors.clear && return unless hash
       hash.each do |attribute, messages|
         messages.each do |message|
-          errors.add(attribute, message: message)
+          errors.add(attribute, message)
         end
       end
     end
