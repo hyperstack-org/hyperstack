@@ -188,8 +188,6 @@ module React
                           function(dom_node){
                             if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
                               #{ value.call(`dom_node.__opalInstance`) };
-                            } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && typeof(dom_node.nodeType) === "undefined") {
-                              #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
                             } else {
                               #{ value.call(`dom_node`) };
                             }
