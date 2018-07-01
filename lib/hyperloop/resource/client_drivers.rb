@@ -63,8 +63,8 @@ module Hyperloop
             @opts[:hyper_record_update_channel] = "hyper-record-update-channel-#{@opts[:session_id]}"
             case @opts[:resource_transport]
             when :pusher
-              if @opts[:pusher][:client_logging] && `window.console && window.console.log`
-                `Pusher.log = function(message) {window.console.log(message);}`
+              if @opts[:pusher][:client_logging] && `console && console.log`
+                `Pusher.log = function(message) {console.log(message);}`
               end
 
               h = nil
