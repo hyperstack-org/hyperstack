@@ -6,7 +6,7 @@ require 'hyperloop/resource/config'
 require 'hyper-store'
 
 if RUBY_ENGINE == 'opal'
-  require 'hyperloop/resource/http'
+  require 'hyper-transport-http'
   require 'hyper-store'
   require 'hyper_record'
 else

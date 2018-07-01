@@ -709,7 +709,7 @@ module HyperRecord
 
     # @private
     def _promise_get(uri)
-      Hyperloop::Resource::HTTP.get(uri, headers: { 'Content-Type' => 'application/json' })
+      Hyperloop::Transport::HTTP.get(uri, headers: { 'Content-Type' => 'application/json' })
     end
 
     # @private
@@ -728,19 +728,19 @@ module HyperRecord
 
     # @private
     def _promise_delete(uri)
-      Hyperloop::Resource::HTTP.delete(uri, headers: { 'Content-Type' => 'application/json' })
+      Hyperloop::Transport::HTTP.delete(uri, headers: { 'Content-Type' => 'application/json' })
     end
 
     # @private
     def _promise_patch(uri, payload)
-      Hyperloop::Resource::HTTP.patch(uri, payload: payload,
+      Hyperloop::Transport::HTTP.patch(uri, payload: payload,
                                  headers: { 'Content-Type' => 'application/json' },
                                  dataType: :json)
     end
 
     # @private
     def _promise_post(uri, payload)
-      Hyperloop::Resource::HTTP.post(uri, payload: payload,
+      Hyperloop::Transport::HTTP.post(uri, payload: payload,
                                 headers: { 'Content-Type' => 'application/json' },
                                 dataType: :json)
     end
