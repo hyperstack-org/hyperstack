@@ -30,7 +30,7 @@ module Hyperloop
         }
         message[:destroyed] = true if record.destroyed?
 
-        # can only trigger to max 10 channels at once on pusher
+        # can only trigger max 10 channels at once on pusher
         subscribers.each_slice(10) do |slice|
           channel_array = []
           slice.each do |session_id, last_requested|

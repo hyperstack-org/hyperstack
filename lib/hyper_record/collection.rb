@@ -14,7 +14,7 @@ module HyperRecord
           record._register_collection(self)
         end
       end
-      @record._notify_observers if @record
+      @record.notify_observers if @record
       collection ? super(collection) : super
     end
 
@@ -26,7 +26,7 @@ module HyperRecord
         @record.promise_link(other_record, @relation_name)
       end
       other_record._register_collection(self)
-      @record._notify_observers if @record
+      @record.notify_observers if @record
       super(other_record)
     end
 
@@ -38,7 +38,7 @@ module HyperRecord
         @record.promise_unlink(other_record, @relation_name)
       end
       other_record._unregister_collection(self)
-      @record._notify_observers if @record
+      @record.notify_observers if @record
       super(other_record)
     end
 
@@ -47,7 +47,7 @@ module HyperRecord
     # @param other_record [HyperRecord] record to add
     def push(other_record)
       other_record._register_collection(self)
-      @record._notify_observers if @record
+      @record.notify_observers if @record
       super(other_record)
     end
   end

@@ -5,12 +5,53 @@ if RUBY_ENGINE == 'opal'
   require 'hyper_record/client_instance_methods'
 
   module HyperRecord
+    # get global api_path
+    #
+    # @return [String]
+    def self.api_path
+      @api_path ||= '/api/endpoint'
+    end
+
+    # set global api path
+    #
+    # @return [String]
+    def self.api_path=(api_path)
+      @api_path = api_path
+    end
+
+    # get global transport
+    #
+    # @return [Class]
+    def self.transport
+      @transport ||= Hyperloop::Transport::HTTP
+    end
+
+    # set global transport
+    #
+    # @return [Class]
+    def self.transport=(transport)
+      @transport = transport
+    end
+
+    # get global request transducer
+    #
+    # @return [HyperRecord::Transducer]
+    def self.request_transducer
+      @transducer ||= HyperRecord::RequestTransducer.new
+    end
+
+    # set global request transducer
+    #
+    # @return [HyperRecord::Transducer]
+    def self.request_transducer=(transducer)
+      @transducer = transducer
+    end
+
     def self.included(base)
-      base.include(Hyperloop::Store::Mixin)
       base.extend(HyperRecord::ClassMethods)
       base.include(HyperRecord::ClientInstanceMethods)
       base.class_eval do
-        state :record_state
+        scope :all
       end
     end
   end

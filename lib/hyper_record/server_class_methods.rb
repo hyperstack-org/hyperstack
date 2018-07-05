@@ -45,14 +45,14 @@ module HyperRecord
     # introspect defined scopes
     # @return [Hash]
     def resource_scopes
-      @resource_scopes ||= []
+      @resource_scopes ||= {}
     end
 
     # defines a scope, wrapper around ORM method
     # @param name [Symbol] name of the args
     # @param *args additional args, passed to ORMs scope DSL
     def scope(name, *args)
-      resource_scopes << name
+      resource_scopes[name] = args
       super(name, *args)
     end
   end

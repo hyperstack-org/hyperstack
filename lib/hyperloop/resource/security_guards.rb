@@ -2,7 +2,7 @@ module Hyperloop
   module Resource
     class SecurityError < StandardError
     end
-    
+
     module SecurityGuards
       def self.included(base)
         base.extend(Hyperloop::Resource::SecurityGuards::ClassMethods)
@@ -28,8 +28,8 @@ module Hyperloop
         raise Hyperloop::Resource::SecurityError
       end
 
-      def guarded_record_class_from_param(record_class_param)
-        raise Hyperloop::Resource::SecurityError unless self.class.valid_record_class_params.include?(record_class_param) # guard
+      def guarded_record_class(model_name)
+        raise Hyperloop::Resource::SecurityError unless self.class.valid_record_class_params.include?(model_name) # guard
         record_class_param.camelize.constantize
       end
     end

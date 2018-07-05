@@ -171,9 +171,16 @@ end
 `import Pusher from 'pusher-js';`
 `global.Pusher = Pusher;`
 
-+ Add your api endpoint to `hyperloop.rb`
++ Add your api endpoint to your client code, for example in `hyperloop_webpack_loader.rb`
 
-`config.resource_api_base_path = '/api'`
+`HyperResource.api_path = '/api/endpoint'`
+
+(You may set the api_path per model too)
+
+TODO:
++ Use the supplied catch all controller or write your own
+
+vs.
 
 + Create you API controllers as normal - ensure they return JSON in this format
 

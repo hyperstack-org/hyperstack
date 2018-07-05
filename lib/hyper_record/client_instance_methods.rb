@@ -63,14 +63,12 @@ module HyperRecord
     ### high level api
 
     # Check if record has been changed since last save.
-    #
     # @return boolean
     def changed?
       @changed_properties != {}
     end
 
     # destroy record, success is assumed
-    #
     # @return nil
     def destroy
       promise_destroy
@@ -78,10 +76,20 @@ module HyperRecord
     end
 
     # Check if record has been destroyed.
-    #
     # @return [Boolean]
     def destroyed?
       @destroyed
+    end
+
+    # record id, shortcut
+    # @return [String]
+    def id
+      _register_observer
+      if @changed_properties.has_key?(:id)
+        @changed_properties[:id]
+      else
+        @properties[:id]
+      end
     end
 
     # link the two records using a relation determined by other_record.class, success is assumed
@@ -112,6 +120,18 @@ module HyperRecord
           @properties[method]
         end
       end
+    end
+
+    # notify observer, will change state of observers, will also notify class observers
+    #
+    # @return nil
+    def notify_observers
+      @observers.each do |observer|
+        React::State.set_state(observer, @state_key, `Date.now() + Math.random()`)
+      end
+      @observers = Set.new
+      self.class.notify_class_observers
+      nil
     end
 
     # introspection
@@ -150,9 +170,7 @@ module HyperRecord
     # @return [Hash]
     def to_hash
       _register_observer
-      res = @properties.dup
-      res.merge!(@changed_properties)
-      res
+      @properties.dup.merge!(@changed_properties)
     end
 
     # return record properties as String
@@ -160,7 +178,12 @@ module HyperRecord
     # @return [String]
     def to_s
       _register_observer
-      @properties.to_s
+      @properties.dup.merge!(@changed_properties).to_s
+    end
+
+    # return record properties as hash, ready for transport
+    def to_transport_hash
+      { self.class.model_name => @properties.dup.merge!(@changed_properties) }
     end
 
     # unlink the two records using a relation determined by other_record.class, success is assumed
@@ -180,7 +203,8 @@ module HyperRecord
     #   on failure the HTTP response is passed to the .fail block
     def promise_destroy
       _local_destroy
-      self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}").then do |record|
+      request = self.class.request_transducer.destroy(self.to_transport_hash)
+      self.class.transport.promise_send(request).then do |_|
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -218,11 +242,12 @@ module HyperRecord
           end
         end
       end
-      payload_hash = other_record.to_hash
-      self.class._promise_post("#{resource_base_uri}/#{self.id}/relations/#{relation_name}.json", { data: payload_hash }).then do |response|
+
+      request = self.class.request_transducer.link(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
+      self.class.transport.promise_send(request).then do |response|
         other_record.instance_variable_get(:@properties).merge!(response.json[other_record.class.to_s.underscore])
-        _notify_observers
-        other_record._notify_observers
+        notify_observers
+        other_record.notify_observers
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -240,11 +265,12 @@ module HyperRecord
       (%i[id created_at updated_at] + reflections.keys).each do |key|
         payload_hash.delete(key)
       end
+      request = self.class.request_transducer.save(self.to_transport_hash)
       if @properties[:id] && ! (@changed_properties.has_key?(:id) && @changed_properties[:id].nil?)
         reset
-        self.class._promise_patch("#{resource_base_uri}/#{@properties[:id]}", { data: payload_hash }).then do |response|
+        self.class.transport.promise_send(request).then do |response|
           @properties.merge!(response.json[self.class.to_s.underscore])
-          _notify_observers
+          notify_observers
           self
         end.fail do |response|
           error_message = "Saving record #{self} failed!"
@@ -253,7 +279,7 @@ module HyperRecord
         end
       else
         reset
-        self.class._promise_post(resource_base_uri, { data: payload_hash }).then do |response|
+        self.class.transport.promise_send(request).then do |response|
           @properties.merge!(response.json[self.class.to_s.underscore])
           self
         end.fail do |response|
@@ -274,9 +300,10 @@ module HyperRecord
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
-      self.class._promise_delete("#{resource_base_uri}/#{@properties[:id]}/relations/#{relation_name}.json?record_id=#{other_record.id}").then do |response|
-        _notify_observers
-        other_record._notify_observers
+      request = self.class.request_transducer(self.class.model_name => { relations: { relation_name => other_record.to_transport_hash }})
+      self.class.transport.promise_send(request).then do |response|
+        notify_observers
+        other_record.notify_observers
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
@@ -286,6 +313,8 @@ module HyperRecord
     end
 
     ### internal
+    private
+
     # @private
     def _local_destroy
       _register_observer
@@ -295,16 +324,7 @@ module HyperRecord
         collection.delete(self)
       end
       @registered_collections = Set.new
-      _notify_observers
-    end
-
-    # @private
-    def _notify_observers
-      @observers.each do |observer|
-        React::State.set_state(observer, @state_key, `Date.now() + Math.random()`)
-      end
-      @observers = Set.new
-      self.class._notify_class_observers
+      notify_observers
     end
 
     # @private
@@ -351,7 +371,7 @@ module HyperRecord
         end
         @fetch_states[data[:relation]] = 'u'
         send("promise_#{data[:relation]}").then do |collection|
-          _notify_observers
+          notify_observers
         end.fail do |response|
           error_message = "#{self}[#{self.id}].#{data[:relation]} failed to update!"
           `console.error(error_message)`
@@ -362,11 +382,11 @@ module HyperRecord
         @fetch_states[data[:rest_method]] = 'u'
         if data[:rest_method].include?('_[')
           # rest_method with params
-          _notify_observers
+          notify_observers
         else
           # rest_method without params
           send("promise_#{data[:rest_method]}").then do |result|
-            _notify_observers
+            notify_observers
           end.fail do |response|
             error_message = "#{self}[#{self.id}].#{data[:rest_method]} failed to update!"
             `console.error(error_message)`
@@ -384,8 +404,8 @@ module HyperRecord
         return if `Date.parse(#{@properties[:updated_at]}) >= Date.parse(#{data[:updated_at]})`
       end
       self.class._class_fetch_states["record_#{id}"] = 'u'
-      self.class._promise_find(@properties[:id], self).then do |record|
-        _notify_observers
+      self.class.promise_find(@properties[:id], self).then do |record|
+        notify_observers
         self
       end.fail do |response|
         error_message = "#{self} failed to update!"

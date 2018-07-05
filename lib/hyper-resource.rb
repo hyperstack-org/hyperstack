@@ -7,7 +7,6 @@ require 'hyper-store'
 
 if RUBY_ENGINE == 'opal'
   require 'hyper-transport-http'
-  require 'hyper-store'
   require 'hyper_record'
 else
   require 'hyperloop/resource/pub_sub' # server side, controller helper methods
