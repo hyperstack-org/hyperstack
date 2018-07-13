@@ -2,11 +2,11 @@ module Vis
   module EventSupport
     def off(event, event_handler_id)
       event = lower_camelize(event)
-      handler = @event_handlers[event][event_handler_id]
-      `self["native"].off(event, handler)`
-      @event_handlers[event].delete(event_handler_id)
+      handler = @event_handlers[event].delete(event_handler_id)
+      `self["native"].off(event, handler)` if handler
+      nil
     end
-    
+
     def on(event, &block)
       event = lower_camelize(event)
       @event_handlers[event] = {} unless @event_handlers[event]
