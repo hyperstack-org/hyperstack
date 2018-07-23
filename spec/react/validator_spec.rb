@@ -95,28 +95,22 @@ describe 'React::Validator', js: true do
     end
   end
 
-  describe '#undefined_props' do
-    before :each do
-      on_client do
-        PROPS = { foo: 'foo', bar: 'bar', biz: 'biz', baz: 'baz' }
-        VALIDATOR = React::Validator.new.build do
-          requires :foo
-          optional :bar
+  it 'collects other params into a hash' do
+    evaluate_ruby do
+      PROPS = { foo: 'foo', bar: 'bar', biz: 'biz', baz: 'baz' }
+      VALIDATOR = React::Validator.new.build do
+        requires :foo
+        optional :bar
+        all_other_params :baz
+      end
+      class Dummy
+        def props
+          PROPS
         end
       end
     end
-
-
-    it 'slurps up any extra params into a hash' do
-      expect_evaluate_ruby('VALIDATOR.undefined_props(PROPS)').to eq({ "biz" => 'biz', "baz" => 'baz' })
-    end
-
-    it 'prevents validate non-specified params' do
-      evaluate_ruby do
-        VALIDATOR.undefined_props(PROPS)
-      end
-      expect_evaluate_ruby('VALIDATOR.validate(PROPS)').to eq([])
-    end
+    expect_evaluate_ruby('VALIDATOR.validate(PROPS)').to eq([])
+    expect_evaluate_ruby('VALIDATOR.props_wrapper.new(Dummy.new).baz').to eq({ "biz" => 'biz', "baz" => 'baz' })
   end
 
   describe "default_props" do

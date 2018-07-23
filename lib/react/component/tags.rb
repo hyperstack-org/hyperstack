@@ -20,8 +20,10 @@ module React
         React::RenderingContext.render(component, *params, &children)
       end
 
-      # define each predefined tag as an instance method
+      # define each predefined tag (downcase) as an instance method (deprecated) and as a component (upcase)
       HTML_TAGS.each do |tag|
+
+        # deprecated - remove
         if tag == 'p'
           define_method(tag) do |*params, &children|
             if children || params.count == 0 || (params.count == 1 && params.first.is_a?(Hash))
@@ -35,8 +37,23 @@ module React
             React::RenderingContext.render(tag, *params, &children)
           end
         end
-        alias_method tag.upcase, tag
-        const_set tag.upcase, tag
+
+        # new style: allows custom hooks to be added and/or the render method to
+        # be modified.  i.e. see how hyper-mesh deals with defaultValues in input tags
+
+        klass = Class.new(Hyperloop::Component) do
+          # its complicated but the automatic inclusion of the Mixin is setup after all
+          # the files are loaded, so at this point we have to manually load it.
+          include Hyperloop::Component::Mixin
+          collect_other_params_as :opts
+          # we simply pass along all the params and children with the tag string name
+          render { React::RenderingContext.render(tag, params.opts, &children) }
+
+          # after_error do |error, info|
+          #   raise error
+          # end
+        end
+        const_set(tag.upcase, klass)
       end
 
       def self.html_tag_class_for(tag)

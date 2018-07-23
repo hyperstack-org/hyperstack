@@ -14,6 +14,31 @@ describe 'the param macro', js: true do
     expect(page.body[-35..-19]).to include("<div>biz</div>")
   end
 
+  it 'defines collect_other_params_as method on params proxy' do
+    mount 'Foo' do
+      class Foo < React::Component::Base
+        state s: :beginning, scope: :shared
+        def self.update_s(x)
+          mutate.s x
+        end
+        render do
+          Foo2(another_param: state.s)
+        end
+      end
+
+      class Foo2 < Hyperloop::Component
+        collect_other_params_as :opts
+
+        def render
+          DIV(id: :tp) { params.opts[:another_param] }
+        end
+      end
+    end
+    expect(page).to have_content('beginning')
+    evaluate_ruby("Foo.update_s 'updated'")
+    expect(page).to have_content('updated')
+  end
+
   it "can create and access a required param" do
     mount 'Foo', foo: :bar do
       class Foo < React::Component::Base

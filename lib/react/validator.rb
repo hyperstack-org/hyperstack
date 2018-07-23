@@ -27,13 +27,9 @@ module React
       define_rule(name, options)
     end
 
-    def allow_undefined_props=(allow)
-      @allow_undefined_props = allow
-    end
-
-    def undefined_props(props)
-      self.allow_undefined_props = true
-      props.reject { |name, value| rules[name] }
+    def all_other_params(name)
+      @allow_undefined_props = true
+      props_wrapper.define_all_others(name) { |props| props.reject { |name, value| rules[name] } }
     end
 
     def validate(props)

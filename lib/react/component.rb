@@ -8,7 +8,6 @@ require 'react/state_wrapper'
 require 'react/component/api'
 require 'react/component/class_methods'
 require 'react/component/props_wrapper'
-require 'native'
 
 module Hyperloop
   class Component
@@ -70,10 +69,13 @@ module Hyperloop
         # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
         # for now we are just using it to clear processed_params
         React::State.set_state_context_to(self) { self.run_callback(:before_receive_props, next_props) }
+        @_receiving_props = true
       end
 
       def component_will_update(next_props, next_state)
         React::State.set_state_context_to(self) { self.run_callback(:before_update, next_props, next_state) }
+        params._reset_all_others_cache if @_receiving_props
+        @_receiving_props = false
       end
 
       def component_did_update(prev_props, prev_state)
@@ -92,15 +94,7 @@ module Hyperloop
 
       def component_did_catch(error, info)
         React::State.set_state_context_to(self) do
-          if self.class.callbacks_for(:after_error) == []
-            if `typeof error.$backtrace === "function"`
-              `console.error(error.$backtrace().$join("\n"))`
-            else
-              `console.error(error, info)`
-            end
-          else
-            self.run_callback(:after_error, error, info)
-          end
+          self.run_callback(:after_error, error, info)
         end
       end
 
@@ -109,7 +103,7 @@ module Hyperloop
       def update_react_js_state(object, name, value)
         if object
           name = "#{object.class}.#{name}" unless object == self
-          # Date.now() has only millisecond precision, if several notifications of 
+          # Date.now() has only millisecond precision, if several notifications of
           # observer happen within a millisecond, updates may get lost.
           # to mitigate this the Math.random() appends some random number
           # this way notifactions will happen as expected by the rest of hyperloop
@@ -125,7 +119,7 @@ module Hyperloop
       def set_state_synchronously?
         @native.JS[:__opalInstanceSyncSetState]
       end
-      
+
       def render
         raise 'no render defined'
       end unless method_defined?(:render)

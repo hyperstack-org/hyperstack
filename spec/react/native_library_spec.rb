@@ -9,7 +9,7 @@ describe "React::NativeLibrary", js: true do
           backtrace :none
           render { NativeComponent(name: "There - #{params.time_stamp}") }
         end
-      
+
         class NestedComponent < React::Component::Base
           param :time_stamp
           backtrace :none
@@ -26,7 +26,7 @@ describe "React::NativeLibrary", js: true do
       end.to be_truthy
     end
 
-    it "imports a React.js functional stateless component" do        
+    it "imports a React.js functional stateless component" do
       mount 'Foo', name: "There" do
         JS.call(:eval, 'window.NativeLibrary = { FunctionalComponent: function HelloMessage(props){
           return React.createElement("div", null, "Hello ", props.name); }}')
@@ -260,7 +260,7 @@ describe "React::NativeLibrary", js: true do
             }
           JSCODE
         )
-        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::Component, time_stamp: Time.now)
+        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::Component, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
       end
       expect(page.body[-100..-19]).to match(/<div>Hello There.*<\/div>/)
     end
@@ -317,7 +317,7 @@ describe "React::NativeLibrary", js: true do
               }}}
           JSCODE
         )
-        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now)
+        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
       end
       expect(page.body[-100..-19]).to match(/<div>Hello There.*<\/div>/)
     end
@@ -351,7 +351,7 @@ describe "React::NativeLibrary", js: true do
           JSCODE
         )
         begin
-          React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now)
+          React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
         rescue Exception => e
           e.message
         end

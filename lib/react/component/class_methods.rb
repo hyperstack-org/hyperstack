@@ -92,16 +92,7 @@ module React
       end
 
       def collect_other_params_as(name)
-        validator.allow_undefined_props = true
-        validator_in_lexical_scope = validator
-        props_wrapper.define_method(name) do
-          @_all_others ||= validator_in_lexical_scope.undefined_props(props)
-        end
-
-        validator_in_lexial_scope = validator
-        props_wrapper.define_method(name) do
-          @_all_others ||= validator_in_lexial_scope.undefined_props(props)
-        end
+        validator.all_other_params(name) { props }
       end
 
       def define_state(*states, &block)
@@ -173,7 +164,7 @@ module React
         end
       end
 
-      def to_n 
+      def to_n
         React::API.class_eval('@@component_classes')[self]
       end
     end

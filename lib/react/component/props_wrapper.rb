@@ -44,12 +44,24 @@ module React
         end
       end
 
+      def self.define_all_others(name)
+        define_method("#{name}") do
+          @_all_others_cache ||= yield(props)
+        end
+      end
+
+
       def initialize(component)
         @component = component
       end
 
       def [](prop)
         props[prop]
+      end
+
+
+      def _reset_all_others_cache
+        @_all_others_cache = nil
       end
 
       private

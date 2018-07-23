@@ -6,6 +6,14 @@ module React
       @children = children
     end
 
+    def render
+      each(&:render)
+    end
+
+    def to_proc
+      -> () { render }
+    end
+
     def each(&block)
       return to_enum(__callee__) { length } unless block_given?
       return [] unless length > 0

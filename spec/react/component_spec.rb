@@ -132,7 +132,7 @@ describe 'React::Component', js: true do
         end
       end
       expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
-      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in React::TopLevelRailsComponent")
+      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in React::Component::Tags::DIV\n    in Foo\n    in React::TopLevelRailsComponent")
     end
   end
 
@@ -719,7 +719,7 @@ describe 'React::Component', js: true do
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-          .to match(/Instead the Hash \{\} was returned/)
+          .to match(/You may need to convert this to a string./)
     end
     it "will generate a message if render returns a Component class" do
       mount 'Foo' do
@@ -737,7 +737,7 @@ describe 'React::Component', js: true do
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/Instead 2 elements were generated/)
+        .to match(/Do you want to wrap your elements in a div?/)
     end
     it "will generate a message if the element generated is not the element returned" do
       mount 'Foo' do
@@ -746,7 +746,7 @@ describe 'React::Component', js: true do
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/A different element was returned than was generated within the DSL/)
+        .to match(/Possibly improper use of Element#delete./)
     end
   end
 

@@ -129,4 +129,41 @@ describe 'React::Children', js: true do
       end
     end
   end
+
+  describe 'other methods' do
+    it 'responds to to_proc' do
+      mount 'Children' do
+        class ChildTester < Hyperloop::Component
+          render do
+            DIV(id: :tp, &children)
+          end
+        end
+        class Children < Hyperloop::Component
+          render do
+            ChildTester { "one".span; "two".span; "three".span }
+          end
+        end
+      end
+      expect(page).to have_content('one')
+      expect(page).to have_content('two')
+      expect(page).to have_content('three')
+    end
+    it 'responds to render' do
+      mount 'Children' do
+        class ChildTester < Hyperloop::Component
+          render do
+            DIV(id: :tp) { children.render }
+          end
+        end
+        class Children < Hyperloop::Component
+          render do
+            ChildTester { "one".span; "two".span; "three".span }
+          end
+        end
+      end
+      expect(page).to have_content('one')
+      expect(page).to have_content('two')
+      expect(page).to have_content('three')
+    end
+  end
 end
