@@ -146,7 +146,7 @@ module React
       end
     end
 
-    def self.create_element(type, properties = {}, &block)
+    def self.create_element(type, *args, &block)
       params = []
 
       # Component Spec, Normal DOM, String or Native Component
@@ -164,7 +164,7 @@ module React
       end
 
       # Convert Passed in properties
-      properties = convert_props(properties)
+      properties = convert_props(args)
       params << properties.shallow_to_n
 
       # Children Nodes
@@ -183,14 +183,40 @@ module React
       @@component_classes = {}
     end
 
-    def self.convert_props(properties)
-      raise "Component parameters must be a hash. Instead you sent #{properties}" unless properties.is_a? Hash
+    def self.convert_props(args)
+      # merge args together into a single properties hash
+      properties = {}
+      args.each do |arg|
+        if arg.is_a? String
+          properties[arg] = true
+        elsif arg.is_a? Hash
+          arg.each do |key, value|
+            if ['class', 'className', 'class_name'].include? key
+              if value.is_a?(String)
+                value = value.split(' ')
+              elsif !value.is_a?(Array)
+                raise "The class param must be a string or array of strings"
+              end
+              properties['className'] = (properties['className'] || []) + value
+            elsif key == 'style'
+              if !value.is_a?(Hash)
+                raise "The style param must be a Hash"
+              end
+              properties['style'] = (properties['style'] || {}).merge(value)
+            else
+              properties[key] = value
+            end
+          end
+        end
+      end
+      # process properties according to react rules
       props = {}
       properties.each do |key, value|
-        if key == "class" || key == "class_name"
-          props["className"] = value
-        elsif ["style", "dangerously_set_inner_HTML"].include? key
+        if ["style", "dangerously_set_inner_HTML"].include? key
           props[lower_camelize(key)] = value.to_n
+
+        elsif key == "className"
+          props[key] = value.join(' ')
 
         elsif key == "key"
           props["key"] = value.to_key

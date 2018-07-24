@@ -95,6 +95,9 @@ module React
         validator.all_other_params(name) { props }
       end
 
+      alias other_params collect_other_params_as
+      alias others collect_other_params_as
+
       def define_state(*states, &block)
         deprecation_warning "'define_state' is deprecated. Use the 'state' macro to declare states."
         default_initial_value = (block && block.arity == 0) ? yield : nil

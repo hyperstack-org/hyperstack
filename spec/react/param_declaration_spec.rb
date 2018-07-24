@@ -183,6 +183,38 @@ describe 'the param macro', js: true do
         .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle/)
     end
 
+    it 'allows passing and merging complex arguments to params' do
+      mount 'Tester' do
+        class TakesParams < Hyperloop::Component
+          param :flag
+          param :a
+          param :b
+          param :c
+          param :d
+          others :opts
+          render do
+            DIV(params.opts, id: :tp, class: "another-class", style: {marginLeft: 12}) do
+              "flag: #{params.flag}, a: #{params.a}, b: #{params.b}, c: #{params.c}, d: #{params.d}"
+            end
+          end
+        end
+        class Tester < Hyperloop::Component
+          render do
+            TakesParams(
+              :flag,
+              {a: 1, b: 2, class: [:x, :y], className: 'foo', class_name: 'bar baz', style: {marginRight: 12}},
+              c: 3, d: 4
+            )
+          end
+        end
+      end
+      tp = find('#tp')
+      expect(tp[:class].split).to contain_exactly("x", "y", "foo", "bar", "baz", "another-class")
+      expect(tp[:style]).to match('margin-right: 12px')
+      expect(tp[:style]).to match('margin-left: 12px')
+      expect(tp).to have_content('flag: true, a: 1, b: 2, c: 3, d: 4')
+    end
+
     describe "converts params only once" do
       it "not on every access" do
         mount 'Foo', foo: {bazwoggle: 1} do
