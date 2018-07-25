@@ -132,7 +132,7 @@ describe 'React::Component', js: true do
         end
       end
       expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
-      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in React::Component::Tags::DIV\n    in Foo\n    in React::TopLevelRailsComponent")
+      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in React::TopLevelRailsComponent")
     end
   end
 

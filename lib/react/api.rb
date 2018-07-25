@@ -203,6 +203,8 @@ module React
                 raise "The style param must be a Hash"
               end
               properties['style'] = (properties['style'] || {}).merge(value)
+            elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
+              properties[key] = (properties[key] || {}).merge(value)
             else
               properties[key] = value
             end
@@ -234,7 +236,7 @@ module React
                           }
                         }
         elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
-          value.each { |k, v| props["#{key}-#{k.tr('_', '-')}"] = v.to_n }
+          value.each { |k, v| props["#{key}-#{k.gsub(/__|_/, '__' => '_', '_' => '-')}"] = v.to_n }
         else
           props[React.html_attr?(lower_camelize(key)) ? lower_camelize(key) : key] = value
         end

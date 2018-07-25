@@ -186,14 +186,14 @@ describe 'the param macro', js: true do
     it 'allows passing and merging complex arguments to params' do
       mount 'Tester' do
         class TakesParams < Hyperloop::Component
-          param :flag
-          param :a
-          param :b
-          param :c
-          param :d
+          param  :flag
+          param  :a
+          param  :b
+          param  :c
+          param  :d
           others :opts
           render do
-            DIV(params.opts, id: :tp, class: "another-class", style: {marginLeft: 12}) do
+            DIV(params.opts, id: :tp, class: "another-class", style: {marginLeft: 12}, data: {foo: :hi}) do
               "flag: #{params.flag}, a: #{params.a}, b: #{params.b}, c: #{params.c}, d: #{params.d}"
             end
           end
@@ -202,7 +202,7 @@ describe 'the param macro', js: true do
           render do
             TakesParams(
               :flag,
-              {a: 1, b: 2, class: [:x, :y], className: 'foo', class_name: 'bar baz', style: {marginRight: 12}},
+              {a: 1, b: 2, class: [:x, :y], className: 'foo', class_name: 'bar baz', style: {marginRight: 12}, data: {bar: :there}},
               c: 3, d: 4
             )
           end
@@ -212,6 +212,8 @@ describe 'the param macro', js: true do
       expect(tp[:class].split).to contain_exactly("x", "y", "foo", "bar", "baz", "another-class")
       expect(tp[:style]).to match('margin-right: 12px')
       expect(tp[:style]).to match('margin-left: 12px')
+      expect(tp['data-foo']).to eq("hi")
+      expect(tp['data-bar']).to eq("there")
       expect(tp).to have_content('flag: true, a: 1, b: 2, c: 3, d: 4')
     end
 

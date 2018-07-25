@@ -20,10 +20,18 @@ module React
         React::RenderingContext.render(component, *params, &children)
       end
 
-      # define each predefined tag (downcase) as an instance method (deprecated) and as a component (upcase)
+      # define each predefined tag (upcase) as an instance method and a constant
+      # deprecated: define each predefined tag (downcase) as the alias of the instance method
+
       HTML_TAGS.each do |tag|
 
-        # deprecated - remove
+        define_method(tag.upcase) do |*params, &children|
+          React::RenderingContext.render(tag, *params, &children)
+        end
+
+        const_set tag.upcase, tag
+
+        # deprecated: remove
         if tag == 'p'
           define_method(tag) do |*params, &children|
             if children || params.count == 0 || (params.count == 1 && params.first.is_a?(Hash))
@@ -33,29 +41,12 @@ module React
             end
           end
         else
-          define_method(tag) do |*params, &children|
-            React::RenderingContext.render(tag, *params, &children)
-          end
+          alias_method tag, tag.upcase
         end
-
-        # new style: allows custom hooks to be added and/or the render method to
-        # be modified.  i.e. see how hyper-mesh deals with defaultValues in input tags
-
-        klass = Class.new(Hyperloop::Component) do
-          # its complicated but the automatic inclusion of the Mixin is setup after all
-          # the files are loaded, so at this point we have to manually load it.
-          include Hyperloop::Component::Mixin
-          collect_other_params_as :opts
-          # we simply pass along all the params and children with the tag string name
-          render { React::RenderingContext.render(tag, params.opts, &children) }
-
-          # after_error do |error, info|
-          #   raise error
-          # end
-        end
-        const_set(tag.upcase, klass)
+        # end of deprecated code
       end
 
+      # this is used for haml style (i.e. DIV.foo.bar) class tags which is deprecated
       def self.html_tag_class_for(tag)
         downcased_tag = tag.downcase
         if tag =~ /[A-Z]+/ && HTML_TAGS.include?(downcased_tag)
