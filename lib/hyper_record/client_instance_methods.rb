@@ -183,7 +183,8 @@ module HyperRecord
 
     # return record properties as hash, ready for transport
     def to_transport_hash
-      { self.class.model_name => @properties.dup.merge!(@changed_properties) }
+      id_key = self.id ? self.id : "_new_#{`Date.now() + Math.random()`}"
+      { self.class.model_name => { id_key => { properties: @properties.dup.merge!(@changed_properties) }}}
     end
 
     # unlink the two records using a relation determined by other_record.class, success is assumed
@@ -203,8 +204,8 @@ module HyperRecord
     #   on failure the HTTP response is passed to the .fail block
     def promise_destroy
       _local_destroy
-      request = self.class.request_transducer.destroy(self.to_transport_hash)
-      self.class.transport.promise_send(request).then do |_|
+      request = self.class.request_transducer.destroy(self.class.model_name => { instances: { id => { properties: self.to_transport_hash}}})
+      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -244,10 +245,7 @@ module HyperRecord
       end
 
       request = self.class.request_transducer.link(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      self.class.transport.promise_send(request).then do |response|
-        other_record.instance_variable_get(:@properties).merge!(response.json[other_record.class.to_s.underscore])
-        notify_observers
-        other_record.notify_observers
+      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -261,32 +259,18 @@ module HyperRecord
     # @return [Promise] on success the record is passed to the .then block
     #   on failure the HTTP response is passed to the .fail block
     def promise_save
-      payload_hash = @properties.merge(@changed_properties) # copy hash, because we need to delete some keys
-      (%i[id created_at updated_at] + reflections.keys).each do |key|
-        payload_hash.delete(key)
-      end
       request = self.class.request_transducer.save(self.to_transport_hash)
-      if @properties[:id] && ! (@changed_properties.has_key?(:id) && @changed_properties[:id].nil?)
-        reset
-        self.class.transport.promise_send(request).then do |response|
-          @properties.merge!(response.json[self.class.to_s.underscore])
-          notify_observers
-          self
-        end.fail do |response|
-          error_message = "Saving record #{self} failed!"
-          `console.error(error_message)`
-          response
-        end
-      else
-        reset
-        self.class.transport.promise_send(request).then do |response|
-          @properties.merge!(response.json[self.class.to_s.underscore])
-          self
-        end.fail do |response|
-          error_message = "Creating record #{self} failed!"
-          `console.error(error_message)`
-          response
-        end
+      is_new = @properties[:id].nil?
+      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+        self
+      end.fail do |response|
+        error_message = if is_new
+                          "Creating record #{self} failed!"
+                        else
+                          "Saving record #{self} failed!"
+                        end
+        `console.error(error_message)`
+        response
       end
     end
 
@@ -300,10 +284,8 @@ module HyperRecord
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
-      request = self.class.request_transducer(self.class.model_name => { relations: { relation_name => other_record.to_transport_hash }})
-      self.class.transport.promise_send(request).then do |response|
-        notify_observers
-        other_record.notify_observers
+      request = self.class.request_transducer.unlink(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
+      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
@@ -325,6 +307,54 @@ module HyperRecord
       end
       @registered_collections = Set.new
       notify_observers
+    end
+
+    # @private
+    def _process_instance_destroyed(_destroy_result)
+      self._local_destroy unless self.destroyed?
+    end
+
+    # @private
+    def _process_instance_errors(errors_hash)
+      errors_hash.keys.each do |name|
+        raise "#{self.class.to_s} with id #{self.id}: #{errors_hash[name]}"
+      end
+    end
+
+    # @private
+    def _process_instance_methods(methods_hash)
+      # rest_method
+      methods_hash.keys.each do |method_name|
+        methods_hash[method_name].keys.each do |args|
+          @rest_methods[method_name][args][:result] = methods_hash[method_name][args] # result is parsed json
+          @fetch_states[method_name][args] = 'f'
+        end
+      end
+    end
+
+    # @private
+    def _process_instance_properties(properties_hash)
+      self.class.new(properties_hash)
+      self.class._class_fetch_states[id] = 'f'
+    end
+
+    # @private
+    def _process_instance_relations(relations_hash)
+      relations_hash.keys.each do |relation_name|
+        if %i[has_many has_and_belongs_to_many].include?(reflections[relation_name][:kind])
+          # has_and_belongs_to_many and has_many
+          collection = self.class._convert_hashes_to_collection(relations_hash[relation_name], self, relation_name)
+          @relations[relation_name] = collection
+        else
+          # belongs_to and has_one
+          @relations[relation_name] = if relations_hash[relation_name]
+                                        self.class._convert_json_hash_to_record(relations_hash[relation_name])
+                                      else
+                                        nil
+                                      end
+        end
+        @fetch_states[relation_name] = 'f'
+      end
     end
 
     # @private

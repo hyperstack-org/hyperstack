@@ -37,29 +37,43 @@ module HyperRecord
     # get transport
     #
     # @return [String]
-    def self.transport
+    def transport
       @transport ||= HyperRecord.transport
     end
 
-    # set global api path
+    # set transport
     #
-    # @return [String]
-    def self.transport=(transport)
+    # @return [Class]
+    def transport=(transport)
       @transport = transport
     end
 
-    # get global transport
+    # get transducer
     #
-    # @return [String]
-    def self.request_transducer
-      @transducer ||= HyperRecord.transducer
+    # @return [Class]
+    def request_transducer
+      @transducer ||= HyperRecord.request_transducer
     end
 
-    # set global api path
+    # set transducer
     #
-    # @return [String]
-    def self.request_transducer=(transducer)
+    # @return [Class]
+    def request_transducer=(transducer)
       @transducer = transducer
+    end
+
+    # get response processor
+    #
+    # @return [Class]
+    def response_processor
+      @response_processor ||= HyperRecord.response_processor
+    end
+
+    # set response_processor
+    #
+    # @return [Class]
+    def response_processor=(processor)
+      @response_processor = processor
     end
 
     # DSL macro to declare a belongs_to relationship
@@ -89,15 +103,8 @@ module HyperRecord
       define_method("promise_#{relation_name}") do
         _register_observer
         @fetch_states[relation_name] = 'i'
-        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => nil }}}})
-        self.class.transport.promise_send(request).then do |response|
-          @relations[relation_name] = if response.json[self.class.model_name][relation_name]
-                               self.class._convert_json_hash_to_record(response.json[self.class.model_name][relation_name])
-                             else
-                               nil
-                             end
-          @fetch_states[relation_name] = 'f'
-          notify_observers
+        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
+        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a belongs_to association, failed to fetch records!"
@@ -155,10 +162,11 @@ module HyperRecord
     # @param id [String] id of the record to find
     # @return [HyperRecord]
     def find(id)
+      return nil if !id || id.respond_to?(:is_dummy?)
       sid = id.to_s
       return nil if sid == ''
       record_sid = "record_#{sid}"
-      if _record_cache.has_key?(sid)
+      if _record_cache.has_key?(sid) && _class_fetch_states.has_key?(record_sid)
         _register_class_observer if _class_fetch_states[record_sid] == 'i'
         return _record_cache[sid] if 'fi'.include?(_class_fetch_states[record_sid])
       end
@@ -180,14 +188,10 @@ module HyperRecord
       sid = id.to_s
       record_sid = "record_#{sid}"
       _class_fetch_states[record_sid] = 'i'
-      request = request_transducer.fetch(self.class.model_name => { id: sid })
+      request = request_transducer.fetch(self.model_name => { instances: { sid => {}}})
       _register_class_observer
-      transport.promise_send(request).then do |response|
-        klass_key = self.to_s.underscore
-        record = self.new(response.json[klass_key]) if response.json[klass_key]
-        _class_fetch_states[record_sid] = 'f'
-        notify_class_observers
-        record
+      transport.promise_send(api_path, request, response_processor).then do |_processor_result|
+        _record_cache[sid]
       end.fail do |response|
         error_message = "#{self.to_s}.find(#{sid}) failed to fetch record!"
         `console.error(error_message)`
@@ -197,13 +201,13 @@ module HyperRecord
 
     # find a existing instance of current HyperRecord class by property value
     #
-    # @param property_value_hash [Hash] hash with the values to find
-    # @return [Promise] on success the .then block will receive the new HyperRecord instance as arg
+    # param property_value_hash [Hash] hash with the values to find
+    # return [Promise] on success the .then block will receive the new HyperRecord instance as arg
     #   on failure the .fail block will receive the HTTP response object as arg
     # def promise_find_by(property_value_hash)
     #   request = request_transducer.fetch(self.class.model_name => { properties: property_value_hash })
     #   _register_class_observer
-    #   transport.promise_send(request).then do |response|
+    #   transport.promise_send(self.class.api_path, request).then do |_processor_result|
     #     klass_key = self.to_s.underscore
     #     record = self.new(response.json[klass_key]) if response.json[klass_key]
     #     record_sid = "record_#{record.id}"
@@ -243,12 +247,8 @@ module HyperRecord
       define_method("promise_#{relation_name}") do
         _register_observer
         @fetch_states[relation_name] = 'i'
-        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => nil }}}})
-        self.class.transport.promise_send(request).then do |response|
-          collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][relation_name], self, relation_name)
-          @relations[relation_name] = collection
-          @fetch_states[relation_name] = 'f'
-          notify_observers
+        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
+        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_and_belongs_to_many association, failed to fetch records!"
@@ -315,13 +315,9 @@ module HyperRecord
       define_method("promise_#{relation_name}") do
         _register_observer
         @fetch_states[relation_name] = 'i'
-        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => nil }}}})
-        self.class.transport.promise_send(request).then do |response|
-          collection = self.class._convert_array_to_collection(response.json[self.class.to_s.underscore][relation_name], self, relation_name)
-          @relations[relation_name] = collection
-          @fetch_states[relation_name] = 'f'
-          notify_observers
-          @relations[relation_name]
+        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
+        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+          self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_many association, failed to fetch records!"
           `console.error(error_message)`
@@ -385,12 +381,9 @@ module HyperRecord
       #    on failure the .fail block will receive the HTTP response object as arg
       define_method("promise_#{relation_name}") do
         @fetch_states[relation_name] = 'i'
-        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => nil }}}})
-        self.class.transport.promise_send(request).then do |response|
-          @relations[relation_name] = self.class._convert_json_hash_to_record(response.json[self.class.to_s.underscore][relation_name])
-          @fetch_states[relation_name] = 'f'
-          notify_observers
-          @relations[relation_name]
+        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
+        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+          self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_one association, failed to fetch records!"
           `console.error(error_message)`
@@ -438,10 +431,58 @@ module HyperRecord
       nil
     end
 
-    # check if a record of current HyperRecord class has been cached already
-    # @param id [String]
-    def record_cached?(id)
-      _record_cache.has_key?(id.to_s)
+    def process_notification(notification_hash)
+      record_class = Object.const_get(data[:record_type])
+      if data[:scope]
+        scope_name, scope_params = data[:scope].split('_[')
+        if scope_params
+          scope_params = '[' + scope_params
+          record_class._class_fetch_states[data[:scope]] = 'u'
+          record_class.send("promise_#{scope_name}", *JSON.parse(scope_params)).then do |collection|
+            record_class.notify_class_observers
+          end.fail do |response|
+            error_message = "#{record_class}.#{scope_name}(#{scope_params}), a scope failed to update!"
+            `console.error(error_message)`
+          end
+        else
+          record_class._class_fetch_states[data[:scope]] = 'u'
+          record_class.send(data[:scope]).then do |collection|
+            record_class._notify_class_observers
+          end.fail do |response|
+            error_message = "#{record_class}.#{scope_name}, a scope failed to update!"
+            `console.error(error_message)`
+          end
+        end
+      elsif data[:rest_class_method]
+        record_class._class_fetch_states[data[:rest_class_method]] = 'u'
+        if data[:rest_class_method].include?('_[')
+          record_class.notify_class_observers
+        else
+          send("promise_#{data[:rest_class_method]}").then do |result|
+            _notify_observers
+          end.fail do |response|
+            error_message = "#{self}[#{self.id}].#{data[:rest_class_method]} failed to update!"
+            `console.error(error_message)`
+          end
+        end
+      elsif record_class.record_cached?(data[:id])
+        record_class._record_cache[data[:id].to_s]._update_record(data)
+      elsif data[:destroyed]
+        return
+      end
+    end
+
+    def process_response(response_hash)
+      records_to_notify = []
+      response_hash.keys.each do |fetchables|
+        if fetchables == :instances
+          send("_process_model_#{fetchables}", response_hash[fetchables], records_to_notify)
+        else
+          send("_process_model_#{fetchables}", response_hash[fetchables])
+        end
+      end
+      records_to_notify.each(&:notify_observers)
+      notify_class_observers
     end
 
     # declare a property (attribute) for the current HyperRecord class
@@ -486,6 +527,12 @@ module HyperRecord
       end
     end
 
+    # check if a record of current HyperRecord class has been cached already
+    # @param id [String]
+    def record_cached?(id)
+      _record_cache.has_key?(id.to_s)
+    end
+
     # introspect on current HyperRecord class
     # @return [Hash]
     def reflections
@@ -508,11 +555,8 @@ module HyperRecord
         name_args = _name_args(name, *args)
         _class_fetch_states[name_args] = 'i'
         rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
-        request = request_transducer.fetch(self.class.model_name => { methods: { method_name => args }})
-        transport.promise_send(request).then do |response_json|
-          rest_class_methods[name_args][:result] = response_json[:result] # result is parsed json
-          _class_fetch_states[name_args] = 'f'
-          notify_class_observers
+        request = request_transducer.fetch(self.model_name => { methods: { name =>{ args => {}}}})
+        transport.promise_send(api_path, request, response_processor).then do |_processor_result|
           rest_class_methods[name_args][:result]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}, a rest_method, failed to execute!"
@@ -551,17 +595,15 @@ module HyperRecord
       # @return [Promise] on success the .then block will receive the result of the RPC call as arg
       #    on failure the .fail block will receive the HTTP response object as arg
       define_method("promise_#{name}") do |*args|
-        name_args = self.class._name_args(name, *args)
-        @fetch_states[name_args] = 'i'
+        args_json = args.to_json
+        @fetch_states[name] = {} unless @fetch_states.has_key?(name)
+        @fetch_states[name][args_json] = 'i'
         @rest_methods[name] = options unless @rest_methods.has_key?(name)
-        @rest_methods[name_args] = { result: options[:default_result] } unless @rest_methods.has_key?(name_args)
+        @rest_methods[name][args_json] = { result: options[:default_result] } unless @rest_methods[name].has_key?(args_json)
         raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance rest_method without id!" unless self.id
-        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { methods: { method_name => args }}}})
-        self.class.transport.promise_send(request).then do |response_json|
-          @rest_methods[name_args][:result] = response_json[:result] # result is parsed json
-          @fetch_states[name_args] = 'f'
-          notify_observers
-          @rest_methods[name_args][:result]
+        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { methods: { name => { args => {}}}}}})
+        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+          @rest_methods[name][args_json][:result]
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to execute!"
           `console.error(error_message)`
@@ -571,14 +613,18 @@ module HyperRecord
       # @!method [name]
       # @return result either the default_result ass specified in the options or the real result if the RPC call already finished
       define_method(name) do |*args|
-        _register_observer
-        name_args = self.class._name_args(name, *args)
-        @rest_methods[name] = options unless @rest_methods.has_key?(name)
-        @rest_methods[name_args] = { result: options[:default_result] } unless @rest_methods.has_key?(name_args)
-        unless @fetch_states.has_key?(name_args) && 'fi'.include?(@fetch_states[name_args])
-          self.send("promise_#{name}", *args)
+        unless self.id
+          options[:default_result]
+        else
+          _register_observer
+          args_json = args.to_json
+          @rest_methods[name] = options unless @rest_methods.has_key?(name)
+          @rest_methods[name][args_json] = { result: options[:default_result] } unless @rest_methods[name].has_key?(args_json)
+          unless @fetch_states.has_key?(name) && @fetch_states[name].has_key?(args_json) && 'fi'.include?(@fetch_states[name][args_json])
+            self.send("promise_#{name}", *args)
+          end
+          @rest_methods[name][args_json][:result]
         end
-        @rest_methods[name_args][:result]
       end
       # @!method update_[name] mark internal structures so that the method is called again once it is requested again
       # @return nil
@@ -601,21 +647,19 @@ module HyperRecord
     # @param options [Hash] further options
     #
     # This macro defines additional methods:
-    def scope(name, options = {})
+    def scope(name, _options = {})
       # @!method promise_[name]
       # @return [Promise] on success the .then block will receive a [HyperRecord::Collection] as arg
       #    on failure the .fail block will receive the HTTP response object as arg
       define_singleton_method("promise_#{name}") do |*args|
-        name_args = _name_args(name, *args)
-        _class_fetch_states[name_args] = 'i'
-        request = request_transducer.fetch(self.class.model_name => { scopes: { scope_name => args }})
-        promise_send(request).then do |response_json|
-          scopes[name_args] = _convert_array_to_collection(response_json[self.to_s.underscore][name])
-          _class_fetch_states[name_args] = 'f'
-          notify_class_observers
-          scopes[name_args]
+        args_json = args.to_json
+        _class_fetch_states[name] = {} unless _class_fetch_states.has_key?(name)
+        _class_fetch_states[name][args_json] = 'i'
+        request = request_transducer.fetch(self.model_name => { scopes: { name => { args_json => {}}}})
+        transport.promise_send(api_path, request, response_processor).then do |_processor_result|
+          scopes[name][args_json]
         end.fail do |response|
-          error_message = "#{self.to_s}.#{name_args}, a scope, failed to fetch records!"
+          error_message = "#{self.to_s}.#{name}(#{args_json if args.any}), a scope, failed to fetch records!"
           `console.error(error_message)`
           response
         end
@@ -624,18 +668,19 @@ module HyperRecord
       # @return [HyperRecord::Collection] either a empty one, if the data has not been fetched yet, or the
       #   collection with the real data, if it has been fetched already
       define_singleton_method(name) do |*args|
-        name_args = _name_args(name, *args)
-        scopes[name_args] = HyperRecord::Collection.new unless scopes.has_key?(name_args)
+        args_json = args.to_json
+        scopes[name] = {} unless scopes.has_key?(name)
+        scopes[name][args_json] = HyperRecord::Collection.new unless scopes.has_key?(name) && scopes[name].has_key?(args_json)
         _register_class_observer
-        unless _class_fetch_states.has_key?(name_args) && 'fi'.include?(_class_fetch_states[name_args])
+        unless _class_fetch_states.has_key?(name) && _class_fetch_states[name].has_key?(args_json) && 'fi'.include?(_class_fetch_states[name][args_json])
           self.send("promise_#{name}", *args)
         end
-        scopes[name_args]
+        scopes[name][args_json]
       end
       # @!method update_[name] mark internal structures so that the scope data is updated once it is requested again
       # @return nil
       define_singleton_method("update_#{name}") do |*args|
-        _class_fetch_states[_name_args(name, *args)] = 'u'
+        _class_fetch_states[name][args.to_json] = 'u'
         nil
       end
     end
@@ -654,6 +699,23 @@ module HyperRecord
     def _convert_array_to_collection(array, record = nil, relation_name = nil)
       res = array.map do |record_hash|
         _convert_json_hash_to_record(record_hash)
+      end
+      HyperRecord::Collection.new(res, record, relation_name)
+    end
+
+    # @private
+    def _convert_hashes_to_collection(record_hashes, record = nil, relation_name = nil)
+      res = []
+      record_hashes.keys.each do |model_name|
+        model = model_name.camelize.constantize
+        record_hashes[model_name].keys.each do |id|
+          record = if model.record_cached?(id)
+                     model._record_cache[id]._initialize_from_hash(record_hashes[model_name][id]['properties'])
+                   else
+                     model.new(record_hashes[model_name][id]['properties'])
+                   end
+          res << record
+        end
       end
       HyperRecord::Collection.new(res, record, relation_name)
     end
@@ -682,7 +744,7 @@ module HyperRecord
 
     # @private
     def _class_fetch_states
-      @_class_fetch_states ||= { all: 'n' }
+      @_class_fetch_states ||= { all: { '' => 'n' }}
       @_class_fetch_states
     end
 
@@ -705,6 +767,68 @@ module HyperRecord
       else
         name
       end
+    end
+
+    def _process_model_errors(errors_hash)
+      errors_hash.keys.each do |name|
+        raise "#{self.to_s}: #{errors_hash[name]}"
+      end
+    end
+
+    def _process_model_instances(instances_hash, records_to_notify)
+      instances_hash.keys.each do |id|
+        # this should probably be a error class on its own
+        record = if record_cached?(id)
+                   _record_cache[id]
+                 else
+                   self.new(id: id)
+                 end
+
+        instances_hash[id].keys.each do |fetchables|
+          record.send("_process_instance_#{fetchables}", instances_hash[id][fetchables])
+        end
+        records_to_notify << record
+      end
+    end
+
+    def _process_model_scopes(scopes_hash)
+      # scope
+      scopes_hash.keys.each do |scope_name|
+        scopes_hash[scope_name].keys.each do |args|
+          scopes[scope_name][args] = _convert_hashes_to_collection(scopes_hash[scope_name][args])
+          _class_fetch_states[scope_name][args] = 'f'
+        end
+      end
+    end
+
+    def _process_model_methods(methods_hash)
+      # rest_class_method
+      methods_hash.keys.each do |method_name|
+        methods_hash[method_name].keys.each do |args|
+          rest_class_methods[method_name][args] = methods_hash[method_name][args] # result is parsed json
+          _class_fetch_states[method_name][args] = 'f'
+        end
+      end
+    end
+
+    # TODO
+    def _process_the_rest
+      # destroy
+      # do nothing
+
+      # link
+      other_record.instance_variable_get(:@properties).merge!(response.json[other_record.class.to_s.underscore])
+      notify_observers
+      other_record.notify_observers
+
+      # save
+      @properties.merge!(response.json[self.class.to_s.underscore])
+      reset
+      notify_observers
+
+      # unlink
+      notify_observers
+      other_record.notify_observers
     end
 
     # @private

@@ -1,22 +1,22 @@
 module HyperRecord
-  class RequestTransducer
-    def destroy(request)
+  class Transducer
+    def self.destroy(request)
       { destroy: request }
     end
 
-    def fetch(request)
+    def self.fetch(request)
       { fetch: request }
     end
 
-    def link(request)
+    def self.link(request)
       { link: request }
     end
 
-    def save(request)
+    def self.save(request)
       { save: request }
     end
 
-    def unlink(request)
+    def self.unlink(request)
       { unlink: request }
     end
   end

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.homepage     = 'https://github.com/janbiedermann/hyper-resource'
   s.summary      = 'Transparent Opal Ruby Data/Resource Access from the browser for Ruby-Hyperloop'
   s.description  = "Write Browser Apps that transparently access server side resources like 'MyModel.first_name', with ease"
-
+  s.executables << 'hyper-resource-install-handlers'
   s.files          = `git ls-files`.split("\n")
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']

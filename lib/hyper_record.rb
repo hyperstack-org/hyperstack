@@ -1,6 +1,7 @@
 if RUBY_ENGINE == 'opal'
   require 'hyper_record/dummy_value'
   require 'hyper_record/collection'
+  require 'hyper_record/transducer'
   require 'hyper_record/class_methods'
   require 'hyper_record/client_instance_methods'
 
@@ -9,7 +10,7 @@ if RUBY_ENGINE == 'opal'
     #
     # @return [String]
     def self.api_path
-      @api_path ||= '/api/endpoint'
+      @api_path ||= Hyperloop.api_path
     end
 
     # set global api path
@@ -37,7 +38,7 @@ if RUBY_ENGINE == 'opal'
     #
     # @return [HyperRecord::Transducer]
     def self.request_transducer
-      @transducer ||= HyperRecord::RequestTransducer.new
+      @transducer ||= HyperRecord::Transducer
     end
 
     # set global request transducer
@@ -45,6 +46,20 @@ if RUBY_ENGINE == 'opal'
     # @return [HyperRecord::Transducer]
     def self.request_transducer=(transducer)
       @transducer = transducer
+    end
+
+    # get response processor
+    #
+    # @return [Class]
+    def self.response_processor
+      @response_processor ||= Hyperloop::Resource::ResponseProcessor
+    end
+
+    # set response_processor
+    #
+    # @return [Class]
+    def self.response_processor=(processor)
+      @response_processor = processor
     end
 
     def self.included(base)

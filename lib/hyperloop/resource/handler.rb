@@ -4,9 +4,14 @@ module Hyperloop
       def process_request(request)
         result = {}
         request.keys.each do |key|
-          handler_const = "Hyperloop::Resource::#{key.camelize}Handler"
+          # TODO check safety
+          handler_const = "#{key.underscore.camelize}Handler"
           handler = Object.const_get(handler_const)
-          result.merge(handler.new.process_request(request[key]))
+          if handler
+            result.merge!(handler.new.process_request(request[key]))
+          else
+            result.merge!(error: { key => "No such handler!"})
+          end
         end
         result
       end

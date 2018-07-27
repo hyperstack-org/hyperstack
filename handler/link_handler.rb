@@ -1,59 +1,70 @@
-module Hyperloop
-  module Resource
-    class LinkHandler
+class LinkHandler
 
-      SINGLE_RELATIONS = %i[belongs_to has_one]
+  SINGLE_RELATIONS =
 
-      def process_request(request)
-        result = {}
+  def process_request(request)
+    result = {}
 
-        request.each_key do |model_name|
+    request.keys.each do |model_name|
 
-          # security guard
-          model = guarded_record_class(model_name)
-          request[model_name]['instances'].each_key do |id|
-            record = model.find(id)
+      model = guarded_record_class(model_name) # security guard
+      result[model_name] = {} unless result.has_key?(model_name)
+      result[model_name][:instances] = {} unless result[model_name].has_key?(:instances)
 
-            updated = false
+      request[model_name]['instances'].keys.each do |id|
+        record = begin
+                   model.find(id)
+                 rescue ActiveRecord::RecordNotFound
+                   nil
+                 end
 
-            request[model_name]['instances'][id]['relations'].each_key do |relation_name|
-              # security guard
-              sym_relation_name = relation_name.to_sym
-              has_relation = model.reflections.has_key?(sym_relation_name) # for neo4j, key is a symbol
-              has_relation = model.reflections.has_key?(relation_name) unless has_relation
+        if record
+          request[model_name]['instances'][id]['relations'].keys.each do |relation_name|
 
-              if has_relation
+            sym_relation_name = relation_name.to_sym
+            relation_type = record.class.reflect_on_association(sym_relation_name)&.macro # security guard
 
-                request[model_name]['instances'][id]['relations'][relation_name].each_key do |right_model_name|
-                  # security guard
-                  right_model = guarded_record_class(right_model_name)
+            if relation_type
 
-                  request[model_name]['instances'][id]['relations'][relation_name][right_model_name].each_key do |right_id|
-                    right_record = right_model.find(right_id)
+              request[model_name]['instances'][id]['relations'][relation_name].keys.each do |right_model_name|
 
-                    if right_record
-                      relation_type = model.reflections[sym_relation_name].association.type
-                      relation_type = model.reflections[relation_name].association.type unless relation_type
-                      if SINGLE_RELATIONS.include?(relation_type)
-                        record.send("#{relation_name}=", right_record)
-                      else
-                        record.send(relation_name) << right_record
-                      end
-                      updated = true
-                      right_record.touch
+                right_model = guarded_record_class(right_model_name) # security guard
+
+                request[model_name]['instances'][id]['relations'][relation_name][right_model_name].keys.each do |right_id|
+                  right_record = right_model.find(right_id)
+
+                  if right_record
+                    relation_type = model.reflections[sym_relation_name].association.type
+                    relation_type = model.reflections[relation_name].association.type unless relation_type
+                    if %i[belongs_to has_one].include?(relation_type)
+                      record.send("#{relation_name}=", right_record)
+                      record.save
+                    else
+                      record.send(relation_name) << right_record
                     end
+                    record.touch
+                    right_record.touch
 
+                    record_json = record.as_json
+
+                    if record_json.has_key?(model_name)
+                      # for neo4j
+                      result[model_name][:instances].merge!(id => { properties: record_json[model_name] })
+                    else
+                      # for active_record
+                      result[model_name][:instances].merge!(id => { properties: record_json })
+                    end
                   end
                 end
               end
             end
-
-            record.touch if updated
           end
+        else
+          result[model_name][:instances].merge!(errors: { id => 'Record not found!' })
         end
-
-        result
       end
     end
+
+    result
   end
 end

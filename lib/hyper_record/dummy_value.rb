@@ -12,8 +12,16 @@ module HyperRecord
       end
     end
 
+    def is_dummy?
+      true
+    end
+
     def acts_as_string?
       true
+    end
+
+    def to_i
+      0
     end
 
     def to_s

@@ -1,21 +1,41 @@
-module Hyperloop
-  module Resource
-    class SaveHandler
-      def process_request(request)
-        result = {}
+class SaveHandler
+  include Hyperloop::Resource::SecurityGuards
 
-        request.each_key do |model_name|
-          model = guarded_record_class(model_name)
-          record = model.find(request[model_name]['id'])
-          if record && record.save
-            result.merge!(model_name => { request[model_name] => { instances: { record.id.to_s => { properties: { updated_at: record.updated_at }}}}})
+  def process_request(request)
+    result = {}
+
+    request.keys.each do |model_name|
+      model = guarded_record_class(model_name)
+      result[model_name] = {} unless result.has_key?(model_name)
+      result[model_name][:instances] = {} unless result[model_name].has_key?(:instances)
+
+      request[model_name].keys.each do |id|
+        record = if id.start_with?('_new_')
+                   model.new
+                 else
+                   model.find(id)
+                 end
+        if record
+          request[model_name][id]['properties'].delete('id')
+          record.assign_attributes(request[model_name][id]['properties'])
+          if record.save
+            record_hash = {}
+            record_hash[model_name] = {} unless record_hash.has_key?(model_name)
+            record_json = record.as_json
+            if record_json.has_key?(model)
+              # for neo4j
+              record_hash[model_name].merge!(record.id => { properties: record_json[model_name] })
+            else
+              # for active_record
+              record_hash[model_name].merge!(record.id => { properties: record_json })
+            end
+            result[model_name][:instances].merge!(record.id.to_s => record_hash)
           else
-            result.merge!(model_name => { request[model_name] => { instances: { record.id.to_s => false }}})
+            result[model_name][:instances].merge!(record.id.to_s => { errors: "Record could not be saved!" })
           end
         end
-
-        result
       end
     end
+    result
   end
 end

@@ -30,7 +30,7 @@ module Hyperloop
 
       def guarded_record_class(model_name)
         raise Hyperloop::Resource::SecurityError unless self.class.valid_record_class_params.include?(model_name) # guard
-        record_class_param.camelize.constantize
+        model_name.camelize.constantize
       end
     end
   end
