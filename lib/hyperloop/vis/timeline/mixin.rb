@@ -1,5 +1,3 @@
-require 'react/component'
-
 module Hyperloop
   module Vis
     module Timeline
@@ -34,13 +32,13 @@ module Hyperloop
             def automatic_refresh
               true
             end
-            
+
             def self.automatic_refresh(value)
               define_method(:automatic_refresh) do
                 value
               end
             end
-            
+
             def self.render_with_dom_node(tag = 'DIV', &block)
               render do
                 @_vis_render_block = block
