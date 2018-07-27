@@ -244,6 +244,13 @@ module Hyperloop
         "#<HTTP @url=#{@url} @method=#{@method}>"
       end
 
+      # meant for hyper-resource
+      def self.promise_send(uri, data, processor_class)
+        post(uri + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
+          processor_class.process_response(response.json)
+        end
+      end
+
       private
 
       # @private
