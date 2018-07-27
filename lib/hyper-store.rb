@@ -14,5 +14,12 @@ require 'react/state'
 
 if RUBY_ENGINE != 'opal'
   require 'opal'
-  Opal.append_path(File.expand_path('../', __FILE__).untaint)
+  Opal.append_path(__dir__.untaint)
+  if Dir.exist?(File.join('app', 'hyperloop'))
+    # Opal.append_path(File.expand_path(File.join('app', 'hyperloop', 'stores')))
+    Opal.append_path(File.expand_path(File.join('app', 'hyperloop'))) unless Opal.paths.include?(File.expand_path(File.join('app', 'hyperloop')))
+  elsif Dir.exist?(File.join('hyperloop'))
+    # Opal.append_path(File.expand_path(File.join('hyperloop', 'stores')))
+    Opal.append_path(File.expand_path(File.join('hyperloop'))) unless Opal.paths.include?(File.expand_path(File.join('hyperloop')))
+  end
 end
