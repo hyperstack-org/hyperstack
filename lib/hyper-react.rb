@@ -30,6 +30,8 @@ else
   require 'reactive-ruby/isomorphic_helpers'
   require 'reactive-ruby/serializers'
   require 'hyperloop/component/version'
+  require 'hyperloop/config'
+  require 'hyperloop/view_helpers'
   Opal.append_path(__dir__.untaint)
   if Dir.exist?(File.join('app', 'hyperloop'))
     # Opal.append_path(File.expand_path(File.join('app', 'hyperloop', 'components')))
