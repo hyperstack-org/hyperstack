@@ -1,6 +1,7 @@
 require 'hyperloop/transport/version'
+require 'hyper-transport'
+
 if RUBY_ENGINE == 'opal'
-  require 'hyperloop/transport'
   require 'hyperloop/transport/action_cable/subscription'
   require 'hyperloop/transport/action_cable/subscriptions'
   require 'hyperloop/transport/action_cable/consumer'

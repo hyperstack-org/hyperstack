@@ -245,9 +245,9 @@ module Hyperloop
       end
 
       # meant for hyper-resource
-      def self.promise_send(uri, data, processor_class)
+      def self.promise_send(uri, data)
         post(uri + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
-          processor_class.process_response(response.json)
+          Hyperloop::Transport::ResponseProcessor.process_response(response.json)
         end
       end
 

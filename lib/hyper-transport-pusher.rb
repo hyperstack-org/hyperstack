@@ -1,6 +1,7 @@
 require 'hyperloop/transport/version'
+require 'hyper-transport'
+
 if RUBY_ENGINE == 'opal'
-  require 'hyperloop/transport'
   require 'hyperloop/transport/pusher/event_support'
   require 'hyperloop/transport/pusher/channel'
 else
