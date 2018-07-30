@@ -205,7 +205,7 @@ module HyperRecord
     def promise_destroy
       _local_destroy
       request = self.class.request_transducer.destroy(self.class.model_name => { instances: { id => { properties: self.to_transport_hash}}})
-      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+      self.class.transport.promise_send(self.class.api_path).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -245,7 +245,7 @@ module HyperRecord
       end
 
       request = self.class.request_transducer.link(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+      self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -261,7 +261,7 @@ module HyperRecord
     def promise_save
       request = self.class.request_transducer.save(self.to_transport_hash)
       is_new = @properties[:id].nil?
-      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+      self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
         self
       end.fail do |response|
         error_message = if is_new
@@ -285,7 +285,7 @@ module HyperRecord
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
       request = self.class.request_transducer.unlink(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+      self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"

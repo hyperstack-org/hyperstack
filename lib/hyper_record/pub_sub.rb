@@ -27,12 +27,11 @@ module HyperRecord
         time_now = Time.now.to_f
         scrub_time = time_now - 24.hours.to_f
 
-        message = {
-          record_type: record.class.to_s,
-          id: record.id,
-          updated_at: record.updated_at
-        }
-        message[:destroyed] = true if record.destroyed?
+        message = if record.destroyed?
+                    { record.class.to_s.underscore => { instances: { record.id => { destroyed: true }}}}
+                  else
+                    { record.class.to_s.underscore => { instances: { record.id => { properties: { updated_at: record.updated_at }}}}}
+                  end
 
         # can only trigger max 10 channels at once on pusher
         subscribers.each_slice(10) do |slice|

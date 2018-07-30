@@ -24,7 +24,11 @@ if RUBY_ENGINE == 'opal'
     #
     # @return [Class]
     def self.transport
-      @transport ||= Hyperloop::Transport::HTTP
+      @transport ||= if Hyperloop.options[:resource_transport]
+                       Object.const_get(Hyperloop.options[:resource_transport])
+                     else
+                       Hyperloop::Transport::HTTP
+                     end
     end
 
     # set global transport
@@ -46,20 +50,6 @@ if RUBY_ENGINE == 'opal'
     # @return [HyperRecord::Transducer]
     def self.request_transducer=(transducer)
       @transducer = transducer
-    end
-
-    # get response processor
-    #
-    # @return [Class]
-    def self.response_processor
-      @response_processor ||= Hyperloop::Resource::ResponseProcessor
-    end
-
-    # set response_processor
-    #
-    # @return [Class]
-    def self.response_processor=(processor)
-      @response_processor = processor
     end
 
     def self.included(base)

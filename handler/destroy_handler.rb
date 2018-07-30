@@ -17,7 +17,7 @@ class DestroyHandler
         if record
           destroy_successful = record.destroy
           if destroy_successful
-            result[model_name][:instances].merge!(id => { destroyed: true})
+            result[model_name][:instances].merge!(id => { destroyed: true })
           else
             result[model_name][:instances].merge!(id => { errors: 'Destroy failed!' })
           end

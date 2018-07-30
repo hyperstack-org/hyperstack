@@ -1,18 +1,16 @@
 require 'opal-activesupport'
 require 'hyperloop/resource/version'
-require 'hyperloop/resource/config'
 require 'hyper-store'
+require 'hyper-react'
 
 if RUBY_ENGINE == 'opal'
-  require 'hyper-transport-http'
-  require 'hyperloop/resource/client_drivers' # initialize options for the client
-  require 'hyperloop/resource/notification_processor'
-  require 'hyperloop/resource/response_processor'
+  require 'hyper-transport-http' # TODO, this is acually optional, might a different transport
   require 'hyper_record'
 else
+  require 'hyperloop/transport'
+  require 'hyperloop/resource/config'
   require 'hyperloop/resource/pub_sub' # server side, controller helper methods
   require 'hyperloop/resource/security_guards' # server side, controller helper methods
-  require 'hyperloop/resource/view_helpers'
   require 'hyperloop/resource/handler'
   require 'hyper_record'
   Opal.append_path(__dir__.untaint)

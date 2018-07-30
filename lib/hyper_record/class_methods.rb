@@ -62,20 +62,6 @@ module HyperRecord
       @transducer = transducer
     end
 
-    # get response processor
-    #
-    # @return [Class]
-    def response_processor
-      @response_processor ||= HyperRecord.response_processor
-    end
-
-    # set response_processor
-    #
-    # @return [Class]
-    def response_processor=(processor)
-      @response_processor = processor
-    end
-
     # DSL macro to declare a belongs_to relationship
     # options are for the server side ORM, on the client side options are ignored
     #
@@ -104,7 +90,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a belongs_to association, failed to fetch records!"
@@ -190,7 +176,7 @@ module HyperRecord
       _class_fetch_states[record_sid] = 'i'
       request = request_transducer.fetch(self.model_name => { instances: { sid => {}}})
       _register_class_observer
-      transport.promise_send(api_path, request, response_processor).then do |_processor_result|
+      transport.promise_send(api_path, request).then do |_processor_result|
         _record_cache[sid]
       end.fail do |response|
         error_message = "#{self.to_s}.find(#{sid}) failed to fetch record!"
@@ -248,7 +234,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_and_belongs_to_many association, failed to fetch records!"
@@ -316,7 +302,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_many association, failed to fetch records!"
@@ -382,7 +368,7 @@ module HyperRecord
       define_method("promise_#{relation_name}") do
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_one association, failed to fetch records!"
@@ -556,7 +542,7 @@ module HyperRecord
         _class_fetch_states[name_args] = 'i'
         rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
         request = request_transducer.fetch(self.model_name => { methods: { name =>{ args => {}}}})
-        transport.promise_send(api_path, request, response_processor).then do |_processor_result|
+        transport.promise_send(api_path, request).then do |_processor_result|
           rest_class_methods[name_args][:result]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}, a rest_method, failed to execute!"
@@ -602,7 +588,7 @@ module HyperRecord
         @rest_methods[name][args_json] = { result: options[:default_result] } unless @rest_methods[name].has_key?(args_json)
         raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance rest_method without id!" unless self.id
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { methods: { name => { args => {}}}}}})
-        self.class.transport.promise_send(self.class.api_path, request, self.class.response_processor).then do |_processor_result|
+        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
           @rest_methods[name][args_json][:result]
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to execute!"
@@ -656,7 +642,7 @@ module HyperRecord
         _class_fetch_states[name] = {} unless _class_fetch_states.has_key?(name)
         _class_fetch_states[name][args_json] = 'i'
         request = request_transducer.fetch(self.model_name => { scopes: { name => { args_json => {}}}})
-        transport.promise_send(api_path, request, response_processor).then do |_processor_result|
+        transport.promise_send(api_path, request).then do |_processor_result|
           scopes[name][args_json]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}(#{args_json if args.any}), a scope, failed to fetch records!"
