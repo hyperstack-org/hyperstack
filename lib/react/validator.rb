@@ -65,7 +65,7 @@ module React
     end
 
     def rules
-      @rules ||= { children: { required: false } }
+      @rules ||= { children: { required: false }, className: { required: false } }
     end
 
     def define_rule(name, options = {})
