@@ -34,6 +34,7 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/class_methods"
   require "reactive_record/active_record/instance_methods"
   require "reactive_record/active_record/base"
+  require 'hyper_react/input_tags'
   require_relative 'hypermesh/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'

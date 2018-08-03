@@ -151,6 +151,67 @@ describe "while loading", js: true do
     expect(page).not_to have_content('loading...', wait: 0)
   end
 
+  it "achieving while_loading behavior with state variables" do
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      mount "WhileLoadingTester", {}, no_wait: true do
+        class MyComponent < Hyperloop::Component
+          render do
+            SPAN { 'loading...' }
+          end
+        end
+
+        class WhileLoadingTester < Hyperloop::Component
+
+          before_mount do
+            ReactiveRecord.load do
+              User.find_by_first_name('Lily').last_name
+            end.then do |last_name|
+              mutate.last_name last_name
+            end
+          end
+
+          render do
+            if state.last_name
+              DIV { state.last_name }
+            else
+              MyComponent {}
+            end
+          end
+        end
+      end
+      expect(page).to have_content('loading...')
+      expect(page).not_to have_content('DaDog', wait: 0)
+    end
+    expect(page).to have_content('DaDog')
+    expect(page).not_to have_content('loading...', wait: 0)
+  end
+
+  it "while loading display an application defined element" do
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      mount "WhileLoadingTester", {}, no_wait: true do
+        class MyComponent < Hyperloop::Component
+          render do
+            SPAN { 'loading...' }
+          end
+        end
+        class WhileLoadingTester < Hyperloop::Component
+          render do
+            DIV do
+              User.find_by_first_name('Lily').last_name
+            end
+            .while_loading do
+              MyComponent {}
+            end
+          end
+        end
+      end
+      expect(page).to have_content('loading...')
+      expect(page).not_to have_content('DaDog', wait: 0)
+    end
+    expect(page).to have_content('DaDog')
+    expect(page).not_to have_content('loading...', wait: 0)
+  end
+
   it "will display the while loading message on condition" do
     isomorphic do
       class FetchNow < Hyperloop::ServerOp

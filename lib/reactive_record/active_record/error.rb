@@ -24,7 +24,7 @@ module ActiveModel
       @messages.clear
     end
 
-    def add(attribute, message:)
+    def add(attribute, message = :invalid, _options = {})
       @messages[attribute] << message unless @messages[attribute].include? message
     end
   end

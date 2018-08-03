@@ -39,7 +39,7 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
       User.new(last_name: 'f**k').validate.then do |new_user|
         new_user.errors.messages
       end
-    end.to eq("last_name"=>[{"message"=>"no swear words allowed"}])
+    end.to eq("last_name"=>["no swear words allowed"])
   end
 
   it "the valid? method will return true if the model has no errors" do

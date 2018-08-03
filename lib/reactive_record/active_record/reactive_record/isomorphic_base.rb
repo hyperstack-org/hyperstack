@@ -281,8 +281,8 @@ module ReactiveRecord
                     Broadcast.to_self backing_records[item[0]].ar_instance, item[2]
                   end
                 else
-                  log("Reactive Record Save Failed: #{response[:message]}", :error)
-                  response[:saved_models].each do | item |
+                  log(response[:message], :error)
+                  response[:saved_models].each do |item|
                     log("  Model: #{item[1]}[#{item[0]}]  Attributes: #{item[2]}  Errors: #{item[3]}", :error) if item[3]
                   end
                 end
@@ -308,7 +308,7 @@ module ReactiveRecord
           backing_records.each { |_id, record| record.saved!(true) rescue nil } if save
         end
       rescue Exception => e
-        # debugger
+        debugger
         log("Exception raised while saving - #{e}", :error)
         yield false, e.message, [] if block
         promise.resolve({success: false, message: e.message, models: []})
@@ -480,7 +480,7 @@ module ReactiveRecord
 
           saved_models = reactive_records.collect do |reactive_record_id, model|
             messages = model.errors.messages if validate && !model.valid?
-            all_messages << messages if save && messages
+            all_messages << [model, messages] if save && messages
             attributes = model.__hyperloop_secure_attributes(acting_user)
             [reactive_record_id, model.class.name, attributes, messages]
           end
@@ -494,7 +494,7 @@ module ReactiveRecord
 
           unless all_messages.empty?
             ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel saving records failed:\033[0;30;21m"
-            all_messages.each do |message|
+            all_messages.each do |model, message|
               ::Rails.logger.debug "\033[0;31;1m\t#{model}: #{message}\033[0;30;21m"
             end
             raise 'HyperModel saving records failed!'
