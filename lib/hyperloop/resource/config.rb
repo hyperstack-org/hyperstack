@@ -13,8 +13,8 @@ if RUBY_ENGINE != 'opal'
     self.add_client_options(%i[api_path notification_transport resource_transport])
 
     # default values
-    self.resource_transport = 'Hyperloop::Transport::HTTP'
-    self.notification_transport = :pusher
+    self.resource_transport = Hyperloop::Transport::HTTP
+    self.resource_pub_sub_transport = Hyperloop::Transport::Pusher::PubSub
     self.valid_record_class_params = []
   end
 end
