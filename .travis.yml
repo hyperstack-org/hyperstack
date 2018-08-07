@@ -16,7 +16,7 @@ before_install:
   - gem install bundler
 before_script:
   - cd spec/test_app
-  - bundle install
+  - bundle install --jobs=3 --retry=3
   - bundle exec rails db:setup
   - cd ../../
   - if [[ "$DRIVER" == "travis" ]]; then chromedriver-update; fi
