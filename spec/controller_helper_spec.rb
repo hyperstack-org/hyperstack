@@ -3,9 +3,6 @@ require 'spec_helper'
 require 'rails-controller-testing'
 Rails::Controller::Testing.install
 
-# Rails 5.2.0 migration of the sqlite boolean
-Rails.application.config.active_record.sqlite3.represent_boolean_as_integer = true
-
 class TestController < ActionController::Base; end
 
 RSpec.describe TestController, type: :controller do
