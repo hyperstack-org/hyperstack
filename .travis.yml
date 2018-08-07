@@ -6,7 +6,8 @@ rvm:
   - ruby-head
 env:
   - DRIVER=google-chrome TZ=Europe/Berlin
-  - DRIVER=firefox TZ=Europe/Berlin
+  - DRIVER=firefox TZ=Europe/Berlin MOZ_HEADLESS=1
+
 matrix:
     fast_finish: true
     allow_failures:
