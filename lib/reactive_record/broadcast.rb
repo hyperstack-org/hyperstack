@@ -45,7 +45,10 @@ module ReactiveRecord
             params.salt, params.channel, params.broadcast_id
           ) == params.authorization
         end
-        dispatch_to { params.channel }
+        dispatch_to do
+          # No need to broadcast if the changes are filtered out by a policy
+          params.channel unless params.operation == :change && params.previous_changes.empty?
+        end
       end
     end
 
