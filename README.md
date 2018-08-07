@@ -8,7 +8,7 @@ HyperI18n seamlessly brings Rails I18n into your Hyperloop application.
 
 ## Documentation and Help
 
-+ Please see the [ruby-hyperloop.io](http://ruby-hyperloop.io/) website for documentation.
++ Please see the [ruby-hyperloop.org](http://ruby-hyperloop.org/) website for documentation.
 + Join the Hyperloop [gitter.io](https://gitter.im/ruby-hyperloop/chat) chat for help and support.
 
 
