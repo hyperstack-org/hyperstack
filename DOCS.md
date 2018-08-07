@@ -87,6 +87,18 @@ end
 
 For Hyperloop to see this change, this file needs to be moved (or copied if you have some server-side models) to the `apps/hyperloop` folder.
 
+### Explicit Scope Access
+
+In order to prevent unauthorized access to information like scope counts, lists of record ids, etc, Hyperloop now (see issue https://github.com/ruby-hyperloop/hyper-mesh/issues/43) requires you explicitly allow scopes to be viewed on the client, otherwise you will get an AccessViolation.
+
+To globally allow access to all scopes add this to the ApplicationRecord class
+
+```ruby
+class ApplicationRecord < ActiveRecord::Base
+  regulate_scope :all
+end
+```
+
 ## ActiveRecord API
 
 Hyperloop uses a subset of the standard ActiveRecord API to give your Isomorphic Components, Operations and Stores access to your server side Models.  As much as possible Hyperloop follows the syntax and semantics of ActiveRecord.  
