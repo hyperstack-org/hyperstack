@@ -30,6 +30,7 @@ node_modules
 .bundle
 
 spec/test_app/tmp
+spec/test_app/db
 Gemfile.lock
 
 /gemfiles/*.lock
