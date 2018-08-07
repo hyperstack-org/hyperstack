@@ -36,4 +36,4 @@ before_script:
   - if [[ "$DRIVER" == "firefox" ]]; then geckodriver --version; fi
   - if [[ "$DRIVER" == "firefox" ]]; then which firefox; fi
   - if [[ "$DRIVER" == "firefox" ]]; then which geckodriver; fi
-script: bundle exec rspec
+script: xvfb-run bundle exec rspec
