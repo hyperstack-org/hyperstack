@@ -1,10 +1,12 @@
 dist: trusty
 language: ruby
 rvm:
-  - ruby
+  - 2.4.4
+  - 2.5.1
+  - ruby-head
 env:
-  - DRIVER=travis HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
-  - DRIVER=beheaded HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
+  - DRIVER=travis TZ=Europe/Berlin
+  - DRIVER=beheaded TZ=Europe/Berlin
 before_install:
   - if [[ "$DRIVER" == "travis" ]]; then wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; fi
   - if [[ "$DRIVER" == "travis" ]]; then sudo dpkg -i google-chrome*.deb; fi
