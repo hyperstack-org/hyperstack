@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'hyperloop-config', React::VERSION
   spec.add_dependency 'mini_racer', '~> 0.1.15'
+  # https://github.com/discourse/mini_racer/issues/92
+  spec.add_dependency 'libv8', '~> 6.3.0'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
   spec.add_development_dependency 'chromedriver-helper'
