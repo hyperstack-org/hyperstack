@@ -2,7 +2,7 @@ module HyperI18n
   class Localize < Hyperloop::ServerOp
     include HelperMethods
 
-    param :acting_user
+    param :acting_user, nils: true
     param :date_or_time
     param :format
     param :opts

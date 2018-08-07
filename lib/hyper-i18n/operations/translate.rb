@@ -1,6 +1,6 @@
 module HyperI18n
   class Translate < Hyperloop::ServerOp
-    param :acting_user
+    param :acting_user, nils: true
     param :attribute
     param :opts
     param :translation, default: nil
