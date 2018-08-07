@@ -28,5 +28,3 @@ before_script:
   - if [[ "$DRIVER" == "beheaded" ]]; then which firefox; fi
   - if [[ "$DRIVER" == "beheaded" ]]; then which geckodriver; fi
 script: bundle exec rspec
-gemfile:
-  - gemfiles/opal_0_11_react-rails_2_4.gemfile
