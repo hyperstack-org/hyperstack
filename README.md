@@ -14,7 +14,7 @@ HyperI18n seamlessly brings Rails I18n into your Hyperloop application.
 
 ## Installation and Setup
 
-1. Add `gem 'hyper-i18n', git: 'https://https://github.com/ruby-hyperloop/hyper-i18n.git'` to your `Gemfile`
+1. Add `gem 'hyper-i18n', git: 'https://github.com/ruby-hyperloop/hyper-i18n.git'` to your `Gemfile`
 2. Install the Gem: `bundle install`
 3. Add `require 'hyper-i18n'` to your components manifest
 
@@ -26,7 +26,7 @@ Contributions are very welcome!
 
 ### Usage
 
-Hyper-I81n brings in the standard ActiveSupport API.
+Hyper-I18n brings in the standard ActiveSupport API.
 
 
 #### ActiveRecord Models
@@ -34,7 +34,7 @@ Hyper-I81n brings in the standard ActiveSupport API.
 The methods `Model.model_name.human` and `Model.human_attribute_name` are available:
 
 ```yaml
-# config/locals/models/en.yml
+# config/locales/models/en.yml
 en:
   activerecord:
     models:
@@ -57,7 +57,7 @@ It also implements the same lazy-loading pattern,
 so if you name space your locale file the same as your components, it will just work:
 
 ```yaml
-# config/locals/views/en.yml
+# config/locales/views/en.yml
 en:
   users:
     show:
