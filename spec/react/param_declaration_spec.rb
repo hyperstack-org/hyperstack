@@ -217,6 +217,21 @@ describe 'the param macro', js: true do
       expect(tp).to have_content('flag: true, a: 1, b: 2, c: 3, d: 4')
     end
 
+    it 'allows passing nil for class and style params' do
+      mount 'Tester' do
+        class Tester < Hyperloop::Component
+          render do
+            DIV(id: 'tp', class: nil, style: nil) { 'Tester' }
+          end
+        end
+      end
+
+      tp = find('#tp')
+
+      expect(tp[:class]).to eq('')
+      expect(tp[:style]).to eq('')
+    end
+
     describe "converts params only once" do
       it "not on every access" do
         mount 'Foo', foo: {bazwoggle: 1} do

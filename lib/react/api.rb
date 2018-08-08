@@ -192,16 +192,22 @@ module React
         elsif arg.is_a? Hash
           arg.each do |key, value|
             if ['class', 'className', 'class_name'].include? key
+              next unless value
+
               if value.is_a?(String)
                 value = value.split(' ')
               elsif !value.is_a?(Array)
                 raise "The class param must be a string or array of strings"
               end
-              properties['className'] = (properties['className'] || []) + value
+
+              properties['className'] = [*properties['className'], *value]
             elsif key == 'style'
+              next unless value
+
               if !value.is_a?(Hash)
                 raise "The style param must be a Hash"
               end
+
               properties['style'] = (properties['style'] || {}).merge(value)
             elsif React::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
               properties[key] = (properties[key] || {}).merge(value)
