@@ -60,6 +60,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'spring-commands-rspec'
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'
+  # https://github.com/discourse/mini_racer/issues/92
+  spec.add_development_dependency 'libv8', '~> 6.3.0'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
   spec.add_development_dependency 'pry'
