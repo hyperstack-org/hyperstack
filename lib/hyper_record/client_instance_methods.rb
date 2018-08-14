@@ -205,7 +205,7 @@ module HyperRecord
     def promise_destroy
       _local_destroy
       request = self.class.request_transducer.destroy(self.class.model_name => { instances: { id => { properties: self.to_transport_hash}}})
-      self.class.transport.promise_send(self.class.api_path).then do |_processor_result|
+      Hyperloop.client_transport_driver.promise_send(self.class.api_path).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -245,7 +245,7 @@ module HyperRecord
       end
 
       request = self.class.request_transducer.link(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+      Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -261,7 +261,7 @@ module HyperRecord
     def promise_save
       request = self.class.request_transducer.save(self.to_transport_hash)
       is_new = @properties[:id].nil?
-      self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+      Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
         self
       end.fail do |response|
         error_message = if is_new
@@ -285,7 +285,7 @@ module HyperRecord
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
       request = self.class.request_transducer.unlink(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+      Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
@@ -310,36 +310,54 @@ module HyperRecord
     end
 
     # @private
-    def _process_instance_destroyed(_destroy_result)
+    def _process_destroyed(_destroy_result)
       self._local_destroy unless self.destroyed?
     end
 
+    def _process_destroyed_notification(destroy_result)
+      _process_destroyed(destroy_result) if destroy_result
+    end
+
     # @private
-    def _process_instance_errors(errors_hash)
+    def _process_errors(errors_hash)
       errors_hash.keys.each do |name|
         raise "#{self.class.to_s} with id #{self.id}: #{errors_hash[name]}"
       end
     end
 
     # @private
-    def _process_instance_methods(methods_hash)
+    def _process_methods(methods_hash)
       # rest_method
       methods_hash.keys.each do |method_name|
         methods_hash[method_name].keys.each do |args|
           @rest_methods[method_name][args][:result] = methods_hash[method_name][args] # result is parsed json
           @fetch_states[method_name][args] = 'f'
+          notify_observers
+        end
+      end
+    end
+
+    def _process_methods_notification(methods_hash)
+      methods_hash.keys.each do |method_name|
+        methods_hash[method_name].keys.each do |args|
+          @fetch_states[method_name][args] = 'u'
         end
       end
     end
 
     # @private
-    def _process_instance_properties(properties_hash)
+    def _process_properties(properties_hash)
       self.class.new(properties_hash)
       self.class._class_fetch_states[id] = 'f'
+      notify_observers
+    end
+
+    def _process_properties_notification(properties_hash)
+      _process_properties(properties_hash)
     end
 
     # @private
-    def _process_instance_relations(relations_hash)
+    def _process_relations(relations_hash)
       relations_hash.keys.each do |relation_name|
         if %i[has_many has_and_belongs_to_many].include?(reflections[relation_name][:kind])
           # has_and_belongs_to_many and has_many
@@ -354,6 +372,14 @@ module HyperRecord
                                       end
         end
         @fetch_states[relation_name] = 'f'
+        notify_observers
+      end
+    end
+
+    def _process_relations_notification(relations_hash)
+      relations_hash.keys.each do |relation_name|
+        @fetch_states[relation_name] = 'u'
+        send("promise_#{relation_name}")
       end
     end
 

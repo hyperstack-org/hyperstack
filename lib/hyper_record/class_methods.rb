@@ -34,20 +34,6 @@ module HyperRecord
       @api_path = api_path
     end
 
-    # get transport
-    #
-    # @return [String]
-    def transport
-      @transport ||= HyperRecord.transport
-    end
-
-    # set transport
-    #
-    # @return [Class]
-    def transport=(transport)
-      @transport = transport
-    end
-
     # get transducer
     #
     # @return [Class]
@@ -90,7 +76,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a belongs_to association, failed to fetch records!"
@@ -176,7 +162,8 @@ module HyperRecord
       _class_fetch_states[record_sid] = 'i'
       request = request_transducer.fetch(self.model_name => { instances: { sid => {}}})
       _register_class_observer
-      transport.promise_send(api_path, request).then do |_processor_result|
+      Hyperloop.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
+        notify_class_observers
         _record_cache[sid]
       end.fail do |response|
         error_message = "#{self.to_s}.find(#{sid}) failed to fetch record!"
@@ -234,7 +221,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_and_belongs_to_many association, failed to fetch records!"
@@ -302,7 +289,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_many association, failed to fetch records!"
@@ -368,7 +355,7 @@ module HyperRecord
       define_method("promise_#{relation_name}") do
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_one association, failed to fetch records!"
@@ -418,43 +405,8 @@ module HyperRecord
     end
 
     def process_notification(notification_hash)
-      record_class = Object.const_get(data[:record_type])
-      if data[:scope]
-        scope_name, scope_params = data[:scope].split('_[')
-        if scope_params
-          scope_params = '[' + scope_params
-          record_class._class_fetch_states[data[:scope]] = 'u'
-          record_class.send("promise_#{scope_name}", *JSON.parse(scope_params)).then do |collection|
-            record_class.notify_class_observers
-          end.fail do |response|
-            error_message = "#{record_class}.#{scope_name}(#{scope_params}), a scope failed to update!"
-            `console.error(error_message)`
-          end
-        else
-          record_class._class_fetch_states[data[:scope]] = 'u'
-          record_class.send(data[:scope]).then do |collection|
-            record_class._notify_class_observers
-          end.fail do |response|
-            error_message = "#{record_class}.#{scope_name}, a scope failed to update!"
-            `console.error(error_message)`
-          end
-        end
-      elsif data[:rest_class_method]
-        record_class._class_fetch_states[data[:rest_class_method]] = 'u'
-        if data[:rest_class_method].include?('_[')
-          record_class.notify_class_observers
-        else
-          send("promise_#{data[:rest_class_method]}").then do |result|
-            _notify_observers
-          end.fail do |response|
-            error_message = "#{self}[#{self.id}].#{data[:rest_class_method]} failed to update!"
-            `console.error(error_message)`
-          end
-        end
-      elsif record_class.record_cached?(data[:id])
-        record_class._record_cache[data[:id].to_s]._update_record(data)
-      elsif data[:destroyed]
-        return
+      notification_hash.keys.each do |notifyable|
+        send("_process_#{notifyable}_notification", notification_hash[notifyable])
       end
     end
 
@@ -542,7 +494,7 @@ module HyperRecord
         _class_fetch_states[name_args] = 'i'
         rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
         request = request_transducer.fetch(self.model_name => { methods: { name =>{ args => {}}}})
-        transport.promise_send(api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
           rest_class_methods[name_args][:result]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}, a rest_method, failed to execute!"
@@ -588,7 +540,7 @@ module HyperRecord
         @rest_methods[name][args_json] = { result: options[:default_result] } unless @rest_methods[name].has_key?(args_json)
         raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance rest_method without id!" unless self.id
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { methods: { name => { args => {}}}}}})
-        self.class.transport.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           @rest_methods[name][args_json][:result]
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to execute!"
@@ -642,7 +594,7 @@ module HyperRecord
         _class_fetch_states[name] = {} unless _class_fetch_states.has_key?(name)
         _class_fetch_states[name][args_json] = 'i'
         request = request_transducer.fetch(self.model_name => { scopes: { name => { args_json => {}}}})
-        transport.promise_send(api_path, request).then do |_processor_result|
+        Hyperloop.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
           scopes[name][args_json]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}(#{args_json if args.any}), a scope, failed to fetch records!"
@@ -676,7 +628,6 @@ module HyperRecord
     def scopes
       @scopes ||= {}
     end
-
 
     private
     # internal, should not be used in application code
@@ -757,13 +708,13 @@ module HyperRecord
 
     def _process_model_errors(errors_hash)
       errors_hash.keys.each do |name|
+        # this should probably be a error class on its own
         raise "#{self.to_s}: #{errors_hash[name]}"
       end
     end
 
     def _process_model_instances(instances_hash, records_to_notify)
       instances_hash.keys.each do |id|
-        # this should probably be a error class on its own
         record = if record_cached?(id)
                    _record_cache[id]
                  else
@@ -771,7 +722,7 @@ module HyperRecord
                  end
 
         instances_hash[id].keys.each do |fetchables|
-          record.send("_process_instance_#{fetchables}", instances_hash[id][fetchables])
+          record.send("_process_#{fetchables}", instances_hash[id][fetchables])
         end
         records_to_notify << record
       end
@@ -783,6 +734,7 @@ module HyperRecord
         scopes_hash[scope_name].keys.each do |args|
           scopes[scope_name][args] = _convert_hashes_to_collection(scopes_hash[scope_name][args])
           _class_fetch_states[scope_name][args] = 'f'
+          notify_class_observers
         end
       end
     end
@@ -793,28 +745,44 @@ module HyperRecord
         methods_hash[method_name].keys.each do |args|
           rest_class_methods[method_name][args] = methods_hash[method_name][args] # result is parsed json
           _class_fetch_states[method_name][args] = 'f'
+          notify_class_observers
         end
       end
     end
 
-    # TODO
-    def _process_the_rest
-      # destroy
-      # do nothing
+    def _process_instances_notification(instances_hash)
+      instances_hash.keys.each do |id|
+        record = if record_cached?(id)
+                   _record_cache[id]
+                 else
+                   self.new(id: id)
+                 end
+        instances_hash[id].keys.each do |notifyables|
+          record.send("_process_#{notifyables}_notification", instances_hash[id][notifyables])
+        end
+      end
+    end
 
-      # link
-      other_record.instance_variable_get(:@properties).merge!(response.json[other_record.class.to_s.underscore])
-      notify_observers
-      other_record.notify_observers
+    def _process_methods_notification(notification_hash)
+      notification_hash.keys.each do |method_name|
+        _class_fetch_states[method_name].keys.each do |args|
+          _class_fetch_states[method_name][args] = 'u'
+          if args != '[]'
+            notify_class_observers
+          else
+            send("promise_#{method_name}")
+          end
+        end
+      end
+    end
 
-      # save
-      @properties.merge!(response.json[self.class.to_s.underscore])
-      reset
-      notify_observers
-
-      # unlink
-      notify_observers
-      other_record.notify_observers
+    def _process_scopes_notification(notification_hash)
+      notification_hash.keys.each do |scope_name|
+        _class_fetch_states[scope_name].keys.each do |args|
+          _class_fetch_states[scope_name][args] = 'u'
+          send("promise_#{scope_name}", *JSON.parse(args))
+        end
+      end
     end
 
     # @private

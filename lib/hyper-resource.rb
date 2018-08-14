@@ -2,15 +2,14 @@ require 'opal-activesupport'
 require 'hyperloop/resource/version'
 require 'hyper-store'
 require 'hyper-react'
+require 'hyper-transport'
 
 if RUBY_ENGINE == 'opal'
   require 'hyper-transport-http' # TODO, this is actually optional, might a different transport
   require 'hyper_record'
 else
-  require 'hyperloop/transport'
   require 'hyperloop/resource/config'
   require 'hyperloop/resource/security_guards' # server side, controller helper methods
-  require 'hyperloop/resource/handler'
   require 'hyper_record'
   Opal.append_path(__dir__.untaint)
   if Dir.exist?(File.join('app', 'hyperloop', 'models'))

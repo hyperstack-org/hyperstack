@@ -20,24 +20,6 @@ if RUBY_ENGINE == 'opal'
       @api_path = api_path
     end
 
-    # get global transport
-    #
-    # @return [Class]
-    def self.transport
-      @transport ||= if Hyperloop.options[:resource_transport]
-                       Object.const_get(Hyperloop.options[:resource_transport])
-                     else
-                       Hyperloop::Transport::HTTP
-                     end
-    end
-
-    # set global transport
-    #
-    # @return [Class]
-    def self.transport=(transport)
-      @transport = transport
-    end
-
     # get global request transducer
     #
     # @return [HyperRecord::Transducer]
