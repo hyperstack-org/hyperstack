@@ -24,10 +24,6 @@ before_script:
   - if [[ "$DRIVER" == "google-chrome" ]]; then which google-chrome; fi
 script: bundle exec rspec
 gemfile:
-  - gemfiles/opal_0_10_react-rails_2_3.gemfile
-  - gemfiles/opal_0_10_react-rails_2_4.gemfile
-  - gemfiles/opal_0_11_react-rails_2_4.gemfile
+  - gemfiles/gemfiles/hyper-mesh.gemfile
 matrix:
     fast_finish: true
-  allow_failures:
-    - gemfile: gemfiles/opal_0_11_react-rails_2_4.gemfile
