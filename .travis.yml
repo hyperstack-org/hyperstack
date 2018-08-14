@@ -1,0 +1,43 @@
+dist: trusty
+language: ruby
+rvm:
+  - 2.4.4
+  - 2.5.1
+  - ruby-head
+env:
+  - DRIVER=google-chrome TZ=Europe/Berlin
+matrix:
+  fast_finish: true
+  allow_failures:
+  - rvm: ruby-head
+before_install:
+  - if [[ "$DRIVER" == "google-chrome" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then sudo apt-get update -qq && sudo apt-get install -qq -y google-chrome-stable; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then sudo apt-get update -qq && sudo apt-get install -qq -y firefox; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then wget -q https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then tar zxf geckodriver-v0.21.0-linux64.tar.gz; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then sudo mv geckodriver /usr/local/bin/; fi
+  - gem install bundler
+before_script:
+  - bundle install --jobs=3 --retry=3
+  - if [[ "$DRIVER" == "google-chrome" ]]; then chromedriver-update; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then ls -lR ~/.chromedriver-helper/; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then chromedriver --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then google-chrome --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then which chromedriver; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then which google-chrome; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then firefox --version; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then geckodriver --version; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then which firefox; fi
+  - if [[ "$DRIVER" == "firefox" ]]; then which geckodriver; fi
+script: bundle exec rspec
+deploy:
+  provider: rubygems
+  gem: hyper-i18n
+  gemspec: hyper-i18n.gemspec
+  api_key:
+    secure: R2JQCFGu2E2bb9vEk66UwJy6sr3B7wFvxrHqulh2t0gCG0TK/3C5kwcPoHgz/7kQAgisresL5GGENCqLHrFvn30MOmVvv32cBr+jiPKdl9c0P4xxkD4SkrStZrukFd3hGCXRLptSg/aWYMMfmYgv826BKgsYfRaYuQnzgjkYXyJ8wcaWiZIffNnwUoteKPLSqxKl1+LQvw8LklG/2rv0SkZmKyE99lef7XSKTbhhB+kgutqHnYoYcS+Zs90ev5EDPNad5t8LdE/f6H14u8YpI3ouOPWfT6dGERvRPVatggPZMmW2lMaY48slDY4Um2sHUhtbJcTqGpaG2UGoth2Nb6vqVTRp7NF5b0lMKEWiZj15ZG798ACYGin3Y6yBhBq9s/6HYmfyKDzspXdr9VwfW4w4vt6RkcQa59I5s9qAEZNeQOPW4WGgM+K5S++dOn3ThfZDjabyHyJtxXeAgswGQQ78ymUCSQIfna4psjEObX5HyRZiG/OuzpjCBF7xIoQmaeu3oZnFeVHfNI4WMw+x5GRrFeCDmAKlRxHf6kEPjKvj/PC0AGvQ00x5dj+uqATCL4jl8AxvbpbAmLri5o4bmVsgPfcwogXO4Darni4z23N+4ZDBT6N9IunsTGthR6Dk5+MyPiYyMB0dYY/yyS6Jt44jTXvOJkHg2dFYmIvRejQ=
+  on:
+    tags: true
+    rvm: 2.4.4
