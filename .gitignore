@@ -14,7 +14,6 @@ spec/test_app/log/development.log
 spec/test_app/Gemfile.lock
 /synchromesh-simple-poller-store
 /synchromesh-pusher-channel-store
-/Gemfile.lock
 /examples/action-cable/rails_cache_dir/
 rails_cache_dir/
 react_prerendering_src.js
