@@ -31,7 +31,6 @@ node_modules
 
 spec/test_app/tmp
 spec/test_app/db
-Gemfile.lock
 
 /gemfiles/*.lock
 /tmp
