@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hyper-i18n (0.1.1)
+    hyper-i18n (0.99.0)
       hyper-component
       hyper-operation
       hyper-store
