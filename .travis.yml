@@ -1,5 +1,6 @@
 dist: trusty
 language: ruby
+cache: bundler
 rvm:
   - 2.4.4
   - 2.5.1
