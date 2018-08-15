@@ -21,7 +21,7 @@ before_install:
 before_script:
   - cd spec/test_app
   - bundle install --jobs=3 --retry=3
-  - rails db:setup
+  - bundle exec rails db:setup
   - cd ../../
   - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver-update; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then ls -lR ~/.chromedriver-helper/; fi
