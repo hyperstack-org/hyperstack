@@ -9,7 +9,7 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-  - rvm: ruby-head
+    - rvm: ruby-head
 before_install:
   - if [[ "$DRIVER" == "google-chrome" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list; fi
