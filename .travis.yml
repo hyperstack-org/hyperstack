@@ -17,6 +17,7 @@ before_install:
   - gem install bundler
 before_script:
   - bundle install --jobs=3 --retry=3
+  - if [[ "$DRIVER" == "google-chrome" ]]; then chromedriver-update; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then ls -lR ~/.chromedriver-helper/; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then chromedriver --version; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then google-chrome --version; fi
