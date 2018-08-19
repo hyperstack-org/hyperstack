@@ -1,10 +1,14 @@
+ENV["RAILS_ENV"] ||= 'test'
+
 require 'hyper-spec'
 require 'pry'
-#require 'opal-browser'
 require 'opal-browser'
 
-ENV["RAILS_ENV"] ||= 'test'
-require File.expand_path('../test_app/config/environment', __FILE__)
+begin
+  require File.expand_path('../test_app/config/environment', __FILE__)
+rescue LoadError
+  puts 'Could not load test application. Please ensure you have run `bundle exec rake test_app`'
+end
 
 require 'rspec/rails'
 require 'rspec-steps'
