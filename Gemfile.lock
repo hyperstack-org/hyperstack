@@ -42,6 +42,8 @@ PATH
       activerecord (>= 4.0.0)
       hyper-component (= 1.0.0.lap28)
       hyperloop-config (= 1.0.0.lap28)
+      libv8 (~> 6.3.0)
+      mini_racer (~> 0.1.15)
       mutations
       opal-activesupport (~> 0.3.1)
 
@@ -354,8 +356,6 @@ DEPENDENCIES
   hyper-react (= 1.0.0.lap28)
   hyper-spec!
   hyperloop-config!
-  libv8 (~> 6.3.0)
-  mini_racer (~> 0.1.15)
   mysql2
   opal (>= 0.11.0, < 0.12.0)
   opal-browser (~> 0.2.0)
