@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-source ENV['HYPER_DEV_GEM_SOURCE'] if ENV['HYPER_DEV_GEM_SOURCE']
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails'
@@ -47,6 +46,8 @@ end
 
 gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 gem 'mini_racer', '~> 0.1.15'
+# https://github.com/discourse/mini_racer/issues/92
+gem 'libv8', '~> 6.3.0'
 # gem 'react-router-rails', '~> 0.13.3'
 # gem 'reactrb-router'
 
