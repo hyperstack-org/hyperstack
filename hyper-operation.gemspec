@@ -31,7 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'libv8', '~> 6.3.0'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-react', Hyperloop::Operation::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperloop::Operation::VERSION
