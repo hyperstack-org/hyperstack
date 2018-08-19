@@ -1,21 +1,26 @@
+dist: trusty
 language: ruby
+cache: bundler
 rvm:
-  - ruby
+  - 2.4.4
+  - 2.5.1
+  - ruby-head
 env:
-  - DRIVER=travis HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
+  - DRIVER=google-chrome TZ=Europe/Berlin
+matrix:
+  fast_finish: true
+  allow_failures:
+    - rvm: ruby-head
 before_install:
-  - sudo apt-get install -y fonts-liberation
-  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-  - sudo dpkg -i google-chrome*.deb
+  - if [[ "$DRIVER" == "google-chrome" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then sudo apt-get update -qq && sudo apt-get install -qq -y google-chrome-stable; fi
   - gem install bundler
 before_script:
-  - cd spec/test_app
-  - bundle update
-  - cd ../../
-  - chromedriver-update
-  - ls -lR ~/.chromedriver-helper/
-script:
-  - bundle exec rake spec
-gemfile:
-  - gemfiles/opal_0_11_react-rails_2_4.gemfile
-
+  - bundle install --jobs=3 --retry=3
+  - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver-update; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then ls -lR ~/.chromedriver-helper/; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then google-chrome --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then which google-chrome; fi
+script: bundle exec rspec
