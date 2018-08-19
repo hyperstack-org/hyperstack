@@ -348,6 +348,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
+  chromedriver-helper
   database_cleaner
   hyper-operation!
   hyper-react (= 1.0.0.lap28)
