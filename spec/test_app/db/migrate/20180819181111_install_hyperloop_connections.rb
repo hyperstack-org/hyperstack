@@ -9,10 +9,10 @@ class InstallHyperloopConnections < ActiveRecord::Migration[5.2]
       t.datetime :refresh_at
     end
 
-
     create_table :hyperloop_queued_messages do |t|
       t.integer :connection_id, index: true
       t.text :data
     end
+
   end
 end

@@ -1,4 +1,4 @@
-class CreateTestModels < ActiveRecord::Migration
+class CreateTestModels < ActiveRecord::Migration[4.2]
   def change
     create_table :test_models do |t|
       t.string :test_attribute
