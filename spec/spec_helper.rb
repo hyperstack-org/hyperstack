@@ -119,10 +119,6 @@ RSpec.configure do |config|
   # end
 end
 
-module Helpers
-
-end
-
 module HyperSpec
   module ComponentTestHelpers
     alias old_expect_promise expect_promise
@@ -139,10 +135,6 @@ module HyperSpec
       end
     end
   end
-end
-
-RSpec.configure do |config|
-  config.include Helpers
 end
 
 RSpec::Matchers.define :have_failed_with do |expected|
