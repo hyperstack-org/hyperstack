@@ -36,10 +36,12 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'uglifier'
   spec.add_dependency 'unparser'
   spec.add_dependency 'webdrivers'
+  spec.add_dependency 'mini_racer', '~> 0.1.15'
+  # https://github.com/discourse/mini_racer/issues/92
+  spec.add_dependency 'libv8', '~> 6.3.0'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'hyper-react', HyperSpec::VERSION
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'puma'
