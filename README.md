@@ -6,11 +6,18 @@ take this from the repo
 then in your shell:
 `$ hyper-business-installer`
 
+This will create directories and install a default business operations handler in your projects `hyperstack/handlers` directory or
+`app/hyperstack/handlers`, depending on your config.
+
 ## Usage
-add the business operation class to you config as valid, for security:
+You may modify the installed BusinessHandler, for example enable additional authorization. See the business_handler.rb file.
+Create a business operations class like below, add the business operation class to you config as valid, for security:
 `Hyperstack.valid_business_class_names = ['earn_money']`
 
 params are used exactly like hyper-react params.
+Place operation in your projects `hyperstack/operations` directory or
+`app/hyperstack/operations`, depending on your config.
+
 
 Example Operation:
 ```ruby
