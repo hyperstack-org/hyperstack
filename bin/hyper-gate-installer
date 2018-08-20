@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+require 'bundler'
+Bundler.require
+
+target_dir = if ARGV[0]
+               File.expand_path(ARGV[0])
+             elsif Dir.exist?(File.join('app', 'hyperstack'))
+               File.expand_path(File.join('app', 'hyperstack', 'handlers'))
+             elsif Dir.exist?('hyperstack')
+               File.expand_path(File.join('hyperstack', 'handlers'))
+             else
+               nil
+             end
+
+unless target_dir
+  raise "Can't find target directory for installing handlers. Checked for directories app/hyperstack and hyperstack."
+  exit(1)
+end
+
+unless Dir.exist?(target_dir)
+  FileUtils.mkdir(target_dir)
+end
+
+source_dir = File.expand_path(File.join(__dir__.untaint, '..', 'handler'))
+
+%w[gate].each do |handler_name|
+  FileUtils.cp(File.join(source_dir, handler_name + '_handler.rb'), target_dir)
+  puts "Installed " + File.join(target_dir, handler_name + '_handler.rb')
+end
+
+exit(0)
