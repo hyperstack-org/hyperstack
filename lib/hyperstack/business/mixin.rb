@@ -46,6 +46,7 @@ module Hyperstack
       end
 
       def _common_run!
+        # TODO make this properly work with promises as results of each step
         promise = Promise.new
         self.class._pipe.each do |step|
           @last_result = @last_result.then do |*args|

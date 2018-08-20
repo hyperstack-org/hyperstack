@@ -67,6 +67,6 @@ Execute like:
 ```ruby
 params = { user_id: 1, products: [], cc_number: '123456' }
 EarnMoney.run(params).then { |result| puts result } # local run, result is returned
-EarnMoney.run_on_server(params).then { |result| puts result } # result should be returned, but currently is not
-EarnMoney.run_on_client(session_id, params) # run for side effects, result is currently not returned
+EarnMoney.run_on_server(params).then { |result| puts result } # remote run on  server, result is not returned
+EarnMoney.run_on_client(session_id, params) # remote run on client, run for side effects, result is currently not returned
 ```

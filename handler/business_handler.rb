@@ -15,10 +15,10 @@ class BusinessHandler
       # enable authorization if needed, depends on hyper-gate, also see above
       # authorize(current_user, business_operation, :run)
 
-      request[business_operation_name].keys.each do |params|
-        parsed_params = Oj.load(params, symbol_keys: true)
-        business_operation.run(parsed_params).then do |operation_result|
-          result[business_operation_name][params] = operation_result
+      request[business_operation_name].keys.each do |agent_object_id|
+        parsed_params = Oj.load(request[business_operation_name][agent_object_id], symbol_keys: true)
+        business_operation.run(*parsed_params).then do |operation_result|
+          result[business_operation_name][agent_object_id] = operation_result
         end
       end
     end
