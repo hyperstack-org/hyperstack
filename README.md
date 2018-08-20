@@ -80,7 +80,7 @@ authorized?(user, class_name, action, *policy_context)
 authorize!(user, class_name, action, *policy_context)
 # will raise a exception if denied
 
-# on the client is available:
+# (for now only) on the client is available:
 promise_authorize(user, class_name, action, *policy_context)
 # authorize gets executed on the server
 # result is a promise, once resolved its value will be the result of the server side authorize call
