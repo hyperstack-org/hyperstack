@@ -81,7 +81,11 @@ authorize!(user, class_name, action, *policy_context)
 # will raise a exception if denied
 
 # (for now only) on the client is available:
-promise_authorize(user, class_name, action, *policy_context)
+promise_authorize(user, class_name, action, *policy_context).then do |result|
+  # result is the allowed hash, as above
+end.fail do |result|
+  # result is the denied hash, as above
+end 
 # authorize gets executed on the server
 # result is a promise, once resolved its value will be the result of the server side authorize call
 # policy_context must be JSON serializable in this case
