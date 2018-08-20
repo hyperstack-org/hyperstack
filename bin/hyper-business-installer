@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+require 'bundler'
+Bundler.require
+
+target_dir = if ARGV[0]
+               File.expand_path(ARGV[0])
+             elsif Dir.exist?(File.join('app', 'hyperloop'))
+               File.expand_path(File.join('app', 'hyperloop', 'handlers'))
+             elsif Dir.exist?('hyperloop')
+               File.expand_path(File.join('hyperloop', 'handlers'))
+             else
+               nil
+             end
+
+unless target_dir
+  raise "Can't find target directory for installing handlers. Checked for directories app/hyperloop and hyperloop."
+  exit(1)
+end
+
+unless Dir.exist?(target_dir)
+  FileUtils.mkdir(target_dir)
+end
+
+source_dir = File.expand_path(File.join(__dir__.untaint, '..', 'handler'))
+
+%w[business].each do |handler_name|
+  FileUtils.cp(File.join(source_dir, handler_name + '_handler.rb'), target_dir)
+  puts "Installed " + File.join(target_dir, handler_name + '_handler.rb')
+end
+
+exit(0)
