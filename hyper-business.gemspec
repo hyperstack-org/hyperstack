@@ -1,4 +1,4 @@
-require_relative 'lib/hyperloop/business/version'
+require_relative 'lib/hyperstack/business/version'
 
 Gem::Specification.new do |s|
   s.name         = 'hyper-business'
