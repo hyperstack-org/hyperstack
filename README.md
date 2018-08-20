@@ -27,10 +27,10 @@ class SuperDuperPolicy
   include Hyperstack::Gate::PolicyDefinition
   
   qualify :member_is_valid do |*policy_context|
-    # args are whatever is passed as additional policy context, up to you
+    # policy_context is whatever is passed to Hyperstack::Gate.authorize
   
-    # current_user is available is instance method, is passed to the policy initializer by Hyperstack::Gate.authorize
-    current_user.class == Member # result is and must be a boolean
+    # current_user is available as instance method and is passed to the policy initializer by Hyperstack::Gate.authorize
+    current_user.class == Member # result must be a boolean
   end
   
   qualify :member_is_admin do |*policy_context|
