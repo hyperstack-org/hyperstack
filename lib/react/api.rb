@@ -122,7 +122,6 @@ module React
               }
               this.__opalInstance.is_mounted = false;
             }
-
             render() {
               this.__opalInstanceSyncSetState = false;
               return this.__opalInstance.$send(render_fn).$to_n();
