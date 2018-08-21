@@ -1,7 +1,7 @@
 require_relative 'lib/hyperstack/transport/subscription_store/redis/version'
 
 Gem::Specification.new do |s|
-  s.name         = 'hyper-transport'
+  s.name         = 'hyper-transport-store-redis'
   s.version      = Hyperstack::Transport::SubscriptionStore::Redis::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
