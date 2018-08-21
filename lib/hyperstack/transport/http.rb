@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   module Transport
     # HTTP is used to perform a `XMLHttpRequest` in ruby. It is a simple wrapper
     # around `XMLHttpRequest`
@@ -134,7 +134,7 @@ module Hyperloop
         @active_requests ||= 0
         @active_requests -= 1
         if @active_requests < 0
-          `console.warn("Ooops, Hyperloop::HTTP active_requests out of sync!")`
+          `console.warn("Ooops, Hyperstack::HTTP active_requests out of sync!")`
           @active_requests = 0
         end
       end
@@ -247,7 +247,7 @@ module Hyperloop
       # meant for hyper-resource
       def self.promise_send(uri, data)
         post(uri + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
-          Hyperloop::Transport::ResponseProcessor.process_response(response.json)
+          Hyperstack::Transport::ResponseProcessor.process_response(response.json)
         end
       end
 

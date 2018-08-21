@@ -1,4 +1,4 @@
-module Hyperlooop
+module Hyperstack
   module Transport
     class WebSocket
       CONNECTING  = 0

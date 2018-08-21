@@ -1,10 +1,10 @@
 # hyper-transport
 
-Various transport options for ruby-hyperloop and hyper-stack.
+Various transport options for hyperstack.
 Supports:
 - Pusher
 - ActionCable
-- WebSocket
+- WebSockets (NI)
 - HTTP Ajax
 
 ## Installation
@@ -30,7 +30,7 @@ in your client code add:
 ```ruby
 require 'hyper-transport-action-cable'
 ```
-### WebSocket
+### WebSocket (NI)
 in your client code add:
 ```ruby
 require 'hyper-transport-web-socket'

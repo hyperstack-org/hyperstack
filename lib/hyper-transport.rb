@@ -1,10 +1,13 @@
-require 'hyperloop/transport/version'
+require 'hyperstack/transport/version'
 if RUBY_ENGINE == 'opal'
-  require 'hyperloop/transport/response_processor'
-  require 'hyperloop/transport/notification_processor'
-  require 'hyperloop/transport/client_drivers' # initialize options for the client
+  require 'hyperstack/transport/request_agent'
+  require 'hyperstack/transport/response_processor'
+  require 'hyperstack/transport/notification_processor'
+  require 'hyperstack/transport/client_drivers'
 else
   require 'hyper-react'
-  require 'hyperloop/transport/config'
+  require 'hyperstack/transport/config'
+  require 'hyperstack/transport/server_pub_sub'
+  require 'hyperstack/transport/request_processor'
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 end

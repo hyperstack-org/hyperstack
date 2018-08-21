@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   module Transport
     module Helpers
       def request_id
