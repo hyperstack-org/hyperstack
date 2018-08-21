@@ -137,7 +137,7 @@ module Hyperstack
 
         def process_response(response)
           response.keys.each do |agent_object_id|
-            agent = Hyperstack::Business::RequestAgent.agents.delete(agent_object_id)
+            agent = Hyperstack::Transport::RequestAgent.agents.delete(agent_object_id)
             agent.result = response[agent_object_id]
           end
         end
@@ -149,7 +149,7 @@ module Hyperstack
                      validate({})
                    end
           raise errors.join("\n") if errors.any?
-          agent = Hyperstack::Business::RequestAgent.new
+          agent = Hyperstack::Transport::RequestAgent.new
           Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, { business: { self.to_s.underscore  => { agent.object_id => JSON.generate(*params) }}} ).then do
             agent.result
           end
