@@ -1,4 +1,4 @@
-require 'hyperloop/config'
+require 'hyperstack/config'
 
 module React
   module IsomorphicHelpers
@@ -37,7 +37,7 @@ module React
     def self.log(message, message_type = :info)
       message = [message] unless message.is_a? Array
 
-      if (message_type == :info || message_type == :warning) #&& Hyperloop.env.production?
+      if (message_type == :info || message_type == :warning) #&& Hyperstack.env.production?
         return
       end
 
@@ -124,7 +124,7 @@ module React
             end
           end
         end
-        Hyperloop::Application::Boot.run(context: self)
+        Hyperstack::Application::Boot.run(context: self)
         self.class.before_first_mount_blocks.each { |block| block.call(self) }
       end
 

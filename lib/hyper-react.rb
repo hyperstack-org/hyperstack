@@ -3,7 +3,8 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-store'
   require 'react'
   require 'react/observable'
-  require 'react/validator'
+  require 'hyperstack/props_wrapper'
+  require 'hyperstack/validator'
 
   require 'react/component/dsl_instance_methods'
   require 'react/component/should_component_update'
@@ -17,11 +18,13 @@ if RUBY_ENGINE == 'opal'
   require 'react/object'
   require 'react/to_key'
   require 'reactive-ruby/isomorphic_helpers'
-  require 'hyperloop/component/mixin'
-  require 'hyperloop/component'
-  require 'hyperloop/component/version'
-  require 'hyperloop/context'
-  require 'hyperloop/top_level'
+  require 'hyperstack/params/class_methods'
+  require 'hyperstack/params/instance_methods'
+  require 'hyperstack/component/mixin'
+  require 'hyperstack/component'
+  require 'hyperstack/component/version'
+  require 'hyperstack/context'
+  require 'hyperstack/top_level'
 else
   require 'opal'
   require 'hyper-store'
@@ -29,15 +32,15 @@ else
   require 'opal-browser'
   require 'reactive-ruby/isomorphic_helpers'
   require 'reactive-ruby/serializers'
-  require 'hyperloop/component/version'
-  require 'hyperloop/config'
-  require 'hyperloop/view_helpers'
+  require 'hyperstack/component/version'
+  require 'hyperstack/config'
+  require 'hyperstack/view_helpers'
   Opal.append_path(__dir__.untaint)
-  if Dir.exist?(File.join('app', 'hyperloop'))
-    # Opal.append_path(File.expand_path(File.join('app', 'hyperloop', 'components')))
-    Opal.append_path(File.expand_path(File.join('app', 'hyperloop'))) unless Opal.paths.include?(File.expand_path(File.join('app', 'hyperloop')))
-  elsif Dir.exist?('hyperloop')
-    # Opal.append_path(File.expand_path(File.join('hyperloop', 'components')))
-    Opal.append_path(File.expand_path('hyperloop')) unless Opal.paths.include?(File.expand_path('hyperloop'))
+  if Dir.exist?(File.join('app', 'hyperstack'))
+    # Opal.append_path(File.expand_path(File.join('app', 'hyperstack', 'components')))
+    Opal.append_path(File.expand_path(File.join('app', 'hyperstack'))) unless Opal.paths.include?(File.expand_path(File.join('app', 'hyperstack')))
+  elsif Dir.exist?('hyperstack')
+    # Opal.append_path(File.expand_path(File.join('hyperstack', 'components')))
+    Opal.append_path(File.expand_path('hyperstack')) unless Opal.paths.include?(File.expand_path('hyperstack'))
   end
 end

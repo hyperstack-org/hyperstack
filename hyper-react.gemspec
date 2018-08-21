@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-require 'hyperloop/component/version'
+require 'hyperstack/component/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-react'
-  spec.version       = Hyperloop::Component::VERSION
+  spec.version       = Hyperstack::Component::VERSION
 
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
-  spec.homepage      = 'http://ruby-hyperloop.org'
+  spec.homepage      = 'http://ruby-hyperstack.org'
   spec.summary       = 'Opal Ruby wrapper of React.js library.'
   spec.license       = 'MIT'
   spec.description   = 'Write React UI components in pure Ruby.'
@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyper-store', Hyperloop::Component::VERSION
+  spec.add_dependency 'hyper-store', Hyperstack::Component::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'opal-browser', '~> 0.2.0'

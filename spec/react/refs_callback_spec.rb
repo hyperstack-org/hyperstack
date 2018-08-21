@@ -68,7 +68,7 @@ describe 'Refs callback', js: true do
     # callback failed then
     # ref is called two times, once on mount with dom_node, once on unmount with null
     mount "Foo" do
-      class Unmountable < Hyperloop::Component
+      class Unmountable < Hyperstack::Component
         render do
           DIV { "This is a Component" }
         end

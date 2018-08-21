@@ -7,7 +7,7 @@ describe 'React::State', js: true do
         include React::Component
         export_state(:foo) { 'bar' }
       end
-      Hyperloop::Application::Boot.run
+      Hyperstack::Application::Boot.run
       Foo.foo
     end.to eq('bar')
   end

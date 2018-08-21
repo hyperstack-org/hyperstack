@@ -106,7 +106,7 @@ describe 'React::Component', js: true do
       client_option raise_on_js_errors: :off
       mount 'Foo' do
         class ErrorFoo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
           param :just
           def render
             raise 'ErrorFoo Error'
@@ -139,7 +139,7 @@ describe 'React::Component', js: true do
   describe 'Misc Methods' do
     it 'has a force_update! method' do
       mount 'Foo' do
-        class Foo < Hyperloop::Component
+        class Foo < Hyperstack::Component
           class << self
             attr_accessor :render_counter
             attr_accessor :instance
@@ -162,7 +162,7 @@ describe 'React::Component', js: true do
 
     it 'has its force_update! method return itself' do
       mount 'Foo' do
-        class Foo < Hyperloop::Component
+        class Foo < Hyperstack::Component
           class << self
             attr_accessor :instance
           end
@@ -420,7 +420,7 @@ describe 'React::Component', js: true do
     it 'sets initial state with default value in constructor in @native object state property' do
       mount 'StateFoo' do
         class StateFoo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
           state bar: 25
 
           def initialize(native)
@@ -443,7 +443,7 @@ describe 'React::Component', js: true do
     it 'doesnt cause extra render when setting initial state' do
       mount 'StateFoo' do
         class StateFoo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
           state bar: 25
 
           def self.render_count
@@ -466,7 +466,7 @@ describe 'React::Component', js: true do
     it 'doesnt cause extra render when setting state in :before_mount' do
       mount 'StateFoo' do
         class StateFoo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
 
           def self.render_count
             @@render_count ||= 0
@@ -493,7 +493,7 @@ describe 'React::Component', js: true do
     it 'doesnt cause extra render when setting state in :before_receive_props' do
       mount 'Foo' do
         class StateFoo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
 
           param :drinks
 
@@ -618,7 +618,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include Hyperloop::Component::Mixin
+            include Hyperstack::Component::Mixin
           end
         end
       end

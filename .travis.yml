@@ -3,8 +3,8 @@ language: ruby
 rvm:
   - ruby
 env:
-  - DRIVER=travis HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
-  - DRIVER=beheaded HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperloop.org" TZ=Europe/Berlin
+  - DRIVER=travis HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperstack.org" TZ=Europe/Berlin
+  - DRIVER=beheaded HYPER_DEV_GEM_SOURCE="https://gems.ruby-hyperstack.org" TZ=Europe/Berlin
 before_install:
   - if [[ "$DRIVER" == "travis" ]]; then wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; fi
   - if [[ "$DRIVER" == "travis" ]]; then sudo dpkg -i google-chrome*.deb; fi

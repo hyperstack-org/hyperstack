@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
 
   class TopLevel
     def self.search_path

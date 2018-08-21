@@ -111,7 +111,7 @@ module React
         improper_render "Instead #{@buffer.count} elements were generated.",
                         'Do you want to wrap your elements in a div?' if @buffer.count > 1
         improper_render "Instead the component #{result} was returned.",
-                        "Did you mean #{result}()?" if result.try :reactrb_component?
+                        "Did you mean #{result}()?" if result.try :react_component?
         improper_render "Instead the #{result.class} #{result} was returned.",
                         'You may need to convert this to a string.'
       end

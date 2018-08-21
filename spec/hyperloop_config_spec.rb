@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
-describe 'Hyperloop Auto Config', js: true do
+describe 'Hyperstack Auto Config', js: true do
   # note most config functionality is coverered when running other gem specs.
   it 'will find and load everything and expand erb files' do
     `rm -rf spec/test_app/tmp/cache`

@@ -7,10 +7,6 @@ module React
         Children.new(`#{@native}.props.children`)
       end
 
-      def params
-        @params ||= self.class.props_wrapper.new(self)
-      end
-
       def props
         Hash.new(`#{@native}.props`)
       end

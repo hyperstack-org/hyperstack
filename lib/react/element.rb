@@ -101,7 +101,7 @@ module React
       new_props.merge! args
     end
 
-    # built in events, events going to native components, and events going to reactrb
+    # built in events, events going to native components, and events going to react
 
     # built in events will have their event param translated to the Event wrapper
     # and the name will camelcased and have on prefixed, so :click becomes onClick.
@@ -109,7 +109,7 @@ module React
     # events emitting from native components are assumed to have the same camel case and
     # on prefixed.
     #
-    # events emitting from reactrb components will just have on_ prefixed.  So
+    # events emitting from react components will just have on_ prefixed.  So
     # :play_button_pushed attaches to the :on_play_button_pushed param
     #
     # in all cases the default name convention can be overriden by wrapping in <...> brackets.

@@ -4,7 +4,7 @@ module React
 
   # A NativeLibrary is simply a wrapper that holds the name of the native js library.
   # It responds to const_missing and method_missing by looking up objects within the js library.
-  # If the object is a react component it is wrapped by a reactrb component class, otherwise
+  # If the object is a react component it is wrapped by a react component class, otherwise
   # a nested NativeLibrary is returned.
 
   # Two macros are provided: imports (for naming the native library) and renames which allows
@@ -72,7 +72,7 @@ module React
         if React::API.native_react_component?(native_name)
           new_klass = klass.const_set ruby_name, Class.new
           new_klass.class_eval do
-            include Hyperloop::Component::Mixin
+            include Hyperstack::Component::Mixin
             imports native_name
           end
           new_klass

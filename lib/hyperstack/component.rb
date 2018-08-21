@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Component
     def self.inherited(child)
       child.include(Mixin)

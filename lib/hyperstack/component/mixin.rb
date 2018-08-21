@@ -6,20 +6,24 @@ require 'react/rendering_context'
 require 'hyper-store'
 require 'hyper-store/state_wrapper'
 require 'react/component/api'
+require 'hyperstack/params/class_methods'
+require 'hyperstack/params/instance_methods'
 require 'react/component/class_methods'
-require 'react/component/props_wrapper'
+require 'hyperstack/props_wrapper'
+require 'hyperstack/validator'
 require 'native'
 
-module Hyperloop
+module Hyperstack
   class Component
     module Mixin
       def self.included(base)
-        base.include(Hyperloop::Store::Mixin)
+        base.include(Hyperstack::Store::Mixin)
         base.include(React::Component::API)
         base.include(React::Callbacks)
         base.include(React::Component::Tags)
         base.include(React::Component::DslInstanceMethods)
         base.include(React::Component::ShouldComponentUpdate)
+        base.include(Hyperstack::Params::InstanceMethods)
         base.class_eval do
           class_attribute :initial_state
           define_callback :before_mount
@@ -30,6 +34,7 @@ module Hyperloop
           define_callback :before_unmount
           define_callback :after_error
         end
+        base.extend(Hyperstack::Params::ClassMethods)
         base.extend(React::Component::ClassMethods)
       end
 
@@ -112,7 +117,7 @@ module Hyperloop
           # Date.now() has only millisecond precision, if several notifications of
           # observer happen within a millisecond, updates may get lost.
           # to mitigate this the Math.random() appends some random number
-          # this way notifactions will happen as expected by the rest of hyperloop
+          # this way notifactions will happen as expected by the rest of hyperstack
           set_state(
             '***_state_updated_at-***' => `Date.now() + Math.random()`,
             name => value
@@ -154,8 +159,8 @@ module React
   module Component
     def self.included(base)
       # note this is turned off during old style testing:  See the spec_helper
-      deprecation_warning base, "The module name React::Component has been deprecated.  Use Hyperloop::Component::Mixin instead."
-      base.include Hyperloop::Component::Mixin
+      deprecation_warning base, "The module name React::Component has been deprecated.  Use Hyperstack::Component::Mixin instead."
+      base.include Hyperstack::Component::Mixin
     end
     def self.deprecation_warning(name, message)
       @deprecation_messages ||= []
@@ -168,10 +173,7 @@ module React
   end
   module ComponentNoNotice
     def self.included(base)
-      base.include Hyperloop::Component::Mixin
+      base.include Hyperstack::Component::Mixin
     end
   end
-end
-
-module React
 end

@@ -37,13 +37,13 @@ describe 'React::Callbacks', js: true do
     end.to eq([true, true, ["wash_hands", "turn_off_laptop" ]])
   end
 
-  context 'using Hyperloop::Context.reset!' do
+  context 'using Hyperstack::Context.reset!' do
     #after(:all) do
-    #  Hyperloop::Context.instance_variable_set(:@context, nil)
+    #  Hyperstack::Context.instance_variable_set(:@context, nil)
     #end
-    it 'clears callbacks on Hyperloop::Context.reset!' do
+    it 'clears callbacks on Hyperstack::Context.reset!' do
       on_client do
-        Hyperloop::Context.reset!
+        Hyperstack::Context.reset!
 
         class Foo
           include React::Callbacks
@@ -59,7 +59,7 @@ describe 'React::Callbacks', js: true do
       expect_evaluate_ruby do
         instance = Foo.new
 
-        Hyperloop::Context.reset!
+        Hyperstack::Context.reset!
         
         Foo.class_eval do
           before_dinner :wash_hands

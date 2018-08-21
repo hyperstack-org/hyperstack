@@ -49,7 +49,7 @@ module React
         needs_update?(next_params, next_state)
       end
 
-      # Whenever state changes, reactrb updates a timestamp on the state object.
+      # Whenever state changes, react updates a timestamp on the state object.
       # We can rapidly check for state changes comparing the incoming state time_stamp
       # with the current time stamp.
 

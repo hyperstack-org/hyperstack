@@ -1,7 +1,7 @@
-module Hyperloop
+module Hyperstack
   # Allows interactive systems to reset context to the state at boot. Any
   # modules or classes that set context instance variables to hold things like
-  # call backs should use Hyperloop::Context.set_var(self, :@var_name) { .... }
+  # call backs should use Hyperstack::Context.set_var(self, :@var_name) { .... }
   # the provided block will be rerun and the instance variable re-initialized
   # when the reset! method is called
   module Context
@@ -27,7 +27,7 @@ module Hyperloop
         @context.each do |ctx, vars|
           vars.each { |var, init| ctx.instance_variable_set(var, init) }
         end
-        Hyperloop::Application::Boot.run if reboot
+        Hyperstack::Application::Boot.run if reboot
       else
         @context = Hash.new { |h, k| h[k] = {} }
       end

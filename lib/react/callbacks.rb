@@ -18,7 +18,7 @@ module React
       def define_callback(callback_name)
         wrapper_name = "_#{callback_name}_callbacks"
         define_singleton_method(wrapper_name) do
-          Hyperloop::Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
+          Hyperstack::Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
         end
         define_singleton_method(callback_name) do |*args, &block|
           send(wrapper_name).concat(args)

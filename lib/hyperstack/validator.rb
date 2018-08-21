@@ -1,11 +1,12 @@
-module React
+module Hyperstack
   class Validator
     attr_accessor :errors
+    attr_accessor :allow_undefined_props
     attr_reader :props_wrapper
-    private :errors, :props_wrapper
+    private :errors #, :props_wrapper
 
-    def initialize(props_wrapper = Class.new(Component::PropsWrapper))
-      @props_wrapper = props_wrapper
+    def initialize
+      @props_wrapper = Class.new(Hyperstack::PropsWrapper)
     end
 
     def self.build(&block)
@@ -27,18 +28,14 @@ module React
       define_rule(name, options)
     end
 
-    def allow_undefined_props=(allow)
-      @allow_undefined_props = allow
-    end
-
     def undefined_props(props)
       self.allow_undefined_props = true
-      props.reject { |name, value| rules[name] }
+      props.reject { |name, _value| rules[name] }
     end
 
     def validate(props)
       self.errors = []
-      validate_undefined(props) unless allow_undefined_props?
+      validate_undefined(props) unless allow_undefined_props
       props = coerce_native_hash_values(defined_props(props))
       validate_required(props)
       props.each do |name, value|
@@ -50,7 +47,7 @@ module React
 
     def default_props
       rules
-        .select {|key, value| value.keys.include?("default") }
+        .select {|_key, value| value.keys.include?(:default) }
         .inject({}) {|memo, (k,v)| memo[k] = v[:default]; memo}
     end
 
@@ -60,12 +57,12 @@ module React
       props.select { |name| rules.keys.include?(name) }
     end
 
-    def allow_undefined_props?
-      !!@allow_undefined_props
-    end
-
     def rules
-      @rules ||= { children: { required: false }, className: { required: false } }
+      if RUBY_ENGINE == 'opal'
+        @rules ||= { children: { required: false }, className: { required: false } } # thats for components
+      else
+        @rules ||= {}
+      end
     end
 
     def define_rule(name, options = {})
@@ -93,8 +90,6 @@ module React
     def type_check(prop_name, value, klass, allow_nil)
       return if allow_nil && value.nil?
       return if value.is_a?(klass)
-      return if klass.respond_to?(:_react_param_conversion) &&
-        klass._react_param_conversion(value, :validate_only)
       errors << "Provided prop #{prop_name} could not be converted to #{klass}"
     end
 
@@ -112,6 +107,7 @@ module React
     end
 
     def validate_undefined(props)
+      return unless props.any?
       (props.keys - rules.keys).each do |prop_name|
         errors <<  "Provided prop `#{prop_name}` not specified in spec"
       end
@@ -121,7 +117,11 @@ module React
       klass = rules[name][:type]
       allow_nil = !!rules[name][:allow_nil]
       value.each_with_index do |item, index|
-        type_check("`#{name}`[#{index}]", Native(item), klass[0], allow_nil)
+        if RUBY_ENGINE == 'opal'
+          type_check("`#{name}`[#{index}]", Native(item), klass[0], allow_nil)
+        else
+          type_check("`#{name}`[#{index}]", item, klass[0], allow_nil)
+        end
       end
     rescue NoMethodError
       errors << "Provided prop `#{name}` was not an Array"
@@ -129,7 +129,11 @@ module React
 
     def coerce_native_hash_values(hash)
       hash.each do |key, value|
-        hash[key] = Native(value)
+        if RUBY_ENGINE == 'opal'
+          hash[key] = Native(value)
+        else
+          hash[key] = value
+        end
       end
     end
   end

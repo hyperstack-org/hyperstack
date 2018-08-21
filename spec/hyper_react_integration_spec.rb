@@ -2,19 +2,19 @@ require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
 describe 'React Integration', js: true do
-  it "The hyper-component gem can use Hyperloop::Component to create components" do
+  it "The hyper-component gem can use Hyperstack::Component to create components" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         render(DIV) { 'hello'}
       end
     end
     expect(page).to have_content('hello')
     expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
   end
-  it "The hyper-component gem can use Hyperloop::Component::Mixin to create components" do
+  it "The hyper-component gem can use Hyperstack::Component::Mixin to create components" do
     mount "TestComp" do
       class TestComp
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
         render(DIV) { 'hello'}
       end
     end
@@ -29,10 +29,10 @@ describe 'React Integration', js: true do
     end
     expect(page).to have_content('hello')
     expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. The class name React::Component::Base has been deprecated.  Use Hyperloop::Component instead."]
+    ["Warning: Deprecated feature used in TestComp. The class name React::Component::Base has been deprecated.  Use Hyperstack::Component instead."]
     )
   end
-  it "The hyper-component gem can use Hyperloop::Component::Mixin to create components" do
+  it "The hyper-component gem can use Hyperstack::Component::Mixin to create components" do
     mount "TestComp" do
       class TestComp
         include React::Component
@@ -41,12 +41,12 @@ describe 'React Integration', js: true do
     end
     expect(page).to have_content('hello')
     expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. The module name React::Component has been deprecated.  Use Hyperloop::Component::Mixin instead."]
+    ["Warning: Deprecated feature used in TestComp. The module name React::Component has been deprecated.  Use Hyperstack::Component::Mixin instead."]
     )
   end
   it "The hyper-component gem can use hyper-store state syntax" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         before_mount do
           mutate.foo 'hello'
         end
@@ -60,7 +60,7 @@ describe 'React Integration', js: true do
   end
   it "and it can still use the deprecated mutate syntax" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         before_mount do
           state.foo! 'hello'
         end
@@ -76,7 +76,7 @@ describe 'React Integration', js: true do
   end
   it "can use the hyper-store syntax to declare component states" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         state foo: 'hello'
         render(DIV) do
           " foo = #{state.foo}"
@@ -88,7 +88,7 @@ describe 'React Integration', js: true do
   end
   it "can use the hyper-store syntax to declare component states and use deprecated mutate syntax" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         state foo: true
         after_mount do
           state.foo! 'hello' if state.foo
@@ -102,7 +102,7 @@ describe 'React Integration', js: true do
   end
   it "can still use the deprecated syntax to declare component states" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         define_state foo: 'hello'
         render(DIV) do
           state.foo
@@ -116,7 +116,7 @@ describe 'React Integration', js: true do
   end
   it "can use the hyper-store syntax to declare class states" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         state foo: 'hello', scope: :class, reader: true
         render(DIV) do
           TestComp.foo
@@ -128,7 +128,7 @@ describe 'React Integration', js: true do
   end
   it "can still use the deprecated syntax to declare component states" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < Hyperstack::Component
         export_state foo: 'hello'
         render(DIV) do
           TestComp.foo
