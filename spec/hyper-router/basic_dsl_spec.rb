@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Hyperloop::Router", js: true do
+describe "Hyperstack::Router", js: true do
 
   it "can route" do
     visit '/'

@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Router
     module Memory
       def self.included(base)

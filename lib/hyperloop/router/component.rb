@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Router
     class Component
       class << self

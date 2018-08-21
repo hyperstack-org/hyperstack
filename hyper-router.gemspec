@@ -7,12 +7,12 @@ Gem::Specification.new do |spec|
   spec.version       = HyperRouter::VERSION
   spec.authors       = ['Adam George', 'Jan Biedermann']
   spec.email         = ['adamgeorge.31@gmail.com', 'jan@kursator.com']
-  spec.homepage      = 'http://ruby-hyperloop.org'
+  spec.homepage      = 'http://ruby-hyperstack.org'
   spec.license       = 'MIT'
-  spec.summary       = 'hyper-router for Opal, part of ruby-hyperloop'
+  spec.summary       = 'hyper-router for Opal, part of ruby-hyperstack'
   # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperloop.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  #   "homepage_uri" => 'http://ruby-hyperstack.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperstack/hyper-component'
   # }
 
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'

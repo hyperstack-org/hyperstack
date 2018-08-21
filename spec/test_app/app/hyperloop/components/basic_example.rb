@@ -1,4 +1,4 @@
-class App  < Hyperloop::Router
+class App  < Hyperstack::Router
   #prerender_path :url_path, default: '/'
   history :browser
 
@@ -16,19 +16,19 @@ class App  < Hyperloop::Router
   end
 end
 
-class Home < Hyperloop::Router::Component
+class Home < Hyperstack::Router::Component
   render(:div) do
     H2() { 'Home' }
   end
 end
 
-class About < Hyperloop::Router::Component
+class About < Hyperstack::Router::Component
   render(:div) do
     H2 { 'About Page' }
   end
 end
 
-class Topics < Hyperloop::Router::Component
+class Topics < Hyperstack::Router::Component
   render(:div) do
     H2 { 'Topics Page' }
     UL() do
@@ -43,7 +43,7 @@ class Topics < Hyperloop::Router::Component
   end
 end
 
-class Topic < Hyperloop::Router::Component
+class Topic < Hyperstack::Router::Component
   render(:div) do
     H3 { "more on #{match.params[:topic_id]}..." }
   end

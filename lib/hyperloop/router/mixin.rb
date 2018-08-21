@@ -1,9 +1,9 @@
-module Hyperloop
+module Hyperstack
   class Router
     module Mixin
       class << self
         def included(base)
-          base.include(Hyperloop::Component::Mixin)
+          base.include(Hyperstack::Component::Mixin)
           base.include(HyperRouter::ComponentMethods)
 
           base.class_eval do

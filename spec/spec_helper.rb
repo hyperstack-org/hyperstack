@@ -24,7 +24,7 @@ RSpec.configure do |config|
   #   unless example.exception
   #     #Object.send(:remove_const, :Application) rescue nil
   #     ObjectSpace.each_object(Class).each do |klass|
-  #       if klass < Hyperloop::Regulation || klass < Hyperloop::Operation
+  #       if klass < Hyperstack::Regulation || klass < Hyperstack::Operation
   #         klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
   #       end
   #     end
@@ -70,7 +70,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do |x|
-    # Hyperloop.class_eval do
+    # Hyperstack.class_eval do
     #   def self.on_server?
     #     true
     #   end
