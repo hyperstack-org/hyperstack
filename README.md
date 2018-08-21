@@ -2,7 +2,7 @@
 
 [Github Repo](https://github.com/janbiedermann/hyper-resource "Github Repo")
 
-HyperResource is an affective way of moving data between your server and clients when using Hyperloop and Rails.
+HyperResource is an affective way of moving data between your server and clients when using Hyperstack and Rails.
 
 [![Reactivity Demo](http://img.youtube.com/vi/fPSpESBbeMQ/0.jpg)](http://www.youtube.com/watch?v=fPSpESBbeMQ "Reactivity Demo")
 
@@ -89,7 +89,7 @@ end
 
 ```ruby
 class ApplicationController
-  include Hyperloop::Resource::PubSub
+  include Hyperstack::Resource::PubSub
 
   def my_action
     # available methods for pubsub
@@ -114,7 +114,7 @@ EXAMPLE
 
 ## Implementation
 
-Hyperloop needs to be installed and working before you install HyperResource. These instructions are likely to change/be simplified as this Gem matures.
+Hyperstack needs to be installed and working before you install HyperResource. These instructions are likely to change/be simplified as this Gem matures.
 
 + Add the gems (make sure its the latest version)
 
@@ -122,12 +122,12 @@ Hyperloop needs to be installed and working before you install HyperResource. Th
 `gem 'opal-jquery', github: 'janbiedermann/opal-jquery', branch: 'why_to_n'`
 `gem 'opal-activesupport', github: 'opal/opal-activesupport', branch: 'master'`
 
-+ Require HyperResource in your `hyperloop_webpack_loader.rb` file
++ Require HyperResource in your `hyperstack_webpack_loader.rb` file
 
 `require 'hyper-resource'`
 `require 'opal-jquery'`
 
- + Update your `application_record.rb` file and move it to the `hyperloop/models` folder
+ + Update your `application_record.rb` file and move it to the `hyperstack/models` folder
 
  ```
 # application_record.rb
@@ -148,7 +148,7 @@ else
 end
  ```
 
-+ Move the models you want on the client to the `hyperloop/models` folder
++ Move the models you want on the client to the `hyperstack/models` folder
 
 + Make sure you guard anything in your model which you do not want on the client:
 
@@ -171,7 +171,7 @@ end
 `import Pusher from 'pusher-js';`
 `global.Pusher = Pusher;`
 
-+ Add your api endpoint to your client code, for example in `hyperloop_webpack_loader.rb`
++ Add your api endpoint to your client code, for example in `hyperstack_webpack_loader.rb`
 
 `HyperResource.api_path = '/api/endpoint'`
 
@@ -291,7 +291,7 @@ module Api
 end
 ```
 
-+ Install Redis and add the following to your `hyperloop.rb`
++ Install Redis and add the following to your `hyperstack.rb`
 
 ```ruby
 config.redis_instance = if ENV['REDIS_URL']
@@ -304,7 +304,7 @@ config.redis_instance = if ENV['REDIS_URL']
 + Add the following to your `ApplicationController`
 
 ```
-include Hyperloop::Resource::PubSub
+include Hyperstack::Resource::PubSub
 ```
 
 + Add these routes:

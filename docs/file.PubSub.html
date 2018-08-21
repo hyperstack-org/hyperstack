@@ -57,26 +57,30 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><div id='filecontents'>
-<h2 id="label-PubSub+with+HyperResource">PubSub with HyperResource</h2>
+      <div id="content"><div id='filecontents'><h2>PubSub with HyperResource</h2>
 
-<p>PubSub is handled in the controller. In your controller: <code> include
-Hyperloop::Resource::PubSub </code></p>
+<p>PubSub is handled in the controller. In your controller:</p>
 
-<p>Then you can use the PubSub methods of Hyperloop::Resource::PubSub.</p>
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="Hyperstack.html" title="Hyperstack (module)">Hyperstack</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Hyperstack/Resource.html" title="Hyperstack::Resource (module)">Resource</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Hyperstack/Resource/PubSub.html" title="Hyperstack::Resource::PubSub (module)">PubSub</a></span></span>
+</code></pre>
 
-<p>For example, a record has been requested, subscribe to it in the show
-action of the controller: <code>   subscribe_record(my_record) </code></p>
+<p>Then you can use the PubSub methods of Hyperstack::Resource::PubSub.</p>
 
-<p>When somebody updates the record, in the update action for example: <code> 
-publish_record(record) </code></p>
+<p>For example, a record has been requested, subscribe to it in the show action of the controller:</p>
 
-<p>All subscribers will receive a message indicating, that the record has been
-updated.</p>
+<pre class="code ruby"><code class="ruby">  <span class='id identifier rubyid_subscribe_record'>subscribe_record</span><span class='lparen'>(</span><span class='id identifier rubyid_my_record'>my_record</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>When somebody updates the record, in the update action for example:</p>
+
+<pre class="code ruby"><code class="ruby">  <span class='id identifier rubyid_publish_record'>publish_record</span><span class='lparen'>(</span><span class='id identifier rubyid_record'>record</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>All subscribers will receive a message indicating, that the record has been updated.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Sun Jun 10 23:20:59 2018 by
+  Generated on Tue Aug 21 13:16:03 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>

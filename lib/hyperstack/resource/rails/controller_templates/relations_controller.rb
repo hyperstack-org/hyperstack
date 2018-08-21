@@ -1,4 +1,4 @@
-class Hyperloop::Resource::RelationsController < ApplicationController
+class Hyperstack::Resource::RelationsController < ApplicationController
 
   def index
     # introspect available relations

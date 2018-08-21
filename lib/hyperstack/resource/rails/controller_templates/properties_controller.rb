@@ -1,5 +1,5 @@
-class Hyperloop::Resource::PropertiesController < ApplicationController
-  include Hyperloop::Resource::SecurityGuards
+class Hyperstack::Resource::PropertiesController < ApplicationController
+  include Hyperstack::Resource::SecurityGuards
   
   def index
     # introspect available class scopes

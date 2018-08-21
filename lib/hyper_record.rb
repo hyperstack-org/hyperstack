@@ -10,7 +10,7 @@ if RUBY_ENGINE == 'opal'
     #
     # @return [String]
     def self.api_path
-      @api_path ||= Hyperloop.api_path
+      @api_path ||= Hyperstack.api_path
     end
 
     # set global api path

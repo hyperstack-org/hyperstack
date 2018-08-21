@@ -1,5 +1,5 @@
-class Hyperloop::Resource::MethodsController < ApplicationController
-  include Hyperloop::Resource::SecurityGuards
+class Hyperstack::Resource::MethodsController < ApplicationController
+  include Hyperstack::Resource::SecurityGuards
 
   def index
     model_klass = guarded_record_class_from_param(model_klass_param)

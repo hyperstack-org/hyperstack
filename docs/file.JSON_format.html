@@ -57,32 +57,31 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><div id='filecontents'>
-<h2 id="label-JSON+format">JSON format</h2>
+      <div id="content"><div id='filecontents'><h2>JSON format</h2>
 
-<h3 id="label-In+case+of+a+error-3A">In case of a error:</h3>
+<h3>In case of a error:</h3>
 
-<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>error message</span><span class='tstring_end'>&quot;</span></span>
-<span class='rbrace'>}</span>
+<pre class="code json"><code class="json">{
+  &quot;error&quot;: &quot;error message&quot;
+}
 </code></pre>
 
 <p>along with HTTP response status set accordingly</p>
 
-<h3 id="label-A+single+record">A single record</h3>
+<h3>A single record</h3>
 
-<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>record.class.to_s.underscore</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>a_string</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>updated_at</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time stamp, required at several places</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>further_properties</span><span class='label_end'>&quot;:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>at will</span><span class='tstring_end'>&quot;</span></span>
-  <span class='rbrace'>}</span>
-<span class='rbrace'>}</span>
+<pre class="code json"><code class="json">{
+  &quot;record.class.to_s.underscore&quot;: {
+    &quot;id&quot;: &quot;a_string&quot;,
+    &quot;updated_at&quot;: &quot;time stamp, required at several places&quot;,
+    &quot;further_properties&quot;: &quot;at will&quot;
+  }
+}
 </code></pre>
 
-<h3 id="label-A+relation">A relation</h3>
+<h3>A relation</h3>
 
-<pre class="code ruby"><code class="ruby">{
+<pre class="code json"><code class="json">{
   &quot;record.class.to_s.underscore&quot;: {
     &quot;id&quot;: &quot;a_string&quot;,
     &quot;relation_name&quot;: [
@@ -98,9 +97,9 @@
 }
 </code></pre>
 
-<h3 id="label-A+scope">A scope</h3>
+<h3>A scope</h3>
 
-<pre class="code ruby"><code class="ruby">{
+<pre class="code json"><code class="json">{
   &quot;record.class.to_s.underscore&quot;: {
     &quot;scope_name&quot;: [
       {
@@ -115,16 +114,16 @@
 }
 </code></pre>
 
-<h3 id="label-A+rest_method+or+a+rest_class_method">A rest_method or a rest_class_method</h3>
+<h3>A rest_method or a rest_class_method</h3>
 
-<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
-  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>result</span><span class='label_end'>&quot;:</span> <span class='id identifier rubyid_result_value_or_object'>result_value_or_object</span>
-<span class='rbrace'>}</span>
+<pre class="code json"><code class="json">{
+  &quot;result&quot;: result_value_or_object
+}
 </code></pre>
 </div></div>
 
       <div id="footer">
-  Generated on Sun Jun 10 23:20:59 2018 by
+  Generated on Tue Aug 21 13:16:03 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>

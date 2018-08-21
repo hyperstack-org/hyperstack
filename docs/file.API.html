@@ -57,56 +57,50 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><div id='filecontents'>
-<p>Hyper-Resource provides two API levels</p>
+      <div id="content"><div id='filecontents'><p>Hyper-Resource provides two API levels</p>
 
 <p>The high level API and the promise API</p>
 
-<h2 id="label-High+level+API">High level API</h2>
+<h2>High level API</h2>
 
-<p>The high level api allows for a simple use of records and is in general
-recommended for read accesses. For write accesses, saving of data, the
-promise API is recommended, unless weather the data was saved or not is not
-of importance.</p>
+<p>The high level api allows for a simple use of records and is in general recommended for read accesses. For write accesses, saving of data, the promise API is recommended, unless weather the data was saved or not is not of importance.</p>
 
-<h4 id="label-Schema+of+accessing+data+in+the+high+level+API-3A">Schema of accessing data in the high level API:</h4>
+<h4>Schema of accessing data in the high level API:</h4>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_my_record'>my_record</span> <span class='op'>=</span> <span class='const'>MyModel</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_my_record'>my_record</span><span class='period'>.</span><span class='id identifier rubyid_a_property'>a_property</span>
 </code></pre>
-<ol><li>
-<p>component is rendered</p>
-</li><li>
-<p>during render a fetch is triggered 2.1 component is registered as observer
-2.2 component gets dummy data to render</p>
-</li><li>
-<p>render completes, data is fetched in the background</p>
-</li><li>
-<p>when the data arrived 4.1 the component as observer is notified 4.2 a state
-change happens and the component is rendered again with the real data</p>
-</li></ol>
 
-<h4 id="label-Schema+of+saving+data+in+the+high+level+API">Schema of saving data in the high level API</h4>
+<ol>
+<li>component is rendered</li>
+<li>during render a fetch is triggered
+2.1 component is registered as observer
+2.2 component gets dummy data to render</li>
+<li>render completes, data is fetched in the background</li>
+<li>when the data arrived
+4.1 the component as observer is notified
+4.2 a state change happens and the component is rendered again with the real data</li>
+</ol>
+
+<h4>Schema of saving data in the high level API</h4>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_my_record'>my_record</span><span class='period'>.</span><span class='id identifier rubyid_a_property'>a_property</span> <span class='op'>=</span> <span class='int'>2</span>
 <span class='id identifier rubyid_my_record'>my_record</span><span class='period'>.</span><span class='id identifier rubyid_save'>save</span>
 </code></pre>
 
 <p>Saving of data in the high level API is optimistic:</p>
-<ol><li>
-<p>triggering a save of data</p>
-</li><li>
-<p>the method called returns immediately</p>
-</li><li>
-<p>a successful save is assumed</p>
-</li></ol>
 
-<h2 id="label-Promise+API">Promise API</h2>
+<ol>
+<li>triggering a save of data</li>
+<li>the method called returns immediately</li>
+<li>a successful save is assumed</li>
+</ol>
 
-<p>All methods of the promise API are prefixed by &#39;promise_&#39;, so
-instead of my_redord.save in the high level API, in the promise API one
-would use my_record.promise_save. All methods in the promise API return a
-promise. In general the pattern is:</p>
+<h2>Promise API</h2>
+
+<p>All methods of the promise API are prefixed by &#39;promise_&#39;, so instead of my_redord.save in the high level API, in the promise API one would use my_record.promise_save.
+All methods in the promise API return a promise.
+In general the pattern is:</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_my_record'>my_record</span><span class='period'>.</span><span class='id identifier rubyid_a_property'>a_property</span> <span class='op'>=</span> <span class='int'>2</span>
 
@@ -128,7 +122,7 @@ end
 </div></div>
 
       <div id="footer">
-  Generated on Sun Jun 10 23:20:59 2018 by
+  Generated on Tue Aug 21 13:16:03 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>

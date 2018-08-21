@@ -328,7 +328,7 @@
       <span class='id identifier rubyid_record'>record</span><span class='period'>.</span><span class='id identifier rubyid__register_collection'>_register_collection</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
-  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
+  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid_notify_observers'>notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
   <span class='id identifier rubyid_collection'>collection</span> <span class='op'>?</span> <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>super</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -406,7 +406,7 @@
     <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid_promise_link'>promise_link</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='comma'>,</span> <span class='ivar'>@relation_name</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid__register_collection'>_register_collection</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
-  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
+  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid_notify_observers'>notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -476,7 +476,7 @@
   <span class='kw'>if</span> <span class='ivar'>@record</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@relation_name</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_instance_variable_get'>instance_variable_get</span><span class='lparen'>(</span><span class='symbol'>:promise_unlink</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='comma'>,</span> <span class='ivar'>@relation_name</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid__unregister_collection'>_unregister_collection</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
-  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
+  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid_notify_observers'>notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -541,7 +541,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid__register_collection'>_register_collection</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
-  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
+  <span class='ivar'>@record</span><span class='period'>.</span><span class='id identifier rubyid_notify_observers'>notify_observers</span> <span class='kw'>if</span> <span class='ivar'>@record</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -554,7 +554,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Jun 10 23:21:00 2018 by
+  Generated on Tue Aug 21 13:16:03 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>

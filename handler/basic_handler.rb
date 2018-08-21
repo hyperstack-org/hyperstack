@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   module Resource
     class BasicHandler
       def process_request(request)

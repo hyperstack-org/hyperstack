@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   module Resource
     VERSION = '1.1.0.lap0'
   end

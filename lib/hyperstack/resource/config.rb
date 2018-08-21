@@ -1,5 +1,5 @@
 if RUBY_ENGINE != 'opal'
-  module Hyperloop
+  module Hyperstack
 
     # available settings
     class << self

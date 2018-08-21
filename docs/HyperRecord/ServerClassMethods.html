@@ -298,7 +298,7 @@
       <pre class="code"><span class="info file"># File 'lib/hyper_record/server_class_methods.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resource_scopes'>resource_scopes</span>
-  <span class='ivar'>@resource_scopes</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@resource_scopes</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -674,7 +674,7 @@
       <pre class="code"><span class="info file"># File 'lib/hyper_record/server_class_methods.rb', line 54</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scope'>scope</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_resource_scopes'>resource_scopes</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_resource_scopes'>resource_scopes</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -687,7 +687,7 @@
 </div>
 
       <div id="footer">
-  Generated on Sun Jun 10 23:21:00 2018 by
+  Generated on Tue Aug 21 13:16:03 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>

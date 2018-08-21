@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   module Resource
     module PubSub
       class << self
@@ -7,8 +7,8 @@ module Hyperloop
                                                                                     destroyed: record.destroyed? }}}}
           object_string = "HRPS__#{record.class}__#{record.id}"
 
-          Hyperloop::Transport::ServerPubSub.publish(object_string, message)
-          Hyperloop::Transport::ServerPubSub.unsubscribe_all(object_string) if record.destroyed?
+          Hyperstack::Transport::ServerPubSub.publish(object_string, message)
+          Hyperstack::Transport::ServerPubSub.unsubscribe_all(object_string) if record.destroyed?
         end
 
         def publish_relation(base_record, relation_name, record = nil)
@@ -22,7 +22,7 @@ module Hyperloop
 
           object_string = "HRPS__#{base_record.class}__#{base_record.id}__#{relation_name}"
 
-          Hyperloop::Transport::ServerPubSub.publish(object_string, message)
+          Hyperstack::Transport::ServerPubSub.publish(object_string, message)
         end
 
         def publish_rest_class_method(record_class, method_name)
@@ -31,7 +31,7 @@ module Hyperloop
           message = { record_class.to_s.underscore => { methods: { s_method_name => { s_method_args => nil } }}}
 
           object_string = "HRPS__#{record_class}__rest_class_method__#{method_name}"
-          Hyperloop::Transport::ServerPubSub.publish(object_string, message)
+          Hyperstack::Transport::ServerPubSub.publish(object_string, message)
         end
 
         def publish_rest_method(record, method_name)
@@ -43,7 +43,7 @@ module Hyperloop
           }, methods: { s_method_name => { s_method_args => nil } }}}}}
 
           object_string = "HRPS__#{record.class}__#{record.id}__rest_method__#{method_name}"
-          Hyperloop::Transport::ServerPubSub.publish(object_string, message)
+          Hyperstack::Transport::ServerPubSub.publish(object_string, message)
         end
 
         def publish_scope(record_class, scope_name)
@@ -52,13 +52,13 @@ module Hyperloop
           message = { record_class.to_s.underscore => { scopes: { s_scope_name => { s_scope_args => nil } }}}
 
           object_string = "HRPS__#{record_class}__scope__#{scope_name}"
-          Hyperloop::Transport::ServerPubSub.publish(object_string, message)
+          Hyperstack::Transport::ServerPubSub.publish(object_string, message)
         end
 
         def subscribe_record(session_id, record)
           return unless session_id
           object_string = "HRPS__#{record.class}__#{record.id}"
-          Hyperloop::Transport::ServerPubSub.subscribe(object_string, session_id)
+          Hyperstack::Transport::ServerPubSub.subscribe(object_string, session_id)
         end
 
         def subscribe_relation(session_id, relation, base_record = nil, relation_name = nil)
@@ -74,19 +74,19 @@ module Hyperloop
             object_strings << "HRPS__#{relation.class}__#{relation.id}"
           end
           object_strings << "HRPS__#{base_record.class}__#{base_record.id}__#{relation_name}" if base_record && relation_name
-          Hyperloop::Transport::ServerPubSub.subscribe_to_many(object_strings, session_id)
+          Hyperstack::Transport::ServerPubSub.subscribe_to_many(object_strings, session_id)
         end
 
         def subscribe_rest_class_method(session_id, record_class, rest_class_method_name)
           return unless session_id
           object_string = "HRPS__#{record_class}__rest_class_method_name__#{rest_class_method_name}"
-          Hyperloop::Transport::ServerPubSub.subscribe(object_string, session_id)
+          Hyperstack::Transport::ServerPubSub.subscribe(object_string, session_id)
         end
 
         def subscribe_rest_method(session_id, record, rest_method_name)
           return unless session_id
           object_string = "HRPS__#{record.class}__#{record.id}__rest_method__#{rest_method_name}"
-          Hyperloop::Transport::ServerPubSub.subscribe(object_string, session_id)
+          Hyperstack::Transport::ServerPubSub.subscribe(object_string, session_id)
         end
 
         def subscribe_scope(session_id, collection, record_class = nil, scope_name = nil)
@@ -99,7 +99,7 @@ module Hyperloop
             end
           end
           object_strings <<  "HRPS__#{record_class}__scope__#{scope_name}" if record_class && scope_name
-          Hyperloop::Transport::ServerPubSub.subscribe_to_many(object_strings, session_id)
+          Hyperstack::Transport::ServerPubSub.subscribe_to_many(object_strings, session_id)
         end
 
         def pub_sub_record(session_id, record)

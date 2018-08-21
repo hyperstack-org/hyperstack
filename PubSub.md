@@ -2,10 +2,10 @@
 
 PubSub is handled in the controller. In your controller:
 ```
-include Hyperloop::Resource::PubSub
+include Hyperstack::Resource::PubSub
 ```
 
-Then you can use the PubSub methods of Hyperloop::Resource::PubSub.
+Then you can use the PubSub methods of Hyperstack::Resource::PubSub.
 
 For example, a record has been requested, subscribe to it in the show action of the controller:
 ```

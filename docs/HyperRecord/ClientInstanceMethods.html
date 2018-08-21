@@ -195,6 +195,30 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#id-instance_method" title="#id (instance method)">#<strong>id</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>record id, shortcut.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(record_hash = {})  &#x21d2; Object </a>
     
 
@@ -261,6 +285,31 @@ success is assumed.</p>
     <span class="summary_desc"><div class='inline'>
 <p>method_missing is used for undeclared properties like in ActiveRecord
 models.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#notify_observers-instance_method" title="#notify_observers (instance method)">#<strong>notify_observers</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>notify observer, will change state of observers, will also notify class
+observers.</p>
 </div></span>
   
 </li>
@@ -509,6 +558,30 @@ models.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#to_transport_hash-instance_method" title="#to_transport_hash (instance method)">#<strong>to_transport_hash</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>return record properties as hash, ready for transport.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#unlink-instance_method" title="#unlink (instance method)">#<strong>unlink</strong>(other_record)  &#x21d2; HyperRecord </a>
     
 
@@ -581,21 +654,21 @@ returns value</p>
       <pre class="lines">
 
 
-104
-105
-106
-107
-108
-109
-110
-111
 112
 113
 114
-115</pre>
+115
+116
+117
+118
+119
+120
+121
+122
+123</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -751,12 +824,12 @@ returns value</p>
       <pre class="lines">
 
 
+67
 68
-69
-70</pre>
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_changed?'>changed?</span>
   <span class='ivar'>@changed_properties</span> <span class='op'>!=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -810,13 +883,13 @@ returns value</p>
       <pre class="lines">
 
 
+73
+74
 75
-76
-77
-78</pre>
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy'>destroy</span>
   <span class='id identifier rubyid_promise_destroy'>promise_destroy</span>
@@ -866,15 +939,79 @@ returns value</p>
       <pre class="lines">
 
 
-83
-84
-85</pre>
+80
+81
+82</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 80</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroyed?'>destroyed?</span>
   <span class='ivar'>@destroyed</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="id-instance_method">
+  
+    #<strong>id</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>record id, shortcut</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+86
+87
+88
+89
+90
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 86</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
+  <span class='id identifier rubyid__register_observer'>_register_observer</span>
+  <span class='kw'>if</span> <span class='ivar'>@changed_properties</span><span class='period'>.</span><span class='id identifier rubyid_has_key?'>has_key?</span><span class='lparen'>(</span><span class='symbol'>:id</span><span class='rparen'>)</span>
+    <span class='ivar'>@changed_properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span>
+  <span class='kw'>else</span>
+    <span class='ivar'>@properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1044,19 +1181,89 @@ success is assumed</p>
       <pre class="lines">
 
 
-91
-92
-93
-94
-95</pre>
+99
+100
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 99</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_link'>link</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
   <span class='id identifier rubyid_promise_link'>promise_link</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
   <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="notify_observers-instance_method">
+  
+    #<strong>notify_observers</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>notify observer, will change state of observers, will also notify class
+observers</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+128
+129
+130
+131
+132
+133
+134
+135</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 128</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_notify_observers'>notify_observers</span>
+  <span class='ivar'>@observers</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_observer'>observer</span><span class='op'>|</span>
+    <span class='const'>React</span><span class='op'>::</span><span class='const'>State</span><span class='period'>.</span><span class='id identifier rubyid_set_state'>set_state</span><span class='lparen'>(</span><span class='id identifier rubyid_observer'>observer</span><span class='comma'>,</span> <span class='ivar'>@state_key</span><span class='comma'>,</span> <span class='backtick'>`</span><span class='tstring_content'>Date.now() + Math.random()</span><span class='tstring_end'>`</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@observers</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_notify_class_observers'>notify_class_observers</span>
+  <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1108,23 +1315,25 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190</pre>
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 181</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 205</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_destroy'>promise_destroy</span>
   <span class='id identifier rubyid__local_destroy'>_local_destroy</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__promise_delete'>_promise_delete</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span><span class='embexpr_end'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_record'>record</span><span class='op'>|</span>
+  <span class='id identifier rubyid_request'>request</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_request_transducer'>request_transducer</span><span class='period'>.</span><span class='id identifier rubyid_destroy'>destroy</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_model_name'>model_name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>instances:</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>properties:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_to_transport_hash'>to_transport_hash</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Hyperstack.html" title="Hyperstack (module)">Hyperstack</a></span></span><span class='period'>.</span><span class='id identifier rubyid_client_transport_driver'>client_transport_driver</span><span class='period'>.</span><span class='id identifier rubyid_promise_send'>promise_send</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_api_path'>api_path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__processor_result'>_processor_result</span><span class='op'>|</span>
     <span class='kw'>self</span>
   <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_fail'>fail</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
     <span class='id identifier rubyid_error_message'>error_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Destroying record </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
@@ -1197,31 +1406,6 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
 222
 223
 224
@@ -1232,10 +1416,33 @@ response is passed to the .fail block</p>
 229
 230
 231
-232</pre>
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 197</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 222</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_link'>promise_link</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_called_from_collection'>called_from_collection</span> <span class='op'>=</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
@@ -1261,11 +1468,9 @@ response is passed to the .fail block</p>
       <span class='kw'>end</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
-  <span class='id identifier rubyid_payload_hash'>payload_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_to_hash'>to_hash</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__promise_post'>_promise_post</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span><span class='embexpr_end'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>/relations/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.json</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>data:</span> <span class='id identifier rubyid_payload_hash'>payload_hash</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
-    <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_instance_variable_get'>instance_variable_get</span><span class='lparen'>(</span><span class='symbol'>:merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_json'>json</span><span class='lbracket'>[</span><span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_underscore'>underscore</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid__notify_observers'>_notify_observers</span>
-    <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span>
+
+  <span class='id identifier rubyid_request'>request</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_request_transducer'>request_transducer</span><span class='period'>.</span><span class='id identifier rubyid_link'>link</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_model_name'>model_name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>instances:</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>relations:</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_to_transport_hash'>to_transport_hash</span> <span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Hyperstack.html" title="Hyperstack (module)">Hyperstack</a></span></span><span class='period'>.</span><span class='id identifier rubyid_client_transport_driver'>client_transport_driver</span><span class='period'>.</span><span class='id identifier rubyid_promise_send'>promise_send</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_api_path'>api_path</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__processor_result'>_processor_result</span><span class='op'>|</span>
     <span class='kw'>self</span>
   <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_fail'>fail</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
     <span class='id identifier rubyid_error_message'>error_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Linking record </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_other_record'>other_record</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
@@ -1323,64 +1528,38 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-238
-239
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260
 261
 262
 263
 264
-265</pre>
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 238</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 261</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_save'>promise_save</span>
-  <span class='id identifier rubyid_payload_hash'>payload_hash</span> <span class='op'>=</span> <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='rparen'>)</span> <span class='comment'># copy hash, because we need to delete some keys
-</span>  <span class='lparen'>(</span><span class='qsymbols_beg'>%i[</span><span class='tstring_content'>id</span><span class='words_sep'> </span><span class='tstring_content'>created_at</span><span class='words_sep'> </span><span class='tstring_content'>updated_at</span><span class='tstring_end'>]</span></span> <span class='op'>+</span> <span class='id identifier rubyid_reflections'>reflections</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span>
-    <span class='id identifier rubyid_payload_hash'>payload_hash</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  <span class='kw'>if</span> <span class='ivar'>@properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span> <span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='period'>.</span><span class='id identifier rubyid_has_key?'>has_key?</span><span class='lparen'>(</span><span class='symbol'>:id</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@changed_properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_reset'>reset</span>
-    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__promise_patch'>_promise_patch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span><span class='embexpr_end'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>data:</span> <span class='id identifier rubyid_payload_hash'>payload_hash</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
-      <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_json'>json</span><span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_underscore'>underscore</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-      <span class='id identifier rubyid__notify_observers'>_notify_observers</span>
-      <span class='kw'>self</span>
-    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_fail'>fail</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
-      <span class='id identifier rubyid_error_message'>error_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Saving record </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
-      <span class='backtick'>`</span><span class='tstring_content'>console.error(error_message)</span><span class='tstring_end'>`</span></span>
-      <span class='id identifier rubyid_response'>response</span>
-    <span class='kw'>end</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_reset'>reset</span>
-    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__promise_post'>_promise_post</span><span class='lparen'>(</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>data:</span> <span class='id identifier rubyid_payload_hash'>payload_hash</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
-      <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_json'>json</span><span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_underscore'>underscore</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-      <span class='kw'>self</span>
-    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_fail'>fail</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
-      <span class='id identifier rubyid_error_message'>error_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Creating record </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
-      <span class='backtick'>`</span><span class='tstring_content'>console.error(error_message)</span><span class='tstring_end'>`</span></span>
-      <span class='id identifier rubyid_response'>response</span>
-    <span class='kw'>end</span>
+  <span class='id identifier rubyid_request'>request</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_request_transducer'>request_transducer</span><span class='period'>.</span><span class='id identifier rubyid_save'>save</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_to_transport_hash'>to_transport_hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_is_new'>is_new</span> <span class='op'>=</span> <span class='ivar'>@properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='const'><span class='object_link'><a href="../Hyperstack.html" title="Hyperstack (module)">Hyperstack</a></span></span><span class='period'>.</span><span class='id identifier rubyid_client_transport_driver'>client_transport_driver</span><span class='period'>.</span><span class='id identifier rubyid_promise_send'>promise_send</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_api_path'>api_path</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__processor_result'>_processor_result</span><span class='op'>|</span>
+    <span class='kw'>self</span>
+  <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_fail'>fail</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
+    <span class='id identifier rubyid_error_message'>error_message</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_is_new'>is_new</span>
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Creating record </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
+                    <span class='kw'>else</span>
+                      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Saving record </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
+                    <span class='kw'>end</span>
+    <span class='backtick'>`</span><span class='tstring_content'>console.error(error_message)</span><span class='tstring_end'>`</span></span>
+    <span class='id identifier rubyid_response'>response</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1448,33 +1627,31 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-272
-273
-274
-275
-276
-277
-278
-279
-280
-281
 282
 283
 284
 285
-286</pre>
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 272</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 282</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_promise_unlink'>promise_unlink</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='comma'>,</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_called_from_collection'>called_from_collection</span> <span class='op'>=</span> <span class='id identifier rubyid_collection_name'>collection_name</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
   <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=</span> <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_underscore'>underscore</span><span class='period'>.</span><span class='id identifier rubyid_pluralize'>pluralize</span> <span class='kw'>unless</span> <span class='id identifier rubyid_relation_name'>relation_name</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No relation for record of type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_reflections'>reflections</span><span class='period'>.</span><span class='id identifier rubyid_has_key?'>has_key?</span><span class='lparen'>(</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='rparen'>)</span>
   <span class='ivar'>@relations</span><span class='lbracket'>[</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_delete_if'>delete_if</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_cr'>cr</span><span class='op'>|</span> <span class='id identifier rubyid_cr'>cr</span> <span class='op'>==</span> <span class='id identifier rubyid_other_record'>other_record</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_called_from_collection'>called_from_collection</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@fetch_states</span><span class='lbracket'>[</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>f</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid__promise_delete'>_promise_delete</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span><span class='embexpr_end'>}</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@properties</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>/relations/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_relation_name'>relation_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>.json?record_id=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
-    <span class='id identifier rubyid__notify_observers'>_notify_observers</span>
-    <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid__notify_observers'>_notify_observers</span>
+  <span class='id identifier rubyid_request'>request</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_request_transducer'>request_transducer</span><span class='period'>.</span><span class='id identifier rubyid_unlink'>unlink</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_model_name'>model_name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>instances:</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>relations:</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_relation_name'>relation_name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_other_record'>other_record</span><span class='period'>.</span><span class='id identifier rubyid_to_transport_hash'>to_transport_hash</span> <span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Hyperstack.html" title="Hyperstack (module)">Hyperstack</a></span></span><span class='period'>.</span><span class='id identifier rubyid_client_transport_driver'>client_transport_driver</span><span class='period'>.</span><span class='id identifier rubyid_promise_send'>promise_send</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_api_path'>api_path</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__processor_result'>_processor_result</span><span class='op'>|</span>
     <span class='kw'>self</span>
   <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_fail'>fail</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span>
     <span class='id identifier rubyid_error_message'>error_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unlinking </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_other_record'>other_record</span><span class='embexpr_end'>}</span><span class='tstring_content'> from </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed!</span><span class='tstring_end'>&quot;</span></span>
@@ -1526,12 +1703,12 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-119
-120
-121</pre>
+139
+140
+141</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reflections'>reflections</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_reflections'>reflections</span>
@@ -1585,14 +1762,14 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-126
-127
-128
-129
-130</pre>
+146
+147
+148
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 126</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 146</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1643,12 +1820,12 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-135
-136
-137</pre>
+155
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_resource_base_uri'>resource_base_uri</span>
@@ -1702,14 +1879,14 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-142
-143
-144
-145
-146</pre>
+162
+163
+164
+165
+166</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 142</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 162</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_save'>save</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1760,21 +1937,17 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-151
-152
-153
-154
-155
-156</pre>
+171
+172
+173
+174</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 151</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 171</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_hash'>to_hash</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
-  <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
-  <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_res'>res</span>
+  <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1820,17 +1993,60 @@ response is passed to the .fail block</p>
       <pre class="lines">
 
 
-161
-162
-163
-164</pre>
+179
+180
+181
+182</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 161</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 179</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
-  <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_transport_hash-instance_method">
+  
+    #<strong>to_transport_hash</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>return record properties as hash, ready for transport</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+185
+186
+187
+188</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 185</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_transport_hash'>to_transport_hash</span>
+  <span class='id identifier rubyid_id_key'>id_key</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>?</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_new_</span><span class='embexpr_beg'>#{</span><span class='backtick'>`</span><span class='tstring_content'>Date.now() + Math.random()</span><span class='tstring_end'>`</span></span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='lbrace'>{</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_model_name'>model_name</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_id_key'>id_key</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='label'>properties:</span> <span class='ivar'>@properties</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='ivar'>@changed_properties</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1882,14 +2098,14 @@ success is assumed</p>
       <pre class="lines">
 
 
-169
-170
-171
-172
-173</pre>
+193
+194
+195
+196
+197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 169</span>
+      <pre class="code"><span class="info file"># File 'lib/hyper_record/client_instance_methods.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unlink'>unlink</span><span class='lparen'>(</span><span class='id identifier rubyid_other_record'>other_record</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__register_observer'>_register_observer</span>
@@ -1906,7 +2122,7 @@ success is assumed</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Jun 10 23:21:00 2018 by
+  Generated on Tue Aug 21 13:16:03 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.13 (ruby-2.5.1).
 </div>

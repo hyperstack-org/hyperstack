@@ -76,7 +76,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a belongs_to association, failed to fetch records!"
@@ -108,6 +108,61 @@ module HyperRecord
       #   @fetch_states[name] = 'f'
       #   @relations[name]
       # end
+    end
+
+    # TODO update for new transport!
+    # macro define collection_query_method, RPC on instance level of a record of current HyperRecord class
+    # The supplied block must return a Array of Records!
+    #
+    # @param name [Symbol] name of method
+    # @param options [Hash] with known keys:
+    #   default_result: result to present during render during method call in progress, is a Array by default, should be a Enumerable in any case
+    #
+    # This macro defines additional methods:
+    def collection_query_method(name, options = { default_result: []})
+      # @!method promise_[name]
+      # @return [Promise] on success the .then block will receive the result of the RPC call as arg
+      #    on failure the .fail block will receive the HTTP response object as arg
+      define_method("promise_#{name}") do
+        @fetch_states[name] = 'i'
+        unless @rest_methods.has_key?(name)
+          @rest_methods[name] = options
+          @rest_methods[name] = { result: options[:default_result] }
+          @update_on_link[name] = {}
+        end
+        raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance collection_query_method without id!" unless self.id
+        self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response_json|
+          collection = self.class._convert_array_to_collection(response_json[:result], self)
+          @rest_methods[name][:result] = collection
+          @fetch_states[name] = 'f'
+          _notify_observers
+          @rest_methods[name][:result]
+        end.fail do |response|
+          error_message = "#{self.class.to_s}[#{self.id}].#{name}, a collection_query_method, failed to execute!"
+          `console.error(error_message)`
+          response
+        end
+      end
+      # @!method [name]
+      # @return result either the default_result ass specified in the options or the real result if the RPC call already finished
+      define_method(name) do
+        _register_observer
+        unless @rest_methods.has_key?(name)
+          @rest_methods[name] = options
+          @rest_methods[name] = { result: options[:default_result] }
+          @update_on_link[name] = {}
+        end
+        unless @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
+          self.send("promise_#{name}")
+        end
+        @rest_methods[name][:result]
+      end
+      # @!method update_[name] mark internal structures so that the method is called again once it is requested again
+      # @return nil
+      define_method("update_#{name}") do
+        @fetch_states[name] = 'u'
+        nil
+      end
     end
 
     # create a new instance of current HyperRecord class and save it to the db
@@ -162,7 +217,7 @@ module HyperRecord
       _class_fetch_states[record_sid] = 'i'
       request = request_transducer.fetch(self.model_name => { instances: { sid => {}}})
       _register_class_observer
-      Hyperloop.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
+      Hyperstack.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
         notify_class_observers
         _record_cache[sid]
       end.fail do |response|
@@ -221,7 +276,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_and_belongs_to_many association, failed to fetch records!"
@@ -289,7 +344,7 @@ module HyperRecord
         _register_observer
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_many association, failed to fetch records!"
@@ -355,7 +410,7 @@ module HyperRecord
       define_method("promise_#{relation_name}") do
         @fetch_states[relation_name] = 'i'
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}})
-        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           self
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_one association, failed to fetch records!"
@@ -494,7 +549,7 @@ module HyperRecord
         _class_fetch_states[name_args] = 'i'
         rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
         request = request_transducer.fetch(self.model_name => { methods: { name =>{ args => {}}}})
-        Hyperloop.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
           rest_class_methods[name_args][:result]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}, a rest_method, failed to execute!"
@@ -540,7 +595,7 @@ module HyperRecord
         @rest_methods[name][args_json] = { result: options[:default_result] } unless @rest_methods[name].has_key?(args_json)
         raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance rest_method without id!" unless self.id
         request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { methods: { name => { args => {}}}}}})
-        Hyperloop.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           @rest_methods[name][args_json][:result]
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{name}, a rest_method, failed to execute!"
@@ -594,7 +649,7 @@ module HyperRecord
         _class_fetch_states[name] = {} unless _class_fetch_states.has_key?(name)
         _class_fetch_states[name][args_json] = 'i'
         request = request_transducer.fetch(self.model_name => { scopes: { name => { args_json => {}}}})
-        Hyperloop.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
+        Hyperstack.client_transport_driver.promise_send(api_path, request).then do |_processor_result|
           scopes[name][args_json]
         end.fail do |response|
           error_message = "#{self.to_s}.#{name}(#{args_json if args.any}), a scope, failed to fetch records!"

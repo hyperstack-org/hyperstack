@@ -1,4 +1,4 @@
-class Hyperloop::Resource::ScopesController < ApplicationController
+class Hyperstack::Resource::ScopesController < ApplicationController
   # introspect available class scopes, like Plan.all or Plan.resolved
   def index
     record_class = guarded_record_class_from_param(record_class_param)

@@ -1,20 +1,20 @@
-module Hyperloop
+module Hyperstack
   module Resource
     class SecurityError < StandardError
     end
 
     module SecurityGuards
       def self.included(base)
-        base.extend(Hyperloop::Resource::SecurityGuards::ClassMethods)
+        base.extend(Hyperstack::Resource::SecurityGuards::ClassMethods)
       end
 
       module ClassMethods
         def valid_record_class_params
-          @valid_record_class_params = Hyperloop.valid_record_class_params.freeze
+          @valid_record_class_params = Hyperstack.valid_record_class_params.freeze
         end
 
         def valid_record_id_params
-          @valid_record_id_params ||= Hyperloop.valid_record_class_params.map { |m| m + '_id' }.freeze
+          @valid_record_id_params ||= Hyperstack.valid_record_class_params.map { |m| m + '_id' }.freeze
         end
       end
 
@@ -25,11 +25,11 @@ module Hyperloop
             return [record_class.find(params[record_id]),  params[record_id]]
           end
         end
-        raise Hyperloop::Resource::SecurityError
+        raise Hyperstack::Resource::SecurityError
       end
 
       def guarded_record_class(model_name)
-        raise Hyperloop::Resource::SecurityError unless self.class.valid_record_class_params.include?(model_name) # guard
+        raise Hyperstack::Resource::SecurityError unless self.class.valid_record_class_params.include?(model_name) # guard
         model_name.camelize.constantize
       end
     end

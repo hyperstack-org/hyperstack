@@ -1,5 +1,5 @@
 class FetchHandler
-  include Hyperloop::Resource::SecurityGuards
+  include Hyperstack::Resource::SecurityGuards
 
   def process_request(request)
     result = {}
