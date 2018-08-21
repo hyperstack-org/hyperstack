@@ -1,5 +1,5 @@
 module Test
-  class Store < Hyperloop::Store
+  class Store < Hyperstack::Store
     class << self
       state singleton_klass: 'SC', reader: true
       state singleton_instance: 'SI', scope: :instance, reader: true

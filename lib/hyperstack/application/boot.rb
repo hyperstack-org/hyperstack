@@ -1,6 +1,6 @@
-module Hyperloop
+module Hyperstack
   # insure at least a stub of operation is defined.  If
-  # Hyperloop::Operation is already loaded it will have
+  # Hyperstack::Operation is already loaded it will have
   # defined these.
   class Operation
     class << self
@@ -10,8 +10,8 @@ module Hyperloop
 
       def receivers
         # use the force: true option so that system code needing to receive
-        # boot will NOT be erased on the next Hyperloop::Context.reset!
-        Hyperloop::Context.set_var(self, :@receivers, force: true) { [] }
+        # boot will NOT be erased on the next Hyperstack::Context.reset!
+        Hyperstack::Context.set_var(self, :@receivers, force: true) { [] }
       end unless method_defined? :receivers
     end
   end

@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Store
     class << self
       def inherited(child)

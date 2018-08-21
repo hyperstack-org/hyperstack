@@ -5,9 +5,9 @@ def class_of(x)
 end
 
 # Just checks to make sure all methods are available when either subclassing or including
-describe 'subclassing Hyperloop::Store' do
+describe 'subclassing Hyperstack::Store' do
   before(:each) do
-    class Foo < Hyperloop::Store
+    class Foo < Hyperstack::Store
     end
   end
 
@@ -48,10 +48,10 @@ describe 'subclassing Hyperloop::Store' do
   end
 end
 
-describe 'including Hyperloop::Store::Mixin' do
+describe 'including Hyperstack::Store::Mixin' do
   before(:each) do
     class Foo
-      include Hyperloop::Store::Mixin
+      include Hyperstack::Store::Mixin
     end
   end
 

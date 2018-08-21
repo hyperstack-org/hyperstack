@@ -29,13 +29,13 @@ module HyperStore
         initializer = initializer_proc(opts[:initializer], klass, name) if opts[:initializer]
 
         if initializer && opts[:block]
-          klass.receives(Hyperloop::Application::Boot, initializer) do
+          klass.receives(Hyperstack::Application::Boot, initializer) do
             klass.mutate.__send__(:"#{name}", opts[:block].call)
           end
         elsif initializer
-          klass.receives(Hyperloop::Application::Boot, initializer)
+          klass.receives(Hyperstack::Application::Boot, initializer)
         elsif opts[:block]
-          klass.receives(Hyperloop::Application::Boot) do
+          klass.receives(Hyperstack::Application::Boot) do
             klass.mutate.__send__(:"#{name}", opts[:block].call)
           end
         end

@@ -8,12 +8,12 @@ Gem::Specification.new do |spec|
   spec.version       = HyperStore::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Adam Creekroad', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
-  spec.summary       = 'Flux Stores and more for Hyperloop'
-  spec.homepage      = 'https://ruby-hyperloop.org'
+  spec.summary       = 'Flux Stores and more for Hyperstack'
+  spec.homepage      = 'https://ruby-hyperstack.org'
   spec.license       = 'MIT'
   # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperloop.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  #   "homepage_uri" => 'http://ruby-hyperstack.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperstack/hyper-component'
   # }
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }

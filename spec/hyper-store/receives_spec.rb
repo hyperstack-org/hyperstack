@@ -4,7 +4,7 @@ require 'spec_helper'
 describe 'the receives macro' do
 
   before(:all) do
-    class TestOp < Hyperloop::Operation
+    class TestOp < Hyperstack::Operation
       def self.dispatch(params={})
         receivers.each do |receiver|
           receiver.call params
@@ -24,7 +24,7 @@ describe 'the receives macro' do
   context 'arguments' do
     before(:each) do
       class Bar < TestOp; end
-      class Foo < Hyperloop::Store
+      class Foo < Hyperstack::Store
         state :bar, scope: :class
       end
     end
