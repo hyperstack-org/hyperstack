@@ -1,4 +1,4 @@
-require_relative 'lib/hyperstack/transport/version'
+require_relative 'lib/hyperstack/transport/pusher/version'
 
 Gem::Specification.new do |s|
   s.name         = 'hyper-transport-pusher'
