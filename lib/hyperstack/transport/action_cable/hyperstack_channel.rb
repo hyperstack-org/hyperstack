@@ -1,7 +1,7 @@
 module Hyperstack
   module Transport
     module ActionCable
-      class Channel < ActionCable::Channel
+      class HyperstackChannel < ActionCable::Channel
         def subscribed
           stream_from "hyper-transport-notifications-#{params[:session_id]}"
         end
