@@ -7,6 +7,7 @@ if RUBY_ENGINE == 'opal'
   #require 'hyperstack/transport/action_cable/consumer'
   require 'hyperstack/transport/action_cable/client_driver'
 else
+  require 'action_cable'
   require 'hyperstack/transport/action_cable/hyperstack_channel'
   require 'hyperstack/transport/action_cable/server_driver'
   require 'hyperstack/transport/action_cable/config'
