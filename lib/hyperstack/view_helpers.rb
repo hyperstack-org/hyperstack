@@ -15,5 +15,23 @@ module Hyperstack
       SCRIPT
       tag
     end
+
+    def hyper_component(component_name, params)
+      component_name_id = component_id_name(component_name)
+      tag = <<~SCRIPT
+        <div id="#{component_name_id}"></div>
+        <script type="text/javascript">
+          var component = Opal.Object.$const_get("#{component_name}");
+          Opal.Hyperstack.$const_get('TopLevel').$mount(component, JSON.parse(#{Oj.dump(params)}), "##{component_name_id}" );
+        </script>
+      SCRIPT
+      tag
+    end
+
+    private
+
+    def component_id_name(component_name)
+      "#{component_name.underscore}_#{Random.rand.to_s[2..-1]}"
+    end
   end
 end
