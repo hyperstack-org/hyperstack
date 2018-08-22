@@ -21,7 +21,7 @@ Place operation in your projects `hyperstack/operations` directory or
 
 Example Operation:
 ```ruby
-class EarnMoney < Hyperloop::Business
+class EarnMoney < Hyperstack::Business
   param :user_id
   param :products
   param :cc_number

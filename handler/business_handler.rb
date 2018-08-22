@@ -1,8 +1,8 @@
 class BusinessHandler
-  include Hyperloop::Business::SecurityGuards
+  include Hyperstack::Business::SecurityGuards
 
   # enable authorization if needed, depends on hyper-gate, also see below
-  # include Hyperloop::Gate
+  # include Hyperstack::Gate
 
   def process_request(_session_id, current_user, request)
     result = {}
