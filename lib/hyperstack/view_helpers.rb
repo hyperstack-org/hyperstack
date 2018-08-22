@@ -13,7 +13,7 @@ module Hyperstack
           Opal.Hyperstack.$init();
         </script>
       SCRIPT
-      tag
+      tag.respond_to?(:html_safe) ? tag.html_safe : tag
     end
 
     def hyper_component(component_name, params)
@@ -25,7 +25,7 @@ module Hyperstack
           Opal.Hyperstack.$const_get('TopLevel').$mount(component, JSON.parse(#{Oj.dump(params)}), "##{component_name_id}" );
         </script>
       SCRIPT
-      tag
+      tag.respond_to?(:html_safe) ? tag.html_safe : tag
     end
 
     private
