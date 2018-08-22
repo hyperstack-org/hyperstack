@@ -3,7 +3,7 @@ module Hyperstack
     module ActionCable
       class ClientDriver
         def self.init
-          @consumer_instance = `ActionCable.createConsumer.apply(ActionCable, #{Hyperstack.action_cable_consumer_url})`
+          @consumer_instance = `ActionCable.createConsumer.apply(ActionCable, [#{Hyperstack.action_cable_consumer_url}])`
           notification_channel = "#{Hyperstack.transport_notification_channel_prefix}#{Hyperstack.session_id}"
           %x{
           #{@consumer_instance}.subscriptions.create({ channel: 'HyperstackChannel', session_id: #{notification_channel} }, {
