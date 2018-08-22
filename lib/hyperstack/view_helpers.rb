@@ -22,7 +22,7 @@ module Hyperstack
         <div id="#{component_name_id}"></div>
         <script type="text/javascript">
           var component = Opal.Object.$const_get("#{component_name}");
-          var json_params = #{Oj.dump(params)};
+          var json_params = #{Oj.dump(params, mode: :compat)};
           Opal.Hyperstack.$const_get('TopLevel').$mount(component, Opal.Hash.$new(json_params), "##{component_name_id}" );
         </script>
       SCRIPT
