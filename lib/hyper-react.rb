@@ -26,6 +26,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/context'
   require 'hyperstack/top_level'
 else
+  require 'oj'
   require 'opal'
   require 'hyper-store'
   require 'opal-activesupport'
