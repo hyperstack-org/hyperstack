@@ -1,7 +1,4 @@
 #!/usr/bin/env ruby
-require 'bundler'
-Bundler.require
-
 target_dir = if ARGV[0]
                File.expand_path(ARGV[0])
              elsif Dir.exist?(File.join('app', 'hyperstack'))
@@ -24,8 +21,15 @@ end
 source_dir = File.expand_path(File.join(__dir__.untaint, '..', 'handler'))
 
 %w[gate].each do |handler_name|
-  FileUtils.cp(File.join(source_dir, handler_name + '_handler.rb'), target_dir)
-  puts "Installed " + File.join(target_dir, handler_name + '_handler.rb')
+  target_file = File.join(target_dir, handler_name + '_handler.rb')
+  source_file = File.join(source_dir, handler_name + '_handler.rb')
+  unless File.exist?(target_file)
+    FileUtils.cp(source_file, target_dir)
+    puts "Installed " + target_file
+  else
+    puts "Not Installed #{handler_name + '_handler.rb'}, #{target_file} already exists."
+    puts "\tYou may compare for updates with #{source_file}"
+  end
 end
 
 exit(0)
