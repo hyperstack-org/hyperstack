@@ -8,6 +8,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-transport-http' # TODO, this is actually optional, might a different transport
   require 'hyper_record'
 else
+   require 'oj'
   require 'hyperstack/resource/config'
   require 'hyperstack/resource/security_guards' # server side, controller helper methods
   require 'hyper_record'

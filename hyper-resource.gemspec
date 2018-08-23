@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'opal-activesupport', '~> 0.3.1'
   s.add_runtime_dependency 'hyper-react' , '~> 1.0.0.lap27'
   s.add_runtime_dependency 'hyper-transport', '~> 0.0.1'
+  s.add_runtime_dependency 'oj', '~> 3.6.0'
   s.add_development_dependency 'listen'
   s.add_development_dependency 'rake', '>= 11.3.0'
   s.add_development_dependency 'redis'
