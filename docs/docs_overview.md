@@ -1,6 +1,16 @@
-# Hyperstack 2.0 (HS2)
+# Welcome to Hyperstack!
 
-## Release goals:
+**Hyperstack 1.0 and Hyperstack 2.0 are work-in-progress. Please consider everything in this repo as ALPHA.**
+
+Hyperloop (version 0.9) is stable, and the existing website remains in place. If you are looking for a production ready project, then please stay there until this is released. http://ruby-hyperloop.org
+
+In this project, there are two Hyperstack implementations (HS1 and HS2). The goals of each are detailed below.
+
+This website loads all content dynamically from the HS1 and HS2 projects. You can switch the document base using the link in topbar.  
+
+## Hyperstack 2.0 (HS2)
+
+### Release goals:
 
 + Backend independent - no dependency on Rails, ReactRails and OpalRails
 + Supported backends: Rails & Roda (others to be community added)
@@ -13,7 +23,7 @@
 + HyperGate for authorisation and authentication on the client and server
 + Faster rspec framework plus automated build and deploy process
 
-## Change management needed:
+### Change management needed:
 
 + HyperResource is a rewrite (and replacement of) HyperMesh. There should be minimal client-side DSL difference, but we need to capture any conceptual or DSL changes / document features that will be missing
 + HyperOperation upgraded DSL will require docs changes, bring in step DSL
@@ -24,7 +34,7 @@
   + Upgrading from HL/HS1 to HS2
   + HS2 DSL/functional change log (detailing each functional or DSL change, the implication and hopefully a link to the commit so that it can be understood)
 
-## Out of scope / constraints:
+### Out of scope / constraints:
 
 + Component, Model, Store and Operation DSL changes should be kept to a minimum and where there are changes, deprecation must be considered.
 The 2.0 release cannot be a moving target. Our goals is to replace 1.0 in the quickest time possible then evolve 2.0 part by part (not be in this situation again)
