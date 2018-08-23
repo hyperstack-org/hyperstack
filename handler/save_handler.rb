@@ -1,7 +1,7 @@
 class SaveHandler
   include Hyperstack::Resource::SecurityGuards
 
-  def process_request(request)
+  def process_request(session_id, current_user, request)
     result = {}
 
     request.keys.each do |model_name|
@@ -10,7 +10,8 @@ class SaveHandler
       result[model_name][:instances] = {} unless result[model_name].has_key?(:instances)
 
       request[model_name].keys.each do |id|
-        record = if id.start_with?('_new_')
+        record_is_new = id.start_with?('_new_')
+        record = if record_is_new
                    model.new
                  else
                    model.find(id)
@@ -30,8 +31,10 @@ class SaveHandler
               record_hash[model_name].merge!(record.id => { properties: record_json })
             end
             result[model_name][:instances].merge!(record.id.to_s => record_hash)
+            Hyperstack::Resource::PubSub.pub_sub_record(session_id, record)
+            Hyperstack::Resource::PubSub.publish_scope(model, :all)
           else
-            result[model_name][:instances].merge!(record.id.to_s => { errors: "Record could not be saved!" })
+            result[model_name][:instances].merge!(record.id.to_s => { errors: {'Record could not be saved!' => '' }})
           end
         end
       end

@@ -1,7 +1,7 @@
 class UnlinkHandler
   include Hyperstack::Resource::SecurityGuards
 
-  def process_request(request)
+  def process_request(session_id, current_user, request)
     result = {}
 
     request.keys.each do |model_name|
@@ -12,10 +12,10 @@ class UnlinkHandler
 
       request[model_name]['instances'].keys.each do |id|
         record = begin
-                   model.find(id)
-                 rescue ActiveRecord::RecordNotFound
-                   nil
-                 end
+          model.find(id)
+        rescue ActiveRecord::RecordNotFound
+          nil
+        end
 
         if record
           request[model_name]['instances'][id]['relations'].keys.each do |relation_name|
@@ -31,16 +31,23 @@ class UnlinkHandler
                 request[model_name]['instances'][id]['relations'][relation_name][right_model_name].keys.each do |right_id|
                   right_record = right_model.find(right_id)
 
+                  collection = nil
+
                   if right_record
                     if %i[belongs_to has_one].include?(relation_type)
                       record.send("#{relation_name}=", nil)
                       record.save
                     else
                       record.send(sym_relation_name).delete(right_record)
+                      collection = record.send(sym_relation_name)
                     end
 
                     record.touch
                     right_record.touch
+
+                    Hyperstack::Resource::PubSub.pub_sub_relation(session_id, collection, record, relation_name, right_record)
+                    Hyperstack::Resource::PubSub.pub_sub_record(session_id, right_record)
+                    Hyperstack::Resource::PubSub.pub_sub_record(session_id, record)
 
                     record_json = record.as_json
 
@@ -56,11 +63,11 @@ class UnlinkHandler
                 end
               end
             else
-              result[model_name][:instances].merge!(id => { errors: { relation_name => 'No such relation!' } })
+              result[model_name][:instances].merge!(id => { errors: { relation_name => 'No such relation!' }})
             end
           end
         else
-          result[model_name][:instances].merge!(errors: { id => 'Record not found!' })
+          result[model_name][:instances].merge!(errors: { id => { 'Record not found!' => ''}})
         end
       end
     end

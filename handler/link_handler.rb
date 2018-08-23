@@ -1,8 +1,7 @@
 class LinkHandler
+  include Hyperstack::Resource::SecurityGuards
 
-  SINGLE_RELATIONS =
-
-  def process_request(request)
+  def process_request(session_id, current_user, request)
     result = {}
 
     request.keys.each do |model_name|
@@ -13,10 +12,10 @@ class LinkHandler
 
       request[model_name]['instances'].keys.each do |id|
         record = begin
-                   model.find(id)
-                 rescue ActiveRecord::RecordNotFound
-                   nil
-                 end
+          model.find(id)
+        rescue ActiveRecord::RecordNotFound
+          nil
+        end
 
         if record
           request[model_name]['instances'][id]['relations'].keys.each do |relation_name|
@@ -34,16 +33,21 @@ class LinkHandler
                   right_record = right_model.find(right_id)
 
                   if right_record
+                    collection = nil
                     relation_type = model.reflections[sym_relation_name].association.type
                     relation_type = model.reflections[relation_name].association.type unless relation_type
                     if %i[belongs_to has_one].include?(relation_type)
                       record.send("#{relation_name}=", right_record)
                       record.save
                     else
-                      record.send(relation_name) << right_record
+                      collection = record.send(relation_name) << right_record
                     end
                     record.touch
                     right_record.touch
+
+                    Hyperstack::Resource::PubSub.pub_sub_relation(session_id, collection, record, relation_name, right_record)
+                    Hyperstack::Resource::PubSub.pub_sub_record(session_id, right_record)
+                    Hyperstack::Resource::PubSub.pub_sub_record(session_id, record)
 
                     record_json = record.as_json
 
@@ -60,7 +64,7 @@ class LinkHandler
             end
           end
         else
-          result[model_name][:instances].merge!(errors: { id => 'Record not found!' })
+          result[model_name][:instances].merge!(errors: { id => { 'Record not found!' => ''}})
         end
       end
     end
