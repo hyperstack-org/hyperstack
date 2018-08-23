@@ -110,7 +110,6 @@ module HyperRecord
       # end
     end
 
-    # TODO update for new transport!
     # macro define collection_query_method, RPC on instance level of a record of current HyperRecord class
     # The supplied block must return a Array of Records!
     #
@@ -127,15 +126,12 @@ module HyperRecord
         @fetch_states[name] = 'i'
         unless @rest_methods.has_key?(name)
           @rest_methods[name] = options
-          @rest_methods[name] = { result: options[:default_result] }
+          @rest_methods[name][:result] = options[:default_result]
           @update_on_link[name] = {}
         end
         raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance collection_query_method without id!" unless self.id
-        self.class._promise_get_or_patch("#{resource_base_uri}/#{self.id}/methods/#{name}.json?timestamp=#{`Date.now() + Math.random()`}").then do |response_json|
-          collection = self.class._convert_array_to_collection(response_json[:result], self)
-          @rest_methods[name][:result] = collection
-          @fetch_states[name] = 'f'
-          _notify_observers
+        request = self.class.request_transducer.fetch(self.class.model_name => { instances: { id => { methods: { name => {}}}}})
+        Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
           @rest_methods[name][:result]
         end.fail do |response|
           error_message = "#{self.class.to_s}[#{self.id}].#{name}, a collection_query_method, failed to execute!"
@@ -146,14 +142,18 @@ module HyperRecord
       # @!method [name]
       # @return result either the default_result ass specified in the options or the real result if the RPC call already finished
       define_method(name) do
-        _register_observer
-        unless @rest_methods.has_key?(name)
-          @rest_methods[name] = options
-          @rest_methods[name] = { result: options[:default_result] }
-          @update_on_link[name] = {}
-        end
-        unless @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
-          self.send("promise_#{name}")
+        unless self.id
+          options[:default_result]
+        else
+          _register_observer
+          unless @rest_methods.has_key?(name)
+            @rest_methods[name] = options
+            @rest_methods[name][:result] = options[:default_result]
+            @update_on_link[name] = {}
+          end
+          unless @fetch_states.has_key?(name) && 'fi'.include?(@fetch_states[name])
+            self.send("promise_#{name}")
+          end
         end
         @rest_methods[name][:result]
       end
@@ -621,8 +621,8 @@ module HyperRecord
       end
       # @!method update_[name] mark internal structures so that the method is called again once it is requested again
       # @return nil
-      define_method("update_#{name}") do |*args|
-        @fetch_states[self.class._name_args(name, *args)] = 'u'
+      define_method("update_#{name}") do
+        @fetch_states[name] = 'u'
         nil
       end
     end
