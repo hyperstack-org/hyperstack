@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'opal', '~> 0.11.0'
   s.add_runtime_dependency 'hyper-transport', '~> 0.0.1'
-  s.add_runtime_dependency 'oj'
+  s.add_runtime_dependency 'oj', '~> 3.6.0'
 end
