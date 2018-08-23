@@ -19,10 +19,11 @@ class FetchHandler
             result.merge!(model_name => { errors: { fetchables => 'No such thing to fetch!' }})
           end
         end
-      else
-        result.merge!(model_name => { errors: { 'Not authorized!' => '' }})
-      end
-    # end
+
+      #else
+      #  result.merge!(model_name => { errors: { 'Not authorized!' => '' }})
+      #end
+    end
 
     result
   end
