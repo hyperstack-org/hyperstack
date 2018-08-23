@@ -15,6 +15,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/business/mixin'
   require 'hyperstack/business'
 else
+  require 'oj'
   require 'hyperstack/business/promise'
   require 'hyperstack/props_wrapper'
   require 'hyperstack/params/instance_methods'
