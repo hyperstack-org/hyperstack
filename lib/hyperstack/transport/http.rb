@@ -157,7 +157,6 @@ module Hyperstack
           }
 
           var xhr = new XMLHttpRequest();
-          var csrf_elements = document.getElementsByName("csrf-token");
 
           xhr.onreadystatechange = function() {
             if(xhr.readyState === XMLHttpRequest.DONE) {
@@ -170,9 +169,15 @@ module Hyperstack
             }
           }
           xhr.open(this.method.toUpperCase(), this.url);
-          if (csrf_elements.length > 0) {
-            xhr.setRequestHeader("X-CSRF-Token", csrf_elements[0]["content"]);
+
+          var use_csrf = options["$has_key?"]("csrf") ? options["$delete"]("csrf") : true;
+          if (use_csrf) {
+            var csrf_elements = document.getElementsByName("csrf-token");
+            if (csrf_elements.length > 0) {
+              xhr.setRequestHeader("X-CSRF-Token", csrf_elements[0]["content"]);
+            }
           }
+
           if (payload_to_send !== null && content_type !== null) {
             xhr.setRequestHeader("Content-Type", content_type);
           }
