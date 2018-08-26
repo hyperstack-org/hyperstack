@@ -6,6 +6,7 @@ module Hyperstack
       end
 
       attr_accessor :result
+      attr_accessor :errors
 
       def intitialize
         self.class.agents[object_id] = self

@@ -5,7 +5,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/transport/notification_processor'
   require 'hyperstack/transport/client_drivers'
 else
-  require 'hyper-react'
+  require 'hyperstack/promise'
   require 'hyperstack/transport/config'
   require 'hyperstack/transport/server_pub_sub'
   require 'hyperstack/transport/request_processor'

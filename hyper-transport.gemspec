@@ -15,5 +15,4 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'opal', '~> 0.11.0'
   s.add_runtime_dependency 'hyper-react', '~> 1.0.0.lap0'
-  s.add_runtime_dependency 'redis', '~> 4.0.1'
 end
