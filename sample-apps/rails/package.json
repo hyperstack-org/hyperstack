@@ -1,0 +1,14 @@
+{
+  "name": "myapp",
+  "private": true,
+  "dependencies": {
+    "@rails/webpacker": "3.5",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2"
+  },
+  "devDependencies": {
+    "babel-loader": "^7.1.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "2.11.2"
+  }
+}
