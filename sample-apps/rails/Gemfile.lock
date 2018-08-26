@@ -7,81 +7,125 @@ GIT
       websocket
 
 GIT
-  remote: https://github.com/opal/opal-jquery.git
-  revision: d15ca70f53cb323245c54842587b874945e1083e
-  branch: master
+  remote: https://github.com/janbiedermann/hyper-business.git
+  revision: aa9fa0695daa053680bb474f4331a4102c41e43e
+  branch: ulysses
   specs:
-    opal-jquery (0.4.2)
-      opal (>= 0.10.0, < 0.12.0)
+    hyper-business (0.0.1)
+      hyper-react (~> 1.0.0.lap0)
+      hyper-transport (~> 0.0.1)
+      oj (~> 3.6.0)
+      opal (~> 0.11.0)
+      opal-activesupport (~> 0.3.1)
 
 GIT
-  remote: https://github.com/ruby-hyperloop/hyper-component
-  revision: 3d7f396dc72140379c3d380bf403f8a9ea668600
-  branch: edge
+  remote: https://github.com/janbiedermann/hyper-gate.git
+  revision: 35bbe01badaea7487e184801209176a3ddccb61e
+  branch: ulysses
   specs:
-    hyper-component (1.0.0.lap28)
-      actionview (>= 4.0.0)
-      hyper-react (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      opal-rails (~> 0.9.4)
-      react-rails (>= 2.4.0, < 2.5.0)
+    hyper-gate (0.0.1)
+      hyper-transport (~> 0.0.1)
+      oj (~> 3.6.0)
+      opal (~> 0.11.0)
 
 GIT
-  remote: https://github.com/ruby-hyperloop/hyper-react
-  revision: 8a800927836c748a604bc0f15a99575cb53a1ace
-  branch: edge
+  remote: https://github.com/janbiedermann/hyper-react.git
+  revision: e0b5cc3ecc4c4d9715e0bcf445e4738dabd45dda
+  branch: ulysses
   specs:
     hyper-react (1.0.0.lap28)
       hyper-store (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
+      oj (~> 3.6.0)
       opal (>= 0.11.0, < 0.12.0)
       opal-activesupport (~> 0.3.1)
-      react-rails (>= 2.4.0, < 2.5.0)
+      opal-browser (~> 0.2.0)
 
 GIT
-  remote: https://github.com/ruby-hyperloop/hyper-router
-  revision: 860491e26b0b5b5b8dfce8b9adad00986f817927
-  branch: edge
+  remote: https://github.com/janbiedermann/hyper-resource.git
+  revision: a6030e132a34f4ec1155dfb94ec91fa026b264bb
+  branch: ulysses
+  specs:
+    hyper-resource (1.1.0.lap0)
+      hyper-react (~> 1.0.0.lap27)
+      hyper-transport (~> 0.0.1)
+      oj (~> 3.6.0)
+      opal (~> 0.11.0)
+      opal-activesupport (~> 0.3.1)
+
+GIT
+  remote: https://github.com/janbiedermann/hyper-router.git
+  revision: d846eb9f88c297df96d6f831a6a990073e855111
+  branch: ulysses
   specs:
     hyper-router (4.2.6.lap28)
-      hyper-component (= 1.0.0.lap28)
       hyper-react (= 1.0.0.lap28)
       opal-browser (~> 0.2.0)
-      opal-rails (~> 0.9.4)
-      react-rails (>= 2.4.0, < 2.5.0)
 
 GIT
-  remote: https://github.com/ruby-hyperloop/hyper-store
-  revision: 003d16c90849b6f07ee7cbcc542a35da250d27fa
-  branch: edge
+  remote: https://github.com/janbiedermann/hyper-store.git
+  revision: a897f804366c66adcb9a1bf2a8550e469bbbbaef
+  branch: ulysses
   specs:
     hyper-store (1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
       opal (>= 0.11.0, < 0.12.0)
 
 GIT
-  remote: https://github.com/ruby-hyperloop/hyperloop
-  revision: 57d30ff98c80c8a60b4526691113275335547be1
-  branch: edge
+  remote: https://github.com/janbiedermann/hyper-transport-actioncable.git
+  revision: a9d617d937fed40814db52d492d12011cd791fe0
+  branch: ulysses
   specs:
-    hyperloop (1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      mini_racer (~> 0.1.15)
-      opal-browser (~> 0.2.0)
-      rails (>= 4.0.0)
-      react-rails (>= 2.4.0, < 2.5.0)
+    hyper-transport-actioncable (0.0.1)
+      actioncable (> 5.0.0)
+      hyper-transport (~> 0.0.1)
+      opal (~> 0.11.0)
 
 GIT
-  remote: https://github.com/ruby-hyperloop/hyperloop-config
-  revision: 8fd1b5f4779cf9f53ecfd2076273a7df70ff162e
-  branch: edge
+  remote: https://github.com/janbiedermann/hyper-transport-store-redis.git
+  revision: 7928d871b820abddda5a42cc89d186d52056175e
+  branch: ulysses
   specs:
-    hyperloop-config (1.0.0.lap28)
-      opal (>= 0.11.0, < 0.12.0)
-      opal-browser (~> 0.2.0)
-      uglifier
+    hyper-transport-store-redis (0.0.1)
+      hyper-transport (~> 0.0.1)
+      redis (~> 4.0.1)
+
+GIT
+  remote: https://github.com/janbiedermann/hyper-transport.git
+  revision: a22014d956e9c938e53c35d3e5573bc7b939e209
+  branch: ulysses
+  specs:
+    hyper-transport (0.0.1)
+      hyper-react (~> 1.0.0.lap0)
+      opal (~> 0.11.0)
+      redis (~> 4.0.1)
+
+GIT
+  remote: https://github.com/janbiedermann/opal-autoloader.git
+  revision: 503d3149e7afd80737f6fe21f96c3a73f40287f2
+  branch: master
+  specs:
+    opal-autoloader (0.0.2)
+      opal (>= 0.11.0)
+
+GIT
+  remote: https://github.com/janbiedermann/opal-webpack-compile-server.git
+  revision: 975646ba12c70cadead4132614f303c4acb093dc
+  branch: master
+  specs:
+    opal-webpack-compile-server (0.1.9)
+      eventmachine (~> 1.2.7)
+      oj (~> 3.6.0)
+      opal (>= 0.11.0)
+
+GIT
+  remote: https://github.com/janbiedermann/opal.git
+  revision: e3fdf16e8a657f7d9f9507207848a34953dced8d
+  branch: es6_import_export
+  specs:
+    opal (0.11.1.dev)
+      ast (>= 2.3.0)
+      hike (~> 1.2)
+      parser (= 2.5.1.0)
+      sourcemap (~> 0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -133,10 +177,6 @@ GEM
       io-like (~> 0.3.0)
     arel (9.0.0)
     ast (2.4.0)
-    babel-source (5.8.35)
-    babel-transpiler (0.7.0)
-      babel-source (>= 4.0, < 6)
-      execjs (~> 2.0)
     bindex (0.5.0)
     bootsnap (1.3.1)
       msgpack (~> 1.0)
@@ -162,10 +202,10 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
-    connection_pool (2.2.2)
     crass (1.0.4)
     dotenv (0.7.0)
     erubi (1.7.1)
+    eventmachine (1.2.7)
     execjs (2.7.0)
     ffi (1.9.25)
     foreman (0.64.0)
@@ -180,11 +220,6 @@ GEM
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
-    jquery-rails (4.3.3)
-      rails-dom-testing (>= 1, < 3)
-      railties (>= 4.2.0)
-      thor (>= 0.14, < 2.0)
-    libv8 (6.3.292.48.1)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -200,39 +235,21 @@ GEM
     mimemagic (0.3.2)
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
-    mini_racer (0.1.15)
-      libv8 (~> 6.3)
     minitest (5.11.3)
     msgpack (1.2.4)
     multi_json (1.13.1)
     nio4r (2.3.1)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
-    opal (0.11.1)
-      ast (>= 2.3.0)
-      hike (~> 1.2)
-      parser (= 2.3.3.1)
-      sourcemap (~> 0.1.0)
+    oj (3.6.6)
     opal-activesupport (0.3.1)
       opal (>= 0.5.0, < 1.0.0)
     opal-browser (0.2.0)
       opal
       paggio
-    opal-rails (0.9.4)
-      jquery-rails
-      opal (>= 0.10.0, < 0.12)
-      opal-activesupport (>= 0.0.5)
-      opal-jquery (~> 0.4.0)
-      opal-sprockets (~> 0.4.1)
-      rails (>= 4.1, < 6.0)
-      sprockets-rails (>= 2.3.3, < 4.0)
-    opal-sprockets (0.4.1.0.11.0.3.1)
-      opal (~> 0.11.0)
-      sprockets (~> 3.1)
-      tilt (>= 1.4)
     paggio (0.2.6)
-    parser (2.3.3.1)
-      ast (~> 2.2)
+    parser (2.5.1.0)
+      ast (~> 2.4.0)
     public_suffix (3.0.2)
     puma (3.12.0)
     rack (2.0.5)
@@ -268,12 +285,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
-    react-rails (2.4.7)
-      babel-transpiler (>= 0.7.0)
-      connection_pool
-      execjs
-      railties (>= 3.2)
-      tilt
+    redis (4.0.2)
     ruby_dep (1.5.0)
     rubyzip (1.2.1)
     sass (3.5.7)
@@ -340,15 +352,20 @@ DEPENDENCIES
   chromedriver-helper
   coffee-rails (~> 4.2)
   foreman
-  hyper-component!
+  hyper-business!
+  hyper-gate!
   hyper-react!
+  hyper-resource!
   hyper-router!
   hyper-store!
-  hyperloop!
-  hyperloop-config!
+  hyper-transport!
+  hyper-transport-actioncable!
+  hyper-transport-store-redis!
   jbuilder (~> 2.5)
   listen (>= 3.0.5, < 3.2)
-  opal-jquery!
+  opal!
+  opal-autoloader!
+  opal-webpack-compile-server!
   opal_hot_reloader!
   puma (~> 3.11)
   rails (~> 5.2.1)

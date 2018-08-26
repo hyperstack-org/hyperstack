@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
-  root 'hyperloop#home'
-  match '*all', to: 'hyperloop#home', via: [:get]
+  root 'home#index'
+  match '*all', to: 'home#index', via: [:get]
 end
