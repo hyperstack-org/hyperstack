@@ -52,6 +52,7 @@ require_tree 'components'
 ## app/javascript/app.js
 Should be done by a installer task
 * __Suggestion__ to make a _hyperstack.js_ file soit is very clear that it is hyperstack related
+
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -81,51 +82,63 @@ if (module.hot) {
 ```
 
 ## remove app/assets/javascripts/application.js
+
 ```javascript
 //= require hyperloop-loader
 ```
 
 ## Remove gems because they conflict
+
 * react-rails
 
 ## Remove hyperloop initializer and mount points
+
 * config/initializers/hyperloop.rb
 * config/routes.rb
   * mount Hyperloop::Engine => '/hyperloop'
 
 ## Install new webpack config
+
 Should be done by a installer task
 * config/webpack/development.js: https://github.com/janbiedermann/opal-webpack-loader-example-app/blob/master/config/webpack/development.js
 
 ## Add Yarn packages
+
 * `$ yarn add opal-webpack-loader`
 * `$ yarn add opal-webpack-resolver-plugin`
 * `$ yarn add webpack-serve`
 
 ## Rename hyperloop to hyperstack
+
 * `$ git mv app/hyperloop app/hyperstack`
 
 ## Remove Hyperloop regulators
+
 * Remove `regulate_scope :all` from the _application_record_ and _models_
 * `regulate: :always_allow` from all _models_
 
 ## Add to the ApplicationHelper
+
 If using rails and the rails gem this could be already included
 * include Hyperstack::ViewHelpers
 
 ## Replace react_component by hyper_component
+
 In order to render only a component you need to add a line to the application_layout and include the `Hyperstack::ViewHelpers`
 * Rename in views: `react_component` => `hyper_component`
 * Add to application_layout.rb
   * `<%= hyper_script_tag(current_user_id: current_user.id, session_id: session.id, form_authenticity_token: form_authenticity_token) %>`
 
 ## Load pack before normal application sprockets
+
 See the suggested rename at topic: `app/javascript/app.js`
 * `<%= owl_include_tag '/packs/app.js' %>`
 * `<%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>`
 
 ## Add changes to the package.json
+
 ### In scripts section
+
 ```javascript
 "scripts": {
   "test": "bundle exec opal-webpack-compile-server kill; bundle exec opal-webpack-compile-server && webpack --config=config/webpack/test.js; bundle exec opal-webpack-compile-server kill",
@@ -136,10 +149,13 @@ See the suggested rename at topic: `app/javascript/app.js`
 ```
 
 ### Ensure you have @rails/webpacker version 4 or higher
+
 * `$ npm install @rails/webpacker@4.12.0`
 
 ## Expand the application_helper
+
 __Suggestion__ this should be included in `Hyperstack::ViewHelpers`
+
 ```ruby
   def owl_include_tag(path)
     case Rails.env
@@ -154,7 +170,9 @@ __Suggestion__ this should be included in `Hyperstack::ViewHelpers`
 ```
 
 ## Expand the assets
+
 Add to the config/initializers/assets.rb
+
 ```ruby
 class OpalWebpackManifest
   def self.manifest
@@ -168,8 +186,10 @@ end
 ```
 
 ## Hyperstack models don't support all helper classes
+
 __Suggestion__ this should be taken cared of if a cleaner way of detecting `RUBY_ENGINE == 'opal'` and where possible
 stub the unsupported methods
+
 ```ruby
 # app/hyperstack/models/application_record.rb
 #  Abstract parent
@@ -191,6 +211,7 @@ end
 ```
 
 To prevent code like this:
+
 ```ruby
 class NewModel < ApplicationRecord
   if RUBY_ENGINE != 'opal'
@@ -201,28 +222,35 @@ end
 ```
 
 ## Remove old policy direcotie
+
 * `$ git rm -r app/policies`
 
 ## Rename all Hyperloop models to the new Hyperstack
+
 * `$ find ./hyperloop/models -type f -exec sed -i -e 's/Hyperloop::Model/Hyperstack::Model/' {} \;`
 
 ## Add action able if you use `hyper-transport-actioncable`
+
 * `$ yarn add actioncable`
 * add to `app/javascript/app.js`:
+
   * ```javascript
     import ActionCable from 'actioncable';
     global.ActionCable = ActionCable;
     ```
 
 ## Install Model handlers if used
+
 * `$ bundle exec hyper-resource-installer`
 * `$ bundle exec hyper-business-installer`
 * `$ bundle exec hyper-gate-installer`
 
 ## Install new controller
+
 __Suggestion__ Should be included in the _rails_ gem or if it can be used for other frameworks as well
 
 app/controllers/hyperloop_api_controller.rb
+
 ```ruby
 class HyperstackApiController < ApplicationController
   include Hyperstack::Transport::RequestProcessor
@@ -247,7 +275,9 @@ end
 ```
 
 ## Add to routes
+
 __Suggestion__ This should also be included if the new controller `HyperstackApiController` is also embedded
+
 ```ruby
 resources :hyperstack_api, only: [:create], defaults: {format: :json}
 ```
