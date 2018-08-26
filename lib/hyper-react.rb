@@ -34,6 +34,7 @@ else
   require 'reactive-ruby/isomorphic_helpers'
   require 'reactive-ruby/serializers'
   require 'hyperstack/component/version'
+  require 'hyperstack/promise'
   require 'hyperstack/config'
   require 'hyperstack/view_helpers'
   Opal.append_path(__dir__.untaint)
