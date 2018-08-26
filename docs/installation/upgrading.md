@@ -1,6 +1,6 @@
 # Hyperloop to Hyperstack HS2
 
-These instructions are subject to change as the project mnatures.
+These instructions are subject to change as the project matures.
 
 ## Gemfile
 Update the gem files and remove any old 
