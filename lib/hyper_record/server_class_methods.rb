@@ -3,21 +3,15 @@ module HyperRecord
     # DSL for defining collection_query_methods
     # @param name [Symbol] name of the method
     # @param options [Hash] known key: default_result, used client side
-    def collection_query_method(name, options = { default_result: [] }, &block)
-      rest_methods[name] = options
-      rest_methods[name][:params] = block.arity
+    def collection_query_method(name, &block)
+      collection_query_methods[name] = {}
       define_method(name) do
-        array_of_records = instance_exec(&block)
-        array_of_records.map do |record|
-          subscribe_record(record)
-          record_json = record.as_json
-          record_model = record.class.to_s.underscore
-          if record_json.has_key?(record_model)
-            record_json
-          else
-            { record_model => record_json }
-          end
-        end
+        instance_exec(&block)
+      end
+      define_method("promise_#{name}") do
+        p = Promise.new(success: proc { send(name) })
+        p.resolve
+        p
       end
     end
 
@@ -26,13 +20,17 @@ module HyperRecord
     # @param options [Hash] known key: default_result, used client side
     def rest_class_method(name, options = { default_result: '...' }, &block)
       rest_class_methods[name] = options
-      rest_class_methods[name][:params] = block.arity
       singleton_class.send(:define_method, name) do |*args|
         if args.size > 0
           block.call(*args)
         else
           block.call
         end
+      end
+      singleton_class.send(:define_method, "promise_#{name}") do |*args|
+        p = Promise.new(success: proc { send(name, *args) })
+        p.resolve
+        p
       end
     end
 
@@ -41,7 +39,6 @@ module HyperRecord
     # @param options [Hash] known key: default_result, used client side
     def rest_method(name, options = { default_result: '...' }, &block)
       rest_methods[name] = options
-      rest_methods[name][:params] = block.arity
       define_method(name) do |*args|
         if args.size > 0
           instance_exec(*args, &block)
@@ -49,6 +46,17 @@ module HyperRecord
           instance_exec(&block)
         end
       end
+      define_method("promise_#{name}") do |*args|
+        p = Promise.new(success: proc { send(name, *args) })
+        p.resolve
+        p
+      end
+    end
+
+    # introspect defined collection_query_methods
+    # @return [Hash]
+    def collection_query_methods
+      @collection_query_methods ||= {}
     end
 
     # introspect defined rest_class_methods
@@ -72,9 +80,14 @@ module HyperRecord
     # defines a scope, wrapper around ORM method
     # @param name [Symbol] name of the args
     # @param *args additional args, passed to ORMs scope DSL
-    def scope(name, *args)
-      resource_scopes[name] = args
-      super(name, *args)
+    def scope(name, *options)
+      resource_scopes[name] = options
+      singleton_class.send(:define_method, "promise_#{name}") do |*args|
+        p = Promise.new(success: proc { send(name, *args) })
+        p.resolve
+        p
+      end
+      super(name, *options)
     end
   end
 end

@@ -5,12 +5,16 @@ require 'hyper-react'
 require 'hyper-transport'
 
 if RUBY_ENGINE == 'opal'
-  require 'hyper-transport-http' # TODO, this is actually optional, might a different transport
+  require 'hyper-transport-http' # TODO, this is actually optional, might be a different transport
+  require 'hyperstack/resource/helpers'
   require 'hyper_record'
 else
+  require 'active_support'
   require 'oj'
+  require 'hyperstack/promise'
   require 'hyperstack/resource/config'
   require 'hyperstack/resource/security_guards' # server side, controller helper methods
+  require 'hyperstack/resource/pub_sub'
   require 'hyper_record'
   Opal.append_path(__dir__.untaint)
   if Dir.exist?(File.join('app', 'hyperstack', 'models'))

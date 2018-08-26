@@ -1,5 +1,7 @@
 class LinkHandler
+  include Hyperstack::Resource::Helpers
   include Hyperstack::Resource::SecurityGuards
+  include Hyperstack::Gate
 
   def process_request(session_id, current_user, request)
     result = {}
@@ -7,15 +9,23 @@ class LinkHandler
     request.keys.each do |model_name|
 
       model = guarded_record_class(model_name) # security guard
-      result[model_name] = {} unless result.has_key?(model_name)
-      result[model_name][:instances] = {} unless result[model_name].has_key?(:instances)
 
       request[model_name]['instances'].keys.each do |id|
-        record = begin
-          model.find(id)
-        rescue ActiveRecord::RecordNotFound
-          nil
+
+        # authorize Model.find
+        if Hyperstack.resource_use_authorization
+          authorization_result = authorize(current_user, model.to_s, :find, { id => request[model_name]['instances'][id] })
+          if authorization_result.has_key?(:denied)
+            result.deep_merge!(model_name => { instances: { id => { errors:  { 'Link failed!' => authorization_result[:denied] }}}})
+            next # authorization guard
+          end
         end
+
+        record = begin
+                   model.find(id)
+                 rescue ActiveRecord::RecordNotFound # , Neo4j::ActiveNode::Labels::RecordNotFound
+                   nil
+                 end
 
         if record
           request[model_name]['instances'][id]['relations'].keys.each do |relation_name|
@@ -30,9 +40,33 @@ class LinkHandler
                 right_model = guarded_record_class(right_model_name) # security guard
 
                 request[model_name]['instances'][id]['relations'][relation_name][right_model_name].keys.each do |right_id|
-                  right_record = right_model.find(right_id)
+
+                  # authorize Model.find
+                  if Hyperstack.resource_use_authorization
+                    authorization_result = authorize(current_user, right_model.to_s, :find, { right_id => request[model_name]['instances'][id]['relations'][relation_name][right_model_name]['instances'][right_id] })
+                    if authorization_result.has_key?(:denied)
+                      result.deep_merge!(model_name => { instances: { id => { errors:  { 'Link failed!' => authorization_result[:denied] }}}})
+                      next # authorization guard
+                    end
+                  end
+
+                  right_record = begin
+                                   right_model.find(right_id)
+                                 rescue ActiveRecord::RecordNotFound # , Neo4j::ActiveNode::Labels::RecordNotFound
+                                   nil
+                                 end
 
                   if right_record
+
+                    # authorize record unlink relation
+                    if Hyperstack.resource_use_authorization
+                      authorization_result = authorize(current_user, model.to_s, "#{relation_name}_link", [record, right_record])
+                      if authorization_result.has_key?(:denied)
+                        result.deep_merge!(model_name => { instances: { id => { errors:  { 'Link failed!' => authorization_result[:denied] }}}})
+                        next # authorization guard
+                      end
+                    end
+
                     collection = nil
                     relation_type = model.reflections[sym_relation_name].association.type
                     relation_type = model.reflections[relation_name].association.type unless relation_type
@@ -45,26 +79,20 @@ class LinkHandler
                     record.touch
                     right_record.touch
 
-                    Hyperstack::Resource::PubSub.pub_sub_relation(session_id, collection, record, relation_name, right_record)
-                    Hyperstack::Resource::PubSub.pub_sub_record(session_id, right_record)
-                    Hyperstack::Resource::PubSub.pub_sub_record(session_id, record)
-
-                    record_json = record.as_json
-
-                    if record_json.has_key?(model_name)
-                      # for neo4j
-                      result[model_name][:instances].merge!(id => { properties: record_json[model_name] })
-                    else
-                      # for active_record
-                      result[model_name][:instances].merge!(id => { properties: record_json })
+                    if Hyperstack.resource_use_pubsub
+                      Hyperstack::Resource::PubSub.pub_sub_relation(session_id, collection, record, relation_name, right_record)
+                      Hyperstack::Resource::PubSub.pub_sub_record(session_id, right_record)
+                      Hyperstack::Resource::PubSub.pub_sub_record(session_id, record)
                     end
+
+                    result.deep_merge!(record.to_transport_hash)
                   end
                 end
               end
             end
           end
         else
-          result[model_name][:instances].merge!(errors: { id => { 'Record not found!' => ''}})
+          result.deep_merge!(model_name => { instances: {errors: { id => { 'Record not found!' => ''}}}})
         end
       end
     end

@@ -11,7 +11,9 @@ module HyperRecord
       @changed_properties = {}
       @relations = {}
       @rest_methods = {}
+      @collection_query_methods = {}
       @destroyed = false
+
       # for reactivity, possible @fetch_states:
       # n - not fetched
       # f - fetched
@@ -36,10 +38,10 @@ module HyperRecord
             if record_hash[relation].nil?
               @relations[relation] = HyperRecord::Collection.new([], self, relation)
             else
-              @relations[relation] = self.class._convert_array_to_collection(record_hash[relation], self, relation)
+              @relations[relation] = Hyperstack::Resource::Helpers.collection_from_json_array(record_hash[relation], self, relation)
             end
           else
-            @relations[relation] = self.class._convert_json_hash_to_record(record_hash[relation])
+            @relations[relation] = Hyperstack::Resource::Helpers.record_from_hash(record_hash[relation])
           end
         else
           unless @fetch_states[relation] == 'f'
@@ -57,7 +59,10 @@ module HyperRecord
       @properties = record_hash
 
       # cache in global cache
-      self.class._record_cache[@properties[:id].to_s] = self if @properties.has_key?(:id)
+      if @properties.has_key?(:id)
+        @properties[:id] = @properties[:id].to_s
+        self.class._record_cache[@properties[:id]] = self
+      end
     end
 
     ### high level api
@@ -122,7 +127,7 @@ module HyperRecord
       end
     end
 
-    # notify observer, will change state of observers, will also notify class observers
+    # notify observers, will change state of observers, will also notify class observers
     #
     # @return nil
     def notify_observers
@@ -147,13 +152,6 @@ module HyperRecord
       _register_observer
       @changed_properties = {}
       self
-    end
-
-    # get the resource base uri that is used for api calls, used internally
-    #
-    # @return [String]
-    def resource_base_uri
-      self.class.resource_base_uri
     end
 
     # save record to db, success is assumed
@@ -182,6 +180,8 @@ module HyperRecord
     end
 
     # return record properties as hash, ready for transport
+    #
+    # @return [Hash]
     def to_transport_hash
       id_key = self.id ? self.id : "_new_#{`Date.now() + Math.random()`}"
       { self.class.model_name => { id_key => { properties: @properties.dup.merge!(@changed_properties) }}}
@@ -201,11 +201,11 @@ module HyperRecord
     # destroy record
     #
     # @return [Promise] on success the record is passed to the .then block
-    #   on failure the HTTP response is passed to the .fail block
+    #   on failure the .fail block will receive some error indicator or nothing
     def promise_destroy
       _local_destroy
       request = self.class.request_transducer.destroy(self.class.model_name => { instances: { id => { properties: self.to_transport_hash}}})
-      Hyperstack.client_transport_driver.promise_send(self.class.api_path).then do |_processor_result|
+      Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path).then do
         self
       end.fail do |response|
         error_message = "Destroying record #{self} failed!"
@@ -218,7 +218,7 @@ module HyperRecord
     #
     # @param other_record [HyperRecord]
     # @return [Promise] on success the record is passed to the .then block
-    #   on failure the HTTP response is passed to the .fail block
+    #   on failure the .fail block will receive some error indicator or nothing
     def promise_link(other_record, relation_name = nil)
       called_from_collection = relation_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
@@ -245,7 +245,7 @@ module HyperRecord
       end
 
       request = self.class.request_transducer.link(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+      Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
         self
       end.fail do |response|
         error_message = "Linking record #{other_record} to #{self} failed!"
@@ -257,11 +257,11 @@ module HyperRecord
     # save record
     #
     # @return [Promise] on success the record is passed to the .then block
-    #   on failure the HTTP response is passed to the .fail block
+    #   on failure the .fail block will receive some error indicator or nothing
     def promise_save
       request = self.class.request_transducer.save(self.to_transport_hash)
       is_new = @properties[:id].nil?
-      Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+      Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
         self
       end.fail do |response|
         error_message = if is_new
@@ -278,14 +278,14 @@ module HyperRecord
     #
     # @param other_record [HyperRecord]
     # @return [Promise] on success the record is passed to the .then block
-    #   on failure the HTTP response is passed to the .fail block
+    #   on failure the .fail block will receive some error indicator or nothing
     def promise_unlink(other_record, relation_name = nil)
       called_from_collection = collection_name ? true : false
       relation_name = other_record.class.to_s.underscore.pluralize unless relation_name
       raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
       @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @fetch_states[relation_name] == 'f'
       request = self.class.request_transducer.unlink(self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}})
-      Hyperstack.client_transport_driver.promise_send(self.class.api_path, request).then do |_processor_result|
+      Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
         self
       end.fail do |response|
         error_message = "Unlinking #{other_record} from #{self} failed!"
@@ -307,80 +307,6 @@ module HyperRecord
       end
       @registered_collections = Set.new
       notify_observers
-    end
-
-    # @private
-    def _process_destroyed(_destroy_result)
-      self._local_destroy unless self.destroyed?
-    end
-
-    def _process_destroyed_notification(destroy_result)
-      _process_destroyed(destroy_result) if destroy_result
-    end
-
-    # @private
-    def _process_errors(errors_hash)
-      errors_hash.keys.each do |name|
-        raise "#{self.class.to_s} with id #{self.id}: #{errors_hash[name]}"
-      end
-    end
-
-    # @private
-    def _process_methods(methods_hash)
-      # rest_method
-      methods_hash.keys.each do |method_name|
-        methods_hash[method_name].keys.each do |args|
-          @rest_methods[method_name][args][:result] = methods_hash[method_name][args] # result is parsed json
-          @fetch_states[method_name][args] = 'f'
-          notify_observers
-        end
-      end
-    end
-
-    def _process_methods_notification(methods_hash)
-      methods_hash.keys.each do |method_name|
-        methods_hash[method_name].keys.each do |args|
-          @fetch_states[method_name][args] = 'u'
-        end
-      end
-    end
-
-    # @private
-    def _process_properties(properties_hash)
-      self.class.new(properties_hash)
-      self.class._class_fetch_states[id] = 'f'
-      notify_observers
-    end
-
-    def _process_properties_notification(properties_hash)
-      _process_properties(properties_hash)
-    end
-
-    # @private
-    def _process_relations(relations_hash)
-      relations_hash.keys.each do |relation_name|
-        if %i[has_many has_and_belongs_to_many].include?(reflections[relation_name][:kind])
-          # has_and_belongs_to_many and has_many
-          collection = self.class._convert_hashes_to_collection(relations_hash[relation_name], self, relation_name)
-          @relations[relation_name] = collection
-        else
-          # belongs_to and has_one
-          @relations[relation_name] = if relations_hash[relation_name]
-                                        self.class._convert_json_hash_to_record(relations_hash[relation_name])
-                                      else
-                                        nil
-                                      end
-        end
-        @fetch_states[relation_name] = 'f'
-        notify_observers
-      end
-    end
-
-    def _process_relations_notification(relations_hash)
-      relations_hash.keys.each do |relation_name|
-        @fetch_states[relation_name] = 'u'
-        send("promise_#{relation_name}")
-      end
     end
 
     # @private
