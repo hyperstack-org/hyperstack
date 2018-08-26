@@ -1,10 +1,13 @@
 require 'hyperstack/gate/version'
+require 'hyper-transport'
+
 if RUBY_ENGINE == 'opal'
   require 'hyperstack/gate/version'
   require 'hyperstack_gate_processor'
   # nothing else
 else
   require 'oj'
+  require 'hyperstack/promise'
   require 'hyperstack/gate/class_methods'
   require 'hyperstack/gate/instance_methods'
   require 'hyperstack/gate/policy_definition'
