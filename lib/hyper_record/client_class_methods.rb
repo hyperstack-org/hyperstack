@@ -418,9 +418,7 @@ module HyperRecord
         handler_method_name = method_name.sub('promise_', '')
         agent = Hyperstack::Transport::RequestAgent.new
         request = request_transducer.find_by(self.model_name => { find_by: { agent.object_id => { handler_method_name => args }}})
-        _register_class_observer
         Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
-          notify_class_observers
           raise if agent.errors
           agent.result
         end.fail do |response|
@@ -666,11 +664,9 @@ module HyperRecord
     # @return [Promise] on success the .then block will receive a [HyperRecord::Collection] as arg
     #     on failure the .fail block will receive some error indicator or nothing
     def promise_where(property_hash)
-      _register_class_observer
       agent = Hyperstack::Transport::RequestAgent.new
       request = request_transducer.where(self.model_name => { where: { agent.object_id => property_hash }})
       Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
-        notify_class_observers
         raise if agent.errors
         agent.result
       end.fail do |response|

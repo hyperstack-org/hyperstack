@@ -17,7 +17,7 @@ module HyperRecord
         end
       end
       records_to_notify.each(&:notify_observers)
-      notify_class_observers
+      # notify_class_observers
       nil
     end
 
@@ -33,7 +33,7 @@ module HyperRecord
     # @private
     def _process_model_find_by(instances_hash)
       instances_hash.keys.each do |agent_object_id|
-        agent = Hyperstack::Transport::RequestAgent.agents.delete(agent_object_id)
+        agent = Hyperstack::Transport::RequestAgent.get(agent_object_id)
         if instances_hash[agent_object_id].has_key?(:errors)
           agent.result = nil
           agent.errors = instances_hash[agent_object_id][:errors]
@@ -87,7 +87,7 @@ module HyperRecord
     def _process_model_where(where_hash)
       # scope
       where_hash.keys.each do |agent_object_id|
-        agent = Hyperstack::Transport::RequestAgent.agents.delete(agent_object_id)
+        agent = Hyperstack::Transport::RequestAgent.get(agent_object_id)
         if where_hash[agent_object_id].has_key?(:error)
           agent.result = nil
           agent.errors = where_hash[agent_object_id][:errors]
