@@ -415,8 +415,9 @@ module HyperRecord
     #    on failure the .fail block will receive some error indicator or nothing
     def method_missing(method_name, *args, &block)
       if method_name.start_with?('promise_find_by')
+        handler_method_name = method_name.sub('promise_', '')
         agent = Hyperstack::Transport::RequestAgent.new
-        request = request_transducer.find_by(self.model_name => { find_by: { agent.object_id => { method_name => args }}})
+        request = request_transducer.find_by(self.model_name => { find_by: { agent.object_id => { handler_method_name => args }}})
         _register_class_observer
         Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
           notify_class_observers
