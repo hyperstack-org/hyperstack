@@ -127,7 +127,7 @@ class FetchHandler
       request_model['find_by'][agent_id].keys.each do |find_by_method|
         find_by_args = request_model['find_by'][agent_id][find_by_method]
 
-        if find_by_method.start_with?('find_by') && find_by_args.class == Hash # security guard
+        if find_by_args.size == 1 && ((find_by_method == 'find_by' && find_by_args.first.class == Hash) || find_by_method.start_with?('find_by_')) # security guard
           sym_find_by_method  = find_by_method.to_sym
 
           # authorize Model.find
@@ -139,7 +139,7 @@ class FetchHandler
             end
           end
 
-          record = model.send(sym_find_by_method, find_by_args)
+          record = model.send(sym_find_by_method, *find_by_args)
 
           if record
             result_model.deep_merge!(find_by: { agent_id => { find_by_method => record.to_transport_hash }})
