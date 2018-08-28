@@ -253,7 +253,7 @@ class HyperstackApiController < ApplicationController
   include Hyperstack::Transport::RequestProcessor
 
   def create
-    resource_request = params
+    resource_request = params.permit!.to_hash
 
     resource_request.delete('action')
     resource_request.delete('controller')
@@ -269,6 +269,7 @@ class HyperstackApiController < ApplicationController
     end
   end
 end
+
 ```
 
 ## Add to routes
