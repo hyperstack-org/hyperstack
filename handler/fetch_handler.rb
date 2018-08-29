@@ -96,7 +96,7 @@ class FetchHandler
         if Hyperstack.resource_use_authorization
           authorization_result = authorize(current_user, model.to_s, sym_relation_name, request_instance)
           if authorization_result.has_key?(:denied)
-            result_instance.merge!(errors: { relation_name => authorization_result[:denied] })
+            result_instance.deep_merge!(errors: { relation_name => authorization_result[:denied] })
             next # authorization guard
           end
         end
@@ -115,9 +115,9 @@ class FetchHandler
         if Hyperstack.resource_use_pubsub
           Hyperstack::Resource::PubSub.subscribe_relation(session_id, relation_result, record, relation_name)
         end
-        result_instance.merge!(relations: { relation_name => result })
+        result_instance.deep_merge!(relations: { relation_name => result })
       else
-        result_instance.merge!(errors: { relation_name => 'No such relation!'})
+        result_instance.deep_merge!(errors: { relation_name => 'No such relation!'})
       end
     end
   end
@@ -127,7 +127,7 @@ class FetchHandler
       request_model['find_by'][agent_id].keys.each do |find_by_method|
         find_by_args = request_model['find_by'][agent_id][find_by_method]
 
-        if (find_by_method == 'find_by' && find_by_args.size == 1 && find_by_args.first.class == Hash) || find_by_method.start_with?('find_by_') # security guard
+        if find_by_args.size == 1 && ((find_by_method == 'find_by' && find_by_args.first.class == Hash) || find_by_method.start_with?('find_by_')) # security guard
           sym_find_by_method  = find_by_method.to_sym
 
           # authorize Model.find
@@ -157,9 +157,7 @@ class FetchHandler
 
   def process_model_instances(session_id, current_user, request_model, result_model, model)
     result_model[:instances] = {} unless result_model.has_key?(:instances)
-    result_instances = result_model[:instances]
     request_model['instances'].keys.each do |id|
-      result_instances[id] = {}
 
       # authorize Model.find
       if Hyperstack.resource_use_authorization
@@ -179,17 +177,18 @@ class FetchHandler
       if record
         model_name = model.to_s.underscore
         result_model.deep_merge!(record.to_transport_hash[model_name])
+
         request_model['instances'][id].keys.each do |fetchables|
           method_name = "process_instance_#{fetchables}".to_sym
           if respond_to?(method_name, true)
-            send(method_name, session_id, current_user, request_model['instances'][id], result_instances[id], model, record)
+            send(method_name, session_id, current_user, request_model['instances'][id], result_model[:instances][id], model, record)
           else
-            result_instances[id].merge!(errors: { fetchables => 'No such thing to fetch' })
+            result_model[:instances][id].deep_merge!(errors: { fetchables => 'No such thing to fetch' })
           end
         end
         Hyperstack::Resource::PubSub.subscribe_record(session_id, record) if Hyperstack.resource_use_pubsub
       else
-        result_instances[id] = { errors: { 'Record not found!' => {} }}
+        result_model[:instances][id] = { errors: { 'Record not found!' => {} }}
       end
     end
   end
@@ -254,7 +253,7 @@ class FetchHandler
 
   def process_model_where(session_id, current_user, request_model, result_model, model)
     request_model['where'].keys.each do |agent_id|
-      where_args = request_model['where'][agent_id]
+      where_args = request_model['where'][agent_id].first
 
       if where_args.class == Hash # security guard
 
