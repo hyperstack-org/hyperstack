@@ -195,17 +195,14 @@ stub the unsupported methods
 #  Abstract parent
 if RUBY_ENGINE == 'opal'
   class ApplicationRecord
-    def self.inherited(base)
-      base.include(HyperRecord)
-    end
+    include HyperRecord::Mixin
   end
 else
   class ApplicationRecord < ActiveRecord::Base
+    include HyperRecord::Mixin
     # when updating this part, also update the ApplicationRecord in app/models/application_record.rb
     # for rails eager loading in production, so production doesn't fail
     self.abstract_class = true
-    extend HyperRecord::ServerClassMethods
-    include GenericApp::WhereWithRequestParams
   end
 end
 ```
@@ -256,7 +253,7 @@ class HyperstackApiController < ApplicationController
   include Hyperstack::Transport::RequestProcessor
 
   def create
-    resource_request = params
+    resource_request = params.permit!.to_hash
 
     resource_request.delete('action')
     resource_request.delete('controller')
@@ -272,6 +269,7 @@ class HyperstackApiController < ApplicationController
     end
   end
 end
+
 ```
 
 ## Add to routes
