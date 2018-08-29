@@ -1,8 +1,8 @@
 # Installation
 
-HS2 Installation guide has not been written yet. Please see the Upgrading section for information.
+The Hyperstack Installation guide has not been written yet. Please see the Upgrading section for information.
 
-## Deploying to Heroku
+## Notes for deploying to Heroku
 
 + `heroku create`
 + `heroku buildpacks:set heroku/nodejs`
