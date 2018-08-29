@@ -2,15 +2,16 @@ module Hyperstack
   module Gate
     def authorize(user, class_name, action, *policy_context)
       begin
-        policy_class = Object.const_get("::#{class_name}Policy")
+        policy_class = "::#{class_name}Policy".constantize
+        if policy_class
+          allow_action= "allow_#{action}?"
+          policy = policy_class.new(user)
+          if policy.respond_to?(allow_action)
+            return policy.send(allow_action, *policy_context)
+          end
+        end
+        { denied: "No policy for #{class_name} #{action}!"}
       rescue NameError
-        policy_class = nil
-      end
-      allow_action= "allow_#{action}?"
-      policy = policy_class.new(user)
-      if policy.respond_to?(allow_action)
-        policy.send(allow_action, *policy_context)
-      else
         { denied: "No policy for #{class_name} #{action}!"}
       end
     end

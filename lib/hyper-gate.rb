@@ -1,3 +1,4 @@
+require 'opal-activesupport'
 require 'hyperstack/gate/version'
 require 'hyper-transport'
 
@@ -6,6 +7,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack_gate_processor'
   # nothing else
 else
+  require 'active_support'
   require 'oj'
   require 'hyperstack/promise'
   require 'hyperstack/gate/class_methods'
