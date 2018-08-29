@@ -27,6 +27,6 @@
 
 + Component, Model, Store and Operation DSL changes should be kept to a minimum and where there are changes, deprecation must be considered.
 The 2.0 release cannot be a moving target. Our goals is to replace 1.0 in the quickest time possible then evolve 2.0 part by part (not be in this situation again)
-+ It is understood that HS2 will be better and faster and offer more functionality than HS1. It is completely understood that HS1 DSL != HS2 DSL but where there is a difference, there needs to be comprehensive change management
++ Hyperstack will be better and faster and offer more functionality than Hyperloop. It is completely understood that the Hyperstack DSL != Hyperloop DSL but where there is a difference, there needs to be comprehensive change management
 + If the testing framework is changed (because it is too slow to run), we MUST ensure that the existing tests work with the new framework. There are thousands of tests which have been written over many years, the value of these will not be let go. If we change the framework then it is our responsibility to ensure the existing tests work properly with the new framework. This pertains to all HyperReact, HyperRouter, and HyperStore tests.
   + Where there is functional or DSL change, then we must change the corresponding tests so that they remain valid.
