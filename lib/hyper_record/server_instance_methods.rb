@@ -8,7 +8,7 @@ module HyperRecord
               else
                 record_json # for ActiveRecord
               end
-      { record_model => { instances: { self.id => { properties: props }}}}
+      { record_model => { instances: { self.id.to_s => { properties: props }}}}
     end
   end
 end
