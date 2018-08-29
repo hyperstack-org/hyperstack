@@ -1,4 +1,4 @@
-# Hyperstack 2.0 (HS2)
+# Hyperstack ALPHA
 
 ## Release goals:
 
@@ -21,8 +21,7 @@
 + Setup and installation docs per supported framework
 + General gem naming and versioning, dependency restrictions / make sure the new stack does not pull in new stuff
 + Two documents must be maintained (Barrie will maintain these):
-  + Upgrading from HL/HS1 to HS2
-  + HS2 DSL/functional change log (detailing each functional or DSL change, the implication and hopefully a link to the commit so that it can be understood)
+  + Hyperstack DSL/functional change log (detailing each functional or DSL change, the implication and hopefully a link to the commit so that it can be understood)
 
 ## Out of scope / constraints:
 
