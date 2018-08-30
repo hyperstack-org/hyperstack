@@ -1,9 +1,9 @@
 module Hyperstack
-  module Gate
+  module Policy
     module PolicyDefinition
       def self.included(base)
-        base.include(Hyperstack::Gate::InstanceMethods)
-        base.extend(Hyperstack::Gate::ClassMethods)
+        base.include(Hyperstack::Policy::InstanceMethods)
+        base.extend(Hyperstack::Policy::ClassMethods)
       end
     end
   end

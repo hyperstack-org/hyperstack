@@ -1,4 +1,3 @@
-require 'hyperstack/transport/version'
 if RUBY_ENGINE == 'opal'
   require 'hyperstack/transport/request_agent'
   require 'hyperstack/transport/response_processor'

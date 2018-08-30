@@ -1,7 +1,6 @@
 require 'opal-activesupport'
-require 'hyperstack/resource/version'
 require 'hyper-store'
-require 'hyper-react'
+require 'hyper-component'
 require 'hyper-transport'
 
 if RUBY_ENGINE == 'opal'

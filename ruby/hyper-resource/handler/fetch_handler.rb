@@ -1,6 +1,6 @@
 class FetchHandler
   include Hyperstack::Resource::SecurityGuards
-  include Hyperstack::Gate
+  include Hyperstack::Policy
 
   def process_request(session_id, current_user, request)
     result = {}

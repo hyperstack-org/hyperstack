@@ -3,7 +3,7 @@
 Follow these steps to upgrade:
 
 1. Replace `reactrb` with `hyper-react` both in **Gemfile** and any `require`s in your code.
-2. To include the React.js source, the suggested way is to add `require 'react/react-source'` before `require 'hyper-react'`. This will use the copy of React.js source from `react-rails` gem.
+2. To include the React.js source, the suggested way is to add `require 'react/react-source'` before `require 'hyper-component'`. This will use the copy of React.js source from `react-rails` gem.
 
 ## Upgrading to Reactrb
 

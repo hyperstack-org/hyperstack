@@ -1,10 +1,10 @@
-# hyper-business
+# hyper-operation
 
 ## Installation
 
 take this from the repo
 then in your shell:
-`$ hyper-business-installer`
+`$ hyper-operation-installer`
 
 This will create directories and install a default business operations handler in your projects `hyperstack/handlers` directory or
 `app/hyperstack/handlers`, depending on your config.

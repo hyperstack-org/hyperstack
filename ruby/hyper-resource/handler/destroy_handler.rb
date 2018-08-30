@@ -1,6 +1,6 @@
 class DestroyHandler
   include Hyperstack::Resource::SecurityGuards
-  include Hyperstack::Gate
+  include Hyperstack::Policy
 
   def process_request(_session_id, current_user, request)
     result = {}

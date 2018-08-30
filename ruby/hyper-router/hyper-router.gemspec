@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = Hyperstack::VERSION
   spec.authors       = ['Adam George', 'Jan Biedermann']
   spec.email         = ['adamgeorge.31@gmail.com', 'jan@kursator.com']
-  spec.homepage      = 'http://ruby-hyperstack.org'
+  spec.homepage      = 'http://hyperstack.org'
   spec.license       = 'MIT'
   spec.summary       = 'hyper-router for Opal, part of ruby-hyperstack'
   # spec.metadata      = {
@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   spec.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
 
-  spec.add_dependency 'hyper-react', Hyperstack::VERSION
+  spec.add_dependency 'hyper-component', Hyperstack::VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'

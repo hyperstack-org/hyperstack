@@ -32,6 +32,7 @@ else
     class << self
       attr_accessor :client_init_class_names
       attr_accessor :prerendering
+      attr_accessor :version
 
       def add_client_option(option)
         @options_for_client ||= Set.new
@@ -65,9 +66,11 @@ else
       end
     end
 
+    self.add_client_option(:client_init_class_names)
+    self.add_client_option(:version)
+
     self.client_init_class_names = []
     self.prerendering = :off
-
-    self.add_client_option(:client_init_class_names)
+    self.version = ::Hyperstack::Component::VERSION # thats equal to the hyperstack version
   end
 end

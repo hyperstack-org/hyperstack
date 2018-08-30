@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Hyperstack::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Adam Creekroad', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
-  spec.summary       = 'Flux Stores and more for Hyperstack'
-  spec.homepage      = 'https://ruby-hyperstack.org'
+  spec.summary       = 'Stores and more for Hyperstack'
+  spec.homepage      = 'http://hyperstack.org'
   spec.license       = 'MIT'
   # spec.metadata      = {
   #   "homepage_uri" => 'http://ruby-hyperstack.org',
@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-react', Hyperstack::VERSION
+  spec.add_development_dependency 'hyper-component', Hyperstack::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'pry-byebug'

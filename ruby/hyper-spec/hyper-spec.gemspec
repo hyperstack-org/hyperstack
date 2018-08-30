@@ -5,9 +5,9 @@ Gem::Specification.new do |s|
   s.version      = Hyperstack::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
-  s.homepage     = 'https://github.com/janbiedermann/hyper-gate'
-  s.summary      = 'Spec for hyperstack.'
-  s.description  = 'Spec for hyperstack.'
+  s.homepage     = 'http://hyperstack.org'
+  s.summary      = 'Spec runner for Hyperstack.'
+  s.description  = 'Spec runner for Hyperstack.'
 
   s.files          = `git ls-files`.split("\n")
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")

@@ -1,7 +1,7 @@
 require 'pry'
 require 'opal-browser'
 require 'hyper-spec'
-require 'hyper-react'
+require 'hyper-component'
 require 'hyper-store'
 
 ENV['RAILS_ENV'] ||= 'test'

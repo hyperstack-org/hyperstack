@@ -3,12 +3,12 @@ if RUBY_ENGINE != 'opal'
 
     # available settings
     class << self
-      attr_accessor :business_use_authorization
-      attr_accessor :valid_business_class_names
+      attr_accessor :operation_use_authorization
+      attr_accessor :valid_operation_class_names
     end
 
     # default values
-    self.business_use_authorization = true
-    self.valid_business_class_names = []
+    self.operation_use_authorization = true
+    self.valid_operation_class_names = []
   end
 end

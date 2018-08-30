@@ -1,5 +1,5 @@
-class GateHandler
-  include Hyperstack::Gate
+class PolicyHandler
+  include Hyperstack::Policy
 
   def process_request(_session_id, current_user, request)
     result = { hyperstack_gate: {} }

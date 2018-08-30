@@ -10,7 +10,7 @@
   + ORM agnostic (tested with ActiveRecord SQL and Neo4j.rb)
   + No need for data broadcast Policy
 + Updated Operation DSL (business logic and bidirectional client/server execution)
-+ HyperGate for authorisation and authentication on the client and server
++ HyperPolicy for authorisation and authentication on the client and server
 + Faster rspec framework plus automated build and deploy process
 
 ## Change management needed:

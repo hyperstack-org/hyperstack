@@ -1,5 +1,5 @@
 module Hyperstack
-  class Business
+  class Operation
     module ClassMethods
 
       SUCCESS_TRACK = 0
@@ -71,7 +71,7 @@ module Hyperstack
 
       # step
       def OneStep(description = nil, &block)
-        raise "#{self}: OneStep: First, Then or Finally or another OneStep already defined, one_step is for single step business operations only!" if _pipe.size > 0
+        raise "#{self}: OneStep: First, Then or Finally or another OneStep already defined, one_step is for single step operation operations only!" if _pipe.size > 0
 
         if block_given?
           _add_to_pipe(SUCCESS_TRACK, nil, &block)
@@ -150,7 +150,7 @@ module Hyperstack
                    end
           raise errors.join("\n") if errors.any?
           agent = Hyperstack::Transport::RequestAgent.new
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, { business: { self.to_s.underscore  => { agent.object_id => JSON.generate(*params) }}} ).then do
+          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, { operation: { self.to_s.underscore  => { agent.object_id => JSON.generate(*params) }}} ).then do
             agent.result
           end
         end

@@ -1,5 +1,5 @@
 module Hyperstack
-  module Gate
+  module Policy
     module InstanceMethods
       attr_reader :current_user
 

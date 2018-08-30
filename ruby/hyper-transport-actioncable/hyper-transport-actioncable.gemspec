@@ -5,9 +5,9 @@ Gem::Specification.new do |s|
   s.version      = Hyperstack::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
-  s.homepage     = 'https://github.com/janbiedermann/hyper-transport-actioncable'
-  s.summary      = 'Driver for ActionCable pub sub for hyper-transport for hyperstack.'
-  s.description  = 'Driver for ActionCable pub sub for hyper-transport for hyperstack.'
+  s.homepage     = 'http://hyperstack.org'
+  s.summary      = 'Driver for ActionCable pub sub for hyper-transport for Hyperstack.'
+  s.description  = 'Driver for ActionCable pub sub for hyper-transport for Hyperstack.'
 
   s.files          = `git ls-files`.split("\n")
   s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")

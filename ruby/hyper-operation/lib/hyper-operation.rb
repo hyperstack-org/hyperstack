@@ -1,7 +1,6 @@
 require 'opal'
-require 'hyperstack/business/version'
 require 'hyper-store'
-require 'hyper-react'
+require 'hyper-component'
 require 'hyper-transport'
 
 if RUBY_ENGINE == 'opal'
@@ -11,9 +10,9 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/params/instance_methods'
   require 'hyperstack/params/class_methods'
   require 'hyperstack/validator'
-  require 'hyperstack/business/class_methods'
-  require 'hyperstack/business/mixin'
-  require 'hyperstack/business'
+  require 'hyperstack/operation/class_methods'
+  require 'hyperstack/operation/mixin'
+  require 'hyperstack/operation'
 else
   require 'oj'
   require 'hyperstack/promise'
@@ -21,9 +20,9 @@ else
   require 'hyperstack/params/instance_methods'
   require 'hyperstack/params/class_methods'
   require 'hyperstack/validator'
-  require 'hyperstack/business/class_methods'
-  require 'hyperstack/business/mixin'
-  require 'hyperstack/business'
+  require 'hyperstack/operation/class_methods'
+  require 'hyperstack/operation/mixin'
+  require 'hyperstack/operation'
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
   if Dir.exist?(File.join('app', 'hyperstack', 'operations'))
     # Opal.append_path(File.expand_path(File.join('app', 'hyperstack', 'operations'))) <- opal-autoloader will handle this
@@ -36,7 +35,7 @@ else
   # special treatment for rails
   if defined?(Rails)
     module Hyperstack
-      class Business
+      class Operation
         class Railtie < Rails::Railtie
           def delete_first(a, e)
             a.delete_at(a.index(e) || a.length)

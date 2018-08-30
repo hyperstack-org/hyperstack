@@ -1,5 +1,5 @@
 module Hyperstack
-  module Gate
+  module Policy
     module ClassMethods
       def defined_policies
         @defined_policies ||= {}

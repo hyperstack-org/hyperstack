@@ -1,10 +1,10 @@
 module Hyperstack
-  class Business
+  class Operation
     module Mixin
       def self.included(base)
         base.include(Hyperstack::Params::InstanceMethods)
         base.extend(Hyperstack::Params::ClassMethods)
-        base.extend(Hyperstack::Business::ClassMethods)
+        base.extend(Hyperstack::Operation::ClassMethods)
       end
 
       attr_accessor :props

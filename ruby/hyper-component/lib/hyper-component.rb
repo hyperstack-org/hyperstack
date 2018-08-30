@@ -22,7 +22,6 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/params/instance_methods'
   require 'hyperstack/component/mixin'
   require 'hyperstack/component'
-  require 'hyperstack/component/version'
   require 'hyperstack/context'
   require 'hyperstack/top_level'
 else
@@ -31,9 +30,9 @@ else
   require 'hyper-store'
   require 'opal-activesupport'
   require 'opal-browser'
-  require 'reactive-ruby/isomorphic_helpers'
-  require 'reactive-ruby/serializers'
   require 'hyperstack/component/version'
+  require 'reactive-ruby/isomorphic_helpers' # obsolete, but still needed in router
+  require 'reactive-ruby/serializers' # same
   require 'hyperstack/promise'
   require 'hyperstack/config'
   require 'hyperstack/view_helpers'

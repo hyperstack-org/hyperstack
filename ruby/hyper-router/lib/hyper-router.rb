@@ -1,6 +1,6 @@
 # rubocop:disable Style/FileName
 
-require 'hyper-react'
+require 'hyper-component'
 
 if RUBY_ENGINE == 'opal'
   require 'react/router'
@@ -26,7 +26,6 @@ if RUBY_ENGINE == 'opal'
 else
   require 'opal'
   require 'hyper-router/isomorphic_methods'
-  require 'hyper-router/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end

@@ -1,19 +1,17 @@
 require 'opal-activesupport'
-require 'hyperstack/gate/version'
 require 'hyper-transport'
 
 if RUBY_ENGINE == 'opal'
-  require 'hyperstack/gate/version'
-  require 'hyperstack_gate_processor'
+  require 'hyperstack_policy_processor'
   # nothing else
 else
   require 'active_support'
   require 'oj'
   require 'hyperstack/promise'
-  require 'hyperstack/gate/class_methods'
-  require 'hyperstack/gate/instance_methods'
-  require 'hyperstack/gate/policy_definition'
-  require 'hyperstack/gate'
+  require 'hyperstack/policy/class_methods'
+  require 'hyperstack/policy/instance_methods'
+  require 'hyperstack/policy/policy_definition'
+  require 'hyperstack/policy'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
@@ -27,7 +25,7 @@ else
 
   if defined?(Rails)
     module Hyperstack
-      module Gate
+      module Policy
         class Railtie < Rails::Railtie
           def delete_first(a, e)
             a.delete_at(a.index(e) || a.length)

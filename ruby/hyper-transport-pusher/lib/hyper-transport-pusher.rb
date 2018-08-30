@@ -1,5 +1,4 @@
 require 'hyper-transport'
-require 'hyperstack/transport/pusher/version'
 
 if RUBY_ENGINE == 'opal'
   require 'hyperstack/transport/pusher/client_driver'
