@@ -1,8 +1,8 @@
-require_relative 'lib/hyperstack/gate/version'
+require_relative 'lib/hyperstack/policy/version'
 
 Gem::Specification.new do |s|
-  s.name         = 'hyper-gate'
-  s.version      = Hyperstack::Gate::VERSION
+  s.name         = 'hyper-policy'
+  s.version      = Hyperstack::Policy::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.homepage     = 'https://github.com/janbiedermann/hyper-gate'

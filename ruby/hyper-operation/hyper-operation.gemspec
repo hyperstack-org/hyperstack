@@ -1,8 +1,8 @@
 require_relative 'lib/hyperstack/business/version'
 
 Gem::Specification.new do |s|
-  s.name         = 'hyper-business'
-  s.version      = Hyperstack::Business::VERSION
+  s.name         = 'hyper-operation'
+  s.version      = Hyperstack::Operation::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.homepage     = 'https://github.com/janbiedermann/hyper-business'

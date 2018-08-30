@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib/', __FILE__)
 require 'hyperstack/component/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'hyper-react'
+  spec.name          = 'hyper-component'
   spec.version       = Hyperstack::Component::VERSION
 
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann']
