@@ -1,8 +1,8 @@
-require_relative 'lib/hyperstack/policy/version'
+require '../version.rb'
 
 Gem::Specification.new do |s|
   s.name         = 'hyper-policy'
-  s.version      = Hyperstack::Policy::VERSION
+  s.version      = Hyperstack::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.homepage     = 'https://github.com/janbiedermann/hyper-gate'
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport', '~> 5.0'
   s.add_runtime_dependency 'opal', '~> 0.11.0'
   s.add_runtime_dependency 'opal-activesupport', '~> 0.3.1'
-  s.add_runtime_dependency 'hyper-react', '~> 1.0.0.lap0'
-  s.add_runtime_dependency 'hyper-transport', '~> 0.0.1'
+  s.add_runtime_dependency 'hyper-react', Hyperstack::VERSION
+  s.add_runtime_dependency 'hyper-transport', Hyperstack::VERSION
   s.add_runtime_dependency 'oj', '~> 3.6.0'
 end

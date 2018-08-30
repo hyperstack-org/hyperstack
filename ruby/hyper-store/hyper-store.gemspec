@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'hyper-store/version'
+require '../version.rb'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-store'
-  spec.version       = HyperStore::VERSION
+  spec.version       = Hyperstack::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Adam Creekroad', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = 'Flux Stores and more for Hyperstack'
@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-react', HyperStore::VERSION
+  spec.add_development_dependency 'hyper-react', Hyperstack::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'pry-byebug'

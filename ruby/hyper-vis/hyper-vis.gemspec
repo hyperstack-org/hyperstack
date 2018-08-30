@@ -1,8 +1,8 @@
-require_relative "lib/hyperloop/vis/version"
+require '../version.rb'
 
 Gem::Specification.new do |s|
   s.name         = "hyper-vis"
-  s.version      = Hyperloop::Vis::VERSION
+  s.version      = Hyperstack::VERSION
   s.author       = "Jan Biedermann"
   s.email        = "jan@kursator.de"
   s.homepage     = "https://github.com/janbiedermann/hyper-vis"
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "opal", "~> 0.11.0"
   s.add_runtime_dependency "opal-activesupport", "~> 0.3.1"
-  s.add_runtime_dependency "hyper-react", "~> 1.0.0.lap28"
+  s.add_runtime_dependency "hyper-react", Hyperstack::VERSION
   s.add_development_dependency "listen"
   s.add_development_dependency "rake", ">= 11.3.0"
   s.add_development_dependency "rails", ">= 5.1.0"

@@ -1,10 +1,10 @@
 # coding: utf-8
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
-require 'hyper-router/version'
+require '../version.rb'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-router'
-  spec.version       = HyperRouter::VERSION
+  spec.version       = Hyperstack::VERSION
   spec.authors       = ['Adam George', 'Jan Biedermann']
   spec.email         = ['adamgeorge.31@gmail.com', 'jan@kursator.com']
   spec.homepage      = 'http://ruby-hyperstack.org'
@@ -18,13 +18,13 @@ Gem::Specification.new do |spec|
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
   spec.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
 
-  spec.add_dependency 'hyper-react', HyperRouter::HYPERLOOP_VERSION
+  spec.add_dependency 'hyper-react', Hyperstack::VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'hyper-spec', HyperRouter::HYPERLOOP_VERSION
+  spec.add_development_dependency 'hyper-spec', Hyperstack::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'parser'
   spec.add_development_dependency 'rails', '>= 4.0.0'

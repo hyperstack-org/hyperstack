@@ -1,5 +1,5 @@
 module Hyperstack
   module Resource
-    VERSION = '1.1.0.lap0'
+    VERSION = File.read(File.expand_path("../../../../../HYPERSTACK_VERSION", __dir__)).strip
   end
 end

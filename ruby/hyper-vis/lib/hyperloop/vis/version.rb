@@ -1,5 +1,5 @@
 module Hyperloop
   module Vis
-    VERSION = '1.0.1'
+    VERSION = File.read(File.expand_path("../../../../../HYPERSTACK_VERSION", __dir__)).strip
   end
 end

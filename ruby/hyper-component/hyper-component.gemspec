@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-require 'hyperstack/component/version'
+require '../version.rb'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-component'
-  spec.version       = Hyperstack::Component::VERSION
+  spec.version       = Hyperstack::VERSION
 
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyper-store', Hyperstack::Component::VERSION
+  spec.add_dependency 'hyper-store', Hyperstack::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'opal-browser', '~> 0.2.0'

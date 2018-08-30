@@ -1,3 +1,3 @@
 module HyperStore
-  VERSION = '1.0.0.lap28'
+  VERSION = File.read(File.expand_path("../../../../HYPERSTACK_VERSION", __dir__)).strip
 end

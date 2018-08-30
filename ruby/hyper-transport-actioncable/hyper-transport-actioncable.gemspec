@@ -1,8 +1,8 @@
-require_relative 'lib/hyperstack/transport/action_cable/version'
+require '../version.rb'
 
 Gem::Specification.new do |s|
   s.name         = 'hyper-transport-actioncable'
-  s.version      = Hyperstack::Transport::ActionCable::VERSION
+  s.version      = Hyperstack::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.homepage     = 'https://github.com/janbiedermann/hyper-transport-actioncable'
@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'actioncable', '> 5.0.0'
   s.add_runtime_dependency 'opal', '~> 0.11.0'
-  s.add_runtime_dependency 'hyper-transport', '~> 0.0.1'
+  s.add_runtime_dependency 'hyper-transport', Hyperstack::VERSION
 end
