@@ -1,0 +1,62 @@
+source 'https://rubygems.org'
+
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'rails'
+# Use sqlite3 as the database for Active Record
+# gem 'sqlite3'
+gem 'mysql2'
+# Use SCSS for stylesheets
+# gem 'sass-rails'
+# Use Uglifier as compressor for JavaScript assets
+# gem 'uglifier'
+# Use CoffeeScript for .coffee assets and views
+# gem 'coffee-rails'
+# See https://github.com/rails/execjs#readme for more supported runtimes
+# gem 'mini_racer', platforms: :ruby
+
+# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+gem 'turbolinks'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'jbuilder'
+
+# Use ActiveModel has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
+
+# Use Unicorn as the app server
+# gem 'unicorn'
+
+# Use Capistrano for deployment
+# gem 'capistrano-rails', group: :development
+
+group :development, :test do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug'
+  gem 'pry'
+  gem 'hyper-trace'
+end
+
+group :development do
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console'
+  # gem 'reactrb-rails-generator'
+  gem 'puma'
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+end
+
+# gem 'opal'
+gem "opal", '>= 0.11.0'
+gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
+gem "opal-rails", '~> 0.9.4'
+gem "opal-activesupport", '~> 0.3.1'
+gem 'react-rails', '>= 2.4.0', '< 2.5.0'
+gem 'mini_racer', platforms: :ruby
+gem 'hyper-router'
+gem 'hyper-mesh', path: '../..'
+gem 'hyperloop-config' #, path: '../../../hyperloop-config'
+gem 'hyper-operation' #, path: '../../../hyper-operation'
+gem 'hyper-component'#, path: '../../../hyper-component'
+gem 'hyper-react' #, path: '../../../hyper-react'
+gem 'hyper-store'#, path: '../../../hyper-store'
+gem 'opal-browser'
+gem 'rspec-rails'

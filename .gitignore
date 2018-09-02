@@ -1,0 +1,36 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/.byebug_history
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+tmp/
+spec/test_app/tmp/
+spec/test_app/db/test.sqlite3
+spec/test_app/log/test.log
+spec/test_app/log/development.log
+spec/test_app/Gemfile.lock
+/synchromesh-simple-poller-store
+/synchromesh-pusher-channel-store
+/examples/action-cable/rails_cache_dir/
+rails_cache_dir/
+react_prerendering_src.js
+
+.bundle/
+log/*.log
+pkg/
+reactive_record_test_app/db/*.sqlite3
+reactive_record_test_app/log/
+reactive_record_test_app/tmp/
+reactive_record_test_app/.sass-cache
+.DS_Store
+public/assets/*
+
+# ignore gems
+*.gem
+
+# ingore Idea
+.idea
+.vscode
