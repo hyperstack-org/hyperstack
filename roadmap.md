@@ -1,17 +1,17 @@
 # draft hyperstack 1.0 roadmap
 
-### version 0.99
+### Hyperloop (!!) version 0.99
 
 #### mission:  release the functionality of current hyperloop edge branch
 
-+ move current gem set to one repo under hyperstack
++ move current gem set to one repo under hyperstack (done - tx Barry)
 + get specs to pass with current names
 + release under old hyperloop gem names version 0.99
 + publish to hyperloop-legacy branch *(not master)* with tag 0.99
 
 ------
 
-### version 0.1
+### Hyperstack version 0.1
 
 #### mission: move to new naming conventions
 
