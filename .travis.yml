@@ -1,0 +1,35 @@
+dist: trusty
+language: ruby
+cache: bundler
+rvm:
+  - 2.4.4
+  - 2.5.1
+  - ruby-head
+env:
+  - DRIVER=google-chrome TZ=Europe/Berlin
+matrix:
+  fast_finish: true
+  allow_failures:
+    - rvm: ruby-head
+before_install:
+  - if [[ "$DRIVER" == "google-chrome" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then sudo apt-get update -qq && sudo apt-get install -qq -y google-chrome-stable; fi
+  - gem install bundler
+before_script:
+  - bundle install --jobs=3 --retry=3
+  - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver-update; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then ls -lR ~/.chromedriver-helper/; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then google-chrome --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then which google-chrome; fi
+script: bundle exec rspec
+deploy:
+  provider: rubygems
+  gem: hyper-i18n
+  gemspec: hyper-i18n.gemspec
+  api_key:
+    secure: ku9SGaxOhlbrc1G6F9xSCqITXLHi49IM0HglCX0Gr1QV2lEHa/1V+uTDGiatC5x2fKDF23KPVJ+A/MWO+nr0AGHNhxTJubU4NdhUspWtx8vn4eT9dmQFKjeaQqXBK00B7f97m4zg/yniGQusvt/l6Wq6lx5bGk3EM995zbFROn60JGqYK5yeZoUU7hKG87PFAjKZGkLO+r9bV+Na9m1AfJiQsOJeyG4IHmnUu+YR5moS76/+ikZnXDNDJzsxANljmP6+kRMfO91v077oAdfeJJwKzZndDoY3LBxxp5ZMWCZdqSgvY7hYTrrDIAGUiZr1/SrwGYEKFnMCDErxSsIvPDYfBSp0QPygEDP0tVoO4h3sm1T+0oTejB7+ZWUygJpAlriqVjJxV1Xi3BziejZgQoG8Z8iiHccw0e+4JzLcYGbNPAvVAQYeDgLA8sFj1WlE/HX2sE5Ct1Rg+coR23/2IDuOcZ2UmC7JHXP0PSylr07aa5vA3lIxPc/B//LF2xsQ/9LxFbmAJaVa6Efrc3IcJFghNEHR1nYiKNuRAg8g4+zqdGDlKhmaO9U3cfUZmQvb1qdKjS83nt9VIE8bWchgixW66W65FZ2++Yzi9sDcDlJWIlr/29W8q8KA96E7JzLKT4NrtO83OSDzJFbAzRi1KlmPJZlBx+N5tCuEcBo7pYc=
+  on:
+    tags: true
+    rvm: 2.4.4
