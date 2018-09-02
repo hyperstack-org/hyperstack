@@ -1,0 +1,29 @@
+dist: trusty
+language: ruby
+cache: bundler
+rvm:
+  - 2.4.4
+  - 2.5.1
+  - ruby-head
+env:
+  - DRIVER=google-chrome TZ=Europe/Berlin
+matrix:
+    fast_finish: true
+    allow_failures:
+      - rvm: ruby-head
+before_install:
+  - if [[ "$DRIVER" == "google-chrome" ]]; then wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then sudo apt-get update -qq && sudo apt-get install -qq -y google-chrome-stable; fi
+  - gem install bundler
+before_script:
+  - cd spec/test_app
+  - bundle install --jobs=3 --retry=3
+  - bundle exec rails db:setup
+  - cd ../../
+  - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver-update; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then ls -lR ~/.chromedriver-helper/; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then google-chrome --version; fi
+  - if [[ "$DRIVER" == "google-chrome" ]]; then which google-chrome; fi
+script: bundle exec rspec
