@@ -1,6 +1,5 @@
 <div class="githubhyperloopheader">
 
-<p align="center">
 
 <a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
 <img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
