@@ -1,6 +1,13 @@
-# Ruby version for Hyperstack
+# Hyperstack 1.0
 
-## Gemfile
+## Release goals
+
++ Hyperstack 1.0 based on Hyperloop edge
+
+
+## Ruby version for Hyperstack
+
+### Gemfile
 
 Include this repo for development in your Gemfile can be done like this:
 
