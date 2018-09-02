@@ -25,9 +25,14 @@
 /yarn-error.log
 /.owl_cache
 
+<<<<<<< HEAD
 /public/assets
 /public/packs
 .byebug_history
+=======
+spec/test_app/tmp
+spec/test_app/db
+>>>>>>> hyperloop-hyper-react/edge
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
