@@ -1,12 +1,3 @@
-<div class="githubhyperloopheader">
-
-
-<a href="http://ruby-hyperloop.io/" alt="Hyperloop" title="Hyperloop">
-<img width="350px" src="http://ruby-hyperloop.io/images/hyperloop-github-logo.png">
-</a>
-
-</p>
-
 <h2 align="center">The Complete Isomorphic Ruby Framework</h2>
 
 <br>
