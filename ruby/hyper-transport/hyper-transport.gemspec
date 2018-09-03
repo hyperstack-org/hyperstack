@@ -14,5 +14,6 @@ Gem::Specification.new do |s|
   s.require_paths  = ['lib']
 
   s.add_runtime_dependency 'opal', '~> 0.11.0'
+  s.add_runtime_dependency 'activesupport', '~> 5.0'
   s.add_runtime_dependency 'hyper-component', Hyperstack::VERSION
 end

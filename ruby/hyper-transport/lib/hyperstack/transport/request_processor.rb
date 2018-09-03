@@ -6,7 +6,7 @@ module Hyperstack
         request.keys.each do |key|
           # TODO check safety
           handler_const = "::#{key.underscore.camelize}Handler"
-          handler = Object.const_get(handler_const)
+          handler = handler_const.camelize.constantize
           if handler
             result.merge!(handler.new.process_request(session_id, current_user, request[key]))
           else
