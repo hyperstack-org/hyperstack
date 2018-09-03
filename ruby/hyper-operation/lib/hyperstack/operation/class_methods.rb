@@ -150,7 +150,7 @@ module Hyperstack
                    end
           raise errors.join("\n") if errors.any?
           agent = Hyperstack::Transport::RequestAgent.new
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, { operation: { self.to_s.underscore  => { agent.object_id => JSON.generate(*params) }}} ).then do
+          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, { 'hyperstack/handler/operation' => { self.to_s.underscore  => { agent.object_id => JSON.generate(*params) }}} ).then do
             agent.result
           end
         end

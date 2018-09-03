@@ -23,6 +23,9 @@ else
   require 'hyperstack/operation/class_methods'
   require 'hyperstack/operation/mixin'
   require 'hyperstack/operation'
+  require 'hyperstack/operation/security_guards'
+  require 'hyperstack/handler/operation_handler'
+
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
   if Dir.exist?(File.join('app', 'hyperstack', 'operations'))
     # Opal.append_path(File.expand_path(File.join('app', 'hyperstack', 'operations'))) <- opal-autoloader will handle this
