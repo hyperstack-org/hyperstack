@@ -10,8 +10,11 @@ else
   require 'hyperstack/promise'
   require 'hyperstack/policy/class_methods'
   require 'hyperstack/policy/instance_methods'
-  require 'hyperstack/policy/policy_definition'
+  require 'hyperstack/policy/definition'
   require 'hyperstack/policy'
+  require 'hyperstack/policy/driver'
+  require 'hyperstack/policy/config'
+  require 'hyperstack/handler/policy_handler'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 

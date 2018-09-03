@@ -1,6 +1,6 @@
 module Hyperstack
   module Policy
-    module PolicyDefinition
+    module Definition
       def self.included(base)
         base.include(Hyperstack::Policy::InstanceMethods)
         base.extend(Hyperstack::Policy::ClassMethods)
