@@ -1,17 +1,4 @@
-# Hyperstack 1.0 
-
-## Goals of this release
-
-+ First Hyperstack release based on last Hyperloop
-+ Change class names from Hyperloop to Hyperstack convention
-+ All gems building from one repo with an automated test, build, deploy process
-+ 10x speed improvement in hyper-spec
-+ Opal-webpack-loader based build process
-+ New webesite and updated docs and tutorials
-+ Use rails templates for installation and setup
-+ Depreciation of changes and documented upgrade path
-
-## Roadmap
+# draft hyperstack 1.0 roadmap
 
 ### Hyperloop (!!) version 0.99
 
@@ -64,3 +51,4 @@
 ------
 
 ### version 1.0
+
