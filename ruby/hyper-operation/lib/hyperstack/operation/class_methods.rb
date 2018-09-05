@@ -150,7 +150,7 @@ module Hyperstack
                    end
           raise errors.join("\n") if errors.any?
           agent = Hyperstack::Transport::RequestAgent.new
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, { 'hyperstack/handler/operation' => { self.to_s.underscore  => { agent.object_id => JSON.generate(*params) }}} ).then do
+          Hyperstack.client_transport_driver.promise_send('hyperstack/handler/operation' => { self.to_s.underscore  => { agent.object_id => params }}).then do
             agent.result
           end
         end
@@ -162,7 +162,7 @@ module Hyperstack
                       validate({})
                     end
           raise errors.join("\n") if errors.any?
-          Hyperstack::Transport::ServerPubSub.publish_to_session(session_id, { self.to_s.underscore => { Oj.dump(*params) => {}}})
+          Hyperstack::Transport::ServerPubSub.publish_to_session(session_id, { self.to_s.underscore => { params => {}}})
         end
 
         # def run_on_multiple_clients(sessions, *params)
