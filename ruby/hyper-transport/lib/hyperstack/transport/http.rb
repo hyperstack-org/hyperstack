@@ -250,8 +250,8 @@ module Hyperstack
       end
 
       # meant for hyper-resource
-      def self.promise_send(uri, data)
-        post(uri + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
+      def self.promise_send(data)
+        post(Hyperstack.api_path + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
           Hyperstack::Transport::ResponseProcessor.process_response(response.json)
         end
       end
