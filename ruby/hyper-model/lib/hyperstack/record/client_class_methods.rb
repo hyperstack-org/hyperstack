@@ -57,7 +57,7 @@ module Hyperstack
           _register_observer
           @read_states[relation_name] = 'i'
           request = { 'hyperstack/handler/model/read' => { self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             self
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a belongs_to association, failed to read records!"
@@ -113,7 +113,7 @@ module Hyperstack
           end
           raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance collection_query without id!" unless self.id
           request = { 'hyperstack/handler/model/read' => { self.class.model_name => { instances: { id => { collection_queries: { name => {}}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             @collection_query[name][:result]
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{name}, a collection_query, failed to execute!"
@@ -198,7 +198,7 @@ module Hyperstack
         _class_read_states[record_sid] = 'i'
         request = { 'hyperstack/handler/model/read' => { self.model_name => { instances: { sid => {}}}}}
         _register_class_observer
-        Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+        Hyperstack.client_transport_driver.promise_send(request).then do
           notify_class_observers
           _record_cache[sid]
         end.fail do |response|
@@ -235,7 +235,7 @@ module Hyperstack
           _register_observer
           @read_states[relation_name] = 'i'
           request = { 'hyperstack/handler/model/read' => { self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             self
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_and_belongs_to_many association, failed to read records!"
@@ -303,7 +303,7 @@ module Hyperstack
           _register_observer
           @read_states[relation_name] = 'i'
           request = { 'hyperstack/handler/model/read' => { self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             self
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_many association, failed to read records!"
@@ -369,7 +369,7 @@ module Hyperstack
         define_method("promise_#{relation_name}") do
           @read_states[relation_name] = 'i'
           request = { 'hyperstack/handler/model/read' => { self.class.model_name => { instances: { id => { relations: { relation_name => {}}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             self
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{relation_name}, a has_one association, failed to read records!"
@@ -415,7 +415,7 @@ module Hyperstack
           handler_method_name = method_name.sub('promise_', '')
           agent = Hyperstack::Transport::RequestAgent.new
           request = { 'hyperstack/handler/model/read' => { self.model_name => { find_by: { agent.object_id => { handler_method_name => args }}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             raise if agent.errors
             agent.result
           end.fail do |response|
@@ -519,7 +519,7 @@ module Hyperstack
           _class_read_states[name_args] = 'i'
           rest_class_methods[name_args] = { result: options[:default_result] } unless rest_class_methods.has_key?(name_args)
           request = { 'hyperstack/handler/model/read' => { self.model_name => { remote_methods: { name =>{ args => {}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             rest_class_methods[name_args][:result]
           end.fail do |response|
             error_message = "#{self.to_s}.#{name}, a remote_method, failed to execute!"
@@ -565,7 +565,7 @@ module Hyperstack
           @remote_methods[name][args_json] = { result: options[:default_result] } unless @remote_methods[name].has_key?(args_json)
           raise "#{self.class.to_s}[_no_id_].#{name}, can't execute instance remote_method without id!" unless self.id
           request = { 'hyperstack/handler/model/read' => { self.class.model_name => { instances: { id => { remote_methods: { name => { args => {}}}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             @remote_methods[name][args_json][:result]
           end.fail do |response|
             error_message = "#{self.class.to_s}[#{self.id}].#{name}, a remote_method, failed to execute!"
@@ -619,7 +619,7 @@ module Hyperstack
           _class_read_states[name] = {} unless _class_read_states.has_key?(name)
           _class_read_states[name][args_json] = 'i'
           request = { 'hyperstack/handler/model/read' => { self.model_name => { scopes: { name => { args_json => {}}}}}}
-          Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+          Hyperstack.client_transport_driver.promise_send(request).then do
             scopes[name][args_json]
           end.fail do |response|
             error_message = "#{self.to_s}.#{name}(#{args_json if args.any}), a scope, failed to read records!"
@@ -663,7 +663,7 @@ module Hyperstack
       def promise_where(property_hash)
         agent = Hyperstack::Transport::RequestAgent.new
         request = { 'hyperstack/handler/model/read' => { self.model_name => { where: { agent.object_id => property_hash }}}}
-        Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+        Hyperstack.client_transport_driver.promise_send(request).then do
           raise if agent.errors
           agent.result
         end.fail do |response|

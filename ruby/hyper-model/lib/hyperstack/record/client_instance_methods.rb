@@ -206,7 +206,7 @@ module Hyperstack
       def promise_destroy
         _local_destroy
         request = { 'hyperstack/handler/model/destroy' => { self.class.model_name => { instances: { id => { properties: self.to_transport_hash}}}}}
-        Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+        Hyperstack.client_transport_driver.promise_send(request).then do
           self
         end.fail do |response|
           error_message = "Destroying record #{self} failed!"
@@ -246,7 +246,7 @@ module Hyperstack
         end
 
         request = { 'hyperstack/handler/model/link' => { self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}}}}
-        Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+        Hyperstack.client_transport_driver.promise_send(request).then do
           self
         end.fail do |response|
           error_message = "Linking record #{other_record} to #{self} failed!"
@@ -262,7 +262,7 @@ module Hyperstack
       def promise_save
         request = { 'hyperstack/handler/model/save' => self.to_transport_hash }
         is_new = @properties[:id].nil?
-        Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+        Hyperstack.client_transport_driver.promise_send(request).then do
           self
         end.fail do |response|
           error_message = if is_new
@@ -286,7 +286,7 @@ module Hyperstack
         raise "No relation for record of type #{other_record.class}" unless reflections.has_key?(relation_name)
         @relations[relation_name].delete_if { |cr| cr == other_record } if !called_from_collection && @read_states[relation_name] == 'f'
         request = { 'hyperstack/handler/model/unlink' => { self.class.model_name => { instances: { id => { relations: { relation_name => other_record.to_transport_hash }}}}}}
-        Hyperstack.client_transport_driver.promise_send(Hyperstack.api_path, request).then do
+        Hyperstack.client_transport_driver.promise_send(request).then do
           self
         end.fail do |response|
           error_message = "Unlinking #{other_record} from #{self} failed!"
