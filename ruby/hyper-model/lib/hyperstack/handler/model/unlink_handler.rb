@@ -23,66 +23,65 @@ module Hyperstack
               end
 
               record = model.hyperstack_orm_driver.find(id)
+              return result.deep_merge!(model_name => { instances: { errors: { id => { 'Record not found!' => ''}}}}) if record.nil?
 
-              if record
-                request[model_name]['instances'][id]['relations'].keys.each do |relation_name|
-                  sym_relation_name = relation_name.to_sym
 
-                  if model.hyperstack_orm_driver.has_relation?(sym_relation_name) # security guard
+              request[model_name]['instances'][id]['relations'].keys.each do |relation_name|
+                sym_relation_name = relation_name.to_sym
 
-                    request[model_name]['instances'][id]['relations'][relation_name].keys.each do |right_model_name|
+                unless model.hyperstack_orm_driver.has_relation?(sym_relation_name) # security guard
+                  return result.deep_merge!(model_name => { instances: { id => { errors: { relation_name => 'No such relation!' }}}})
+                end
 
-                      right_model = guarded_record_class(right_model_name) # security guard
+                request[model_name]['instances'][id]['relations'][relation_name].keys.each do |right_model_name|
 
-                      request[model_name]['instances'][id]['relations'][relation_name][right_model_name]['instances'].keys.each do |right_id|
+                  right_model = guarded_record_class(right_model_name) # security guard
 
-                        # authorize Model.find
-                        if Hyperstack.authorization_driver
-                          authorization_result = Hyperstack.authorization_driver.authorize(current_user, right_model.to_s, :find, { right_id => request[model_name]['instances'][id]['relations'][relation_name][right_model_name]['instances'][right_id] })
-                          if authorization_result.has_key?(:denied)
-                            result.deep_merge!(model_name => { instances: { id => { errors:  { 'Unlink failed!' => authorization_result[:denied] }}}})
-                            next # authorization guard
-                          end
-                        end
+                  request[model_name]['instances'][id]['relations'][relation_name][right_model_name]['instances'].keys.each do |right_id|
 
-                        right_record = model.hyperstack_orm_driver.find(id)
-
-                        collection = nil
-
-                        if right_record
-
-                          # authorize record unlink relation
-                          if Hyperstack.authorization_driver
-                            authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, "#{relation_name}_unlink", [record, right_record])
-                            if authorization_result.has_key?(:denied)
-                              result.deep_merge!(model_name => { instances: { id => { errors:  { 'Unlink failed!' => authorization_result[:denied] }}}})
-                              next # authorization guard
-                            end
-                          end
-
-                          model.hyperstack_orm_driver.unlink(record, right_record, sym_relation_name)
-
-                          model.hyperstack_orm_driver.touch(record)
-                          right_model.hyperstack_orm_driver.touch(right_record)
-
-                          if Hyperstack.model_use_pubsub
-                            Hyperstack::Model::PubSub.pub_sub_relation(session_id, collection, record, relation_name, right_record)
-                            Hyperstack::Model::PubSub.pub_sub_record(session_id, right_record)
-                            Hyperstack::Model::PubSub.pub_sub_record(session_id, record)
-                          end
-
-                          result.deep_merge!(record.to_transport_hash)
-                          result.deep_merge!(right_record.to_transport_hash)
-                        end
-
+                    # authorize Model.find
+                    if Hyperstack.authorization_driver
+                      authorization_result = Hyperstack.authorization_driver.authorize(current_user, right_model.to_s, :find, { right_id => request[model_name]['instances'][id]['relations'][relation_name][right_model_name]['instances'][right_id] })
+                      if authorization_result.has_key?(:denied)
+                        result.deep_merge!(model_name => { instances: { id => { errors:  { 'Unlink failed!' => authorization_result[:denied] }}}})
+                        next # authorization guard
                       end
                     end
-                  else
-                    result.deep_merge!(model_name => { instances: { id => { errors: { relation_name => 'No such relation!' }}}})
+
+                    right_record = model.hyperstack_orm_driver.find(id)
+
+                    collection = nil
+
+                    # TODO record not found message if right_record.nil?
+                    if right_record
+
+                      # authorize record unlink relation
+                      if Hyperstack.authorization_driver
+                        authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, "#{relation_name}_unlink", [record, right_record])
+                        if authorization_result.has_key?(:denied)
+                          result.deep_merge!(model_name => { instances: { id => { errors:  { 'Unlink failed!' => authorization_result[:denied] }}}})
+                          next # authorization guard
+                        end
+                      end
+
+                      model.hyperstack_orm_driver.unlink(record, right_record, sym_relation_name)
+
+                      model.hyperstack_orm_driver.touch(record)
+                      right_model.hyperstack_orm_driver.touch(right_record)
+
+                      if Hyperstack.model_use_pubsub
+                        Hyperstack::Model::PubSub.pub_sub_relation(session_id, collection, record, relation_name, right_record)
+                        Hyperstack::Model::PubSub.pub_sub_record(session_id, right_record)
+                        Hyperstack::Model::PubSub.pub_sub_record(session_id, record)
+                      end
+
+                      result.deep_merge!(record.to_transport_hash)
+                      result.deep_merge!(right_record.to_transport_hash)
+                    end
+
                   end
                 end
-              else
-                result.deep_merge!(model_name => { instances: { errors: { id => { 'Record not found!' => ''}}}})
+
               end
             end
           end

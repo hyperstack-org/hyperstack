@@ -8,17 +8,10 @@ module Hyperstack
         nil
       end
 
-      def process_response(response_hash)
-        records_to_notify = [] # could be a Set maybe
+      def process_response(promise, response_hash)
         response_hash.keys.each do |readables|
-          if readables == :instances
-            send("_process_class_#{readables}", response_hash[readables], records_to_notify)
-          else
-            send("_process_class_#{readables}", response_hash[readables])
-          end
+          send("_process_class_#{readables}", response_hash[readables])
         end
-        records_to_notify.each(&:notify_observers)
-        # notify_class_observers
         nil
       end
 
@@ -33,21 +26,17 @@ module Hyperstack
 
       # @private
       def _process_class_find_by(instances_hash)
-        instances_hash.keys.each do |agent_object_id|
-          agent = Hyperstack::Transport::RequestAgent.get(agent_object_id)
-          if instances_hash[agent_object_id].has_key?(:errors)
-            agent.result = nil
-            agent.errors = instances_hash[agent_object_id][:errors]
-          else
-            instances_hash[agent_object_id].keys.each do |find_by_method|
-              agent.result = Hyperstack::Model::Helpers.record_from_transport_hash(instances_hash[agent_object_id][find_by_method])
-            end
+        if instances_hash.has_key?(:errors)
+          promise.reject(instances_hash[:errors])
+        else
+          instances_hash.keys.each do |find_by_method|
+            Hyperstack::Model::Helpers.record_from_transport_hash(instances_hash[find_by_method])
           end
         end
       end
 
       # @private
-      def _process_class_instances(instances_hash, records_to_notify)
+      def _process_class_instances(instances_hash)
         instances_hash.keys.each do |id|
           record = if record_cached?(id)
                      _record_cache[id]
@@ -58,7 +47,6 @@ module Hyperstack
           instances_hash[id].keys.each do |readables|
             record.send("_process_#{readables}", instances_hash[id][readables])
           end
-          records_to_notify << record
         end
       end
 
@@ -87,15 +75,11 @@ module Hyperstack
       # @private
       def _process_class_where(where_hash)
         # scope
-        where_hash.keys.each do |agent_object_id|
-          agent = Hyperstack::Transport::RequestAgent.get(agent_object_id)
-          if where_hash[agent_object_id].has_key?(:error)
-            agent.result = nil
-            agent.errors = where_hash[agent_object_id][:errors]
-          else
-            agent.result = Hyperstack::Model::Helpers.collection_from_transport_array(where_hash[agent_object_id])
-            _class_read_states[scope_name][args] = 'f'
-          end
+        if where_hash.has_key?(:error)
+          where_hash[:errors]
+        else
+          Hyperstack::Model::Helpers.collection_from_transport_array(where_hash)
+          _class_read_states[scope_name][args] = 'f'
         end
       end
 

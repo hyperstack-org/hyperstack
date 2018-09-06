@@ -22,28 +22,24 @@ module Hyperstack
               end
 
               record = model.hyperstack_orm_driver.find(id)
+              return result.deep_merge!(model_name => { instances: { id => { destroyed: true }}}) if record.nil?
 
-              if record
-
-                # authorize record.destroy
-                if Hyperstack.authorization_driver
-                  authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, :destroy, record)
-                  if authorization_result.has_key?(:denied)
-                    result.deep_merge!(model_name => { instances: { id => { errors:  { 'Destroy failed!' => authorization_result[:denied] }}}})
-                    next # authorization guard
-                  end
+              # authorize record.destroy
+              if Hyperstack.authorization_driver
+                authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, :destroy, record)
+                if authorization_result.has_key?(:denied)
+                  result.deep_merge!(model_name => { instances: { id => { errors:  { 'Destroy failed!' => authorization_result[:denied] }}}})
+                  next # authorization guard
                 end
+              end
 
-                destroy_successful = model.hyperstack_orm_driver.destroy(record)
+              destroy_successful = model.hyperstack_orm_driver.destroy(record)
 
-                if destroy_successful
-                  result.deep_merge!(model_name => { instances: { id => { destroyed: true }}})
-                  # Hyperstack::Model::PubSub.publish_record(record) if Hyperstack.model_use_pubsub
-                else
-                  result.deep_merge!(model_name => { instances: { id => { errors:  { 'Destroy failed!' => {}}}}})
-                end
-              else
+              if destroy_successful
                 result.deep_merge!(model_name => { instances: { id => { destroyed: true }}})
+                # Hyperstack::Model::PubSub.publish_record(record) if Hyperstack.model_use_pubsub
+              else
+                result.deep_merge!(model_name => { instances: { id => { errors:  { 'Destroy failed!' => {}}}}})
               end
             end
 

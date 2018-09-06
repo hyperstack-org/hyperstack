@@ -129,34 +129,28 @@ module Hyperstack
         end
 
         def process_class_find_by(session_id, current_user, request_model, result_model, model)
-          request_model['find_by'].keys.each do |agent_id|
-            request_model['find_by'][agent_id].keys.each do |find_by_method|
-              find_by_args = request_model['find_by'][agent_id][find_by_method]
+          request_model['find_by'].keys.each do |find_by_method|
+            find_by_args = request_model['find_by'][find_by_method]
 
-              if find_by_args.size == 1 && ((find_by_method == 'find_by' && find_by_args.first.class == Hash) || find_by_method.start_with?('find_by_')) # security guard
-                sym_find_by_method  = find_by_method.to_sym
+            if find_by_args.size == 1 && ((find_by_method == 'find_by' && find_by_args.first.class == Hash) || find_by_method.start_with?('find_by_')) # security guard
+              sym_find_by_method  = find_by_method.to_sym
 
-                # authorize Model.find
-                if Hyperstack.authorization_driver
-                  authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, :find, request_model['find_by'][agent_id])
-                  if authorization_result.has_key?(:denied)
-                    result_model.deep_merge!(find_by: { agent_id => { errors: { find_by_method => authorization_result[:denied] }}})
-                    next # authorization guard
-                  end
+              # authorize Model.find
+              if Hyperstack.authorization_driver
+                authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, :find, request_model['find_by'])
+                if authorization_result.has_key?(:denied)
+                  result_model.deep_merge!(find_by: { errors: { find_by_method => authorization_result[:denied] }})
+                  next # authorization guard
                 end
-
-                record = model.hyperstack_orm_driver.find_by(sym_find_by_method, *find_by_args)
-
-                if record
-                  result_model.deep_merge!(find_by: { agent_id => { find_by_method => record.to_transport_hash }})
-                  # Hyperstack::Model::PubSub.subscribe_record(session_id, record) if Hyperstack.model_use_pubsub
-                else
-                  result_model.deep_merge!(find_by: { agent_id => { find_by_method => nil }})
-                end
-              else
-                result_model.deep_merge!(find_by: { agent_id => { errors: { find_by_method => 'Not possible!' }}})
               end
 
+              record = model.hyperstack_orm_driver.find_by(sym_find_by_method, *find_by_args)
+              return result_model.deep_merge!(find_by: { find_by_method => nil }) if record.nil?
+
+              result_model.deep_merge!(find_by: { find_by_method => record.to_transport_hash })
+              # Hyperstack::Model::PubSub.subscribe_record(session_id, record) if Hyperstack.model_use_pubsub
+            else
+              result_model.deep_merge!(find_by: { errors: { find_by_method => 'Not possible!' }})
             end
           end
         end
@@ -175,23 +169,21 @@ module Hyperstack
             end
 
             record = model.hyperstack_orm_driver.find(id)
+            return result_model[:instances][id] = { errors: { 'Record not found!' => {} }} if record.nil?
 
-            if record
-              model_name = model.to_s.underscore
-              result_model.deep_merge!(record.to_transport_hash[model_name])
+            model_name = model.to_s.underscore
+            result_model.deep_merge!(record.to_transport_hash[model_name])
 
-              request_model['instances'][id].keys.each do |readables|
-                method_name = "process_instance_#{readables}".to_sym
-                if respond_to?(method_name, true)
-                  send(method_name, session_id, current_user, request_model['instances'][id], result_model[:instances][id], model, record)
-                else
-                  result_model[:instances][id].deep_merge!(errors: { readables => 'No such thing to read' })
-                end
+            request_model['instances'][id].keys.each do |readables|
+              method_name = "process_instance_#{readables}".to_sym
+              if respond_to?(method_name, true)
+                send(method_name, session_id, current_user, request_model['instances'][id], result_model[:instances][id], model, record)
+              else
+                result_model[:instances][id].deep_merge!(errors: { readables => 'No such thing to read' })
               end
-              # Hyperstack::Model::PubSub.subscribe_record(session_id, record) if Hyperstack.model_use_pubsub
-            else
-              result_model[:instances][id] = { errors: { 'Record not found!' => {} }}
             end
+            # Hyperstack::Model::PubSub.subscribe_record(session_id, record) if Hyperstack.model_use_pubsub
+
           end
         end
 
@@ -256,16 +248,16 @@ module Hyperstack
         end
 
         def process_class_where(session_id, current_user, request_model, result_model, model)
-          request_model['where'].keys.each do |agent_id|
-            where_args = Oj.load(request_model['where'][agent_id], symbol_keys: true).first
+          request_model['where'].keys.each do |args|
+            where_args = Oj.load(args, symbol_keys: true).first
 
             if where_args.class == Hash # security guard
 
               # authorize Model.find
               if Hyperstack.authorization_driver
-                authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, :find, request_model['where'][agent_id])
+                authorization_result = Hyperstack.authorization_driver.authorize(current_user, model.to_s, :find, request_model['where'])
                 if authorization_result.has_key?(:denied)
-                  result_model.deep_merge!(where: { agent_id => { errors: { authorization_result[:denied] => '' }}})
+                  result_model.deep_merge!(where: { errors: { authorization_result[:denied] => '' }})
                   next # authorization guard
                 end
               end
@@ -282,9 +274,9 @@ module Hyperstack
               #   end
               # end
 
-              result_model.deep_merge!(where: { agent_id => result_array })
+              result_model.deep_merge!(where: result_array)
             else
-              result_model.deep_merge!(where: { agent_id => { errors: { 'Not possible!' => '' }}})
+              result_model.deep_merge!(where: { errors: { 'Not possible!' => '' }})
             end
           end
         end
