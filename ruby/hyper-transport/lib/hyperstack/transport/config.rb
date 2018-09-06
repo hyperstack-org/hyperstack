@@ -13,6 +13,7 @@ module Hyperstack
   self.add_client_init_class_name('Hyperstack::Transport::ClientDrivers')
 
   # defaults
+  self.api_path = '/hyperstack/api/endpoint'
   self.client_transport_driver_class_name = 'Hyperstack::Transport::HTTP'
   self.authorization_driver = nil
   self.transport_notification_channel_prefix = 'hyper-transport-notifications-'

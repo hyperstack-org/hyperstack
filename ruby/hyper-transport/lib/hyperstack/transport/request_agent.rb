@@ -9,11 +9,13 @@ module Hyperstack
         agents.delete(object_id.to_s)
       end
 
-      attr_accessor :result
-      attr_accessor :errors
+      attr_reader :id
+      attr_reader :promise
 
       def initialize
-        self.class.agents[object_id.to_s] = self
+        @id = object_id.to_s
+        self.class.agents[@id] = self
+        @promise = Promise.new
       end
     end
   end
