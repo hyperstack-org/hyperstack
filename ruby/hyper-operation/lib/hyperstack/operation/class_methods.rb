@@ -149,10 +149,7 @@ module Hyperstack
                      validate({})
                    end
           raise errors.join("\n") if errors.any?
-          agent = Hyperstack::Transport::RequestAgent.new
-          Hyperstack.client_transport_driver.promise_send('hyperstack/handler/operation' => { self.to_s.underscore  => { agent.object_id => params }}).then do
-            agent.result
-          end
+          Hyperstack::Transport.promise_send('hyperstack/handler/operation' => { self.to_s.underscore  => params })
         end
       else
         def run_on_client(session_id, *params)

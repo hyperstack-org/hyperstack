@@ -38,12 +38,11 @@ module Hyperstack
 
     def promise_authorize(user, class_name, action, *policy_context)
       if RUBY_ENGINE == 'opal'
-        agent = Hyperstack::Transport::RequestAgent.new
-        Hyperstack.client_transport_driver.promise_send('hyperstack/handler/policy' => { agent.object_id => { user_id: user.id, class_name: class_name, action: action, policy_context: JSON.generate(*policy_context)}}).then do
-          raise if agent.result.has_key?(:denied)
-          agent.result
-        end.fail do
-          agent.result
+        Hyperstack::Transport.promise_send('hyperstack/handler/policy' => { user_id: user.id, class_name: class_name, action: action, policy_context: JSON.generate(*policy_context)}).then do |result|
+          raise if result.has_key?(:denied)
+          result
+        end.fail do |result|
+          result
         end
       else
         p = Promise.new(success: proc { authorize(user, class_name, action, *policy_context)})
