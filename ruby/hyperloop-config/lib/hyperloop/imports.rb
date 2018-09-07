@@ -5,10 +5,12 @@ module Hyperloop
       @import_list ||= []
     end
 
-    def import(value, gem: nil, cancelled: nil, client_only: nil, server_only: nil, tree: nil, js_import: nil)
-      unless import_list.detect { |current_value, *_rest| value == current_value }
-        import_list << [value, cancelled, !client_only, !server_only, (tree ? :tree : :gem), js_import]
-      end
+    def import(value, gem: nil, cancelled: nil, client_only: nil, server_only: nil, tree: nil, js_import: nil, at_head: nil)
+      return if import_list.detect { |current_value, *_rest| value == current_value }
+      new_element = [
+        value, cancelled, !client_only, !server_only, (tree ? :tree : :gem), js_import
+      ]
+      import_list.send(at_head ? :unshift : :push, new_element)
     end
 
     alias imports import
@@ -38,8 +40,8 @@ module Hyperloop
       client_and_server_manifest = Webpacker.manifest.lookup("client_and_server.js")
       return unless client_only_manifest || client_and_server_manifest
       cancel_webpack_imports
-      import client_only_manifest.split("/").last, client_only: true if client_only_manifest
-      import client_and_server_manifest.split("/").last if client_and_server_manifest
+      import client_only_manifest.split("/").last, client_only: true, at_head: true if client_only_manifest
+      import client_and_server_manifest.split("/").last, at_head: true if client_and_server_manifest
     end
 
     def generate_requires(mode, sys, file)

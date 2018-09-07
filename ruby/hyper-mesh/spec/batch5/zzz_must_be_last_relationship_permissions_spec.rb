@@ -276,21 +276,64 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
           regulate_all_broadcasts { |policy| policy.send_all }
         end
       end
+
       it 'will allow access via scopes' do
         isomorphic do
+          TodoItem.scope :annuder_scope, ->() { all }
           TodoItem.scope :test_scope, ->() { all }, regulate: :always_allow
         end
         TodoItem.create
         mount 'TestComponentZ' do
           class TestComponentZ < Hyperloop::Component
             render do
-              DIV { "There is #{TodoItem.test_scope.count} TodoItem" }
+              DIV { "There is #{TodoItem.annuder_scope.test_scope.count} TodoItem" }
             end
           end
         end
         expect(page).to have_content("There is 1 TodoItem")
         TodoItem.create
         expect(page).to have_content("There is 2 TodoItem")
+      end
+
+      it 'will fail if direct access to relationships is attempted' do
+        # scopes and permissions are chained, and so you cannot fail until the
+        # entire chain has been evaluated. The permission mechanism needs to
+        # have a final *all or *count operation to trigger the permission
+        # evaluation.  A hacker could present a vector without final *all or
+        # *count, and thus get the entire scope result returned.  To pervent this
+        # an explicit check insures vectors never return raw relationships.
+
+        # Here we hack the Fetch Operation (like a Hacker might) but we should
+        # get an error back instead of data.
+        mount 'TestComponentZ' do
+          module ReactiveRecord
+            class Base
+              class << self
+                attr_accessor :last_log_message
+                def log(*args)
+                  Base.last_log_message = args
+                end
+              end
+            end
+
+            class Operations::Fetch < Operations::Base
+              class << self
+                alias unmodified_serialize_params serialize_params
+                def serialize_params(hash)
+                  hash['pending_fetches'][0].pop
+                  unmodified_serialize_params hash
+                end
+              end
+            end
+          end
+
+          class TestComponentZ < Hyperloop::Component
+            render do
+              DIV { "There is #{TodoItem.count} TodoItem" }
+            end
+          end
+        end
+        expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
       end
 
       it 'will allow access via relationships' do
@@ -329,21 +372,37 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         expect(page).to have_content("There is 1 TodoItem")  # it will never change because scope is not allowed
       end
 
-      it 'will protect access via relationships' do
+      it 'will allow access via relationships' do
+        isomorphic do
+          TodoItem.regulate_relationship comments: true
+        end
         todo_item = TodoItem.create
         2.times { Comment.create(todo_item: todo_item) }
         mount 'TestComponentZ' do
           class TestComponentZ < Hyperloop::Component
             render do
-              DIV { "There is #{TodoItem.find(1).comments.count} comments on the first TodoItem" }
+              DIV { "There are #{TodoItem.find(1).comments.count} comments on the first TodoItem" }
             end
           end
         end
         wait_for_ajax
-        expect(page).to have_content("There is 1 comments on the first TodoItem") # should be 2 but will never update
-        # unlike scopes relationships generally will increment automatically on the client if the attributes are being
-        # broadcast.  I.e. hyperloop client will see that a new comment is pointing to the curren todo and will add
-        # it the collection on the client.
+        expect(page).to have_content("There are 2 comments on the first TodoItem")
+      end
+
+      it 'relationships will inherit the all regulation' do
+        isomorphic do
+          ActiveRecord::Base.regulate_scope all: true
+        end
+        todo_item = TodoItem.create
+        2.times { Comment.create(todo_item: todo_item) }
+        mount 'TestComponentZ' do
+          class TestComponentZ < Hyperloop::Component
+            render do
+              DIV { "There are #{TodoItem.find(1).comments.all.count} comments on the first TodoItem" }
+            end
+          end
+        end
+        expect(page).to have_content("There are 2 comments on the first TodoItem")
       end
     end
     context 'without synchromesh running' do

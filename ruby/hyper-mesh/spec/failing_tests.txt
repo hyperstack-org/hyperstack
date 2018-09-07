@@ -1,1 +1,8 @@
-all while_loading specs
+rspec ./spec/batch4/scope_spec.rb:68 # synchronized scopes will be updated only when needed
+rspec ./spec/batch4/scope_spec.rb:259 # synchronized scopes can have a client filter method
+rspec ./spec/batch4/scope_spec.rb:315 # synchronized scopes can have a client collector method
+rspec ./spec/batch4/scope_spec.rb:472 # synchronized scopes the joins array can be combined with the client proc
+rspec ./spec/batch4/scope_spec.rb:506 # synchronized scopes the joins option can join with all or no models
+
+This specs were not failing at this commit 3d6ba04633bda72fa508e0dbe674860c93c18236 on catmando local
+but after merge they began failing
