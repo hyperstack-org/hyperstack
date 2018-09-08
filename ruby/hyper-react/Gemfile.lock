@@ -1,15 +1,20 @@
 GIT
   remote: https://github.com/opal/opal-jquery.git
-  revision: d15ca70f53cb323245c54842587b874945e1083e
+  revision: 6249dfaf406ecd7199079b4f4d9dc67cfdf4d602
   branch: master
   specs:
-    opal-jquery (0.4.2)
+    opal-jquery (0.4.3)
       opal (>= 0.10.0, < 0.12.0)
 
-GIT
-  remote: https://github.com/ruby-hyperloop/hyperloop-config.git
-  revision: 1714c3a62d1eb1807c7f98f8274e8cdc7dbb9885
-  branch: edge
+PATH
+  remote: ../hyper-store
+  specs:
+    hyper-store (1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      opal (>= 0.11.0, < 0.12.0)
+
+PATH
+  remote: ../hyperloop-config
   specs:
     hyperloop-config (1.0.0.lap28)
       libv8 (~> 6.3.0)
@@ -89,7 +94,7 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     builder (3.2.3)
-    capybara (3.6.0)
+    capybara (3.7.1)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -129,9 +134,6 @@ GEM
       uglifier
       unparser
       webdrivers
-    hyper-store (1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      opal (>= 0.11.0, < 0.12.0)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -167,7 +169,7 @@ GEM
     nio4r (2.3.1)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
-    opal (0.11.1)
+    opal (0.11.3)
       ast (>= 2.3.0)
       hike (~> 1.2)
       parser (= 2.3.3.1)
@@ -177,17 +179,17 @@ GEM
     opal-browser (0.2.0)
       opal
       paggio
-    opal-rails (0.9.4)
+    opal-rails (0.9.5)
       jquery-rails
-      opal (>= 0.10.0, < 0.12)
+      opal (>= 0.11.0, < 0.12)
       opal-activesupport (>= 0.0.5)
       opal-jquery (~> 0.4.0)
-      opal-sprockets (~> 0.4.1)
+      opal-sprockets (~> 0.4.2)
       rails (>= 4.1, < 6.0)
       sprockets-rails (>= 2.3.3, < 4.0)
     opal-rspec (0.6.1)
       opal (>= 0.10.0, < 0.12)
-    opal-sprockets (0.4.1.0.11.0.3.1)
+    opal-sprockets (0.4.2.0.11.0.3.1)
       opal (~> 0.11.0)
       sprockets (~> 3.1)
       tilt (>= 1.4)
@@ -200,7 +202,7 @@ GEM
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    public_suffix (3.0.2)
+    public_suffix (3.0.3)
     puma (3.11.4)
     rack (2.0.5)
     rack-test (1.1.0)
@@ -271,7 +273,7 @@ GEM
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.10.0)
     ruby_dep (1.5.0)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     selenium-webdriver (3.14.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2)
@@ -301,7 +303,7 @@ GEM
       equalizer (~> 0.0.9)
       parser (>= 2.3.1.2, < 2.6)
       procto (~> 0.0.2)
-    webdrivers (3.3.2)
+    webdrivers (3.4.0)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
@@ -319,6 +321,7 @@ DEPENDENCIES
   chromedriver-helper
   hyper-react!
   hyper-spec (= 1.0.0.lap28)
+  hyper-store!
   hyperloop-config!
   jquery-rails
   listen
