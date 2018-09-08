@@ -4,7 +4,11 @@ This template will create a new Rails app with Webpacker and Hyperstack 1.0 ALPH
 
 ## Usage
 
-+ `rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb`
+Simply run the command below to create a new Rails app with Hyperstack all configured:
+
+```
+rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+```
 
 ## Start the Rails app
 

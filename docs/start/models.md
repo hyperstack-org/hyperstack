@@ -1,12 +1,10 @@
 # Models
 
-THESE DOCS NEED UPDATING WITH THE NEW DSL
-
 Much like Stores, Models hold state which Components watch and re-render when the data changes. The key difference between Models and Stores, however, is that Models are an extension of your server side (Rails) Active Record models. Changes made on the server are pushed to the connected clients who's Components are rendering that data.
 
 Components, Operations and Stores have no backend dependancy, but Models and Policies are integrated with Rails and require a Rails backend.
 
-Your ActiveRecord Models are accessible in your isomorphic code. Models are an Isomorphic ActiveRecord wrapper for Hyperloop.
+ActiveRecord-like Models are accessible in your isomorphic code. Models are an Isomorphic ActiveRecord wrapper for Hyperloop.
 
 You access your Models as simply as this:
 
