@@ -92,11 +92,11 @@ describe 'React Integration', js: true do
       class Foo
         include React::Component
         def render
-          "initial_state = #{initial_state}"
+          "initial_state = #{initial_state.inspect}"
         end
       end
     end
-    expect(page).to have_content('initial_state = ')
+    expect(page).to have_content('initial_state = nil')
   end
 
   it 'allows block for life cycle callback' do

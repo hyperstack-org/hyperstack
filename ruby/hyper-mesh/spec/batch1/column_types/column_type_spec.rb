@@ -141,46 +141,6 @@ describe "column types on client", js: true do
     check_errors
   end
 
-  it 'loads and converts the value' do
-    t = Timex.parse('1/2/2003')
-    r = TypeTest.create(
-      boolean: true,
-      date: t.time,
-      datetime: t.time,
-      decimal: 12.2,
-      float: 13.2,
-      integer: 14,
-      bigint: 15,
-      string: "hello",
-      text: "goodby",
-      time: t.time,
-      timestamp: t.time
-    )
-    r.reload
-    expect_promise do
-      ReactiveRecord.load do
-        TypeTest.columns_hash.collect do |attr, _info|
-          [TypeTest.find(1).send(attr).class, TypeTest.find(1).send(attr)]
-        end.flatten
-      end
-    end.to eq([
-      'Number', 1,
-      'NilClass', nil,
-      'Boolean', true,
-      'Date', t.to_date.as_json,
-      'Time', t.as_json,
-      'Number', 12.2,
-      'Number', 13.2,
-      'Number', 14,
-      'Number', 15,
-      'String', 'hello',
-      'String', 'goodby',
-      'Time', t.time_only.as_json, # date is indeterminate for active record time
-      'Time', t.as_json
-    ])
-    check_errors
-  end
-
   it 'while loading the dummy value delegates the correct type with operators etc' do
     t = Time.parse('1/2/2003')
     TypeTest.create(
@@ -205,6 +165,46 @@ describe "column types on client", js: true do
     end.to eq([
       true, "2001-01-02", (Timex.sqlmin+2.days).as_json, 5, 6, 7,
       8, 0, 0, (Timex.sqlmin+3.days).as_json, (Timex.sqlmin+4.days).as_json
+    ])
+    check_errors
+  end
+
+  it 'loads and converts the value' do  # randomly generates an error, but the exactual spec passed... perhaps move it up or down? (tried moving down one step)
+    t = Timex.parse('1/2/2003')
+    r = TypeTest.create(
+      boolean: true,
+      date: t.time,
+      datetime: t.time,
+      decimal: 12.2,
+      float: 13.2,
+      integer: 14,
+      bigint: 15,
+      string: "hello",
+      text: "goodby",
+      time: t.time,
+      timestamp: t.time
+    )
+    #r.reload
+    expect_promise do
+      ReactiveRecord.load do
+        TypeTest.columns_hash.collect do |attr, _info|
+          [TypeTest.find(1).send(attr).class, TypeTest.find(1).send(attr)]
+        end.flatten
+      end
+    end.to eq([
+      'Number', 1,
+      'NilClass', nil,
+      'Boolean', true,
+      'Date', t.to_date.as_json,
+      'Time', t.as_json,
+      'Number', 12.2,
+      'Number', 13.2,
+      'Number', 14,
+      'Number', 15,
+      'String', 'hello',
+      'String', 'goodby',
+      'Time', t.time_only.as_json, # date is indeterminate for active record time
+      'Time', t.as_json
     ])
     check_errors
   end

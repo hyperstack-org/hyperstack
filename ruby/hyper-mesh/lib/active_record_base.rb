@@ -41,6 +41,7 @@ module ActiveRecord
       attr_accessor :acting_user
       def __secure_collection_check(acting_user)
         return self if __synchromesh_permission_granted
+        return self if __secure_remote_access_to_all(self, acting_user).__synchromesh_permission_granted
         return self if __secure_remote_access_to_unscoped(self, acting_user).__synchromesh_permission_granted
         Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_permission_not_granted, "Last relation: #{self}, acting_user: #{acting_user}")
       end
@@ -225,7 +226,7 @@ module ActiveRecord
           pre_synchromesh_default_scope(opts[:server], &block)
         end
 
-        # add regulate_relationship method and monkey patch monkey patch has_many macro
+        # add regulate_relationship method and monkey patch has_many macro
         # to add regulations if present
 
         def regulate_relationship(name, &block)

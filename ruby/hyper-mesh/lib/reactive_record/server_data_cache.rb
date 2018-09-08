@@ -130,7 +130,9 @@ module ReactiveRecord
         def [](*vector)
           timing('building cache_items') do
             root = CacheItem.new(self, @acting_user, vector[0], @preloaded_records)
-            vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
+            final = vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
+            next final unless final && final.value.respond_to?(:superclass) && final.value.superclass <= ActiveRecord::Base
+            Hyperloop::InternalPolicy.raise_operation_access_violation(:invalid_vector, "attempt to insecurely access relationship #{vector.last}.")
           end
         end
 
