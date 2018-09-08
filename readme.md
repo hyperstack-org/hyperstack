@@ -1,4 +1,16 @@
-# Hyperstack 1.0 
+# Hyperstack 1.0
+
+## Top-level project goals
+
++ One language for all code (which is Ruby for now)
++ Avoiding repetitive and boilerplate code.
++ Use convention over configuration where possible.
++ Class definitions that are internally consistent, and stable over time.
++ Class definitions that act like existing well known structures.
++ As friction free as possible configuration and development tool chain.
++ Good documentation, and a helpful community, both for users, and contributors.
++ A professional, well structured code base, complete test coverage, and automatic continuous integration.
++ Implementation should be as efficient both in speed and space as practical given the above.
 
 ## Goals of this release
 
@@ -24,7 +36,7 @@
 
 ------
 
-### Hyperstack version 0.1
+### Hyperstack version 1.0.0.alpha1
 
 #### mission: move to new naming conventions
 
