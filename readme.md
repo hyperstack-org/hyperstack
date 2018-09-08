@@ -26,4 +26,4 @@ Hyperstack is evolving. Please see [ROADMAP][] file for more information.
 
 Released under the MIT License.  See the [LICENSE][] file for further details.
 
-[license]: LICENSE.md
+[license]: LICENSE
