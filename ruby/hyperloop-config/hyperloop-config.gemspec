@@ -29,9 +29,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'libv8', '~> 6.3.0'
 
   spec.add_development_dependency 'bundler', '~> 1.16.0'
+  spec.add_development_dependency 'puma'
   spec.add_development_dependency 'hyper-spec', Hyperloop::Config::VERSION
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
-  spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'

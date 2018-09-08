@@ -8,6 +8,8 @@ require 'hyper-spec'
 require 'timecop'
 require 'hyperloop-config'
 
+require 'hyperloop-config'
+
 RSpec.configure do |config|
   config.color = true
   config.formatter = :documentation

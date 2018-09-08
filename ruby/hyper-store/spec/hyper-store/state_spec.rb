@@ -74,12 +74,11 @@ describe 'StateWrapper' do
                   end
 
                   render(DIV) do
-                    H1 { "@foo.state.bar: #{@foo.state.bar}" }
+                    H1 { "@foo.state.bar: #{@foo.state.bar.inspect}" }
                   end
                 end
               end
-
-              expect(page).to have_content('@foo.state.bar: ')
+              expect(page).to have_content('@foo.state.bar: nil')
             end
 
             it 'string' do

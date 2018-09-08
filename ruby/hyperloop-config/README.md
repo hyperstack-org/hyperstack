@@ -1,3 +1,13 @@
+<div class="githubhyperloopheader">
+
+<p align="center">
+
+<a href="http://ruby-hyperloop.org/" alt="Hyperloop" title="Hyperloop">
+<img width="350px" src="http://ruby-hyperloop.org/images/hyperloop-github-logo.png">
+</a>
+
+</p>
+
 <h2 align="center">The Complete Isomorphic Ruby Framework</h2>
 
 <br>
@@ -20,14 +30,14 @@ Build interactive Web applications quickly. Hyperloop encourages rapid developme
 
 One language. One model. One set of tests. The same business logic and domain models running on the clients and the server. Hyperloop is fully integrated with Rails and also gives you unfettered access to the complete universe of JavaScript libraries (including React) from within your Ruby code. Hyperloop lets you build beautiful interactive user interfaces in Ruby.
 
-Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state.
+Everything has a place in our architecture. Components deliver interactive user experiences, Operations encapsulate business logic, Models magically synchronize data between clients and servers, Policies govern authorization and Stores hold local state. 
 
 **Hyperloop-config** gem is used internally by other [Hyperloop](http://ruby-hyperloop.org) gems for keeping config settings, and for registering client side autoload requirements.
 
 ## Getting Started
 
 1. Update your Gemfile:
-
+        
 ```ruby
 #Gemfile
 
@@ -60,3 +70,4 @@ Please **do not post** usage questions to GitHub Issues. For these types of ques
 ## License
 
 Hyperloop is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+

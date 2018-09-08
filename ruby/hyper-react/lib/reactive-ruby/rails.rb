@@ -1,0 +1,8 @@
+require 'action_view'
+require 'react-rails'
+require 'reactive-ruby/server_rendering/hyper_asset_container'
+require 'reactive-ruby/server_rendering/contextual_renderer'
+require 'reactive-ruby/rails/component_mount'
+require 'reactive-ruby/rails/railtie'
+require 'reactive-ruby/rails/controller_helper'
+require 'reactive-ruby/component_loader'
