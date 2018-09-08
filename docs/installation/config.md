@@ -39,7 +39,3 @@ module Hyperloop
     # you do what you want here...
   end
 ```
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
