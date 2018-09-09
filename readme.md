@@ -19,7 +19,7 @@ class GoodBooksToRead < Hyperstack::Component
 end
 ```
 
-In the code above, if the `good_books` scope changed (even on the server) the UI would update automatically. Magical. That's React and Isomorphic Models with bi-directional data at work.
+In the code above, if the `good_books` scope changed (even on the server) the UI would update automatically. That's the magic of React and Isomorphic Models with bi-directional data at work!
 
 ## Website and documentation
 
@@ -37,13 +37,13 @@ You can be up and running in **less than 5 minutes**. Just follow the simple set
 
 ## Community and support
 
-Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, reach out and say hello.
+Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, please reach out and say hello.
 
-+ Reach us in Gitter: [Gitter chat](https://gitter.im/ruby-hyperloop/chat)
++ Reach us at: [Gitter chat](https://gitter.im/ruby-hyperloop/chat)
 
 ## Roadmap
 
-Hyperstack is evolving, we are improving it all the time. Please see [ROADMAP][] file for more information.
+Hyperstack is evolving, we are improving it all the time. Please see the  [ROADMAP][] file for more information.
 
 [roadmap]: ROADMAP.md
 
