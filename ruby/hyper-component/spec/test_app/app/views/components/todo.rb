@@ -1,6 +1,6 @@
 module Components
   class Todo
-    include React::Component
+    include Hyperloop::Component::Mixin
     export_component
 
     params do

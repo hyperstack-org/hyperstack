@@ -4,7 +4,7 @@ describe 'opal-jquery extensions', js: true do
   describe 'Element' do
     xit 'will reuse the wrapper component class for the same Element' do
       evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           param :name
           def render
             "hello #{params.name}"
@@ -29,7 +29,7 @@ describe 'opal-jquery extensions', js: true do
 
     it 'renders a top level component using render with a block' do
       expect_evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           param :name
           def render
             "hello #{params.name}"
@@ -51,7 +51,7 @@ describe 'opal-jquery extensions', js: true do
 
     it 'will find the DOM node given a react element' do
       expect_evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def render
             div { 'hello' }
           end

@@ -68,7 +68,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: nil
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -86,7 +86,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: 'a state value'
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -105,7 +105,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: true
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -124,7 +124,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: 30
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -143,7 +143,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: 30.0
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -162,7 +162,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: ['30', 30, 30.0]
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -181,7 +181,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: { string: '30', integer: 30, decimal: 30.0 }
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -207,7 +207,7 @@ describe 'StateWrapper' do
                 class Foo < Hyperloop::Store
                   state bar: Bar.new
                 end
-                class App < React::Component::Base
+                class App < Hyperloop::Component
                   before_mount do
                     @foo = Foo.new
                   end
@@ -230,7 +230,7 @@ describe 'StateWrapper' do
                   class Foo < Hyperloop::Store
                     state bar: 'a state value', scope: :shared
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -255,7 +255,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -276,7 +276,7 @@ describe 'StateWrapper' do
                   class Foo < Hyperloop::Store
                     state :bar, scope: :shared, initializer: -> { 'a state value' }
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -299,7 +299,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -322,7 +322,7 @@ describe 'StateWrapper' do
                   class Foo < Hyperloop::Store
                     state bar: 'a state value', scope: :class
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -341,7 +341,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -356,7 +356,7 @@ describe 'StateWrapper' do
                   class Foo < Hyperloop::Store
                     state :bar, scope: :class, initializer: -> { 'a state value' }
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -373,7 +373,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -390,7 +390,7 @@ describe 'StateWrapper' do
                   class Foo < Hyperloop::Store
                     state bar: 'a state value'
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -413,7 +413,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -432,7 +432,7 @@ describe 'StateWrapper' do
                   class Foo < Hyperloop::Store
                     state :bar, initializer: -> { 'a state value' }
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -453,7 +453,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -478,7 +478,7 @@ describe 'StateWrapper' do
                       state bar: 'a state value', scope: :shared
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -505,7 +505,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -528,7 +528,7 @@ describe 'StateWrapper' do
                       state :bar, scope: :shared, initializer: -> { 'a state value' }
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -553,7 +553,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -578,7 +578,7 @@ describe 'StateWrapper' do
                       state bar: 'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -599,7 +599,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -616,7 +616,7 @@ describe 'StateWrapper' do
                       state :bar, initializer: -> { 'a state value' }
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -635,7 +635,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -654,7 +654,7 @@ describe 'StateWrapper' do
                       state bar: 'a state value', scope: :instance
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -679,7 +679,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -700,7 +700,7 @@ describe 'StateWrapper' do
                       state :bar, scope: :instance, initializer: -> { 'a state value' }
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end
@@ -723,7 +723,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < React::Component::Base
+                  class App < Hyperloop::Component
                     before_mount do
                       @foo = Foo.new
                     end

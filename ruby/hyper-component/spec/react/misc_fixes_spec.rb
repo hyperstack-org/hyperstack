@@ -9,7 +9,6 @@ describe 'React Integration', js: true do
       end
     end
     expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
   end
   it "The hyper-component gem can use Hyperloop::Component::Mixin to create components" do
     mount "TestComp" do
@@ -19,30 +18,6 @@ describe 'React Integration', js: true do
       end
     end
     expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
-  end
-  it "The hyper-component gem can use the deprecated React::Component::Base class to create components" do
-    mount "TestComp" do
-      class TestComp < React::Component::Base
-        render(DIV) { 'hello'}
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. The class name React::Component::Base has been deprecated.  Use Hyperloop::Component instead."]
-    )
-  end
-  it "The hyper-component gem can use Hyperloop::Component::Mixin to create components" do
-    mount "TestComp" do
-      class TestComp
-        include React::Component
-        render(DIV) { 'hello'}
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. The module name React::Component has been deprecated.  Use Hyperloop::Component::Mixin instead."]
-    )
   end
   it "The hyper-component gem can use hyper-store state syntax" do
     mount "TestComp" do
@@ -56,7 +31,6 @@ describe 'React Integration', js: true do
       end
     end
     expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
   end
   it "and it can still use the deprecated mutate syntax" do
     mount "TestComp" do
@@ -144,18 +118,18 @@ describe 'React Integration', js: true do
   it 'defines component spec methods' do
     mount "Foo" do
       class Foo
-        include React::Component
+        include Hyperloop::Component::Mixin
         def render
-          "initial_state = #{initial_state}"
+          "initial_state = #{initial_state.inspect}"
         end
       end
     end
-    expect(page).to have_content('initial_state = ')
+    expect(page).to have_content('initial_state = nil')
   end
 
   it 'allows block for life cycle callback' do
     mount "Foo" do
-      class Foo < React::Component::Base
+      class Foo < Hyperloop::Component
         before_mount do
           set_state({ foo: "bar" })
         end
@@ -169,7 +143,7 @@ describe 'React Integration', js: true do
 
   it 'allows kernal method names like "format" to be used as state variable names' do
     mount 'Foo' do
-      class Foo < React::Component::Base
+      class Foo < Hyperloop::Component
         before_mount do
           mutate.format 'hello'
         end

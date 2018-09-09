@@ -22,7 +22,7 @@ describe 'React::Element', js: true do
       client_option render_on: :both
       mount 'Foo' do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
           def render
             INPUT(value: nil, type: 'text').on(:change) {}
           end
@@ -36,7 +36,7 @@ describe 'React::Element', js: true do
 
     it 'will subscribe to a component event param' do
       evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           param :on_event, type: Proc, default: nil, allow_nil: true
           def render
             params.on_event
@@ -49,7 +49,7 @@ describe 'React::Element', js: true do
 
     it 'will subscribe to multiple component event params' do
       evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           param :on_event1, type: Proc, default: nil, allow_nil: true
           param :on_event2, type: Proc, default: nil, allow_nil: true
           def render
@@ -74,7 +74,7 @@ describe 'React::Element', js: true do
         render() { return React.createElement("span", null, this.props.onEvent()); }
       }')
       evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           imports "NativeComponent"
         end
         React::Test::Utils.render_into_document(React.create_element(Foo).on(:event) {'works!'})
@@ -86,7 +86,7 @@ describe 'React::Element', js: true do
     it 'will subscribe to a component event param with a non-default name' do
 
       evaluate_ruby do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           param :my_event, type: Proc, default: nil, allow_nil: true
           def render
             params.my_event

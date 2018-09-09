@@ -16,7 +16,7 @@ module React
         # element must be a component or a dom node or a element
         el =  if `typeof element.nodeType !== "undefined"`
                 element
-              elsif element.is_a? React::Component
+              elsif element.respond_to? :dom_node
                 element.dom_node
               elsif element.is_a? React::Element
                 `ReactDOM.findDOMNode(#{element.to_n}.native)`
@@ -37,7 +37,7 @@ module React
         # element must be a component or a dom node or a element
         el =  if `typeof element.nodeType !== "undefined"`
                 element
-              elsif element.is_a? React::Component
+              elsif element.respond_to? :dom_node
                 element.dom_node
               elsif element.is_a? React::Element
                 `ReactDOM.findDOMNode(#{element.to_n}.native)`
@@ -54,7 +54,7 @@ module React
         # element must be a component or a dom node or a element
         el =  if `typeof element.nodeType !== "undefined"`
                 element
-              elsif element.is_a? React::Component
+              elsif element.respond_to? :dom_node
                 element.dom_node
               elsif element.is_a? React::Element
                 `ReactDOM.findDOMNode(#{element.to_n}.native)`

@@ -4,7 +4,7 @@ describe 'Refs callback', js: true do
   before do
     on_client do
       class Foo
-        include React::Component
+        include Hyperloop::Component::Mixin
         def self.bar
           @@bar
         end
@@ -18,7 +18,7 @@ describe 'Refs callback', js: true do
   it "is invoked with the actual Ruby instance" do
     expect_evaluate_ruby do
       class Bar
-        include React::Component
+        include Hyperloop::Component::Mixin
         def render
           React.create_element('div')
         end

@@ -11,7 +11,7 @@ gem 'sqlite3'
 gem 'puma'
 
 require '../../lib/hyper-store/version'
-gem 'hyper-react', path: '../../../hyper-react' # HyperStore::VERSION #
+gem 'hyper-component', path: '../../../hyper-component' # HyperStore::VERSION #
 gem 'hyper-spec', HyperStore::VERSION #, path: '../../../hyper-spec'
 gem 'hyper-store', path: '../..'
 gem 'hyperloop-config', path: '../../../hyperloop-config' # remove before release

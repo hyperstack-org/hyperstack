@@ -5,7 +5,7 @@ describe 'React::Component', js: true do
   it 'defines component spec methods' do
     on_client do
       class Foo
-        include React::Component
+        include Hyperloop::Component::Mixin
         def initialize(native = nil)
         end
 
@@ -32,7 +32,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
           def self.call_history
             @call_history ||= []
           end
@@ -73,7 +73,7 @@ describe 'React::Component', js: true do
         end
 
         class FooBar
-          include React::Component
+          include Hyperloop::Component::Mixin
           after_mount :bar2
           def self.call_history
             @call_history ||= []
@@ -182,7 +182,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
           def render
             div { state.foo }
           end
@@ -253,7 +253,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
           def render
             React.create_element('div') { 'lorem' }
           end
@@ -540,7 +540,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include React::Component
+            include Hyperloop::Component::Mixin
           end
         end
       end
@@ -574,7 +574,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include React::Component
+            include Hyperloop::Component::Mixin
           end
         end
       end
@@ -675,7 +675,7 @@ describe 'React::Component', js: true do
       it 'sets default props using validation helper' do
         on_client do
           class Foo
-            include React::Component
+            include Hyperloop::Component::Mixin
             params do
               optional :foo, default: 'foo'
               optional :bar, default: 'bar'
@@ -697,7 +697,7 @@ describe 'React::Component', js: true do
   describe 'Anonymous Component' do
     it "will not generate spurious warning messages" do
       evaluate_ruby do
-        foo = Class.new(React::Component::Base)
+        foo = Class.new(Hyperloop::Component)
         foo.class_eval do
           def render; "hello" end
         end
@@ -714,7 +714,7 @@ describe 'React::Component', js: true do
   describe 'Render Error Handling' do
     it "will generate a message if render returns something other than an Element or a String" do
       mount 'Foo' do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def render; Hash.new; end
         end
       end
@@ -723,7 +723,7 @@ describe 'React::Component', js: true do
     end
     it "will generate a message if render returns a Component class" do
       mount 'Foo' do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def render; Foo; end
         end
       end
@@ -732,7 +732,7 @@ describe 'React::Component', js: true do
     end
     it "will generate a message if more than 1 element is generated" do
       mount 'Foo' do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def render; "hello".span; "goodby".span; end
         end
       end
@@ -741,7 +741,7 @@ describe 'React::Component', js: true do
     end
     it "will generate a message if the element generated is not the element returned" do
       mount 'Foo' do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def render; "hello".span; "goodby".span.delete; end
         end
       end
@@ -754,7 +754,7 @@ describe 'React::Component', js: true do
     before do
       on_client do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
         end
       end
     end
@@ -828,7 +828,7 @@ describe 'React::Component', js: true do
     it 'supports element building helpers' do
       on_client do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
           param :foo
           def render
             div do
@@ -838,7 +838,7 @@ describe 'React::Component', js: true do
         end
 
         class Bar
-          include React::Component
+          include Hyperloop::Component::Mixin
           def render
             div do
               React::RenderingContext.render(Foo, foo: 'astring')
@@ -855,7 +855,7 @@ describe 'React::Component', js: true do
     it 'builds single node in top-level render without providing a block' do
       mount 'Foo' do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
 
           def render
             div
@@ -868,7 +868,7 @@ describe 'React::Component', js: true do
     it 'redefines `p` to make method missing work' do
       mount 'Foo' do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
 
           def render
             div {
@@ -886,7 +886,7 @@ describe 'React::Component', js: true do
     it 'only overrides `p` in render context' do
       mount 'Foo' do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
 
           def self.result
             @@result ||= 'ooopsy'
@@ -924,7 +924,7 @@ describe 'React::Component', js: true do
     it 'returns true if after mounted' do
       expect_evaluate_ruby do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
 
           def render
             React.create_element('div')
@@ -941,7 +941,7 @@ describe 'React::Component', js: true do
 
     before(:each) do
       on_client do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def needs_update?(next_params, next_state)
             next_params.changed?
           end
@@ -978,7 +978,7 @@ describe 'React::Component', js: true do
 
     before(:each) do
       on_client do
-        class Foo < React::Component::Base
+        class Foo < Hyperloop::Component
           def needs_update?(next_params, next_state)
             next_state.changed?
           end
@@ -1079,7 +1079,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include React::Component
+          include Hyperloop::Component::Mixin
           def render
             React.create_element('div') { 'lorem' }
           end

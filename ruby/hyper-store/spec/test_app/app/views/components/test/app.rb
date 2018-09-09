@@ -1,5 +1,5 @@
 module Test
-  class App < React::Component::Base
+  class App < Hyperloop::Component
     before_mount do
       @store = Store.new
     end

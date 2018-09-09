@@ -4,7 +4,7 @@ describe 'React::State', js: true do
   it "can create dynamically initialized exported states" do
     expect_evaluate_ruby do
       class Foo
-        include React::Component
+        include Hyperloop::Component::Mixin
         export_state(:foo) { 'bar' }
       end
       Hyperloop::Application::Boot.run
@@ -26,7 +26,7 @@ describe 'React::State', js: true do
   it 'ignores state updates during rendering' do
     client_option render_on: :both    
     evaluate_ruby do
-      class StateTest < React::Component::Base
+      class StateTest < Hyperloop::Component
         export_state :boom
         before_mount do
           # force boom to be on the observing list during the current rendering cycle

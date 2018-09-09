@@ -4,7 +4,7 @@ describe 'An Example from the react.rb doc', js: true do
   it 'produces the correct result' do
     mount 'HelloMessage' do
       class HelloMessage
-        include React::Component
+        include Hyperloop::Component::Mixin
         def render
           div { "Hello World!" }
         end
@@ -18,7 +18,7 @@ describe 'Adding state to a component (second tutorial example)', js: true do
   before :each do
     on_client do
       class HelloMessage2
-        include React::Component
+        include Hyperloop::Component::Mixin
         define_state(:user_name) { '@catmando' }
         def render
           div { "Hello #{state.user_name}" }

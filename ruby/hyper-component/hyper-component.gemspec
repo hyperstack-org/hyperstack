@@ -3,8 +3,8 @@ $:.push File.expand_path('../lib/', __FILE__)
 require 'reactive-ruby/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'hyper-react'
-  spec.version       = React::VERSION
+  spec.name          = 'hyper-component'
+  spec.version       = Hyperloop::Component::VERSION
 
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
@@ -21,10 +21,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyper-store', React::VERSION
+  spec.add_dependency 'hyper-store', Hyperloop::Component::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
-  spec.add_dependency 'hyperloop-config', React::VERSION
+  spec.add_dependency 'hyperloop-config', Hyperloop::Component::VERSION
   spec.add_dependency 'mini_racer', '~> 0.1.15'
   # https://github.com/discourse/mini_racer/issues/92
   spec.add_dependency 'libv8', '~> 6.3.0'
@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', '~> 1.16.0'
   spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'hyper-spec', React::VERSION
+  spec.add_development_dependency 'hyper-spec', Hyperloop::Component::VERSION
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'

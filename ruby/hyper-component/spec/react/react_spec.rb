@@ -64,7 +64,7 @@ describe 'React', js: true do
     describe "custom element" do
       before :each do
         on_client do
-          class Foo < React::Component::Base
+          class Foo < Hyperloop::Component
             def initialize(native)
               @native = native
             end

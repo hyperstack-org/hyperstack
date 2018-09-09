@@ -4,7 +4,7 @@ describe 'React::Observable', js: true do
   it "allows to set value on Observable" do
     mount 'Foo' do
       class Zoo
-        include React::Component
+        include Hyperloop::Component::Mixin
         param :foo, type: React::Observable
         before_mount do
           params.foo! 4
@@ -16,7 +16,7 @@ describe 'React::Observable', js: true do
       end
 
       class Foo
-        include React::Component
+        include Hyperloop::Component::Mixin
 
         def render
           div do

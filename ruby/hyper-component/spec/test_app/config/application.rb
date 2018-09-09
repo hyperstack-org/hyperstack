@@ -12,7 +12,7 @@ require 'opal-browser'
 require 'opal-rails'
 require 'react-rails'
 require 'hyper-store'
-require 'hyper-react'
+require 'hyper-component'
 require 'hyper-spec'
 
 module TestApp
@@ -41,5 +41,3 @@ module TestApp
     # -- all .rb files in that directory are automatically loaded.
   end
 end
-
-

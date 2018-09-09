@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'puma'
-  spec.add_development_dependency 'hyper-react', HyperStore::VERSION
+  spec.add_development_dependency 'hyper-component', HyperStore::VERSION
   spec.add_development_dependency 'hyper-spec', HyperStore::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'

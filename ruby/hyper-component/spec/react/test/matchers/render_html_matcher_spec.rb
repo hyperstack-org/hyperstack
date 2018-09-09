@@ -4,7 +4,7 @@ if RUBY_ENGINE == 'opal'
 describe React::Test::Matchers::RenderHTMLMatcher do
   let(:component) {
     Class.new do
-      include React::Component
+      include Hyperloop::Component::Mixin
       params do
         optional :string
       end
