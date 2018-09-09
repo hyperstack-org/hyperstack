@@ -25,7 +25,7 @@ You can be up and running in **less than 5 minutes**. Just follow the simple set
 Please see the website for full documentation, or find the same content in the `docs` folder in this repo if you prefer.
 
 + Website: [hyperstack.org](https://hyperstack.org)
-+ Docs folder: [/docs(/docs)
++ Docs folder: [/docs](/docs)
 
 Our website is an excellent Hyperstack example application. All the content is loaded dynamically from this repo, and it uses Semantic UI and a client-side JavaScript full-text search engine. Its a Rails application hosted on Heroku. 
 
@@ -33,7 +33,7 @@ Our website is an excellent Hyperstack example application. All the content is l
 
 You can have a working HelloWorld application in less than 5 minutes from now. 
 
-+ [Setup and Installation](/install)
++ Setup and Installation: [/install](/install)
 
 ## Contributing
 
@@ -43,7 +43,7 @@ If you would like to help, please read the [CONTRIBUTING][] file for suggestions
 
 ## Roadmap
 
-Hyperstack is evolving. Please see [ROADMAP][] file for more information.
+Hyperstack is evolving, we are improving it all the time. Please see [ROADMAP][] file for more information.
 
 [roadmap]: ROADMAP.md
 
