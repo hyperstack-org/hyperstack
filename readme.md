@@ -43,7 +43,9 @@ Hyperstack is supported by a friendly, helpful community, both for users, and co
 
 ## Roadmap
 
-Hyperstack is evolving, we are improving it all the time. Please see the  [ROADMAP][] file for more information.
+Hyperstack is evolving, we are improving it all the time. As much as we love Ruby today, we see ourselves embracing new languages in the future. [Crystal](https://crystal-lang.org/) perhaps? We are also watching [Wasm](https://webassembly.org/) carefully.
+
+Please see the  [ROADMAP][] file for more information.
 
 [roadmap]: ROADMAP.md
 
@@ -58,3 +60,7 @@ If you would like to help, please read the [CONTRIBUTING][] file for suggestions
 Released under the MIT License.  See the [LICENSE][] file for further details.
 
 [license]: LICENSE
+
+## History
+
+Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop). We decided to rename the project to drop the Ruby suffix and also took the opportunity to simplify the repos and project overall.
