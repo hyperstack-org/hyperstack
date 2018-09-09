@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-rails', '~> 0.9.4'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'puma'
   spec.add_development_dependency 'hyper-spec', Hyperloop::Component::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'

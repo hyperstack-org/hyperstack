@@ -1,6 +1,7 @@
 require 'hyperloop/component/version'
 require 'hyperloop-config'
-Hyperloop.import 'hyper-component'
+Hyperloop.import 'hyperloop/component/version'
+Hyperloop.import 'hyper-react'
 if RUBY_ENGINE == 'opal'
   module Hyperloop
     class Component
@@ -8,7 +9,7 @@ if RUBY_ENGINE == 'opal'
       # off the hyper-react deprecation notice
     end
   end
-  require 'hyper-react'
+  #require 'hyper-react'
 else
   require 'opal'
   require 'hyper-react'

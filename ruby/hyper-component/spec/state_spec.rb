@@ -7,6 +7,7 @@ describe 'StateWrapper' do
       context 'declared at the class level' do
         it 'will rerender a component when an instance state is mutated' do
           mount 'Test::App'
+          binding.pry
           expect(find('#sci')).to have_content('CI')
           click_button('mci')
           expect(find('#sci')).to have_content('CI x')

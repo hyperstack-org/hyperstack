@@ -1,5 +1,3 @@
-require 'hyper-spec'
-require 'hyper-component'
 require 'pry'
 require 'opal-browser'
 
@@ -9,6 +7,9 @@ require File.expand_path('../test_app/config/environment', __FILE__)
 require 'rspec/rails'
 require 'rspec-steps'
 require 'timecop'
+require 'hyper-spec'
+require 'hyper-component'
+
 
 RSpec.configure do |config|
   config.color = true
