@@ -2,10 +2,10 @@
 
 Hyperstack is a Ruby-based DSL and modern web toolkit for building spectacular, interactive web applications fast!
 
-+ **One language** throughout the client and server - all Ruby code compiled by Opal into JavaScript automatically
-+ Webpacker and Yarn modern web tooling with a **fast hot-reloader build environment**
-+ Ruby DSL for wrapping **React** & **ReactRouter** as well as **any** JavaScript library or component
-+ **Isomorphic Models with bi-directional data** so you can access your models as if they were on the client
++ **One language** throughout the client and server. All Ruby code is compiled by [Opal](https://opalrb.com/) into JavaScript automatically.
++ Webpacker and Yarn tooling for a **modern, fast hot-reloader build environment with Ruby source maps**.
++ A well documented and stable Ruby DSL for wrapping **React** and **ReactRouter** as well as **any** JavaScript library or component.
++ **Isomorphic Models with bi-directional data** so you can access your models as if they were on the client.
 
 All that means you can write simple front-end code like this:
 
