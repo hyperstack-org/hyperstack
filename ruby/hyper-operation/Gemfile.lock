@@ -1,10 +1,22 @@
 GIT
   remote: https://github.com/opal/opal-jquery.git
-  revision: d15ca70f53cb323245c54842587b874945e1083e
+  revision: 6249dfaf406ecd7199079b4f4d9dc67cfdf4d602
   branch: master
   specs:
-    opal-jquery (0.4.2)
+    opal-jquery (0.4.3)
       opal (>= 0.10.0, < 0.12.0)
+
+PATH
+  remote: ../hyper-component
+  specs:
+    hyper-component (1.0.0.lap28)
+      hyper-store (= 1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      libv8 (~> 6.3.0)
+      mini_racer (~> 0.1.15)
+      opal (>= 0.11.0, < 0.12.0)
+      opal-activesupport (~> 0.3.1)
+      react-rails (>= 2.4.0, < 2.5.0)
 
 PATH
   remote: ../hyper-spec
@@ -24,6 +36,13 @@ PATH
       uglifier
       unparser
       webdrivers
+
+PATH
+  remote: ../hyper-store
+  specs:
+    hyper-store (1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperloop-config
@@ -150,12 +169,6 @@ GEM
     hike (1.2.3)
     http_parser.rb (0.6.0)
     httpclient (2.8.3)
-    hyper-component (1.0.0.lap28)
-      actionview (>= 4.0.0)
-      hyper-react (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      opal-rails (~> 0.9.4)
-      react-rails (>= 2.4.0, < 2.5.0)
     hyper-react (1.0.0.lap28)
       hyper-store (= 1.0.0.lap28)
       hyperloop-config (= 1.0.0.lap28)
@@ -163,9 +176,6 @@ GEM
       opal (>= 0.11.0, < 0.12.0)
       opal-activesupport (~> 0.3.1)
       react-rails (>= 2.4.0, < 2.5.0)
-    hyper-store (1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      opal (>= 0.11.0, < 0.12.0)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -209,15 +219,15 @@ GEM
     opal-browser (0.2.0)
       opal
       paggio
-    opal-rails (0.9.4)
+    opal-rails (0.9.5)
       jquery-rails
-      opal (>= 0.10.0, < 0.12)
+      opal (>= 0.11.0, < 0.12)
       opal-activesupport (>= 0.0.5)
       opal-jquery (~> 0.4.0)
-      opal-sprockets (~> 0.4.1)
+      opal-sprockets (~> 0.4.2)
       rails (>= 4.1, < 6.0)
       sprockets-rails (>= 2.3.3, < 4.0)
-    opal-sprockets (0.4.1.0.11.0.3.1)
+    opal-sprockets (0.4.2.0.11.0.3.1)
       opal (~> 0.11.0)
       sprockets (~> 3.1)
       tilt (>= 1.4)
@@ -335,7 +345,7 @@ GEM
       equalizer (~> 0.0.9)
       parser (>= 2.3.1.2, < 2.6)
       procto (~> 0.0.2)
-    webdrivers (3.3.3)
+    webdrivers (3.4.0)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
@@ -351,9 +361,11 @@ PLATFORMS
 DEPENDENCIES
   bundler
   database_cleaner
+  hyper-component!
   hyper-operation!
   hyper-react (= 1.0.0.lap28)
   hyper-spec!
+  hyper-store!
   hyperloop-config!
   mysql2
   opal (>= 0.11.0, < 0.12.0)
