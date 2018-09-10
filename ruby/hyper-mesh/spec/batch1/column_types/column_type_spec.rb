@@ -28,7 +28,7 @@ describe "column types on client", js: true do
       end
 
       def as_json
-        strftime("%Y-%m-%dT%H:%M:%S%z")
+        strftime("%Y-%m-%dT%H:%M:%S%z").gsub(/\+0000$/, '-0000')
       end
 
       attr_reader :time

@@ -1,10 +1,22 @@
 GIT
   remote: https://github.com/opal/opal-jquery.git
-  revision: d15ca70f53cb323245c54842587b874945e1083e
+  revision: 6249dfaf406ecd7199079b4f4d9dc67cfdf4d602
   branch: master
   specs:
-    opal-jquery (0.4.2)
+    opal-jquery (0.4.3)
       opal (>= 0.10.0, < 0.12.0)
+
+PATH
+  remote: ../hyper-component
+  specs:
+    hyper-component (1.0.0.lap28)
+      hyper-store (= 1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      libv8 (~> 6.3.0)
+      mini_racer (~> 0.1.15)
+      opal (>= 0.11.0, < 0.12.0)
+      opal-activesupport (~> 0.3.1)
+      react-rails (>= 2.4.0, < 2.5.0)
 
 PATH
   remote: ../hyper-operation
@@ -13,8 +25,17 @@ PATH
       activerecord (>= 4.0.0)
       hyper-component (= 1.0.0.lap28)
       hyperloop-config (= 1.0.0.lap28)
+      libv8 (~> 6.3.0)
+      mini_racer (~> 0.1.15)
       mutations
       opal-activesupport (~> 0.3.1)
+
+PATH
+  remote: ../hyper-store
+  specs:
+    hyper-store (1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperloop-config
@@ -93,7 +114,7 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     builder (3.2.3)
-    capybara (3.6.0)
+    capybara (3.7.1)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -131,10 +152,10 @@ GEM
     erubi (1.7.1)
     eventmachine (1.2.7)
     execjs (2.7.0)
-    factory_bot (4.10.0)
+    factory_bot (4.11.1)
       activesupport (>= 3.0.0)
-    factory_bot_rails (4.10.0)
-      factory_bot (~> 4.10.0)
+    factory_bot_rails (4.11.1)
+      factory_bot (~> 4.11.1)
       railties (>= 3.0.0)
     ffi (1.9.25)
     globalid (0.4.1)
@@ -142,19 +163,6 @@ GEM
     hike (1.2.3)
     http_parser.rb (0.6.0)
     httpclient (2.8.3)
-    hyper-component (1.0.0.lap28)
-      actionview (>= 4.0.0)
-      hyper-react (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      opal-rails (~> 0.9.4)
-      react-rails (>= 2.4.0, < 2.5.0)
-    hyper-react (1.0.0.lap28)
-      hyper-store (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      mini_racer (~> 0.1.15)
-      opal (>= 0.11.0, < 0.12.0)
-      opal-activesupport (~> 0.3.1)
-      react-rails (>= 2.4.0, < 2.5.0)
     hyper-spec (1.0.0.lap28)
       capybara
       chromedriver-helper
@@ -168,9 +176,6 @@ GEM
       uglifier
       unparser
       webdrivers
-    hyper-store (1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      opal (>= 0.11.0, < 0.12.0)
     hyper-trace (0.3.1)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
@@ -205,7 +210,7 @@ GEM
     nio4r (2.3.1)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
-    opal (0.11.1)
+    opal (0.11.3)
       ast (>= 2.3.0)
       hike (~> 1.2)
       parser (= 2.3.3.1)
@@ -215,15 +220,15 @@ GEM
     opal-browser (0.2.0)
       opal
       paggio
-    opal-rails (0.9.4)
+    opal-rails (0.9.5)
       jquery-rails
-      opal (>= 0.10.0, < 0.12)
+      opal (>= 0.11.0, < 0.12)
       opal-activesupport (>= 0.0.5)
       opal-jquery (~> 0.4.0)
-      opal-sprockets (~> 0.4.1)
+      opal-sprockets (~> 0.4.2)
       rails (>= 4.1, < 6.0)
       sprockets-rails (>= 2.3.3, < 4.0)
-    opal-sprockets (0.4.1.0.11.0.3.1)
+    opal-sprockets (0.4.2.0.11.0.3.1)
       opal (~> 0.11.0)
       sprockets (~> 3.1)
       tilt (>= 1.4)
@@ -239,13 +244,13 @@ GEM
     pry-rescue (1.4.5)
       interception (>= 0.5)
       pry
-    public_suffix (3.0.2)
+    public_suffix (3.0.3)
     puma (3.12.0)
     pusher (1.3.1)
       httpclient (~> 2.7)
       multi_json (~> 1.0)
       pusher-signature (~> 0.1.8)
-    pusher-fake (1.9.0)
+    pusher-fake (1.10.0)
       em-http-request (~> 1.1)
       em-websocket (~> 0.5)
       multi_json (~> 1.6)
@@ -327,7 +332,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.10.0)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     selenium-webdriver (3.14.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2)
@@ -371,7 +376,7 @@ GEM
       equalizer (~> 0.0.9)
       parser (>= 2.3.1.2, < 2.6)
       procto (~> 0.0.2)
-    webdrivers (3.3.2)
+    webdrivers (3.4.0)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
@@ -390,11 +395,14 @@ DEPENDENCIES
   chromedriver-helper
   database_cleaner
   factory_bot_rails
+  hyper-component!
   hyper-mesh!
   hyper-operation!
   hyper-spec (= 1.0.0.lap28)
+  hyper-store!
   hyper-trace
   hyperloop-config!
+  libv8 (~> 6.3.0)
   mini_racer (~> 0.1.15)
   mysql2
   opal-activesupport (~> 0.3.1)

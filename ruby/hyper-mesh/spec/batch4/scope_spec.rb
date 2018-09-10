@@ -25,12 +25,12 @@ describe "synchronized scopes", js: true do
         def scope(name, *args, &block)
           opts = _synchromesh_scope_args_check(args)
           self.class.class_eval do
-            attr_reader "#{name}_count".to_sym
+            attr_accessor "#{name}_count".to_sym
           end
           instance_variable_set("@#{name}_count", 0)
           original_proc = opts[:server]
           opts[:server] = lambda do |*args|
-            instance_variable_set("@#{name}_count", send("#{name}_count")+1); original_proc.call(*args, &block)
+            send("#{name}_count=", send("#{name}_count")+1); original_proc.call(*args, &block)
           end
           pretest_scope name, opts, &block
         end

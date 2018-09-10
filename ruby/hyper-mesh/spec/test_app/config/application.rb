@@ -7,7 +7,7 @@ require File.expand_path('../boot', __FILE__)
 Bundler.require(*Rails.groups(assets: %w(development test)))
 
 require 'opal-rails'
-require 'hyper-react'
+#require 'hyper-react'
 
 module TestApp
   class Application < Rails::Application
