@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-require 'hypermesh/version'
+require 'hyper_model/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'hyper-mesh'
-  spec.version       = Hypermesh::VERSION
+  spec.name          = 'hyper-model'
+  spec.version       = HyperModel::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = 'React based CRUD access and Synchronization of active record models across multiple clients'
@@ -26,14 +26,14 @@ Gem::Specification.new do |spec|
   spec.require_paths  = ['lib']
 
   spec.add_dependency 'activerecord', '>= 4.0.0'
-  spec.add_dependency 'hyper-component', Hypermesh::VERSION
-  spec.add_dependency 'hyper-operation', Hypermesh::VERSION
+  spec.add_dependency 'hyper-component', HyperModel::VERSION
+  spec.add_dependency 'hyper-operation', HyperModel::VERSION
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
-  spec.add_development_dependency 'hyper-spec', Hypermesh::VERSION
+  spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
   spec.add_development_dependency 'hyper-trace'
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'

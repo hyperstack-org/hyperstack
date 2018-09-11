@@ -52,7 +52,7 @@ gem "opal-activesupport", '~> 0.3.1'
 gem 'react-rails', '>= 2.4.0', '< 2.5.0'
 gem 'mini_racer', platforms: :ruby
 #gem 'hyper-router'
-gem 'hyper-mesh', path: '../..'
+gem 'hyper-model', path: '../..'
 # gem 'hyperloop-config' #, path: '../../../hyperloop-config'
 # gem 'hyper-operation' #, path: '../../../hyper-operation'
 # gem 'hyper-component'#, path: '../../../hyper-component'

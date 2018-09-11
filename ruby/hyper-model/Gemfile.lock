@@ -50,7 +50,7 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-mesh (1.0.0.lap28)
+    hyper-model (1.0.0.lap28)
       activerecord (>= 4.0.0)
       hyper-component (= 1.0.0.lap28)
       hyper-operation (= 1.0.0.lap28)
@@ -396,7 +396,7 @@ DEPENDENCIES
   database_cleaner
   factory_bot_rails
   hyper-component!
-  hyper-mesh!
+  hyper-model!
   hyper-operation!
   hyper-spec (= 1.0.0.lap28)
   hyper-store!

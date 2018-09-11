@@ -35,7 +35,8 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/instance_methods"
   require "reactive_record/active_record/base"
   require 'hyper_react/input_tags'
-  require_relative 'hypermesh/version'
+  require 'hyperloop/model/load'
+  require_relative 'hyper_model/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'
   require_relative 'opal/equality_patches'
@@ -54,7 +55,7 @@ else
   require "reactive_record/serializers"
   require "reactive_record/pry"
   require_relative 'active_record_base'
-  require 'hypermesh/version'
+  require 'hyper_model/version'
 
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint

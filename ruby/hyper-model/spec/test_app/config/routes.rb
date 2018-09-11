@@ -1,4 +1,4 @@
-require 'hyper-mesh'
+#require 'hyper-mesh'
 
 Rails.application.routes.draw do
   mount Hyperloop::Engine => "/rr"
