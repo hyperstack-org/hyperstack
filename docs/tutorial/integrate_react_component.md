@@ -136,8 +136,7 @@ handleKeyDown(key) {
 ```
 1.2.3 Import in hyperloop: app/hyperloop/components/date_picker_input.js
 
-## hyper stack usage
-
+## hyperstack usage
 
 ```ruby
  DatePickerInput(selected: get_filter_value(filter, position)).
@@ -179,15 +178,65 @@ global.moment = moment
 
 
 ```ruby
-class DateSelector < Hyperloop::Component
+class DatePickerInput < Hyperloop::Component
+  param :selected, allow_nil: true
+  param :onChange, type: Proc, default: nil, allow_nil: true
+  param :onBlur, type: Proc, default: nil, allow_nil: true
+  param :onKeyDown, type: Proc, default: nil, allow_nil: true
+
+  before_mount do
+    mutate.date params.selected
+  end
   render(DIV) do
-    DatePicker(selected: `moment()`,
-      todayButton: "Today", onChange: lambda { |date| mutate.date date })
-    date_name = `moment(#{state.date}).format('LL')`
-    H2 { date_name } if state.date
+    parameter_hash = {placeholderText: "HH/MM/EEEE",
+                      isClearable: true,
+                      dateFormat: ['L', 'D/M/YY'],
+                      todayButton: "Today",
+                      onChange: lambda do |date|
+                        return unless is_valid?
+                        mutate.date date
+                        params.onChange self, event_date
+                      end,
+                      onBlur: lambda {params.onBlur self, event_date},
+                      onKeyDown: lambda {|key| params.onKeyDown self, key_code_for(key), event_date}
+    }.merge(set_selected)
+    DatePicker(parameter_hash)
+  end
+
+  def set_selected
+    `#{state.date}==null || #{state.date} =='' `  ? {} : {selected: `moment(#{state.date})`}
+  end
+
+  def event_date
+    `#{state.date}.format('YYYY-MM-DD')`
+  end
+
+  def key_code_for(key)
+    `#{key}.keyCode`
+  end
+
+  def is_valid?(date)
+    `moment(#{date}).isValid()`
   end
 end
 ```
+
+## final usage
+```ruby
+        DatePickerInput(
+            selected: get_filter_value(filter, position),
+            onChange: lambda {|e| set_filter_value(e.event_date, filter, position)}
+        ).
+            # on(:change) {|e,v| set_filter_value(v, filter, position)}.
+            on(:blur) {|e, v| set_filter_value(v, filter, position)}.
+            on(:key_down) do |e, k, v|
+              if k == 13
+                set_filter_value(v, filter, position)
+                apply_filter_values
+              end
+            end
+```
+
 BTW, the .on(:change) (as you say) always passes an event first. To b e honest, I more than often like the lambda version above as you get only what the component is passing to you
 
 ## conclusion
