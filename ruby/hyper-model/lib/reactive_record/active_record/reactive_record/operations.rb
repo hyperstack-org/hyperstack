@@ -3,7 +3,7 @@ module ReactiveRecord
   def self.on_fetch_error(e, params); end
 
   # associations: {parent_id: record.object_id, attribute: attribute, child_id: assoc_record.object_id}
-  # models: {id: record.object_id, model: record.model.model_name, attributes: changed_attributes}
+  # models: {id: record.object_id, model: record.model.model_name.to_s, attributes: changed_attributes}
 
   module Operations
     # to make debug easier we convert all the object_id strings to be hex representation

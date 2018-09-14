@@ -1,3 +1,4 @@
+# Legacy definition of HyperI18n
 module HyperI18n
   class I18n
     extend HelperMethods
@@ -84,6 +85,20 @@ module HyperI18n
         else
           { t: {}, l: {} }.to_json
         end
+      end
+    end
+  end
+end
+
+# we now allow directly using I18n on client (as on server)
+if RUBY_ENGINE == 'opal'
+  module I18n
+    class << self
+      def t(*args)
+        HyperI18n::I18n.t(*args)
+      end
+      def l(*args)
+        HyperI18n::I18n.l(*args)
       end
     end
   end

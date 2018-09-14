@@ -2,7 +2,7 @@ module Hyperloop
   class Component
     module Mixin
       def t(attribute, opts = {})
-        namespace = self.class.name.underscore.tr('/', '.')
+        namespace = self.class.name.underscore.gsub(%r{::|/}, '.')
 
         HyperI18n::I18n.t("#{namespace}.#{attribute}", opts)
       end

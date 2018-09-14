@@ -1,0 +1,11 @@
+en:
+  hello: Hello world
+  activerecord:
+    models:
+      my_model: My Model
+    attributes:
+      my_model:
+        the_attribute: The Attribute
+  components:
+    test_component:
+      the_key: I am a key

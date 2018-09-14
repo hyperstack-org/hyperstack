@@ -48,8 +48,7 @@ module ActiveRecord
     end
 
     def model_name
-      # in reality should return ActiveModel::Name object, blah blah
-      name
+      @model_name ||= ActiveModel::Name.new(self)
     end
 
     def find(id)
@@ -241,7 +240,7 @@ module ActiveRecord
       # provides a filter for the all scopes taking into account STI subclasses
       # note: within the lambda `self` will be the model instance
       defining_class_is_base_class = base_class == self
-      defining_model_name = model_name
+      defining_model_name = model_name.to_s
       lambda do
         # have to delay computation of inheritance column since it might
         # not be defined when class is first defined

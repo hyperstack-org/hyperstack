@@ -125,20 +125,21 @@ module Hyperloop
     # will remove the session from the list.
 
     prerender_footer do |controller|
-      next if Hyperloop.transport == :none
-      if defined?(PusherFake)
-        path = ::Rails.application.routes.routes.detect do |route|
-          route.app == Hyperloop::Engine ||
-            (route.app.respond_to?(:app) && route.app.app == Hyperloop::Engine)
-        end.path.spec
-        pusher_fake_js = PusherFake.javascript(
-          auth: { headers: { 'X-CSRF-Token' => controller.send(:form_authenticity_token) } },
-          authEndpoint: "#{path}/hyperloop-pusher-auth"
-        )
+      unless Hyperloop.transport == :none
+        if defined?(PusherFake)
+          path = ::Rails.application.routes.routes.detect do |route|
+            route.app == Hyperloop::Engine ||
+              (route.app.respond_to?(:app) && route.app.app == Hyperloop::Engine)
+          end.path.spec
+          pusher_fake_js = PusherFake.javascript(
+            auth: { headers: { 'X-CSRF-Token' => controller.send(:form_authenticity_token) } },
+            authEndpoint: "#{path}/hyperloop-pusher-auth"
+          )
+        end
+        controller.session.delete 'hyperloop-dummy-init' unless controller.session.id
+        id = "#{SecureRandom.uuid}-#{controller.session.id}"
+        auto_connections = Hyperloop::AutoConnect.channels(id, controller.acting_user)
       end
-      controller.session.delete 'hyperloop-dummy-init' unless controller.session.id
-      id = "#{SecureRandom.uuid}-#{controller.session.id}"
-      auto_connections = Hyperloop::AutoConnect.channels(id, controller.acting_user)
       config_hash = {
         transport: Hyperloop.transport,
         id: id,

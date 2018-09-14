@@ -75,7 +75,7 @@ module ReactiveRecord
 
       inher_col = model.inheritance_column
       if inher_col && model < model.base_class && !attrs.key?(inher_col)
-        attrs = attrs.merge(inher_col => model.model_name)
+        attrs = attrs.merge(inher_col => model.model_name.to_s)
       end
 
       model = model.base_class

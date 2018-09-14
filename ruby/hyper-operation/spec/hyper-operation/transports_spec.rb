@@ -151,50 +151,71 @@ describe "Transport Tests", js: true do
     end
   end
 
-  context "Simple Polling" do
+  context "Action Cable" do
 
-    before(:all) do
+    before(:each) do
       Hyperloop.configuration do |config|
         config.connect_session = false
-        config.transport = :simple_poller
-        # slow down the polling so wait_for_ajax works
-        config.opts = { seconds_between_poll: 2 }
+        config.transport = :action_cable
+        config.channel_prefix = "synchromesh"
       end
     end
 
     it "opens the connection" do
       mount "TestComponent"
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+    end
+
+    it "will not keep the temporary polled connection open" do
+      mount "TestComponent"
       Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperloop::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      wait_for_ajax
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
-      Timecop.travel(Time.now+Hyperloop.expire_polled_connection_in)
-      wait(10.seconds).for { Hyperloop::Connection.active }.to eq([])
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      wait_for { Hyperloop::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
+      # one tricky thing about synchromesh is that we want to capture all
+      # changes to the database that might be made while the client connections
+      # is still being initialized.  To do this we establish a server side
+      # queue of all messages sent between the time the page begins rendering
+      # until the connection is established.
+
+      # mount our test component
       mount "TestComponent"
+      # add a model
       CreateTestModel.run(test_attribute: "I'm new here!")
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      # until we connect there should only be 5 items
+      page.should have_content("0 items")
+      # okay now we can go ahead and connect (this runs on the client)
+      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      # once we connect it should change to 6
       page.should have_content("1 items")
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      # now that we are connected the UI should keep updating
+      CreateTestModel.run(test_attribute: "I'm also new here!")
+      page.should have_content("2 items")
     end
 
     it "broadcasts to the session channel" do
       Hyperloop.connect_session = true
       mount "TestComponent"
-      sleep 0.25
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
     end
-
   end
 
   context "Real Pusher Account", skip: (pusher_credentials ? false : SKIP_MESSAGE) do
@@ -269,67 +290,45 @@ describe "Transport Tests", js: true do
       page.should have_content("hello")
     end
   end
+  
+  context "Simple Polling" do
 
-  context "Action Cable" do
-
-    before(:each) do
+    before(:all) do
       Hyperloop.configuration do |config|
         config.connect_session = false
-        config.transport = :action_cable
-        config.channel_prefix = "synchromesh"
+        config.transport = :simple_poller
+        # slow down the polling so wait_for_ajax works
+        config.opts = { seconds_between_poll: 2 }
       end
     end
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
-    end
-
-    it "will not keep the temporary polled connection open" do
-      mount "TestComponent"
       Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for_ajax
       ApplicationController.acting_user = true
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Timecop.travel(Time.now+Hyperloop.expire_polled_connection_in)
+      wait(10.seconds).for { Hyperloop::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
-      # one tricky thing about synchromesh is that we want to capture all
-      # changes to the database that might be made while the client connections
-      # is still being initialized.  To do this we establish a server side
-      # queue of all messages sent between the time the page begins rendering
-      # until the connection is established.
-
-      # mount our test component
       mount "TestComponent"
-      # add a model
       CreateTestModel.run(test_attribute: "I'm new here!")
-      # until we connect there should only be 5 items
-      page.should have_content("0 items")
-      # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      # once we connect it should change to 6
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
       page.should have_content("1 items")
-      # now that we are connected the UI should keep updating
-      CreateTestModel.run(test_attribute: "I'm also new here!")
-      page.should have_content("2 items")
+      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
     end
 
     it "broadcasts to the session channel" do
       Hyperloop.connect_session = true
       mount "TestComponent"
+      sleep 0.25
       evaluate_ruby "Hyperloop.go_ahead_and_connect"
       wait_for_ajax
       evaluate_ruby "MyControllerOp.run(data: 'hello')"

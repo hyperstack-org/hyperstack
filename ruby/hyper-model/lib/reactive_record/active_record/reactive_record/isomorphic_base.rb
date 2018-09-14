@@ -108,7 +108,7 @@ module ReactiveRecord
       # takes care of informing react that there are things to load, and schedules the loader to run
       # Note there is no equivilent to find_in_db, because each vector implicitly does a find.
       raise "attempt to do a find_by_id of nil.  This will return all records, and is not allowed" if vector[1] == ["find_by_id", nil]
-      vector = [record.model.model_name, ["new", record.object_id]]+vector[1..-1] if vector[0].nil?
+      vector = [record.model.model_name.to_s, ["new", record.object_id]]+vector[1..-1] if vector[0].nil?
       unless data_loading?
         @pending_fetches << vector
         @pending_records << record if record
@@ -192,7 +192,7 @@ module ReactiveRecord
         # input
         # list of records to process, will grow as we chase associations
         # outputs
-        models = [] # the actual data to save {id: record.object_id, model: record.model.model_name, attributes: changed_attributes}
+        models = [] # the actual data to save {id: record.object_id, model: record.model.model_name.to_s, attributes: changed_attributes}
         associations = [] # {parent_id: record.object_id, attribute: attribute, child_id: assoc_record.object_id}
 
         # used to keep track of records that have been processed for effeciency
@@ -215,8 +215,8 @@ module ReactiveRecord
             raise "Attempt to save a model while it or an associated model is still loading: model being saved: #{record_being_saved.model}:#{record_being_saved.id}#{', associated model: '+record.model.to_s if record != record_being_saved}"
           end
           output_attributes = {record.model.primary_key => record.id.loading? ? nil : record.id}
-          vector = record.vector || [record.model.model_name, ["new", record.object_id]]
-          models << {id: record.object_id, model: record.model.model_name, attributes: output_attributes, vector: vector}
+          vector = record.vector || [record.model.model_name.to_s, ["new", record.object_id]]
+          models << {id: record.object_id, model: record.model.model_name.to_s, attributes: output_attributes, vector: vector}
           record.attributes.each do |attribute, value|
             if association = record.model.reflect_on_association(attribute)
               if association.collection?
@@ -527,7 +527,7 @@ module ReactiveRecord
         promise = Promise.new
 
         if !data_loading? and (id or vector)
-          Operations::Destroy.run(model: ar_instance.model_name, id: id, vector: vector)
+          Operations::Destroy.run(model: ar_instance.model_name.to_s, id: id, vector: vector)
           .then do |response|
             Broadcast.to_self ar_instance
             yield response[:success], response[:message] if block
