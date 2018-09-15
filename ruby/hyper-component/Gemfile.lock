@@ -209,7 +209,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     public_suffix (3.0.3)
-    puma (3.11.4)
+    puma (3.12.0)
     rack (2.0.5)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -337,7 +337,7 @@ DEPENDENCIES
   opal-rails (~> 0.9.4)
   opal-rspec
   pry
-  puma (~> 3.11.0)
+  puma
   rails (>= 4.0.0)
   rails-controller-testing
   rake

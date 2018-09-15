@@ -78,9 +78,7 @@ PATH
   remote: .
   specs:
     hyper-i18n (1.0.0.lap28)
-      hyper-component (= 1.0.0.lap28)
       hyper-operation (= 1.0.0.lap28)
-      hyper-store (= 1.0.0.lap28)
       i18n
 
 GEM
@@ -360,4 +358,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.16.1
+   1.16.0

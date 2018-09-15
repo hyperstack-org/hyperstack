@@ -1,4 +1,3 @@
-require 'hyperloop-config'
 require 'hyper-component'
 require 'react/version'
 Hyperloop.import 'hyper-react'

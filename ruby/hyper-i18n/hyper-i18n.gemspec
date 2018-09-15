@@ -19,21 +19,18 @@ Gem::Specification.new do |spec|
   spec.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths  = ['lib']
 
-  spec.add_dependency 'i18n'
-  spec.add_dependency 'hyper-component', HyperI18n::VERSION
   spec.add_dependency 'hyper-operation', HyperI18n::VERSION
-  spec.add_dependency 'hyper-store', HyperI18n::VERSION
+  spec.add_dependency 'i18n'
 
   spec.add_development_dependency 'bundler', '~> 1.16.0'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-model', HyperI18n::VERSION
   spec.add_development_dependency 'hyper-spec', HyperI18n::VERSION
+  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'sqlite3'
-
 end

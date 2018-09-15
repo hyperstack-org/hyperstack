@@ -38,6 +38,21 @@ describe "reactive-record edge cases", js: true do
     size_window(:small, :portrait)
   end
 
+  it "prerenders a belongs to relationship" do
+    # must be first otherwise check for ajax fails because of race condition
+    # with previous test
+    user_item = User.create(name: 'Fred')
+    todo_item = TodoItem.create(title: 'test-todo', user: user_item)
+    mount "PrerenderTest", {}, render_on: :server_only do
+      class PrerenderTest < Hyperloop::Component
+        render(DIV) do
+          TodoItem.first.user.name
+        end
+      end
+    end
+    page.should have_content("Fred")
+  end
+
   it "trims the association tree" do
     5.times do |i|
       user = FactoryBot.create(:user, first_name: i) unless i == 3
@@ -82,19 +97,6 @@ describe "reactive-record edge cases", js: true do
     Todo.all.each do |todo|
       page.should have_content(todo.title)
     end
-  end
-
-  it "prerenders a belongs to relationship" do
-    user_item = User.create(name: 'Fred')
-    todo_item = TodoItem.create(title: 'test-todo', user: user_item)
-    mount "PrerenderTest", {}, render_on: :server_only do
-      class PrerenderTest < Hyperloop::Component
-        render(DIV) do
-          TodoItem.first.user.name
-        end
-      end
-    end
-    page.should have_content("Fred")
   end
 
   it "the limit and offset predefined scopes work" do

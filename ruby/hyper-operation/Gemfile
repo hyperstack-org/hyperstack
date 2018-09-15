@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
-gem 'hyper-spec', path: '../hyper-spec'
+gem 'hyper-spec',       path: '../hyper-spec'
 gem 'hyperloop-config', path: '../hyperloop-config'
-gem 'hyper-store', path: '../hyper-store'
-gem 'hyper-component', path: '../hyper-component'
+gem 'hyper-store',      path: '../hyper-store'
+gem 'hyper-component',  path: '../hyper-component'
 gemspec

@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = 'React based CRUD access and Synchronization of active record models across multiple clients'
-  spec.description   = 'HyperMesh is the base for HyperModel. HyperModel gives your HyperComponents CRUD access to your '\
+  spec.description   = 'HyperModel gives your HyperComponents CRUD access to your '\
                        'ActiveRecord models on the client, using the the standard ActiveRecord '\
                        'API. HyperModel also implements push notifications (via a number of '\
                        'possible technologies) so changes to records on the server are '\
@@ -34,12 +34,13 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
   spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
-  spec.add_development_dependency 'hyper-trace'
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'parser'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
@@ -59,11 +60,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec'
   spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
-  # https://github.com/discourse/mini_racer/issues/92
-  spec.add_development_dependency 'libv8', '~> 6.3.0'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
-  spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'pry-rescue'
 end

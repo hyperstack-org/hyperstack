@@ -60,9 +60,6 @@ PATH
     hyper-operation (1.0.0.lap28)
       activerecord (>= 4.0.0)
       hyper-component (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
       mutations
       opal-activesupport (~> 0.3.1)
 
@@ -169,13 +166,6 @@ GEM
     hike (1.2.3)
     http_parser.rb (0.6.0)
     httpclient (2.8.3)
-    hyper-react (1.0.0.lap28)
-      hyper-store (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      mini_racer (~> 0.1.15)
-      opal (>= 0.11.0, < 0.12.0)
-      opal-activesupport (~> 0.3.1)
-      react-rails (>= 2.4.0, < 2.5.0)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -363,7 +353,6 @@ DEPENDENCIES
   database_cleaner
   hyper-component!
   hyper-operation!
-  hyper-react (= 1.0.0.lap28)
   hyper-spec!
   hyper-store!
   hyperloop-config!

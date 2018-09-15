@@ -1,0 +1,320 @@
+GIT
+  remote: https://github.com/opal/opal-jquery.git
+  revision: f47a9b42da366cea270f743b05acf529f3077d35
+  branch: master
+  specs:
+    opal-jquery (0.4.2)
+      opal (>= 0.10.0, < 0.12.0)
+
+PATH
+  remote: ../hyper-component
+  specs:
+    hyper-component (1.0.0.lap28)
+      hyper-store (= 1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      libv8 (~> 6.3.0)
+      mini_racer (~> 0.1.15)
+      opal (>= 0.11.0, < 0.12.0)
+      opal-activesupport (~> 0.3.1)
+      react-rails (>= 2.4.0, < 2.5.0)
+
+PATH
+  remote: ../hyper-operation
+  specs:
+    hyper-operation (1.0.0.lap28)
+      activerecord (>= 4.0.0)
+      hyper-component (= 1.0.0.lap28)
+      mutations
+      opal-activesupport (~> 0.3.1)
+
+PATH
+  remote: ../hyper-spec
+  specs:
+    hyper-spec (1.0.0.lap28)
+      capybara
+      chromedriver-helper
+      libv8 (~> 6.3.0)
+      method_source
+      mini_racer (~> 0.1.15)
+      opal (>= 0.11.0, < 0.12.0)
+      parser (>= 2.3.3.1)
+      pry
+      rspec-rails
+      selenium-webdriver
+      timecop (~> 0.8.1)
+      uglifier
+      unparser
+      webdrivers
+
+PATH
+  remote: ../hyper-store
+  specs:
+    hyper-store (1.0.0.lap28)
+      hyperloop-config (= 1.0.0.lap28)
+      opal (>= 0.11.0, < 0.12.0)
+
+PATH
+  remote: ../hyperloop-config
+  specs:
+    hyperloop-config (1.0.0.lap28)
+      libv8 (~> 6.3.0)
+      mini_racer (~> 0.1.15)
+      opal (>= 0.11.0, < 0.12.0)
+      opal-browser (~> 0.2.0)
+      uglifier
+
+PATH
+  remote: .
+  specs:
+    hyper-console (1.0.0.lap28)
+      hyper-operation (= 1.0.0.lap28)
+      hyper-store (= 1.0.0.lap28)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    abstract_type (0.0.7)
+    actioncable (5.1.5)
+      actionpack (= 5.1.5)
+      nio4r (~> 2.0)
+      websocket-driver (~> 0.6.1)
+    actionmailer (5.1.5)
+      actionpack (= 5.1.5)
+      actionview (= 5.1.5)
+      activejob (= 5.1.5)
+      mail (~> 2.5, >= 2.5.4)
+      rails-dom-testing (~> 2.0)
+    actionpack (5.1.5)
+      actionview (= 5.1.5)
+      activesupport (= 5.1.5)
+      rack (~> 2.0)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    actionview (5.1.5)
+      activesupport (= 5.1.5)
+      builder (~> 3.1)
+      erubi (~> 1.4)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    activejob (5.1.5)
+      activesupport (= 5.1.5)
+      globalid (>= 0.3.6)
+    activemodel (5.1.5)
+      activesupport (= 5.1.5)
+    activerecord (5.1.5)
+      activemodel (= 5.1.5)
+      activesupport (= 5.1.5)
+      arel (~> 8.0)
+    activesupport (5.1.5)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (~> 0.7)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    adamantium (0.2.0)
+      ice_nine (~> 0.11.0)
+      memoizable (~> 0.4.0)
+    addressable (2.5.2)
+      public_suffix (>= 2.0.2, < 4.0)
+    archive-zip (0.11.0)
+      io-like (~> 0.3.0)
+    arel (8.0.0)
+    ast (2.4.0)
+    babel-source (5.8.35)
+    babel-transpiler (0.7.0)
+      babel-source (>= 4.0, < 6)
+      execjs (~> 2.0)
+    builder (3.2.3)
+    capybara (3.7.2)
+      addressable
+      mini_mime (>= 0.1.3)
+      nokogiri (~> 1.8)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      xpath (~> 3.1)
+    childprocess (0.9.0)
+      ffi (~> 1.0, >= 1.0.11)
+    chromedriver-helper (1.2.0)
+      archive-zip (~> 0.10)
+      nokogiri (~> 1.8)
+    coderay (1.1.2)
+    concord (0.1.5)
+      adamantium (~> 0.2.0)
+      equalizer (~> 0.0.9)
+    concurrent-ruby (1.0.5)
+    connection_pool (2.2.2)
+    crass (1.0.3)
+    diff-lcs (1.3)
+    equalizer (0.0.11)
+    erubi (1.7.1)
+    execjs (2.7.0)
+    ffi (1.9.25)
+    globalid (0.4.1)
+      activesupport (>= 4.2.0)
+    hike (1.2.3)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
+    ice_nine (0.11.2)
+    io-like (0.3.0)
+    jquery-rails (4.3.1)
+      rails-dom-testing (>= 1, < 3)
+      railties (>= 4.2.0)
+      thor (>= 0.14, < 2.0)
+    libv8 (6.3.292.48.1-x86_64-darwin-15)
+    loofah (2.2.2)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.5.9)
+    mail (2.7.0)
+      mini_mime (>= 0.1.1)
+    memoizable (0.4.2)
+      thread_safe (~> 0.3, >= 0.3.1)
+    method_source (0.9.0)
+    mini_mime (1.0.0)
+    mini_portile2 (2.3.0)
+    mini_racer (0.1.15)
+      libv8 (~> 6.3)
+    minitest (5.11.3)
+    mutations (0.8.3)
+      activesupport
+    nio4r (2.3.0)
+    nokogiri (1.8.2)
+      mini_portile2 (~> 2.3.0)
+    opal (0.11.0)
+      ast (>= 2.3.0)
+      hike (~> 1.2)
+      parser (= 2.3.3.1)
+      sourcemap (~> 0.1.0)
+    opal-activesupport (0.3.1)
+      opal (>= 0.5.0, < 1.0.0)
+    opal-browser (0.2.0)
+      opal
+      paggio
+    opal-rails (0.9.4)
+      jquery-rails
+      opal (>= 0.10.0, < 0.12)
+      opal-activesupport (>= 0.0.5)
+      opal-jquery (~> 0.4.0)
+      opal-sprockets (~> 0.4.1)
+      rails (>= 4.1, < 6.0)
+      sprockets-rails (>= 2.3.3, < 4.0)
+    opal-sprockets (0.4.1.0.11.0.3.1)
+      opal (~> 0.11.0)
+      sprockets (~> 3.1)
+      tilt (>= 1.4)
+    paggio (0.2.6)
+    parser (2.3.3.1)
+      ast (~> 2.2)
+    procto (0.0.3)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    public_suffix (3.0.3)
+    rack (2.0.4)
+    rack-test (0.8.3)
+      rack (>= 1.0, < 3)
+    rails (5.1.5)
+      actioncable (= 5.1.5)
+      actionmailer (= 5.1.5)
+      actionpack (= 5.1.5)
+      actionview (= 5.1.5)
+      activejob (= 5.1.5)
+      activemodel (= 5.1.5)
+      activerecord (= 5.1.5)
+      activesupport (= 5.1.5)
+      bundler (>= 1.3.0)
+      railties (= 5.1.5)
+      sprockets-rails (>= 2.0.0)
+    rails-dom-testing (2.0.3)
+      activesupport (>= 4.2.0)
+      nokogiri (>= 1.6)
+    rails-html-sanitizer (1.0.4)
+      loofah (~> 2.2, >= 2.2.2)
+    railties (5.1.5)
+      actionpack (= 5.1.5)
+      activesupport (= 5.1.5)
+      method_source
+      rake (>= 0.8.7)
+      thor (>= 0.18.1, < 2.0)
+    rake (10.5.0)
+    react-rails (2.4.7)
+      babel-transpiler (>= 0.7.0)
+      connection_pool
+      execjs
+      railties (>= 3.2)
+      tilt
+    rspec-core (3.8.0)
+      rspec-support (~> 3.8.0)
+    rspec-expectations (3.8.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.8.0)
+    rspec-mocks (3.8.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.8.0)
+    rspec-rails (3.8.0)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 3.8.0)
+      rspec-expectations (~> 3.8.0)
+      rspec-mocks (~> 3.8.0)
+      rspec-support (~> 3.8.0)
+    rspec-support (3.8.0)
+    rubyzip (1.2.2)
+    selenium-webdriver (3.14.0)
+      childprocess (~> 0.5)
+      rubyzip (~> 1.2)
+    sourcemap (0.1.1)
+    sprockets (3.7.1)
+      concurrent-ruby (~> 1.0)
+      rack (> 1, < 3)
+    sprockets-rails (3.2.1)
+      actionpack (>= 4.0)
+      activesupport (>= 4.0)
+      sprockets (>= 3.0.0)
+    thor (0.20.0)
+    thread_safe (0.3.6)
+    tilt (2.0.8)
+    timecop (0.8.1)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
+    uglifier (4.1.6)
+      execjs (>= 0.3.0, < 3)
+    unparser (0.2.8)
+      abstract_type (~> 0.0.7)
+      adamantium (~> 0.2.0)
+      concord (~> 0.1.5)
+      diff-lcs (~> 1.3)
+      equalizer (~> 0.0.9)
+      parser (>= 2.3.1.2, < 2.6)
+      procto (~> 0.0.2)
+    webdrivers (3.4.0)
+      nokogiri (~> 1.6)
+      rubyzip (~> 1.0)
+      selenium-webdriver (~> 3.0)
+    websocket-driver (0.6.5)
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.3)
+    xpath (3.1.0)
+      nokogiri (~> 1.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.12)
+  hyper-component!
+  hyper-console!
+  hyper-operation!
+  hyper-spec!
+  hyper-store!
+  hyperloop-config!
+  opal (>= 0.11.0, < 0.12.0)
+  opal-browser
+  opal-jquery!
+  opal-rails (~> 0.9.4)
+  rails
+  rake (~> 10.0)
+  uglifier (= 4.1.6)
+
+BUNDLED WITH
+   1.16.0

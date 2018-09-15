@@ -176,7 +176,6 @@ GEM
       uglifier
       unparser
       webdrivers
-    hyper-trace (0.3.1)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -400,10 +399,7 @@ DEPENDENCIES
   hyper-operation!
   hyper-spec (= 1.0.0.lap28)
   hyper-store!
-  hyper-trace
   hyperloop-config!
-  libv8 (~> 6.3.0)
-  mini_racer (~> 0.1.15)
   mysql2
   opal-activesupport (~> 0.3.1)
   opal-browser (~> 0.2.0)

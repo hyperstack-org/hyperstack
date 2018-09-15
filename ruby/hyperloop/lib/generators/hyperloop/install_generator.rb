@@ -62,7 +62,7 @@ class Hyperloop::ApplicationPolicy
   # for any scope or relationship
   ApplicationRecord.regulate_scope :all
 end unless Rails.env.production?
-        RUBY
+      RUBY
     end
 
     def add_router
@@ -159,11 +159,11 @@ Opal.OpalHotReloader.$listen() // optional (port, false, poll_seconds) i.e. (808
     end
 
     def add_gems
-      gem 'hyper-model', Hyperloop::VERSION
-      gem 'hyper-router', Hyperloop::ROUTERVERSION
-      #gem 'opal-rails', '~> 0.9.4'
-      #gem 'opal-jquery'
-      gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
+      # gem 'hyper-model', Hyperloop::VERSION
+      # gem 'hyper-router', Hyperloop::ROUTERVERSION
+      # gem 'opal-rails', '~> 0.9.4'
+      # gem 'opal-jquery'
+      # gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
     end
 
     def install

@@ -129,7 +129,6 @@ RSpec::Steps.steps "class inheritance", js: true do
   end
 
   it "will use the subclass name to set the type" do
-    binding.pry
     evaluate_ruby('Sti::SubClass1.create(data: "record 1")')
     expect_promise('Sti::Base.last.load(:type)').to eq('Sti::SubClass1')
   end

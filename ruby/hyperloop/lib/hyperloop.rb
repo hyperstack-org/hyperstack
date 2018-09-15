@@ -10,6 +10,7 @@ Hyperloop.js_import 'react_ujs', defines: 'ReactRailsUJS'
 
 Hyperloop.import 'reactrb/auto-import'
 Hyperloop.import 'hyper-router'
+Hyperloop.import 'hyper-model'
 
 require 'generators/hyperloop/install_generator'
 require 'generators/hyper/component_generator'

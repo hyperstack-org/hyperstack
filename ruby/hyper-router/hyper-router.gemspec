@@ -20,15 +20,16 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hyper-component', HyperRouter::HYPERLOOP_VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_dependency 'opal-rails', '~> 0.9.4'
-  spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-spec', HyperRouter::HYPERLOOP_VERSION
   spec.add_development_dependency 'listen'
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'parser'
+  spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec-collection_matchers'
@@ -43,7 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'sinatra'
   spec.add_development_dependency 'spring-commands-rspec'
   spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
   spec.add_development_dependency 'webdrivers'

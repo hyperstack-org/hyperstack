@@ -1,0 +1,20 @@
+PATH
+  remote: .
+  specs:
+    hyper-trace (0.3.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (10.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.12)
+  hyper-trace!
+  rake (~> 10.0)
+
+BUNDLED WITH
+   1.16.1
