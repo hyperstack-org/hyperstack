@@ -4,7 +4,7 @@ module ReactiveRecord
     def self.after_commit(operation, model)
       Hyperloop::InternalPolicy.regulate_broadcast(model) do |data|
         if !Hyperloop.on_server? && Hyperloop::Connection.root_path
-          send_to_server(operation, data)
+          send_to_server(operation, data) rescue nil # server no longer running so ignore
         else
           SendPacket.run(data, operation: operation)
         end
