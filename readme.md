@@ -1,4 +1,5 @@
 # Hyperstack 1.0
+[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=hyperloop-legacy)](https://travis-ci.org/hyperstack-org/hyperstack)
 
 ## Top-level project goals
 
