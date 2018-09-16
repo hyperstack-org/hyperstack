@@ -3,6 +3,8 @@ cache:
   bundler: true
   directories:
   - node_modules # NPM packages
+services:
+  - mysql
 addons:
   apt:
     sources:
