@@ -44,6 +44,10 @@ before_install:
 before_script:
   - cd $LANGUAGE/$COMPONENT
   - bundle install --jobs=3 --retry=3
+  - bundle exec chromedriver-update
+  - bundle exec chromedriver --version
+  - google-chrome --version
+  - which google-chrome
   - yarn install
   - bundle exec rake spec:prepare
 script:
