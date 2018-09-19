@@ -45,10 +45,10 @@ before_script:
   - cd $LANGUAGE/$COMPONENT
   - if [[ "$LANGUAGE" == "ruby" ]]; then bundle install --jobs=3 --retry=3; fi
   - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec chromedriver-update; fi
+  - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec ruby -e "system('chromedriver -v')"; fi
   - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec chromedriver --version; fi
   - google-chrome --version
   - which google-chrome
   - yarn install
-  - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake spec:prepare; fi
 script:
   - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake; fi
