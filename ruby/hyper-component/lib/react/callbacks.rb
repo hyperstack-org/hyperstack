@@ -17,7 +17,7 @@ module React
     end
 
     module ClassMethods
-      def define_callback(callback_name)
+      def define_callback(callback_name, &after_define_hook)
         wrapper_name = "_#{callback_name}_callbacks"
         define_singleton_method(wrapper_name) do
           Hyperloop::Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
@@ -25,6 +25,7 @@ module React
         define_singleton_method(callback_name) do |*args, &block|
           send(wrapper_name).concat(args)
           send(wrapper_name).push(block) if block_given?
+          after_define_hook.call(*args, &block) if after_define_hook
         end
       end
 

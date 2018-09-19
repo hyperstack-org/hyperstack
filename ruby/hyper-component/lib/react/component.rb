@@ -11,6 +11,20 @@ require 'react/component/props_wrapper'
 
 module Hyperloop
   class Component
+    class << self
+      def mounted_components
+        @mounted_components ||= Set.new
+      end
+
+      def force_update!
+        components = mounted_components.to_a
+        components.each do |comp|
+          next unless mounted_components.include? comp
+          comp.force_update!
+        end
+      end
+    end
+
     module Mixin
       def self.included(base)
         base.include(Hyperloop::Store::Mixin)
@@ -27,7 +41,7 @@ module Hyperloop
           define_callback :before_update
           define_callback :after_update
           define_callback :before_unmount
-          define_callback :after_error
+          define_callback(:after_error) { React::API.add_after_error_hook(base) }
         end
         base.extend(React::Component::ClassMethods)
       end
@@ -55,7 +69,10 @@ module Hyperloop
 
       def component_will_mount
         React::IsomorphicHelpers.load_context(true) if React::IsomorphicHelpers.on_opal_client?
-        React::State.set_state_context_to(self) { run_callback(:before_mount) }
+        React::State.set_state_context_to(self) do
+          Hyperloop::Component.mounted_components << self
+          run_callback(:before_mount)
+        end
       end
 
       def component_did_mount
@@ -68,33 +85,34 @@ module Hyperloop
       def component_will_receive_props(next_props)
         # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
         # for now we are just using it to clear processed_params
-        React::State.set_state_context_to(self) { self.run_callback(:before_receive_props, next_props) }
+        React::State.set_state_context_to(self) { run_callback(:before_receive_props, next_props) }
         @_receiving_props = true
       end
 
       def component_will_update(next_props, next_state)
-        React::State.set_state_context_to(self) { self.run_callback(:before_update, next_props, next_state) }
+        React::State.set_state_context_to(self) { run_callback(:before_update, next_props, next_state) }
         params._reset_all_others_cache if @_receiving_props
         @_receiving_props = false
       end
 
       def component_did_update(prev_props, prev_state)
         React::State.set_state_context_to(self) do
-          self.run_callback(:after_update, prev_props, prev_state)
+          run_callback(:after_update, prev_props, prev_state)
           React::State.update_states_to_observe
         end
       end
 
       def component_will_unmount
         React::State.set_state_context_to(self) do
-          self.run_callback(:before_unmount)
+          run_callback(:before_unmount)
           React::State.remove
+          Hyperloop::Component.mounted_components.delete self
         end
       end
 
       def component_did_catch(error, info)
         React::State.set_state_context_to(self) do
-          self.run_callback(:after_error, error, info)
+          run_callback(:after_error, error, info)
         end
       end
 

@@ -15,6 +15,10 @@ module React
     backtrace :off
 
     def render
+      top_level_render
+    end
+
+    def top_level_render
       paths_searched = []
       component = nil
       if params.component_name.start_with?('::')

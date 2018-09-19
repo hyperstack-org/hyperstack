@@ -40,6 +40,20 @@ module React
       nil
     end
 
+    def self.add_after_error_hook(klass)
+      add_after_error_hook_to_native(@@component_classes[klass])
+    end
+
+    def self.add_after_error_hook_to_native(native_comp)
+      return unless native_comp
+      %x{
+        native_comp.prototype.componentDidCatch = function(error, info) {
+          this.__opalInstanceSyncSetState = false;
+          this.__opalInstance.$component_did_catch(error, Opal.Hash.$new(info));
+        }
+      }
+    end
+
     def self.create_native_react_class(type)
       raise "Provided class should define `render` method"  if !(type.method_defined? :render)
       render_fn = (type.method_defined? :_render_wrapper) ? :_render_wrapper : :render
@@ -135,12 +149,7 @@ module React
         # we have a callbacks_for method.  This all becomes much easier once issue
         # #270 is resolved.
         if type.respond_to?(:callbacks_for) && type.callbacks_for(:after_error) != []
-          %x{
-            comp.prototype.componentDidCatch = function(error, info) {
-              this.__opalInstanceSyncSetState = false;
-              this.__opalInstance.$component_did_catch(error, Opal.Hash.$new(info));
-            }
-          }
+          add_after_error_hook_to_native comp
         end
         comp
       end
