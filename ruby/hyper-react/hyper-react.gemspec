@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hyper-component', React::VERSION
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', React::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'
