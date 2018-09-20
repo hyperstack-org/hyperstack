@@ -400,7 +400,7 @@ module ComponentTestHelpers
     logs = page.driver.browser.manage.logs.get(:browser)
     errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
                 .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
-    binding.pry if errors.present?
+    puts "WARNING - FOUND UNEXPECTED ERRORS #{errors}" if errors.present?
   end
 
 end
