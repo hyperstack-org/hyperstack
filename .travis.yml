@@ -21,7 +21,6 @@ env:
   - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  - COMPONENT=hyper-policy                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-react                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
