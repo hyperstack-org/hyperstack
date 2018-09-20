@@ -51,4 +51,4 @@ before_script:
   - which google-chrome
   - yarn install
 script:
-  - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake; fi
+  - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
