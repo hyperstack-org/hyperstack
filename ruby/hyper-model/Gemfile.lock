@@ -24,9 +24,6 @@ PATH
     hyper-operation (1.0.0.lap28)
       activerecord (>= 4.0.0)
       hyper-component (= 1.0.0.lap28)
-      hyperloop-config (= 1.0.0.lap28)
-      libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
       mutations
       opal-activesupport (~> 0.3.1)
 
@@ -51,6 +48,7 @@ PATH
   remote: .
   specs:
     hyper-model (1.0.0.lap28)
+      activemodel
       activerecord (>= 4.0.0)
       hyper-component (= 1.0.0.lap28)
       hyper-operation (= 1.0.0.lap28)
@@ -123,7 +121,7 @@ GEM
       xpath (~> 3.1)
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
-    chromedriver-helper (2.1.0)
+    chromedriver-helper (1.2.0)
       archive-zip (~> 0.10)
       nokogiri (~> 1.8)
     coderay (1.1.2)
@@ -391,7 +389,7 @@ PLATFORMS
 DEPENDENCIES
   bundler
   capybara
-  chromedriver-helper (>= 2.1.0)
+  chromedriver-helper (= 1.2.0)
   database_cleaner
   factory_bot_rails
   hyper-component!

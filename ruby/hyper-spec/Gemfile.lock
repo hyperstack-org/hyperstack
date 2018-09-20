@@ -11,7 +11,7 @@ PATH
   specs:
     hyper-spec (1.0.0.lap28)
       capybara
-      chromedriver-helper
+      chromedriver-helper (= 1.2.0)
       libv8 (~> 6.3.0)
       method_source
       mini_racer (~> 0.1.15)

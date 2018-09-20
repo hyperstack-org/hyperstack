@@ -25,7 +25,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.require_paths = ['lib']
 
   spec.add_dependency 'capybara'
-  spec.add_dependency 'chromedriver-helper'
+  spec.add_dependency 'chromedriver-helper', '1.2.0'
   spec.add_dependency 'libv8', '~> 6.3.0' # see https://github.com/discourse/mini_racer/issues/92
   spec.add_dependency 'method_source'
   spec.add_dependency 'mini_racer', '~> 0.1.15'
