@@ -1,2 +1,8 @@
 require "bundler/gem_tasks"
-task :default => :spec
+task :default do
+end
+
+namespace :spec do
+  task :prepare do
+  end
+end

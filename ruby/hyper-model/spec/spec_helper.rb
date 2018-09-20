@@ -329,6 +329,14 @@ if RUBY_ENGINE != 'opal'
       Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
     end
 
+    Capybara.register_driver :chrome_headless_docker_travis do |app|
+      options = ::Selenium::WebDriver::Chrome::Options.new
+      options.add_argument('--headless')
+      options.add_argument('--no-sandbox')
+      options.add_argument('--disable-dev-shm-usage')
+      Capybara::Selenium::Driver.new(app, browser: :chrome, :driver_path => "/usr/lib/chromium-browser/chromedriver", options: options)
+    end
+
     class Selenium::WebDriver::Firefox::Profile
 
       def self.firebug_version
@@ -397,6 +405,8 @@ if RUBY_ENGINE != 'opal'
       Capybara.javascript_driver = :chromez
     elsif ENV['DRIVER'] == 'headless'
       Capybara.javascript_driver = :selenium_chrome_headless
+    elsif ENV['DRIVER'] == 'travis'
+      Capybara.javascript_driver = :chrome_headless_docker_travis
     else
       Capybara.javascript_driver = :selenium_chrome_headless
     end
