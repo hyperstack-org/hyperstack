@@ -65,6 +65,10 @@ describe "column types on client", js: true do
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
     end
 
+
+    TypeTest.build_tables #rescue nil
+    DefaultTest.build_tables #rescue nil
+
     isomorphic do
       class TypeTest < ActiveRecord::Base
         server_method :a_server_method, default: "hello" do |s=""|
@@ -74,9 +78,6 @@ describe "column types on client", js: true do
       class DefaultTest < ActiveRecord::Base
       end
     end
-
-    TypeTest.build_tables rescue nil
-    DefaultTest.build_tables rescue nil
 
     ActiveRecord::Base.instance_variable_set(:@public_columns_hash, nil)
 

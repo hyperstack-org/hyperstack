@@ -58,6 +58,10 @@ RSpec::Steps.steps "has_many through relationships", js: true do
       end
     end
 
+    Physician.build_tables #rescue nil
+    Appointment.build_tables #rescue nil
+    Patient.build_tables #rescue nil
+
     isomorphic do
       class Physician < ActiveRecord::Base
         has_many :appointments
@@ -75,9 +79,6 @@ RSpec::Steps.steps "has_many through relationships", js: true do
       end
     end
 
-    Physician.build_tables rescue nil
-    Appointment.build_tables rescue nil
-    Patient.build_tables rescue nil
 
   end
 

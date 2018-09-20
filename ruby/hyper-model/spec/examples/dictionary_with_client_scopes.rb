@@ -43,6 +43,9 @@ describe "dictionary examples", js: true do
 
     size_window(:small, :portrait)
 
+    DictionaryEntry.build_tables
+    Definition.build_tables
+
     isomorphic do
       class DictionaryEntry < ActiveRecord::Base
         has_many :definitions
@@ -54,9 +57,6 @@ describe "dictionary examples", js: true do
               select: ->() { sort { |a, b| b <=> a } }
       end
     end
-
-    DictionaryEntry.build_tables
-    Definition.build_tables
 
     DictionaryEntry.create(word: 'meaningless')
 

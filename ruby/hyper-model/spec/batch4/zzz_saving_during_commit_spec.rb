@@ -36,6 +36,8 @@ describe "saving during commit", js: true do
       ActiveRecord::Base.public_columns_hash[name] = columns_hash
     end
 
+    CommitIssue.build_tables rescue nil
+
     isomorphic do
       class CommitIssue < ActiveRecord::Base
         after_create :save_again
@@ -44,8 +46,6 @@ describe "saving during commit", js: true do
         end
       end
     end
-
-    CommitIssue.build_tables rescue nil
 
     stub_const 'ApplicationPolicy', Class.new
     ApplicationPolicy.class_eval do
