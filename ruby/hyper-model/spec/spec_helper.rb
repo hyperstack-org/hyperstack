@@ -235,15 +235,15 @@ if RUBY_ENGINE != 'opal'
     Capybara.default_max_wait_time = 10.seconds
 
     config.before(:suite) do
-      DatabaseCleaner.clean_with(:truncation)
+      #DatabaseCleaner.clean_with(:truncation)
       Hyperloop.configuration do |config|
         config.transport = :simple_poller
       end
     end
 
-    config.before(:each) do
-      DatabaseCleaner.strategy = :transaction
-    end
+    # config.before(:each) do
+    #   DatabaseCleaner.strategy = :transaction
+    # end
 
     config.before(:each) do |x|
       Hyperloop.class_eval do
@@ -267,9 +267,9 @@ if RUBY_ENGINE != 'opal'
       size_window
     end
 
-    config.before(:each) do
-      DatabaseCleaner.start
-    end
+    # config.before(:each) do
+    #   DatabaseCleaner.start
+    # end
 
     config.after(:each) do |example|
       puts "after each is example.exception? #{example.exception}"
