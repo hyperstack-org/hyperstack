@@ -136,7 +136,7 @@ describe "column types on client", js: true do
     evaluate_promise do
       ReactiveRecord.load do
         TypeTest.columns_hash.collect do |attr, _info|
-          [TypeTest.find(1).send(attr).class, TypeTest.find(1).send(attr)]
+          [TypeTest.find(1).send(attr)]
         end.flatten
       end
     end
