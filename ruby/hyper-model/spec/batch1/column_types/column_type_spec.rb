@@ -136,7 +136,7 @@ describe "column types on client", js: true do
     evaluate_promise do
       ReactiveRecord.load do
         TypeTest.columns_hash.collect do |attr, _info|
-          [TypeTest.find(1).send(attr)]
+          [attr, TypeTest.find(1).send(attr)]
         end.flatten
       end
     end
@@ -156,6 +156,7 @@ describe "column types on client", js: true do
     #   'Time', t, #.time_only.as_json, # date is indeterminate for active record time
     #   'Time', t #.as_json
     # ])
+    puts "the logs: \n#{page.driver.browser.manage.logs.get(:browser).join("\n")}"
     check_errors
   end
 
