@@ -132,6 +132,8 @@ describe "column types on client", js: true do
       timestamp: t #.time
     )
     #r.reload
+    puts "on server r =  \n #{r.inspect}"
+    puts "on server TypeTest.find(1) = \n #{TypeTest.find(1).inspect}"
     x =
     evaluate_promise do
       ReactiveRecord.load do
@@ -158,6 +160,7 @@ describe "column types on client", js: true do
     # ])
     puts "the logs: \n#{page.driver.browser.manage.logs.get(:browser).join("\n")}"
     check_errors
+
   end
 
   it 'loads and converts the value' do
