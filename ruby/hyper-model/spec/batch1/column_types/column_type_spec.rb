@@ -65,7 +65,6 @@ describe "column types on client", js: true do
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
     end
 
-
     TypeTest.build_tables #rescue nil
     DefaultTest.build_tables #rescue nil
 
@@ -92,9 +91,6 @@ describe "column types on client", js: true do
     end
 
     size_window(:small, :portrait)
-  end
-
-  after(:each) do
     TypeTest.delete_all
     DefaultTest.delete_all
   end
@@ -190,6 +186,7 @@ describe "column types on client", js: true do
       time: t.time,
       timestamp: t.time
     )
+    puts "Todo.count = #{Todo.count}, Todo.last = #{Todo.last.inspect}"
     #r.reload
     expect_promise do
       ReactiveRecord.load do
