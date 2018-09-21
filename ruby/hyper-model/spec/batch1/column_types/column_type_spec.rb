@@ -116,61 +116,7 @@ describe "column types on client", js: true do
     check_errors
   end
 
-  it 'creates a dummy value of the appropriate type' do
-    t = Time.now
-    TypeTest.create(
-      boolean: true,
-      date: t,
-      datetime: t,
-      decimal: 12.2,
-      float: 13.2,
-      integer: 14,
-      bigint: 15,
-      string: "hello",
-      text: "goodby",
-      time: t,
-      timestamp: t
-    )
-    expect_evaluate_ruby do
-      TypeTest.columns_hash.collect do |attr, _info|
-        TypeTest.find(1).send(attr).class
-      end
-    end.to eq([
-      'Number', 'NilClass', 'Boolean', 'Date', 'Time', 'Number', 'Number', 'Number',
-      'Number', 'String', 'String', 'Time', 'Time'
-    ])
-    check_errors
-  end
-
-  it 'while loading the dummy value delegates the correct type with operators etc' do
-    t = Time.parse('1/2/2003')
-    TypeTest.create(
-      boolean: true,
-      date: t,
-      datetime: t,
-      decimal: 12.2,
-      float: 13.2,
-      integer: 14,
-      bigint: 15,
-      string: "hello",
-      text: "goodby",
-      time: t,
-      timestamp: t
-    )
-    expect_evaluate_ruby do
-      t = TypeTest.find(1)
-      [
-        !t.boolean, t.date+1, t.datetime+2.days, t.decimal + 5, t.float + 6, t.integer + 7,
-        t.bigint + 8, t.string.length, t.text.length, t.time+3.days, t.timestamp+4.days
-      ]
-    end.to eq([
-      true, "2001-01-02", (Timex.sqlmin+2.days).as_json, 5, 6, 7,
-      8, 0, 0, (Timex.sqlmin+3.days).as_json, (Timex.sqlmin+4.days).as_json
-    ])
-    check_errors
-  end
-
-  it 'loads and converts the value' do  # randomly generates an error, but the exactual spec passed... perhaps move it up or down? (tried moving down one step)
+  it 'loads and converts the value' do
     t = Timex.parse('1/2/2003')
     r = TypeTest.create(
       boolean: true,
@@ -206,6 +152,60 @@ describe "column types on client", js: true do
       'String', 'goodby',
       'Time', t.time_only.as_json, # date is indeterminate for active record time
       'Time', t.as_json
+    ])
+    check_errors
+  end
+
+  it 'while loading the dummy value delegates the correct type with operators etc' do
+    t = Time.parse('1/2/2003')
+    TypeTest.create(
+      boolean: true,
+      date: t,
+      datetime: t,
+      decimal: 12.2,
+      float: 13.2,
+      integer: 14,
+      bigint: 15,
+      string: "hello",
+      text: "goodby",
+      time: t,
+      timestamp: t
+    )
+    expect_evaluate_ruby do
+      t = TypeTest.find(1)
+      [
+        !t.boolean, t.date+1, t.datetime+2.days, t.decimal + 5, t.float + 6, t.integer + 7,
+        t.bigint + 8, t.string.length, t.text.length, t.time+3.days, t.timestamp+4.days
+      ]
+    end.to eq([
+      true, "2001-01-02", (Timex.sqlmin+2.days).as_json, 5, 6, 7,
+      8, 0, 0, (Timex.sqlmin+3.days).as_json, (Timex.sqlmin+4.days).as_json
+    ])
+    check_errors
+  end
+
+  it 'creates a dummy value of the appropriate type' do
+    t = Time.now
+    TypeTest.create(
+      boolean: true,
+      date: t,
+      datetime: t,
+      decimal: 12.2,
+      float: 13.2,
+      integer: 14,
+      bigint: 15,
+      string: "hello",
+      text: "goodby",
+      time: t,
+      timestamp: t
+    )
+    expect_evaluate_ruby do
+      TypeTest.columns_hash.collect do |attr, _info|
+        TypeTest.find(1).send(attr).class
+      end
+    end.to eq([
+      'Number', 'NilClass', 'Boolean', 'Date', 'Time', 'Number', 'Number', 'Number',
+      'Number', 'String', 'String', 'Time', 'Time'
     ])
     check_errors
   end
