@@ -71,9 +71,9 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
   end
 
-  config.before(:each) do
-    DatabaseCleaner.strategy = :transaction
-  end
+  # config.before(:each) do
+  #   DatabaseCleaner.strategy = :transaction
+  # end
 
   config.before(:each) do |x|
     Hyperloop.class_eval do
@@ -94,9 +94,9 @@ RSpec.configure do |config|
     size_window
   end
 
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
+  # config.before(:each) do
+  #   DatabaseCleaner.start
+  # end
 
   config.after(:each) do |example|
     unless example.exception
