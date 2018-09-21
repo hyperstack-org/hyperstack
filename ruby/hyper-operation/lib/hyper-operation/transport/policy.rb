@@ -3,6 +3,16 @@ module Hyperloop
   class InternalClassPolicy
 
     def initialize(regulated_klass)
+      unless regulated_klass.is_a?(Class)
+        # attempt to constantize the class in case eager_loading in production
+        # has loaded the policy before the class.  THis will insure that if
+        # there is a class being regulated, it is loaded first.
+        begin
+          regulated_klass.constantize
+        rescue NameError
+          nil
+        end
+      end
       @regulated_klass = regulated_klass
     end
 
