@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'chromedriver-helper', '1.2.0' #'>= 2.1.0'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
-  spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
+  #spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'

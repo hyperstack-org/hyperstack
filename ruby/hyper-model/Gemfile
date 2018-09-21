@@ -1,8 +1,9 @@
 source 'https://rubygems.org'
-gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
+#gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
 # hyper-model is still using an ancient inlined version of gem 'hyper-spec',       path: '../hyper-spec'
 gem 'hyperloop-config', path: '../hyperloop-config'
 gem 'hyper-store',      path: '../hyper-store'
 gem 'hyper-component',  path: '../hyper-component'
 gem 'hyper-operation',  path: '../hyper-operation'
+
 gemspec
