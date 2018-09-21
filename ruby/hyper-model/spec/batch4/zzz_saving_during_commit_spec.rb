@@ -32,11 +32,11 @@ describe "saving during commit", js: true do
           t.string :name
           t.timestamps
         end
+        ActiveRecord::Base.public_columns_hash[name] = columns_hash
       end
-      ActiveRecord::Base.public_columns_hash[name] = columns_hash
     end
 
-    CommitIssue.build_tables rescue nil
+    CommitIssue.build_tables #rescue nil
 
     isomorphic do
       class CommitIssue < ActiveRecord::Base
