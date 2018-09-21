@@ -272,6 +272,7 @@ if RUBY_ENGINE != 'opal'
     end
 
     config.after(:each) do |example|
+      puts "after each is example.exception? #{example.exception}"
       unless example.exception
         # Clear session data
         Capybara.reset_sessions!
