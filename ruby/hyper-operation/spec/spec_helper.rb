@@ -62,13 +62,13 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods if defined? FactoryBot
 
-  config.use_transactional_fixtures = false
+  config.use_transactional_fixtures = true # -sfc george false
 
   Capybara.default_max_wait_time = 10.seconds
 
   config.before(:suite) do
     #Hyperloop.define_setting :connect_session, false
-    DatabaseCleaner.clean_with(:truncation)
+    # -sfc george DatabaseCleaner.clean_with(:truncation)
   end
 
   # config.before(:each) do
@@ -87,7 +87,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :js => true) do
-    DatabaseCleaner.strategy = :truncation
+    # -sfc george DatabaseCleaner.strategy = :truncation
   end
 
   config.before(:each, :js => true) do
@@ -103,7 +103,7 @@ RSpec.configure do |config|
       # Clear session data
       Capybara.reset_sessions!
       # Rollback transaction
-      DatabaseCleaner.clean
+      # -sfc george DatabaseCleaner.clean
     end
   end
 
