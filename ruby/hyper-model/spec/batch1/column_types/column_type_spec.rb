@@ -96,6 +96,8 @@ describe "column types on client", js: true do
   end
 
   it 'transfers the columns hash to the client' do
+    puts "count of TypeTest records = #{TypeTest.count}"
+
     expect_evaluate_ruby do
       TypeTest.columns_hash
     end.to eq(TypeTest.columns_hash.as_json)
@@ -103,6 +105,8 @@ describe "column types on client", js: true do
   end
 
   it 'defines the server method with a default value' do
+    puts "count of TypeTest records = #{TypeTest.count}"
+
     expect_evaluate_ruby do
       TypeTest.new.a_server_method()
     end.to eq('hello')
@@ -110,6 +114,8 @@ describe "column types on client", js: true do
   end
 
   it 'loads the server method' do
+    puts "count of TypeTest records = #{TypeTest.count}"
+
     TypeTest.create
     expect_promise do
       ReactiveRecord.load { TypeTest.find(1).a_server_method('hello') }
@@ -118,6 +124,8 @@ describe "column types on client", js: true do
   end
 
   it 'loads and converts the value' do
+    puts "count of TypeTest records = #{TypeTest.count}"
+
     t = Time.now #Timex.parse('1/2/2003')
     r = TypeTest.create(
       boolean: true,
