@@ -31,9 +31,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-operation', HyperModel::VERSION
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
-  spec.add_dependency 'chromedriver-helper', '1.2.0'
-  spec.add_dependency 'libv8', '~> 6.3.0' # see https://github.com/discourse/mini_racer/issues/92
-  spec.add_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_development_dependency 'chromedriver-helper', '1.2.0'
+  spec.add_development_dependency 'libv8', '~> 6.3.0' # see https://github.com/discourse/mini_racer/issues/92
+  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
   #spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
