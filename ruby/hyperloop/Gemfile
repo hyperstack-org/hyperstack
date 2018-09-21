@@ -1,4 +1,8 @@
 source 'https://rubygems.org'
-gem 'hyperloop-config', path: '../hyper-model'
-gem 'hyperloop-config', path: '../hyper-router'
+gem 'hyperloop-config', path: '../hyperloop-config'
+gem 'hyper-store',      path: '../hyper-store'
+gem 'hyper-component',  path: '../hyper-component'
+gem 'hyper-operation',  path: '../hyper-operation'
+gem 'hyper-model',      path: '../hyper-model'
+gem 'hyper-router',     path: '../hyper-router'
 gemspec
