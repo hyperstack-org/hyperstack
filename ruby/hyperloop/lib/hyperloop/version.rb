@@ -1,4 +1,4 @@
 module Hyperloop
-  VERSION = '1.0.0.lap28'
+  VERSION = '0.99'
   ROUTERVERSION = '4.2.6.lap28'
 end

@@ -91,11 +91,8 @@ describe "column types on client", js: true do
     end
 
     size_window(:small, :portrait)
-    puts "before delete TypeTest.count = #{TypeTest.count}, TypeTest.last = #{TypeTest.last.inspect}"
 
     TypeTest.delete_all
-
-    puts "after delete TypeTest.count = #{TypeTest.count}, TypeTest.last = #{TypeTest.last.inspect}"
 
     DefaultTest.delete_all
   end
@@ -191,8 +188,6 @@ describe "column types on client", js: true do
       time: t.time,
       timestamp: t.time
     )
-    puts "TypeTest.count = #{TypeTest.count}, TypeTest.last = #{TypeTest.last.inspect}"
-    #r.reload
     expect_promise do
       ReactiveRecord.load do
         TypeTest.columns_hash.collect do |attr, _info|

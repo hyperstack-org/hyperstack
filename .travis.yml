@@ -25,7 +25,7 @@ env:
   - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  #- COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyperloop                   LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyperloop-config            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
 before_install:
