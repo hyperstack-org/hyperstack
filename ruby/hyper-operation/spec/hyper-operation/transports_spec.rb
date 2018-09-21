@@ -139,6 +139,7 @@ describe "Transport Tests", js: true do
       # now that we are connected the UI should keep updating
       CreateTestModel.run(test_attribute: "I'm also new here!")
       page.should have_content("2 items")
+      sleep 1
     end
 
     it "broadcasts to the session channel" do
@@ -206,6 +207,7 @@ describe "Transport Tests", js: true do
       # now that we are connected the UI should keep updating
       CreateTestModel.run(test_attribute: "I'm also new here!")
       page.should have_content("2 items")
+      sleep 1
     end
 
     it "broadcasts to the session channel" do
@@ -278,6 +280,7 @@ describe "Transport Tests", js: true do
       # now that we are connected the UI should keep updating
       CreateTestModel.run(test_attribute: "I'm also new here!")
       page.should have_content("2 items")
+      sleep 1
     end
 
     it "broadcasts to the session channel" do
