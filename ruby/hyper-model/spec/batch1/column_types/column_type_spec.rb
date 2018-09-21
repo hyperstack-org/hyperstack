@@ -92,6 +92,7 @@ describe "column types on client", js: true do
     end
 
     size_window(:small, :portrait)
+    puts "count of TypeTest records = #{TypeTest.count}"
   end
 
   it 'transfers the columns hash to the client' do
