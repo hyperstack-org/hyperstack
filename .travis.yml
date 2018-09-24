@@ -45,3 +45,82 @@ before_script:
   - yarn install
 script:
   - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
+
+deploy:
+  - provider: rubygems
+    gemspec: ruby/hyper-component/hyper-component.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-component
+  - provider: rubygems
+    gemspec: ruby/hyper-i18n/hyper-i18n.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-i18n
+  - provider: rubygems
+    gemspec: ruby/hyper-model/hyper-model.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-model
+  - provider: rubygems
+    gemspec: ruby/hyper-operation/hyper-operation.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-operation
+  - provider: rubygems
+    gemspec: ruby/hyper-react/hyper-react.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-react
+  - provider: rubygems
+    gemspec: ruby/hyper-router/hyper-router.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-router
+  - provider: rubygems
+    gemspec: ruby/hyper-spec/hyper-spec.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-spec
+  - provider: rubygems
+    gemspec: ruby/hyper-store/hyper-store.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-store
+  - provider: rubygems
+    gemspec: ruby/hyper-trace/hyper-trace.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyper-trace
+  - provider: rubygems
+    gemspec: ruby/hyperloop/hyperloop.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyperloop
+  - provider: rubygems
+    gemspec: ruby/hyperloop-config/hyperloop-config.gemspec
+    api_key:
+      secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
+    on:
+      tags: true
+      condition: $COMPONENT = hyperloop-config
