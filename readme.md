@@ -1,6 +1,6 @@
 # Hyperstack
 
-[![Build Status](https://travis-ci.org/Hyperloop-org/Hyperloop.svg?branch=edge)](https://travis-ci.org/Hyperloop-org/Hyperloop)
+[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=edge)](https://travis-ci.org/hyperstack-org/hyperstack)
 
 Hyperstack is a Ruby-based DSL and modern web toolkit for building spectacular, interactive web applications fast!
 
