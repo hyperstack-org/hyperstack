@@ -1,4 +1,4 @@
-# RubyHyperloop Legacy 0.99.x
+# Hyperstack edge
 
 [![Build Status](https://travis-ci.org/Hyperloop-org/Hyperloop.svg?branch=hyperloop-legacy)](https://travis-ci.org/Hyperloop-org/Hyperloop)
 
