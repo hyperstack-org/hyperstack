@@ -16,11 +16,11 @@ During this rename (which of course involves changes to just about everything), 
 
 + This hyperloop-legacy branch will only contain critical bug fixes
 + The original website is here: http://ruby-hyperloop.org/
-+ See the /install folder for installation instructions
++ See the [/install](/install) for installation instructions
 
 ## Hyperstack
 
 All future work is in the Hyperstack repo and website:
 
-Webiste: https://hyperstack.org/
-Github: https://github.com/hyperstack-org
++ Webiste: https://hyperstack.org/
++ Github: https://github.com/hyperstack-org
