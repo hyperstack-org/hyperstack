@@ -1,5 +1,16 @@
 # Welcome to Hyperstack!
 
-**Hyperstack is work-in-progress. Please consider everything in this repo as ALPHA.**
+**Hyperstack 1.0.0.alpha is work-in-progress. Please consider everything in the edge branch as ALPHA.**
 
-Hyperloop (version 0.99.x) is stable, and the existing website remains in place. If you are looking for a production ready project, then please stay there until this is released. http://ruby-hyperloop.org
+## Hyperstack
+
++ Webiste: https://hyperstack.org/
++ Github: https://github.com/hyperstack-org
+
+## RubyHyperloop legacy
+
++ RubyHyperloop (legacy version 0.99.x) is production ready and very stable
++ This hyperloop-legacy branch will only contain critical bug fixes
++ The original website is here: http://ruby-hyperloop.org/
++ The final stable branch is https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy
+
