@@ -1,6 +1,6 @@
 # RubyHyperloop Legacy 0.99.x
 
-[![Build Status](https://travis-ci.org/Hyperloop-org/Hyperloop.svg?branch=hyperloop-legacy)](https://travis-ci.org/Hyperloop-org/Hyperloop)
+[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=hyperloop-legacy)](https://travis-ci.org/hyperstack-org/hyperstack)
 
 ## RubyHyperloop has become Hyperstack
 
