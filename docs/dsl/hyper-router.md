@@ -1,20 +1,13 @@
 # HyperRouter
 
-**These are Legacy Documents**
-
-Hyperloop has been renamed Hyperstack and the new project details are as follows:
-
-Webiste: https://hyperstack.org/
-Github: https://github.com/hyperstack-org
-
-These documents and this branch will remain for legacy purposes.
+# Work in progress - ALPHA (docs and code)
 
 ## Usage
 
 This is simply a DSL wrapper on [react-router](https://github.com/ReactTraining/react-router) v4.x
 
 ```ruby
-class AppRouter < Hyperloop::Router
+class AppRouter < Hyperstack::Router
   history :browser
 
   route do
@@ -29,7 +22,7 @@ class AppRouter < Hyperloop::Router
   end
 end
 
-class Home < Hyperloop::Router::Component
+class Home < Hyperstack::Router::Component
   render(:div) do
     H2 { 'Home' }
   end
@@ -107,10 +100,10 @@ const Topic = ({ match }) => (
 export default BasicExample
 ```
 
-And here is the same example in Hyperloop:
+And here is the same example in Hyperstack:
 
 ```ruby
-class BasicExample < Hyperloop::Router
+class BasicExample < Hyperstack::Router
   history :browser
 
   route do
@@ -128,19 +121,19 @@ class BasicExample < Hyperloop::Router
   end
 end
 
-class Home < Hyperloop::Router::Component
+class Home < Hyperstack::Router::Component
   render(:div) do
     H2 { 'Home' }
   end
 end
 
-class About < Hyperloop::Router::Component
+class About < Hyperstack::Router::Component
   render(:div) do
     H2 { 'About' }
   end
 end
 
-class Topics < Hyperloop::Router::Component
+class Topics < Hyperstack::Router::Component
   render(:div) do
     H2 { 'Topics' }
     UL() do
@@ -155,7 +148,7 @@ class Topics < Hyperloop::Router::Component
   end
 end
 
-class Topic < Hyperloop::Router::Component
+class Topic < Hyperstack::Router::Component
   render(:div) do
     H3 { match.params[:topic_id] }
   end
@@ -167,11 +160,11 @@ end
 This is the base Router class, it can either be inherited or included:
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
 end
 
 class MyRouter < React::Component::Base
-  include Hyperloop::Router::Base
+  include Hyperstack::Router::Base
 end
 ```
 
@@ -180,7 +173,7 @@ With the base Router class, you must specify the history you want to use.
 This can be done either using a macro:
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   history :browser
 end
 ```
@@ -190,7 +183,7 @@ The macro accepts three options: `:browser`, `:hash`, or `:memory`.
 Or defining the `history` method:
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   def history
     self.class.browser_history
   end
@@ -204,11 +197,11 @@ so you don't need to specify one.
 They also can be used by inheritance or inclusion:
 
 ```ruby
-class MyRouter < Hyperloop::HashRouter
+class MyRouter < Hyperstack::HashRouter
 end
 
 class MyRouter < React::Component::Base
-  include Hyperloop::Router::Hash
+  include Hyperstack::Router::Hash
 end
 ```
 
@@ -218,7 +211,7 @@ Static router is a little different, since it doesn't actually have a history.
 These are used under-the-hood for any other Router during prerendering.
 
 ```ruby
-class MyRouter < Hyperloop::StaticRouter
+class MyRouter < Hyperstack::StaticRouter
   route do
     DIV do
       Route('/:name', mounts: Greet)
@@ -232,7 +225,7 @@ end
 To render children/routes use the `route` macro, it is the equivalent to `render` of a component.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -249,7 +242,7 @@ end
 Routes are no longer defined separately, but are just components you call inside the router/components.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -273,7 +266,7 @@ The `Route` method takes a url path, and these options:
 It can also take a block instead of the `mounts` option.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -287,7 +280,7 @@ end
 ```
 The block will give you the match, location, and history data:
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -301,7 +294,7 @@ class MyRouter < Hyperloop::Router
 end
 ```
 
-+ It is recommended to inherit from `Hyperloop::Router::Component` for components mounted by routes.
++ It is recommended to inherit from `Hyperstack::Router::Component` for components mounted by routes.
 + This automatically sets the `match`, `location`, and `history` params,
 and also gives you instance methods with those names.
 + You can use either `params.match` or just `match`.
@@ -309,7 +302,7 @@ and gives you access to the Route method and more.
 + This allows you to create inner routes as you need them.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -319,7 +312,7 @@ class MyRouter < Hyperloop::Router
   end
 end
 
-class Greet < Hyperloop::Router::Component
+class Greet < Hyperstack::Router::Component
   render(DIV) do
     H1 { "Hello #{match.params[:foo]}!" }
     Route(match.url, exact: true) do
@@ -329,7 +322,7 @@ class Greet < Hyperloop::Router::Component
   end
 end
 
-class Activity < Hyperloop::Router::Component
+class Activity < Hyperstack::Router::Component
   render(DIV) do
     H2 { params.match.params[:activity] }
   end
@@ -339,7 +332,7 @@ end
 Routes will **always** render alongside sibling routes that match as well.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -356,7 +349,7 @@ end
 Going to `/goodbye` would match `/:name` as well and render `Greet` with the `name` param with the value 'goodbye'. To avoid this behavior and only render one matching route at a time, use a `Switch` component.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -374,7 +367,7 @@ Now, going to `/goodbye` would match the `Goodbye` route first and only render t
 
 ### Links
 
-Links are available to Routers, classes that inherit from `Hyperloop::Router::Component`, or by including `Hyperloop::Router::Mixin`.
+Links are available to Routers, classes that inherit from `Hyperstack::Router::Component`, or by including `Hyperstack::Router::Mixin`.
 
 The `Link` method takes a url path, and these options:
 + `search: String` adds the specified string to the search query
@@ -382,7 +375,7 @@ The `Link` method takes a url path, and these options:
 it can also take a block of children to render inside it.
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -406,7 +399,7 @@ NavLinks are the same as Links, but will add styling attributes when it matches 
 - `active: Proc` A proc that will add extra logic to determine if the link is active
 
 ```ruby
-class MyRouter < Hyperloop::Router
+class MyRouter < Hyperstack::Router
   ...
 
   route do
@@ -435,8 +428,8 @@ Pre-rendering is automatically taken care for you unde the hood, no more need to
 
 To setup HyperRouter:
 
-+ Install the gem (if you have installed the `Hyperloop` gem this has already been done)
-+ Your page should render your `Hyperloop::Router` as its top-level-component (first component to be rendered on the page) - in the example below this would be `AppRouter`
++ Install the gem (if you have installed the `Hyperstack` gem this has already been done)
++ Your page should render your `Hyperstack::Router` as its top-level-component (first component to be rendered on the page) - in the example below this would be `AppRouter`
 + You will need to configure your server to route all unknown routes to the client-side router (Rails example below)
 
 ### With Rails
@@ -444,10 +437,10 @@ To setup HyperRouter:
 Assuming your router is called `AppRouter`, add the following to your `routes.rb`
 
 ```ruby
-root 'Hyperloop#AppRouter' # see note below
-match '*all', to: 'Hyperloop#AppRouter', via: [:get] # this should be the last line of routes.rb
+root 'Hyperstack#AppRouter' # see note below
+match '*all', to: 'Hyperstack#AppRouter', via: [:get] # this should be the last line of routes.rb
 ```
 
 Note:
 
-`root 'Hyperloop#AppRouter'` is shorthand which will automagically create a Controller, View and launch `AppRouter` as the top-level Component. If you are rendering your Component via your own COntroller or View then ignore this line.
+`root 'Hyperstack#AppRouter'` is shorthand which will automagically create a Controller, View and launch `AppRouter` as the top-level Component. If you are rendering your Component via your own COntroller or View then ignore this line.

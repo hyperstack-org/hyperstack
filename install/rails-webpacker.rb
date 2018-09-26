@@ -1,4 +1,4 @@
-# Legacy Hyperloop
+# Hyperstack
 
 # ----------------------------------- Commit so we have good history of these changes
 
@@ -9,7 +9,7 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'hyperloop', ">=0.9.1", "<1.0.0"
+gem 'hyperloop', github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
 gem 'opal_hot_reloader', github: 'hyperstack-org/opal-hot-reloader'
 
 gem_group :development do
@@ -103,7 +103,7 @@ route "root 'hyperloop#HelloWorld'"
 file 'app/hyperloop/components/hello_world.rb', <<-CODE
 class HelloWorld < Hyperloop::Component
   render do
-    H1 { "Hello world from Legacy Hyperloop!" }
+    H1 { "Hello world from Hyperstack edge!" }
   end
 end
 CODE

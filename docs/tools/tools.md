@@ -1,14 +1,5 @@
 # Tools
 
-**These are Legacy Documents**
-
-Hyperloop has been renamed Hyperstack and the new project details are as follows:
-
-Webiste: https://hyperstack.org/
-Github: https://github.com/hyperstack-org
-
-These documents and this branch will remain for legacy purposes.
-
 ## Hyper-console
 
 Hyper-Console will open a new popup window, that is running an IRB style read-eval loop. The console window will compile what ever ruby code you type, and if it compiles, will send it to your main window for execution. The result (or error message) plus any console output will be displayed in the console window.

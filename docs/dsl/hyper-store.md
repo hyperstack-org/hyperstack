@@ -1,22 +1,13 @@
 # HyperStore
 
-**These are Legacy Documents**
+# Work in progress - ALPHA (docs and code)
 
-Hyperloop has been renamed Hyperstack and the new project details are as follows:
-
-Webiste: https://hyperstack.org/
-Github: https://github.com/hyperstack-org
-
-These documents and this branch will remain for legacy purposes.
-
-## Introduction
-
-Hyperloop **Stores** are implemented in the **HyperStore Gem**.
+Hyperstack **Stores** are implemented in the **HyperStore Gem**.
 
 Stores are where the state of your Application lives. Anything but a completely static web page will have dynamic states that change because of user inputs, the passage of time, or other external events.
 
 ```ruby
-class UserStore < Hyperloop::Store
+class UserStore < Hyperstack::Store
   state :current, scope: :class, reader: true
 
   def self.set_current! user
@@ -31,8 +22,8 @@ UserStore.current_user
 
 **Stores are Ruby classes that keep the dynamic parts of the state in special state variables**
 
-+ `Hyperloop::Store::Mixin` can be mixed in to any class to turn it into a Flux Store.
-+ You can also create Stores by subclassing `Hyperloop::Store`.
++ `Hyperstack::Store::Mixin` can be mixed in to any class to turn it into a Flux Store.
++ You can also create Stores by subclassing `Hyperstack::Store`.
 + Stores are built out of *reactive state variables*.
 + Components that *read* a Store's state will **automatically** update when the state changes.
 + All of your **shared** reactive state should be Stores - *The Store is the Truth*!
@@ -42,9 +33,9 @@ UserStore.current_user
 
 A Store will have one or more *Reactive State Variables* or *State* for short.  States are read using the `state` method, and are changed using the `mutate` method.
 
-`state.items` reads the current value of the state named `items`.  Hyperloop tracks all reads of state, and mutating those states will trigger a re-render of any Components depending on the current value.
+`state.items` reads the current value of the state named `items`.  Hyperstack tracks all reads of state, and mutating those states will trigger a re-render of any Components depending on the current value.
 
-`mutate.items` returns the current value of the state named `items`, but also tells Hyperloop that the value is changing, and that any Components depending on the current value will have to be re-rendered.
+`mutate.items` returns the current value of the state named `items`, but also tells Hyperstack that the value is changing, and that any Components depending on the current value will have to be re-rendered.
 
 The one thing you must remember to do is use `mutate` if you intend to update the internal value of a state.  For example if the state contains a hash, and you are updating the Hash's internal value you would use `mutate` otherwise the change will go unrecorded.
 
@@ -84,7 +75,7 @@ However sometimes you will want to create a class where each instance is a Store
 # Each UserStream provides a stream of unique user profiles.
 # Each instance has a single HyperStore state variable called user
 # user will contain a single hash representing the user profile.
-class UserStream < Hyperloop::Store
+class UserStream < Hyperstack::Store
 
   # get another user
 
@@ -147,12 +138,12 @@ States like instance variables are created when they are first referenced.
 As a convenience you may also explicitly declare states.  This reduces code noise, and improves readability.
 
 ```ruby
-class Cart < Hyperloop::Store
+class Cart < Hyperstack::Store
   state items: Hash.new { |h, k| h[k] = 0 }, scope: :class, reader: true
 end
 ```
 
-This *declares* the `items` state as a class state variable, will initialize it with the hash on `Hyperloop::Boot`, and provides a reader method.
+This *declares* the `items` state as a class state variable, will initialize it with the hash on `Hyperstack::Boot`, and provides a reader method.
 That is 6 lines of code for the price of 1, plus now the intention of `items` is clearly defined.
 
 The `state` declaration has the following flavors, depending on how the state is to be initialized:
@@ -194,7 +185,7 @@ items for each instance.
 The `shared` option just makes it easier to access a class state from instances.
 
 ```ruby
-class MyStore < Hyperloop::Store
+class MyStore < Hyperstack::Store
   state :shared_state, scope: :shared
   state :class_state, scope: :class
   state :instance_state # scope: :instance is default here
@@ -222,7 +213,7 @@ class MyStore < Hyperloop::Store
   end
 ```
 
-Class state variables are initialized by an implicit `Hyperloop::Application::Boot` receiver.  If an initial value is directly provided (not via a proc, method or block) then the value will be `dup`ed when the second and following Boot dispatches are received.  The proc, method or block initializers will run in the context of the class, and the state variable will be available.  For example:
+Class state variables are initialized by an implicit `Hyperstack::Application::Boot` receiver.  If an initial value is directly provided (not via a proc, method or block) then the value will be `dup`ed when the second and following Boot dispatches are received.  The proc, method or block initializers will run in the context of the class, and the state variable will be available.  For example:
 
 ```ruby
 state :boot_counter, scope: :shared do
@@ -258,7 +249,7 @@ Stores can receive Operation dispatches using the receive method.
 Here is a simple shopping cart Store that receives Add, Remove and Empty Operations:
 
 ```ruby
-class Cart < Hyperloop::Store
+class Cart < Hyperstack::Store
   # First we will define the two Operations.
   # Because these are closely associated with the Cart
   # we will name space them inside the cart.
@@ -274,9 +265,9 @@ class Cart < Hyperloop::Store
   end
 
   # The cart's state is represented as a hash, items are the keys, qty is the value
-  # initialize the hash by receiving the system Hyperloop::Application::Boot or Empty dispatches
+  # initialize the hash by receiving the system Hyperstack::Application::Boot or Empty dispatches
 
-  receives Hyperloop::Application::Boot, Empty do
+  receives Hyperstack::Application::Boot, Empty do
     mutate.items(Hash.new { |h, k| h[k] = 0 })
   end
 
@@ -316,7 +307,7 @@ When the dispatch is received the method, proc, or block will be run within the 
 
 The *Flux* paradigm promotes only mutating state inside of receivers.
 
-Hyperloop is less opinionated.  You may also add mutator methods to your class.  Our recommendation is that you append an exclamation (!) to methods that mutate state.
+Hyperstack is less opinionated.  You may also add mutator methods to your class.  Our recommendation is that you append an exclamation (!) to methods that mutate state.
 
 Note that it is reasonable to have several receivers for the same Operation.  This allows subclassing, mixins, and separation of concerns.
 
