@@ -1,17 +1,26 @@
 # HyperModel
 
-# Work in progress - ALPHA (docs and code)
+**These are Legacy Documents**
 
-In Hyperstack, your ActiveRecord Models are available in your Isomorphic code.
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
+
+In Hyperloop, your ActiveRecord Models are available in your Isomorphic code.
 
 Components, Operations, and Stores have CRUD access to your server side ActiveRecord Models, using the standard ActiveRecord API.
 
-In addition, Hyperstack implements push notifications (via a number of possible technologies) so changes to records on the server are dynamically pushed to all authorized clients.
+In addition, Hyperloop implements push notifications (via a number of possible technologies) so changes to records on the server are dynamically pushed to all authorized clients.
 
 In other words, one browser creates, updates, or destroys a Model, and the changes are persisted in ActiveRecord models and then broadcast to all other authorized clients.
 
 + You access your Model data in your Components, Operations, and Stores just like you would on the server or in an ERB or HAML view file.
-+ If an optional push transport is connected Hyperstack broadcasts any changes made to your ActiveRecord models as they are persisted on the server or updated by one of the authorized clients.
++ If an optional push transport is connected Hyperloop broadcasts any changes made to your ActiveRecord models as they are persisted on the server or updated by one of the authorized clients.
 + Some Models can be designated as *server-only* which means they are not available to the Isomorphic code.
 
 For example, consider a simple model called `Dictionary` which might be part of Wiktionary type app.
@@ -28,10 +37,10 @@ class Dictionary < ActiveRecord::Base
 end
 ```
 
-Here is a very simple Hyperstack Component that shows a random word from the dictionary:
+Here is a very simple Hyperloop Component that shows a random word from the dictionary:
 
 ```ruby
-class WordOfTheDay < Hyperstack::Component
+class WordOfTheDay < Hyperloop::Component
 
   def pick_entry!  
     # pick a random word and assign the selected record to entry
@@ -62,14 +71,14 @@ For complete examples with *push* updates, see any of the apps in the `examples`
 
 ## Isomorphic Models
 
-Depending on the architecture of your application, you may decide that some of your models should be Isomorphic and some should remain server-only. The consideration will be that your Isomorphic models will be compiled by Opal to JavaScript and accessible on he client (without the need for a boilerplate API) - Hyperstack takes care of the communication between your server-side models and their client-side compiled versions and you can use Policy to govern access to the models.
+Depending on the architecture of your application, you may decide that some of your models should be Isomorphic and some should remain server-only. The consideration will be that your Isomorphic models will be compiled by Opal to JavaScript and accessible on he client (without the need for a boilerplate API) - Hyperloop takes care of the communication between your server-side models and their client-side compiled versions and you can use Policy to govern access to the models.
 
-In order for Hyperstack to see your Models (and his make them Isomorphic) you need to move them to the `hyperstack/models` folder. Only models in this folder will be seen by Hyperstack and compiled to Javascript. Once a Model is on this folder it ill be accessable to both your client and server code.
+In order for Hyperloop to see your Models (and his make them Isomorphic) you need to move them to the `Hyperloop/models` folder. Only models in this folder will be seen by Hyperloop and compiled to Javascript. Once a Model is on this folder it ill be accessable to both your client and server code.
 
 | **Location of Models**        | **Scope**           |
 | ------------------------- |---------------|
 | `app\models` | Server-side code only |
-| `app\Hyperstack\models` | Isomorphic code (client and server) |
+| `app\Hyperloop\models` | Isomorphic code (client and server) |
 
 ### Rails 5.1.x
 
@@ -84,11 +93,11 @@ class ApplicationRecord < ActiveRecord::Base
 end
 ```
 
-For Hyperstack to see this change, this file needs to be moved (or copied if you have some server-side models) to the `apps/Hyperstack` folder.
+For Hyperloop to see this change, this file needs to be moved (or copied if you have some server-side models) to the `apps/Hyperloop` folder.
 
 ### Explicit Scope Access
 
-In order to prevent unauthorized access to information like scope counts, lists of record ids, etc, Hyperstack now (see issue https://github.com/ruby-Hyperstack/hyper-mesh/issues/43) requires you explicitly allow scopes to be viewed on the client, otherwise you will get an AccessViolation.
+In order to prevent unauthorized access to information like scope counts, lists of record ids, etc, Hyperloop now (see issue https://github.com/ruby-Hyperloop/hyper-mesh/issues/43) requires you explicitly allow scopes to be viewed on the client, otherwise you will get an AccessViolation.
 
 To globally allow access to all scopes add this to the ApplicationRecord class
 
@@ -100,13 +109,13 @@ end
 
 ## ActiveRecord API
 
-Hyperstack uses a subset of the standard ActiveRecord API to give your Isomorphic Components, Operations and Stores access to your server side Models.  As much as possible Hyperstack follows the syntax and semantics of ActiveRecord.  
+Hyperloop uses a subset of the standard ActiveRecord API to give your Isomorphic Components, Operations and Stores access to your server side Models.  As much as possible Hyperloop follows the syntax and semantics of ActiveRecord.  
 
 ### Interfacing to React
 
-Hyperstack integrates with React (through Components) to deliver your Model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
+Hyperloop integrates with React (through Components) to deliver your Model data to the client without you having to create extra APIs or specialized controllers.  The key idea of React is that when state (or params) change, the portions of the display effected by this data will be updated.
 
-Hyperstack automatically creates React state objects that will be updated as server side data is loaded or changes.  When these states change the associated parts of the display will be updated.
+Hyperloop automatically creates React state objects that will be updated as server side data is loaded or changes.  When these states change the associated parts of the display will be updated.
 
 A brief overview of how this works will help you understand the how Hypeloop gets the job done.
 
@@ -114,9 +123,9 @@ A brief overview of how this works will help you understand the how Hypeloop get
 
 On the UI you will be reading models in order to display data.
 
-If during the rendering of the display the Model data is not yet loaded, placeholder values (the default values from the `columns_hash`) will be returned by Hyperstack.  
+If during the rendering of the display the Model data is not yet loaded, placeholder values (the default values from the `columns_hash`) will be returned by Hyperloop.  
 
-Hyperstack then keeps track of where these placeholders (or `DummyValue`s) are displayed, and when they do get loaded, those parts of the display will re-render.
+Hyperloop then keeps track of where these placeholders (or `DummyValue`s) are displayed, and when they do get loaded, those parts of the display will re-render.
 
 If later the data changes (either due to local user actions, or receiving push updates) then again any parts of the display that were dependent on the current values will be re-rendered.
 
@@ -124,11 +133,11 @@ You normally do not have to be aware of this.  Just access your Models using the
 
 #### Prerendering
 
-During server-side pre-rendering, Hyperstack has direct access to the server so on initial page load all the values will be loaded and present.  
+During server-side pre-rendering, Hyperloop has direct access to the server so on initial page load all the values will be loaded and present.  
 
 #### Lazy Loading
 
-Hyperstack lazy loads values, and does not load any thing until an explicit displayable value is requested.  For example `Todo.all` will have no action, but `Todo.all.pluck[:title]` will return an array of titles.
+Hyperloop lazy loads values, and does not load any thing until an explicit displayable value is requested.  For example `Todo.all` will have no action, but `Todo.all.pluck[:title]` will return an array of titles.
 
 At the end of the rendering cycle the set of all values requested will be merged into a tree structure and sent to the server, returning the minimum amount of data needed.
 
@@ -148,7 +157,7 @@ If `new` is passed a native javascript object it will be treated as a hash and c
 
 #### Scoping and Finding
 
-`scope` and `default_scope`:  Hyperstack adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the other options.
+`scope` and `default_scope`:  Hyperloop adds four new options to these methods: `joins`, `client`, `select` and `server`.  The `joins` option provides information on how the scope will be joined with other models.  The `client` and `select` options allow scoping to be done on the client side to offload this from the server, and the `server` option is there just for symmetry with the other options.
 
 ```ruby
 # the active scope proc is executed on the server
@@ -333,12 +342,12 @@ After the destroy completes the record's `destroyed?` method will return true.
 
 All Ruby objects will respond to these methods.  If you want to put up a "Please Wait" message, spinner, etc, you can use the `loaded?` or `loading?` method to determine if the object represents a real loaded value or not.  Any value for which `loaded?` returns `false` (or `loading?` returns `true`) will eventually load and cause a re-render
 
-#### Hyperstack::Model.load method
+#### Hyperloop::Model.load method
 
-Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `Hyperstack::Model.load` method:
+Sometimes it is necessary to insure values are loaded outside of the rendering cycle.  For this you can use the `Hyperloop::Model.load` method:
 
 ```ruby
-Hyperstack::Model.load do
+Hyperloop::Model.load do
   x = my_model.some_attribute
   OtherModel.find(x+12).other_attribute
   # code in here can be arbitrarily complex and load
@@ -366,23 +375,23 @@ before_mount do
 end
 ```
 
-Think hard about how you are using this, as Hyperstack already acts as flux store, and is managing state for you.  It may be you are just creating a redundant store!
+Think hard about how you are using this, as Hyperloop already acts as flux store, and is managing state for you.  It may be you are just creating a redundant store!
 
 ## Client Side Scoping
 
-By default scopes will be recalculated on the server.  For simple scopes that do not use joins or includes no additional action needs to be taken to make scopes work with Hyperstack.  For scopes that do use joins, or if you want to offload the scoping computation from the server to the client read this section.
+By default scopes will be recalculated on the server.  For simple scopes that do not use joins or includes no additional action needs to be taken to make scopes work with Hyperloop.  For scopes that do use joins, or if you want to offload the scoping computation from the server to the client read this section.
 
 ## ActiveRecord Scope Enhancement
 
-When the client receives notification that a record has changed Hyperstack finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
+When the client receives notification that a record has changed Hyperloop finds the set of currently rendered scopes that might be effected, and requests them to be updated from the server.  
 
-On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated in the browser.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way Hyperstack keeps the data requested by the browser limited to a reasonable amount.  
+On the server scopes are a useful way to structure code.  **On the client** scopes are vital as they limit the amount of data loaded, viewed, and updated in the browser.  Consider a factory floor management system that shows *job* state as work flows through the factory.  There may be millions of jobs that a production floor browser is authorized to view, but at any time there are probably only 50 being shown.  Using ActiveRecord scopes is the way Hyperloop keeps the data requested by the browser limited to a reasonable amount.  
 
-To make scopes work efficiently on the client Hyperstack adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with Hyperstack.
+To make scopes work efficiently on the client Hyperloop adds some features to the ActiveRecord `scope` and `default_scope` macros.  Note you must use the `scope` macro (and not class methods) for things to work with Hyperloop.
 
 The additional features are accessed via the `:joins`, `:client`, and `:select` options.
 
-The `:joins` option tells the Hyperstack client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, Hyperstack will not know to update the scope.*
+The `:joins` option tells the Hyperloop client which models are joined with the scope.  *You must add a `:joins` option if the scope has any data base join operations in it, otherwise if a joined model changes, Hyperloop will not know to update the scope.*
 
 The `:client` and `:select` options provide the client a way to update scopes without having to contact the server.  Unlike the `:joins` option this is an optimization and is not required for scopes to work.
 
@@ -408,7 +417,7 @@ class Todo < ActiveRecord::Base
   # Now with_recent_comments will be re-evaluated whenever a Todo record, or a Comment
   # joined with a Todo change.
 
-  # Normally whenever Hyperstack detects that a scope may be effected by a changed
+  # Normally whenever Hyperloop detects that a scope may be effected by a changed
   # model, it will request the scope be re-evaluated on the server.  To offload this
   # computation to the client provide a client side scope method:
 
@@ -478,26 +487,26 @@ While the server side proc efficiently delivers all the objects in the scope, th
 
 ## Configuring the Transport
 
-Hyperstack implements push notifications (via a number of possible technologies) so changes to records on the server are dynamically pushed to all authorized clients.
+Hyperloop implements push notifications (via a number of possible technologies) so changes to records on the server are dynamically pushed to all authorized clients.
 
 The can be accomplished by configuring **one** of the push technologies below:
 
 | Push Technology | When to choose this...        |
 |---------------------------|--------------------|
-| [Simple Polling](#setting-up-simple-polling) | The easiest push transport is the built-in simple poller.  This is great for demos or trying out Hyperstack but because it is constantly polling it is not suitable for production systems or any kind of real debug or test activities. |
+| [Simple Polling](#setting-up-simple-polling) | The easiest push transport is the built-in simple poller.  This is great for demos or trying out Hyperloop but because it is constantly polling it is not suitable for production systems or any kind of real debug or test activities. |
 | [Action Cable](#setting-up-action-cable) | If you are using Rails 5 this is the perfect route to go. Action Cable is a production ready transport built into Rails 5. |
 | [Pusher.com](#setting-up-pusher-com) | Pusher.com is a commercial push notification service with a free basic offering. The technology works well but does require a connection to the internet at all times. |
 | [Pusher Fake](#setting-up-pusher-fake) | The Pusher-Fake gem will provide a transport using the same protocol as pusher.com but you can use it to locally test an app that will be put into production using pusher.com. |
 
 ### Setting up Simple Polling
 
-The easiest push transport is the built-in simple poller.  This is great for demos or trying out Hyperstack but because it is constantly polling it is not suitable for production systems or any kind of real debug or test activities.
+The easiest push transport is the built-in simple poller.  This is great for demos or trying out Hyperloop but because it is constantly polling it is not suitable for production systems or any kind of real debug or test activities.
 
 Simply add this initializer:
 
 ```ruby
-#config/initializers/Hyperstack.rb
-Hyperstack.configuration do |config|
+#config/initializers/Hyperloop.rb
+Hyperloop.configuration do |config|
   config.transport = :simple_poller
   # options
   # config.opts = {
@@ -507,22 +516,22 @@ Hyperstack.configuration do |config|
 end
 ```
 
-That's it. Hyperstack will use simple polling for the push transport.
+That's it. Hyperloop will use simple polling for the push transport.
 
 --------------------
 
 ### Setting up Action Cable
 
-To configure Hyperstack to use Action Cable, add this initializer:
+To configure Hyperloop to use Action Cable, add this initializer:
 
 ```ruby
-#config/initializers/Hyperstack.rb
-Hyperstack.configuration do |config|
+#config/initializers/Hyperloop.rb
+Hyperloop.configuration do |config|
   config.transport = :action_cable
 end
 ```
 
-If you are already using ActionCable in your app that is fine, as Hyperstack will not interfere with your existing connections.
+If you are already using ActionCable in your app that is fine, as Hyperloop will not interfere with your existing connections.
 
 **Otherwise** go through the following steps to setup ActionCable.
 
@@ -530,7 +539,7 @@ Firstly, make sure the `action_cable` js file is required in your assets.
 
 Typically `app/assets/javascripts/application.js` will finish with a `require_tree .` and this will pull in the `cable.js` file which will pull in `action_cable.js`
 
-However at a minimum if `application.js` simply does a `require action_cable` that will be sufficient for Hyperstack.
+However at a minimum if `application.js` simply does a `require action_cable` that will be sufficient for Hyperloop.
 
 Make sure you have a cable.yml file:
 
@@ -558,7 +567,7 @@ Rails.application.configure do
 end
 ```
 
-That's it. Hyperstack will use Action Cable as the push transport.
+That's it. Hyperloop will use Action Cable as the push transport.
 
 ----------------
 
@@ -566,7 +575,7 @@ That's it. Hyperstack will use Action Cable as the push transport.
 
 [Pusher.com](https://pusher.com/) provides a production ready push transport for your App.  You can combine this with [Pusher-Fake](/docs/pusher_faker_quickstart.md) for local testing as well.  You can get a free pusher account and API keys at [https://pusher.com](https://pusher.com)
 
-First add the Pusher and Hyperstack gems to your Rails app:
+First add the Pusher and Hyperloop gems to your Rails app:
 
 add `gem 'pusher'` to your Gemfile.
 
@@ -575,17 +584,17 @@ Next Add the pusher js file to your application.js file:
 ```ruby
 # app/assets/javascript/application.js
 ...
-//= require 'Hyperstack/pusher'
+//= require 'Hyperloop/pusher'
 //= require_tree .
 ```
 
 Finally set the transport:
 
 ```ruby
-# config/initializers/Hyperstack.rb
-Hyperstack.configuration do |config|
+# config/initializers/Hyperloop.rb
+Hyperloop.configuration do |config|
   config.transport = :pusher
-  config.channel_prefix = "Hyperstack"
+  config.channel_prefix = "Hyperloop"
   config.opts = {
     app_id: "2....9",
     key: "f.....g",
@@ -601,7 +610,7 @@ That's it. You should be all set for push notifications using Pusher.com.
 
 The [Pusher-Fake](https://github.com/tristandunn/pusher-fake) gem will provide a transport using the same protocol as pusher.com.  You can use it to locally test an app that will be put into production using pusher.com.
 
-Firstly add the Pusher, Pusher-Fake and Hyperstack gems to your Rails app
+Firstly add the Pusher, Pusher-Fake and Hyperloop gems to your Rails app
 
 - add `gem 'pusher'` to your Gemfile.
 - add `gem 'pusher-fake'` to the development and test sections of your Gemfile.
@@ -611,14 +620,14 @@ Next add the pusher js file to your application.js file
 ```ruby
 # app/assets/javascript/application.js
 ...
-//= require 'Hyperstack/pusher'
+//= require 'Hyperloop/pusher'
 //= require_tree .
 ```
 
 Add this initializer to set the transport:
 
 ```ruby
-# typically app/config/initializers/Hyperstack.rb
+# typically app/config/initializers/Hyperloop.rb
 # or you can do a similar setup in your tests (see this gem's specs)
 require 'pusher'
 require 'pusher-fake'
@@ -631,9 +640,9 @@ Pusher.secret = "MY_TEST_SECRET"
 # it is important this require be AFTER the above settings, as it will use these
 require 'pusher-fake/support/base' # if using pusher with rspec change this to pusher-fake/support/rspec
 # now copy over the credentials, and merge with PusherFake's config details
-Hyperstack.configuration do |config|
+Hyperloop.configuration do |config|
   config.transport = :pusher
-  config.channel_prefix = "Hyperstack"
+  config.channel_prefix = "Hyperloop"
   config.opts = {
     app_id: Pusher.app_id,
     key: Pusher.key,
@@ -650,11 +659,11 @@ Sometimes you need to figure out what connections are available, or what attribu
 
 Its usually all to do with your policies, but perhaps you just need a little investigation.
 
-TODO check rr has become Hyperstack (as below)
+TODO check rr has become Hyperloop (as below)
 
-You can bring up a console within the controller context by browsing `localhost:3000/Hyperstack/console`
+You can bring up a console within the controller context by browsing `localhost:3000/Hyperloop/console`
 
-**Note:  change `rr` to wherever you are mounting Hyperstack in your routes file.**
+**Note:  change `rr` to wherever you are mounting Hyperloop in your routes file.**
 
 **Note: in rails 4, you will need to add the gem 'web-console' to your development section**
 
@@ -690,7 +699,7 @@ You can of course simulate server side changes to your Models through this conso
 ## Common Errors
 
 - **No policy class**
-  If you don't define a policy file, nothing will happen because nothing will get connected. By default Hyperstack will look for a `ApplicationPolicy` class.
+  If you don't define a policy file, nothing will happen because nothing will get connected. By default Hyperloop will look for a `ApplicationPolicy` class.
 
 - **Wrong version of pusher-fake**  (pusher-fake/base vs. pusher-fake/rspec) See the Pusher-Fake gem repo for details.
 
@@ -713,13 +722,13 @@ this results in an error like this:
   failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED
   ```
   Check to see if you are including the pusher-fake gem.
-  Hyperstack will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/hyper-react/HyperMesh/issues/5) for more details.
+  Hyperloop will always try to use pusher-fake if it sees the gem included.  Remove it and you should be good to go.  See [issue #5](https://github.com/hyper-react/HyperMesh/issues/5) for more details.
 
 - **Cannot connect with ActionCable.**
   Make sure that `config.action_cable.allowed_request_origins` includes the url you use for development (including the port) and that you are using `Puma`.
 
 - **Attributes are not being converted from strings, or do not have their default values**
-Eager loading is probably turned off.  Hyperstack needs to eager load `Hyperstack/models` so it can find all the column information for all Isomorphic models.
+Eager loading is probably turned off.  Hyperloop needs to eager load `Hyperloop/models` so it can find all the column information for all Isomorphic models.
 
 - **When starting rails you get a message on the rails console `couldn't find file 'browser'`**
 The `hyper-component` v0.10.0 gem removed the dependency on opal-browser.  You will have to add the 'opal-browser' gem to your Gemfile.

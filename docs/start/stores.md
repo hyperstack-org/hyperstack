@@ -1,5 +1,16 @@
 # Stores
 
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
+
 Hyperloop Stores (similar to Flux Stores) exist to hold local application state. Components read state from Stores and render accordingly. This separation of concerns is an improvement in the overall architecture and makes your application easier to maintain.
 
 **Why would we have Stores?** Let's examine that question through an example.

@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Hyperloop::Operation::VERSION
   spec.authors       = ['Mitch VanDuyn', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
-  spec.summary       = 'HyperOperations are the swiss army knife of the HyperStack'
+  spec.summary       = 'HyperOperations are the swiss army knife of the Hyperloop'
   spec.homepage      = 'http://ruby-hyperloop.org'
   spec.license       = 'MIT'
   # spec.metadata      = {

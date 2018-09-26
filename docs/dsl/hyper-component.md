@@ -1,40 +1,47 @@
 # HyperComponent
 
-# Work in progress - ALPHA (docs and code)
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
 
 ## Components DSL Overview
 
-Hyperstack **Components** are implemented in the hyper-component and hyper-react Gems.
+Hyperloop **Components** are implemented in the hyper-component and hyper-react Gems.
 
-Hyperstack Component DSL (Domain Specific Language) is a set of class and instance methods that are used to describe your React components.
+Hyperloop Component DSL (Domain Specific Language) is a set of class and instance methods that are used to describe your React components.
 
 The DSL has the following major areas:  
 
-+ The `Hyperstack::Component` class and the equivalent `Hyperstack::Component::Mixin` mixin
++ The `Hyperloop::Component` class and the equivalent `Hyperloop::Component::Mixin` mixin
 + Class methods or *macros* that describe component class level behaviors
 + The four data accessors methods: `params`, `state`, `mutate`, and `children`
 + The tag and component rendering methods
 + Event handlers
 + Miscellaneous methods
 
-### Hyperstack::Component
+### Hyperloop::Component
 
-Hyperstack Components classes either include `Hyperstack::Component::Mixin` or are subclasses of `Hyperstack::Component`.  
+Hyperloop Components classes either include `Hyperloop::Component::Mixin` or are subclasses of `Hyperloop::Component`.  
 
 ```ruby
-class Component < Hyperstack::Component
+class Component < Hyperloop::Component
 end
 
 # if subclassing is inappropriate, you can mixin instead
 class AnotherComponent
-  include Hyperstack::Component::Mixin
+  include Hyperloop::Component::Mixin
 end
 ```
 
 At a minimum every component class must define a `render` macro which returns **one single** child element. That child may in turn have an arbitrarily deep structure.
 
 ```ruby
-class Component < Hyperstack::Component
+class Component < Hyperloop::Component
   render do
     DIV { } # render an empty div
   end
@@ -44,7 +51,7 @@ end
 You may also include the top level element to be rendered:
 
 ```ruby
-class Component < Hyperstack::Component
+class Component < Hyperloop::Component
   render(DIV) do
     # everything will be rendered in a div
   end
@@ -54,7 +61,7 @@ end
 To render a component, you reference its class name in the DSL as a method call.  This creates a new instance, passes any parameters proceeds with the component lifecycle.  
 
 ```ruby
-class AnotherComponent < Hyperstack::Component
+class AnotherComponent < Hyperloop::Component
   render do
     Component() # ruby syntax requires either () or {} following the class name
   end
@@ -68,7 +75,7 @@ Note that you should never redefine the `new` or `initialize` methods, or call t
 Macros specify class wide behaviors.  
 
 ```ruby
-class MyComponent < Hyperstack::Component
+class MyComponent < Hyperloop::Component
   param ...
   before_mount ...
   after_mount ...
@@ -98,7 +105,7 @@ The four data accessor methods - `params, state, mutate, and children` are insta
 The `params` method gives *read-only* access to each of the scalar params passed to the Component.
 
 ```ruby
-class WelcomeUser < Hyperstack::Component
+class WelcomeUser < Hyperloop::Component
   param: id
 
   render(DIV) do
@@ -109,7 +116,7 @@ class WelcomeUser < Hyperstack::Component
   end
 end
 
-class SayHello < Hyperstack::Component
+class SayHello < Hyperloop::Component
   param :name, type: String # params.name is immutable and will validate as a String
 
   render do
@@ -119,7 +126,7 @@ class SayHello < Hyperstack::Component
 
 A core design concept taken from React is that data flows down to child Components via params and params (called props in React) are immutable.
 
-In Hyperstack, there are two exceptions to this rule:
+In Hyperloop, there are two exceptions to this rule:
 
 + An instance of a Store (passed as a param) is mutable and changes to the state of the Store will cause a re-render
 + An instance of a Model (which is a type of Store) will also case a re-render when changed
@@ -127,7 +134,7 @@ In Hyperstack, there are two exceptions to this rule:
 In the example below, clicking on the button will cause the Component to re-render (even though `book` is a `param`) because `book` is a Model. If `book` were not a Model then the Component would not re-render.
 
 ```ruby
-class Likes < Hyperstack::Component
+class Likes < Hyperloop::Component
   param :book # book is an instance of the Book model
 
   render(DIV) do
@@ -137,17 +144,17 @@ class Likes < Hyperstack::Component
 end
 ```
 
->Note: Non-scalar params (objects) which are mutable through their methods are not read only. Care should be taken here as changes made to these objects will **not** cause a re-render of the Component. Specifically, if you pass a non-scalar param into a Component, and modify the internal data of that param, Hyperstack will not be notified to re-render the Component (as it does not know about the internal structure of your object). To achieve a re-render in this circumstance you will need to ensure that the parts of your object which are mutable are declared as state in a higher-order parent Component so that data can flow down from the parent to the child as per the React pattern.
+>Note: Non-scalar params (objects) which are mutable through their methods are not read only. Care should be taken here as changes made to these objects will **not** cause a re-render of the Component. Specifically, if you pass a non-scalar param into a Component, and modify the internal data of that param, Hyperloop will not be notified to re-render the Component (as it does not know about the internal structure of your object). To achieve a re-render in this circumstance you will need to ensure that the parts of your object which are mutable are declared as state in a higher-order parent Component so that data can flow down from the parent to the child as per the React pattern.
 
 
 #### State
 
-In React (and Hyperstack) state is mutable. Changes to state variables cause Components to re-render and where state is passed into a child Component as a param, it will cause a re-rendering of that child Component. Change flows from a parent to a child - change does not flow upward and this is why params are not mutable.
+In React (and Hyperloop) state is mutable. Changes to state variables cause Components to re-render and where state is passed into a child Component as a param, it will cause a re-rendering of that child Component. Change flows from a parent to a child - change does not flow upward and this is why params are not mutable.
 
 State variables are (optionally) initialized and accessed through the `state` method.
 
 ```ruby
-class Counter < Hyperstack::Component
+class Counter < Hyperloop::Component
   state count: 0 # optional initialization
 
   render(DIV) do
@@ -181,7 +188,7 @@ More on the details of these methods can be found in the [Component API](#top-le
   ...
 ```
 
->**Note on coding style:** In the Hyperstack documentation and tutorials we use uppercase HTML elements like `DIV` and `BUTTON` as we believe this makes for greater readability in the code; specifically with code highlighting. If you do not like this you can use lowercase `div` and `button` instead.
+>**Note on coding style:** In the Hyperloop documentation and tutorials we use uppercase HTML elements like `DIV` and `BUTTON` as we believe this makes for greater readability in the code; specifically with code highlighting. If you do not like this you can use lowercase `div` and `button` instead.
 
 HTML such as `DIV, A, SELECT, OPTION` etc. each have a corresponding instance method that will render that tag.  For all the tags the
 method call looks like this:
@@ -247,12 +254,12 @@ end
 
 `force_update!` is a component instance method that causes the component to re-rerender. This method is seldom (if ever) needed.
 
-`as_node` can be attached to a component or tag, and removes the element from the rendering buffer and returns it.   This is useful when you need store an element in some data structure, or passing to a native JS component.  When passing an element to another Hyperstack Component `.as_node` will be automatically applied so you normally don't need it.  
+`as_node` can be attached to a component or tag, and removes the element from the rendering buffer and returns it.   This is useful when you need store an element in some data structure, or passing to a native JS component.  When passing an element to another Hyperloop Component `.as_node` will be automatically applied so you normally don't need it.  
 
 `render` can be applied to the objects returned by `as_node` and `children` to actually render the node.
 
 ```ruby
-class Test < Hyperstack::Component
+class Test < Hyperloop::Component
   param :node
 
   render do
@@ -267,7 +274,7 @@ class Test < Hyperstack::Component
 end
 ```
 
-### Ruby and Hyperstack
+### Ruby and Hyperloop
 
 A key design goal of the DSL is to make it work seamlessly with the rest of Ruby.  Notice in the above example, the use of constant declaration (`FORMATS`), regular instance variables (`@timer`), and other non-react methods like `every` (an Opal Browser method).  
 
@@ -339,7 +346,7 @@ br                   # okay
   data-rows=12
   data-top-level-component="LikeButton">
 <pre>
-class LikeButton < Hyperstack::Component
+class LikeButton < Hyperloop::Component
 
   render(DIV) do
     P do
@@ -398,7 +405,7 @@ By building modular components that reuse other components with well-defined int
 Let's create a simple Avatar component which shows a profile picture and username using the Facebook Graph API.
 
 ```ruby
-class Avatar < Hyperstack::Component
+class Avatar < Hyperloop::Component
   param :user_name
   render(DIV) do
     ProfilePic  user_name: params.user_name
@@ -406,14 +413,14 @@ class Avatar < Hyperstack::Component
   end
 end
 
-class ProfilePic < Hyperstack::Component
+class ProfilePic < Hyperloop::Component
   param :user_name
   render do
     IMG src: "https://graph.facebook.com/#{params.user_name}/picture"
   end
 end
 
-class ProfileLink < Hyperstack::Component
+class ProfileLink < Hyperloop::Component
   param :user_name
   render do
     A href: "https://www.facebook.com/#{params.user_name}" do
@@ -494,13 +501,13 @@ The `key` should *always* be supplied directly to the components in the array, n
 
 ```ruby
 # WRONG!
-class ListItemWrapper < Hyperstack::Component
+class ListItemWrapper < Hyperloop::Component
   param :data
   render do
     LI(key: params.data[:id]) { params.data[:text] }
   end
 end    
-class MyComponent < Hyperstack::Component
+class MyComponent < Hyperloop::Component
   param :results
   render do
     UL do
@@ -513,13 +520,13 @@ end
 ```
 ```ruby
 # CORRECT
-class ListItemWrapper < Hyperstack::Component
+class ListItemWrapper < Hyperloop::Component
   param :data
   render do
     LI { params.data[:text] }
   end
 end
-class MyComponent < Hyperstack::Component
+class MyComponent < Hyperloop::Component
   param :results
   render do
     UL do
@@ -548,7 +555,7 @@ When designing interfaces, break down the common design elements (buttons, form 
 As your app grows it's helpful to ensure that your components are used correctly. We do this by allowing you to specify the expected ruby class of your parameters. When an invalid value is provided for a param, a warning will be shown in the JavaScript console. Note that for performance reasons type checking is only done in development mode. Here is an example showing typical type specifications:
 
 ```ruby
-class ManyParams < Hyperstack::Component
+class ManyParams < Hyperloop::Component
   param :an_array,         type: [] # or type: Array
   param :a_string,         type: String
   param :array_of_strings, type: [String]
@@ -565,7 +572,7 @@ Note that if the param can be nil, add `allow_nil: true` to the specification.
 React lets you define default values for your `params`:
 
 ```ruby
-class ManyParams < Hyperstack::Component
+class ManyParams < Hyperloop::Component
   param :an_optional_param, default: "hello", type: String, allow_nil: true
 ```
 
@@ -591,7 +598,7 @@ A common type of React component is one that extends a basic HTML element in a s
 To do this use the `collect_other_params_as` macro which will gather all the params you did not declare into a hash. Then you can pass this hash on to the child component
 
 ```ruby
-class CheckLink < Hyperstack::Component
+class CheckLink < Hyperloop::Component
   collect_other_params_as :attributes
   render do
     # we just pass along any incoming attributes
@@ -606,12 +613,12 @@ Note: `collect_other_params_as` builds a hash, so you can merge other data in or
 
 ### Mixins and Inheritance
 
-Ruby has a rich set of mechanisms enabling code reuse, and Hyperstack is intended to be a team player in your Ruby application.  Components can be subclassed, and they can include (or mixin) other modules.  You can also create a component by including `Hyperstack::Component::Mixin` which allows a class to inherit from some other non-react class, and then mixin the React DSL.
+Ruby has a rich set of mechanisms enabling code reuse, and Hyperloop is intended to be a team player in your Ruby application.  Components can be subclassed, and they can include (or mixin) other modules.  You can also create a component by including `Hyperloop::Component::Mixin` which allows a class to inherit from some other non-react class, and then mixin the React DSL.
 
 ```ruby
   # make a SuperFoo react component class
   class Foo < SuperFoo
-    include Hyperstack::Component::Mixin
+    include Hyperloop::Component::Mixin
   end
 ```
 
@@ -640,7 +647,7 @@ module ReactInterval
   end
 end
 
-class TickTock < Hyperstack::Component
+class TickTock < Hyperloop::Component
   include ReactInterval
 
   before_mount do
@@ -652,7 +659,7 @@ class TickTock < Hyperstack::Component
   end
 
   render(DIV) do
-    "Hyperstack has been running for #{state.seconds} seconds".para
+    "Hyperloop has been running for #{state.seconds} seconds".para
   end
 end
 </pre></div>
@@ -674,7 +681,7 @@ A component may define callbacks for each phase of the components lifecycle:
 All the callback macros may take a block or the name of an instance method to be called.
 
 ```ruby
-class AComponent < Hyperstack::Component
+class AComponent < Hyperloop::Component
   before_mount do
     # initialize stuff here
   end
@@ -721,7 +728,7 @@ param foo: [], type: [String]       # foo must be an array of strings, and has a
 The component instance method `params` gives access to all declared params.  So for example
 
 ```ruby
-class Hello < Hyperstack::Component
+class Hello < Hyperloop::Component
   param visitor: "World", type: String
 
   render do
@@ -736,7 +743,7 @@ A param of type proc (i.e. `param :update, type: Proc`) gets special treatment t
 call the proc when the param is accessed.
 
 ```ruby
-class Alarm < Hyperstack::Component
+class Alarm < Hyperloop::Component
   param :at, type: Time
   param :notify, type: Proc
 
@@ -809,7 +816,7 @@ The instance method `children` returns an enumerable that is used to access the 
   data-rows=20
   data-top-level-component="Indenter">
 <pre>
-class IndentEachLine < Hyperstack::Component
+class IndentEachLine < Hyperloop::Component
   param by: 20, type: Integer
 
   render(DIV) do
@@ -819,7 +826,7 @@ class IndentEachLine < Hyperstack::Component
   end
 end
 
-class Indenter < Hyperstack::Component
+class Indenter < Hyperloop::Component
   render(DIV) do
     IndentEachLine(by: 100) do
       DIV {"Line 1"}
@@ -838,7 +845,7 @@ A component class may define callbacks for  specific points in a component's lif
 
 The lifecycle revolves around rendering the component.  As the state or parameters of a component changes, its render method will be called to generate the new HTML.  The rest of the callbacks hook into the lifecycle before or after rendering.
 
-For reasons described below Hyperstack provides a render callback to simplify defining the render method:
+For reasons described below Hyperloop provides a render callback to simplify defining the render method:
 
 ```ruby
 render do ....
@@ -914,22 +921,22 @@ end
 
 #### Controlling Updates
 
-Normally Hyperstack will only update a component if some state variable or param has changed.  To override this behavior you can redefine the `should_component_update?` instance method.  For example, assume that we have a state called `funky` that for whatever reason, we
+Normally Hyperloop will only update a component if some state variable or param has changed.  To override this behavior you can redefine the `should_component_update?` instance method.  For example, assume that we have a state called `funky` that for whatever reason, we
 cannot update using the normal `state.funky!` update method.  So what we can do is override `should_component_update?` call `super`, and then double check if the `funky` has changed by doing an explicit comparison.
 
 ```ruby
-class RerenderMore < Hyperstack::Component
+class RerenderMore < Hyperloop::Component
   def should_component_update?(new_params_hash, new_state_hash)
     super || new_state_hash[:funky] != state.funky
   end
 end
 ```
 
-Why would this happen?  Most likely there is integration between new Hyperstack Components and other data structures being maintained outside of Hyperstack, and so we have to do some explicit comparisons to detect the state change.
+Why would this happen?  Most likely there is integration between new Hyperloop Components and other data structures being maintained outside of Hyperloop, and so we have to do some explicit comparisons to detect the state change.
 
 Note that `should_component_update?` is not called for the initial render or when `force_update!` is used.
 
-> Note to react.js readers.  Essentially Hyperstack assumes components are "well behaved" in the sense that all state changes
+> Note to react.js readers.  Essentially Hyperloop assumes components are "well behaved" in the sense that all state changes
 > will be explicitly declared using the state update ("!") method when changing state.  This gives similar behavior to a
 > "pure" component without the possible performance penalties.
 > To achieve the standard react.js behavior add this line to your class `def should_component_update?; true; end`
@@ -983,7 +990,7 @@ Your event handlers will be passed instances of `React::Event`, a wrapper around
 For example:
 
 ```ruby
-class YouSaid < Hyperstack::Component
+class YouSaid < Hyperloop::Component
 
   render(DIV) do
     INPUT(value: state.value).
@@ -1142,7 +1149,7 @@ shift_key               -> Boolean
 
 #### Drag and Drop example
 
-Here is a Hyperstack version of this [w3schools.com](https://www.w3schools.com/html/html5_draganddrop.asp) example:
+Here is a Hyperloop version of this [w3schools.com](https://www.w3schools.com/html/html5_draganddrop.asp) example:
 
 ```ruby
 DIV(id: "div1", style: {width: 350, height: 70, padding: 10, border: '1px solid #aaaaaa'})
@@ -1333,13 +1340,13 @@ Similar to `render_to_string`, except this doesn't create extra DOM attributes s
 
 ### Using Javascript Components
 
-While it is quite possible to develop large applications purely in Hyperstack Components with a ruby back end like rails, you may eventually find you want to use some pre-existing React Javascript library.   Or you may be working with an existing React-JS application, and want to just start adding some Hyperstack Components.
+While it is quite possible to develop large applications purely in Hyperloop Components with a ruby back end like rails, you may eventually find you want to use some pre-existing React Javascript library.   Or you may be working with an existing React-JS application, and want to just start adding some Hyperloop Components.
 
-Either way you are going to need to import Javascript components into the Hyperstack namespace. Hyperstack provides both manual and automatic mechanisms to do this depending on the level of control you need.
+Either way you are going to need to import Javascript components into the Hyperloop namespace. Hyperloop provides both manual and automatic mechanisms to do this depending on the level of control you need.
 
 #### Importing Components
 
-Lets say you have an existing React Component written in javascript that you would like to access from Hyperstack.  
+Lets say you have an existing React Component written in javascript that you would like to access from Hyperloop.  
 
 Here is a simple hello world component:
 
@@ -1352,16 +1359,16 @@ window.SayHello = React.createClass({
 })
 ```
 
-Assuming that this component is loaded some place in your assets, you can then access this from Hyperstack by creating a wrapper Component:
+Assuming that this component is loaded some place in your assets, you can then access this from Hyperloop by creating a wrapper Component:
 
 ```ruby
-class SayHello < Hyperstack::Component
+class SayHello < Hyperloop::Component
   imports 'SayHello'
 end
 
-class MyBigApp < Hyperstack::Component
+class MyBigApp < Hyperloop::Component
   render(DIV) do
-    # SayHello will now act like any other Hyperstack component
+    # SayHello will now act like any other Hyperloop component
     SayHello name: 'Matz'
   end
 end
@@ -1372,7 +1379,7 @@ The `imports` directive takes a string (or a symbol) and will simply evaluate it
 
 #### Importing Libraries
 
-Many React components come in libraries.  The `ReactBootstrap` library is one example.  You can import the whole library at once using the `React::NativeLibrary` class.  Assuming that you have initialized `ReactBootstrap` elsewhere, this is how you would bring it into Hyperstack.
+Many React components come in libraries.  The `ReactBootstrap` library is one example.  You can import the whole library at once using the `React::NativeLibrary` class.  Assuming that you have initialized `ReactBootstrap` elsewhere, this is how you would bring it into Hyperloop.
 
 ```ruby
 class RBS < React::NativeLibrary
@@ -1383,7 +1390,7 @@ end
 We can now access our bootstrap components as components defined within the RBS scope:
 
 ```ruby
-class Show < Hyperstack::Component
+class Show < Hyperloop::Component
 
   def say_hello(i)
     alert "Hello from number #{i}"
@@ -1392,7 +1399,7 @@ class Show < Hyperstack::Component
   render RBS::Navbar, bsStyle: :inverse do
     RBS::Nav() do
       RBS::NavbarBrand() do
-        A(href: '#') { 'Hyperstack Showcase' }
+        A(href: '#') { 'Hyperloop Showcase' }
       end
       RBS::NavDropdown(eventKey: 1, title: 'Things', id: :drop_down) do
         (1..5).each do |n|
@@ -1432,9 +1439,9 @@ Note that the `rename` directive can be used to rename both components and subli
 
 #### Auto Import
 
-If you use a lot of libraries and are using a Javascript tool chain with Webpack, having to import the libraries in both Hyperstack and Webpack is redundant and just hard work.
+If you use a lot of libraries and are using a Javascript tool chain with Webpack, having to import the libraries in both Hyperloop and Webpack is redundant and just hard work.
 
-Instead you can opt-in for *auto importing* Javascript components into Hyperstack as you need them.  Simply `require hyper-react/auto-import` immediately after you `require hyper-react`.  
+Instead you can opt-in for *auto importing* Javascript components into Hyperloop as you need them.  Simply `require hyper-react/auto-import` immediately after you `require hyper-react`.  
 
 Now you do not have to use component `imports` directive or `React::NativeLibrary` unless you need to rename a component.
 
@@ -1444,11 +1451,11 @@ In Ruby all module and class names normally begin with an uppercase letter.  How
 
 Likewise MyLib::MyComponent would match any of the following in the Javascript namespace: `MyLib.MyComponent`, `myLib.MyComponent`, `MyLib.myComponent`, `myLib.myComponent`
 
-*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of Hyperstack::Component or React::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
+*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of Hyperloop::Component or React::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
 
 #### Including React Source  
 
-If you are in the business of importing components with a tool like Webpack, then you will need to let Webpack (or whatever dependency manager you are using) take care of including the React source code.  Just make sure that you are *not* including it on the ruby side of things. Hyperstack is currently tested with React versions 13, 14, and 15, so its not sensitive to the version you use.
+If you are in the business of importing components with a tool like Webpack, then you will need to let Webpack (or whatever dependency manager you are using) take care of including the React source code.  Just make sure that you are *not* including it on the ruby side of things. Hyperloop is currently tested with React versions 13, 14, and 15, so its not sensitive to the version you use.
 
 However it gets a little tricky if you are using the react-rails gem.  Each version of this gem depends on a specific version of React, and so you will need to manually declare this dependency in your Javascript dependency manager.  Consult this [table](https://github.com/reactjs/react-rails/blob/master/VERSIONS.md) to determine which version of React you need. For example assuming you are using `npm` to install modules and you are using version 1.7.2 of react-rails you would say something like this:
 
@@ -1466,42 +1473,42 @@ There are also good tutorials on integrating Webpack with existing rails apps a 
 
 **Prerendering is controllable at three levels:**
 
-+ In the rails Hyperstack initializer you can say:
++ In the rails Hyperloop initializer you can say:
 
  ```ruby
- Hyperstack.configuration do |config|
+ Hyperloop.configuration do |config|
    config.prerendering = :on # :off by default
  end
  ```
 
-+ In a route you can override the config setting by setting a default for Hyperstack_prerendering:
++ In a route you can override the config setting by setting a default for Hyperloop_prerendering:
 
 ```ruby
-get '/some_page', to: 'Hyperstack#some_page', defaults: {Hyperstack_prerendering: :off} # or :on
+get '/some_page', to: 'Hyperloop#some_page', defaults: {Hyperloop_prerendering: :off} # or :on
 ```
 
 This allows you to override the prerendering option for specific pages. For example the application may have prererendering off by default (via the config setting) but you can still turn it on for a specific page.
 
-+ You can override the route, and config setting using the Hyperstack-prerendering query param:
++ You can override the route, and config setting using the Hyperloop-prerendering query param:
 
 ```html
-http://localhost:3000/my_hyper_app/some_page?Hyperstack-prerendering=off
+http://localhost:3000/my_hyper_app/some_page?Hyperloop-prerendering=off
 ```
 
 This is useful for development and testing
 
-NOTE: in the route you say Hyperstack_prererendering but in the query string its Hyperstack-prerendering (underscore vs. dash). This is because of rails security protection when using defaults.
+NOTE: in the route you say Hyperloop_prererendering but in the query string its Hyperloop-prerendering (underscore vs. dash). This is because of rails security protection when using defaults.
 
 ### Further Reading
 
-**Note:** The Hyperstack gems have recently been renamed. The links below will take you to the correct Github projects but you might find the name of the project does not quite match the name of the gem on this page. Hyperstack Components were previously known as HyperReact or Reactrb.
+**Note:** The Hyperloop gems have recently been renamed. The links below will take you to the correct Github projects but you might find the name of the project does not quite match the name of the gem on this page. Hyperloop Components were previously known as HyperReact or Reactrb.
 
-#### Other Hyperstack tutorials and examples
-+ [Hyperstack Tutorials](http://ruby-Hyperstack.io/tutorials/)
+#### Other Hyperloop tutorials and examples
++ [Hyperloop Tutorials](http://ruby-Hyperloop.io/tutorials/)
 
 #### React under the covers
 
-Hyperstack Components and friends are in most cases simple DSL Ruby wrappers to the underlying native JavaScript libraries and React Components. It is really important to have a solid grip on how these technologies work to complement your understanding of Hyperstack. Most searches for help on Google will take you to examples written in JSX or ES6 JavaScript but you will learn over time to translate this to Hyperstack equivalents. To make headway with Hyperstack you do need a solid understanding of the underlying philosophy of React and its component based architecture. The 'Thinking in React' tutorial below is an excellent place to start.
+Hyperloop Components and friends are in most cases simple DSL Ruby wrappers to the underlying native JavaScript libraries and React Components. It is really important to have a solid grip on how these technologies work to complement your understanding of Hyperloop. Most searches for help on Google will take you to examples written in JSX or ES6 JavaScript but you will learn over time to translate this to Hyperloop equivalents. To make headway with Hyperloop you do need a solid understanding of the underlying philosophy of React and its component based architecture. The 'Thinking in React' tutorial below is an excellent place to start.
 
 + [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html)
 + [React](https://facebook.github.io/react/docs/getting-started.html)
@@ -1510,7 +1517,7 @@ Hyperstack Components and friends are in most cases simple DSL Ruby wrappers to 
 
 #### Opal under the covers
 
-Hyperstack Components are a DSL wrapper of React which uses Opal to compile Ruby code to ES5 native JavaScript. If you have not used Opal before then you should at a minimum read the excellent guides as they will teach you enough Opal to get you started with Hyperstack.
+Hyperloop Components are a DSL wrapper of React which uses Opal to compile Ruby code to ES5 native JavaScript. If you have not used Opal before then you should at a minimum read the excellent guides as they will teach you enough Opal to get you started with Hyperloop.
 
 + [Opal](http://opalrb.org/)
 + [Opal Guides](http://opalrb.org/docs/guides/v0.9.2/index.html)

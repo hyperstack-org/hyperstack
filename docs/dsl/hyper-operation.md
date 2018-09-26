@@ -1,13 +1,22 @@
 # HyperOperations
 
-# Work in progress - ALPHA (docs and code)
+**These are Legacy Documents**
 
-Operations are the engine rooms of Hyperstack; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
+
+Operations are the engine rooms of Hyperloop; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
 
 Operations receive parameters and execute a series of steps. They have a simple structure which is not dissimilar to a Component:
 
 ```ruby
-class SimpleOperation < Hyperstack::Operation
+class SimpleOperation < Hyperloop::Operation
   param :anything
   step { do_something }
 end
@@ -18,7 +27,7 @@ SimpleOperation.run(anything: :something)
 .fail { fail }
 ```
 
-Hyperstack's Isomorphic Operations span the client and server divide automagically. Operations can run on the client, the server, and traverse between the two.
+Hyperloop's Isomorphic Operations span the client and server divide automagically. Operations can run on the client, the server, and traverse between the two.
 
 This goal of this documentation is to outline Operations classes and provides enough information and examples to show how to implement Operations in an application.
 
@@ -34,7 +43,7 @@ Operations are packaged as one neat package but perform three different function
 
 ## Operations encapsulate business logic
 
-In a traditional MVC architecture, the business logic ends up either in Controllers, Models, Views or some other secondary construct such as service objects, helpers, or concerns. In Hyperstack,  Operations are first class objects who's job is to mutate state in the Stores, Models, and Components. Operations are discreet logic, which is of course, testable and maintainable.
+In a traditional MVC architecture, the business logic ends up either in Controllers, Models, Views or some other secondary construct such as service objects, helpers, or concerns. In Hyperloop,  Operations are first class objects who's job is to mutate state in the Stores, Models, and Components. Operations are discreet logic, which is of course, testable and maintainable.
 
 An Operation does the following things:
 
@@ -48,12 +57,12 @@ These are defined by series of class methods described below.
 
 ### Operation Structure
 
-`Hyperstack::Operation` is the base class for an *Operation*
+`Hyperloop::Operation` is the base class for an *Operation*
 
 As an example, here is an Operation which ensures that the Model being saved always has the current `created_by` and `updated_by` `Member`.
 
 ```ruby
-class SaveWithUpdatingMemberOp < Hyperstack::Operation
+class SaveWithUpdatingMemberOp < Hyperloop::Operation
   param :model
   step { params.model.created_by = Member.current if params.model.new? }
   step { params.model.updated_by = Member.current }
@@ -71,7 +80,7 @@ Operations always return Promises, and those Promises can be chained together. S
 Operations can invoke other Operations so you can chain a sequence of `steps` and Promises which proceed unless the previous `step` fails:
 
 ```ruby
-class InvoiceOpertion < Hyperstack::Operation
+class InvoiceOpertion < Hyperloop::Operation
   param :order, type: Order
   param :customer, type: Customer
 
@@ -109,11 +118,11 @@ MyOperation.run(params)
 
 ### Parameters
 
-Operations can take parameters when they are run.  Parameters are described and accessed with the same syntax as Hyperstack Components.
+Operations can take parameters when they are run.  Parameters are described and accessed with the same syntax as Hyperloop Components.
 
 The parameter filter types and options are taken from the [Mutations](https://github.com/cypriss/mutations) gem with the following changes:
 
-+ In Hyperstack::Operations all params are declared with the param macro  
++ In Hyperloop::Operations all params are declared with the param macro  
 + The type *can* be specified using the `type:` option
 + Array and hash types can be shortened to `[]` and `{}`
 + Optional params either have the default value associated with the param name or by having the `default` option present
@@ -140,7 +149,7 @@ All incoming params are validated against the param declarations, and any errors
 Operations may define a sequence of steps to be executed when the operation is run, using the `step`, `failed` and `async` callback macros.
 
 ```ruby
-class Reset < Hyperstack::Operation
+class Reset < Hyperloop::Operation
   step { HTTP.post('/logout') }
 end
 ```
@@ -188,7 +197,7 @@ The `async` method can be used to override the waiting behavior.  If a `step` re
 These features make it easy to organize, understand and compose asynchronous code:
 
 ```ruby
-class AddItemToCart < Hyperstack::Operation
+class AddItemToCart < Hyperloop::Operation
   step { HTTP.get('/inventory/#{params.sku}/qty') }
   # previous step returned a Promise so next step
   # will execute when that Promise resolves
@@ -201,7 +210,7 @@ end
 Operations will *always* return a *Promise*.  If an Operation has no steps that return a Promise the value of the last step will be wrapped in a resolved Promise.  Operations can be easily changed regardless of their internal implementation:
 
 ```ruby
-class QuickCheckout < Hyperstack::Operation
+class QuickCheckout < Hyperloop::Operation
   param :sku, type: String
   param qty: 1, type: Integer, minimum: 1
 
@@ -214,7 +223,7 @@ end
 You can also use `Promise#when` if you don't care about the order of Operations
 
 ```ruby
-class DoABunchOStuff < Hyperstack::Operation
+class DoABunchOStuff < Hyperloop::Operation
   step { Promise.when(SomeOperation.run, SomeOtherOperation.run) }
   # dispatch when both operations complete
 end
@@ -225,7 +234,7 @@ end
 Any `step` or `failed` callback, can have an immediate exit from the Operation using the `abort!` and `succeed!` methods.  The `abort!` method returns a failed Promise with any supplied parameters.  The `succeed!` method does an immediate dispatch and returns a resolved Promise with any supplied parameters.  If `succeed!` is used in a `failed` callback, it will override the failed status of the Operation.  This is especially useful if you want to dispatch in spite of failures:
 
 ```ruby
-class Pointless < Hyperstack::Operation
+class Pointless < Hyperloop::Operation
   step { fail }       # go to failure track
   failed { succeed! } # dispatch and exit
 end
@@ -236,7 +245,7 @@ end
 An Operation can also have some `validate` callbacks which will run before the first step.  This is a handy place to put any additional validations.  In the validate method you can add validation type messages using the `add_error` method, and these will be passed along like any other param validation failures.
 
 ```ruby
-class UpdateProfile < Hyperstack::Operation
+class UpdateProfile < Hyperloop::Operation
   param :first_name, type: String  
   param :last_name, type: String
   param :password, type: String, nils: true
@@ -264,7 +273,7 @@ If the validate method returns a Promise, then execution will wait until the Pro
 
 `abort!` can be called from within `validate` or `add_error` to exit the Operation immediately.  Otherwise, all validations will be run and collected together, and the Operation will move onto the `failed` track.  If `abort!` is called within an `add_error` callback the error will be added before aborting.
 
-You can also raise an exception directly in validate if appropriate.  If a `Hyperstack::AccessViolation` exception is raised the Operation will immediately abort, otherwise just the current validation fails.
+You can also raise an exception directly in validate if appropriate.  If a `Hyperloop::AccessViolation` exception is raised the Operation will immediately abort, otherwise just the current validation fails.
 
 To avoid further validations if there are any failures in the basic parameter validations, this can be added
 
@@ -288,11 +297,11 @@ end
 end
 ```
 
-Failures to validate params result in `Hyperstack::ValidationException` which contains a [Mutations error object](https://github.com/cypriss/mutations#what-about-validation-errors).
+Failures to validate params result in `Hyperloop::ValidationException` which contains a [Mutations error object](https://github.com/cypriss/mutations#what-about-validation-errors).
 
 ```ruby
 MyOperation.run.fail do |e|
-  if e.is_a? Hyperstack::ValidationException
+  if e.is_a? Hyperloop::ValidationException
     e.errors.symbolic     # hash: each key is a parameter that failed validation,
                           # value is a symbol representing the reason
     e.errors.message      # same as symbolic but message is in English
@@ -312,7 +321,7 @@ Note that the primary use should be in interfacing to an outside APIs. Applicati
 
 
 ```ruby
-class GetRandomGithubUser < Hyperstack::Operation
+class GetRandomGithubUser < Hyperloop::Operation
   def self.reload_users
     @promise = HTTP.get("https://api.github.com/users?since=#{rand(500)}").then do |response|
       @users = response.json.collect do |user|
@@ -327,7 +336,7 @@ class GetRandomGithubUser < Hyperstack::Operation
   end
 end
 # or
-class GetRandomGithubUser < Hyperstack::Operation
+class GetRandomGithubUser < Hyperloop::Operation
   class << self # as 4 steps - whatever you like
     step  { succeed! @users.delete_at(rand(@users.length)) unless @users.blank? }
     step  { succeed! @promise.then { run } if @promise && @promise.pending? }
@@ -340,7 +349,7 @@ end
 An instance of the operation is always created to hold the current parameter values, dispatcher, etc.  The first parameter to a class level `step` block or method (if it takes parameters) will always be the instance.
 
 ```ruby
-class Interesting < Hyperstack::Operation
+class Interesting < Hyperloop::Operation
   param :increment
   param :multiply
   outbound :result
@@ -354,17 +363,17 @@ end
 
 ### The Boot Operation
 
-Hyperstack includes one predefined Operation, `Hyperstack::Application::Boot`, that runs at system initialization.  Stores can receive `Hyperstack::Application::Boot` to initialize their state.  To reset the state of the application, you can just execute `Hyperstack::Application::Boot`
+Hyperloop includes one predefined Operation, `Hyperloop::Application::Boot`, that runs at system initialization.  Stores can receive `Hyperloop::Application::Boot` to initialize their state.  To reset the state of the application, you can just execute `Hyperloop::Application::Boot`
 
 
 ## Operations can dispatch messages
 
-Hyperstack Operations borrow from the Flux pattern where Operations are dispatchers and Stores are receivers.  The choice to use Operations in this depends entirely on the needs and design of your application.
+Hyperloop Operations borrow from the Flux pattern where Operations are dispatchers and Stores are receivers.  The choice to use Operations in this depends entirely on the needs and design of your application.
 
 To illustrate this point, here is the simplest Operation:
 
 ```ruby
-class Reset < Hyperstack::Operation
+class Reset < Hyperloop::Operation
 end
 ```
 
@@ -377,7 +386,7 @@ To 'Reset' the system you would say
 Elsewhere your HyperStores can receive the Reset *Dispatch* using the `receives` macro:
 
 ```ruby
-class Cart < Hyperstack::Store
+class Cart < Hyperloop::Store
   receives Reset do
     mutate.items Hash.new { |h, k| h[k] = 0 }
   end
@@ -386,14 +395,14 @@ end
 
 Note that multiple stores can receive the same *Dispatch*.
 
->**Note: Flux pattern vs. Hyperstack Operations** Operations serve the role of both Action Creators and Dispatchers described in the Flux architecture. We chose the name `Operation` rather than `Action` or `Mutation` because we feel it best captures all the capabilities of a `Hyperstack::Operation`.  Nevertheless, Operations are fully compatible with the Flux Pattern.  
+>**Note: Flux pattern vs. Hyperloop Operations** Operations serve the role of both Action Creators and Dispatchers described in the Flux architecture. We chose the name `Operation` rather than `Action` or `Mutation` because we feel it best captures all the capabilities of a `Hyperloop::Operation`.  Nevertheless, Operations are fully compatible with the Flux Pattern.  
 
 ### Dispatching With New Parameters
 
 The `dispatch` method sends the `params` object on to any registered receivers.  Sometimes it's useful to add additional outbound params before dispatching.  Additional params can be declared using the `outbound` macro:
 
 ```ruby
-class AddItemToCart < Hyperstack::Operation
+class AddItemToCart < Hyperloop::Operation
   param :sku, type: String
   param qty: 1, type: Integer, minimum: 1
   outbound :available
@@ -411,7 +420,7 @@ Facebook is very keen on their Flux architecture where messages are dispatched b
 
 As stated earlier in this documentation, the `step` idea came from Trailblazer, which is an alternative Rails architecture that posits that business functionality should not be kept in the Models, Controllers or Views.
 
-In designing Hyperstack's Isomorphic Operations (which would run on the client and the server), we decided to borrow from the best of both architectures and let Operations work in either way.  The decision as to adopt the dispatching or stepping based model is left down to the programmer as determined by their preference or the needs of their application.
+In designing Hyperloop's Isomorphic Operations (which would run on the client and the server), we decided to borrow from the best of both architectures and let Operations work in either way.  The decision as to adopt the dispatching or stepping based model is left down to the programmer as determined by their preference or the needs of their application.
 
 ## ServerOps can be used to replace boiler-plate APIs
 
@@ -419,14 +428,14 @@ Some Operations simply do not make sense to run on the client as the resources t
 
 That said, with our highest goal being developer productivity, it should be as invisible as possible to the developer where the Operation will execute. A developer writing front-end code should be able to invoke a server-side resource (like a mailer) just as easily as they might invoke a client-side resource.
 
-Hyperstack `ServerOps` replace the need for a boiler-plate HTTP API. All serialization and de-serialization of params are handled by Hyperstack. Hyperstack automagically creates the API endpoint needed to invoke a function from the client which executes on the server and returns the results (via a Promise) to the calling client-side code.
+Hyperloop `ServerOps` replace the need for a boiler-plate HTTP API. All serialization and de-serialization of params are handled by Hyperloop. Hyperloop automagically creates the API endpoint needed to invoke a function from the client which executes on the server and returns the results (via a Promise) to the calling client-side code.
 
 ### Server Operations
 
-Operations will run on the client or the server. However, some Operations like `ValidateUserDefaultCC` probably need to check information server side and make secure API calls to our credit card processor.  Rather than build an API and controller to "validate the user credentials" you just specify that the operation must run on the server by using the `Hyperstack::ServerOp` class.
+Operations will run on the client or the server. However, some Operations like `ValidateUserDefaultCC` probably need to check information server side and make secure API calls to our credit card processor.  Rather than build an API and controller to "validate the user credentials" you just specify that the operation must run on the server by using the `Hyperloop::ServerOp` class.
 
 ```ruby
-class ValidateUserCredentials < Hyperstack::ServerOp
+class ValidateUserCredentials < Hyperloop::ServerOp
   param :acting_user
   add_error :acting_user, :no_valid_default_cc, "No valid default credit card" do
     !params.acting_user.has_default_cc?
@@ -436,7 +445,7 @@ end
 
 A Server Operation will always run on the server even if invoked on the client.  When invoked from the client, the ServerOp will receive the `acting_user` param with the current value that your ApplicationController's `acting_user` method returns.   Typically the `acting_user` method will return either some User model or nil (if there is no logged in user.)  It's up to you to define how `acting_user` is computed, but this is easily done with any of the popular authentication gems.  Note that unless you explicitly add `nils: true` to the param declaration, nil will not be accepted.
 
-> **Note regarding Rails Controllers:** Hyperstack is quite flexible and rides along side Rails, without interfering. So you could still have your old controllers, and invoke them the "non-Hyperstack" way by doing say an HTTP.post from the client, etc. Hyperstack adds a new mechanism for communicating between client and server called the Server Operation (which is a subclass of Operation.) A ServerOp has no implication on your existing controllers or code, and if used replaces controllers and client side API calls. HyperModel is built on top of Rails ActiveRecord models, and Server Operations, to keep models in sync across the application. ActiveRecord models that are made public (by moving them to the Hyperstack/models folder) will automatically be synchronized across the clients and the server (subject to permissions given in the Policy classes.)
+> **Note regarding Rails Controllers:** Hyperloop is quite flexible and rides along side Rails, without interfering. So you could still have your old controllers, and invoke them the "non-Hyperloop" way by doing say an HTTP.post from the client, etc. Hyperloop adds a new mechanism for communicating between client and server called the Server Operation (which is a subclass of Operation.) A ServerOp has no implication on your existing controllers or code, and if used replaces controllers and client side API calls. HyperModel is built on top of Rails ActiveRecord models, and Server Operations, to keep models in sync across the application. ActiveRecord models that are made public (by moving them to the Hyperloop/models folder) will automatically be synchronized across the clients and the server (subject to permissions given in the Policy classes.)
 Like Server Operations, HyperModel completely removes the need to build controllers, and client side API code. However all of your current active record models, controllers will continue to work unaffected.
 
 
@@ -444,16 +453,16 @@ As shown above, you can also define a validation to ensure further that the acti
 
 ```ruby
   ...
-  validate { raise Hyperstack::AccessViolation unless params.acting_user.admin? }
+  validate { raise Hyperloop::AccessViolation unless params.acting_user.admin? }
   ...
 ```
 
 You can bake this kind logic into a superclass:
 
 ```ruby
-class AdminOnlyOp < Hyperstack::ServerOp
+class AdminOnlyOp < Hyperloop::ServerOp
   param :acting_user
-  validate { raise Hyperstack::AccessViolation unless params.acting_user.admin? }
+  validate { raise Hyperloop::AccessViolation unless params.acting_user.admin? }
 end
 
 class DeleteUser < AdminOnlyOp
@@ -473,10 +482,10 @@ Unless the Operation is a Server Operation, it will run where it was invoked.   
 
 ### Parameters and ServerOps
 
-You cannot pass an object from the client to the server as a parameter as the server has no way of knowing the state of the object. Hyperstack takes a traditional implementation approach where an id (or some unique identifier) is passed as the parameter and the receiving code finds and created an instance of that object. For example:
+You cannot pass an object from the client to the server as a parameter as the server has no way of knowing the state of the object. Hyperloop takes a traditional implementation approach where an id (or some unique identifier) is passed as the parameter and the receiving code finds and created an instance of that object. For example:
 
 ```ruby
-class IndexBookOp < Hyperstack::ServerOp
+class IndexBookOp < Hyperloop::ServerOp
   param :book_id
   step { index_book Book.find_by_id params.book_id }
 end
@@ -496,7 +505,7 @@ There are several strategies you can use to apply the RUBY_ENGINE == 'opal' guar
 
 ```ruby
 # strategy 1:  guard blocks of code and declarations that you don't want to compile to the client
-class MyServerOp < Hyperstack::ServerOp
+class MyServerOp < Hyperloop::ServerOp
   # stuff that is okay to compile on the client
   # ... etc
   unless RUBY_ENGINE == 'opal'
@@ -507,7 +516,7 @@ end
 
 ```ruby
 # strategy 2:  guard individual methods
-class MyServerOp < Hyperstack::ServerOp
+class MyServerOp < Hyperloop::ServerOp
   # stuff that is okay to compile on the client
   # ... etc
   def my_secret_method
@@ -518,9 +527,9 @@ end
 
 ```ruby
 # strategy 3:  describe class in two pieces
-class MyServerOp < Hyperstack::ServerOp; end  # publically declare the operation
+class MyServerOp < Hyperloop::ServerOp; end  # publically declare the operation
 # provide the private implementation only on the server
-class MyServerOp < Hyperstack::ServerOp
+class MyServerOp < Hyperloop::ServerOp
   #
 end unless RUBY_ENGINE == 'opal'
 ```
@@ -528,8 +537,8 @@ end unless RUBY_ENGINE == 'opal'
 Here is a fuller example:
 
 ```ruby
-# app/Hyperstack/operations/list_files.rb
-class ListFiles < Hyperstack::ServerOp
+# app/Hyperloop/operations/list_files.rb
+class ListFiles < Hyperloop::ServerOp
   param :acting_user, nils: true
   param pattern: '*'
   step {  run_ls }
@@ -541,8 +550,8 @@ class ListFiles < Hyperstack::ServerOp
   end unless RUBY_ENGINE == 'opal'
 end
 
-# app/Hyperstack/components/app.rb
-class App < Hyperstack::Component
+# app/Hyperloop/components/app.rb
+class App < Hyperloop::Component
   state files: []
 
   after_mount do
@@ -567,15 +576,15 @@ end
 You can also broadcast the dispatch from Server Operations to all authorized clients.  The `dispatch_to` will determine a list of *channels* to broadcast the dispatch to:
 
 ```ruby
-class Announcement < Hyperstack::ServerOp
+class Announcement < Hyperloop::ServerOp
   # no acting_user because we don't want clients to invoke the Operation
   param :message
   param :duration, type: Float, nils: true
-  # dispatch to the built-in Hyperstack::Application Channel
-  dispatch_to Hyperstack::Application
+  # dispatch to the built-in Hyperloop::Application Channel
+  dispatch_to Hyperloop::Application
 end
 
-class CurrentAnnouncements < Hyperstack::Store
+class CurrentAnnouncements < Hyperloop::Store
   state_reader all: [], scope: :class
   receives Announcement do
     mutate.all << params.message
@@ -595,20 +604,20 @@ For example, the `User` active record model could be a used as a channel to broa
 
 The purpose of having channels is to restrict what gets broadcast to who, therefore typically channels represent *connections* to
 
-+ the application (represented by the `Hyperstack::Application` class)
++ the application (represented by the `Hyperloop::Application` class)
 + or some function within the application (like an Operation)
 + or some class which is *authenticated* like a User or Administrator,
 + instances of those classes,
 + or instances of classes in some relationship - like a `team` that a `user` belongs to.
 
-A channel can be created by including the `Hyperstack::Policy::Mixin`,
+A channel can be created by including the `Hyperloop::Policy::Mixin`,
 which gives three class methods: `regulate_class_connection` `always_allow_connection` and `regulate_instance_connections`.  
 
 For example...
 
 ```ruby
 class User < ActiveRecord::Base
-  include Hyperstack::Policy::Mixin
+  include Hyperloop::Policy::Mixin
   regulate_class_connection { self }  
   regulate_instance_connection { self }
 end
@@ -635,7 +644,7 @@ To broadcast to all users, the Operation would have
 or to send an announcement to a specific user
 
 ```ruby
-class PrivateAnnouncement < Hyperstack::ServerOp
+class PrivateAnnouncement < Hyperloop::ServerOp
   param :receiver
   param :message
   # dispatch_to can take a block if we need to
@@ -650,11 +659,11 @@ end
 The above will work if `PrivateAnnouncement` is invoked from the server, but usually, some other client would be sending the message so the operation could look like this:
 
 ```ruby
-class PrivateAnnouncement < Hyperstack::ServerOp
+class PrivateAnnouncement < Hyperloop::ServerOp
   param :acting_user
   param :receiver
   param :message
-  validate { raise Hyperstack::AccessViolation unless params.acting_user.admin? }
+  validate { raise Hyperloop::AccessViolation unless params.acting_user.admin? }
   validate { params.receiver = User.find_by_login(receiver) }
   dispatch_to { params.receiver }
 end
@@ -671,8 +680,8 @@ On the client::
 and elsewhere in the client code, there would be a component like this:
 
 ```ruby
-class Alerts < Hyperstack::Component
-  include Hyperstack::Store::Mixin
+class Alerts < Hyperloop::Component
+  include Hyperloop::Store::Mixin
   # for simplicity we are going to merge our store with the component
   state alert_messages: [] scope: :class
   receives PrivateAnnouncement { |params| mutate.alert_messages << params.message }
@@ -704,12 +713,12 @@ This will (in only 28 lines of code)
 The `dispatch_to` callback takes a list of classes, representing *Channels.*  The Operation will be dispatched to all clients connected to those Channels.   Alternatively `dispatch_to` can take a block, a symbol (indicating a method to call) or a proc.  The block, proc or method should return a single Channel, or an array of Channels, which the Operation will be dispatched to.   The dispatch_to callback has access to the params object.  For example, we can add an optional `to` param to our Operation, and use this to select which Channel we will broadcast to.
 
 ```ruby
-class Announcement < Hyperstack::Operation
+class Announcement < Hyperloop::Operation
   param :message
   param :duration
   param to: nil, type: User
   # dispatch to the Users channel only if specified otherwise announcement is application wide
-  dispatch_to { params.to || Hyperstack::Application }
+  dispatch_to { params.to || Hyperloop::Application }
 end
 ```
 
@@ -718,7 +727,7 @@ end
 The policy methods `always_allow_connection` and `regulate_class_connection` may be used directly in a ServerOp class.  This will define a channel dedicated to that class, and will also dispatch to that channel when the Operation completes.
 
 ```ruby
-class Announcement < Hyperstack::ServerOp
+class Announcement < Hyperloop::ServerOp
   # all clients will have an Announcement Channel which will
   # receive all dispatches from the Announcement Operation
   always_allow_connection
@@ -726,7 +735,7 @@ end
 ```
 
 ```ruby
-class AdminOps < Hyperstack::ServerOp
+class AdminOps < Hyperloop::ServerOp
   # subclasses can be invoked from the client if an admin is logged in
   # and all other clients that have a logged in admin will receive the dispatch
   regulate_class_connection { acting_user.admin? }
@@ -801,7 +810,7 @@ ServerOps have the ability to receive the "controller" as a param. This is handy
 Here is a sample of the SignIn operation using the Devise Gem:
 
 ```ruby
-class SignIn < Hyperstack::ControllerOp
+class SignIn < Hyperloop::ControllerOp
   param :email
   inbound :password
   add_error(:email, :does_not_exist, 'that login does not exist') { !(@user = User.find_by_email(params.email)) }
@@ -820,7 +829,7 @@ Let's say you would like to be able to broadcast to the current session. For exa
 For this, we have a `current_session` method in the `ControllerOp` that you can dispatch to.
 
 ```ruby
-class SignIn < Hyperstack::ControllerOp
+class SignIn < Hyperloop::ControllerOp
   param :email
   inbound :password
   add_error(:email, :does_not_exist, 'that login does not exist') { !(@user = User.find_by_email(params.email)) }
@@ -833,7 +842,7 @@ end
 The Session channel is special so to attach to the application to it you would say in the top level component:
 
 ```ruby
-class App < Hyperstack::Component
+class App < Hyperloop::Component
   after_mount :connect_session
 end
 ```
@@ -857,14 +866,14 @@ Operations have the following capabilities:
 
 ### Background
 
-The design of Hyperstack's Operations have been inspired by three concepts: [Trailblazer Operations](http://trailblazer.to/gems/operation/2.0/) (for encapsulating business logic in `steps`), the [Flux pattern](https://facebook.github.io/flux/) (for dispatchers and receivers), and the [Mutation Gem](https://github.com/cypriss/mutations) (for validating params).
+The design of Hyperloop's Operations have been inspired by three concepts: [Trailblazer Operations](http://trailblazer.to/gems/operation/2.0/) (for encapsulating business logic in `steps`), the [Flux pattern](https://facebook.github.io/flux/) (for dispatchers and receivers), and the [Mutation Gem](https://github.com/cypriss/mutations) (for validating params).
 
-### Hyperstack Operations compared to Flux
+### Hyperloop Operations compared to Flux
 
-| Flux | Hyperstack |
+| Flux | Hyperloop |
 |-----| --------- |
-| Action | Hyperstack::Operation subclass |
-| ActionCreator | `Hyperstack::Operation.step/failed/async` methods |
-| Action Data | Hyperstack::Operation parameters |
-| Dispatcher | `Hyperstack::Operation#dispatch` method |
+| Action | Hyperloop::Operation subclass |
+| ActionCreator | `Hyperloop::Operation.step/failed/async` methods |
+| Action Data | Hyperloop::Operation parameters |
+| Dispatcher | `Hyperloop::Operation#dispatch` method |
 | Registering a Store | `Store.receives` |

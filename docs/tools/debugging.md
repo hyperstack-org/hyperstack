@@ -1,5 +1,14 @@
 # Debugging
 
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
 ## Debugging tips
 
 Tips, good practice will help you debugging your Hyperloop application.

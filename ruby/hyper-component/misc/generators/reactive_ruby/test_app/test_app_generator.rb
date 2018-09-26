@@ -1,5 +1,5 @@
 # Although we are not using this it would be good to move back to this model in future.
-# For one thing it would be a good way to test the hyperloop/hyperstack rails installer
+# For one thing it would be a good way to test the hyperloop/Hyperloop rails installer
 # so for now keep these files here as a template
 
 require 'rails/generators/rails/app/app_generator'

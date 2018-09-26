@@ -1,6 +1,13 @@
-# Hyperstack Policies
+# Hyperloop Policies
 
-TODO: THIS PAGE NEEDS LOTS OF WORK! @simon :-) all yours
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
 
 ## Authorization
 

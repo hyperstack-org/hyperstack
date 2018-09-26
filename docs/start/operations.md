@@ -1,6 +1,15 @@
 # Operations
 
-THESE DOCS NEED UPDATING WITH THE NEW DSL
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
 
 Operations are the engine rooms of Hyperloop, they orchestrate the interactions between Components, external services, Models and Stores. **Operations are where your business logic lives.**
 

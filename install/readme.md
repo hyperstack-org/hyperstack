@@ -1,13 +1,15 @@
-# Hyperstack Rails Template
+# Legacy Hyperloop Rails Template
 
-This template will create a new Rails app with Webpacker and Hyperstack 1.0 ALPHA configured.
+This template will create a new Rails app with Webpacker and RubyHyperloop >= 0.99.x < 1.0.0
 
 ## Usage
 
-Simply run the command below to create a new Rails app with Hyperstack all configured:
+Simply run the command below to create a new Rails app with Hyperloop all configured:
 
 ```
-rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/hyperloop-legacy/install/rails-webpacker.rb
+...or
+rails new MyApp -m rails-webpacker.rb
 ```
 
 ## Start the Rails app

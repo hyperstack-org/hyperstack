@@ -1,8 +1,17 @@
 # Policies
 
-TODO: THIS PAGE SHOULD BE RE-WRITTEN AS A HIGH LEVEL CONCEPTUAL UNDERSTANDING OF POLOCIES
+**These are Legacy Documents**
 
-Hyperstack uses Policies to regulate what connections are opened between clients and the server and what data is distributed over those connections.
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
+
+Hyperloop uses Policies to regulate what connections are opened between clients and the server and what data is distributed over those connections.
 
 ### Policy Classes
 

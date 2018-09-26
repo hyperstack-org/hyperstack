@@ -1,5 +1,16 @@
 # Models
 
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
+
 Much like Stores, Models hold state which Components watch and re-render when the data changes. The key difference between Models and Stores, however, is that Models are an extension of your server side (Rails) Active Record models. Changes made on the server are pushed to the connected clients who's Components are rendering that data.
 
 Components, Operations and Stores have no backend dependancy, but Models and Policies are integrated with Rails and require a Rails backend.

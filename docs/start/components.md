@@ -1,6 +1,15 @@
 # Components
 
-# Work in progress - ALPHA (code and docs)
+**These are Legacy Documents**
+
+Hyperloop has been renamed Hyperstack and the new project details are as follows:
+
+Webiste: https://hyperstack.org/
+Github: https://github.com/hyperstack-org
+
+These documents and this branch will remain for legacy purposes.
+
+## Introduction
 
 Hyperloop user interfaces are composed of React Components written in Ruby.
 

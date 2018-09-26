@@ -1,4 +1,4 @@
-# Hyperstack 1.0 ALPHA Rails Template
+# Legacy Hyperloop
 
 # ----------------------------------- Commit so we have good history of these changes
 
@@ -9,15 +9,8 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'opal-sprockets', '~> 0.4.2.0.11.0.3.1' # to ensure we have the latest
-gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
-gem 'hyperloop', git: 'https://github.com/ruby-hyperloop/hyperloop', branch: 'edge'
-gem 'hyper-react', git: 'https://github.com/ruby-hyperloop/hyper-react', branch: 'edge'
-gem 'hyper-component', git: 'https://github.com/ruby-hyperloop/hyper-component', branch: 'edge'
-gem 'hyper-router', git: 'https://github.com/ruby-hyperloop/hyper-router', branch: 'edge'
-gem 'hyper-store', git: 'https://github.com/ruby-hyperloop/hyper-store', branch: 'edge'
-gem 'hyperloop-config', git: 'https://github.com/ruby-hyperloop/hyperloop-config', branch: 'edge'
-gem 'opal_hot_reloader', git: 'https://github.com/fkchang/opal-hot-reloader.git'
+gem 'hyperloop', ">=0.9.1", "<1.0.0"
+gem 'opal_hot_reloader', github: 'hyperstack-org/opal-hot-reloader'
 
 gem_group :development do
   gem 'foreman'
@@ -55,7 +48,7 @@ run 'yarn add react'
 run 'yarn add react-dom'
 run 'yarn add react-router'
 
-# ----------------------------------- Create thyperstack.js
+# ----------------------------------- Create hyperstack.js
 
 file 'app/javascript/packs/hyperstack.js', <<-CODE
 // Import all the modules
@@ -100,14 +93,17 @@ require 'opal_hot_reloader'
 OpalHotReloader.listen(25222, false)
 CODE
 
+# ----------------------------------- Mount point
+
+route "mount Hyperloop::Engine => '/hyperloop'"
+
 # ----------------------------------- Hello World
 
 route "root 'hyperloop#HelloWorld'"
-
 file 'app/hyperloop/components/hello_world.rb', <<-CODE
 class HelloWorld < Hyperloop::Component
   render do
-    H1 { "Hello world from Hyperstack!" }
+    H1 { "Hello world from Legacy Hyperloop!" }
   end
 end
 CODE
