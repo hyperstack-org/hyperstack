@@ -74,7 +74,7 @@ Released under the MIT License.  See the [LICENSE][] file for further details.
 
 Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop). We decided to rename the project to drop the Ruby suffix and also took the opportunity to simplify the repos and project overall.
 
-+ Old website: https://github.com/ruby-hyperloop
++ Old website: http://ruby-hyperloop.org/
 + Old Github: https://github.com/ruby-hyperloop
 + Legacy branch: https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy
 + Legacy install script: https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy/install
