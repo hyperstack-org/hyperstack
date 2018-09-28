@@ -1,6 +1,6 @@
-module React
+module Hyperstack
   class TopLevelRailsComponent
-    include Hyperloop::Component::Mixin
+    include Hyperstack::Component::Mixin
 
     def self.search_path
       @search_path ||= [Object]
@@ -58,7 +58,7 @@ module React
           end
         end
       end
-      return React::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
+      return Component::Internal::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
       raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
     end
   end
@@ -67,9 +67,9 @@ end
 class Module
   def add_to_react_search_path(replace_search_path = nil)
     if replace_search_path
-      React::TopLevelRailsComponent.search_path = [self]
-    elsif !React::TopLevelRailsComponent.search_path.include? self
-      React::TopLevelRailsComponent.search_path << self
+      Hyperstack::TopLevelRailsComponent.search_path = [self]
+    elsif !Hyperstack::TopLevelRailsComponent.search_path.include? self
+      Hyperstack::TopLevelRailsComponent.search_path << self
     end
   end
 end

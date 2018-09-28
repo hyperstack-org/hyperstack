@@ -14,13 +14,13 @@ if RUBY_ENGINE == 'opal'
         # so we always call the original, and respond to the exception
         _reactrb_original_const_missing(const_name)
       rescue StandardError => e
-        React::NativeLibrary.import_const_from_native(Object, const_name, true) || raise(e)
+        Hyperstack::Component::NativeLibrary.import_const_from_native(Object, const_name, true) || raise(e)
       end
 
       def method_missing(method, *args, &block)
-        component_class = React::NativeLibrary.import_const_from_native(self, method, false)
+        component_class = Hyperstack::Component::NativeLibrary.import_const_from_native(self, method, false)
         _reactrb_original_method_missing(method, *args, &block) unless component_class
-        React::RenderingContext.render(component_class, *args, &block)
+        Hyperstack::Component::Internal::RenderingContext.render(component_class, *args, &block)
       end
     end
   end

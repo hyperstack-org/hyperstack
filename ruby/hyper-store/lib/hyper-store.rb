@@ -1,10 +1,14 @@
 require 'set'
-require 'hyperloop-config'
-Hyperloop.import 'hyper-store'
+require 'hyperstack-config'
+Hyperstack.import 'hyper-store'
 
-
-module HyperStore # allows us to easily turn off BasicObject for debug
-  class BaseStoreClass < BasicObject
+module Hyperstack
+  module Store
+    module Internal
+      # allows us to easily turn off BasicObject for debug
+      class BaseStoreClass < BasicObject
+      end
+    end
   end
 end
 

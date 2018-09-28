@@ -17,11 +17,11 @@ RSpec.configure do |config|
   config.add_setting :debugger_width, default: nil
 
   config.before(:each) do
-    Hyperloop.class_eval do
+    Hyperstack.class_eval do
       def self.on_server?
         true
       end
-    end if defined?(Hyperloop)
+    end if defined?(Hyperstack)
     # for compatibility with HyperMesh
     HyperMesh.class_eval do
       def self.on_server?

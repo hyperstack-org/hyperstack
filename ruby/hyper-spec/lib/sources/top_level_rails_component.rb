@@ -1,4 +1,4 @@
-module React
+module Hyperstack
   class TopLevelRailsComponent
     class << self
       attr_accessor :event_history
@@ -88,7 +88,7 @@ module React
     end
 
     def render
-      React::RenderingContext.render(component, @render_params)
+      Component::Internal::RenderingContext.render(component, @render_params)
     end
   end
 end

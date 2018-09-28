@@ -9,7 +9,7 @@ class Object
       # so we always call the original, and respond to the exception
       _reactrb_tag_original_const_missing(const_name)
     rescue StandardError => e
-      React::Component::Tags.html_tag_class_for(const_name) || raise(e)
+      Hyperstack::Component::Internal::Tags.html_tag_class_for(const_name) || raise(e)
     end
   end
 end

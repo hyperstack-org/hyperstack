@@ -1,14 +1,14 @@
-module Hyperloop
-  class Store
+module Hyperstack
+  module Store
     module Mixin
       class << self
         def included(base)
-          base.include(HyperStore::InstanceMethods)
-          base.extend(HyperStore::ClassMethods)
-          base.extend(HyperStore::DispatchReceiver)
+          base.include(Hyperstack::Store::Internal::InstanceMethods)
+          base.extend(Hyperstack::Store::Internal::ClassMethods)
+          base.extend(Hyperstack::Store::Internal::DispatchReceiver)
 
           base.singleton_class.define_singleton_method(:__state_wrapper) do
-            @__state_wrapper ||= Class.new(HyperStore::StateWrapper)
+            @__state_wrapper ||= Class.new(Hyperstack::Store::Internal::StateWrapper)
           end
 
           base.singleton_class.define_singleton_method(:state) do |*args, &block|

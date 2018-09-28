@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 #gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
 gem 'hyper-spec',       path: '../hyper-spec'
-gem 'hyperloop-config', path: '../hyperloop-config'
+gem 'hyperstack-config', path: '../hyperstack-config'
 gem 'hyper-store',      path: '../hyper-store'
 #gem 'puma', '~> 3.11.0' # As of adding, version 3.12.0 isn't working so we are locking
 gemspec

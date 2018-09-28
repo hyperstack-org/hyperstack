@@ -14,14 +14,21 @@ Element.instance_eval do
 
   define_method :render do |container = nil, params = {}, &block|
     if `#{self.to_n}._reactrb_component_class === undefined`
-      `#{self.to_n}._reactrb_component_class = #{Class.new(Hyperloop::Component)}`
+      klass = Class.new
+      klass.include Hyperstack::Component::Mixin
+      `#{self.to_n}._reactrb_component_class = klass`
+    else
+      klass = `#{self.to_n}._reactrb_component_class`
     end
-    klass = `#{self.to_n}._reactrb_component_class`
     klass.class_eval do
       render(container, params, &block)
     end
 
-    React.render(React.create_element(`#{self.to_n}._reactrb_component_class`), self)
+    Hyperstack::Component::ReactAPI.render(
+      Hyperstack::Component::ReactAPI.create_element(
+        `#{self.to_n}._reactrb_component_class`
+      ), self
+    )
   end
 
   # mount_components is useful for dynamically generated page segments for example
