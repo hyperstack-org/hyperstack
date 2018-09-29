@@ -65,10 +65,10 @@ describe 'StateWrapper' do
           context 'of type' do
             it 'nil' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: nil
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -83,10 +83,10 @@ describe 'StateWrapper' do
 
             it 'string' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: 'a state value'
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -102,10 +102,10 @@ describe 'StateWrapper' do
 
             it 'boolean' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: true
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -121,10 +121,10 @@ describe 'StateWrapper' do
 
             it 'integer' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: 30
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -140,10 +140,10 @@ describe 'StateWrapper' do
 
             it 'decimal' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: 30.0
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -159,10 +159,10 @@ describe 'StateWrapper' do
 
             it 'array' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: ['30', 30, 30.0]
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -178,10 +178,10 @@ describe 'StateWrapper' do
 
             it 'hash' do
               mount 'App' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: { string: '30', integer: 30, decimal: 30.0 }
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -204,10 +204,10 @@ describe 'StateWrapper' do
                   end
                 end
 
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: Bar.new
                 end
-                class App < Hyperloop::Component
+                class App < HyperComponent
                   before_mount do
                     @foo = Foo.new
                   end
@@ -227,10 +227,10 @@ describe 'StateWrapper' do
             context 'for shared states' do
               it 'can be declared as the value of the name key in the hash' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state bar: 'a state value', scope: :shared
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -241,21 +241,20 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-
                 expect(page).to have_content('Foo.state.bar: a state value')
                 expect(page).to have_content('@foo.state.bar: a state value')
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, scope: :shared, initializer: :baz
 
                     def self.baz
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -273,10 +272,10 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Proc\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, scope: :shared, initializer: -> { 'a state value' }
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -294,12 +293,12 @@ describe 'StateWrapper' do
 
               it 'can be declared with a block' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, scope: :shared do
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -319,10 +318,10 @@ describe 'StateWrapper' do
             context 'for class states' do
               it 'can be declared as the value of the name key in the hash' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state bar: 'a state value', scope: :class
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -334,14 +333,14 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Symbol\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, scope: :class, initializer: :baz
 
                     def self.baz
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -353,10 +352,10 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Proc\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, scope: :class, initializer: -> { 'a state value' }
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -368,12 +367,12 @@ describe 'StateWrapper' do
 
               it 'can be declared with a block' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, scope: :class do
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -387,10 +386,10 @@ describe 'StateWrapper' do
             context 'for instance states' do
               it 'can be declared as the value of the name key in the hash' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state bar: 'a state value'
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -406,14 +405,14 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Symbol\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, initializer: :baz
 
                     def baz
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -429,10 +428,10 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Proc\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar, initializer: -> { 'a state value' }
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -448,12 +447,12 @@ describe 'StateWrapper' do
 
               it 'can be declared with a block' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     state :bar do
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -473,12 +472,12 @@ describe 'StateWrapper' do
             context 'for shared states' do
               it 'can be declared as the value of the name key in the hash' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state bar: 'a state value', scope: :shared
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -489,14 +488,13 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-
                 expect(page).to have_content('Foo.state.bar: a state value')
                 expect(page).to have_content('@foo.state.bar: a state value')
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, scope: :shared, initializer: :baz
 
@@ -505,7 +503,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -523,12 +521,12 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Proc\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, scope: :shared, initializer: -> { 'a state value' }
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -546,14 +544,14 @@ describe 'StateWrapper' do
 
               it 'can be declared with a block' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, scope: :shared do
                         'a state value'
                       end
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -573,12 +571,12 @@ describe 'StateWrapper' do
             context 'for class states' do
               it 'can be declared as the value of the name key in the hash' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state bar: 'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -590,7 +588,7 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Symbol\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, initializer: :baz
 
@@ -599,7 +597,7 @@ describe 'StateWrapper' do
                       end
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -611,12 +609,12 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Proc\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, initializer: -> { 'a state value' }
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -628,14 +626,14 @@ describe 'StateWrapper' do
 
               it 'can be declared with a block' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar do
                         'a state value'
                       end
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     render(DIV) do
                       H1 { "Foo.state.bar: #{Foo.state.bar}" }
                     end
@@ -649,12 +647,12 @@ describe 'StateWrapper' do
             context 'for instance states' do
               it 'can be declared as the value of the name key in the hash' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state bar: 'a state value', scope: :instance
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -670,7 +668,7 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Symbol\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, scope: :instance, initializer: :baz
                     end
@@ -679,7 +677,7 @@ describe 'StateWrapper' do
                       'a state value'
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -695,12 +693,12 @@ describe 'StateWrapper' do
 
               it 'can be declared with \'initializer: Proc\'' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, scope: :instance, initializer: -> { 'a state value' }
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -716,14 +714,14 @@ describe 'StateWrapper' do
 
               it 'can be declared with a block' do
                 mount 'App' do
-                  class Foo < Hyperloop::Store
+                  class Foo < HyperStore
                     class << self
                       state :bar, scope: :instance do
                         'a state value'
                       end
                     end
                   end
-                  class App < Hyperloop::Component
+                  class App < HyperComponent
                     before_mount do
                       @foo = Foo.new
                     end
@@ -741,22 +739,34 @@ describe 'StateWrapper' do
         end
       end
       context 'unit test' do
+        before(:all) do
+          class HyperStore
+            class << self
+              def inherited(child)
+                child.include(Hyperstack::Store::Mixin)
+              end
+            end
+            def initialize
+              init_store
+            end
+          end
+        end
         after(:each) do
           # There's gotta be a better way to deal with this
           Object.send(:remove_const, :Foo)
 
           # We're very basically mocking React::State so we can run these outside of Opal
-          React::State.reset!
+          Hyperstack::Store::Internal::State.reset!
         end
 
         context 'with an initial value' do
           context 'declared in the class level' do
             context 'for shared states' do
               it 'can be declared as the value of the name key in the hash' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: 'a state value', scope: :shared
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -764,7 +774,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :shared, initializer: :baz
 
                   def self.baz
@@ -772,7 +782,7 @@ describe 'StateWrapper' do
                   end
                 end
 
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq(Foo.baz)
@@ -780,24 +790,24 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Proc\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :shared, initializer: -> { 'a state value' }
                 end
                 foo = Foo.new
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
                 expect(foo.state.bar).to eq('a state value')
               end
 
               it 'can be declared with a block' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :shared do
                     'a state value'
                   end
                 end
                 foo = Foo.new
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
                 expect(foo.state.bar).to eq('a state value')
@@ -806,43 +816,43 @@ describe 'StateWrapper' do
 
             context 'for class states' do
               it 'can be declared as the value of the name key in the hash' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: 'a state value', scope: :class
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :class, initializer: :baz
 
                   def self.baz
                     'a state value'
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq(Foo.baz)
               end
 
               it 'can be declared with \'initializer: Proc\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :class, initializer: -> { 'a state value' }
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
 
               it 'can be declared with a block' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :class do
                     'a state value'
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -850,7 +860,7 @@ describe 'StateWrapper' do
 
             context 'for instance states' do
               it 'can be declared as the value of the name key in the hash' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state bar: 'a state value'
                 end
                 foo = Foo.new
@@ -859,7 +869,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, initializer: :baz
 
                   def baz
@@ -872,7 +882,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Proc\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, initializer: -> { 'a state value' }
                 end
                 foo = Foo.new
@@ -881,7 +891,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with a block' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar do
                     'a state value'
                   end
@@ -896,12 +906,12 @@ describe 'StateWrapper' do
           context 'declared in the singleton class level' do
             context 'for shared states' do
               it 'can be declared as the value of the name key in the hash' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state bar: 'a state value', scope: :shared
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -909,7 +919,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :shared, initializer: :baz
 
@@ -918,7 +928,7 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq(Foo.baz)
@@ -926,12 +936,12 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Proc\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :shared, initializer: -> { 'a state value' }
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -939,14 +949,14 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with a block' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :shared do
                       'a state value'
                     end
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
                 foo = Foo.new
 
                 expect(Foo.state.bar).to eq('a state value')
@@ -956,18 +966,18 @@ describe 'StateWrapper' do
 
             context 'for class states' do
               it 'can be declared as the value of the name key in the hash' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state bar: 'a state value'
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, initializer: :baz
 
@@ -976,31 +986,31 @@ describe 'StateWrapper' do
                     end
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq(Foo.baz)
               end
 
               it 'can be declared with \'initializer: Proc\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, initializer: -> { 'a state value' }
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
 
               it 'can be declared with a block' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar do
                       'a state value'
                     end
                   end
                 end
-                Hyperloop::Application::Boot.run
+                Hyperstack::Application::Boot.run
 
                 expect(Foo.state.bar).to eq('a state value')
               end
@@ -1008,7 +1018,7 @@ describe 'StateWrapper' do
 
             context 'for instance states' do
               it 'can be declared as the value of the name key in the hash' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state bar: 'a state value', scope: :instance
                   end
@@ -1019,7 +1029,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Symbol\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :instance, initializer: :baz
                   end
@@ -1034,7 +1044,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with \'initializer: Proc\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :instance, initializer: -> { 'a state value' }
                   end
@@ -1045,7 +1055,7 @@ describe 'StateWrapper' do
               end
 
               it 'can be declared with a block' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :instance do
                       'a state value'
@@ -1067,12 +1077,12 @@ describe 'StateWrapper' do
           Object.send(:remove_const, :Foo)
 
           # We're very basically mocking React::State so we can run these outside of Opal
-          React::State.reset!
+          Hyperstack::Store::Internal::State.reset!
         end
 
         context 'name' do
           it 'can be passed in as a single argument first' do
-            class Foo < Hyperloop::Store
+            class Foo < HyperStore
               state :bar
             end
             foo = Foo.new
@@ -1080,7 +1090,7 @@ describe 'StateWrapper' do
           end
 
           it 'can be passed in as a hash argument first' do
-            class Foo < Hyperloop::Store
+            class Foo < HyperStore
               state bar: nil
             end
             foo = Foo.new
@@ -1088,10 +1098,10 @@ describe 'StateWrapper' do
           end
 
           it 'will raise an error if it is not passed in first' do
-            class Foo < Hyperloop::Store; end
+            class Foo < HyperStore; end
 
             expect { Foo.state(scope: :class, bar: nil) }
-              .to raise_error(HyperStore::StateWrapper::ArgumentValidator::InvalidOptionError)
+              .to raise_error(Hyperstack::Store::InvalidOptionError)
           end
         end
 
@@ -1099,7 +1109,7 @@ describe 'StateWrapper' do
           context 'declared in the class level' do
             context 'for shared states' do
               it 'will define a reader method of the same name when given \'true\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :shared, reader: true
                 end
                 foo = Foo.new
@@ -1109,7 +1119,7 @@ describe 'StateWrapper' do
               end
 
               it 'will define a reader method of the specified when given \'baz\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :shared, reader: :baz
                 end
                 foo = Foo.new
@@ -1122,7 +1132,7 @@ describe 'StateWrapper' do
               end
 
               it 'will NOT define a reader method when not passed in' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :shared
                 end
                 foo = Foo.new
@@ -1135,7 +1145,7 @@ describe 'StateWrapper' do
 
             context 'for class states' do
               it 'will define a reader method of the same name when given \'true\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :class, reader: true
                 end
 
@@ -1143,7 +1153,7 @@ describe 'StateWrapper' do
               end
 
               it 'will define a reader method of the specified when given \'baz\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :class, reader: :baz
                 end
 
@@ -1152,7 +1162,7 @@ describe 'StateWrapper' do
               end
 
               it 'will NOT define a reader method when not passed in' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, scope: :class
                 end
 
@@ -1162,7 +1172,7 @@ describe 'StateWrapper' do
 
             context 'for instance states' do
               it 'will define a reader method of the same name when given \'true\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, reader: true
                 end
                 foo = Foo.new
@@ -1171,7 +1181,7 @@ describe 'StateWrapper' do
               end
 
               it 'will define a reader method of the specified when given \'baz\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar, reader: :baz
                 end
                 foo = Foo.new
@@ -1181,7 +1191,7 @@ describe 'StateWrapper' do
               end
 
               it 'will NOT define a reader method when not passed in' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   state :bar
                 end
                 foo = Foo.new
@@ -1194,7 +1204,7 @@ describe 'StateWrapper' do
           context 'declared in the singleton class level' do
             context 'for shared states' do
               it 'will define a reader method of the same name when given \'true\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :shared, reader: true
                   end
@@ -1206,7 +1216,7 @@ describe 'StateWrapper' do
               end
 
               it 'will define a reader method of the specified when given \'baz\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :shared, reader: :baz
                   end
@@ -1221,7 +1231,7 @@ describe 'StateWrapper' do
               end
 
               it 'will NOT define a reader method when not passed in' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :shared
                   end
@@ -1236,7 +1246,7 @@ describe 'StateWrapper' do
 
             context 'for class states' do
               it 'will define a reader method of the same name when given \'true\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, reader: true
                   end
@@ -1246,7 +1256,7 @@ describe 'StateWrapper' do
               end
 
               it 'will define a reader method of the specified when given \'baz\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, reader: :baz
                   end
@@ -1257,7 +1267,7 @@ describe 'StateWrapper' do
               end
 
               it 'will NOT define a reader method when not passed in' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar
                   end
@@ -1269,7 +1279,7 @@ describe 'StateWrapper' do
 
             context 'for instance states' do
               it 'will define a reader method of the same name when given \'true\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :instance, reader: true
                   end
@@ -1280,7 +1290,7 @@ describe 'StateWrapper' do
               end
 
               it 'will define a reader method of the specified when given \'baz\'' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :instance, reader: :baz
                   end
@@ -1292,7 +1302,7 @@ describe 'StateWrapper' do
               end
 
               it 'will NOT define a reader method when not passed in' do
-                class Foo < Hyperloop::Store
+                class Foo < HyperStore
                   class << self
                     state :bar, scope: :instance
                   end

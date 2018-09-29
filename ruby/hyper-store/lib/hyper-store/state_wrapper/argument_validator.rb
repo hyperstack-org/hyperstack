@@ -1,10 +1,9 @@
 module Hyperstack
   module Store
+    class InvalidOptionError < StandardError; end
     module Internal
       class StateWrapper < BaseStoreClass
         module ArgumentValidator
-          class InvalidOptionError < StandardError; end
-
           def validate_args!(klass, *args, &block)
             name, initial_value, opts = parse_arguments(*args, &block)
 
