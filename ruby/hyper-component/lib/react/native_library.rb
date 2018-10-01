@@ -33,12 +33,15 @@ module React
       end
 
       def import_const_from_native(klass, const_name, create_library)
-        native_name = lookup_native_name(const_name) ||
-                      lookup_native_name(const_name[0].downcase + const_name[1..-1])
-        native_name && (
-          create_component_wrapper(klass, native_name, const_name) || (
-            create_library &&
-              create_library_wrapper(klass, native_name, const_name)))
+        begin
+          native_name = lookup_native_name(const_name) ||
+                        lookup_native_name(const_name[0].downcase + const_name[1..-1])
+          native_name && (
+            create_component_wrapper(klass, native_name, const_name) || (
+              create_library &&
+                create_library_wrapper(klass, native_name, const_name)))
+        rescue Exception
+        end
       end
 
       def const_missing(const_name)
