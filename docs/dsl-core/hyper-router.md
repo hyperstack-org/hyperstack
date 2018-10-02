@@ -1,4 +1,4 @@
-# Router
+# Client-side Routing
 
 **Work in progress - ALPHA (docs and code)**
 
