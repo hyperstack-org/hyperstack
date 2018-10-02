@@ -1,4 +1,6 @@
-# Hyperloop::Configuration
+# Configuration
+
+**Work in progress - ALPHA (docs and code)**
 
 This gem is used internally by other [Hyperloop](http://ruby-hyperloop.io) gems for keeping config settings, and for registering client side autoload requirements.
 

@@ -1,6 +1,6 @@
-# HyperComponent
+# Components
 
-# Work in progress - ALPHA (docs and code)
+**Work in progress - ALPHA (docs and code)**
 
 ## Components DSL Overview
 

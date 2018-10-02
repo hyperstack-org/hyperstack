@@ -1,13 +1,16 @@
-#  HyperI18n
+# Internationalization
 
-## HyperI18n gem
+## HyperI18n
 
-HyperI18n seamlessly brings Rails I18n into your Hyperloop application.
+**Work in progress - ALPHA (docs and code)**
 
+HyperI18n seamlessly brings Rails I18n into your Hyperstack application.
 
 ## Installation and Setup
 
-1. Add `gem 'hyper-i18n', git: 'https://github.com/ruby-hyperloop/hyper-i18n.git'` to your `Gemfile`
+**TODO these steps are wrong**
+
+1. Add `gem 'hyper-i18n', git: 'https://github.com/ruby-Hyperstack/hyper-i18n.git'` to your `Gemfile`
 2. Install the Gem: `bundle install`
 3. Add `require 'hyper-i18n'` to your components manifest
 
@@ -57,7 +60,7 @@ en:
 ```
 ```ruby
 module Users
-  class Show < Hyperloop::Component
+  class Show < Hyperstack::Component
     render do
       H1 { t(:title) }
     end

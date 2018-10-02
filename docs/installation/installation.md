@@ -1,5 +1,7 @@
 # Hyperstack Rails Template
 
+**Work in progress - ALPHA (docs and code)**
+
 This template will create a new Rails app with Webpacker from Hyperstack edge branch
 
 ## Usage

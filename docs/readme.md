@@ -13,4 +13,3 @@
 + This hyperloop-legacy branch will only contain critical bug fixes
 + The original website is here: http://ruby-hyperloop.org/
 + The final stable branch is https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy
-

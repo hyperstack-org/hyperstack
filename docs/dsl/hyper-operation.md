@@ -1,6 +1,6 @@
-# HyperOperations
+# Isomorphic Operations
 
-# Work in progress - ALPHA (docs and code)
+**Work in progress - ALPHA (docs and code)**
 
 Operations are the engine rooms of Hyperstack; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
 

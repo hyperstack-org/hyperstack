@@ -1,6 +1,6 @@
-# HyperStore
+# Stores
 
-# Work in progress - ALPHA (docs and code)
+**Work in progress - ALPHA (docs and code)**
 
 Hyperstack **Stores** are implemented in the **HyperStore Gem**.
 

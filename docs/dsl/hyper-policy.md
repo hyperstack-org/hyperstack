@@ -1,6 +1,6 @@
-# Hyperstack Policies
+# Policies
 
-TODO: THIS PAGE NEEDS LOTS OF WORK! @simon :-) all yours
+**Work in progress - ALPHA (docs and code)**
 
 ## Authorization
 

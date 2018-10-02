@@ -1,6 +1,6 @@
-# HyperModel
+# Isomorphic Models
 
-# Work in progress - ALPHA (docs and code)
+**Work in progress - ALPHA (docs and code)**
 
 In Hyperstack, your ActiveRecord Models are available in your Isomorphic code.
 
