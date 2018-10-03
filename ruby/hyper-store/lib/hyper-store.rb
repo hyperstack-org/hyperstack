@@ -20,7 +20,7 @@ require 'hyper-store/state_wrapper/argument_validator'
 require 'hyper-store/state_wrapper'
 require 'hyper-store/version'
 require 'hyperloop/store'
-require 'hyperloop/application/boot'
+# require 'hyperloop/application/boot' moved to hyperstack-config
 require 'hyperloop/store/mixin'
 require 'react/state'
 

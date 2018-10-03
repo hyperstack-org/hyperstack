@@ -1,3 +1,4 @@
+require 'hyperstack/boot'
 if RUBY_ENGINE == 'opal'
   require 'hyperstack/deprecation_warning'
   require 'hyperstack/string'

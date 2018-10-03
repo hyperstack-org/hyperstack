@@ -4,11 +4,17 @@ require 'spec_helper'
 describe 'the receives macro' do
 
   before(:all) do
-    class TestOp < Hyperstack::Operation::Base
+    class TestOp
       def self.dispatch(params={})
         receivers.each do |receiver|
           receiver.call params
         end
+      end
+      def self.receivers
+        @receivers ||= []
+      end
+      def self.on_dispatch(&block)
+        receivers << block
       end
     end
   end
