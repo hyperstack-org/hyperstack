@@ -12,15 +12,12 @@ module Hyperstack
         end
       end
       module ClassMethods
-        def self.extended(base)
 
-        end
-
-        def has_observers?(object, name)
+        def has_observers?(object, name) # public
           !observers_by_name[object][name].empty?
         end
 
-        def bulk_update
+        def bulk_update # public
           saved_bulk_update_flag = @bulk_update_flag
           @bulk_update_flag = true
           yield
@@ -28,22 +25,21 @@ module Hyperstack
           @bulk_update_flag = saved_bulk_update_flag
         end
 
-        def set_state2(object, name, value, updates, exclusions = nil)
-          # set object's name state to value, tell all observers it has changed.
-          # Observers must implement update_react_js_state
-          object_needs_notification = object.respond_to?(:update_react_js_state)
-          observers_by_name[object][name].dup.each do |observer|
-            next if exclusions && exclusions.include?(observer)
-            updates[observer] += [object, name, value]
-            object_needs_notification = false if object == observer
-          end
-          updates[object] += [nil, name, value] if object_needs_notification
-        end
+        # TODO: remove - these will are no longer used
 
-        def initialize_states(object, initial_values) # initialize objects' name/value pairs
-          states[object].merge!(initial_values || {})
-        end
+        # def initialize_states(object, initial_values) # initialize objects' name/value pairs
+        #   states[object].merge!(initial_values || {})
+        # end
+        # def will_be_observing?(object, name, current_observer)
+        #   current_observer && new_observers[current_observer][object].include?(name)
+        # end
+        #
+        # def is_observing?(object, name, current_observer)
+        #   current_observer && observers_by_name[object][name].include?(current_observer)
+        # end
 
+
+        # public
         def get_state(object, name, current_observer = @current_observer)
           # get current value of name for object, remember that the current object depends on this state,
           # current observer can be overriden with last param
@@ -56,6 +52,7 @@ module Hyperstack
           states[object][name]
         end
 
+        # public
         def set_state(object, name, value, delay=ALWAYS_UPDATE_STATE_AFTER_RENDER)
           states[object][name] = value
           delay = false if object.respond_to?(:set_state_synchronously?) && object.set_state_synchronously?
@@ -82,14 +79,6 @@ module Hyperstack
           value
         end
 
-        def will_be_observing?(object, name, current_observer)
-          current_observer && new_observers[current_observer][object].include?(name)
-        end
-
-        def is_observing?(object, name, current_observer)
-          current_observer && observers_by_name[object][name].include?(current_observer)
-        end
-
         def update_states_to_observe(current_observer = @current_observer)  # should be called after the last after_render callback, currently called after components render method
           raise "update_states_to_observer called outside of watch block" unless current_observer
           current_observers[current_observer].each do |object, names|
@@ -106,16 +95,6 @@ module Hyperstack
           end
         end
 
-        def remove # call after component is unmounted
-          raise "remove called outside of watch block" unless @current_observer
-          current_observers[@current_observer].each do |object, names|
-            names.each do |name|
-              observers_by_name[object][name].delete(@current_observer)
-            end
-          end
-          current_observers.delete(@current_observer)
-        end
-
         def set_state_context_to(observer, rendering = nil) # wrap all execution that may set or get states in a block so we know which observer is executing
           saved_current_observer = @current_observer
           @current_observer = observer
@@ -128,8 +107,32 @@ module Hyperstack
           return_value
         end
 
+        def remove # call after component is unmounted
+          raise "remove called outside of watch block" unless @current_observer
+          current_observers[@current_observer].each do |object, names|
+            names.each do |name|
+              observers_by_name[object][name].delete(@current_observer)
+            end
+          end
+          current_observers.delete(@current_observer)
+        end
+
         def states
           @states ||= Hash.new { |h, k| h[k] = {} }
+        end
+
+        # private
+
+        def set_state2(object, name, value, updates, exclusions = nil)
+          # set object's name state to value, tell all observers it has changed.
+          # Observers must implement update_react_js_state
+          object_needs_notification = object.respond_to?(:update_react_js_state)
+          observers_by_name[object][name].dup.each do |observer|
+            next if exclusions && exclusions.include?(observer)
+            updates[observer] += [object, name, value]
+            object_needs_notification = false if object == observer
+          end
+          updates[object] += [nil, name, value] if object_needs_notification
         end
       end
     end
