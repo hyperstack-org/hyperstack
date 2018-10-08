@@ -238,7 +238,9 @@ module React
         elsif key == "key"
           props["key"] = value.to_key
 
-        elsif key == 'ref' && value.is_a?(Proc)
+        elsif key == 'ref' && value.respond_to?(:call)
+          # currently react still accepts the syntax ref: :foo meaning set refs.foo to the ref.
+          # in hyperstack release 0.1 we can put this behavior on a switch or use the notation `ref_key: :foo` for old school
           props[key] = %x{
                           function(dom_node){
                             if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {

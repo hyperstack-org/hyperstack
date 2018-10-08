@@ -13,15 +13,21 @@ Element.instance_eval do
   end
 
   define_method :render do |container = nil, params = {}, &block|
+    # create an invisible component class and hang it off the DOM element
     if `#{self.to_n}._reactrb_component_class === undefined`
-      `#{self.to_n}._reactrb_component_class = #{Class.new(Hyperloop::Component)}`
+      klass = Class.new(Hyperloop::Component) do
+        # react won't rerender the components unless it sees some params
+        # changing, so we just copy them all in, but we still just reuse
+        # the render macro to define the action
+        others :all_the_params
+      end
+      `#{self.to_n}._reactrb_component_class = #{klass}`
+    else
+      klass = `#{self.to_n}._reactrb_component_class`
     end
-    klass = `#{self.to_n}._reactrb_component_class`
-    klass.class_eval do
-      render(container, params, &block)
-    end
-
-    React.render(React.create_element(`#{self.to_n}._reactrb_component_class`), self)
+    # define / redefine the render method
+    klass.render(container, params, &block)
+    React.render(React.create_element(klass, {container: container, params: params, block: block}), self)
   end
 
   # mount_components is useful for dynamically generated page segments for example
@@ -34,4 +40,4 @@ Element.instance_eval do
     }
   }
   Element.expose :mount_components
-end if Object.const_defined?('Element')
+end
