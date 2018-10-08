@@ -1,6 +1,6 @@
 module Hyperstack
   module Internal
-    class State
+    module StateContext
       class Observer
         def initialize(state)
           @state = state
@@ -8,15 +8,11 @@ module Hyperstack
 
         def method_missing(method, *args, &block)
           value = @state.__non_reactive_read__
-          value.send(method, *args, &block).tap { @state.state = value }
+          @state.mutate { value.send(method, *args, &block) }
         end
 
         def respond_to?(method, *args)
-          if [:call, :to_proc].include? method
-            true
-          else
-            @value.respond_to? method, *args
-          end
+          [:call, :to_proc].include?(method) || @state.__non_reactive_read__.respond_to?(method, *args)
         end
 
         def call(new_value)

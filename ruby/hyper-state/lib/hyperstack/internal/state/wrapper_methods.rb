@@ -1,8 +1,4 @@
 module Hyperstack
-  module State
-    class InvalidOptionError < StandardError; end
-  end
-
   module Internal
     class State
       module WrapperMethods
@@ -89,7 +85,6 @@ module Hyperstack
 
           Proc.new { value }
         end
-
 
         def add_readers(klass, name, opts)
           return unless opts[:reader]

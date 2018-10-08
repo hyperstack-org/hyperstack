@@ -1,6 +1,8 @@
 module Hyperstack
   module State
 
+    class InvalidOptionError < StandardError; end
+
     # instance state cache
 
     def __hyperstack_states
