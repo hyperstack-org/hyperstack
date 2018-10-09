@@ -15,7 +15,7 @@ module Hyperstack
 
       def to_s
         if @name
-          "<ObservableState:#{@name} value = #{@state}>"
+          "<State::Variable:#{@name} value = #{@state}>"
         else
           original_to_s.gsub(/>$/, " value = #{@state}")
         end
@@ -23,7 +23,7 @@ module Hyperstack
 
       def inspect
         if @name
-          "<ObservableState:#{@name} value = #{@state.inspect}>"
+          "<State::Variable:#{@name} value = #{@state.inspect}>"
         else
           original_to_s.gsub(/>$/, " value = #{@state.inspect}")
         end
@@ -43,7 +43,7 @@ module Hyperstack
         if block_given?
           yield.tap { mutated! }
         else
-          @observer ||= Hyperstack::Internal::State::Context::Observer.new(self)
+          @observer ||= Internal::State::Observer.new(self)
         end
       end
 

@@ -1,6 +1,6 @@
 module Hyperstack
   module Internal
-    module StateContext
+    module State
       class Observer
         def initialize(state)
           @state = state

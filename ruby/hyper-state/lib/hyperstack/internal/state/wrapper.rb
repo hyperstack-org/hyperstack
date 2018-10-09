@@ -1,7 +1,7 @@
 module Hyperstack
   module Internal
-    class State
-      module WrapperMethods
+    module State
+      module Wrapper
         def define_state_methods(klass, default_scope, *args, &block)
           name, opts = validate_args!(klass, default_scope, *args, &block)
           add_readers(klass, name, opts)
