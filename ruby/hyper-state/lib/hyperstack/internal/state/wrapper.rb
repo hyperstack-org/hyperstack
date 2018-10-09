@@ -102,11 +102,18 @@ module Hyperstack
         end
 
         def add_methods(klass, name, opts)
+          instance_var = :"@__hyperstack_state_variable_#{name}"
+          initializer = opts[:initializer]
           if opts[:scope] == :instance
-            klass.send(:define_method, name) { __hyperstack_states[name] ||= State.new(self, name, opts[:initializer]) }
+            klass.send(:define_method, name) do
+              return state_var if state_var = instance_variable_get(instance_var)
+              instance_variable_set(instance_var, Variable.new(name, initializer))
+            end
           else
             klass.instance_eval do # https://www.jimmycuadra.com/posts/metaprogramming-ruby-class-eval-and-instance-eval/
-              define_singleton_method(name) { __hyperstack_states[klass][name] ||= State.new(self, name, opts[:initializer]) }
+              define_singleton_method(name) do
+                Hyperstack::Context.set_var(klass, instance_var) { Variable.new(name, initializer) }
+              end
             end
           end
           klass.define_method(name) { klass.send(name) } if opts[:shared]
