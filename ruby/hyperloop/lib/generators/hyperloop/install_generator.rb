@@ -131,6 +131,7 @@ Hyperloop.configuration do |config|
   config.import 'reactrb/auto-import' # will automatically bridge js components to hyperloop components
 #{"  config.import 'jquery', client_only: true  # remove this line if you don't need jquery" if skip_webpack?}
   config.import 'opal-jquery', client_only: true # remove this line if you don't need jquery'
+  config.import 'react/ext/opal-jquery/element', client_only: true # remove tis line if you don't need jquery
 #{"  config.import 'opal_hot_reloader' if Rails.env.development?" unless options['skip-hot-reloader']}
 end
         RUBY

@@ -30,7 +30,7 @@ describe 'Refs callback', js: true do
         end
 
         def render
-          React.create_element(Bar, ref: method(:my_bar=).to_proc)
+          React.create_element(Bar, ref: method(:my_bar=))
         end
       end
 
@@ -85,7 +85,7 @@ describe 'Refs callback', js: true do
         after_mount { mutate.unmount true }
 
         render do
-          Unmountable(ref: method(:ref_rec).to_proc) unless state.unmount 
+          Unmountable(ref: method(:ref_rec).to_proc) unless state.unmount
         end
       end
     end

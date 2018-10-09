@@ -2,31 +2,6 @@ require 'spec_helper'
 
 describe 'opal-jquery extensions', js: true do
   describe 'Element' do
-    xit 'will reuse the wrapper component class for the same Element' do
-      evaluate_ruby do
-        class Foo < Hyperloop::Component
-          param :name
-          def render
-            "hello #{params.name}"
-          end
-
-          def self.rec_cnt
-            @@rec_cnt ||= 0
-          end
-          before_unmount do
-            @@rec_cnt ||= 0
-            @@rec_cnt += 1
-          end
-        end
-      end
-      expect_evaluate_ruby do
-        test_div = Element.new(:div)
-        test_div.render { Foo(name: 'fred') }
-        test_div.render { Foo(name: 'freddy') }
-        [ Element[test_div].find('span').html, Foo.rec_cnt]
-      end.to eq(['hello freddy', 0])
-    end
-
     it 'renders a top level component using render with a block' do
       expect_evaluate_ruby do
         class Foo < Hyperloop::Component
@@ -44,8 +19,52 @@ describe 'opal-jquery extensions', js: true do
     it 'renders a top level component using render with a container and params ' do
       expect_evaluate_ruby do
         test_div = Element.new(:div)
-        test_div.render(:span, id: :render_test_span) { 'hello' }
+        test_div.render(SPAN, id: :render_test_span) { 'hello' }
         Element[test_div].find('#render_test_span').html
+      end.to eq('hello')
+    end
+
+    it 'will reuse the wrapper component class for the same Element' do
+      evaluate_ruby do
+        class Foo < Hyperloop::Component
+          param :name
+          before_mount do
+            @render_count = 0
+          end
+
+          def render
+            "hello #{params.name} render-count: #{@render_count += 1}"
+          end
+
+          def self.rec_cnt
+            @@rec_cnt ||= 0
+          end
+          before_unmount do
+            @@rec_cnt ||= 0
+            @@rec_cnt += 1
+          end
+        end
+      end
+      expect_evaluate_ruby do
+        test_div = Element.new(:div)
+        test_div.render { Foo(name: 'fred') }
+        test_div.render { Foo(name: 'freddy') }
+        [ Element[test_div].find('span').html, Foo.rec_cnt]
+      end.to eq(['hello freddy render-count: 2', 0])
+      expect_evaluate_ruby do
+        test_div = Element.new(:div)
+        test_div.render(Foo, name: 'fred')
+        test_div.render(Foo, name: 'freddy')
+        [ Element[test_div].find('span').html, Foo.rec_cnt]
+      end.to eq(['hello freddy render-count: 2', 0])
+    end
+
+    it 'will use the ref call back to get the component' do
+      expect_promise do
+        test_div = Element.new(:div)
+        Promise.new.then { |c| Element[c].html }.tap do |p|
+          test_div.render(SPAN, id: :render_test_span, ref: p.method(:resolve)) { 'hello' }
+        end
       end.to eq('hello')
     end
 

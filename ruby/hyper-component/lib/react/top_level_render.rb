@@ -16,7 +16,9 @@ module React
     else
       native = `ReactDOM.render(#{element.to_n}, container)`
     end
-    
+
+    return unless `#{native} !== null`
+
     if `#{native}.__opalInstance !== undefined && #{native}.__opalInstance !== null`
       `#{native}.__opalInstance`
     elsif `ReactDOM.findDOMNode !== undefined && #{native}.nodeType === undefined`

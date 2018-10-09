@@ -2,6 +2,7 @@ require 'hyper-component'
 if React::IsomorphicHelpers.on_opal_client?
   require 'browser'
   require 'browser/delay'
+  require 'react/ext/opal-jquery/element'
 end
 require 'react/server'
 require 'react/test/utils'
