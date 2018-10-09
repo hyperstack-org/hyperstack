@@ -3,12 +3,12 @@ module Hyperstack
     module State
       module Wrapper
         def define_state_methods(klass, default_scope, *args, &block)
-          name, opts = validate_args!(klass, default_scope, *args, &block)
+          name, opts = validate_args!(default_scope, *args, &block)
           add_readers(klass, name, opts)
           add_methods(klass, name, opts)
         end
 
-        def validate_args!(klass, default_scope, *args, &block)
+        def validate_args!(default_scope, *args, &block)
           name, initial_value, opts = parse_arguments(*args, &block)
 
           opts[:scope]     ||= default_scope
@@ -26,10 +26,9 @@ module Hyperstack
           # If the only argument is a hash, the first key => value is name => inital_value
           if args.first.is_a?(Hash)
             # If the first key passed in is not the name, raise an error
-            if [:reader, :initializer, :scope].include?(args.first.keys.first.to_sym)
-              message = 'The name of the state must be specified first as '\
-                        "either 'state :name' or 'state name: <initial value>'"
-              invalid_option(message)
+            if %i[reader initializer scope].include?(args.first.keys.first.to_sym)
+              invalid_option 'The name of the state must be specified first as '\
+                             "either 'state :name' or 'state name: <initial value>'"
             end
 
             name, initial_value = args[0].shift
@@ -44,7 +43,7 @@ module Hyperstack
 
         # Returns the initialize option as a proc or nil
         def check_too_many_initializers(initializer)
-          invalid_option("states can only have one form of initializer") if initializer
+          invalid_option('states can only have one form of initializer') if initializer
         end
 
         def validate_initializer(initial_value, opts, block) # rubocop:disable Metrics/MethodLength
@@ -53,7 +52,7 @@ module Hyperstack
           # If we pass in the name as a hash with a value ex: state foo: :bar,
           # we just put that value inside a Proc and return that
 
-          if initial_value != nil
+          unless initial_value.nil?
             check_too_many_initializers(initializer)
             initializer = dup_or_return_initial_value(initial_value)
           end
@@ -62,7 +61,8 @@ module Hyperstack
           # If we pass in the initialize option
 
           check_too_many_initializers(initializer)
-            # If it's a Symbol we convert to to a Proc that calls the method on the instance
+
+          # If it's a Symbol we convert to to a Proc that calls the method on the instance
           if opts[:initializer].respond_to? :to_proc
             opts[:initializer].to_proc
           elsif opts[:initializer].is_a? String
@@ -89,34 +89,44 @@ module Hyperstack
         def add_readers(klass, name, opts)
           return unless opts[:reader]
           if opts[:reader] == name || opts[:reader] == true
-            invalid_option("The reader for the state cannot be the same as the name")
+            invalid_option('The reader for the state cannot be the same as the name')
           end
 
-          if [:instance, :shared].include?(opts[:scope])
+          if %i[instance shared].include?(opts[:scope])
             klass.define_method(:"#{opts[:reader]}") { send(:"#{name}").state }
           end
 
-          if [:class, :shared].include?(opts[:scope])
-            klass.define_singleton_method(:"#{opts[:reader]}") { send(:"#{name}").state }
-          end
+          return unless %i[class shared].include?(opts[:scope])
+
+          klass.define_singleton_method(:"#{opts[:reader]}") { send(:"#{name}").state }
         end
 
         def add_methods(klass, name, opts)
-          instance_var = :"@__hyperstack_state_variable_#{name}"
-          initializer = opts[:initializer]
           if opts[:scope] == :instance
-            klass.send(:define_method, name) do
-              return state_var if state_var = instance_variable_get(instance_var)
-              instance_variable_set(instance_var, Variable.new(name, initializer))
-            end
+            add_instance_method(klass, name, &opts[initializer])
           else
-            klass.instance_eval do # https://www.jimmycuadra.com/posts/metaprogramming-ruby-class-eval-and-instance-eval/
-              define_singleton_method(name) do
-                Hyperstack::Context.set_var(klass, instance_var) { Variable.new(name, initializer) }
+            add_singleton_method(klass, name, &opts[initializer])
+          end
+          klass.define_method(name) { klass.send(name) } if opts[:shared]
+        end
+
+        def add_instance_method(klass, name, &initializer)
+          var_name = :"@__hyperstack_state_variable_#{name}"
+          klass.send(:define_method, name) do
+            instance_variable_get(var_name) ||
+              instance_variable_set(var_name, Hyperstack::State::Variable.new(&initializer))
+          end
+        end
+
+        def add_singleton_method(klass, name, &initializer)
+          var_name = :"@__hyperstack_state_variable_#{name}"
+          klass.instance_eval do # https://www.jimmycuadra.com/posts/metaprogramming-ruby-class-eval-and-instance-eval/
+            define_singleton_method(name) do
+              Hyperstack::Context.set_var(klass, var_name) do
+                Hyperstack::State::Variable.new(&initializer)
               end
             end
           end
-          klass.define_method(name) { klass.send(name) } if opts[:shared]
         end
       end
     end
