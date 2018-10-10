@@ -1,12 +1,14 @@
 module Hyperstack
   module Internal
     module State
-      # State::Context links observers with objects during a rendering cycle.
-      # Any object that responds to the `mutated` method can become
-      # an observer by calling set_state_context_to and
-      # any object can be observed by calling the observed! method.  An object
-      # indicates that has changed state by calling the mutated! method, which
-      # will notify all observers via their mutated methods.
+      # State::Mapper bidirectionally maps observers to objects during a rendering cycle.
+
+      # Observers:  Any object that responds to the `mutations` method can become
+      # an observer by calling Mapper.observe.
+
+      # State Objects: any object can be observed by calling the observed! method, and
+      # an object indicates that it has changed state by calling the mutated! method,
+      # which will notify all observers via their mutations methods.
 
       # During each rendering cycle a list of objects observed during rendering
       # is built called new_objects.
@@ -19,18 +21,20 @@ module Hyperstack
 
       # Typically mutated! is called during some javascript event, and we will want to
       # delay notification until the event handler has completed execution.
-      module Context
-        class << self
-          # Public Entry Points:
-          #   set_state_context_to     setup an observer
-          #   observed!                indicate an object has been observed
-          #   mutated!                 indicate an object has been mutated
-          #   observed?                has this object been observed?
-          #   bulk_update              prevent notifications until the event completes
-          #   update_states_to_observe called at end of each rendering cycle
-          #   remove                   called when a component unmounts
+      module Mapper
+        @rendering_level = 0
 
-          # Observers wrap code in set_state_context_to.  Any calls
+        class << self
+          # Entry Points:
+          #   observe                   setup an observer
+          #   observed!                 indicate an object has been observed
+          #   mutated!                  indicate an object has been mutated
+          #   observed?                 has this object been observed?
+          #   bulk_update               prevent notifications until the event completes
+          #   update_objects_to_observe called at end of each rendering cycle
+          #   remove                    called when a component unmounts
+
+          # Observers wrap code in observe.  Any calls
           # made to the public entry points will then know which
           # observer is executing, along with whether this is the
           # outer most component, and whether to delay or handle state
@@ -38,10 +42,10 @@ module Hyperstack
 
           # Once the observer's block completes execution, the
           # context instance variables are restored.
-          def set_state_context_to(observer, immediate_update, rendering)
+          def observe(observer, immediate_update, rendering)
             saved_context = [@current_observer, @immediate_update]
             @current_observer = observer
-            @immediate_update = immediate_update
+            @immediate_update = immediate_update && observer
             @rendering_level += 1 if rendering
             return_value = yield
             return_value
@@ -51,7 +55,6 @@ module Hyperstack
             return_value
           end
 
-          @rendering_level = 0
 
           # called when an object has been observed (i.e. read) by somebody
           def observed!(object)
@@ -66,11 +69,11 @@ module Hyperstack
           # schedule the update notification for later, immediately
           # notify any observers, or do nothing.
           def mutated!(object)
-            if delay_updates?
+            if delay_updates?(object)
               schedule_delayed_updater(object)
-            elsif rendering_level_zero?
+            elsif @rendering_level.zero?
               current_observers[object].each do |observer|
-                observer.mutatations(object)
+                observer.mutations([object])
               end
             end
           end
@@ -84,7 +87,7 @@ module Hyperstack
 
           # Code can be wrapped in the bulk_update method, and
           # notifications of any mutations that occur during
-          # the yield will be scheduled for noafter the current
+          # the yield will be scheduled for after the current
           # event finishes.
           def bulk_update
             saved_bulk_update_flag = @bulk_update_flag
@@ -113,18 +116,18 @@ module Hyperstack
           # TODO: see if we can get rid of all this and simply calling
           # remove_current_observers_and_objects at the START of each components rendering
           # cycle (i.e. before_mount and before_update)
-          def update_states_to_observe(observer = @current_observer)
+          def update_objects_to_observe(observer = @current_observer)
             remove_current_observers_and_objects(observer)
             objects = new_objects.delete(observer)
-            objects.each { |object| current_observers[object] << observer }
+            objects.each { |object| current_observers[object] << observer } if objects
             current_objects[observer] = objects
           end
 
           # call remove before unmounting components to prevent stray events
           # from being sent to unmounted components.
-          def remove
-            remove_current_observers_and_objects(@current_observer)
-            new_objects.delete @current_observer
+          def remove(observer = @current_observer)
+            remove_current_observers_and_objects(observer)
+            new_objects.delete observer
           end
 
           # Internal (Private) Methods
@@ -168,7 +171,9 @@ module Hyperstack
           # remove_current_observers_and_objects clears the hashes between renders
           def remove_current_observers_and_objects(observer)
             raise 'state management called outside of watch block' unless observer
-            current_objects.delete(observer).each do |object|
+            deleted_objects = current_objects.delete(observer)
+            return unless deleted_objects
+            deleted_objects.each do |object|
               # to allow for GC we never want objects hanging around as keys in
               # the current_observers hash, so we tread carefully here.
               next unless current_observers.key? object
@@ -179,15 +184,15 @@ module Hyperstack
 
           # determine if updates should be delayed.
           # always delay updates if the bulk_update_flag is set
-          # otherwise delayed updates only occurs if the constant
-          # ALWAYS_UPDATE_STATE_AFTER_RENDER is set AND
-          # this rendering context DID NOT request immediate_updates
-          def delay_updates?
+          # otherwise delayed updates only occurs if
+          # Hyperstack.on_client? is true WITH ONE EXCEPTION:
+          # observers can indicate that they need immediate updates in
+          # case that the object being updated is themselves.
+          def delay_updates?(object)
             @bulk_update_flag ||
-              (ALWAYS_UPDATE_STATE_AFTER_RENDER && !@immediate_update)
+              (Hyperstack.on_client? &&
+                (@immediate_update != @current_observer || @current_observer != object))
           end
-
-          ALWAYS_UPDATE_STATE_AFTER_RENDER = Hyperstack.on_client? # if on server then we don't wait to update the state
 
           # schedule_delayed_updater adds a new set to the
           # update_exclusions hash (indexed by object) then makes
@@ -224,7 +229,7 @@ module Hyperstack
               exclusions.each do |object, excluded_observers|
                 current_observers[object].each do |observer|
                   next if excluded_observers.include?(observer)
-                  updates[observer] += object
+                  updates[observer] << object
                 end
               end
             end

@@ -41,9 +41,9 @@ module Hyperstack
 
       def mutate
         if block_given?
-          yield.tap { mutated! }
+          yield(state).tap { mutated! }
         else
-          @observer ||= Internal::State::Observer.new(self)
+          @mutable ||= Internal::State::Mutatable.new(self)
         end
       end
 

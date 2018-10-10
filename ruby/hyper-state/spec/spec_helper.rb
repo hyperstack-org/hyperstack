@@ -16,24 +16,35 @@ require 'hyper-state'
 RSpec.configure do |config|
   config.color = true
   config.formatter = :documentation
+  config.after(:each) { Hyperstack::Internal::State::Mapper.reset_mapper_data }
 end
 
 # Stubbing after for running outside of Opal
 module Hyperstack
   module Internal
-    class State
-      module ClassMethods
-        def after(x, &block)
+    module State
+      module Mapper
+
+        def self.after(x, &block)
           blocks_to_run_after << block
         end
 
-        def blocks_to_run_after
+        def self.blocks_to_run_after
           @blocks_to_run_after ||= []
         end
 
-        def run_after
+        def self.run_after
           blocks_to_run_after.each(&:call)
           @blocks_to_run_after = []
+        end
+
+        def self.reset_mapper_data
+          @blocks_to_run_after = nil
+          @new_objects = nil
+          @current_observers = nil
+          @current_objects = nil
+          @update_exclusions = nil
+          @delayed_updater = nil
         end
       end
     end

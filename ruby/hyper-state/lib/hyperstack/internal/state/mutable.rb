@@ -1,14 +1,13 @@
 module Hyperstack
   module Internal
     module State
-      class Observer
+      class Mutatable
         def initialize(state)
           @state = state
         end
 
         def method_missing(method, *args, &block)
-          value = @state.__non_reactive_read__
-          @state.mutate { value.send(method, *args, &block) }
+          @state.mutate { |value| value.send(method, *args, &block) }
         end
 
         def respond_to?(method, *args)
