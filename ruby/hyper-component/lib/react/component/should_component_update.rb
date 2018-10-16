@@ -25,7 +25,7 @@ module Hyperstack
       #
       module ShouldComponentUpdate
         def should_component_update?(next_props, next_state)
-          Store::Internal::State.set_state_context_to(self, false) do
+          observing do
             # rubocop:disable Style/DoubleNegation # we must return true/false to js land
             if respond_to?(:needs_update?)
               !!call_needs_update(next_props, next_state)

@@ -6,7 +6,7 @@ module Hyperstack
         attr_reader :component
 
         def self.define_param(name, param_type)
-          if param_type == Store::Observable
+          if false && param_type == Store::Observable
             define_method("#{name}") do
               value_for(name)
             end

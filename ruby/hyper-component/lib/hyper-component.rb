@@ -1,13 +1,13 @@
 require 'hyperstack-config'
-Hyperstack.import 'hyper-store'
-Hyperstack.js_import 'react/react-source-browser', client_only: true, defines: ['ReactDOM', 'React']
+Hyperstack.import    'hyperstack/state/observer'
+Hyperstack.js_import 'react/react-source-browser', client_only: true, defines: %w[ReactDOM React]
 Hyperstack.js_import 'react/react-source-server', server_only: true, defines: 'React'
-Hyperstack.import 'browser/delay', client_only: true
+Hyperstack.import    'browser/delay', client_only: true
 Hyperstack.js_import 'react_ujs', defines: 'ReactRailsUJS'
-Hyperstack.import 'hyper-component'  # TODO: confirm this does not break anything.  Added while converting hyperloop->hyperstack
+Hyperstack.import    'hyper-component'  # TODO: confirm this does not break anything.  Added while converting hyperloop->hyperstack
 if RUBY_ENGINE == 'opal'
   require 'native'
-  require 'react/observable'
+  require 'hyperstack/state/observer'
   require 'react/validator'
   require 'react/element'
   require 'react/api'
@@ -18,7 +18,7 @@ if RUBY_ENGINE == 'opal'
   require 'react/component/base'
   require 'react/event'
   require 'react/rendering_context'
-  require 'react/state'
+  #require 'react/state'
   require 'react/object'
   require 'react/to_key'
   require 'react/ext/opal-jquery/element'
@@ -30,7 +30,6 @@ if RUBY_ENGINE == 'opal'
 else
   require 'opal'
 
-  require 'hyper-store'
   require 'opal-activesupport'
   require 'reactive-ruby/version'
   require 'reactive-ruby/rails' if defined?(Rails)

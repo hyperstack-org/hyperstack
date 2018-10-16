@@ -3,13 +3,10 @@ require 'react/ext/hash'
 require 'active_support/core_ext/class/attribute'
 require 'react/callbacks'
 require 'react/rendering_context'
-require 'hyper-store'
 require 'react/state_wrapper'
 require 'react/component/api'
 require 'react/component/class_methods'
 require 'react/component/props_wrapper'
-module WhackyStack
-end
 module Hyperstack
   module Component
 
@@ -32,7 +29,8 @@ module Hyperstack
 
     module Mixin
       def self.included(base)
-        base.include(Hyperstack::Store::Mixin)
+        #base.include(Hyperstack::State::Observable)
+        base.include(Hyperstack::State::Observer)
         base.include(Internal::InstanceMethods)
         base.include(Internal::Callbacks)
         base.include(Internal::Tags)
@@ -61,7 +59,6 @@ module Hyperstack
 
       def initialize(native_element)
         @native = native_element
-        init_store
       end
 
       def emit(event_name, *args)
@@ -74,54 +71,51 @@ module Hyperstack
 
       def component_will_mount
         IsomorphicHelpers.load_context(true) if IsomorphicHelpers.on_opal_client?
-        Store::Internal::State.set_state_context_to(self) do
+        observing(immediate_update: true) do
           Internal.mounted_components << self
           run_callback(:before_mount)
         end
       end
 
       def component_did_mount
-        Store::Internal::State.set_state_context_to(self) do
-          run_callback(:after_mount)
-          Store::Internal::State.update_states_to_observe
-        end
+        observing(update_objects: true) { run_callback(:after_mount) }
       end
 
       def component_will_receive_props(next_props)
         # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
         # for now we are just using it to clear processed_params
-        Store::Internal::State.set_state_context_to(self) { run_callback(:before_receive_props, next_props) }
+        observing(immediate_update: true) { run_callback(:before_receive_props, next_props) }
         @_receiving_props = true
       end
 
       def component_will_update(next_props, next_state)
-        Store::Internal::State.set_state_context_to(self) { run_callback(:before_update, next_props, next_state) }
+        observing { run_callback(:before_update, next_props, next_state) }
         params._reset_all_others_cache if @_receiving_props
         @_receiving_props = false
       end
 
       def component_did_update(prev_props, prev_state)
-        Store::Internal::State.set_state_context_to(self) do
-          run_callback(:after_update, prev_props, prev_state)
-          Store::Internal::State.update_states_to_observe
-        end
+        observing(update_objects: true) { run_callback(:after_update, prev_props, prev_state) }
       end
 
       def component_will_unmount
-        Store::Internal::State.set_state_context_to(self) do
+        observing do
           run_callback(:before_unmount)
-          Store::Internal::State.remove
+          remove
           Internal.mounted_components.delete self
         end
       end
 
       def component_did_catch(error, info)
-        Store::Internal::State.set_state_context_to(self) do
-          run_callback(:after_error, error, info)
-        end
+        observing { run_callback(:after_error, error, info) }
       end
 
       attr_reader :waiting_on_resources
+
+      def mutations(_objects)
+        # if we have to we may have to require that all objects respond to a "name" method (see legacy method update_react_js_state below)
+        set_state('***_state_updated_at-***' => `Date.now() + Math.random()`)
+      end
 
       def update_react_js_state(object, name, value)
         if object
@@ -139,16 +133,16 @@ module Hyperstack
         end
       end
 
-      def set_state_synchronously?
-        @native.JS[:__opalInstanceSyncSetState]
-      end
+      # def set_state_synchronously?
+      #   @native.JS[:__opalInstanceSyncSetState]
+      # end
 
       def render
         raise 'no render defined'
       end unless method_defined?(:render)
 
       def _render_wrapper
-        Store::Internal::State.set_state_context_to(self, true) do
+        observing(rendering: true) do
           element = Internal::RenderingContext.render(nil) { render || '' }
           @waiting_on_resources =
             element.waiting_on_resources if element.respond_to? :waiting_on_resources
@@ -156,13 +150,9 @@ module Hyperstack
         end
       end
 
-      def watch(value, &on_change)
-        Store::Observable.new(value, on_change)
-      end
-
-      def define_state(*args, &block)
-        Store::Internal::State.initialize_states(self, self.class.define_state(*args, &block))
-      end
+      # def watch(value, &on_change)
+      #   Store::Observable.new(value, on_change)
+      # end
     end
   end
 end

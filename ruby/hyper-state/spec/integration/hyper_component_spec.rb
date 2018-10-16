@@ -2,80 +2,145 @@ require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
 describe 'React Integration', js: true do
-  it "The hyper-component gem can use hyper-store state syntax" do
+  it "Hyper-components will update when their internal instance state is mutated" do
     mount "TestComp" do
-      class TestComp < HyperComponent
-        before_mount do
-          mutate.foo 'hello'
-        end
-        render(DIV) do
-          state.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-  end
-  it "can use the hyper-store syntax to declare component states" do
-    mount "TestComp" do
-      class TestComp < HyperComponent
-        state foo: 'hello'
-        render(DIV) do
-          " foo = #{state.foo}"
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-  end
-  it "can use the hyper-store syntax to declare class states" do
-    mount "TestComp" do
-      class TestComp < HyperComponent
-        state foo: 'hello', scope: :class, reader: true
-        render(DIV) do
-          TestComp.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-  end
-  it 'defines component inspect method' do
-    mount "Foo" do
-      class Foo
+      class TestComp
         include Hyperstack::Component::Mixin
-        def render
-          "initial_state = #{initial_state.inspect}"
-        end
-      end
-    end
-    expect(page).to have_content('initial_state = nil')
-  end
-
-  it 'allows block for life cycle callback' do
-    mount "Foo" do
-      class Foo < HyperComponent
+        include Hyperstack::State::Observable
         before_mount do
-          set_state({ foo: "bar" })
+          @click_count = 0
+          @render_count = 0
         end
         render(DIV) do
-          state[:foo]
+          @render_count += 1
+          DIV { "I have been clicked #{@click_count} times. I have been rendered #{@render_count} times." }
+          BUTTON(id: :click_me) { "CLICK ME" }
+          .on(:click) { mutate @click_count += 1 }
         end
       end
     end
-    expect(page).to have_content('bar')
+    expect(page).to have_content('I have been clicked 0 times. I have been rendered 1 times.')
+    page.find('#click_me').click
+    expect(page).to have_content('I have been clicked 1 times. I have been rendered 2 times.')
   end
 
-  it 'allows kernal method names like "format" to be used as state variable names' do
-    mount 'Foo' do
-      class Foo < HyperComponent
+  it "Only the component being mutated will update" do
+    mount "TestComp" do
+      class TestComp
+        include Hyperstack::Component::Mixin
+        before_mount { @render_count = 0 }
+        render(DIV) do
+          @render_count += 1
+          DIV { "Test Comp rendered #{@render_count} times."}
+          2.times { |i| StateTest(id: i) }
+        end
+      end
+      class StateTest
+        include Hyperstack::Component::Mixin
+        include Hyperstack::State::Observable
+
+        param :id
+
+        state_writer :click_count
+        
+        def click_count
+          @click_count ||= 0
+        end
+
         before_mount do
-          mutate.format 'hello'
+          @render_count = 0
+        end
+
+        render(DIV) do
+          @render_count += 1
+          DIV { "click_count = #{click_count}. StateTest(id: #{params.id}) rendered #{@render_count} times." }
+          BUTTON(id: "click_me_#{params.id}") { "CLICK ME" }
+          .on(:click) { self.click_count += 1 }
+        end
+      end
+    end
+    expect(page).to have_content('click_count = 0. StateTest(id: 0) rendered 1 times.')
+    expect(page).to have_content('click_count = 0. StateTest(id: 1) rendered 1 times.')
+    page.find('#click_me_0').click
+    expect(page).to have_content('click_count = 1. StateTest(id: 0) rendered 2 times.')
+    expect(page).to have_content('click_count = 0. StateTest(id: 1) rendered 1 times.')
+    page.find('#click_me_1').click
+    expect(page).to have_content('click_count = 1. StateTest(id: 0) rendered 2 times.')
+    expect(page).to have_content('click_count = 1. StateTest(id: 1) rendered 2 times.')
+  end
+
+  it "Hyper-components will update when their internal class state is mutated" do
+    mount "TestComp" do
+      class TestComp
+        include Hyperstack::Component::Mixin
+        before_mount { @render_count = 0 }
+        render(DIV) do
+          @render_count += 1
+          DIV { "Test Comp rendered #{@render_count} times."}
+          2.times { |i| StateTest(id: i) }
+        end
+      end
+      class StateTest
+        include Hyperstack::Component::Mixin
+        include Hyperstack::State::Observable
+
+        param :id
+
+        class << self
+          state_writer :click_count
+          def click_count
+            @click_count ||= 0
+          end
+        end
+
+        before_mount do
+          @render_count = 0
+        end
+
+        render(DIV) do
+          @render_count += 1
+          DIV { "StateTest.count = #{StateTest.click_count}. StateTest(id: #{params.id}) rendered #{@render_count} times." }
+          BUTTON(id: "click_me_#{params.id}") { "CLICK ME" }
+          .on(:click) { StateTest.click_count += 1 }
+        end
+      end
+    end
+    expect(page).to have_content('StateTest.count = 0. StateTest(id: 0) rendered 1 times.')
+    expect(page).to have_content('StateTest.count = 0. StateTest(id: 1) rendered 1 times.')
+    page.find('#click_me_0').click
+    expect(page).to have_content('StateTest.count = 1. StateTest(id: 0) rendered 2 times.')
+    expect(page).to have_content('StateTest.count = 1. StateTest(id: 1) rendered 2 times.')
+    page.find('#click_me_1').click
+    expect(page).to have_content('StateTest.count = 2. StateTest(id: 0) rendered 3 times.')
+    expect(page).to have_content('StateTest.count = 2. StateTest(id: 1) rendered 3 times.')
+  end
+
+  it "Hyper-components will update when an external state is mutated" do
+    mount "TestComp" do
+      class Store
+        include Hyperstack::State::Observable
+        class << self
+          state_writer :count
+          observer :count do
+            @count ||= 0
+          end
+        end
+      end
+      class TestComp
+        include Hyperstack::Component::Mixin
+        before_mount do
+          @render_count = 0
         end
         render(DIV) do
-          state.format
+          @render_count += 1
+          DIV { "I have been clicked #{Store.count} times. I have been rendered #{@render_count} times." }
+          BUTTON(id: :click_me) { "CLICK ME" }
+          .on(:click) { Store.count += 1 }
         end
       end
     end
-    expect(page).to have_content('hello')
+    expect(page).to have_content('I have been clicked 0 times. I have been rendered 1 times.')
+    page.find('#click_me').click
+    expect(page).to have_content('I have been clicked 1 times. I have been rendered 2 times.')
   end
-
-
 end

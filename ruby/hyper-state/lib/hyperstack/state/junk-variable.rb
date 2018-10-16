@@ -1,14 +1,12 @@
 module Hyperstack
   module State
     class Variable
-      def initialize(name = nil, &initializer)
-        @name = name
-        return unless initializer
-        self.state = object.send(:"instance_#{initializer.lambda? ? :exec : :eval}", &initializer)
+      def initialize(initial = nil)
+        self.state = initial
       end
 
       def name
-        name || original_to_s
+        @name || original_to_s
       end
 
       alias original_to_s to_s
@@ -30,18 +28,18 @@ module Hyperstack
       end
 
       def state
-        Internal::State::Context.observed!(self)
+        Internal::State::Mapper.observed!(self)
         @state
       end
 
       def mutated!
-        Internal::State::Context.mutated!(self)
+        Internal::State::Mapper.mutated!(self)
         self
       end
 
-      def mutate
+      def mutate(&block)
         if block_given?
-          yield(state).tap { mutated! }
+          yield(block.arity.zero? || state).tap { mutated! }
         else
           @mutable ||= Internal::State::Mutatable.new(self)
         end
@@ -72,7 +70,7 @@ module Hyperstack
       end
 
       def observed?
-        Internal::State::Context.observed? self
+        Internal::State::Mapper.observed? self
       end
 
       def __non_reactive_read__
@@ -84,26 +82,26 @@ module Hyperstack
         # know which observer is executing
 
         def set_state_context_to(observer, immediate_update: false, rendering: nil, &block)
-          Internal::State::Context.set_state_context_to(observer, immediate_update, rendering, &block)
+          Internal::State::Mapper.set_state_context_to(observer, immediate_update, rendering, &block)
         end
 
         # Call after each component updates. (in the after_update/after_mount callbacks)
 
         def update_states_to_observe(observer = current_observer)
-          Internal::State::Context.update_states_to_observe(observer)
+          Internal::State::Mapper.update_states_to_observe(observer)
         end
 
         # call after component is unmounted
 
         def remove
-          Internal::State::Context.remove
+          Internal::State::Mapper.remove
         end
 
         # use bulk_update to delay notifications until after the current event
         # completes processing.
 
         def bulk_update(&block)
-          Internal::State::Context.bulk_update(&block)
+          Internal::State::Mapper.bulk_update(&block)
         end
       end
     end

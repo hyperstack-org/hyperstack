@@ -1,14 +1,8 @@
 module Hyperstack
   module Internal
     module State
-      module Wrapper
-        def define_state_methods(klass, default_scope, *args, &block)
-          name, opts = validate_args!(default_scope, *args, &block)
-          add_readers(klass, name, opts)
-          add_methods(klass, name, opts)
-        end
-
-        def validate_args!(default_scope, *args, &block)
+      module ProcessArgs
+        def process_args!(default_scope, *args, &block)
           name, initial_value, opts = parse_arguments(*args, &block)
 
           opts[:scope]     ||= default_scope
@@ -76,57 +70,8 @@ module Hyperstack
         # Dup the initial value if possible, otherwise just return it
         # Ruby has no nice way of doing this...
         def dup_or_return_initial_value(value)
-          value =
-            begin
-              value.dup
-            rescue
-              value
-            end
-
+          value = value.dup rescue value
           Proc.new { value }
-        end
-
-        def add_readers(klass, name, opts)
-          return unless opts[:reader]
-          if opts[:reader] == name || opts[:reader] == true
-            invalid_option('The reader for the state cannot be the same as the name')
-          end
-
-          if %i[instance shared].include?(opts[:scope])
-            klass.define_method(:"#{opts[:reader]}") { send(:"#{name}").state }
-          end
-
-          return unless %i[class shared].include?(opts[:scope])
-
-          klass.define_singleton_method(:"#{opts[:reader]}") { send(:"#{name}").state }
-        end
-
-        def add_methods(klass, name, opts)
-          if opts[:scope] == :instance
-            add_instance_method(klass, name, &opts[initializer])
-          else
-            add_singleton_method(klass, name, &opts[initializer])
-          end
-          klass.define_method(name) { klass.send(name) } if opts[:shared]
-        end
-
-        def add_instance_method(klass, name, &initializer)
-          var_name = :"@__hyperstack_state_variable_#{name}"
-          klass.send(:define_method, name) do
-            instance_variable_get(var_name) ||
-              instance_variable_set(var_name, Hyperstack::State::Variable.new(&initializer))
-          end
-        end
-
-        def add_singleton_method(klass, name, &initializer)
-          var_name = :"@__hyperstack_state_variable_#{name}"
-          klass.instance_eval do # https://www.jimmycuadra.com/posts/metaprogramming-ruby-class-eval-and-instance-eval/
-            define_singleton_method(name) do
-              Hyperstack::Context.set_var(klass, var_name) do
-                Hyperstack::State::Variable.new(&initializer)
-              end
-            end
-          end
         end
       end
     end

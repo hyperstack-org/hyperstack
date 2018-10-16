@@ -8,7 +8,7 @@ require 'rspec/rails'
 require 'rspec-steps'
 require 'timecop'
 require 'hyper-spec'
-#require 'hyper-component'
+require 'hyper-component'
 #require 'hyper-store'
 require 'hyper-state'
 

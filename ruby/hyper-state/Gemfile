@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 gem 'hyper-spec',       path: '../hyper-spec'
 gem 'hyperstack-config', path: '../hyperstack-config'
-#gem 'hyper-component',  path: '../hyper-component'
+gem 'hyper-component',  path: '../hyper-component'
 gemspec

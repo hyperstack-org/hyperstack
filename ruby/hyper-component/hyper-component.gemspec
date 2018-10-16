@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyper-store', Hyperstack::Component::VERSION
+  spec.add_dependency 'hyper-state', Hyperstack::Component::VERSION
   spec.add_dependency 'hyperstack-config', Hyperstack::Component::VERSION
   spec.add_dependency 'libv8', '~> 6.3.0' # see https://github.com/discourse/mini_racer/issues/92
   spec.add_dependency 'mini_racer', '~> 0.1.15'

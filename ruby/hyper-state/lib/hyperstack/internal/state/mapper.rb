@@ -4,7 +4,7 @@ module Hyperstack
       # State::Mapper bidirectionally maps observers to objects during a rendering cycle.
 
       # Observers:  Any object that responds to the `mutations` method can become
-      # an observer by calling Mapper.observe.
+      # an observer by calling Mapper.observing.
 
       # State Objects: any object can be observed by calling the observed! method, and
       # an object indicates that it has changed state by calling the mutated! method,
@@ -26,7 +26,7 @@ module Hyperstack
 
         class << self
           # Entry Points:
-          #   observe                   setup an observer
+          #   observing                 setup an observer
           #   observed!                 indicate an object has been observed
           #   mutated!                  indicate an object has been mutated
           #   observed?                 has this object been observed?
@@ -42,12 +42,15 @@ module Hyperstack
 
           # Once the observer's block completes execution, the
           # context instance variables are restored.
-          def observe(observer, immediate_update, rendering)
+          def observing(observer, immediate_update, rendering, update_objects)
             saved_context = [@current_observer, @immediate_update]
             @current_observer = observer
             @immediate_update = immediate_update && observer
             @rendering_level += 1 if rendering
+            observed!(observer)
+            observed!(observer.class)
             return_value = yield
+            update_objects_to_observe(observer) if update_objects
             return_value
           ensure
             @current_observer, @immediate_update = saved_context
@@ -138,7 +141,7 @@ module Hyperstack
           # new_objects are added as the @current_observer reads
           # an objects state
           def new_objects
-            @new_objects ||= Hash.new { |h, k| h[k] = [] }
+            @new_objects ||= Hash.new { |h, k| h[k] = Set.new }
           end
 
           # at the end of the rendering cycle the new_objects are

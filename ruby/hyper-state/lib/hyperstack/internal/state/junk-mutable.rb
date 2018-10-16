@@ -7,6 +7,7 @@ module Hyperstack
         end
 
         def method_missing(method, *args, &block)
+          super unless respond_to? method
           @state.mutate { |value| value.send(method, *args, &block) }
         end
 
