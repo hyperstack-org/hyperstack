@@ -100,6 +100,10 @@ module Hyperstack
           instance
         end
 
+        def [](name)
+          __send__(name)
+        end
+
         # Any method_missing call will create a state and accessor with that name
         def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
           $method_missing = [name, *args]

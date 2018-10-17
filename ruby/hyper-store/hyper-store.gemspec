@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hyperstack-config', Hyperstack::Store::VERSION
+  spec.add_dependency 'hyper-state', Hyperstack::Store::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
@@ -32,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'pry-byebug'
+  spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'

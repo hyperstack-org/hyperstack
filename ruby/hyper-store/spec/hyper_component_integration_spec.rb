@@ -49,18 +49,19 @@ describe 'React Integration', js: true do
     expect(page).to have_content('initial_state = nil')
   end
 
-  it 'allows block for life cycle callback' do
+  it 'allows access via [] and []= operators' do
     mount "Foo" do
       class Foo < HyperComponent
         before_mount do
-          set_state({ foo: "bar" })
+          mutate[:foo] = {}
+          mutate[:foo][:bar] = :baz
         end
         render(DIV) do
-          state[:foo]
+          DIV { state[:foo][:bar] }
         end
       end
     end
-    expect(page).to have_content('bar')
+    expect(page).to have_content('baz')
   end
 
   it 'allows kernal method names like "format" to be used as state variable names' do

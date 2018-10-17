@@ -1,5 +1,6 @@
 require 'set'
 require 'hyperstack-config'
+require 'hyper-state'
 Hyperstack.import 'hyper-store'
 
 module Hyperstack
@@ -16,6 +17,7 @@ require 'hyper-store/class_methods'
 require 'hyper-store/dispatch_receiver'
 require 'hyper-store/instance_methods'
 require 'hyper-store/mutator_wrapper'
+require 'react/observable'
 require 'hyper-store/state_wrapper/argument_validator'
 require 'hyper-store/state_wrapper'
 require 'hyper-store/version'

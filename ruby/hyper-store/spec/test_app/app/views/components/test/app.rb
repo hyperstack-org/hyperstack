@@ -6,6 +6,7 @@ module Test
     end
 
     render(DIV) do
+      puts "rendering!"
       TABLE do
         THEAD do
           TR do
