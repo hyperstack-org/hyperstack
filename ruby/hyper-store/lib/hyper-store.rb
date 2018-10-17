@@ -4,8 +4,8 @@ require 'hyper-state'
 Hyperstack.import 'hyper-store'
 
 module Hyperstack
-  module Store
-    module Internal
+  module Internal
+    module Store
       # allows us to easily turn off BasicObject for debug
       class BaseStoreClass < BasicObject
       end
@@ -13,18 +13,17 @@ module Hyperstack
   end
 end
 
-require 'hyper-store/class_methods'
-require 'hyper-store/dispatch_receiver'
-require 'hyper-store/instance_methods'
-require 'hyper-store/mutator_wrapper'
-require 'react/observable'
-require 'hyper-store/state_wrapper/argument_validator'
-require 'hyper-store/state_wrapper'
-require 'hyper-store/version'
-require 'hyperloop/store'
-# require 'hyperloop/application/boot' moved to hyperstack-config
-require 'hyperloop/store/mixin'
-require 'react/state'
+require 'hyperstack/internal/store/class_methods'
+require 'hyperstack/internal/store/dispatch_receiver'
+require 'hyperstack/internal/store/instance_methods'
+require 'hyperstack/internal/store/mutator_wrapper'
+require 'hyperstack/internal/store/observable'
+require 'hyperstack/internal/store/state_wrapper/argument_validator'
+require 'hyperstack/internal/store/state_wrapper'
+require 'hyperstack/internal/store/state'
+
+require 'hyperstack/legacy/store'
+require 'hyperstack/legacy/store/version'
 
 if RUBY_ENGINE != 'opal'
   require 'opal'

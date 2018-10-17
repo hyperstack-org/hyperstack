@@ -1,6 +1,6 @@
 module Hyperstack
-  module Store
-    module Internal
+  module Internal
+    module Store
       module ClassMethods
         attr_accessor :__shared_states, :__class_states, :__instance_states
 

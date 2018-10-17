@@ -743,7 +743,7 @@ describe 'StateWrapper' do
           class HyperStore
             class << self
               def inherited(child)
-                child.include(Hyperstack::Store::Mixin)
+                child.include(Hyperstack::Legacy::Store)
               end
             end
             def initialize
@@ -756,7 +756,7 @@ describe 'StateWrapper' do
           Object.send(:remove_const, :Foo)
 
           # We're very basically mocking React::State so we can run these outside of Opal
-          Hyperstack::Store::Internal::State.reset!
+          Hyperstack::Internal::Store::State.reset!
         end
 
         context 'with an initial value' do
@@ -1077,7 +1077,7 @@ describe 'StateWrapper' do
           Object.send(:remove_const, :Foo)
 
           # We're very basically mocking React::State so we can run these outside of Opal
-          Hyperstack::Store::Internal::State.reset!
+          Hyperstack::Internal::Store::State.reset!
         end
 
         context 'name' do
@@ -1101,7 +1101,7 @@ describe 'StateWrapper' do
             class Foo < HyperStore; end
 
             expect { Foo.state(scope: :class, bar: nil) }
-              .to raise_error(Hyperstack::Store::InvalidOptionError)
+              .to raise_error(Hyperstack::Legacy::Store::InvalidOptionError)
           end
         end
 

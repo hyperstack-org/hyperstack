@@ -1,6 +1,6 @@
 module Hyperstack
-  module Store
-    module Internal
+  module Internal
+    module Store
       class State
         class << self
           def legacy_map
@@ -9,12 +9,12 @@ module Hyperstack
 
           def get_state(obj, name)
             map_object = legacy_map[obj][name]
-            map_object[0].tap { |x| puts "get_state(#{obj}, #{name}) = #{x} state_obj: #{map_object.object_id}"; Hyperstack::Internal::State::Mapper.observed!(map_object.object_id) }
+            map_object[0].tap { Hyperstack::Internal::State::Mapper.observed!(map_object.object_id) }
           end
 
           def set_state(obj, name, value)
             map_object = legacy_map[obj][name]
-            (map_object[0] = value).tap { puts "set_state(#{obj}, #{name}, #{value}) state_obj: #{map_object.object_id}"; Hyperstack::Internal::State::Mapper.mutated!(map_object.object_id) }
+            (map_object[0] = value).tap { Hyperstack::Internal::State::Mapper.mutated!(map_object.object_id) }
           end
         end
       end

@@ -1,7 +1,7 @@
 class HyperStore
   class << self
     def inherited(child)
-      child.include Hyperstack::Store::Mixin
+      child.include Hyperstack::Legacy::Store
     end
   end
   # def initialize
@@ -13,7 +13,7 @@ class HyperComponent
   include Hyperstack::Component::Mixin
   class << self
     def inherited(child)
-      child.include Hyperstack::Store::Mixin
+      child.include Hyperstack::Legacy::Store
     end
   end
 end

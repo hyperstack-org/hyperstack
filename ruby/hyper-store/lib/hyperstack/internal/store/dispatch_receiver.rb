@@ -1,8 +1,6 @@
 module Hyperstack
-  module Store
-    class InvalidOperationError < StandardError; end
-    
-    module Internal
+  module Internal
+    module Store
       module DispatchReceiver
 
         attr_accessor :params
@@ -13,7 +11,7 @@ module Hyperstack
 
           if args.empty?
             message = 'At least one operation must be passed in to the \'receives\' macro'
-            raise InvalidOperationError, message
+            raise Legacy::Store::InvalidOperationError, message
           end
 
           # Loop through receivers and call callback and block on dispatch

@@ -1,6 +1,6 @@
 module Hyperstack
-  module Store
-    module Internal
+  module Internal
+    module Store
       class StateWrapper < BaseStoreClass
         extend ArgumentValidator
 

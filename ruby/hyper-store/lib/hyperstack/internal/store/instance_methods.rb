@@ -1,6 +1,6 @@
 module Hyperstack
-  module Store
-    module Internal
+  module Internal
+    module Store
       module InstanceMethods
         def init_store
           return if @__hyperstack_store_initialized

@@ -8,7 +8,7 @@ end
 describe 'subclassing Hyperloop::Store' do
   before(:each) do
     class HyperStore
-      include Hyperstack::Store::Mixin
+      include Hyperstack::Legacy::Store
     end
     class Foo < HyperStore
     end
@@ -23,12 +23,12 @@ describe 'subclassing Hyperloop::Store' do
   context 'class level' do
     it 'should define the :state method' do
       expect(Foo.singleton_methods).to include(:state)
-      expect(class_of(Foo.state)).to be < Hyperstack::Store::Internal::StateWrapper
+      expect(class_of(Foo.state)).to be < Hyperstack::Internal::Store::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(Foo.singleton_methods).to include(:mutate)
-      expect(class_of(Foo.mutate)).to be < Hyperstack::Store::Internal::MutatorWrapper
+      expect(class_of(Foo.mutate)).to be < Hyperstack::Internal::Store::MutatorWrapper
     end
 
     it 'should define the :receieves method' do
@@ -41,12 +41,12 @@ describe 'subclassing Hyperloop::Store' do
 
     it 'should define the :state method' do
       expect(@foo.methods).to include(:state)
-      expect(class_of(@foo.state)).to be < Hyperstack::Store::Internal::StateWrapper
+      expect(class_of(@foo.state)).to be < Hyperstack::Internal::Store::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(@foo.methods).to include(:mutate)
-      expect(class_of(@foo.mutate)).to be < Hyperstack::Store::Internal::MutatorWrapper
+      expect(class_of(@foo.mutate)).to be < Hyperstack::Internal::Store::MutatorWrapper
     end
   end
 end
@@ -54,7 +54,7 @@ end
 describe 'including Hyperloop::Store::Mixin' do
   before(:each) do
     class Foo
-      include Hyperstack::Store::Mixin
+      include Hyperstack::Legacy::Store
     end
   end
 
@@ -67,12 +67,12 @@ describe 'including Hyperloop::Store::Mixin' do
   context 'class level' do
     it 'should define the :state method' do
       expect(Foo.singleton_methods).to include(:state)
-      expect(class_of(Foo.state)).to be < Hyperstack::Store::Internal::StateWrapper
+      expect(class_of(Foo.state)).to be < Hyperstack::Internal::Store::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(Foo.singleton_methods).to include(:mutate)
-      expect(class_of(Foo.mutate)).to be < Hyperstack::Store::Internal::MutatorWrapper
+      expect(class_of(Foo.mutate)).to be < Hyperstack::Internal::Store::MutatorWrapper
     end
 
     it 'should define the :receieves method' do
@@ -85,12 +85,12 @@ describe 'including Hyperloop::Store::Mixin' do
 
     it 'should define the :state method' do
       expect(@foo.methods).to include(:state)
-      expect(class_of(@foo.state)).to be < Hyperstack::Store::Internal::StateWrapper
+      expect(class_of(@foo.state)).to be < Hyperstack::Internal::Store::StateWrapper
     end
 
     it 'should define the :mutate method' do
       expect(@foo.methods).to include(:mutate)
-      expect(class_of(@foo.mutate)).to be < Hyperstack::Store::Internal::MutatorWrapper
+      expect(class_of(@foo.mutate)).to be < Hyperstack::Internal::Store::MutatorWrapper
     end
   end
 end

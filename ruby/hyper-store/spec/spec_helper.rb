@@ -19,27 +19,27 @@ end
 
 # Stubbing the React calls so we can test outside of Opal
 module Hyperstack
-  module Store
-    module Internal
+  module Internal
+    module Store
       class State
         class << self
           def reset!
             @states = nil
           end
 
-          def get_state(from, key)
-            states[from] ||= {}
-            states[from][key.to_s]
-          end
-
-          def set_state(from, key, value)
-            states[from] ||= {}
-            states[from][key.to_s] = value
-          end
-
-          def states
-            @states ||= {}
-          end
+          # def get_state(from, key)
+          #   states[from] ||= {}
+          #   states[from][key.to_s]
+          # end
+          #
+          # def set_state(from, key, value)
+          #   states[from] ||= {}
+          #   states[from][key.to_s] = value
+          # end
+          #
+          # def states
+          #   @states ||= {}
+          # end
         end
       end
     end

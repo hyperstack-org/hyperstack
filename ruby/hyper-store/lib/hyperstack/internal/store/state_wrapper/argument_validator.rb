@@ -1,7 +1,6 @@
 module Hyperstack
-  module Store
-    class InvalidOptionError < StandardError; end
-    module Internal
+  module Internal
+    module Store
       class StateWrapper < BaseStoreClass
         module ArgumentValidator
           def validate_args!(klass, *args, &block)
@@ -21,7 +20,7 @@ module Hyperstack
           private
 
           def invalid_option(message)
-            raise InvalidOptionError, message
+            raise Legacy::Store::InvalidOptionError, message
           end
 
           # Parses the arguments given to get the name, initial_value (if any), and options

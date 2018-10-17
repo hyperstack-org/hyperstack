@@ -1,6 +1,6 @@
 module Test
   class Store
-    include Hyperstack::Store::Mixin
+    include Hyperstack::Legacy::Store
     class << self
       state singleton_klass: 'SC', reader: true
       state singleton_instance: 'SI', scope: :instance, reader: true
