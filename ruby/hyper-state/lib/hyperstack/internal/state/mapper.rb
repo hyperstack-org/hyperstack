@@ -58,7 +58,6 @@ module Hyperstack
             return_value
           end
 
-
           # called when an object has been observed (i.e. read) by somebody
           def observed!(object)
             return unless @current_observer
