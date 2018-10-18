@@ -1,6 +1,8 @@
 # Welcome to Hyperstack!
 
-**Hyperstack 1.0.0.alpha is work-in-progress. Please consider everything in the edge branch as ALPHA.**
+We are in the process of renaming Hyperloop to Hyperstack, so these docs will reference Hyperstack while the code uses Hyperloop.
+
+Alfie is about to finish his bone.
 
 ## Hyperstack
 
@@ -13,3 +15,4 @@
 + This hyperloop-legacy branch will only contain critical bug fixes
 + The original website is here: http://ruby-hyperloop.org/
 + The final stable branch is https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy
+  

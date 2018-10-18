@@ -1,5 +1,112 @@
 # Policies
 
+**WORK IN PROGRESS DOCS**
+
+First as you say to explicitly send stuff to all applicants. Policies work "backwards" to how you might think in a controller. In a controller you might check something like acting_user.chatrooms.include?(message.chatroom) whereas Hyperloop starts from the other end, it'll effectively do something like this message.chatroom.participants.include?(acting_user). Your job in a policy is to start with the actual record, then traverse the relationships to return the user or users it belongs to. Think in terms of "I have a thing, who are all the people who are allowed to see it?".
+Now that may or may not work in your case. If you have anonymous accounts for applicants but they all still have user records and thus IDs then it will work — job_posting.hiring_manager.applicants. But if applicants didn't have any record then you couldn't use this style of "instance channel policy". Instance == ids == non-public. So if something is public you can use a class channel. send_all.to(Applicant).
+Finally you can have many channels or just a few. In our app I've gone with a user instance channel, and a user class channel. That's just what works for my mental model. But you could have other instance and class channels to make dividing things up easier, your scope chains shorter, etc.
+Hopefully you can look at the docs now and see instance, class, channel, broadcast, etc. and come up with a way that works for you. Mitch's snippet looks good, I just tried to give some surrounding color.
+
+The policy send all bit is about once you've got a record/records, are you allowed to see it and what attributes are you allowed to see (in that case all, but you can permit a subset).
+The regulate bit is about what relations are you allowed to access. It may seem redundant as without regulations event if you loaded the relation you still wouldn't be able see any of the record attributes without a policy. So even without regulations there's no risk of exposing private information. BUT what would leak is lists IDs and counts. A count doesn't instantiate any records so there's nothing to run a policy on. Leaking counts and IDs is metadata that may or may not be sensitive, aka you wouldn't want an insurance company to be able to do patient.diseases.count. And if you're using UUIDs so you don't sequentially leak all of your public pages, again you'd want a regulation to protect that. They can also prevent denial of service attacks loading big expensive relations.
+So, broadcast policies are about who can see the attributes of an individual record (or collection but it's still run on each record individually). Regulations are about preventing business data leakage.
+
+------------
+
+from Mitch...
+
+These work very similar to pundit, and by design you can even mix pundit and hyperloop policies.
+Here is an example pundit policy from the pundit tutorial:
+
+# app/policies/article_policy.rb
+class ArticlePolicy < ApplicationPolicy
+  def index?
+    true
+  end
+
+  def create?
+    user.present?
+  end
+
+  def update?
+    return true if user.present? && user == article.user
+  end
+
+  def destroy?
+    return true if user.present? && user == article.user
+  end
+
+  private
+
+    def article
+      record
+    end
+end
+
+--------------
+
+class ArticlePolicy < ApplicationPolicy
+  # def index?
+  #   true
+  # end
+
+  # read policies are defined as part of broadcast policies.  (if you can receive
+  # it in a broadcast then you can read it)
+  # There is no controller in hyperloop so broadcast/read policies
+  # are defined in terms of what data is sent to what channel
+
+  regulate_broadcast do |policy|
+    policy.send_all.to Application
+  end
+
+  # def create?
+  #   user.present? <- create is okay if user is not nil
+  # end
+
+  allow_create { acting_user }  # <- create is okay if acting_user is  not nil
+
+  # def update?
+  #   return true if user.present? && user == article.user
+  # end
+
+  # only difference is hyperloop makes it easier by
+  # 1) running the block with self == the the record
+  # 2) adding the acting_user method to self
+  # 3) treating exceptions as the same as nil
+
+  allow_update { acting_user == user }
+
+  # def destroy?
+  #   return true if user.present? && user == article.user
+  # end
+
+  allow_destroy { acting_user == user }
+
+  # the above two regulations are the same and so can be dried up like this:
+
+  allow_change(on: [:update, :destroy]) { acting_user == user }
+
+  # private
+  #
+  #   def article
+  #     record
+  #   end
+end
+
+without comments....
+
+class ArticlePolicy < ApplicationPolicy
+  regulate_broadcast { |policy| policy.send_all.to Application }
+
+  allow_create { acting_user }  # <- create is okay if acting_user is  not nil
+
+  allow_change(on: [:update, :destroy]) { acting_user == user }
+end
+
+BTW what if you want to restrict what data is broadcast? In Hyperloop you just update the regulation. In pundit you may have to edit both the index controller method and
+Policy class.
+
+
 **Work in progress - ALPHA (docs and code)**
 
 ## Authorization
