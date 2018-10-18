@@ -1,16 +1,16 @@
 require 'spec_helper'
 # This definitely is work in progress
-describe "React::NativeLibrary", js: true do
+describe "Hyperstack::Component::NativeLibrary", js: true do
   before :each do
     on_client do
       module NativeLibraryTestModule
-        class Component < Hyperloop::Component
+        class Component < HyperComponent
           param :time_stamp
           backtrace :none
           render { NativeComponent(name: "There - #{params.time_stamp}") }
         end
 
-        class NestedComponent < Hyperloop::Component
+        class NestedComponent < HyperComponent
           param :time_stamp
           backtrace :none
           render { NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{params.time_stamp}") }
@@ -22,7 +22,7 @@ describe "React::NativeLibrary", js: true do
   describe "functional stateless component (supported in reactjs v14+ only)" do
     it "is detected as native React.js component by `native_react_component?`" do
       expect_evaluate_ruby do
-        React::API.native_react_component?(JS.call(:eval, "(function () { return function C () { return null; }; })();"))
+        Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, "(function () { return function C () { return null; }; })();"))
       end.to be_truthy
     end
 
@@ -30,7 +30,7 @@ describe "React::NativeLibrary", js: true do
       mount 'Foo', name: "There" do
         JS.call(:eval, 'window.NativeLibrary = { FunctionalComponent: function HelloMessage(props){
           return React.createElement("div", null, "Hello ", props.name); }}')
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           imports "NativeLibrary.FunctionalComponent"
         end
       end
@@ -50,16 +50,16 @@ describe "React::NativeLibrary", js: true do
       render() { return React.createElement("div", null, "Hello ", this.props.name); }
     }')
     expect_evaluate_ruby do
-      React::API.native_react_component?(JS.call(:eval, '(function(){ return window.NativeComponent; })();'))
+      Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.NativeComponent; })();'))
     end.to be_truthy
     expect_evaluate_ruby do
-      React::API.native_react_component?(JS.call(:eval, '(function(){ return {render: function render() {}}; })();'))
+      Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return {render: function render() {}}; })();'))
     end.to be_falsy
     expect_evaluate_ruby do
-      React::API.native_react_component?(JS.call(:eval, '(function(){ return window.DoesntExist; })();'))
+      Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.DoesntExist; })();'))
     end.to be_falsy
     expect_evaluate_ruby do
-      React::API.native_react_component?()
+      Hyperstack::Component::Internal::ReactWrapper.native_react_component?()
     end.to be_falsy
   end
 
@@ -77,7 +77,7 @@ describe "React::NativeLibrary", js: true do
           }}
         JSCODE
       )
-      class Foo < React::NativeLibrary
+      class Foo < Hyperstack::Component::NativeLibrary
         imports "NativeLibrary"
       end
     end
@@ -99,7 +99,7 @@ describe "React::NativeLibrary", js: true do
             }}}
         JSCODE
       )
-      class Foo < React::NativeLibrary
+      class Foo < Hyperstack::Component::NativeLibrary
         imports "NativeLibrary"
       end
     end
@@ -120,7 +120,7 @@ describe "React::NativeLibrary", js: true do
           }}
         JSCODE
       )
-      class Foo < React::NativeLibrary
+      class Foo < Hyperstack::Component::NativeLibrary
         imports "NativeLibrary"
         rename "NativeComponent" => "Bar"
       end
@@ -143,7 +143,7 @@ describe "React::NativeLibrary", js: true do
             }}
         JSCODE
       )
-      class Foo < React::NativeLibrary
+      class Foo < Hyperstack::Component::NativeLibrary
         imports "NativeLibrary"
         rename "MispelledComponent" => "Bar"
       end
@@ -166,7 +166,7 @@ describe "React::NativeLibrary", js: true do
           }
         JSCODE
       )
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         imports "NativeComponent"
       end
     end
@@ -187,7 +187,7 @@ describe "React::NativeLibrary", js: true do
             }}
         JSCODE
       )
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         imports "NativeLibrary.NativeComponent"
       end
     end
@@ -198,7 +198,7 @@ describe "React::NativeLibrary", js: true do
     client_option raise_on_js_errors: :off
     evaluate_ruby do
       JS.call(:eval, "window.NativeObject = {}")
-      class Foo < Hyperloop::Component; end
+      class Foo < HyperComponent; end
     end
     expect_evaluate_ruby do
       begin
@@ -233,10 +233,10 @@ describe "React::NativeLibrary", js: true do
           }
         JSCODE
       )
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         imports "NativeComponent"
       end
-      class Wrapper < Hyperloop::Component
+      class Wrapper < HyperComponent
         def render
           Foo(user: JS.call(:eval, "(function () { return {name: 'David'}; })();"))
         end
@@ -267,7 +267,7 @@ describe "React::NativeLibrary", js: true do
 
     it "will automatically import a React.js component when referenced in another component in a different way" do
       mount 'Foo' do
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           render { NativeComponent(name: "There") }
         end
         JS.call(:eval,
@@ -374,7 +374,7 @@ describe "React::NativeLibrary", js: true do
               }}}
           JSCODE
         )
-        class Foo < React::NativeLibrary
+        class Foo < Hyperstack::Component::NativeLibrary
           def render
             NativeLibrary::NativeNestedLibrary::NativeComponent(name: 'Worksmaker')
           end

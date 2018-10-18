@@ -9,7 +9,6 @@ describe 'to_key helper', js: true do
 
   it "to_key return 'self' for String objects" do
     expect_evaluate_ruby do
-      debugger
       "hello".to_key == "hello"
     end.to be_truthy
   end
@@ -25,7 +24,7 @@ describe 'to_key helper', js: true do
       true.to_key == true && false.to_key == false
     end.to be_truthy
   end
-  
+
   it "will use the use the to_key method to get the react key" do
     mount "TestComponent" do
       class MyTestClass
@@ -35,13 +34,13 @@ describe 'to_key helper', js: true do
           super
         end
       end
-      class TestComponent < Hyperloop::Component
+      class TestComponent < HyperComponent
         before_mount { @test_object = MyTestClass.new }
         render do
           DIV(key: @test_object) { TestComponent2(test_object: @test_object) }
         end
       end
-      class TestComponent2 < Hyperloop::Component
+      class TestComponent2 < HyperComponent
         param :test_object
         render do
           "to key was called!" if params.test_object.to_key_called

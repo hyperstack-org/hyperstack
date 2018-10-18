@@ -5,7 +5,7 @@ if RUBY_ENGINE == 'opal'
     before do
       stub_const 'Greeter', Class.new
       Greeter.class_eval do
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
         params do
           optional :message
           optional :from
@@ -43,7 +43,7 @@ if RUBY_ENGINE == 'opal'
     before do
       stub_const 'Greeter', Class.new
       Greeter.class_eval do
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
         params do
           optional :message
           optional :from

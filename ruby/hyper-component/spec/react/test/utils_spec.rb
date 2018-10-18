@@ -5,14 +5,14 @@ if RUBY_ENGINE == 'opal'
     it 'simulates' do
       stub_const 'Foo', Class.new
       Foo.class_eval do
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
 
         def render
           div { 'Click Me' }.on(:click) { |e| click(e) }
         end
       end
 
-      instance = React::Test::Utils.render_into_document(React.create_element(Foo))
+      instance = React::Test::Utils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo))
       expect(instance).to receive(:click)
       described_class.simulate(:click, instance.dom_node)
     end
@@ -20,7 +20,7 @@ if RUBY_ENGINE == 'opal'
     describe "render_into_document" do
       it "works with native element" do
         expect {
-          described_class.render_into_document(React.create_element('div'))
+          described_class.render_into_document(Hyperstack::Component::ReactAPI.create_element('div'))
         }.to_not raise_error
       end
     end

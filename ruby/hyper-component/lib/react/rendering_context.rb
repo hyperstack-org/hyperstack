@@ -17,7 +17,7 @@ module Hyperstack
                 run_child_block(name.nil?, &block)
                 if name
                   buffer = @buffer.dup
-                  ReactAPI.create_element(name, *args) { buffer }.tap do |element|
+                  ReactWrapper.create_element(name, *args) { buffer }.tap do |element|
                     element.waiting_on_resources = saved_waiting_on_resources || !!buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
                     element.waiting_on_resources ||= waiting_on_resources if buffer.last.is_a?(String)
                   end
@@ -31,7 +31,7 @@ module Hyperstack
             elsif name.is_a? Element
               element = name
             else
-              element = ReactAPI.create_element(name, *args)
+              element = ReactWrapper.create_element(name, *args)
               element.waiting_on_resources = waiting_on_resources
             end
             @buffer << element
@@ -125,39 +125,41 @@ module Hyperstack
         end
       end
     end
+  end
+end
 
-    class Object
-      [:span, :td, :th, :while_loading].each do |tag|
-        define_method(tag) do |*args, &block|
-          args.unshift(tag)
-          # legacy hyperloop allowed tags to be lower case as well so self is a component
-          # then this is just a DSL method for example:
-          # render(:div) do
-          #   span { 'foo' }
-          # end
-          # in this case self is just the component being rendered, so span is just a method
-          # in the component.
-          # If we fully deprecate lowercase tags, then this next line can go...
-          return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
-          Hyperstack::Component::Internal::RenderingContext.render(*args) { to_s }
-        end
-      end
-
-      def para(*args, &block)
-        args.unshift(:p)
-        # see above comment
-        return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
-        Hyperstack::Component::Internal::RenderingContext.render(*args) { to_s }
-      end
-
-      def br
-        # see above comment
-        return send(:br) if respond_to?(:hyper_component?) && hyper_component?
-        Hyperstack::Component::Internal::RenderingContext.render(:span) do
-          Hyperstack::Component::Internal::RenderingContext.render(to_s)
-          Hyperstack::Component::Internal::RenderingContext.render(:br)
-        end
-      end
+class Object
+  [:span, :td, :th, :while_loading].each do |tag|
+    define_method(tag) do |*args, &block|
+      args.unshift(tag)
+      # legacy hyperloop allowed tags to be lower case as well so if self is a component
+      # then this is just a DSL method for example:
+      # render(:div) do
+      #   span { 'foo' }
+      # end
+      # in this case self is just the component being rendered, so span is just a method
+      # in the component.
+      # If we fully deprecate lowercase tags, then this next line can go...
+      return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
+      Hyperstack::Component::Internal::RenderingContext.render(*args) { to_s }
     end
   end
+
+
+  def para(*args, &block)
+    args.unshift(:p)
+    # see above comment
+    return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
+    Hyperstack::Component::Internal::RenderingContext.render(*args) { to_s }
+  end
+
+  def br
+    # see above comment
+    return send(:br) if respond_to?(:hyper_component?) && hyper_component?
+    Hyperstack::Component::Internal::RenderingContext.render(:span) do
+      Hyperstack::Component::Internal::RenderingContext.render(to_s)
+      Hyperstack::Component::Internal::RenderingContext.render(:br)
+    end
+  end
+
 end

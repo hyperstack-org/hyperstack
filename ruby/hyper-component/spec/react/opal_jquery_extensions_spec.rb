@@ -2,9 +2,10 @@ require 'spec_helper'
 
 describe 'opal-jquery extensions', js: true do
   describe 'Element' do
-    xit 'will reuse the wrapper component class for the same Element' do
+    # this no longer seems possible with latest react... still would be nice
+    it 'will reuse the wrapper component class for the same Element', skip: 'not sure how to implement with latest react' do
       evaluate_ruby do
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           param :name
           def render
             "hello #{params.name}"
@@ -29,7 +30,7 @@ describe 'opal-jquery extensions', js: true do
 
     it 'renders a top level component using render with a block' do
       expect_evaluate_ruby do
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           param :name
           def render
             "hello #{params.name}"
@@ -51,7 +52,7 @@ describe 'opal-jquery extensions', js: true do
 
     it 'will find the DOM node given a react element' do
       expect_evaluate_ruby do
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           def render
             div { 'hello' }
           end
@@ -70,16 +71,16 @@ describe 'opal-jquery extensions', js: true do
 
     it "can dynamically mount components" do
       on_client do
-        class DynoMount < Hyperloop::Component
+        class DynoMount < HyperComponent
           render(DIV) { 'I got rendered' }
         end
       end
       mount 'MountPoint' do
-        class MountPoint < Hyperloop::Component
+        class MountPoint < HyperComponent
           render(DIV) do
             # simulate what react-rails render_component output
             DIV(
-              'data-react-class' => 'React.TopLevelRailsComponent',
+              'data-react-class' => 'Hyperstack.TopLevelRailsComponent',
               'data-react-props' => '{"render_params": {}, "component_name": "DynoMount", "controller": ""}'
             )
           end

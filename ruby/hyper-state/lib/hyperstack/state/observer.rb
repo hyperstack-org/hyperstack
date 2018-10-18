@@ -10,7 +10,7 @@ module Hyperstack
       end
 
       def remove
-        Internal::State::Mapper.update_states_to_observe(self)
+        Internal::State::Mapper.remove
       end
     end
   end

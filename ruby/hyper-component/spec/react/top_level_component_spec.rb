@@ -1,53 +1,53 @@
 require 'spec_helper'
 
 
-describe 'React::TopLevelRailsComponent', js: true do
+describe 'Hyperstack::TopLevelRailsComponent', js: true do
   before :each do
     on_client do
       module Components
         module Controller
           class Component1
-            include Hyperloop::Component::Mixin
+            include Hyperstack::Component::Mixin
             def render
               self.class.name.to_s
             end
           end
         end
-      
+
         class Component1
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
           def render
             self.class.name.to_s
           end
         end
-      
+
         class Component2
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component::Mixin
           def render
             self.class.name.to_s
           end
         end
       end
-      
+
       module Controller
         class SomeOtherClass  # see issue #80
         end
       end
-      
+
       class Component1
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
         def render
           self.class.name.to_s
         end
       end
-      
+
       def render_top_level(controller, component_name)
         params = {
           controller: controller,
           component_name: component_name,
           render_params: {}
         }
-        component = React::Test::Utils.render_component_into_document(React::TopLevelRailsComponent, params)
+        component = React::Test::Utils.render_component_into_document(Hyperstack::TopLevelRailsComponent, params)
         component.dom_node.JS[:outerHTML]
       end
     end
@@ -71,33 +71,33 @@ describe 'React::TopLevelRailsComponent', js: true do
 
   describe '.html_tag?' do
     it 'is truthy for valid html tags' do
-      expect_evaluate_ruby('React.html_tag?("a")').to be_truthy
-      expect_evaluate_ruby('React.html_tag?("div")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_tag?("a")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_tag?("div")').to be_truthy
     end
 
     it 'is truthy for valid svg tags' do
-      expect_evaluate_ruby('React.html_tag?("svg")').to be_truthy
-      expect_evaluate_ruby('React.html_tag?("circle")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_tag?("svg")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_tag?("circle")').to be_truthy
     end
 
     it 'is falsey for invalid tags' do
-      expect_evaluate_ruby('React.html_tag?("tagizzle")').to be_falsey
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_tag?("tagizzle")').to be_falsey
     end
   end
 
   describe '.html_attr?' do
     it 'is truthy for valid html attributes' do
-      expect_evaluate_ruby('React.html_attr?("id")').to be_truthy
-      expect_evaluate_ruby('React.html_attr?("data")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_attr?("id")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_attr?("data")').to be_truthy
     end
 
     it 'is truthy for valid svg attributes' do
-      expect_evaluate_ruby('React.html_attr?("cx")').to be_truthy
-      expect_evaluate_ruby('React.html_attr?("strokeWidth")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_attr?("cx")').to be_truthy
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_attr?("strokeWidth")').to be_truthy
     end
 
     it 'is falsey for invalid attributes' do
-      expect_evaluate_ruby('React.html_tag?("attrizzle")').to be_falsey
+      expect_evaluate_ruby('Hyperstack::Component::ReactAPI.html_tag?("attrizzle")').to be_falsey
     end
   end
 end

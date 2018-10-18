@@ -27,7 +27,7 @@ module Hyperstack
               create_component_wrapper(self, native_name, ruby_name) ||
                 create_library_wrapper(self, native_name, ruby_name)
             else
-              raise "class #{name} < React::NativeLibrary could not import #{js_name}. "\
+              raise "class #{name} < Hyperstack::Component::NativeLibrary could not import #{js_name}. "\
               "Native value #{scope_native_name(js_name)} is undefined."
             end
           end

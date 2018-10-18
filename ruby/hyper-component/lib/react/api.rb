@@ -180,8 +180,8 @@ module Hyperstack
           params << properties.shallow_to_n
 
           # Children Nodes
-          if block_given?
-            a = [yield].flatten
+          if block
+            a = [block.call].flatten
             %x{
               for(var i=0, l=a.length; i<l; i++) {
                 params.push(a[i].$to_n());

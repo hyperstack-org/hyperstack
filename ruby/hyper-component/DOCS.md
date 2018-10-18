@@ -1277,12 +1277,12 @@ is_valid_element?(object)
 ```
 
 Verifies `object` is a valid react element.  Note that `React::Element` wraps the React.js native class,
-`React.is_valid_element?` returns true for both classes unlike `object.is_a? React::Element`
+`Hyperstack::Component::ReactAPI.is_valid_element?` returns true for both classes unlike `object.is_a? React::Element`
 
-#### React.render
+#### Hyperstack::Component::ReactAPI.render
 
 ```ruby
-React.render(element, container) { puts "element rendered" }
+Hyperstack::Component::ReactAPI.render(element, container) { puts "element rendered" }
 ```
 
 Render an `element` into the DOM in the supplied `container` and return a [reference](/docs/more-about-refs.html) to the component.
@@ -1295,9 +1295,9 @@ If the optional block is provided, it will be executed after the component is re
 
 > Note:
 >
-> `React.render()` controls the contents of the container node you pass in. Any existing DOM elements inside are replaced when first called. Later calls use React’s DOM diffing algorithm for efficient updates.
+> `Hyperstack::Component::ReactAPI.render()` controls the contents of the container node you pass in. Any existing DOM elements inside are replaced when first called. Later calls use React’s DOM diffing algorithm for efficient updates.
 >
-> `React.render()` does not modify the container node (only modifies the children of the container). In the future, it may be possible to insert a component to an existing DOM node without overwriting the existing children.
+> `Hyperstack::Component::ReactAPI.render()` does not modify the container node (only modifies the children of the container). In the future, it may be possible to insert a component to an existing DOM node without overwriting the existing children.
 
 
 #### React.unmount\_component\_at\_node
@@ -1308,23 +1308,23 @@ React.unmount_component_at_node(container)
 
 Remove a mounted React component from the DOM and clean up its event handlers and state. If no component was mounted in the container, calling this function does nothing. Returns `true` if a component was unmounted and `false` if there was no component to unmount.
 
-#### React.render\_to\_string
+#### Hyperstack::Component::ReactAPI.render\_to\_string
 
 ```ruby
-React.render_to_string(element)
+Hyperstack::Component::ReactAPI.render_to_string(element)
 ```
 
 Render an element to its initial HTML. This is should only be used on the server for prerendering content. React will return a string containing the HTML. You can use this method to generate HTML on the server and send the markup down on the initial request for faster page loads and to allow search engines to crawl your pages for SEO purposes.
 
-If you call `React.render` on a node that already has this server-rendered markup, React will preserve it and only attach event handlers, allowing you to have a very performant first-load experience.
+If you call `Hyperstack::Component::ReactAPI.render` on a node that already has this server-rendered markup, React will preserve it and only attach event handlers, allowing you to have a very performant first-load experience.
 
 If you are using rails, then the prerendering functions are automatically performed.  Otherwise you can use `render_to_string` to build your own prerendering system.
 
 
-#### React.render\_to\_static\_markup
+#### Hyperstack::Component::ReactAPI.render\_to\_static\_markup
 
 ```ruby
-React.render_to_static_markup(element)
+Hyperstack::Component::ReactAPI.render_to_static_markup(element)
 ```
 
 Similar to `render_to_string`, except this doesn't create extra DOM attributes such as `data-react-id`, that React uses internally. This is useful if you want to use React as a simple static page generator, as stripping away the extra attributes can save lots of bytes.
@@ -1370,10 +1370,10 @@ The `imports` directive takes a string (or a symbol) and will simply evaluate it
 
 #### Importing Libraries
 
-Many React components come in libraries.  The `ReactBootstrap` library is one example.  You can import the whole library at once using the `React::NativeLibrary` class.  Assuming that you have initialized `ReactBootstrap` elsewhere, this is how you would bring it into Hyperloop.
+Many React components come in libraries.  The `ReactBootstrap` library is one example.  You can import the whole library at once using the `Hyperstack::Component::NativeLibrary` class.  Assuming that you have initialized `ReactBootstrap` elsewhere, this is how you would bring it into Hyperloop.
 
 ```ruby
-class RBS < React::NativeLibrary
+class RBS < Hyperstack::Component::NativeLibrary
   imports 'ReactBootstrap'
 end
 ```
@@ -1404,20 +1404,20 @@ class Show < Hyperloop::Component
 end
 ```
 
-Besides the `imports` directive, `React::NativeLibrary` also provides a rename directive that takes pairs in the form `oldname => newname`.  For example:
+Besides the `imports` directive, `Hyperstack::Component::NativeLibrary` also provides a rename directive that takes pairs in the form `oldname => newname`.  For example:
 
 ```ruby
   rename 'NavDropdown' => 'NavDD', 'Navbar' => 'NavBar', 'NavbarBrand' => 'NavBarBrand'
 ```
 
-`React::NativeLibrary` will import components that may be deeply nested in the library.  For example consider a component was defined as `MyLibrary.MySubLibrary.MyComponent`:
+`Hyperstack::Component::NativeLibrary` will import components that may be deeply nested in the library.  For example consider a component was defined as `MyLibrary.MySubLibrary.MyComponent`:
 
 ```ruby
-class MyLib < React::NativeLibrary
+class MyLib < Hyperstack::Component::NativeLibrary
   imports 'MyLibrary'
 end
 
-class App < React::NativeLibrary
+class App < Hyperstack::Component::NativeLibrary
   render do  
     ...
     MyLib::MySubLibrary::MyComponent ...
@@ -1434,7 +1434,7 @@ If you use a lot of libraries and are using a Javascript tool chain with Webpack
 
 Instead you can opt-in for *auto importing* Javascript components into Hyperloop as you need them.  Simply `require hyper-react/auto-import` immediately after you `require hyper-react`.  
 
-Now you do not have to use component `imports` directive or `React::NativeLibrary` unless you need to rename a component.
+Now you do not have to use component `imports` directive or `Hyperstack::Component::NativeLibrary` unless you need to rename a component.
 
 In Ruby all module and class names normally begin with an uppercase letter.  However in Javascript this is not always the case, so the auto import will first try the Javascript name that exactly matches the Ruby name, and if that fails it will try the same name with the first character downcased.  For example
 
@@ -1442,7 +1442,7 @@ In Ruby all module and class names normally begin with an uppercase letter.  How
 
 Likewise MyLib::MyComponent would match any of the following in the Javascript namespace: `MyLib.MyComponent`, `myLib.MyComponent`, `MyLib.myComponent`, `myLib.myComponent`
 
-*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of Hyperloop::Component or React::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
+*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of Hyperloop::Component or Hyperstack::Component::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
 
 #### Including React Source  
 

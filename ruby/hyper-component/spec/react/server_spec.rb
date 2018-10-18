@@ -6,8 +6,8 @@ describe 'React::Server', js: true do
     it "should render a React.Element to string" do
       client_option render_on: :both
       expect_evaluate_ruby do
-        ele = React.create_element('span') { "lorem" }
-        React::Server.render_to_string(ele).class.name
+        ele = Hyperstack::Component::ReactAPI.create_element('span') { "lorem" }
+        Hyperstack::Component::Server.render_to_string(ele).class.name
       end.to eq("String")
     end
   end
@@ -16,10 +16,9 @@ describe 'React::Server', js: true do
     it "should render a React.Element to static markup" do
       client_option render_on: :both
       expect_evaluate_ruby do
-        ele = React.create_element('span') { "lorem" }
-        React::Server.render_to_static_markup(ele)
+        ele = Hyperstack::Component::ReactAPI.create_element('span') { "lorem" }
+        Hyperstack::Component::Server.render_to_static_markup(ele)
       end.to eq("<span>lorem</span>")
     end
   end
 end
-

@@ -1,10 +1,10 @@
 require "spec_helper"
 
-describe 'React::Event', js: true do
+describe 'Hyperstack::Component::Event', js: true do
   it "should bridge attributes of native SyntheticEvent (see http://facebook.github.io/react/docs/events.html#syntheticevent)" do
     expect_evaluate_ruby do
       results = {}
-      element = React.create_element('div').on(:click) do |event|
+      element = Hyperstack::Component::ReactAPI.create_element('div').on(:click) do |event|
         results[:bubbles] = event.bubbles == event.to_n.JS[:bubbles]
         results[:cancelable] = event.cancelable == event.to_n.JS[:cancelable]
         results[:current_target] = event.current_target == event.to_n.JS[:currentTarget]

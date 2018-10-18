@@ -4,7 +4,8 @@ describe 'Refs callback', js: true do
   before do
     on_client do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
+        include Hyperstack::State::Observable
         def self.bar
           @@bar
         end
@@ -18,9 +19,9 @@ describe 'Refs callback', js: true do
   it "is invoked with the actual Ruby instance" do
     expect_evaluate_ruby do
       class Bar
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component::Mixin
         def render
-          React.create_element('div')
+          Hyperstack::Component::ReactAPI.create_element('div')
         end
       end
 
@@ -30,11 +31,11 @@ describe 'Refs callback', js: true do
         end
 
         def render
-          React.create_element(Bar, ref: method(:my_bar=).to_proc)
+          Hyperstack::Component::ReactAPI.create_element(Bar, ref: method(:my_bar=).to_proc)
         end
       end
 
-      element = React.create_element(Foo)
+      element = Hyperstack::Component::ReactAPI.create_element(Foo)
       React::Test::Utils.render_into_document(element)
       begin
         "#{Foo.bar.class.name}"
@@ -53,11 +54,11 @@ describe 'Refs callback', js: true do
         end
 
         def render
-          React.create_element('div', ref: method(:my_div=).to_proc)
+          Hyperstack::Component::ReactAPI.create_element('div', ref: method(:my_div=).to_proc)
         end
       end
 
-      element = React.create_element(Foo)
+      element = Hyperstack::Component::ReactAPI.create_element(Foo)
       React::Test::Utils.render_into_document(element)
       "#{Foo.bar.JS['nodeType']}" # avoids json serialisation errors by using "#{}"
     end.to eq("1")
@@ -68,7 +69,7 @@ describe 'Refs callback', js: true do
     # callback failed then
     # ref is called two times, once on mount with dom_node, once on unmount with null
     mount "Foo" do
-      class Unmountable < Hyperloop::Component
+      class Unmountable < HyperComponent
         render do
           DIV { "This is a Component" }
         end
@@ -82,10 +83,10 @@ describe 'Refs callback', js: true do
           @@rec_cnt
         end
 
-        after_mount { mutate.unmount true }
+        after_mount { mutate @unmount = true }
 
         render do
-          Unmountable(ref: method(:ref_rec).to_proc) unless state.unmount 
+          Unmountable(ref: method(:ref_rec).to_proc) unless @unmount
         end
       end
     end

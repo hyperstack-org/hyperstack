@@ -52,14 +52,14 @@ module Hyperstack
         }
       end
 
-      def self.create_element(type, properties = {}, &block)
-        Internal::ReactWrapper.create_element(type, properties, &block)
+      def self.create_element(type, *properties, &block)
+        Internal::ReactWrapper.create_element(type, *properties, &block)
       end
 
       # def self.render(element, container)
       #   %x{
       #       console.error(
-      #         "Warning: Using deprecated behavior of `React.render`,",
+      #         "Warning: Using deprecated behavior of `Hyperstack::Component::ReactAPI.render`,",
       #         "require \"react/top_level_render\" to get the correct behavior."
       #       );
       #   }
@@ -103,26 +103,26 @@ module Hyperstack
 
       def self.is_valid_element(element)
         %x{ console.error("Warning: `is_valid_element` is deprecated in favor of `is_valid_element?`."); }
-        element.kind_of?(React::Element) && `React.isValidElement(#{element.to_n})`
+        element.kind_of?(Hyperstack::Component::Element) && `React.isValidElement(#{element.to_n})`
       end
 
       def self.is_valid_element?(element)
-        element.kind_of?(React::Element) && `React.isValidElement(#{element.to_n})`
+        element.kind_of?(Hyperstack::Component::Element) && `React.isValidElement(#{element.to_n})`
       end
 
       def self.render_to_string(element)
-        %x{ console.error("Warning: `React.render_to_string` is deprecated in favor of `React::Server.render_to_string`."); }
+        %x{ console.error("Warning: `Hyperstack::Component::ReactAPI.render_to_string` is deprecated in favor of `React::Server.render_to_string`."); }
         if !(`typeof ReactDOMServer === 'undefined'`)
-          React::RenderingContext.build { `ReactDOMServer.renderToString(#{element.to_n})` } # v0.15+
+          Hyperstack::Component::Internal::RenderingContext.build { `ReactDOMServer.renderToString(#{element.to_n})` } # v0.15+
         else
           raise "renderToString is not defined.  In React >= v15 you must import it with ReactDOMServer"
         end
       end
 
       def self.render_to_static_markup(element)
-        %x{ console.error("Warning: `React.render_to_static_markup` is deprecated in favor of `React::Server.render_to_static_markup`."); }
+        %x{ console.error("Warning: `Hyperstack::Component::ReactAPI.render_to_static_markup` is deprecated in favor of `React::Server.render_to_static_markup`."); }
         if !(`typeof ReactDOMServer === 'undefined'`)
-          React::RenderingContext.build { `ReactDOMServer.renderToStaticMarkup(#{element.to_n})` } # v0.15+
+          Hyperstack::Component::Internal::RenderingContext.build { `ReactDOMServer.renderToStaticMarkup(#{element.to_n})` } # v0.15+
         else
           raise "renderToStaticMarkup is not defined.  In React >= v15 you must import it with ReactDOMServer"
         end

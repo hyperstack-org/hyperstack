@@ -32,7 +32,7 @@ Whitespace conventions:
 ### Deprecated
 
 - Current ref callback behavior is deprecated. Require `"react/ref_callback"` to get the updated behavior. (#188)
-- `React.render_to_string` & `React.render_to_static_markup` is deprecated, use `React::Server.render_to_string` & `React::Server.render_to_static_markup` instead. (#186)
+- `Hyperstack::Component::ReactAPI.render_to_string` & `Hyperstack::Component::ReactAPI.render_to_static_markup` is deprecated, use `React::Server.render_to_string` & `React::Server.render_to_static_markup` instead. (#186)
 - `react/react-source` is deprecated, use `react/react-source-browser` or `react/react-source-server` instead. For most usecase, `react/react-source-browser` is sufficient. If you are using the built-in server side rendering feature, the actual `ReactDOMServer` is already provided by the `react-rails` gem. Therefore, unless you are building a custom server side rendering mechanism, it's not suggested to use `react/react-source-server` in browser code. (#186)
 
 ### Removed
@@ -57,8 +57,8 @@ Whitespace conventions:
 
 ### Deprecated
 
-- Current `React.render` behavior is deprecated. Require `"react/top_level_render"` to get the updated behavior. (#187)
-- `React.is_valid_element` is deprecated in favor of `React.is_valid_element?`.
+- Current `Hyperstack::Component::ReactAPI.render` behavior is deprecated. Require `"react/top_level_render"` to get the updated behavior. (#187)
+- `React.is_valid_element` is deprecated in favor of `Hyperstack::Component::ReactAPI.is_valid_element?`.
 - `expect(component).to render('<div />')` is now deprecated in favor of `expect(component).to render_static_html('<div />')`, which is much clearer.
 
 ### Fixed

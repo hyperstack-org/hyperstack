@@ -169,7 +169,7 @@ end
 #       message = "Warning: Deprecated feature used in #{name}. #{message}"
 #       unless @deprecation_messages.include? message
 #         @deprecation_messages << message
-#         React::IsomorphicHelpers.log message, :warning
+#         Hyperstack::Component::IsomorphicHelpers.log message, :warning
 #       end
 #     end
 #   end

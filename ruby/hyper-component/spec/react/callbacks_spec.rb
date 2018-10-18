@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe 'React::Callbacks', js: true do
+describe 'Hyperstack::Component::Internal::Callbacks', js: true do
   it 'defines callback' do
     on_client do
       class Foo
-        include React::Callbacks
+        include Hyperstack::Component::Internal::Callbacks
         define_callback :before_dinner
         before_dinner :wash_hands
 
@@ -21,7 +21,7 @@ describe 'React::Callbacks', js: true do
   it 'defines multiple callbacks' do
     on_client do
       class Foo
-        include React::Callbacks
+        include Hyperstack::Component::Internal::Callbacks
         define_callback :before_dinner
         before_dinner :wash_hands, :turn_off_laptop
 
@@ -43,10 +43,10 @@ describe 'React::Callbacks', js: true do
     #end
     it 'clears callbacks on Hyperloop::Context.reset!' do
       on_client do
-        Hyperloop::Context.reset!
+        Hyperstack::Context.reset!
 
         class Foo
-          include React::Callbacks
+          include Hyperstack::Component::Internal::Callbacks
           define_callback :before_dinner
 
           before_dinner :wash_hands, :turn_off_laptop
@@ -59,8 +59,8 @@ describe 'React::Callbacks', js: true do
       expect_evaluate_ruby do
         instance = Foo.new
 
-        Hyperloop::Context.reset!
-        
+        Hyperstack::Context.reset!
+
         Foo.class_eval do
           before_dinner :wash_hands
         end
@@ -73,7 +73,7 @@ describe 'React::Callbacks', js: true do
   it 'defines block callback' do
     on_client do
       class Foo
-        include React::Callbacks
+        include Hyperstack::Component::Internal::Callbacks
         attr_accessor :a
         attr_accessor :b
 
@@ -97,7 +97,7 @@ describe 'React::Callbacks', js: true do
   it 'defines multiple callback group' do
     on_client do
       class Foo
-        include React::Callbacks
+        include Hyperstack::Component::Internal::Callbacks
         define_callback :before_dinner
         define_callback :after_dinner
         attr_accessor :a
@@ -118,7 +118,7 @@ describe 'React::Callbacks', js: true do
   it 'receives args as callback' do
     on_client do
       class Foo
-        include React::Callbacks
+        include Hyperstack::Component::Internal::Callbacks
         define_callback :before_dinner
         define_callback :after_dinner
 

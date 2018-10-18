@@ -1,6 +1,6 @@
 module Components
   class HelloWorld
-    include Hyperloop::Component::Mixin
+    include Hyperstack::Component::Mixin
 
     def render
       div do

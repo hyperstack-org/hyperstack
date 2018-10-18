@@ -17,7 +17,7 @@ module Hyperstack
 
         # the present method is retained as a legacy behavior
         # def present(component, *params, &children)
-        #   React::RenderingContext.render(component, *params, &children)
+        #   Hyperstack::Component::Internal::RenderingContext.render(component, *params, &children)
         # end
 
         # define each predefined tag (upcase) as an instance method and a constant
@@ -60,7 +60,7 @@ module Hyperstack
         def method_missing(name, *params, &children)
           component = find_component(name)
           return RenderingContext.render(component, *params, &children) if component
-          Object.method_missing(name, *params, &children)
+          super
         end
 
         # install methods with the same name as the component in the parent class/module
@@ -98,7 +98,7 @@ module Hyperstack
           if component && !component.method_defined?(:render)
             raise "#{name} does not appear to be a react component."
           end
-          component
+          component || Object._reactrb_import_component_class(name)
         end
 
         def lookup_const(name)
@@ -112,6 +112,14 @@ module Hyperstack
           scope.const_get(name) if scope
         end
       end
+    end
+  end
+end
+
+unless Object.respond_to? :_reactrb_import_component_class
+  class Object
+    def self._reactrb_import_component_class(_name)
+      nil
     end
   end
 end

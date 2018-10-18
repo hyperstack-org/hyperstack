@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ReactiveRuby::Rails::ComponentMount do
+RSpec.describe Hyperstack::Component::Internal::Rails::ComponentMount do
   let(:helper) { described_class.new }
 
   before do
@@ -18,9 +18,9 @@ RSpec.describe ReactiveRuby::Rails::ComponentMount do
       expect(html).to match(/<div.*><span.*>Hello, World!<\/span><\/div>/)
     end
 
-    it 'sets data-react-class to React.TopLevelRailsComponent' do
+    it 'sets data-react-class to Hyperstack.TopLevelRailsComponent' do
       html = helper.react_component('Components::HelloWorld')
-      top_level_class = 'React.TopLevelRailsComponent'
+      top_level_class = 'Hyperstack.TopLevelRailsComponent'
       expect(attr_value(html, 'data-react-class')).to eq(top_level_class)
     end
 

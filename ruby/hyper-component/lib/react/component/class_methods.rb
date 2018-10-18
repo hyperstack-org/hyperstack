@@ -37,7 +37,15 @@ module Hyperstack
         # of the component, i.e. Foo::Bar.baz === Foo::Bar().baz
 
         def method_missing(name, *args, &children)
-          Object.method_missing(name, *args, &children) unless args.empty?
+          super unless args.empty?
+          # this was:
+          #   Object.method_missing(name, *args, &children) unless args.empty?
+          # Which does not show the actual component that broke.
+          # Not sure why this was like this, in tags.rb there is a similar method
+          # missing that calls Object._reactrb_import_component_class(name) which
+          # makes sure to autoimport the component.  This is not needed here, as
+          # we already have the class.
+
           RenderingContext.render(
             self, class: Element.haml_class_name(name), &children
           )
