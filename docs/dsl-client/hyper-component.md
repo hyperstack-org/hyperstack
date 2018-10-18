@@ -316,22 +316,22 @@ Along with params components may be passed a block which is used to build the co
 The instance method `children` returns an enumerable that is used to access the unrendered children of a component.
 
 ```ruby
+class Indenter < Hyperstack::Component
+  render(DIV) do
+    IndentEachLine(by: 100) do # see IndentEachLine below
+      DIV {"Line 1"}
+      DIV {"Line 2"}
+      DIV {"Line 3"}
+    end
+  end
+end
+
 class IndentEachLine < Hyperstack::Component
   param by: 20, type: Integer
 
   render(DIV) do
     children.each_with_index do |child, i|
       child.render(style: {"margin-left" => params.by*i})
-    end
-  end
-end
-
-class Indenter < Hyperstack::Component
-  render(DIV) do
-    IndentEachLine(by: 100) do
-      DIV {"Line 1"}
-      DIV {"Line 2"}
-      DIV {"Line 3"}
     end
   end
 end
