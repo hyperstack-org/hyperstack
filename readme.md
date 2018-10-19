@@ -1,6 +1,6 @@
 # Hyperstack
 
-[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=legacy)](https://travis-ci.org/hyperstack-org/hyperstack)
+[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=hyperloop-legacy)](https://travis-ci.org/hyperstack-org/hyperstack)
 
 This is the edge branch - for current status on development see [current status.](https://github.com/hyperstack-org/hyperstack/blob/edge/current-status.md)
 
