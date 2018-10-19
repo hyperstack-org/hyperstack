@@ -1,5 +1,8 @@
 ### Current Status:  Working towards 0.1 release.  See Roadmap for details.
 
+
+[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=edge)](https://travis-ci.org/hyperstack-org/hyperstack)
+
 `hyperstack-config`, `hyper-store`, and `hyper-component` are now following the public interface conventions.
 
 I.e. to create a component you now do this:
