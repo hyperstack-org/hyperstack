@@ -1,6 +1,10 @@
 # Hyperstack
 
-[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=edge)](https://travis-ci.org/hyperstack-org/hyperstack)
+[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=legacy)](https://travis-ci.org/hyperstack-org/hyperstack)
+
+This is the edge branch - for current status on development see [current status.](https://github.com/hyperstack-org/hyperstack/blob/edge/current-status.md)
+
+Visit the legacy branch for the current stable and released Hyperloop (old name) system.
 
 Hyperstack is a Ruby-based DSL and modern web toolkit for building spectacular, interactive web applications fast!
 
