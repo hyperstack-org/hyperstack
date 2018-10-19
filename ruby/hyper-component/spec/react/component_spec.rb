@@ -133,7 +133,7 @@ describe 'React::Component', js: true do
         end
       end
       expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
-      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in Hyperstack::TopLevelRailsComponent")
+      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in Hyperstack::Internal::Component::TopLevelRailsComponent")
     end
   end
 
@@ -591,7 +591,7 @@ describe 'React::Component', js: true do
           end
         end
       end
-      expect(page.body).to include('<div data-react-class="Hyperstack.TopLevelRailsComponent" data-react-props="{&quot;render_params&quot;:{},&quot;component_name&quot;:&quot;Foo&quot;,&quot;controller&quot;:&quot;HyperstackTest&quot;}"><div></div></div>')
+      expect(page.body).to include('<div data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent" data-react-props="{&quot;render_params&quot;:{},&quot;component_name&quot;:&quot;Foo&quot;,&quot;controller&quot;:&quot;HyperstackTest&quot;}"><div></div></div>')
     end
 
     it 'redefines `p` to make method missing work' do

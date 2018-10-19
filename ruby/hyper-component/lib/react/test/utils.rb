@@ -8,7 +8,7 @@ module React
 
       def self.render_into_document(element)
         raise "You should pass a valid Hyperstack::Component::Element" unless Hyperstack::Component::ReactAPI.is_valid_element?(element)
-        dom_el = `document.body.querySelector('div[data-react-class="Hyperstack.TopLevelRailsComponent"]').appendChild(document.createElement('div'))`
+        dom_el = `document.body.querySelector('div[data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent"]').appendChild(document.createElement('div'))`
         Hyperstack::Component::ReactAPI.render(element, dom_el)
       end
 

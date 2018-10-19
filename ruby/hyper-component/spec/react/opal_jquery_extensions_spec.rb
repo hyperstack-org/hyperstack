@@ -80,7 +80,7 @@ describe 'opal-jquery extensions', js: true do
           render(DIV) do
             # simulate what react-rails render_component output
             DIV(
-              'data-react-class' => 'Hyperstack.TopLevelRailsComponent',
+              'data-react-class' => 'Hyperstack.Internal.Component.TopLevelRailsComponent',
               'data-react-props' => '{"render_params": {}, "component_name": "DynoMount", "controller": ""}'
             )
           end

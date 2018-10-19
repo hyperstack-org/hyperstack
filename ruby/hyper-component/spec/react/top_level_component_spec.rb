@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 
-describe 'Hyperstack::TopLevelRailsComponent', js: true do
+describe 'Hyperstack::Internal::Component::TopLevelRailsComponent', js: true do
   before :each do
     on_client do
       module Components
@@ -47,7 +47,7 @@ describe 'Hyperstack::TopLevelRailsComponent', js: true do
           component_name: component_name,
           render_params: {}
         }
-        component = React::Test::Utils.render_component_into_document(Hyperstack::TopLevelRailsComponent, params)
+        component = React::Test::Utils.render_component_into_document(Hyperstack::Internal::Component::TopLevelRailsComponent, params)
         component.dom_node.JS[:outerHTML]
       end
     end

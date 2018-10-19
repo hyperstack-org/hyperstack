@@ -2,7 +2,7 @@ PATH
   remote: ../hyper-component
   specs:
     hyper-component (0.1)
-      hyper-store (= 0.1)
+      hyper-state (= 0.1)
       hyperstack-config (= 0.1)
       libv8 (~> 6.3.0)
       mini_racer (~> 0.1.15)
@@ -11,9 +11,17 @@ PATH
       react-rails (>= 2.4.0, < 2.5.0)
 
 PATH
+  remote: ../hyper-state
+  specs:
+    hyper-state (0.1)
+      hyperstack-config (= 0.1)
+      opal (>= 0.11.0, < 0.12.0)
+
+PATH
   remote: ../hyper-store
   specs:
     hyper-store (0.1)
+      hyper-state (= 0.1)
       hyperstack-config (= 0.1)
       opal (>= 0.11.0, < 0.12.0)
 
@@ -327,6 +335,7 @@ DEPENDENCIES
   bundler
   hyper-component!
   hyper-spec!
+  hyper-state!
   hyper-store!
   hyperstack-config!
   opal-browser (~> 0.2.0)

@@ -18,9 +18,9 @@ RSpec.describe Hyperstack::Component::Internal::Rails::ComponentMount do
       expect(html).to match(/<div.*><span.*>Hello, World!<\/span><\/div>/)
     end
 
-    it 'sets data-react-class to Hyperstack.TopLevelRailsComponent' do
+    it 'sets data-react-class to Hyperstack.Internal.Component.TopLevelRailsComponent' do
       html = helper.react_component('Components::HelloWorld')
-      top_level_class = 'Hyperstack.TopLevelRailsComponent'
+      top_level_class = 'Hyperstack.Internal.Component.TopLevelRailsComponent'
       expect(attr_value(html, 'data-react-class')).to eq(top_level_class)
     end
 

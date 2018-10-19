@@ -107,19 +107,20 @@ describe 'hyper-spec', js: true do
       mount 'CallBackOnEveryThirdClick' do
         class CallBackOnEveryThirdClick
           include Hyperstack::Component::Mixin
+          include Hyperstack::State::Observable
           param :click3, type: Proc
           param :_onClick3, type: Proc
-          state clicks: 0
+          before_mount { @clicks = 0 }
           def increment_click
-            mutate.clicks(state.clicks + 1)
-            if state.clicks % 3 == 0
-              params.click3(state.clicks)
-              params._onClick3(state.clicks)
+            mutate @clicks += 1
+            if @clicks % 3 == 0
+              params.click3(@clicks)
+              params._onClick3(@clicks)
             end
           end
           render do
             DIV do
-              SPAN { "I have been clicked #{state.clicks} times" }
+              SPAN { "I have been clicked #{@clicks} times" }
               BUTTON(class: :tp_clicker) { "click me again" }
               .on(:click) { increment_click }
             end

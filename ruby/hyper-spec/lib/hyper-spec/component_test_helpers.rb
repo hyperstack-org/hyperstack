@@ -250,7 +250,7 @@ module HyperSpec
     [:callback_history_for, :last_callback_for, :clear_callback_history_for,
      :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
       define_method(method) do |event_name|
-        evaluate_ruby("Hyperstack::TopLevelRailsComponent.#{method}('#{event_name}')")
+        evaluate_ruby("Hyperstack::Internal::Component::TopLevelRailsComponent.#{method}('#{event_name}')")
       end
     end
 

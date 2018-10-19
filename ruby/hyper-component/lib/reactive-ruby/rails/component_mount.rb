@@ -39,7 +39,7 @@ module Hyperstack
           end
 
           def top_level_name
-            'Hyperstack.TopLevelRailsComponent'
+            'Hyperstack.Internal.Component.TopLevelRailsComponent'
           end
 
           def footers
