@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       #
       # React assumes all components should update, unless a component explicitly overrides
       # the shouldComponentUpdate method.  Reactrb does an explicit check doing a shallow

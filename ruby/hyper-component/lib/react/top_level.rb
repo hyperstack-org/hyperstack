@@ -1,7 +1,6 @@
 require "native"
 require 'active_support/core_ext/object/try'
 require 'hyperstack/internal/component/tags'
-require 'react/component/base'
 
 module Hyperstack
   module Component

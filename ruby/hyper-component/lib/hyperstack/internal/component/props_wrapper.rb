@@ -1,29 +1,12 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
 
       class PropsWrapper
         attr_reader :component
 
         def self.define_param(name, param_type)
-          if false && param_type == Store::Observable
-            define_method("#{name}") do
-              value_for(name)
-            end
-            define_method("#{name}!") do |*args|
-              current_value = value_for(name)
-              if args.count > 0
-                props[name].call args[0]
-                current_value
-              else
-                # rescue in case we in middle of render... What happens during a
-                # render that causes exception?
-                # Where does `dont_update_state` come from?
-                props[name].call current_value unless @dont_update_state rescue nil
-                props[name]
-              end
-            end
-          elsif param_type == Proc
+          if param_type == Proc
             define_method("#{name}") do |*args, &block|
               props[name].call(*args, &block) if props[name]
             end

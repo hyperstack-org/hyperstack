@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       # class level methods (macros) for components
       module ClassMethods
 
@@ -24,9 +24,9 @@ module Hyperstack
 
         def render(container = nil, params = {}, &block)
           if container
-            container = container.type if container.is_a? Element
+            container = container.type if container.is_a? Hyperstack::Component::Element
             define_method :render do
-              RenderingContext.render(container, params) { instance_eval(&block) if block }
+              Hyperstack::Component::Internal::RenderingContext.render(container, params) { instance_eval(&block) if block }
             end
           else
             define_method(:render) { instance_eval(&block) }
@@ -46,13 +46,13 @@ module Hyperstack
           # makes sure to autoimport the component.  This is not needed here, as
           # we already have the class.
 
-          RenderingContext.render(
-            self, class: Element.haml_class_name(name), &children
+          Hyperstack::Component::Internal::RenderingContext.render(
+            self, class: Hyperstack::Component::Element.haml_class_name(name), &children
           )
         end
 
         def validator
-          @validator ||= Validator.new(props_wrapper)
+          @validator ||= Hyperstack::Component::Internal::Validator.new(props_wrapper)
         end
 
         def prop_types
@@ -149,13 +149,13 @@ module Hyperstack
           first_name = export_name.first
           Native(`Opal.global`)[first_name] = add_item_to_tree(
             Native(`Opal.global`)[first_name],
-            [ReactWrapper.create_native_react_class(self)] + export_name[1..-1].reverse
+            [Hyperstack::Component::Internal::ReactWrapper.create_native_react_class(self)] + export_name[1..-1].reverse
           ).to_n
         end
 
         def imports(component_name)
-          ReactWrapper.import_native_component(
-            self, ReactWrapper.eval_native_react_component(component_name)
+          Hyperstack::Component::Internal::ReactWrapper.import_native_component(
+            self, Hyperstack::Component::Internal::ReactWrapper.eval_native_react_component(component_name)
           )
           define_method(:render) {} # define a dummy render method - will never be called...
         rescue Exception => e # rubocop:disable Lint/RescueException : we need to catch everything!
@@ -177,7 +177,7 @@ module Hyperstack
         end
 
         def to_n
-          ReactWrapper.class_eval('@@component_classes')[self]
+          Hyperstack::Component::Internal::ReactWrapper.class_eval('@@component_classes')[self]
         end
       end
     end

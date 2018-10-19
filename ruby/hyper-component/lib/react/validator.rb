@@ -6,7 +6,7 @@ module Hyperstack
         attr_reader :props_wrapper
         private :errors, :props_wrapper
 
-        def initialize(props_wrapper = Class.new(Internal::PropsWrapper))
+        def initialize(props_wrapper = Class.new(Hyperstack::Internal::Component::PropsWrapper))
           @props_wrapper = props_wrapper
         end
 

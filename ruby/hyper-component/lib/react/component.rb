@@ -5,8 +5,8 @@ require 'hyperstack/internal/component/callbacks'
 require 'react/rendering_context'
 require 'react/state_wrapper'
 require 'hyperstack/internal/component/instance_methods'
-require 'react/component/class_methods'
-require 'react/component/props_wrapper'
+require 'hyperstack/internal/component/class_methods'
+require 'hyperstack/internal/component/props_wrapper'
 module Hyperstack
   module Component
 
@@ -34,7 +34,7 @@ module Hyperstack
       base.include(Hyperstack::Internal::Component::Callbacks)
       base.include(Hyperstack::Internal::Component::Tags)
       #base.include(React::Component::DslInstanceMethods)
-      base.include(Internal::ShouldComponentUpdate)
+      base.include(Hyperstack::Internal::Component::ShouldComponentUpdate)
       base.class_eval do
         class_attribute :initial_state
         define_callback :before_mount
@@ -45,7 +45,7 @@ module Hyperstack
         define_callback :before_unmount
         define_callback(:after_error) { Internal::ReactWrapper.add_after_error_hook(base) }
       end
-      base.extend(Internal::ClassMethods)
+      base.extend(Hyperstack::Internal::Component::ClassMethods)
     end
 
     def self.deprecation_warning(message)
