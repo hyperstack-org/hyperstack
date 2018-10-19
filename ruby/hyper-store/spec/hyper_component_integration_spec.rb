@@ -40,7 +40,7 @@ describe 'React Integration', js: true do
   it 'defines component inspect method' do
     mount "Foo" do
       class Foo
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         def render
           "initial_state = #{initial_state.inspect}"
         end
@@ -87,7 +87,7 @@ end
 #   before(:each) do
 #     on_client do
 #       class Foo
-#         include Hyperstack::Component::Mixin
+#         include Hyperstack::Component
 #         def render
 #           div { state.foo }
 #         end
@@ -158,7 +158,7 @@ end
 #   before(:each) do
 #     on_client do
 #       class Foo
-#         include Hyperstack::Component::Mixin
+#         include Hyperstack::Component
 #         def render
 #           Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
 #         end
@@ -325,7 +325,7 @@ end
 #   it 'sets initial state with default value in constructor in @native object state property' do
 #     mount 'StateFoo' do
 #       class StateFoo
-#         include Hyperstack::Component::Mixin
+#         include Hyperstack::Component
 #         state bar: 25
 #
 #         def initialize(native)
@@ -348,7 +348,7 @@ end
     # it 'doesnt cause extra render when setting state in :before_mount' do
     #   mount 'StateFoo' do
     #     class StateFoo
-    #       include Hyperstack::Component::Mixin
+    #       include Hyperstack::Component
     #
     #       def self.render_count
     #         @@render_count ||= 0

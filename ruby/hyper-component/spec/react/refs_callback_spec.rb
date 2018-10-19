@@ -4,7 +4,7 @@ describe 'Refs callback', js: true do
   before do
     on_client do
       class Foo
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         include Hyperstack::State::Observable
         def self.bar
           @@bar
@@ -19,7 +19,7 @@ describe 'Refs callback', js: true do
   it "is invoked with the actual Ruby instance" do
     expect_evaluate_ruby do
       class Bar
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         def render
           Hyperstack::Component::ReactAPI.create_element('div')
         end

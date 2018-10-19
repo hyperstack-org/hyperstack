@@ -5,7 +5,7 @@ describe 'React::Component', js: true do
   it 'defines component spec methods' do
     on_client do
       class Foo
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         def initialize(native = nil)
         end
 
@@ -32,7 +32,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           def self.call_history
             @call_history ||= []
           end
@@ -73,7 +73,7 @@ describe 'React::Component', js: true do
         end
 
         class FooBar
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           after_mount :bar2
           def self.call_history
             @call_history ||= []
@@ -107,7 +107,7 @@ describe 'React::Component', js: true do
       client_option raise_on_js_errors: :off
       mount 'Foo' do
         class ErrorFoo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           param :just
           def render
             raise 'ErrorFoo Error'
@@ -183,7 +183,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           include Hyperstack::State::Observable
           def render
             div { @foo }
@@ -194,7 +194,7 @@ describe 'React::Component', js: true do
     it 'doesnt cause extra render when calling mutate in before_mount' do
       mount 'StateFoo' do
         class StateFoo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           include Hyperstack::State::Observable
 
           before_mount do
@@ -221,7 +221,7 @@ describe 'React::Component', js: true do
     it 'doesnt cause extra render when calling mutate in :before_receive_props' do
       mount 'Foo' do
         class StateFoo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           include Hyperstack::State::Observable
 
           param :drinks
@@ -267,7 +267,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include Hyperstack::Component::Mixin
+            include Hyperstack::Component
           end
         end
       end
@@ -301,7 +301,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include Hyperstack::Component::Mixin
+            include Hyperstack::Component
           end
         end
       end
@@ -345,7 +345,7 @@ describe 'React::Component', js: true do
       before do
         on_client do
           class Foo
-            include Hyperstack::Component::Mixin
+            include Hyperstack::Component
           end
         end
       end
@@ -402,7 +402,7 @@ describe 'React::Component', js: true do
       it 'sets default props using validation helper' do
         on_client do
           class Foo
-            include Hyperstack::Component::Mixin
+            include Hyperstack::Component
             params do
               optional :foo, default: 'foo'
               optional :bar, default: 'bar'
@@ -481,7 +481,7 @@ describe 'React::Component', js: true do
     before do
       on_client do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
         end
       end
     end
@@ -557,7 +557,7 @@ describe 'React::Component', js: true do
     it 'supports element building helpers' do
       on_client do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           param :foo
           def render
             div do
@@ -567,7 +567,7 @@ describe 'React::Component', js: true do
         end
 
         class Bar
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           def render
             div do
               Hyperstack::Component::Internal::RenderingContext.render(Foo, foo: 'astring')
@@ -584,7 +584,7 @@ describe 'React::Component', js: true do
     it 'builds single node in top-level render without providing a block' do
       mount 'Foo' do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
 
           def render
             div
@@ -597,7 +597,7 @@ describe 'React::Component', js: true do
     it 'redefines `p` to make method missing work' do
       mount 'Foo' do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
 
           def render
             div {
@@ -615,7 +615,7 @@ describe 'React::Component', js: true do
     it 'only overrides `p` in render context' do
       mount 'Foo' do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
 
           def self.result
             @@result ||= 'ooopsy'
@@ -653,7 +653,7 @@ describe 'React::Component', js: true do
     it 'returns true if after mounted' do
       expect_evaluate_ruby do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
 
           def render
             Hyperstack::Component::ReactAPI.create_element('div')
@@ -808,7 +808,7 @@ describe 'React::Component', js: true do
     before(:each) do
       on_client do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           def render
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end

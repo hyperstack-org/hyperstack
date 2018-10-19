@@ -8,7 +8,7 @@ Hyperloop Component DSL (Domain Specific Language) is a set of class and instanc
 
 The DSL has the following major areas:  
 
-+ The `Hyperloop::Component` class and the equivalent `Hyperloop::Component::Mixin` mixin
++ The `Hyperloop::Component` class and the equivalent `Hyperloop::Component` mixin
 + Class methods or *macros* that describe component class level behaviors
 + The four data accessors methods: `params`, `state`, `mutate`, and `children`
 + The tag and component rendering methods
@@ -17,7 +17,7 @@ The DSL has the following major areas:
 
 ### Hyperloop::Component
 
-Hyperloop Components classes either include `Hyperloop::Component::Mixin` or are subclasses of `Hyperloop::Component`.  
+Hyperloop Components classes either include `Hyperloop::Component` or are subclasses of `Hyperloop::Component`.  
 
 ```ruby
 class Component < Hyperloop::Component
@@ -25,7 +25,7 @@ end
 
 # if subclassing is inappropriate, you can mixin instead
 class AnotherComponent
-  include Hyperloop::Component::Mixin
+  include Hyperloop::Component
 end
 ```
 
@@ -604,12 +604,12 @@ Note: `collect_other_params_as` builds a hash, so you can merge other data in or
 
 ### Mixins and Inheritance
 
-Ruby has a rich set of mechanisms enabling code reuse, and Hyperloop is intended to be a team player in your Ruby application.  Components can be subclassed, and they can include (or mixin) other modules.  You can also create a component by including `Hyperloop::Component::Mixin` which allows a class to inherit from some other non-react class, and then mixin the React DSL.
+Ruby has a rich set of mechanisms enabling code reuse, and Hyperloop is intended to be a team player in your Ruby application.  Components can be subclassed, and they can include (or mixin) other modules.  You can also create a component by including `Hyperloop::Component` which allows a class to inherit from some other non-react class, and then mixin the React DSL.
 
 ```ruby
   # make a SuperFoo react component class
   class Foo < SuperFoo
-    include Hyperloop::Component::Mixin
+    include Hyperloop::Component
   end
 ```
 

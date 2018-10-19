@@ -5,7 +5,7 @@ describe 'React Integration', js: true do
   it "Hyper-components will update when their internal instance state is mutated" do
     mount "TestComp" do
       class TestComp
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         include Hyperstack::State::Observable
         before_mount do
           @click_count = 0
@@ -27,7 +27,7 @@ describe 'React Integration', js: true do
   it "Only the component being mutated will update" do
     mount "TestComp" do
       class TestComp
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         before_mount { @render_count = 0 }
         render(DIV) do
           @render_count += 1
@@ -36,7 +36,7 @@ describe 'React Integration', js: true do
         end
       end
       class StateTest
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         include Hyperstack::State::Observable
 
         param :id
@@ -72,7 +72,7 @@ describe 'React Integration', js: true do
   it "Hyper-components will update when their internal class state is mutated" do
     mount "TestComp" do
       class TestComp
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         before_mount { @render_count = 0 }
         render(DIV) do
           @render_count += 1
@@ -81,7 +81,7 @@ describe 'React Integration', js: true do
         end
       end
       class StateTest
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         include Hyperstack::State::Observable
 
         param :id
@@ -127,7 +127,7 @@ describe 'React Integration', js: true do
         end
       end
       class TestComp
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         before_mount do
           @render_count = 0
         end

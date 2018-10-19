@@ -7,7 +7,7 @@ describe 'redefining builtin tags', js: true do
       Hyperstack::Component::Internal::Tags.send(:remove_const, :DIV)
 
       class Hyperstack::Component::Internal::Tags::DIV #< HyperComponent
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         others :opts
         render do
           # see https://github.com/hyperstack-org/hyperstack/issues/47
@@ -17,7 +17,7 @@ describe 'redefining builtin tags', js: true do
       end
 
       class Foo
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         render(DIV, id: :tp) do
           "hello"
         end

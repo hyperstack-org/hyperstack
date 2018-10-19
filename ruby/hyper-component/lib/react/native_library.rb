@@ -73,7 +73,7 @@ module Hyperstack
           if Internal::ReactWrapper.native_react_component?(native_name)
             new_klass = klass.const_set ruby_name, Class.new
             new_klass.class_eval do
-              include Mixin
+              include Component
               imports native_name
             end
             new_klass
@@ -84,6 +84,9 @@ module Hyperstack
           klass.const_set ruby_name, Class.new(NativeLibrary).imports(native_name)
         end
       end
+      # handles the case of an application NativeLibrary called...
+      # NativeLibrary !
+      imports 'NativeLibrary'
     end
   end
 end

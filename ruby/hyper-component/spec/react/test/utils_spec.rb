@@ -5,7 +5,7 @@ if RUBY_ENGINE == 'opal'
     it 'simulates' do
       stub_const 'Foo', Class.new
       Foo.class_eval do
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
 
         def render
           div { 'Click Me' }.on(:click) { |e| click(e) }

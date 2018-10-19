@@ -10,7 +10,7 @@ class HyperStore
 end
 
 class HyperComponent
-  include Hyperstack::Component::Mixin
+  include Hyperstack::Component
   class << self
     def inherited(child)
       child.include Hyperstack::Legacy::Store

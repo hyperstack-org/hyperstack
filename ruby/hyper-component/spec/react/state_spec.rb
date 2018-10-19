@@ -4,7 +4,7 @@ describe 'React::State', js: true do
   it "can create dynamically initialized exported states" do
     expect_evaluate_ruby do
       class Foo
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         include Hyperstack::State::Observable
         class << self
           state_accessor :foo

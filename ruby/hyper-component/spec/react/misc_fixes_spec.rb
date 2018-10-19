@@ -10,10 +10,10 @@ describe 'React Integration', js: true do
     end
     expect(page).to have_content('hello')
   end
-  it "The hyper-component gem can use Hyperstack::Component::Mixin to create components" do
+  it "The hyper-component gem can use Hyperstack::Component to create components" do
     mount "TestComp" do
       class TestComp
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         render(DIV) { 'hello'}
       end
     end
@@ -118,7 +118,7 @@ describe 'React Integration', js: true do
   it 'defines component spec methods' do
     mount "Foo" do
       class Foo
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         def render
           "initial_state = #{initial_state.inspect}"
         end

@@ -22,7 +22,7 @@ describe 'Hyperstack::Component::Element', js: true do
       client_option render_on: :both
       mount 'Foo' do
         class Foo
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           def render
             INPUT(value: nil, type: 'text').on(:change) {}
           end

@@ -2,7 +2,7 @@ module Hyperstack
   module Internal
     module Component
       class TopLevelRailsComponent
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
 
         def self.search_path
           @search_path ||= [Object]

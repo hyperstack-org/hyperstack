@@ -7,7 +7,7 @@ describe 'Hyperstack::Internal::Component::TopLevelRailsComponent', js: true do
       module Components
         module Controller
           class Component1
-            include Hyperstack::Component::Mixin
+            include Hyperstack::Component
             def render
               self.class.name.to_s
             end
@@ -15,14 +15,14 @@ describe 'Hyperstack::Internal::Component::TopLevelRailsComponent', js: true do
         end
 
         class Component1
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           def render
             self.class.name.to_s
           end
         end
 
         class Component2
-          include Hyperstack::Component::Mixin
+          include Hyperstack::Component
           def render
             self.class.name.to_s
           end
@@ -35,7 +35,7 @@ describe 'Hyperstack::Internal::Component::TopLevelRailsComponent', js: true do
       end
 
       class Component1
-        include Hyperstack::Component::Mixin
+        include Hyperstack::Component
         def render
           self.class.name.to_s
         end

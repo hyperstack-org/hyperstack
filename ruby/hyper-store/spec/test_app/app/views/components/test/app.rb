@@ -1,6 +1,6 @@
 module Test
   class App
-    include Hyperstack::Component::Mixin
+    include Hyperstack::Component
     before_mount do
       @store = Store.new
     end

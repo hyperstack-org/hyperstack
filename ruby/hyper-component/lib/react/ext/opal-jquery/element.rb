@@ -15,7 +15,7 @@ Element.instance_eval do
   define_method :render do |container = nil, params = {}, &block|
     if `#{self.to_n}._reactrb_component_class === undefined`
       klass = Class.new
-      klass.include Hyperstack::Component::Mixin
+      klass.include Hyperstack::Component
       `#{self.to_n}._reactrb_component_class = klass`
     else
       klass = `#{self.to_n}._reactrb_component_class`

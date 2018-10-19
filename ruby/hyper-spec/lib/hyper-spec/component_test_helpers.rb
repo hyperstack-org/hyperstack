@@ -217,7 +217,7 @@ module HyperSpec
             end
           end
           class Hyperstack::Component::Internal::TestDummy
-            include Hyperstack::Component::Mixin
+            include Hyperstack::Component
                 def render; end
           end
           #{@client_code}
