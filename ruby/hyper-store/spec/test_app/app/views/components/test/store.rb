@@ -1,5 +1,6 @@
 module Test
-  class Store < Hyperloop::Store
+  class Store
+    include Hyperstack::Legacy::Store
     class << self
       state singleton_klass: 'SC', reader: true
       state singleton_instance: 'SI', scope: :instance, reader: true
@@ -17,6 +18,9 @@ module Test
 
     def bar
       'bar'
+    end
+    def initialize
+      init_store
     end
   end
 end

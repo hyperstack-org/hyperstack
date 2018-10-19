@@ -14,20 +14,23 @@ Element.instance_eval do
 
   define_method :render do |container = nil, params = {}, &block|
     # create an invisible component class and hang it off the DOM element
-    if `#{self.to_n}._reactrb_component_class === undefined`
-      klass = Class.new(Hyperloop::Component) do
-        # react won't rerender the components unless it sees some params
-        # changing, so we just copy them all in, but we still just reuse
-        # the render macro to define the action
-        others :all_the_params
-      end
-      `#{self.to_n}._reactrb_component_class = #{klass}`
+    if `#{to_n}._reactrb_component_class === undefined`
+      klass = Class.new
+      klass.include Hyperstack::Component
+      klass.others :all_the_params
+      `#{to_n}._reactrb_component_class = klass`
     else
-      klass = `#{self.to_n}._reactrb_component_class`
+      klass = `#{to_n}._reactrb_component_class`
     end
-    # define / redefine the render method
-    klass.render(container, params, &block)
-    React.render(React.create_element(klass, {container: container, params: params, block: block}), self)
+    klass.class_eval do
+      render(container, params, &block)
+    end
+
+    Hyperstack::Component::ReactAPI.render(
+      Hyperstack::Component::ReactAPI.create_element(
+        klass, container: container, params: params, block: block
+      ), self
+    )
   end
 
   # mount_components is useful for dynamically generated page segments for example

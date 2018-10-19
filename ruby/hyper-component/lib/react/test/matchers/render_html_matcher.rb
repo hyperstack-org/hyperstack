@@ -31,7 +31,7 @@ module React
         private
 
         def render_to_html
-          element = React.create_element(@component, @params)
+          element = Hyperstack::Component::ReactAPI.create_element(@component, @params)
           React::Server.render_to_static_markup(element)
         end
 

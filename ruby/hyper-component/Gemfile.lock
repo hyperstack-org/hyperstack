@@ -1,7 +1,7 @@
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (0.99.2)
+    hyper-spec (0.1)
       capybara
       chromedriver-helper (= 1.2.0)
       libv8 (~> 6.3.0)
@@ -18,16 +18,24 @@ PATH
       webdrivers
 
 PATH
-  remote: ../hyper-store
+  remote: ../hyper-state
   specs:
-    hyper-store (0.99.2)
-      hyperloop-config (= 0.99.2)
+    hyper-state (0.1)
+      hyperstack-config (= 0.1)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
-  remote: ../hyperloop-config
+  remote: ../hyper-store
   specs:
-    hyperloop-config (0.99.2)
+    hyper-store (0.1)
+      hyper-state (= 0.1)
+      hyperstack-config (= 0.1)
+      opal (>= 0.11.0, < 0.12.0)
+
+PATH
+  remote: ../hyperstack-config
+  specs:
+    hyperstack-config (0.1)
       libv8 (~> 6.3.0)
       mini_racer (~> 0.1.15)
       opal (>= 0.11.0, < 0.12.0)
@@ -37,9 +45,9 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-component (0.99.2)
-      hyper-store (= 0.99.2)
-      hyperloop-config (= 0.99.2)
+    hyper-component (0.1)
+      hyper-state (= 0.1)
+      hyperstack-config (= 0.1)
       libv8 (~> 6.3.0)
       mini_racer (~> 0.1.15)
       opal (>= 0.11.0, < 0.12.0)
@@ -135,6 +143,7 @@ GEM
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
+    interception (0.5)
     io-like (0.3.0)
     jquery-rails (4.3.3)
       rails-dom-testing (>= 1, < 3)
@@ -202,6 +211,9 @@ GEM
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    pry-rescue (1.4.5)
+      interception (>= 0.5)
+      pry
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.5)
@@ -303,14 +315,14 @@ GEM
       equalizer (~> 0.0.9)
       parser (>= 2.3.1.2, < 2.6)
       procto (~> 0.0.2)
-    webdrivers (3.4.1)
+    webdrivers (3.4.2)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
-    xpath (3.1.0)
+    xpath (3.2.0)
       nokogiri (~> 1.8)
 
 PLATFORMS
@@ -321,8 +333,9 @@ DEPENDENCIES
   chromedriver-helper
   hyper-component!
   hyper-spec!
+  hyper-state!
   hyper-store!
-  hyperloop-config!
+  hyperstack-config!
   jquery-rails
   listen
   mime-types
@@ -331,6 +344,7 @@ DEPENDENCIES
   opal-rails (~> 0.9.4)
   opal-rspec
   pry
+  pry-rescue
   puma
   rails (>= 4.0.0)
   rails-controller-testing

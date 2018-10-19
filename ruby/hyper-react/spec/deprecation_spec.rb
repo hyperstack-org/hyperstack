@@ -22,7 +22,7 @@ describe 'React Integration', js: true do
     end
     expect(page).to have_content('hello')
     expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. The module name React::Component has been deprecated.  Use Hyperloop::Component::Mixin instead."]
+    ["Warning: Deprecated feature used in TestComp. The module name React::Component has been deprecated.  Use Hyperloop::Component instead."]
     )
   end
 end

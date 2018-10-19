@@ -1,23 +1,23 @@
 require 'spec_helper'
 
-describe 'React::Children', js: true do
+describe 'Hyperstack::Component::Children', js: true do
   describe 'with multiple child elements' do
     before :each do
       on_client do
         class InitTest
           def self.get_children
             component = Class.new do
-              include Hyperloop::Component::Mixin
+              include Hyperstack::Component
               def render
                 div { 'lorem' }
               end
             end
-            childs = [ React.create_element('a'), React.create_element('li') ]
-            element = React.create_element(component) { childs }
+            childs = [ Hyperstack::Component::ReactAPI.create_element('a'), Hyperstack::Component::ReactAPI.create_element('li') ]
+            element = Hyperstack::Component::ReactAPI.create_element(component) { childs }
             el_children = element.to_n.JS[:props].JS[:children]
-            children = React::Children.new(el_children)
+            children = Hyperstack::Component::Children.new(el_children)
             dom_el = JS.call(:eval, "document.body.appendChild(document.createElement('div'))")
-            React.render(element, dom_el)
+            Hyperstack::Component::ReactAPI.render(element, dom_el)
             children
           end
         end
@@ -42,7 +42,7 @@ describe 'React::Children', js: true do
         expect_evaluate_ruby do
           nodes = InitTest.get_children.each { |elem| elem.element_type }
           [nodes.class.name, nodes.map(&:class)]
-        end.to eq(["Array", ["React::Element", "React::Element"]])
+        end.to eq(["Array", ["Hyperstack::Component::Element", "Hyperstack::Component::Element"]])
       end
     end
 
@@ -61,17 +61,17 @@ describe 'React::Children', js: true do
         class InitTest
           def self.get_children
             component = Class.new do
-              include Hyperloop::Component::Mixin
+              include Hyperstack::Component
               def render
                 div { 'lorem' }
               end
             end
-            childs = [ React.create_element('a') ]
-            element = React.create_element(component) { childs }
+            childs = [ Hyperstack::Component::ReactAPI.create_element('a') ]
+            element = Hyperstack::Component::ReactAPI.create_element(component) { childs }
             el_children = element.to_n.JS[:props].JS[:children]
-            children = React::Children.new(el_children)
+            children = Hyperstack::Component::Children.new(el_children)
             dom_el = JS.call(:eval, "document.body.appendChild(document.createElement('div'))")
-            React.render(element, dom_el)
+            Hyperstack::Component::ReactAPI.render(element, dom_el)
             children
           end
         end
@@ -99,16 +99,16 @@ describe 'React::Children', js: true do
         class InitTest
           def self.get_children
             component = Class.new do
-              include Hyperloop::Component::Mixin
+              include Hyperstack::Component
               def render
                 div { 'lorem' }
               end
             end
-            element = React.create_element(component)
+            element = Hyperstack::Component::ReactAPI.create_element(component)
             el_children = element.to_n.JS[:props].JS[:children]
-            children = React::Children.new(el_children)
+            children = Hyperstack::Component::Children.new(el_children)
             dom_el = JS.call(:eval, "document.body.appendChild(document.createElement('div'))")
-            React.render(element, dom_el)
+            Hyperstack::Component::ReactAPI.render(element, dom_el)
             children
           end
         end
@@ -133,12 +133,12 @@ describe 'React::Children', js: true do
   describe 'other methods' do
     it 'responds to to_proc' do
       mount 'Children' do
-        class ChildTester < Hyperloop::Component
+        class ChildTester < HyperComponent
           render do
             DIV(id: :tp, &children)
           end
         end
-        class Children < Hyperloop::Component
+        class Children < HyperComponent
           render do
             ChildTester { "one".span; "two".span; "three".span }
           end
@@ -150,12 +150,12 @@ describe 'React::Children', js: true do
     end
     it 'responds to render' do
       mount 'Children' do
-        class ChildTester < Hyperloop::Component
+        class ChildTester < HyperComponent
           render do
             DIV(id: :tp) { children.render }
           end
         end
-        class Children < Hyperloop::Component
+        class Children < HyperComponent
           render do
             ChildTester { "one".span; "two".span; "three".span }
           end

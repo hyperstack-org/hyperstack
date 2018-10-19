@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'the param macro', js: true do
   it 'defines collect_other_params_as method on params proxy' do
     mount 'Foo', bar: 'biz' do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         collect_other_params_as :foo
 
         def render
@@ -16,7 +16,7 @@ describe 'the param macro', js: true do
 
   it 'defines collect_other_params_as method on params proxy' do
     mount 'Foo' do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         state s: :beginning, scope: :shared
         def self.update_s(x)
           mutate.s x
@@ -26,7 +26,7 @@ describe 'the param macro', js: true do
         end
       end
 
-      class Foo2 < Hyperloop::Component
+      class Foo2 < HyperComponent
         collect_other_params_as :opts
 
         def render
@@ -41,7 +41,7 @@ describe 'the param macro', js: true do
 
   it "can create and access a required param" do
     mount 'Foo', foo: :bar do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         param :foo
 
         def render
@@ -54,7 +54,7 @@ describe 'the param macro', js: true do
 
   it "can create and access an optional params" do
     mount 'Foo', foo1: :bar1, foo3: :bar3 do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
 
         param foo1: :no_bar1
         param foo2: :no_bar2
@@ -71,7 +71,7 @@ describe 'the param macro', js: true do
 
   it 'can specify validation rules with the type option' do
     expect_evaluate_ruby do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         param :foo, type: String
       end
       Foo.prop_types
@@ -80,7 +80,7 @@ describe 'the param macro', js: true do
 
   it "can type check params" do
     mount 'Foo', foo1: 12, foo2: "string" do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
 
         param :foo1, type: String
         param :foo2, type: String
@@ -98,7 +98,7 @@ describe 'the param macro', js: true do
   it 'logs error in warning if validation failed' do
     evaluate_ruby do
       class Lorem; end
-      class Foo2 < Hyperloop::Component
+      class Foo2 < HyperComponent
         param :foo
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
@@ -114,7 +114,7 @@ describe 'the param macro', js: true do
   it 'should not log anything if validation passes' do
     evaluate_ruby do
       class Lorem; end
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         param :foo
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
@@ -130,7 +130,7 @@ describe 'the param macro', js: true do
   describe 'advanced type handling' do
     before(:each) do
       on_client do
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           def render; ""; end
         end
       end
@@ -185,7 +185,7 @@ describe 'the param macro', js: true do
 
     it 'allows passing and merging complex arguments to params' do
       mount 'Tester' do
-        class TakesParams < Hyperloop::Component
+        class TakesParams < HyperComponent
           param  :flag
           param  :a
           param  :b
@@ -198,7 +198,7 @@ describe 'the param macro', js: true do
             end
           end
         end
-        class Tester < Hyperloop::Component
+        class Tester < HyperComponent
           render do
             TakesParams(
               :flag,
@@ -219,7 +219,7 @@ describe 'the param macro', js: true do
 
     it 'allows passing nil for class and style params' do
       mount 'Tester' do
-        class Tester < Hyperloop::Component
+        class Tester < HyperComponent
           render do
             DIV(id: 'tp', class: nil, style: nil) { 'Tester' }
           end
@@ -255,41 +255,38 @@ describe 'the param macro', js: true do
         expect(page.body[-60..-19]).to include('<span>2</span>')
       end
 
-      it "even if contains an embedded native object"
-      # its not clear what this test was trying to accomplish...
-      #  do
-      #   pending 'Fix after merging'
-      #   stub_const "Bar", Class.new(Hyperloop::Component)
-      #   stub_const "BazWoggle", Class.new
-      #   BazWoggle.class_eval do
-      #     def initialize(kind)
-      #       @kind = kind
-      #     end
-      #     attr_accessor :kind
-      #     def self._react_param_conversion(json, validate_only)
-      #       new(JSON.from_object(json[0])[:bazwoggle]) if JSON.from_object(json[0])[:bazwoggle]
-      #     end
-      #   end
-      #   Bar.class_eval do
-      #     param :foo, type: BazWoggle
-      #     def render
-      #       params.foo.kind.to_s
-      #     end
-      #   end
-      #   Foo.class_eval do
-      #     export_state :change_me
-      #     before_mount do
-      #       Foo.change_me! "initial"
-      #     end
-      #     def render
-      #       Bar(foo: Native([`{bazwoggle: #{Foo.change_me}}`]))
-      #     end
-      #   end
-      #   div = `document.createElement("div")`
-      #   React.render(React.create_element(Foo, {}), div)
-      #   Foo.change_me! "updated"
-      #   expect(`div.children[0].innerHTML`).to eq("updated")
-      # end
+      it "even if contains an embedded native object", skip: 'its not clear what this test was trying to accomplish...' do
+        stub_const "Bar", Class.new(HyperComponent)
+        stub_const "BazWoggle", Class.new
+        BazWoggle.class_eval do
+          def initialize(kind)
+            @kind = kind
+          end
+          attr_accessor :kind
+          def self._react_param_conversion(json, validate_only)
+            new(JSON.from_object(json[0])[:bazwoggle]) if JSON.from_object(json[0])[:bazwoggle]
+          end
+        end
+        Bar.class_eval do
+          param :foo, type: BazWoggle
+          def render
+            params.foo.kind.to_s
+          end
+        end
+        Foo.class_eval do
+          export_state :change_me
+          before_mount do
+            Foo.change_me! "initial"
+          end
+          def render
+            Bar(foo: Native([`{bazwoggle: #{Foo.change_me}}`]))
+          end
+        end
+        div = `document.createElement("div")`
+        Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element(Foo, {}), div)
+        Foo.change_me! "updated"
+        expect(`div.children[0].innerHTML`).to eq("updated")
+      end
     end
 
     it "will alias a Proc type param" do
@@ -305,23 +302,5 @@ describe 'the param macro', js: true do
       expect(page.body[-60..-19]).to include('<span>works!</span>')
     end
 
-    it "will create a 'bang' (i.e. update) method if the type is React::Observable" do
-      expect_evaluate_ruby do
-        Foo.class_eval do
-          param :foo, type: React::Observable
-          before_mount do
-            params.foo! "ha!"
-          end
-          def render
-            params.foo
-          end
-        end
-        current_state = ""
-        observer = React::Observable.new(current_state) { |new_state| current_state = new_state }
-        React::Test::Utils.render_component_into_document(Foo, foo: observer)
-        current_state
-      end.to eq("ha!")
-      expect(page.body[-60..-19]).to include('<span>ha!</span>')
-    end
   end
 end

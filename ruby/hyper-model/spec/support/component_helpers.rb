@@ -13,7 +13,7 @@ module ComponentTestHelpers
 
   TOP_LEVEL_COMPONENT_PATCH = lambda { |&block| Opal.compile(block.source.split("\n")[1..-2].join("\n"))}.call do #ComponentTestHelpers.compile_to_opal do
     module React
-      class TopLevelRailsComponent
+      class TopLevelRailsComponent # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
 
         class << self
           attr_accessor :event_history
@@ -91,9 +91,11 @@ module ComponentTestHelpers
         end
 
         before_mount do
+          # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
           TopLevelRailsComponent.event_history = Hash.new {|h,k| h[k] = [] }
           component.validator.rules.each do |name, rules|
             if rules[:type] == Proc
+              # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
               TopLevelRailsComponent.event_history[name] = []
               params.render_params[name] = lambda { |*args|  TopLevelRailsComponent.event_history[name] << args.collect { |arg| Native(arg).to_n } }
             end

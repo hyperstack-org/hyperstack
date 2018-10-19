@@ -2,18 +2,18 @@ require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
 describe 'React Integration', js: true do
-  it "The hyper-component gem can use Hyperloop::Component to create components" do
+  it "The hyper-component gem can use HyperComponent to create components" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < HyperComponent
         render(DIV) { 'hello'}
       end
     end
     expect(page).to have_content('hello')
   end
-  it "The hyper-component gem can use Hyperloop::Component::Mixin to create components" do
+  it "The hyper-component gem can use Hyperstack::Component to create components" do
     mount "TestComp" do
       class TestComp
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         render(DIV) { 'hello'}
       end
     end
@@ -21,7 +21,7 @@ describe 'React Integration', js: true do
   end
   it "The hyper-component gem can use hyper-store state syntax" do
     mount "TestComp" do
-      class TestComp < Hyperloop::Component
+      class TestComp < HyperComponent
         before_mount do
           mutate.foo 'hello'
         end
@@ -32,93 +32,93 @@ describe 'React Integration', js: true do
     end
     expect(page).to have_content('hello')
   end
-  it "and it can still use the deprecated mutate syntax" do
-    mount "TestComp" do
-      class TestComp < Hyperloop::Component
-        before_mount do
-          state.foo! 'hello'
-        end
-        render(DIV) do
-          state.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. The mutator 'state.foo!' has been deprecated.  Use 'mutate.foo' instead."]
-    )
-  end
-  it "can use the hyper-store syntax to declare component states" do
-    mount "TestComp" do
-      class TestComp < Hyperloop::Component
-        state foo: 'hello'
-        render(DIV) do
-          " foo = #{state.foo}"
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
-  end
-  it "can use the hyper-store syntax to declare component states and use deprecated mutate syntax" do
-    mount "TestComp" do
-      class TestComp < Hyperloop::Component
-        state foo: true
-        after_mount do
-          state.foo! 'hello' if state.foo
-        end
-        render(DIV) do
-          state.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-  end
-  it "can still use the deprecated syntax to declare component states" do
-    mount "TestComp" do
-      class TestComp < Hyperloop::Component
-        define_state foo: 'hello'
-        render(DIV) do
-          state.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. 'define_state' is deprecated. Use the 'state' macro to declare states."]
-    )
-  end
-  it "can use the hyper-store syntax to declare class states" do
-    mount "TestComp" do
-      class TestComp < Hyperloop::Component
-        state foo: 'hello', scope: :class, reader: true
-        render(DIV) do
-          TestComp.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
-  end
-  it "can still use the deprecated syntax to declare component states" do
-    mount "TestComp" do
-      class TestComp < Hyperloop::Component
-        export_state foo: 'hello'
-        render(DIV) do
-          TestComp.foo
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-    expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
-    ["Warning: Deprecated feature used in TestComp. 'export_state' is deprecated. Use the 'state' macro to declare states."]
-    )
-  end
+  # it "and it can still use the deprecated mutate syntax" do
+  #   mount "TestComp" do
+  #     class TestComp < HyperComponent
+  #       before_mount do
+  #         state.foo! 'hello'
+  #       end
+  #       render(DIV) do
+  #         state.foo
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  #   expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
+  #   ["Warning: Deprecated feature used in TestComp. The mutator 'state.foo!' has been deprecated.  Use 'mutate.foo' instead."]
+  #   )
+  # end
+  # it "can use the hyper-store syntax to declare component states" do
+  #   mount "TestComp" do
+  #     class TestComp < HyperComponent
+  #       state foo: 'hello'
+  #       render(DIV) do
+  #         " foo = #{state.foo}"
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  #   expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
+  # end
+  # it "can use the hyper-store syntax to declare component states and use deprecated mutate syntax" do
+  #   mount "TestComp" do
+  #     class TestComp < HyperComponent
+  #       state foo: true
+  #       after_mount do
+  #         state.foo! 'hello' if state.foo
+  #       end
+  #       render(DIV) do
+  #         state.foo
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  # end
+  # it "can still use the deprecated syntax to declare component states" do
+  #   mount "TestComp" do
+  #     class TestComp < HyperComponent
+  #       define_state foo: 'hello'
+  #       render(DIV) do
+  #         state.foo
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  #   expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
+  #   ["Warning: Deprecated feature used in TestComp. 'define_state' is deprecated. Use the 'state' macro to declare states."]
+  #   )
+  # end
+  # it "can use the hyper-store syntax to declare class states" do
+  #   mount "TestComp" do
+  #     class TestComp < HyperComponent
+  #       state foo: 'hello', scope: :class, reader: true
+  #       render(DIV) do
+  #         TestComp.foo
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  #   expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to be_nil
+  # end
+  # it "can still use the deprecated syntax to declare component states" do
+  #   mount "TestComp" do
+  #     class TestComp < HyperComponent
+  #       export_state foo: 'hello'
+  #       render(DIV) do
+  #         TestComp.foo
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  #   expect_evaluate_ruby("React::Component.instance_variable_get('@deprecation_messages')").to eq(
+  #   ["Warning: Deprecated feature used in TestComp. 'export_state' is deprecated. Use the 'state' macro to declare states."]
+  #   )
+  # end
 
   it 'defines component spec methods' do
     mount "Foo" do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           "initial_state = #{initial_state.inspect}"
         end
@@ -127,33 +127,33 @@ describe 'React Integration', js: true do
     expect(page).to have_content('initial_state = nil')
   end
 
-  it 'allows block for life cycle callback' do
-    mount "Foo" do
-      class Foo < Hyperloop::Component
-        before_mount do
-          set_state({ foo: "bar" })
-        end
-        render(DIV) do
-          state[:foo]
-        end
-      end
-    end
-    expect(page).to have_content('bar')
-  end
+  # DUPLICATE: it 'allows block for life cycle callback' do
+  #   mount "Foo" do
+  #     class Foo < HyperComponent
+  #       before_mount do
+  #         set_state({ foo: "bar" })
+  #       end
+  #       render(DIV) do
+  #         state[:foo]
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('bar')
+  # end
 
-  it 'allows kernal method names like "format" to be used as state variable names' do
-    mount 'Foo' do
-      class Foo < Hyperloop::Component
-        before_mount do
-          mutate.format 'hello'
-        end
-        render(DIV) do
-          state.format
-        end
-      end
-    end
-    expect(page).to have_content('hello')
-  end
+  # DUPLICATE it 'allows kernal method names like "format" to be used as state variable names' do
+  #   mount 'Foo' do
+  #     class Foo < HyperComponent
+  #       before_mount do
+  #         mutate.format 'hello'
+  #       end
+  #       render(DIV) do
+  #         state.format
+  #       end
+  #     end
+  #   end
+  #   expect(page).to have_content('hello')
+  # end
 
   # failures due to React::State::ALWAYS_UPDATE_STATE_AFTER_RENDER = true
   # these tests are all synchronous and fail if we don't react to state change during the rendering cycle.
