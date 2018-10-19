@@ -1,4 +1,4 @@
-require 'react/ext/string'
+require 'hyperstack/ext/component/string'
 
 module Hyperstack
   module Component

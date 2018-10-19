@@ -1,5 +1,5 @@
-require 'react/ext/string'
-require 'react/ext/hash'
+require 'hyperstack/ext/component/string'
+require 'hyperstack/ext/component/hash'
 require 'active_support/core_ext/class/attribute'
 require 'hyperstack/internal/component/callbacks'
 require 'react/rendering_context'

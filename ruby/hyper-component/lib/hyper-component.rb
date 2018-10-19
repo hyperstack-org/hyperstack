@@ -20,7 +20,6 @@ if RUBY_ENGINE == 'opal'
   #require 'react/state'
   require 'react/object'
   require 'react/to_key'
-  #require 'react/ext/opal-jquery/element' # now have to manually require this
   require 'reactive-ruby/isomorphic_helpers'
   require 'react/top_level'
   #require 'react/top_level_render'
