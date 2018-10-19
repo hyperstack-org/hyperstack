@@ -1,11 +1,11 @@
 require "react/children"
 
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module InstanceMethods
         def children
-          Children.new(`#{@native}.props.children`)
+          Hyperstack::Component::Children.new(`#{@native}.props.children`)
         end
 
         def params

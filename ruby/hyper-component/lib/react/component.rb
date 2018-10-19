@@ -1,10 +1,10 @@
 require 'react/ext/string'
 require 'react/ext/hash'
 require 'active_support/core_ext/class/attribute'
-require 'react/callbacks'
+require 'hyperstack/internal/component/callbacks'
 require 'react/rendering_context'
 require 'react/state_wrapper'
-require 'react/component/api'
+require 'hyperstack/internal/component/instance_methods'
 require 'react/component/class_methods'
 require 'react/component/props_wrapper'
 module Hyperstack
@@ -30,9 +30,9 @@ module Hyperstack
     def self.included(base)
       #base.include(Hyperstack::State::Observable)
       base.include(Hyperstack::State::Observer)
-      base.include(Internal::InstanceMethods)
-      base.include(Internal::Callbacks)
-      base.include(Internal::Tags)
+      base.include(Hyperstack::Internal::Component::InstanceMethods)
+      base.include(Hyperstack::Internal::Component::Callbacks)
+      base.include(Hyperstack::Internal::Component::Tags)
       #base.include(React::Component::DslInstanceMethods)
       base.include(Internal::ShouldComponentUpdate)
       base.class_eval do

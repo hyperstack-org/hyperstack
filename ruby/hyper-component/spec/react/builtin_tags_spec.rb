@@ -3,10 +3,10 @@ require 'spec_helper'
 describe 'redefining builtin tags', js: true do
   it "built in tags can be redefined" do
     mount 'Foo' do
-      Hyperstack::Component::Internal::Tags.remove_method :DIV
-      Hyperstack::Component::Internal::Tags.send(:remove_const, :DIV)
+      Hyperstack::Internal::Component::Tags.remove_method :DIV
+      Hyperstack::Internal::Component::Tags.send(:remove_const, :DIV)
 
-      class Hyperstack::Component::Internal::Tags::DIV #< HyperComponent
+      class Hyperstack::Internal::Component::Tags::DIV #< HyperComponent
         include Hyperstack::Component
         others :opts
         render do

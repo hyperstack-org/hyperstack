@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe 'Hyperstack::Component::Internal::Callbacks', js: true do
+describe 'Hyperstack::Internal::Component::Callbacks', js: true do
   it 'defines callback' do
     on_client do
       class Foo
-        include Hyperstack::Component::Internal::Callbacks
+        include Hyperstack::Internal::Component::Callbacks
         define_callback :before_dinner
         before_dinner :wash_hands
 
@@ -21,7 +21,7 @@ describe 'Hyperstack::Component::Internal::Callbacks', js: true do
   it 'defines multiple callbacks' do
     on_client do
       class Foo
-        include Hyperstack::Component::Internal::Callbacks
+        include Hyperstack::Internal::Component::Callbacks
         define_callback :before_dinner
         before_dinner :wash_hands, :turn_off_laptop
 
@@ -46,7 +46,7 @@ describe 'Hyperstack::Component::Internal::Callbacks', js: true do
         Hyperstack::Context.reset!
 
         class Foo
-          include Hyperstack::Component::Internal::Callbacks
+          include Hyperstack::Internal::Component::Callbacks
           define_callback :before_dinner
 
           before_dinner :wash_hands, :turn_off_laptop
@@ -73,7 +73,7 @@ describe 'Hyperstack::Component::Internal::Callbacks', js: true do
   it 'defines block callback' do
     on_client do
       class Foo
-        include Hyperstack::Component::Internal::Callbacks
+        include Hyperstack::Internal::Component::Callbacks
         attr_accessor :a
         attr_accessor :b
 
@@ -97,7 +97,7 @@ describe 'Hyperstack::Component::Internal::Callbacks', js: true do
   it 'defines multiple callback group' do
     on_client do
       class Foo
-        include Hyperstack::Component::Internal::Callbacks
+        include Hyperstack::Internal::Component::Callbacks
         define_callback :before_dinner
         define_callback :after_dinner
         attr_accessor :a
@@ -118,7 +118,7 @@ describe 'Hyperstack::Component::Internal::Callbacks', js: true do
   it 'receives args as callback' do
     on_client do
       class Foo
-        include Hyperstack::Component::Internal::Callbacks
+        include Hyperstack::Internal::Component::Callbacks
         define_callback :before_dinner
         define_callback :after_dinner
 

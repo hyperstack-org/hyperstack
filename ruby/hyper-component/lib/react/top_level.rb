@@ -1,6 +1,6 @@
 require "native"
 require 'active_support/core_ext/object/try'
-require 'react/component/tags'
+require 'hyperstack/internal/component/tags'
 require 'react/component/base'
 
 module Hyperstack
@@ -28,7 +28,7 @@ module Hyperstack
                     viewBox x1 x2 x xlinkActuate xlinkArcrole xlinkHref xlinkRole
                     xlinkShow xlinkTitle xlinkType xmlBase xmlLang xmlSpace y1 y2 y)
       HASH_ATTRIBUTES = %w(data aria)
-      HTML_TAGS = Internal::Tags::HTML_TAGS
+      HTML_TAGS = Hyperstack::Internal::Component::Tags::HTML_TAGS
 
       def self.html_tag?(name)
         tags = HTML_TAGS

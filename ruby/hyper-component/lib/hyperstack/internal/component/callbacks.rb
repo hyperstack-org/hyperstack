@@ -1,8 +1,8 @@
 require 'hyperstack-config'
 
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module Callbacks
         def self.included(base)
           base.extend(ClassMethods)
@@ -22,7 +22,7 @@ module Hyperstack
           def define_callback(callback_name, &after_define_hook)
             wrapper_name = "_#{callback_name}_callbacks"
             define_singleton_method(wrapper_name) do
-              Hyperstack::Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
+              Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
             end
             define_singleton_method(callback_name) do |*args, &block|
               send(wrapper_name).concat(args)

@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal    # contains the name of all HTML tags, and the mechanism to register a component
+  module Internal
+    module Component    # contains the name of all HTML tags, and the mechanism to register a component
       # class as a new tag
       module Tags
         HTML_TAGS = %w(a abbr address area article aside audio b base bdi bdo big blockquote body br
@@ -26,7 +26,7 @@ module Hyperstack
         HTML_TAGS.each do |tag|
 
           define_method(tag.upcase) do |*params, &children|
-            RenderingContext.render(tag, *params, &children)
+            Hyperstack::Component::Internal::RenderingContext.render(tag, *params, &children)
           end
 
           const_set tag.upcase, tag
@@ -35,7 +35,7 @@ module Hyperstack
           if tag == 'p'
             define_method(tag) do |*params, &children|
               if children || params.count == 0 || (params.count == 1 && params.first.is_a?(Hash))
-                RenderingContext.render(tag, *params, &children)
+                Hyperstack::Component::Internal::RenderingContext.render(tag, *params, &children)
               else
                 Kernel.p(*params)
               end
@@ -50,7 +50,7 @@ module Hyperstack
         def self.html_tag_class_for(tag)
           downcased_tag = tag.downcase
           if tag =~ /[A-Z]+/ && HTML_TAGS.include?(downcased_tag)
-            Object.const_set tag, ReactWrapper.create_element(downcased_tag)
+            Object.const_set tag, Hyperstack::Component::Internal::ReactWrapper.create_element(downcased_tag)
           end
         end
 
@@ -59,7 +59,7 @@ module Hyperstack
 
         def method_missing(name, *params, &children)
           component = find_component(name)
-          return RenderingContext.render(component, *params, &children) if component
+          return Hyperstack::Component::Internal::RenderingContext.render(component, *params, &children) if component
           super
         end
 
@@ -71,11 +71,11 @@ module Hyperstack
             name, parent = find_name_and_parent(component)
             tag_names_module = Module.new do
               define_method name do |*params, &children|
-                RenderingContext.render(component, *params, &children)
+                Hyperstack::Component::Internal::RenderingContext.render(component, *params, &children)
               end
               # handle deprecated _as_node style
               define_method "#{name}_as_node" do |*params, &children|
-                RenderingContext.build_only(component, *params, &children)
+                Hyperstack::Component::Internal::RenderingContext.build_only(component, *params, &children)
               end
             end
             parent.extend(tag_names_module)
@@ -103,8 +103,6 @@ module Hyperstack
 
         def lookup_const(name)
           return nil unless name =~ /^[A-Z]/
-          #html_tag = React::Component::Tags.html_tag_class(name)
-          #return html_tag if html_tag
           scopes = self.class.name.to_s.split('::').inject([Module]) do |nesting, next_const|
             nesting + [nesting.last.const_get(next_const)]
           end.reverse

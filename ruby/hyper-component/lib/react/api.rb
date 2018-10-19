@@ -167,7 +167,7 @@ module Hyperstack
             params << ncc
           elsif type.is_a?(Class)
             params << create_native_react_class(type)
-          elsif block_given? || Tags::HTML_TAGS.include?(type)
+          elsif block_given? || Hyperstack::Internal::Component::Tags::HTML_TAGS.include?(type)
             params << type
           elsif type.is_a?(String)
             return Element.new(type)
