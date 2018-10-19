@@ -1,4 +1,4 @@
-require 'react/native_library'
+require 'hyperstack/component/native_library'
 
 module Hyperstack
   module Internal

@@ -1,11 +1,11 @@
 require "spec_helper"
 
-describe 'Hyperstack::Component::Internal::Validator', js: true do
+describe 'Hyperstack::Internal::Component::Validator', js: true do
   describe '#validate' do
     describe "Presence validation" do
       it "should check if required props provided" do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo
             requires :bar
           end
@@ -16,7 +16,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
 
       it "should check if passed non specified prop" do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             optional :foo
           end
         end
@@ -28,7 +28,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
     describe "Type validation" do
       it "should check if passed value with wrong type" do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo, type: String
           end
         end
@@ -39,7 +39,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
       it "should check if passed value with wrong custom type" do
         evaluate_ruby do
           class Bar; end
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo, type: Bar
           end
         end
@@ -49,7 +49,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
 
       it 'coerces native JS prop types to opal objects' do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo, type: JS.call(:eval, "(function () { return { x: 1 }; })();")
           end
         end
@@ -58,7 +58,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
 
       it 'coerces native JS values to opal objects' do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo, type: Array[Integer]
           end
         end
@@ -67,7 +67,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
 
       it "should support Array[Class] validation" do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo, type: Array[Hash]
           end
         end
@@ -85,7 +85,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
     describe "Limited values" do
       it "should check if passed value is not one of the specified values" do
         evaluate_ruby do
-          VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+          VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
             requires :foo, values: [4,5,6]
           end
         end
@@ -98,7 +98,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
   it 'collects other params into a hash' do
     evaluate_ruby do
       PROPS = { foo: 'foo', bar: 'bar', biz: 'biz', baz: 'baz' }
-      VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+      VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
         requires :foo
         optional :bar
         all_other_params :baz
@@ -116,7 +116,7 @@ describe 'Hyperstack::Component::Internal::Validator', js: true do
   describe "default_props" do
     it "should return specified default values" do
       evaluate_ruby do
-        VALIDATOR = Hyperstack::Component::Internal::Validator.new.build do
+        VALIDATOR = Hyperstack::Internal::Component::Validator.new.build do
           requires :foo, default: 10
           requires :bar
           optional :lorem, default: 20

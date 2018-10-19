@@ -3,12 +3,12 @@ require 'hyperstack/ext/component/hash'
 require 'active_support/core_ext/class/attribute'
 require 'hyperstack/internal/component/callbacks'
 require 'react/rendering_context'
-require 'react/state_wrapper'
 require 'hyperstack/internal/component'
 require 'hyperstack/internal/component/instance_methods'
 require 'hyperstack/internal/component/class_methods'
 require 'hyperstack/internal/component/props_wrapper'
 module Hyperstack
+
   module Component
 
     def self.included(base)

@@ -1,4 +1,4 @@
-require "react/config"
+require "hyperstack/internal/component"
 
 module Hyperstack
   module Component

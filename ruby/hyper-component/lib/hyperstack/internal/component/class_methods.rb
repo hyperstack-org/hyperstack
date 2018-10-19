@@ -52,7 +52,7 @@ module Hyperstack
         end
 
         def validator
-          @validator ||= Hyperstack::Component::Internal::Validator.new(props_wrapper)
+          @validator ||= Validator.new(props_wrapper)
         end
 
         def prop_types

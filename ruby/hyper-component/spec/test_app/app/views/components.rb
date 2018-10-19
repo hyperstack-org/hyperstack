@@ -5,7 +5,7 @@ if Hyperstack::Component::IsomorphicHelpers.on_opal_client?
   #require 'react/ext/opal-jquery/element'
   require 'hyperstack/component/jquery'
 end
-require 'react/server'
+require 'hyperstack/component/server'
 require 'react/test/utils'
 require 'reactrb/auto-import'
 require 'js'

@@ -115,7 +115,7 @@ describe 'React Integration', js: true do
   #   )
   # end
 
-  it 'defines component spec methods' do
+  it 'defines component introspection methods (used by Hypertrace and Hyperconsole)' do
     mount "Foo" do
       class Foo
         include Hyperstack::Component

@@ -1,12 +1,12 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       class Validator
         attr_accessor :errors
         attr_reader :props_wrapper
         private :errors, :props_wrapper
 
-        def initialize(props_wrapper = Class.new(Hyperstack::Internal::Component::PropsWrapper))
+        def initialize(props_wrapper = Class.new(PropsWrapper))
           @props_wrapper = props_wrapper
         end
 

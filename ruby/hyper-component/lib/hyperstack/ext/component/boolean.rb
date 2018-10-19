@@ -5,18 +5,6 @@
 #
 # to_key is automatically called on objects passed as keys for
 # example Foo(key: my_object) results in Foo(key: my_object.to_key)
-class Object
-  def to_key
-    object_id
-  end
-end
-
-# for Number to_key can just be the number itself
-class Number
-  def to_key
-    self
-  end
-end
 
 # for Boolean to_key can be true or false
 class Boolean
