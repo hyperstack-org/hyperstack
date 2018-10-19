@@ -17,7 +17,7 @@ module Hyperstack
                 run_child_block(name.nil?, &block)
                 if name
                   buffer = @buffer.dup
-                  ReactWrapper.create_element(name, *args) { buffer }.tap do |element|
+                  Hyperstack::Internal::Component::ReactWrapper.create_element(name, *args) { buffer }.tap do |element|
                     element.waiting_on_resources = saved_waiting_on_resources || !!buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
                     element.waiting_on_resources ||= waiting_on_resources if buffer.last.is_a?(String)
                   end
@@ -31,7 +31,7 @@ module Hyperstack
             elsif name.is_a? Element
               element = name
             else
-              element = ReactWrapper.create_element(name, *args)
+              element = Hyperstack::Internal::Component::ReactWrapper.create_element(name, *args)
               element.waiting_on_resources = waiting_on_resources
             end
             @buffer << element

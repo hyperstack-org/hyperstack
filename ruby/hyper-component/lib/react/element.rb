@@ -49,7 +49,7 @@ module Hyperstack
         if props.empty?
           Internal::RenderingContext.render(self)
         else
-          props = ReactWrapper.convert_props(props)
+          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(props)
           Internal::RenderingContext.render(
             Element.new(`React.cloneElement(#{@native}, #{props.shallow_to_n})`,
                         type, @properties.merge(props), block)

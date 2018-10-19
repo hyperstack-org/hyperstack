@@ -22,7 +22,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
   describe "functional stateless component (supported in reactjs v14+ only)" do
     it "is detected as native React.js component by `native_react_component?`" do
       expect_evaluate_ruby do
-        Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, "(function () { return function C () { return null; }; })();"))
+        Hyperstack::Internal::Component::ReactWrapper.native_react_component?(JS.call(:eval, "(function () { return function C () { return null; }; })();"))
       end.to be_truthy
     end
 
@@ -50,16 +50,16 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
       render() { return React.createElement("div", null, "Hello ", this.props.name); }
     }')
     expect_evaluate_ruby do
-      Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.NativeComponent; })();'))
+      Hyperstack::Internal::Component::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.NativeComponent; })();'))
     end.to be_truthy
     expect_evaluate_ruby do
-      Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return {render: function render() {}}; })();'))
+      Hyperstack::Internal::Component::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return {render: function render() {}}; })();'))
     end.to be_falsy
     expect_evaluate_ruby do
-      Hyperstack::Component::Internal::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.DoesntExist; })();'))
+      Hyperstack::Internal::Component::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.DoesntExist; })();'))
     end.to be_falsy
     expect_evaluate_ruby do
-      Hyperstack::Component::Internal::ReactWrapper.native_react_component?()
+      Hyperstack::Internal::Component::ReactWrapper.native_react_component?()
     end.to be_falsy
   end
 

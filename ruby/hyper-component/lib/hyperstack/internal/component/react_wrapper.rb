@@ -1,8 +1,8 @@
 require 'react/native_library'
 
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       # contains the name of all HTML tags, and the mechanism to register a component
       # Provides the internal mechanisms to interface between reactrb and native components
       # the code will attempt to create a js component wrapper on any rb class that has a
@@ -167,10 +167,10 @@ module Hyperstack
             params << ncc
           elsif type.is_a?(Class)
             params << create_native_react_class(type)
-          elsif block_given? || Hyperstack::Internal::Component::Tags::HTML_TAGS.include?(type)
+          elsif block_given? || Tags::HTML_TAGS.include?(type)
             params << type
           elsif type.is_a?(String)
-            return Element.new(type)
+            return Hyperstack::Component::Element.new(type)
           else
             raise "#{type} not implemented"
           end
@@ -188,7 +188,7 @@ module Hyperstack
               }
             }
           end
-          Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
+          Hyperstack::Component::Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
         end
 
         def self.clear_component_class_cache
@@ -221,7 +221,7 @@ module Hyperstack
                   end
 
                   properties['style'] = (properties['style'] || {}).merge(value)
-                elsif ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
+                elsif Hyperstack::Component::ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
                   properties[key] = (properties[key] || {}).merge(value)
                 else
                   properties[key] = value
@@ -255,10 +255,10 @@ module Hyperstack
                                 }
                               }
                             }
-            elsif ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
+            elsif Hyperstack::Component::ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
               value.each { |k, v| props["#{key}-#{k.gsub(/__|_/, '__' => '_', '_' => '-')}"] = v.to_n }
             else
-              props[ReactAPI.html_attr?(lower_camelize(key)) ? lower_camelize(key) : key] = value
+              props[Hyperstack::Component::ReactAPI.html_attr?(lower_camelize(key)) ? lower_camelize(key) : key] = value
             end
           end
           props

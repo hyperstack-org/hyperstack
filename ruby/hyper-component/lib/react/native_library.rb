@@ -70,7 +70,7 @@ module Hyperstack
         end
 
         def create_component_wrapper(klass, native_name, ruby_name)
-          if Internal::ReactWrapper.native_react_component?(native_name)
+          if Hyperstack::Internal::Component::ReactWrapper.native_react_component?(native_name)
             new_klass = klass.const_set ruby_name, Class.new
             new_klass.class_eval do
               include Component

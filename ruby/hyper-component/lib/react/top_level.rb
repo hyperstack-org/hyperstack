@@ -52,7 +52,7 @@ module Hyperstack
       end
 
       def self.create_element(type, *properties, &block)
-        Internal::ReactWrapper.create_element(type, *properties, &block)
+        Hyperstack::Internal::Component::ReactWrapper.create_element(type, *properties, &block)
       end
 
       # def self.render(element, container)

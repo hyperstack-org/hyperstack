@@ -4,36 +4,18 @@ require 'active_support/core_ext/class/attribute'
 require 'hyperstack/internal/component/callbacks'
 require 'react/rendering_context'
 require 'react/state_wrapper'
+require 'hyperstack/internal/component'
 require 'hyperstack/internal/component/instance_methods'
 require 'hyperstack/internal/component/class_methods'
 require 'hyperstack/internal/component/props_wrapper'
 module Hyperstack
   module Component
 
-    # TODO: move to its own file (i.e. component/force_update)
-    module Internal
-      class << self
-        def mounted_components
-          @mounted_components ||= Set.new
-        end
-      end
-    end
-    def self.force_update!
-      components = Internal.mounted_components.to_a
-      components.each do |comp|
-        next unless Internal.mounted_components.include? comp
-        comp.force_update!
-      end
-    end
-    # end of todo
-
     def self.included(base)
-      #base.include(Hyperstack::State::Observable)
       base.include(Hyperstack::State::Observer)
       base.include(Hyperstack::Internal::Component::InstanceMethods)
       base.include(Hyperstack::Internal::Component::Callbacks)
       base.include(Hyperstack::Internal::Component::Tags)
-      #base.include(React::Component::DslInstanceMethods)
       base.include(Hyperstack::Internal::Component::ShouldComponentUpdate)
       base.class_eval do
         class_attribute :initial_state
@@ -43,7 +25,7 @@ module Hyperstack
         define_callback :before_update
         define_callback :after_update
         define_callback :before_unmount
-        define_callback(:after_error) { Internal::ReactWrapper.add_after_error_hook(base) }
+        define_callback(:after_error) { Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(base) }
       end
       base.extend(Hyperstack::Internal::Component::ClassMethods)
     end
@@ -71,7 +53,7 @@ module Hyperstack
     def component_will_mount
       IsomorphicHelpers.load_context(true) if IsomorphicHelpers.on_opal_client?
       observing(immediate_update: true) do
-        Internal.mounted_components << self
+        Hyperstack::Internal::Component.mounted_components << self
         run_callback(:before_mount)
       end
     end
@@ -101,7 +83,7 @@ module Hyperstack
       observing do
         run_callback(:before_unmount)
         remove
-        Internal.mounted_components.delete self
+        Hyperstack::Internal::Component.mounted_components.delete self
       end
     end
 
@@ -132,10 +114,6 @@ module Hyperstack
       end
     end
 
-    # def set_state_synchronously?
-    #   @native.JS[:__opalInstanceSyncSetState]
-    # end
-
     def render
       raise 'no render defined'
     end unless method_defined?(:render)
@@ -148,35 +126,5 @@ module Hyperstack
         element
       end
     end
-
-      # def watch(value, &on_change)
-      #   Store::Observable.new(value, on_change)
-      # end
   end
 end
-
-# module React
-#   module Component
-#     def self.included(base)
-#       # note this is turned off during old style testing:  See the spec_helper
-#       deprecation_warning base, "The module name React::Component has been deprecated.  Use Hyperloop::Component instead."
-#       base.include Hyperloop::Component
-#     end
-#     def self.deprecation_warning(name, message)
-#       @deprecation_messages ||= []
-#       message = "Warning: Deprecated feature used in #{name}. #{message}"
-#       unless @deprecation_messages.include? message
-#         @deprecation_messages << message
-#         Hyperstack::Component::IsomorphicHelpers.log message, :warning
-#       end
-#     end
-#   end
-#   module ComponentNoNotice
-#     def self.included(base)
-#       base.include Hyperloop::Component
-#     end
-#   end
-# end
-#
-# module React
-# end

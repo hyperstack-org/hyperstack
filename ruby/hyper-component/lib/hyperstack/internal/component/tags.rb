@@ -50,7 +50,7 @@ module Hyperstack
         def self.html_tag_class_for(tag)
           downcased_tag = tag.downcase
           if tag =~ /[A-Z]+/ && HTML_TAGS.include?(downcased_tag)
-            Object.const_set tag, Hyperstack::Component::Internal::ReactWrapper.create_element(downcased_tag)
+            Object.const_set tag, ReactWrapper.create_element(downcased_tag)
           end
         end
 

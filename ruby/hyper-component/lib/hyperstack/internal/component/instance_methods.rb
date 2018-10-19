@@ -1,4 +1,4 @@
-require "react/children"
+require "hyperstack/component/children"
 
 module Hyperstack
   module Internal
@@ -49,7 +49,7 @@ module Hyperstack
           `var state_prop_n = #{state_or_prop.shallow_to_n}`
           # the state object is initalized when the ruby component is instantiated
           # this is detected by self.native.__opalInstanceInitializedState
-          # which is set in the native component constructor in react/api.rb
+          # which is set in the native component constructor in ReactWrapper
           # the setState update callback is not called when initalizing initial state
           if block
             %x{

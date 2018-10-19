@@ -149,13 +149,13 @@ module Hyperstack
           first_name = export_name.first
           Native(`Opal.global`)[first_name] = add_item_to_tree(
             Native(`Opal.global`)[first_name],
-            [Hyperstack::Component::Internal::ReactWrapper.create_native_react_class(self)] + export_name[1..-1].reverse
+            [ReactWrapper.create_native_react_class(self)] + export_name[1..-1].reverse
           ).to_n
         end
 
         def imports(component_name)
-          Hyperstack::Component::Internal::ReactWrapper.import_native_component(
-            self, Hyperstack::Component::Internal::ReactWrapper.eval_native_react_component(component_name)
+          ReactWrapper.import_native_component(
+            self, ReactWrapper.eval_native_react_component(component_name)
           )
           define_method(:render) {} # define a dummy render method - will never be called...
         rescue Exception => e # rubocop:disable Lint/RescueException : we need to catch everything!
@@ -177,7 +177,15 @@ module Hyperstack
         end
 
         def to_n
-          Hyperstack::Component::Internal::ReactWrapper.class_eval('@@component_classes')[self]
+          ReactWrapper.class_eval('@@component_classes')[self]
+        end
+
+        def force_update!
+          components = Component.mounted_components.to_a
+          components.each do |comp|
+            next unless Component.mounted_components.include? comp
+            comp.force_update!
+          end
         end
       end
     end
