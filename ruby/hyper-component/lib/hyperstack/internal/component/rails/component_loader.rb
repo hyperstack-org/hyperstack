@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module Rails
         class ComponentLoader
           attr_reader :v8_context

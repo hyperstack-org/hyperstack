@@ -30,7 +30,7 @@ else
 
   require 'opal-activesupport'
   require 'reactive-ruby/version'
-  require 'reactive-ruby/rails' if defined?(Rails)
+  require 'hyperstack/internal/component/rails'
   require 'reactive-ruby/isomorphic_helpers'
   require 'reactive-ruby/serializers'
 

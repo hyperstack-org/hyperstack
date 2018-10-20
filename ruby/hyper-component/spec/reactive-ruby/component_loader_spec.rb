@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Hyperstack::Component::Internal::Rails::ComponentLoader do
+describe Hyperstack::Internal::Component::Rails::ComponentLoader do
   GLOBAL_WRAPPER = <<-JS
     #{React::ServerRendering::ExecJSRenderer::GLOBAL_WRAPPER}
     var console = {

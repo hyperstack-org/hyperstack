@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Hyperstack::Component::Internal::Rails::ComponentMount do
+RSpec.describe Hyperstack::Internal::Component::Rails::ComponentMount do
   let(:helper) { described_class.new }
 
   before do

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Hyperstack::Component::Internal::Rails::ServerRendering::ContextualRenderer do
+RSpec.describe Hyperstack::Internal::Component::Rails::ServerRendering::ContextualRenderer do
   let(:renderer) { described_class.new({}) }
   let(:init) { Proc.new {} }
   let(:options) { { context_initializer: init } }

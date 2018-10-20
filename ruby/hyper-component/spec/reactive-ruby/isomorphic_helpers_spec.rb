@@ -70,14 +70,14 @@ describe Hyperstack::Component::IsomorphicHelpers do
 
     # Need to decouple/dry up this...
     def test_context(files = nil)
-      js = Hyperstack::Component::Internal::Rails::ServerRendering::ContextualRenderer::CONSOLE_POLYFILL.dup
+      js = Hyperstack::Internal::Component::Rails::ServerRendering::ContextualRenderer::CONSOLE_POLYFILL.dup
       js << Opal::Builder.build('opal').to_s
       Array(files).each do |filename|
         js << ::Rails.application.assets[filename].to_s
       end
       js = "#{React::ServerRendering::ExecJSRenderer::GLOBAL_WRAPPER}#{js}"
       ctx = ExecJS.compile(js)
-      ctx = Hyperstack::Component::Internal::Rails::ServerRendering.context_instance_for(ctx)
+      ctx = Hyperstack::Internal::Component::Rails::ServerRendering.context_instance_for(ctx)
     end
 
     def react_context

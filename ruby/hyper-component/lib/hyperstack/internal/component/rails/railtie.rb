@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module Rails
         class Railtie < ::Rails::Railtie
           config.before_configuration do |app|

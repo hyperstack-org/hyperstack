@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module Rails
         module ServerRendering
           def self.context_instance_name

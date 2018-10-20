@@ -3,8 +3,8 @@ require 'react/server_rendering/manifest_container'
 require 'react/server_rendering/webpacker_manifest_container'
 
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module Rails
         module ServerRendering
           class HyperTestAssetContainer
@@ -48,5 +48,5 @@ module Hyperstack
         end
       end
     end
-  end 
+  end
 end

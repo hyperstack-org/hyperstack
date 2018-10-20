@@ -179,14 +179,6 @@ module Hyperstack
         def to_n
           ReactWrapper.class_eval('@@component_classes')[self]
         end
-
-        def force_update!
-          components = Component.mounted_components.to_a
-          components.each do |comp|
-            next unless Component.mounted_components.include? comp
-            comp.force_update!
-          end
-        end
       end
     end
   end

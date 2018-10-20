@@ -30,6 +30,14 @@ module Hyperstack
       base.extend(Hyperstack::Internal::Component::ClassMethods)
     end
 
+    def self.force_update!
+      components = Hyperstack::Internal::Component.mounted_components.to_a
+      components.each do |comp|
+        next unless Hyperstack::Internal::Component.mounted_components.include? comp
+        comp.force_update!
+      end
+    end
+
     def self.deprecation_warning(message)
       Hyperstack.deprecation_warning(name, message)
     end

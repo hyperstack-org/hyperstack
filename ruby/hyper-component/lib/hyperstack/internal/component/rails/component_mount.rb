@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       module Rails
         class ComponentMount < React::Rails::ComponentMount
           attr_accessor :controller
@@ -26,7 +26,7 @@ module Hyperstack
             existing_context_initializer = options[:prerender][:context_initializer]
 
             options[:prerender][:context_initializer] = lambda do |ctx|
-              IsomorphicHelpers.load_context(ctx, controller, name)
+              Hyperstack::Component::IsomorphicHelpers.load_context(ctx, controller, name)
               existing_context_initializer.call(ctx) if existing_context_initializer
             end
 
@@ -43,7 +43,7 @@ module Hyperstack
           end
 
           def footers
-            IsomorphicHelpers.prerender_footers(controller)
+            Hyperstack::Component::IsomorphicHelpers.prerender_footers(controller)
           end
         end
       end
