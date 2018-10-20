@@ -1,8 +1,6 @@
 # HTML and Component DSL
 
-**Work in progress - ALPHA (docs and code)**
-
-A key design goal of the DSL (Domain Specific Language) is to make it work seamlessly with the rest of Ruby and easy to work with HTML elements and Components.
+A key design goal of the DSL (Domain Specific Language) is to make it work seamlessly with the rest of Ruby and easy to work with HTML elements and Components. Additionally, the DSL provides an abstraction layer between your code and the underlying (fast moving) technology stack. Hyperstack always uses the very latest versions of React and React Router yet our DSL does not change often. We believe that a stable DSL abstraction is an advantage.
 
 ## HTML DSL
 
@@ -16,7 +14,7 @@ UL do
 end
 ```
 
-**Note: All HTML tags are written in CAPS.**
+> **Notice that the HTML elements (BUTTON, DIV, etc.) are in CAPS**. We know this is bending the standard Ruby style rules, but we think it reads better this way.
 
 For example, to render a `<div>`:
 
@@ -99,7 +97,7 @@ The DSL has the following major areas:
 
 + The `Hyperstack::Component` class or `Hyperstack::Component::Mixin` mixin
 + HTML DSL elements
-+ Lifecycle methods (or macros) (`before_mount`, `render`, `after_mount`, `after_update`, `after_error`)
++ Component Lifecycle Methods (`before_mount`, `render`, `after_mount`, `after_update`, `after_error`)
 + The four data accessors methods: `params`, `state`, `mutate`, and `children`
 + Event handlers
 + Miscellaneous methods
@@ -118,7 +116,7 @@ class AnotherComponent
 end
 ```
 
-At a minimum every component class must define a `render` macro which returns **one single** child element. That child may in turn have an arbitrarily deep structure.
+At a minimum every component class must define a `render` method which returns **one single** child element. That child may in turn have an arbitrarily deep structure.
 
 ```ruby
 class Component < Hyperstack::Component
@@ -148,11 +146,11 @@ class FirstComponent < Hyperstack::Component
 end
 ```
 
-Note that you should never redefine the `new` or `initialize` methods, or call them directly.  The equivalent of `initialize` is the `before_mount` callback.  
+Note that you should never redefine the `new` or `initialize` methods, or call them directly.  The equivalent of `initialize` is the `before_mount` method.  
 
 ### Invoking Components
 
-When invoking a custom component **you must have** a (possibly empty) parameter list or (possibly empty) block.
+> Note: when invoking a component **you must have** a (possibly empty) parameter list or (possibly empty) block.
 
 ```ruby
 MyCustomComponent()  # ok
@@ -354,10 +352,10 @@ When designing interfaces, break down the common design elements (buttons, form 
 
 The `params` method gives *read-only* access to each of the scalar params passed to the Component.
 
-Within a React Component the `param` macro is used to define the parameter signature of the component.  You can think of params as
+Within a React Component the `param` method is used to define the parameter signature of the component.  You can think of params as
 the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is rerendered.  
 
-The param macro has the following syntax:
+The param method has the following syntax:
 
 ```ruby
 param symbol, ...options... # or
@@ -526,7 +524,7 @@ end
 
 A common type of React component is one that extends a basic HTML element in a simple way. Often you'll want to copy any HTML attributes passed to your component to the underlying HTML element.
 
-To do this use the `collect_other_params_as` macro which will gather all the params you did not declare into a hash. Then you can pass this hash on to the child component
+To do this use the `collect_other_params_as` method which will gather all the params you did not declare into a hash. Then you can pass this hash on to the child component
 
 ```ruby
 class CheckLink < Hyperstack::Component
@@ -665,11 +663,11 @@ class TickTock < Hyperstack::Component
 end
 ```
 
-Notice that TickTock effectively has two before_mount callbacks, one that is called to initialize the `@intervals` array and another to initialize `state.seconds`
+Notice that TickTock effectively has two `before_mount` methods, one that is called to initialize the `@intervals` array and another to initialize `state.seconds`
 
-## Lifecycle Callbacks
+## Lifecycle Methods
 
-A component may define callbacks for each phase of the components lifecycle:
+A component may define lifecycle methods for each phase of the components lifecycle:
 
 * `before_mount`
 * `render`
@@ -679,41 +677,44 @@ A component may define callbacks for each phase of the components lifecycle:
 * `after_update`
 * `before_unmount`
 
-All the callback macros may take a block or the name of an instance method to be called.
+>Note: A `render` method must be defined and must return just one HTML element.
+
+All the Component Lifecycle methods may take a block or the name of an instance method to be called.
 
 ```ruby
 class MyComponent < Hyperstack::Component
   before_mount do
     # initialize stuff here
   end
+
+  render do
+    # return just one HTML element
+  end
+
   before_unmount :cleanup  # call the cleanup method before unmounting
   ...
 end
 ```
 
-Except for the render callback, multiple callbacks may be defined for each lifecycle phase, and will be executed in the order defined, and from most deeply nested subclass outwards.
-
-Details on the component lifecycle is described [here](docs/component-specs.html)
+Except for the render method, multiple lifecycle methods may be defined for each lifecycle phase, and will be executed in the order defined, and from most deeply nested subclass outwards.
 
 ### Lifecycle Methods
 
-A component class may define callbacks for  specific points in a component's lifecycle.
+A component class may define lifecycle methods for specific points in a component's lifecycle.
 
 ### Rendering
 
-The lifecycle revolves around rendering the component.  As the state or parameters of a component changes, its render method will be called to generate the new HTML.  The rest of the callbacks hook into the lifecycle before or after rendering.
-
-For reasons described below Hyperstack provides a render callback to simplify defining the render method:
+The lifecycle revolves around rendering the component.  As the state or parameters of a component changes, its render method will be called to generate the new HTML.
 
 ```ruby
 render do ....
 end
 ```
 
-The render callback will generate the components render method.  It may optionally take the container component and params:
+The render method may optionally take the container component and params:
 
 ```ruby
-render(:DIV, class: 'my-class') do
+render(DIV, class: 'my-class') do
   ...
 end
 ```
@@ -728,7 +729,7 @@ render do
 end
 ```
 
-The purpose of the render callback is syntactic.  Many components consist of a static outer container with possibly some parameters, and most component's render method by necessity will be longer than the normal *10 line* ruby style guideline.  The render call back solves both these problems by allowing the outer container to be specified as part of the callback parameter (which reads very nicely) and because the render code is now specified as a block you avoid the 10 line limitation, while encouraging the rest of your methods to adhere to normal ruby style guides
+The purpose of the render method is syntactic.  Many components consist of a static outer container with possibly some parameters, and most component's render method by necessity will be longer than the normal *10 line* ruby style guideline.  The render method solves both these problems by allowing the outer container to be specified as part of the method parameter (which reads very nicely) and because the render code is now specified as a block you avoid the 10 line limitation, while encouraging the rest of your methods to adhere to normal ruby style guides
 
 ### Before Mounting (first render)
 
@@ -749,7 +750,7 @@ after_mount do ...
 end
 ```
 
-Invoked once, only on the client (not on the server), immediately after the initial rendering occurs. At this point in the lifecycle, you can access any refs to your children (e.g., to access the underlying DOM representation). The `after_mount` callbacks of children components are invoked before that of parent components.
+Invoked once, only on the client (not on the server), immediately after the initial rendering occurs. At this point in the lifecycle, you can access any refs to your children (e.g., to access the underlying DOM representation). The `after_mount` methods of children components are invoked before that of parent components.
 
 If you want to integrate with other JavaScript frameworks, set timers using the `after` or `every` methods, or send AJAX requests, perform those operations in this method.  Attempting to perform such operations in before_mount will cause errors during prerendering because none of these operations are available in the server environment.
 
@@ -829,7 +830,7 @@ end
 
 Invoked immediately before a component is unmounted from the DOM.
 
-Perform any necessary cleanup in this method, such as invalidating timers or cleaning up any DOM elements that were created in the `after_mount` callback.
+Perform any necessary cleanup in this method, such as invalidating timers or cleaning up any DOM elements that were created in the `after_mount` method.
 
 ### The force_update! method
 
@@ -924,7 +925,7 @@ type                   -> String
 
 ### Event pooling
 
-The underlying React `SyntheticEvent` is pooled. This means that the `SyntheticEvent` object will be reused and all properties will be nullified after the event callback has been invoked. This is for performance reasons. As such, you cannot access the event in an asynchronous way.
+The underlying React `SyntheticEvent` is pooled. This means that the `SyntheticEvent` object will be reused and all properties will be nullified after the event method has been invoked. This is for performance reasons. As such, you cannot access the event in an asynchronous way.
 
 ### Supported Events
 
@@ -1187,7 +1188,7 @@ The `imports` directive takes a string (or a symbol) and will simply evaluate it
 
 ### The dom_node method
 
-Returns the HTML dom_node that this component instance is mounted to.  Typically used in the `after_mount` callback to setup linkages to external libraries.
+Returns the HTML dom_node that this component instance is mounted to.  Typically used in the `after_mount` method to setup linkages to external libraries.
 
 Example:
 
@@ -1407,7 +1408,7 @@ http://localhost:3000/my_hyper_app/some_page?Hyperstack-prerendering=off
 
 This is useful for development and testing.
 
-NOTE: in the route you say Hyperstack_prererendering but in the query string its Hyperstack-prerendering (underscore vs. dash). This is because of rails security protection when using defaults.
+>Note: in the route you say Hyperstack_prererendering but in the query string its Hyperstack-prerendering (underscore vs. dash). This is because of rails security protection when using defaults.
 
 ## DSL Gotchas
 
