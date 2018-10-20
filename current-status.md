@@ -74,7 +74,7 @@ The `Hyperstack::State::Observable` module provides a handful of methods to make
 Here is an example (compare to the state example on the [Hyperstack.org home page](https://hyperstack.org/))
 
 ```ruby
-class UsingState < Hyperloop::Component
+class UsingState < HyperComponent
 
   # Our component has two instance variables to keep track of what is going on
   #   @show        - if true we will show an input box, otherwise the box is hidden
