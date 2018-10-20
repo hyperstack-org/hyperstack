@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe React::IsomorphicHelpers do
+describe Hyperstack::Component::IsomorphicHelpers do
   describe 'code execution context' do
     let(:klass) { Class.send(:include, described_class) }
 
@@ -58,7 +58,7 @@ describe React::IsomorphicHelpers do
     end
   end
 
-  describe React::IsomorphicHelpers::Context do
+  describe Hyperstack::Component::IsomorphicHelpers::Context do
     class TestV8Context < Hash
       def eval(args)
         true
@@ -70,14 +70,14 @@ describe React::IsomorphicHelpers do
 
     # Need to decouple/dry up this...
     def test_context(files = nil)
-      js = ReactiveRuby::ServerRendering::ContextualRenderer::CONSOLE_POLYFILL.dup
+      js = Hyperstack::Internal::Component::Rails::ServerRendering::ContextualRenderer::CONSOLE_POLYFILL.dup
       js << Opal::Builder.build('opal').to_s
       Array(files).each do |filename|
         js << ::Rails.application.assets[filename].to_s
       end
       js = "#{React::ServerRendering::ExecJSRenderer::GLOBAL_WRAPPER}#{js}"
       ctx = ExecJS.compile(js)
-      ctx = ReactiveRuby::ServerRendering.context_instance_for(ctx)
+      ctx = Hyperstack::Internal::Component::Rails::ServerRendering.context_instance_for(ctx)
     end
 
     def react_context
@@ -118,7 +118,7 @@ describe React::IsomorphicHelpers do
     describe '#send_to_opal' do
       let(:opal_code) { Opal::Builder.new.build_str(ruby_code, __FILE__).to_s }
       let(:ruby_code) { %Q[
-        module React::IsomorphicHelpers
+        module Hyperstack::Component::IsomorphicHelpers
           def self.greet(name)
             "Hello, " + name + "!"
           end
@@ -134,7 +134,7 @@ describe React::IsomorphicHelpers do
         context.instance_variable_set(:@ctx, test_context)
         expect {
           context.send_to_opal(:foo)
-        }.to raise_error(/No HyperReact components found/)
+        }.to raise_error(/No Hyperstack components found/)
       end
 
       it 'executes method with args inside opal rubyracer context' do

@@ -7,7 +7,7 @@ describe 'the React DSL', js: true do
     it "can define the render method with the render macro with a html tag container" do
       mount 'Foo' do
         class Foo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component
           render(:div, class: :foo) do
             "hello"
           end
@@ -19,7 +19,7 @@ describe 'the React DSL', js: true do
     it "can define the render method with the render macro without a container" do
       mount 'Foo' do
         class Foo
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component
           render do
             "hello"
           end
@@ -30,11 +30,11 @@ describe 'the React DSL', js: true do
 
     it "can define the render method with the render macro with a application defined container" do
       on_client do
-        class Bar < Hyperloop::Component
+        class Bar < HyperComponent
           param :p1
           render { "hello #{params.p1}" }
         end
-        class Foo < Hyperloop::Component
+        class Foo < HyperComponent
           render Bar, p1: "fred"
         end
       end
@@ -46,7 +46,7 @@ describe 'the React DSL', js: true do
   it "will turn the last string in a block into a element" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div { "hello" }
         end
@@ -59,7 +59,7 @@ describe 'the React DSL', js: true do
     client_option render_on: :both
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           INPUT(data: {foo: 12}).on(:change) {}
         end
@@ -71,7 +71,7 @@ describe 'the React DSL', js: true do
   it "will turn the last string in a block into a element" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           DIV { "hello" }
         end
@@ -83,7 +83,7 @@ describe 'the React DSL', js: true do
   it "has a .span short hand String method" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div { "hello".span; "goodby".span }
         end
@@ -97,7 +97,7 @@ describe 'the React DSL', js: true do
     client_option raise_on_js_errors: :off
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div { "hello".br }
         end
@@ -109,7 +109,7 @@ describe 'the React DSL', js: true do
   it "has a .td short hand String method" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           table {
             tbody {
@@ -125,7 +125,7 @@ describe 'the React DSL', js: true do
   it "has a .para short hand String method" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div { "hello".para }
         end
@@ -142,7 +142,7 @@ describe 'the React DSL', js: true do
     mount 'Mod::NestedMod::NestedComp' do
       module Mod
         class Comp
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component
           param :test
           def render
              "Mod::Comp"
@@ -150,7 +150,7 @@ describe 'the React DSL', js: true do
         end
         module NestedMod
           class NestedComp
-            include Hyperloop::Component::Mixin
+            include Hyperstack::Component
             def render
               Comp(test: 'string')
             end
@@ -166,7 +166,7 @@ describe 'the React DSL', js: true do
     mount 'Mod::NestedMod::NestedComp' do
       module Mod
         module NestedMod
-          class NestedComp < Hyperloop::Component
+          class NestedComp < HyperComponent
             backtrace :none
             render do
               Comp(test: 'string')
@@ -184,7 +184,7 @@ describe 'the React DSL', js: true do
     client_option render_on: :both
     client_option raise_on_js_errors: :off
     expect_evaluate_ruby do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         backtrace :none
         render do
           _undefined_method
@@ -204,13 +204,13 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       module Mod
         class Bar
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component
           def render
             "a man walks into a bar"
           end
         end
       end
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         def render
           Mod::Bar()
         end
@@ -223,14 +223,14 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       module Mod
         class Bar
-          include Hyperloop::Component::Mixin
+          include Hyperstack::Component
           collect_other_params_as :attributes
           def render
             "a man walks into a bar".span(params.attributes)
           end
         end
       end
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         def render
           Mod::Bar().the_class.other_class
         end
@@ -242,7 +242,7 @@ describe 'the React DSL', js: true do
   it "can use the 'class' keyword for classes" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           span(class: "the-class") { "hello" }
         end
@@ -254,19 +254,19 @@ describe 'the React DSL', js: true do
   it "can generate a unrendered node using the .as_node method" do          # div { "hello" }.as_node
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           span(data: {size: 12}) { "hello".span.as_node.class.name }.as_node.render
         end
       end
     end
-    expect(page.body[-80..-19]).to include('<span data-size="12">React::Element</span>')
+    expect(page.body[-80..-19]).to include('<span data-size="12">Hyperstack::Component::Element</span>')
   end
 
   it "can use the dangerously_set_inner_HTML param" do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div(dangerously_set_inner_HTML:  { __html: "Hello and Goodby" })
         end
@@ -278,7 +278,7 @@ describe 'the React DSL', js: true do
   it 'should convert a hash param to hyphenated html attributes if in React::HASH_ATTRIBUTES' do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div(data: { foo: :bar }, aria: { label: "title" })
         end
@@ -290,7 +290,7 @@ describe 'the React DSL', js: true do
   it 'should not convert a hash param to hyphenated html attributes if not in React::HASH_ATTRIBUTES' do
     mount 'Foo' do
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div(title: { bar: :foo })
         end
@@ -302,7 +302,7 @@ describe 'the React DSL', js: true do
   it "will remove all elements passed as params from the rendering buffer" do
     mount 'Foo' do
       class X2
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         param :ele
         def render
           div do
@@ -312,7 +312,7 @@ describe 'the React DSL', js: true do
         end
       end
       class Foo
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           X2(ele: b { "hello" })
         end

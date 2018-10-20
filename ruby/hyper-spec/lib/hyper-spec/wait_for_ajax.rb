@@ -12,9 +12,9 @@ module HyperSpec
     def running?
       jscode = <<-CODE
       (function() {
-        if (typeof Opal !== "undefined" && Opal.Hyperloop !== undefined) {
+        if (typeof Opal !== "undefined" && Opal.Hyperstack !== undefined) {
           try {
-            return Opal.Hyperloop.$const_get("HTTP")["$active?"]();
+            return Opal.Hyperstack.$const_get("HTTP")["$active?"]();
           } catch(err) {
             if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
               return (jQuery.active > 0);
@@ -39,7 +39,7 @@ module HyperSpec
     rescue Capybara::NotSupportedByDriverError
       true
     rescue Exception => e
-      e.message == 'either jQuery or Hyperloop::HTTP is not defined'
+      e.message == 'either jQuery or Hyperstack::HTTP is not defined'
     end
   end
 end

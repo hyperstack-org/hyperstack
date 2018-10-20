@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe 'Hyperloop::Component', js: true do
+describe 'HyperComponent', js: true do
 
   before :each do
     on_client do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         before_mount do
           @instance_data = ["working"]
         end

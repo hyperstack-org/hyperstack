@@ -3,7 +3,7 @@ module Hyperloop
     module Mixin
       class << self
         def included(base)
-          base.include(Hyperloop::Component::Mixin)
+          base.include(Hyperloop::Component)
           base.include(HyperRouter::ComponentMethods)
 
           base.class_eval do

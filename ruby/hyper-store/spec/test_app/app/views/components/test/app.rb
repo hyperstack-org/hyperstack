@@ -1,5 +1,6 @@
 module Test
-  class App < Hyperloop::Component
+  class App
+    include Hyperstack::Component
     before_mount do
       @store = Store.new
     end

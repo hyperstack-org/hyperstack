@@ -3,17 +3,21 @@ require 'spec_helper'
 describe 'redefining builtin tags', js: true do
   it "built in tags can be redefined" do
     mount 'Foo' do
-      React::Component::Tags.remove_method :DIV
-      React::Component::Tags.send(:remove_const, :DIV)
+      Hyperstack::Internal::Component::Tags.remove_method :DIV
+      Hyperstack::Internal::Component::Tags.send(:remove_const, :DIV)
 
-      class React::Component::Tags::DIV < Hyperloop::Component
+      class Hyperstack::Internal::Component::Tags::DIV #< HyperComponent
+        include Hyperstack::Component
         others :opts
         render do
-          present :div, params.opts, data: {render_time:  Time.now}, &children
+          # see https://github.com/hyperstack-org/hyperstack/issues/47
+          Hyperstack::Component::Internal::RenderingContext.render(:div, params.opts, data: {render_time:  Time.now}, &children)
+          #Hyperstack::Component::ReactAPI.create_element(:div params.opts, data: {render_time:  Time.now}, &children)
         end
       end
 
-      class Foo < Hyperloop::Component
+      class Foo
+        include Hyperstack::Component
         render(DIV, id: :tp) do
           "hello"
         end

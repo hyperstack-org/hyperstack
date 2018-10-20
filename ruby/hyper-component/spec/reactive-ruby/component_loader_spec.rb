@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ReactiveRuby::ComponentLoader do
+describe Hyperstack::Internal::Component::Rails::ComponentLoader do
   GLOBAL_WRAPPER = <<-JS
     #{React::ServerRendering::ExecJSRenderer::GLOBAL_WRAPPER}
     var console = {
@@ -28,7 +28,7 @@ describe ReactiveRuby::ComponentLoader do
   end
 
   describe '#load' do
-    xit 'loads given asset file into context' do
+    it 'loads given asset file into context', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
 
       expect {
@@ -36,37 +36,37 @@ describe ReactiveRuby::ComponentLoader do
       }.to change { !!v8_context.eval('Opal.React !== undefined') }.from(false).to(true)
     end
 
-    xit 'is truthy upon successful load' do
+    it 'is truthy upon successful load', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
       expect(loader.load('components')).to be_truthy
     end
 
-    xit 'fails silently returning false' do
+    it 'fails silently returning false', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
       expect(loader.load('foo')).to be_falsey
     end
   end
 
   describe '#load!' do
-    xit 'is truthy upon successful load' do
+    it 'is truthy upon successful load', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
       expect(loader.load!('components')).to be_truthy
     end
 
-    xit 'raises an expection if loading fails' do
+    it 'raises an expection if loading fails', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
       expect { loader.load!('foo') }.to raise_error(/No HyperReact components/)
     end
   end
 
   describe '#loaded?' do
-    xit 'is truthy if components file is already loaded' do
+    it 'is truthy if components file is already loaded', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
       loader.load('components')
       expect(loader).to be_loaded
     end
 
-    xit 'is false if components file is not loaded' do
+    it 'is false if components file is not loaded', skip: 'feature not implemented yet' do
       loader = described_class.new(v8_context)
       expect(loader).to_not be_loaded
     end

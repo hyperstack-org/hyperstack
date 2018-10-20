@@ -105,7 +105,7 @@ module ReactiveRecord
       # -: You think wrong. add_style_sheet uses the jQuery $, after_mount too, others too
       # -: I removed those references. Now you think right.
 
-      include Hyperloop::Component::Mixin
+      include Hyperloop::Component
 
       param :loading
       param :loaded_children

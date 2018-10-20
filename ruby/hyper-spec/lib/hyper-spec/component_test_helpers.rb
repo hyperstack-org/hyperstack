@@ -7,7 +7,7 @@ require_relative '../../lib/hyper-spec/time_cop.rb'
 module HyperSpec
   module ComponentTestHelpers
     TOP_LEVEL_COMPONENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../react/top_level_rails_component.rb', __FILE__)))
+      Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
     TIME_COP_CLIENT_PATCH =
       Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
       "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
@@ -24,11 +24,11 @@ module HyperSpec
 
     def build_test_url_for(controller)
       unless controller
-        unless defined?(::ReactTestController)
-          Object.const_set('ReactTestController', Class.new(::ActionController::Base))
+        unless defined?(::HyperstackTestController)
+          Object.const_set('HyperstackTestController', Class.new(::ActionController::Base))
         end
 
-        controller = ::ReactTestController
+        controller = ::HyperstackTestController
       end
 
       route_root = controller.name.gsub(/Controller$/, '').underscore
@@ -216,7 +216,8 @@ module HyperSpec
               }
             end
           end
-          class React::Component::HyperTestDummy < React::Component::Base
+          class Hyperstack::Component::Internal::TestDummy
+            include Hyperstack::Component
                 def render; end
           end
           #{@client_code}
@@ -225,7 +226,7 @@ module HyperSpec
         opts[:code] = Opal.compile(block_with_helpers)
       end
 
-      component_name ||= 'React::Component::HyperTestDummy'
+      component_name ||= 'Hyperstack::Component::Internal::TestDummy'
       ::Rails.cache.write(test_url, [component_name, params, opts])
       test_code_key = "hyper_spec_prerender_test_code.js"
       @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
@@ -249,7 +250,7 @@ module HyperSpec
     [:callback_history_for, :last_callback_for, :clear_callback_history_for,
      :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
       define_method(method) do |event_name|
-        evaluate_ruby("React::TopLevelRailsComponent.#{method}('#{event_name}')")
+        evaluate_ruby("Hyperstack::Internal::Component::TopLevelRailsComponent.#{method}('#{event_name}')")
       end
     end
 

@@ -4,11 +4,17 @@ require 'spec_helper'
 describe 'the receives macro' do
 
   before(:all) do
-    class TestOp < Hyperloop::Operation
+    class TestOp
       def self.dispatch(params={})
         receivers.each do |receiver|
           receiver.call params
         end
+      end
+      def self.receivers
+        @receivers ||= []
+      end
+      def self.on_dispatch(&block)
+        receivers << block
       end
     end
   end
@@ -18,13 +24,14 @@ describe 'the receives macro' do
     Object.send(:remove_const, :Bar)
 
     # We're very basically mocking React::State so we can run these outside of Opal
-    React::State.reset!
+    Hyperstack::Internal::Store::State.reset!
   end
 
   context 'arguments' do
     before(:each) do
       class Bar < TestOp; end
-      class Foo < Hyperloop::Store
+      class Foo
+        include Hyperstack::Legacy::Store
         state :bar, scope: :class
       end
     end
@@ -132,7 +139,7 @@ describe 'the receives macro' do
       it 'will throw an error if nothing at all is passed in' do
         expect do
           Foo.receives
-        end.to raise_error(HyperStore::DispatchReceiver::InvalidOperationError)
+        end.to raise_error(Hyperstack::Legacy::Store::InvalidOperationError)
       end
 
       it 'will throw an error if only a Symbol is passed in' do
@@ -143,13 +150,13 @@ describe 'the receives macro' do
         end
         expect do
           Foo.receives :foo!
-        end.to raise_error(HyperStore::DispatchReceiver::InvalidOperationError)
+        end.to raise_error(Hyperstack::Legacy::Store::InvalidOperationError)
       end
 
       it 'will throw an error if only a Proc is passed in' do
         expect do
           Foo.receives -> { mutate.bar('foo') }
-        end.to raise_error(HyperStore::DispatchReceiver::InvalidOperationError)
+        end.to raise_error(Hyperstack::Legacy::Store::InvalidOperationError)
       end
 
       it 'will throw an error if only a block is passed in' do
@@ -157,7 +164,7 @@ describe 'the receives macro' do
           Foo.receives do
             mutate.bar('foo')
           end
-        end.to raise_error(HyperStore::DispatchReceiver::InvalidOperationError)
+        end.to raise_error(Hyperstack::Legacy::Store::InvalidOperationError)
       end
     end
 

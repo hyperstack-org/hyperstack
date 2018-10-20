@@ -4,21 +4,21 @@ module React
       DSL_METHODS = %i[mount instance update_params html].freeze
 
       def mount(component_klass, params = {})
-        @element = React.create_element(component_klass, params)
+        @element = Hyperstack::Component::ReactAPI.create_element(component_klass, params)
         instance
       end
 
       def instance
         unless @instance
           @container = `document.createElement('div')`
-          @instance = React.render(@element, @container)
+          @instance = Hyperstack::Component::ReactAPI.render(@element, @container)
         end
         @instance
       end
 
       def update_params(params, &block)
-        cloned_element = React::Element.new(`React.cloneElement(#{@element.to_n}, #{params.to_n})`)
-        React.render(cloned_element, @container, &block)
+        cloned_element = Hyperstack::Component::Element.new(`React.cloneElement(#{@element.to_n}, #{params.to_n})`)
+        Hyperstack::Component::ReactAPI.render(cloned_element, @container, &block)
         nil
       end
 

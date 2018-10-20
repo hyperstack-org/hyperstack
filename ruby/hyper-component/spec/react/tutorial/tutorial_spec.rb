@@ -4,7 +4,7 @@ describe 'An Example from the react.rb doc', js: true do
   it 'produces the correct result' do
     mount 'HelloMessage' do
       class HelloMessage
-        include Hyperloop::Component::Mixin
+        include Hyperstack::Component
         def render
           div { "Hello World!" }
         end
@@ -18,10 +18,10 @@ describe 'Adding state to a component (second tutorial example)', js: true do
   before :each do
     on_client do
       class HelloMessage2
-        include Hyperloop::Component::Mixin
-        define_state(:user_name) { '@catmando' }
+        include Hyperstack::Component
+        before_mount { @user_name = '@catmando' }
         def render
-          div { "Hello #{state.user_name}" }
+          div { "Hello #{@user_name}" }
         end
       end
     end
@@ -35,7 +35,7 @@ describe 'Adding state to a component (second tutorial example)', js: true do
   it 'renders to the document' do
     evaluate_ruby do
       ele = JS.call(:eval, "document.body.appendChild(document.createElement('div'))")
-      React.render(React.create_element(HelloMessage2), ele)
+      Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element(HelloMessage2), ele)
     end
     expect(page).to have_xpath('//div', text: 'Hello @catmando')
   end
