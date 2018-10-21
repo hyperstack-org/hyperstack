@@ -95,7 +95,7 @@ Hyperstack Component DSL is a set of class and instance methods that are used to
 
 The DSL has the following major areas:  
 
-+ The `Hyperstack::Component` class or `Hyperstack::Component::Mixin` mixin
++ The `Hyperstack::Component` class or `Hyperstack::Component` mixin
 + HTML DSL elements
 + Component Lifecycle Methods (`before_mount`, `render`, `after_mount`, `after_update`, `after_error`)
 + The four data accessors methods: `params`, `state`, `mutate`, and `children`
@@ -104,7 +104,7 @@ The DSL has the following major areas:
 
 ## Hyperstack::Component
 
-Hyperstack Components classes either include `Hyperstack::Component::Mixin` or are subclasses of `Hyperstack::Component`.  
+Hyperstack Components classes either include `Hyperstack::Component` or are subclasses of `Hyperstack::Component`.  
 
 ```ruby
 class Component < Hyperstack::Component
@@ -112,7 +112,7 @@ end
 
 # if subclassing is inappropriate, you can mixin instead
 class AnotherComponent
-  include Hyperstack::Component::Mixin
+  include Hyperstack::Component
 end
 ```
 
