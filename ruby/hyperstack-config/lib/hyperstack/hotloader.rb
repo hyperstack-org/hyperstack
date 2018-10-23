@@ -1,10 +1,10 @@
-require 'hyperstack/hot_loader/add_error_boundry'
-require 'hyperstack/hot_loader/stack-trace.js'
-require 'hyperstack/hot_loader/css_reloader'
+require 'hyperstack/hotloader/add_error_boundry'
+require 'hyperstack/hotloader/stack-trace.js'
+require 'hyperstack/hotloader/css_reloader'
 require 'opal-parser' # gives me 'eval', for hot-loading code
 
 require 'json'
-require 'hyperstack/hot_loader/short_cut.js'
+require 'hyperstack/hotloader/short_cut.js'
 
 # Opal client to support hot reloading
 $eval_proc = proc do |file_name, s|
@@ -14,7 +14,7 @@ end
 
 module Hyperstack
 
-  class HotLoader
+  class Hotloader
     def self.callbackmaps
       @@callbackmaps ||= Hash.new { |h, k| h[k] = Hash.new { |h1, k1| h1[k1] = Hash.new { |h2, k2| h2[k2] = Array.new }}}
     end
@@ -58,7 +58,7 @@ module Hyperstack
     end
 
     def notify_error(reload_request)
-      msg = "HotLoader #{reload_request[:filename]} RELOAD ERROR:\n\n#{$!}"
+      msg = "Hotloader #{reload_request[:filename]} RELOAD ERROR:\n\n#{$!}"
       puts msg
       alert msg if use_alert?
     end
@@ -83,7 +83,7 @@ module Hyperstack
         begin
           #Hyperstack::Context.reset! false
           file_name = reload_request[:asset_path] #.gsub(/.+hyperstack\//, '')
-          HotLoader.remove(file_name)
+          Hotloader.remove(file_name)
           $eval_proc.call file_name, reload_request[:source_code]
         rescue
           notify_error(reload_request)
@@ -114,7 +114,7 @@ module Hyperstack
 
     def self.listen(port=25222, ping=nil)
       ::Hyperstack::Internal::Component::TopLevelRailsComponent.include AddErrorBoundry
-      @server = HotLoader.new(port, ping) do
+      @server = Hotloader.new(port, ping) do
         # TODO: check this out when Operations are integrated
         # if defined?(Hyperloop::Internal::Operation::ClientDrivers) &&
         #    Hyperloop::ClientDrivers.respond_to?(:initialize_client_drivers_on_boot)

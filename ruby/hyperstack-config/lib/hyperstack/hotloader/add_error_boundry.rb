@@ -1,5 +1,5 @@
 module Hyperstack
-  class HotLoader
+  class Hotloader
     module AddErrorBoundry
       def self.included(base)
         base.after_error do |*err|

@@ -8,7 +8,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/on_client'
   require 'hyperstack/active_support_string_inquirer.rb'
   require 'hyperstack_env'
-  require 'hyperstack/hot_loader/stub'
+  require 'hyperstack/hotloader/stub'
 else
   require 'opal'
   require 'opal-browser'

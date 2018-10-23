@@ -3,7 +3,7 @@ require 'io/writable'
 
 module Hyperstack
 
-  class HotLoader
+  class Hotloader
 
     # Code taken from opal browser, did not want to force an opal-browser dependency
     #

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require "hyperstack/hot_loader/server"
+require "hyperstack/hotloader/server"
 
 options = {:port => 25222, :directories => []}
 OptionParser.new do |opts|
@@ -17,6 +17,6 @@ OptionParser.new do |opts|
 
 end.parse!
 
-server = Hyperstack::HotLoader::Server.new(options)
+server = Hyperstack::Hotloader::Server.new(options)
 puts "Listening on port #{options[:port]}, watching for changes in #{options[:directories].join(', ')}"
 server.loop

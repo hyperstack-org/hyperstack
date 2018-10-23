@@ -7,7 +7,7 @@ require 'json'
 require 'pry'
 
 module Hyperstack
-  class HotLoader
+  class Hotloader
     # Most of this lifted from https://github.com/saward/Rubame
     class Server
 

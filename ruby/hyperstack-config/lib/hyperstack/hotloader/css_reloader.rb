@@ -1,6 +1,6 @@
 require 'native'
 module Hyperstack
-  class HotLoader
+  class Hotloader
     class CssReloader
 
       def reload(reload_request, document)
@@ -34,7 +34,7 @@ module Hyperstack
           href_base = File.basename(href).sub(/\.self-?.*.css.+/, '')
           url_base == href_base
         end
-      
+
       end
     end
   end
