@@ -30,26 +30,12 @@ module Hyperstack
           end
 
           const_set tag.upcase, tag
-
-          # deprecated: remove
-          if tag == 'p'
-            define_method(tag) do |*params, &children|
-              if children || params.count == 0 || (params.count == 1 && params.first.is_a?(Hash))
-                RenderingContext.render(tag, *params, &children)
-              else
-                Kernel.p(*params)
-              end
-            end
-          else
-            #alias_method tag, tag.upcase
-          end
-          # end of deprecated code
         end
 
         # this is used for haml style (i.e. DIV.foo.bar) class tags which is deprecated
         def self.html_tag_class_for(tag)
           downcased_tag = tag.downcase
-          if tag =~ /[A-Z]+/ && HTML_TAGS.include?(downcased_tag)
+          if tag =~ /^[A-Z]+$/ && HTML_TAGS.include?(downcased_tag)
             Object.const_set tag, ReactWrapper.create_element(downcased_tag)
           end
         end

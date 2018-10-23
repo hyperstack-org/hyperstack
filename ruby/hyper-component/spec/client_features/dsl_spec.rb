@@ -219,25 +219,6 @@ describe 'the React DSL', js: true do
     expect(page.body[-60..-19]).to include('<span>a man walks into a bar</span>')
   end
 
-  it "can add class names by the haml .class notation" do
-    mount 'Foo' do
-      module Mod
-        class Bar
-          include Hyperstack::Component
-          collect_other_params_as :attributes
-          def render
-            "a man walks into a bar".span(params.attributes)
-          end
-        end
-      end
-      class Foo < HyperComponent
-        def render
-          Mod::Bar().the_class.other_class
-        end
-      end
-    end
-    expect(page.body[-90..-19]).to include('<span class="other-class the-class">a man walks into a bar</span>')
-  end
 
   it "can use the 'class' keyword for classes" do
     mount 'Foo' do

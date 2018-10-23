@@ -1,6 +1,7 @@
 # see component_test_helpers_spec.rb for examples
 require 'parser/current'
 require 'unparser'
+require 'hyper-spec/unparser_patch'
 require 'method_source'
 require_relative '../../lib/hyper-spec/time_cop.rb'
 

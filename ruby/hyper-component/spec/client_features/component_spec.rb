@@ -372,7 +372,7 @@ describe 'React::Component', js: true do
               optional :bar, type: String
             end
 
-            def render; DIV; end
+            def render; DIV {}; end
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
         end
@@ -390,7 +390,7 @@ describe 'React::Component', js: true do
               optional :bar, type: String
             end
 
-            def render; DIV; end
+            def render; DIV {}; end
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
         end
@@ -587,66 +587,11 @@ describe 'React::Component', js: true do
           include Hyperstack::Component
 
           def render
-            DIV() # this fails but DIV {} passes.  Why?
+            DIV()
           end
         end
       end
-      binding.pry
       expect(page.body).to include('<div data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent" data-react-props="{&quot;render_params&quot;:{},&quot;component_name&quot;:&quot;Foo&quot;,&quot;controller&quot;:&quot;HyperstackTest&quot;}"><div></div></div>')
-    end
-
-    it 'redefines `p` to make method missing work' do
-      mount 'Foo' do
-        class Foo
-          include Hyperstack::Component
-
-          def render
-            DIV {
-              p(class_name: 'foo')
-              p
-              DIV { 'lorem ipsum' }
-              p(id: '10')
-            }
-          end
-        end
-      end
-      expect(page.body).to include('<div><p class="foo"></p><p></p><div>lorem ipsum</div><p id="10"></p></div>')
-    end
-
-    it 'only overrides `p` in render context' do
-      mount 'Foo' do
-        class Foo
-          include Hyperstack::Component
-
-          def self.result
-            @@result ||= 'ooopsy'
-          end
-
-          def self.result_two
-            @@result_two ||= 'ooopsy'
-          end
-
-          before_mount do
-            @@result = p 'first'
-          end
-
-          after_mount do
-            @@result_two = p 'second'
-          end
-
-          def render
-            p do
-              'third'
-            end
-          end
-        end
-      end
-      expect_evaluate_ruby('Kernel.p "first"').to eq('first')
-      expect_evaluate_ruby('p "second"').to eq('second')
-      expect_evaluate_ruby('Foo.result').to eq('first')
-      expect_evaluate_ruby('Foo.result_two').to eq('second')
-      expect(page.body[-40..-10]).to include("<p>third</p>")
-      expect(page.body[-40..-10]).not_to include("<p>first</p>")
     end
   end
 

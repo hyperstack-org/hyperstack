@@ -3,4 +3,5 @@ gem 'hyper-component',   path: '../hyper-component'
 gem 'hyper-store',       path: '../hyper-store'
 gem 'hyper-state',       path: '../hyper-state'
 gem 'hyperstack-config', path: '../hyperstack-config'
+#gem 'unparser', path: '../../../unparser'
 gemspec

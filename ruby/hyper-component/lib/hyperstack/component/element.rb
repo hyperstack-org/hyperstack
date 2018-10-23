@@ -66,41 +66,7 @@ module Hyperstack
       # Deprecated version of delete method
       alias as_node delete
 
-      # Any other method applied to an element will be treated as class name (haml style) thus
-      # div.foo.bar(id: :fred) is the same as saying div(class: "foo bar", id: :fred)
-      #
-      # single underscores become dashes, and double underscores become a single underscore
-      #
-      # params may be provide to each class (but typically only to the last for easy reading.)
-
-      def method_missing(class_name, args = {}, &new_block)
-        return dup.render.method_missing(class_name, args, &new_block) unless rendered?
-        Hyperstack::Internal::Component::RenderingContext.replace(
-          self,
-          Hyperstack::Internal::Component::RenderingContext.build do
-            Hyperstack::Internal::Component::RenderingContext.render(type, build_new_properties(class_name, args), &new_block)
-          end
-        )
-      end
-
-      def rendered?
-        Hyperstack::Internal::Component::RenderingContext.rendered? self
-      end
-
-      def self.haml_class_name(class_name)
-        class_name.gsub(/__|_/, '__' => '_', '_' => '-')
-      end
-
       private
-
-      def build_new_properties(class_name, args)
-        class_name = self.class.haml_class_name(class_name)
-        new_props = @properties.dup
-        new_props[:className] = "\
-          #{class_name} #{new_props[:className]} #{args.delete(:class)} #{args.delete(:className)}\
-        ".split(' ').uniq.join(' ')
-        new_props.merge! args
-      end
 
       # built in events, events going to native components, and events going to reactrb
 

@@ -16,6 +16,19 @@ describe 'hyper-spec', js: true do
     expect(page).to have_content('Now how cool is that???')
   end
 
+  it "correctly handles a call to a method that looks like a constant" do
+    mount 'CallDIV' do
+      class CallDIV
+        include Hyperstack::Component
+        def render
+          DIV()
+        end
+      end
+    end
+    binding.pry
+    expect(page).to have_content('I made a div')
+  end
+
   context "the client_option method" do
 
     it "can rendered server side only" do
