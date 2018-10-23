@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib/', __FILE__)
-require 'reactive-ruby/version'
+require 'hyperstack/component/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hyper-component'

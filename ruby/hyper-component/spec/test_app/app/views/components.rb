@@ -7,7 +7,7 @@ if Hyperstack::Component::IsomorphicHelpers.on_opal_client?
 end
 require 'hyperstack/component/server'
 require 'react/test/utils'
-require 'reactrb/auto-import'
+require 'hyperstack/component/auto-import'
 require 'js'
 require 'hyper-store'
 

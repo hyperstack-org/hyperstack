@@ -6,12 +6,13 @@ Hyperstack.js_import 'react/react-source-server', server_only: true, defines: 'R
 Hyperstack.import    'browser/delay', client_only: true
 Hyperstack.js_import 'react_ujs', defines: 'ReactRailsUJS'
 Hyperstack.import    'hyper-component'  # TODO: confirm this does not break anything.  Added while converting hyperloop->hyperstack
+Hyperstack.import    'hyperstack/component/auto-import'  # TODO: confirm we can cancel the import
 
 if RUBY_ENGINE == 'opal'
   require 'native'
   require 'hyperstack/state/observer'
   require 'hyperstack/internal/component/validator'
-  require 'react/element'
+  require 'hyperstack/component/element'
   require 'hyperstack/internal/component/react_wrapper'
   require 'hyperstack/component'
   require 'hyperstack/internal/component/should_component_update'
@@ -21,18 +22,17 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/ext/component/object'
   require 'hyperstack/ext/component/number'
   require 'hyperstack/ext/component/boolean'
-  require 'reactive-ruby/isomorphic_helpers'
+  require 'hyperstack/component/isomorphic_helpers'
   require 'hyperstack/component/react_api'
   require 'hyperstack/internal/component/top_level_rails_component'
-  require 'reactive-ruby/version'
+  require 'hyperstack/component/version'
 else
   require 'opal'
-
   require 'opal-activesupport'
-  require 'reactive-ruby/version'
+  require 'hyperstack/component/version'
   require 'hyperstack/internal/component/rails'
-  require 'reactive-ruby/isomorphic_helpers'
-  require 'reactive-ruby/serializers'
+  require 'hyperstack/component/isomorphic_helpers'
+  require 'hyperstack/ext/component/serializers'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
   require 'react/react-source'
