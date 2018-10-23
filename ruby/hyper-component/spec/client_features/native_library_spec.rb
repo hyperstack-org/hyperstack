@@ -260,7 +260,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
             }
           JSCODE
         )
-        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::Component, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(NativeLibraryTestModule::Component, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
       end
       expect(page.body[-100..-19]).to match(/<div>Hello There.*<\/div>/)
     end
@@ -317,7 +317,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
               }}}
           JSCODE
         )
-        React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
       end
       expect(page.body[-100..-19]).to match(/<div>Hello There.*<\/div>/)
     end
@@ -351,7 +351,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
           JSCODE
         )
         begin
-          React::Test::Utils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
+          Hyperstack::Component::ReactTestUtils.render_component_into_document(NativeLibraryTestModule::NestedComponent, time_stamp: Time.now.strftime('%Y%m%dT%H%M%S%z'))
         rescue Exception => e
           e.message
         end
@@ -379,7 +379,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
             NativeLibrary::NativeNestedLibrary::NativeComponent(name: 'Worksmaker')
           end
         end
-        React::Test::Utils.render_component_into_document(Foo)
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
       end
       expect(page.body[-80..-19]).to match(/<div>Hello Worksmaker<\/div>/)
     end

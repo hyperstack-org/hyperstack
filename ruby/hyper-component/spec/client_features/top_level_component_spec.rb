@@ -47,7 +47,7 @@ describe 'Hyperstack::Internal::Component::TopLevelRailsComponent', js: true do
           component_name: component_name,
           render_params: {}
         }
-        component = React::Test::Utils.render_component_into_document(Hyperstack::Internal::Component::TopLevelRailsComponent, params)
+        component = Hyperstack::Component::ReactTestUtils.render_component_into_document(Hyperstack::Internal::Component::TopLevelRailsComponent, params)
         component.dom_node.JS[:outerHTML]
       end
     end

@@ -42,7 +42,7 @@ describe 'Hyperstack::Component::Element', js: true do
             params.on_event
           end
         end
-        React::Test::Utils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event) {'works!'})
+        Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event) {'works!'})
       end
       expect(page.body[-50..-19]).to include('<span>works!</span>')
     end
@@ -56,7 +56,7 @@ describe 'Hyperstack::Component::Element', js: true do
             params.on_event1+params.on_event2
           end
         end
-        React::Test::Utils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event1, :event2) {'works!'})
+        Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event1, :event2) {'works!'})
       end
       expect(page.body[-60..-19]).to include('<span>works!works!</span>')
     end
@@ -77,7 +77,7 @@ describe 'Hyperstack::Component::Element', js: true do
         class Foo < HyperComponent
           imports "NativeComponent"
         end
-        React::Test::Utils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event) {'works!'})
+        Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event) {'works!'})
         true
       end
       expect(page.body[-60..-19]).to include('<span>works!</span>')
@@ -92,7 +92,7 @@ describe 'Hyperstack::Component::Element', js: true do
             params.my_event
           end
         end
-        React::Test::Utils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on("<my_event>") {'works!'})
+        Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on("<my_event>") {'works!'})
       end
       expect(page.body[-60..-19]).to include('<span>works!</span>')
     end
@@ -102,22 +102,22 @@ describe 'Hyperstack::Component::Element', js: true do
     it 'is subscribable through `on(:event_name)` method' do
       expect_evaluate_ruby do
         element = Hyperstack::Component::ReactAPI.create_element("div").on(:click) { |event| RESULT_C = 'clicked' if event.is_a? Hyperstack::Component::Event }
-        dom_node = React::Test::Utils.render_into_document(element)
-        React::Test::Utils.simulate_click(dom_node)
+        dom_node = Hyperstack::Component::ReactTestUtils.render_into_document(element)
+        Hyperstack::Component::ReactTestUtils.simulate_click(dom_node)
         RESULT_C rescue 'not clicked'
       end.to eq('clicked')
 
       expect_evaluate_ruby do
         element = Hyperstack::Component::ReactAPI.create_element("div").on(:key_down) { |event| RESULT_P = 'pressed' if event.is_a? Hyperstack::Component::Event }
-        dom_node = React::Test::Utils.render_into_document(element)
-        React::Test::Utils.simulate_keydown(dom_node, "Enter")
+        dom_node = Hyperstack::Component::ReactTestUtils.render_into_document(element)
+        Hyperstack::Component::ReactTestUtils.simulate_keydown(dom_node, "Enter")
         RESULT_P rescue 'not pressed'
       end.to eq('pressed')
 
       expect_evaluate_ruby do
         element = Hyperstack::Component::ReactAPI.create_element("form").on(:submit) { |event| RESULT_S = 'submitted' if event.is_a? Hyperstack::Component::Event }
-        dom_node = React::Test::Utils.render_into_document(element)
-        React::Test::Utils.simulate_submit(dom_node)
+        dom_node = Hyperstack::Component::ReactTestUtils.render_into_document(element)
+        Hyperstack::Component::ReactTestUtils.simulate_submit(dom_node)
         RESULT_S rescue 'not submitted'
       end.to eq('submitted')
     end

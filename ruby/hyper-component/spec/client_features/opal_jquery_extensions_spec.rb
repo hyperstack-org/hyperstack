@@ -81,7 +81,7 @@ describe 'opal-jquery extensions', js: true do
             div { 'hello' }
           end
         end
-        Element[React::Test::Utils.render_component_into_document(Foo)].html
+        Element[Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)].html
       end.to eq('hello')
     end
 

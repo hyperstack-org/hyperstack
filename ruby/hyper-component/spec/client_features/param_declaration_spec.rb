@@ -105,7 +105,7 @@ describe 'the param macro', js: true do
         def render; div; end
       end
 
-      React::Test::Utils.render_component_into_document(Foo2, bar: 10, lorem: Lorem.new)
+      Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo2, bar: 10, lorem: Lorem.new)
     end
     expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
       .to match(/Warning: Failed prop( type|Type): In component `Foo2`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
@@ -121,7 +121,7 @@ describe 'the param macro', js: true do
 
         def render; div; end
       end
-      React::Test::Utils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
+      Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
     end
     expect(page.driver.browser.manage.logs.get(:browser).reject { |m| m.message =~ /(D|d)eprecated/ }.map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
       .not_to match(/Warning|Error/)
@@ -297,7 +297,7 @@ describe 'the param macro', js: true do
             params.foo
           end
         end
-        React::Test::Utils.render_component_into_document(Foo, foo: lambda { 'works!' })
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: lambda { 'works!' })
       end
       expect(page.body[-60..-19]).to include('<span>works!</span>')
     end

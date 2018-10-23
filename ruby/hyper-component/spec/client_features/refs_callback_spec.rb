@@ -36,7 +36,7 @@ describe 'Refs callback', js: true do
       end
 
       element = Hyperstack::Component::ReactAPI.create_element(Foo)
-      React::Test::Utils.render_into_document(element)
+      Hyperstack::Component::ReactTestUtils.render_into_document(element)
       begin
         "#{Foo.bar.class.name}"
       rescue
@@ -59,7 +59,7 @@ describe 'Refs callback', js: true do
       end
 
       element = Hyperstack::Component::ReactAPI.create_element(Foo)
-      React::Test::Utils.render_into_document(element)
+      Hyperstack::Component::ReactTestUtils.render_into_document(element)
       "#{Foo.bar.JS['nodeType']}" # avoids json serialisation errors by using "#{}"
     end.to eq("1")
   end

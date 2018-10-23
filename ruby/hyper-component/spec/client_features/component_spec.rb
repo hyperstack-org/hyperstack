@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'React::Component', js: true do
 
-  it 'defines component spec methods' do
+  it 'defines react component methods' do
     on_client do
       class Foo
         include Hyperstack::Component
@@ -28,7 +28,7 @@ describe 'React::Component', js: true do
     expect_evaluate_ruby("Foo.new.respond_to?(:component_will_unmount)").to be_truthy
   end
 
-  describe 'Life Cycle' do
+  describe 'Life Cycle Methods' do
     before(:each) do
       on_client do
         class Foo
@@ -83,8 +83,8 @@ describe 'React::Component', js: true do
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end
         end
-        instance = React::Test::Utils.render_component_into_document(Foo)
-        instance = React::Test::Utils.render_component_into_document(FooBar)
+        instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
+        instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(FooBar)
       end
       expect_evaluate_ruby("Foo.call_history").to eq(["bar"])
       expect_evaluate_ruby("FooBar.call_history").to eq(["bar2"])
@@ -98,7 +98,7 @@ describe 'React::Component', js: true do
             self.foo = :bar
           end
         end
-        instance = React::Test::Utils.render_component_into_document(Foo)
+        instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
         instance.foo
       end.to eq('bar')
     end
@@ -314,7 +314,7 @@ describe 'React::Component', js: true do
               Hyperstack::Component::ReactAPI.create_element('div') { params[:foo] }
             end
           end
-          instance = React::Test::Utils.render_component_into_document(Foo, foo: 10)
+          instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10)
           begin
             instance.set_props(foo: 20)
           rescue
@@ -331,7 +331,7 @@ describe 'React::Component', js: true do
               Hyperstack::Component::ReactAPI.create_element('div') { params[:foo] ? 'exist' : 'null' }
             end
           end
-          instance = React::Test::Utils.render_component_into_document(Foo, foo: 10)
+          instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10)
           begin
             instance.set_props!(bar: 20)
           rescue
@@ -374,7 +374,7 @@ describe 'React::Component', js: true do
 
             def render; div; end
           end
-          React::Test::Utils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
+          Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
         end
         expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
           .to match(/Warning: Failed prop( type|Type): In component `Foo`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
@@ -392,7 +392,7 @@ describe 'React::Component', js: true do
 
             def render; div; end
           end
-          React::Test::Utils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
+          Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
         end
         expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n")).to_not match(/prop/)
       end
@@ -429,7 +429,7 @@ describe 'React::Component', js: true do
           def render; "hello" end
         end
 
-        React::Test::Utils.render_component_into_document(foo)
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(foo)
       end
       expect(page.driver.browser.manage.logs.get(:browser)
         .reject { |entry| entry.to_s.include?("Deprecated feature") }
@@ -499,8 +499,8 @@ describe 'React::Component', js: true do
             end
           end
         end
-        instance = React::Test::Utils.render_component_into_document(Foo)
-        React::Test::Utils.simulate_click(instance)
+        instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
+        Hyperstack::Component::ReactTestUtils.simulate_click(instance)
         instance.clicked
       end.to eq(true)
     end
@@ -522,7 +522,7 @@ describe 'React::Component', js: true do
       end
       evaluate_ruby do
         element = Hyperstack::Component::ReactAPI.create_element(Foo).on(:foo_submit) { 'bar' }
-        React::Test::Utils.render_into_document(element)
+        Hyperstack::Component::ReactTestUtils.render_into_document(element)
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to_not match(/Exception raised/)
@@ -546,7 +546,7 @@ describe 'React::Component', js: true do
 
       evaluate_ruby do
         element = Hyperstack::Component::ReactAPI.create_element(Foo).on(:foo_invoked) { return [1,2,3], 'bar' }
-        React::Test::Utils.render_into_document(element)
+        Hyperstack::Component::ReactTestUtils.render_into_document(element)
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to_not match(/Exception raised/)
@@ -576,7 +576,7 @@ describe 'React::Component', js: true do
         end
       end
       evaluate_ruby do
-        React::Test::Utils.render_component_into_document(Bar)
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(Bar)
       end
       expect(page.body[-80..-19]).to include("<div><div><span>astring</span></div></div>")
     end
@@ -660,7 +660,7 @@ describe 'React::Component', js: true do
           end
         end
 
-        component = React::Test::Utils.render_component_into_document(Foo)
+        component = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
         component.mounted?
       end.to eq(true)
     end
@@ -821,7 +821,7 @@ describe 'React::Component', js: true do
         ele = Hyperstack::Component::ReactAPI.create_element(Foo) {
           [Hyperstack::Component::ReactAPI.create_element('a'), Hyperstack::Component::ReactAPI.create_element('li')]
         }
-        instance = React::Test::Utils.render_into_document(ele)
+        instance = Hyperstack::Component::ReactTestUtils.render_into_document(ele)
 
         CHILDREN = instance.children
       end
@@ -833,7 +833,7 @@ describe 'React::Component', js: true do
     it 'returns an empty Enumerator if there are no children' do
       evaluate_ruby do
         ele = Hyperstack::Component::ReactAPI.create_element(Foo)
-        instance = React::Test::Utils.render_into_document(ele)
+        instance = Hyperstack::Component::ReactTestUtils.render_into_document(ele)
         NODES = instance.children.each
       end
       expect_evaluate_ruby("NODES.size").to eq(0)

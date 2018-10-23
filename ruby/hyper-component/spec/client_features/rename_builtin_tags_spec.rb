@@ -12,7 +12,6 @@ describe 'redefining builtin tags', js: true do
         render do
           # see https://github.com/hyperstack-org/hyperstack/issues/47
           Hyperstack::Internal::Component::RenderingContext.render(:div, params.opts, data: {render_time:  Time.now}, &children)
-          #Hyperstack::Component::ReactAPI.create_element(:div params.opts, data: {render_time:  Time.now}, &children)
         end
       end
 

@@ -18,8 +18,8 @@ describe 'Hyperstack::Component::Event', js: true do
         results[:prevent_default] = event.respond_to?(:prevent_default)
         results[:stop_propagation] = event.respond_to?(:stop_propagation)
       end
-      dom_node = React::Test::Utils.render_into_document(element)
-      React::Test::Utils.simulate_click(dom_node)
+      dom_node = Hyperstack::Component::ReactTestUtils.render_into_document(element)
+      Hyperstack::Component::ReactTestUtils.simulate_click(dom_node)
       results
     end.to eq({
       'bubbles' => true,

@@ -191,7 +191,7 @@ describe 'the React DSL', js: true do
         end
       end
       begin
-        React::Test::Utils.render_component_into_document(Foo)
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
         'not raised'
       rescue NoMethodError
         'raised for sure!'

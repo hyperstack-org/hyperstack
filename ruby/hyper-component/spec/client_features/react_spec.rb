@@ -55,7 +55,7 @@ describe 'React', js: true do
           element = Hyperstack::Component::ReactAPI.create_element('div') do
             [Hyperstack::Component::ReactAPI.create_element('span'), Hyperstack::Component::ReactAPI.create_element('span'), Hyperstack::Component::ReactAPI.create_element('span')]
           end
-          dom_node = React::Test::Utils.render_into_document(element)
+          dom_node = Hyperstack::Component::ReactTestUtils.render_into_document(element)
           dom_node.JS[:children].JS[:length]
         end.to eq(3)
       end
@@ -84,7 +84,7 @@ describe 'React', js: true do
 
         evaluate_ruby do
           element = Hyperstack::Component::ReactAPI.create_element(Foo) { Hyperstack::Component::ReactAPI.create_element('span') }
-          INSTANCE = React::Test::Utils.render_into_document(element)
+          INSTANCE = Hyperstack::Component::ReactTestUtils.render_into_document(element)
           true
         end
         expect_evaluate_ruby("INSTANCE.props[:children].is_a?(Array)").to be_falsy
@@ -95,7 +95,7 @@ describe 'React', js: true do
 
         evaluate_ruby do
           element = Hyperstack::Component::ReactAPI.create_element(Foo) { [Hyperstack::Component::ReactAPI.create_element('span'), Hyperstack::Component::ReactAPI.create_element('span')] }
-          INSTANCE = React::Test::Utils.render_into_document(element)
+          INSTANCE = Hyperstack::Component::ReactTestUtils.render_into_document(element)
           true
         end
         expect_evaluate_ruby("INSTANCE.props[:children].is_a?(Array)").to be_truthy
@@ -168,8 +168,8 @@ describe 'React', js: true do
             end
           end
 
-          React::Test::Utils.render_component_into_document(Foo)
-          React::Test::Utils.render_component_into_document(Foo)
+          Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
+          Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
           Foo.count
         end.to eq(2)
       end
@@ -227,7 +227,7 @@ describe 'React', js: true do
     it "should work without providing a block" do
       expect_evaluate_ruby do
         begin
-          React::Test::Utils.render_into_document(Hyperstack::Component::ReactAPI.create_element('span') { "lorem" })
+          Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element('span') { "lorem" })
           true
         rescue
           false
