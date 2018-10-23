@@ -49,8 +49,8 @@ describe 'Refs callback', js: true do
     # client_option raise_on_js_errors: :off
     expect_evaluate_ruby do
       Foo.class_eval do
-        def my_div=(div)
-          Foo.bar = div
+        def my_div=(a_div)
+          Foo.bar = a_div
         end
 
         def render

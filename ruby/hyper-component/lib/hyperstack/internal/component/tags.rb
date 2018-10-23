@@ -41,7 +41,7 @@ module Hyperstack
               end
             end
           else
-            alias_method tag, tag.upcase
+            #alias_method tag, tag.upcase
           end
           # end of deprecated code
         end

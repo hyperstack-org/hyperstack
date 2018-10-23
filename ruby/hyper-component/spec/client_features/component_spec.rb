@@ -186,7 +186,7 @@ describe 'React::Component', js: true do
           include Hyperstack::Component
           include Hyperstack::State::Observable
           def render
-            div { @foo }
+            DIV { @foo }
           end
         end
       end
@@ -250,7 +250,7 @@ describe 'React::Component', js: true do
           end
 
           def render
-            div { StateFoo(drinks: @foo) }
+            DIV { StateFoo(drinks: @foo) }
           end
 
           after_mount do
@@ -372,7 +372,7 @@ describe 'React::Component', js: true do
               optional :bar, type: String
             end
 
-            def render; div; end
+            def render; DIV; end
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
         end
@@ -390,7 +390,7 @@ describe 'React::Component', js: true do
               optional :bar, type: String
             end
 
-            def render; div; end
+            def render; DIV; end
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
         end
@@ -409,7 +409,7 @@ describe 'React::Component', js: true do
             end
 
             def render
-              div { params[:foo] + '-' + params[:bar]}
+              DIV { params[:foo] + '-' + params[:bar]}
             end
           end
         end
@@ -560,8 +560,8 @@ describe 'React::Component', js: true do
           include Hyperstack::Component
           param :foo
           def render
-            div do
-              span { params[:foo] }
+            DIV do
+              SPAN { params[:foo] }
             end
           end
         end
@@ -569,7 +569,7 @@ describe 'React::Component', js: true do
         class Bar
           include Hyperstack::Component
           def render
-            div do
+            DIV do
               Hyperstack::Internal::Component::RenderingContext.render(Foo, foo: 'astring')
             end
           end
@@ -587,10 +587,11 @@ describe 'React::Component', js: true do
           include Hyperstack::Component
 
           def render
-            div
+            DIV() # this fails but DIV {} passes.  Why?
           end
         end
       end
+      binding.pry
       expect(page.body).to include('<div data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent" data-react-props="{&quot;render_params&quot;:{},&quot;component_name&quot;:&quot;Foo&quot;,&quot;controller&quot;:&quot;HyperstackTest&quot;}"><div></div></div>')
     end
 
@@ -600,10 +601,10 @@ describe 'React::Component', js: true do
           include Hyperstack::Component
 
           def render
-            div {
+            DIV {
               p(class_name: 'foo')
               p
-              div { 'lorem ipsum' }
+              DIV { 'lorem ipsum' }
               p(id: '10')
             }
           end

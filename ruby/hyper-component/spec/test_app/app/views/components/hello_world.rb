@@ -3,7 +3,7 @@ module Components
     include Hyperstack::Component
 
     def render
-      div do
+      DIV do
         "Hello, World!".span
       end
     end

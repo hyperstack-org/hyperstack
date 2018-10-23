@@ -9,7 +9,7 @@ describe 'Hyperstack::Component::Children', js: true do
             component = Class.new do
               include Hyperstack::Component
               def render
-                div { 'lorem' }
+                DIV { 'lorem' }
               end
             end
             childs = [ Hyperstack::Component::ReactAPI.create_element('a'), Hyperstack::Component::ReactAPI.create_element('li') ]
@@ -63,7 +63,7 @@ describe 'Hyperstack::Component::Children', js: true do
             component = Class.new do
               include Hyperstack::Component
               def render
-                div { 'lorem' }
+                DIV { 'lorem' }
               end
             end
             childs = [ Hyperstack::Component::ReactAPI.create_element('a') ]
@@ -101,7 +101,7 @@ describe 'Hyperstack::Component::Children', js: true do
             component = Class.new do
               include Hyperstack::Component
               def render
-                div { 'lorem' }
+                DIV { 'lorem' }
               end
             end
             element = Hyperstack::Component::ReactAPI.create_element(component)

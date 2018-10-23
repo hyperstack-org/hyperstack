@@ -78,7 +78,7 @@ describe 'opal-jquery extensions', js: true do
       expect_evaluate_ruby do
         class Foo < HyperComponent
           def render
-            div { 'hello' }
+            DIV { 'hello' }
           end
         end
         Element[Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)].html

@@ -7,7 +7,7 @@ describe 'the param macro', js: true do
         collect_other_params_as :foo
 
         def render
-          div { params.foo[:bar] }
+          DIV { params.foo[:bar] }
         end
       end
     end
@@ -45,7 +45,7 @@ describe 'the param macro', js: true do
         param :foo
 
         def render
-          div { params.foo }
+          DIV { params.foo }
         end
       end
     end
@@ -62,7 +62,7 @@ describe 'the param macro', js: true do
         param :foo4, default: :no_bar4
 
         def render
-          div { "#{params.foo1}-#{params.foo2}-#{params.foo3}-#{params.foo4}" }
+          DIV { "#{params.foo1}-#{params.foo2}-#{params.foo3}-#{params.foo4}" }
         end
       end
     end
@@ -86,7 +86,7 @@ describe 'the param macro', js: true do
         param :foo2, type: String
 
         def render
-          div { "#{params.foo1}-#{params.foo2}" }
+          DIV { "#{params.foo1}-#{params.foo2}" }
         end
       end
     end
@@ -102,7 +102,7 @@ describe 'the param macro', js: true do
         param :foo
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
-        def render; div; end
+        def render; DIV; end
       end
 
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo2, bar: 10, lorem: Lorem.new)
@@ -119,7 +119,7 @@ describe 'the param macro', js: true do
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
 
-        def render; div; end
+        def render; DIV; end
       end
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
     end
@@ -282,8 +282,8 @@ describe 'the param macro', js: true do
             Bar(foo: Native([`{bazwoggle: #{Foo.change_me}}`]))
           end
         end
-        div = `document.createElement("div")`
-        Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element(Foo, {}), div)
+        a_div = `document.createElement("div")`
+        Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element(Foo, {}), a_div)
         Foo.change_me! "updated"
         expect(`div.children[0].innerHTML`).to eq("updated")
       end

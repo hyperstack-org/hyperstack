@@ -245,8 +245,8 @@ describe 'React', js: true do
           end
         end
 
-        div = JS.call(:eval, 'document.createElement("div")')
-        instance = Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element(Foo), div)
+        a_div = JS.call(:eval, 'document.createElement("div")')
+        instance = Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element(Foo), a_div)
         instance.is_a?(Foo)
       end.to be_truthy
     end
@@ -254,8 +254,8 @@ describe 'React', js: true do
     it "returns the actual DOM node" do
 
       expect_evaluate_ruby do
-        div = JS.call(:eval, 'document.createElement("div")')
-        node = Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element('span') { "lorem" }, div)
+        a_div = JS.call(:eval, 'document.createElement("div")')
+        node = Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element('span') { "lorem" }, a_div)
         node.JS['nodeType']
       end.to eq(1)
     end
@@ -269,9 +269,9 @@ describe 'React', js: true do
       # trying to emulate that failed, becasue during render, _getOpalInstance was not yet defined.
       # it is defined only after render, when the component was mounted. So we call unmount after render
       expect_evaluate_ruby do
-        div = JS.call(:eval, 'document.createElement("div")')
-        Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element('span') { "lorem" }, div )
-        Hyperstack::Component::ReactAPI.unmount_component_at_node(div)
+        a_div = JS.call(:eval, 'document.createElement("div")')
+        Hyperstack::Component::ReactAPI.render(Hyperstack::Component::ReactAPI.create_element('span') { "lorem" }, a_div )
+        Hyperstack::Component::ReactAPI.unmount_component_at_node(a_div)
       end.to eq(true)
     end
   end

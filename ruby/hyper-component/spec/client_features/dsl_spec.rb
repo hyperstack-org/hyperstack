@@ -48,7 +48,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div { "hello" }
+          DIV { "hello" }
         end
       end
     end
@@ -85,7 +85,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div { "hello".span; "goodby".span }
+          DIV { "hello".span; "goodby".span }
         end
       end
     end
@@ -99,7 +99,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div { "hello".br }
+          DIV { "hello".br }
         end
       end
     end
@@ -111,9 +111,9 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          table {
-            tbody {
-              tr { "hello".td }
+          TABLE {
+            TBODY {
+              TR { "hello".td }
             }
           }
         end
@@ -127,7 +127,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div { "hello".para }
+          DIV { "hello".para }
         end
       end
     end
@@ -244,19 +244,19 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          span(class: "the-class") { "hello" }
+          SPAN(class: "the-class") { "hello" }
         end
       end
     end
     expect(page.body[-60..-19]).to include('<span class="the-class">hello</span>')
   end
 
-  it "can generate a unrendered node using the .as_node method" do          # div { "hello" }.as_node
+  it "can generate a unrendered node using the .as_node method" do          # DIV { "hello" }.as_node
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
         def render
-          span(data: {size: 12}) { "hello".span.as_node.class.name }.as_node.render
+          SPAN(data: {size: 12}) { "hello".span.as_node.class.name }.as_node.render
         end
       end
     end
@@ -268,7 +268,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div(dangerously_set_inner_HTML:  { __html: "Hello and Goodby" })
+          DIV(dangerously_set_inner_HTML:  { __html: "Hello and Goodby" })
         end
       end
     end
@@ -280,7 +280,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div(data: { foo: :bar }, aria: { label: "title" })
+          DIV(data: { foo: :bar }, aria: { label: "title" })
         end
       end
     end
@@ -292,7 +292,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          div(title: { bar: :foo })
+          DIV(title: { bar: :foo })
         end
       end
     end
@@ -305,7 +305,7 @@ describe 'the React DSL', js: true do
         include Hyperstack::Component
         param :ele
         def render
-          div do
+          DIV do
             params[:ele].render
             params[:ele].render
           end
@@ -314,7 +314,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         def render
-          X2(ele: b { "hello" })
+          X2(ele: B { "hello" })
         end
       end
     end

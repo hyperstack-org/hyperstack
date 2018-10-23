@@ -8,7 +8,7 @@ module Components
     end
 
     def render
-      li { "#{params[:todo]}" }
+      LI { "#{params[:todo]}" }
     end
   end
 end
