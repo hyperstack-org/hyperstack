@@ -8,6 +8,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/on_client'
   require 'hyperstack/active_support_string_inquirer.rb'
   require 'hyperstack_env'
+  require 'hyperstack/hot_loader/stub'
 else
   require 'opal'
   require 'opal-browser'
@@ -23,12 +24,15 @@ else
   require 'hyperstack/js_imports'
   require 'hyperstack/client_readers'
   require 'hyperstack/on_client'
+
   if defined? Rails
     require 'hyperstack/rail_tie'
   end
   require 'hyperstack/active_support_string_inquirer.rb' unless defined? ActiveSupport
   require 'hyperstack/env'
   require 'hyperstack/on_error'
+  Hyperstack.define_setting :hotloader_port, 25222
+  Hyperstack.define_setting :hotloader_ping, nil
   Hyperstack.import 'opal', gem: true
   Hyperstack.import 'browser', client_only: true
   Hyperstack.import 'hyperstack-config', gem: true

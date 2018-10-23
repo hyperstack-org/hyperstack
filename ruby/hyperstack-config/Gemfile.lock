@@ -22,10 +22,12 @@ PATH
   specs:
     hyperstack-config (0.1)
       libv8 (~> 6.3.0)
+      listen (~> 3.0)
       mini_racer (~> 0.1.15)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
+      websocket
 
 GEM
   remote: https://rubygems.org/
@@ -117,6 +119,10 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     libv8 (6.3.292.48.1-x86_64-darwin-15)
+    listen (3.1.5)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+      ruby_dep (~> 1.2)
     loofah (2.2.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -201,6 +207,9 @@ GEM
     rainbow (2.2.2)
       rake
     rake (12.3.1)
+    rb-fsevent (0.10.3)
+    rb-inotify (0.9.10)
+      ffi (>= 0.5.0, < 2)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -230,6 +239,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.10.0)
+    ruby_dep (1.5.0)
     rubyzip (1.2.2)
     selenium-webdriver (3.14.1)
       childprocess (~> 0.5)
@@ -264,6 +274,7 @@ GEM
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
+    websocket (1.2.8)
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)

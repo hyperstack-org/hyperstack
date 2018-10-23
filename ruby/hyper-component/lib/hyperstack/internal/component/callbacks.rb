@@ -27,6 +27,7 @@ module Hyperstack
             define_singleton_method(callback_name) do |*args, &block|
               send(wrapper_name).concat(args)
               send(wrapper_name).push(block) if block_given?
+              HotLoader.record(self, "@#{wrapper_name}", 4, *args, block)
               after_define_hook.call(*args, &block) if after_define_hook
             end
           end
