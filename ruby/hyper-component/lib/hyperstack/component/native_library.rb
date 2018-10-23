@@ -51,7 +51,7 @@ module Hyperstack
           component_class ||= import_const_from_native(self, method, false)
           raise 'could not import a react component named: '\
                 "#{scope_native_name method}" unless component_class
-          Internal::RenderingContext.render(component_class, *args, &block)
+          Hyperstack::Internal::Component::RenderingContext.render(component_class, *args, &block)
         end
 
         private

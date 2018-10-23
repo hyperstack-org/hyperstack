@@ -216,7 +216,7 @@ module HyperSpec
               }
             end
           end
-          class Hyperstack::Component::Internal::TestDummy
+          class Hyperstack::Internal::Component::TestDummy
             include Hyperstack::Component
                 def render; end
           end
@@ -226,7 +226,7 @@ module HyperSpec
         opts[:code] = Opal.compile(block_with_helpers)
       end
 
-      component_name ||= 'Hyperstack::Component::Internal::TestDummy'
+      component_name ||= 'Hyperstack::Internal::Component::TestDummy'
       ::Rails.cache.write(test_url, [component_name, params, opts])
       test_code_key = "hyper_spec_prerender_test_code.js"
       @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]

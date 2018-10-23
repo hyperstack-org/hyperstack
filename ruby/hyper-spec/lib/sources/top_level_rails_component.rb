@@ -90,7 +90,7 @@ module Hyperstack
         end
 
         def render
-          Hyperstack::Component::Internal::RenderingContext.render(component, @render_params)
+          Hyperstack::Internal::Component::RenderingContext.render(component, @render_params)
         end
       end
     end

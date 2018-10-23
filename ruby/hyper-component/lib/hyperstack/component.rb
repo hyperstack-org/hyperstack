@@ -2,7 +2,7 @@ require 'hyperstack/ext/component/string'
 require 'hyperstack/ext/component/hash'
 require 'active_support/core_ext/class/attribute'
 require 'hyperstack/internal/component/callbacks'
-require 'react/rendering_context'
+require 'hyperstack/internal/component/rendering_context'
 require 'hyperstack/internal/component'
 require 'hyperstack/internal/component/instance_methods'
 require 'hyperstack/internal/component/class_methods'
@@ -128,7 +128,7 @@ module Hyperstack
 
     def _render_wrapper
       observing(rendering: true) do
-        element = Internal::RenderingContext.render(nil) { render || '' }
+        element = Hyperstack::Internal::Component::RenderingContext.render(nil) { render || '' }
         @waiting_on_resources =
           element.waiting_on_resources if element.respond_to? :waiting_on_resources
         element

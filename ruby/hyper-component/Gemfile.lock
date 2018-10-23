@@ -37,10 +37,12 @@ PATH
   specs:
     hyperstack-config (0.1)
       libv8 (~> 6.3.0)
+      listen (~> 3.0)
       mini_racer (~> 0.1.15)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
+      websocket
 
 PATH
   remote: .
@@ -319,6 +321,7 @@ GEM
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
+    websocket (1.2.8)
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)

@@ -570,7 +570,7 @@ describe 'React::Component', js: true do
           include Hyperstack::Component
           def render
             div do
-              Hyperstack::Component::Internal::RenderingContext.render(Foo, foo: 'astring')
+              Hyperstack::Internal::Component::RenderingContext.render(Foo, foo: 'astring')
             end
           end
         end

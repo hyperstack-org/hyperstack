@@ -11,7 +11,7 @@ describe 'redefining builtin tags', js: true do
         others :opts
         render do
           # see https://github.com/hyperstack-org/hyperstack/issues/47
-          Hyperstack::Component::Internal::RenderingContext.render(:div, params.opts, data: {render_time:  Time.now}, &children)
+          Hyperstack::Internal::Component::RenderingContext.render(:div, params.opts, data: {render_time:  Time.now}, &children)
           #Hyperstack::Component::ReactAPI.create_element(:div params.opts, data: {render_time:  Time.now}, &children)
         end
       end

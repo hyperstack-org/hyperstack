@@ -1,6 +1,6 @@
 module Hyperstack
-  module Component
-    module Internal
+  module Internal
+    module Component
       class RenderingContext
         class << self
           attr_accessor :waiting_on_resources
@@ -17,21 +17,21 @@ module Hyperstack
                 run_child_block(name.nil?, &block)
                 if name
                   buffer = @buffer.dup
-                  Hyperstack::Internal::Component::ReactWrapper.create_element(name, *args) { buffer }.tap do |element|
+                  ReactWrapper.create_element(name, *args) { buffer }.tap do |element|
                     element.waiting_on_resources = saved_waiting_on_resources || !!buffer.detect { |e| e.waiting_on_resources if e.respond_to?(:waiting_on_resources) }
                     element.waiting_on_resources ||= waiting_on_resources if buffer.last.is_a?(String)
                   end
-                elsif @buffer.last.is_a? Element
+                elsif @buffer.last.is_a? Hyperstack::Component::Element
                   @buffer.last.tap { |element| element.waiting_on_resources ||= saved_waiting_on_resources }
                 else
                   buffer_s = @buffer.last.to_s
                   RenderingContext.render(:span) { buffer_s }.tap { |element| element.waiting_on_resources = saved_waiting_on_resources }
                 end
               end
-            elsif name.is_a? Element
+            elsif name.is_a? Hyperstack::Component::Element
               element = name
             else
-              element = Hyperstack::Internal::Component::ReactWrapper.create_element(name, *args)
+              element = ReactWrapper.create_element(name, *args)
               element.waiting_on_resources = waiting_on_resources
             end
             @buffer << element
@@ -66,7 +66,7 @@ module Hyperstack
           def remove_nodes_from_args(args)
             args[0].each do |key, value|
               begin
-                value.delete if value.is_a?(Element) # deletes Element from buffer
+                value.delete if value.is_a?(Hyperstack::Component::Element) # deletes Element from buffer
               rescue Exception
               end
             end if args[0] && args[0].is_a?(Hash)
@@ -99,7 +99,7 @@ module Hyperstack
               # be converted to spans INSIDE the parent, otherwise the waiting_on_resources
               # flag will get set in the wrong context
               RenderingContext.render(:span) { result.to_s }
-            elsif result.is_a?(String) || (result.is_a?(Element) && @buffer.empty?)
+            elsif result.is_a?(String) || (result.is_a?(Hyperstack::Component::Element) && @buffer.empty?)
               @buffer << result
             end
             raise_render_error(result) if is_outer_scope && @buffer != [result]
@@ -141,7 +141,7 @@ class Object
       # in the component.
       # If we fully deprecate lowercase tags, then this next line can go...
       return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
-      Hyperstack::Component::Internal::RenderingContext.render(*args) { to_s }
+      Hyperstack::Internal::Component::RenderingContext.render(*args) { to_s }
     end
   end
 
@@ -150,15 +150,15 @@ class Object
     args.unshift(:p)
     # see above comment
     return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
-    Hyperstack::Component::Internal::RenderingContext.render(*args) { to_s }
+    Hyperstack::Internal::Component::RenderingContext.render(*args) { to_s }
   end
 
   def br
     # see above comment
     return send(:br) if respond_to?(:hyper_component?) && hyper_component?
-    Hyperstack::Component::Internal::RenderingContext.render(:span) do
-      Hyperstack::Component::Internal::RenderingContext.render(to_s)
-      Hyperstack::Component::Internal::RenderingContext.render(:br)
+    Hyperstack::Internal::Component::RenderingContext.render(:span) do
+      Hyperstack::Internal::Component::RenderingContext.render(to_s)
+      Hyperstack::Internal::Component::RenderingContext.render(:br)
     end
   end
 

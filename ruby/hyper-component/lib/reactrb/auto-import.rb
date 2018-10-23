@@ -24,7 +24,7 @@ if RUBY_ENGINE == 'opal'
       def method_missing(method, *args, &block)
         component_class = _reactrb_import_component_class(method)
         _reactrb_original_method_missing(method, *args, &block) unless component_class
-        Hyperstack::Component::Internal::RenderingContext.render(component_class, *args, &block)
+        Hyperstack::Internal::Component::RenderingContext.render(component_class, *args, &block)
       end
     end
   end

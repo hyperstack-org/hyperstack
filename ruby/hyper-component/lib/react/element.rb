@@ -47,10 +47,10 @@ module Hyperstack
 
       def render(props = {}, &new_block)
         if props.empty?
-          Internal::RenderingContext.render(self)
+          Hyperstack::Internal::Component::RenderingContext.render(self)
         else
           props = Hyperstack::Internal::Component::ReactWrapper.convert_props(props)
-          Internal::RenderingContext.render(
+          Hyperstack::Internal::Component::RenderingContext.render(
             Element.new(`React.cloneElement(#{@native}, #{props.shallow_to_n})`,
                         type, @properties.merge(props), block)
           )
@@ -61,7 +61,7 @@ module Hyperstack
       # using the render method.
 
       def delete
-        Internal::RenderingContext.delete(self)
+        Hyperstack::Internal::Component::RenderingContext.delete(self)
       end
       # Deprecated version of delete method
       alias as_node delete
@@ -75,16 +75,16 @@ module Hyperstack
 
       def method_missing(class_name, args = {}, &new_block)
         return dup.render.method_missing(class_name, args, &new_block) unless rendered?
-        Internal::RenderingContext.replace(
+        Hyperstack::Internal::Component::RenderingContext.replace(
           self,
-          Internal::RenderingContext.build do
-            Internal::RenderingContext.render(type, build_new_properties(class_name, args), &new_block)
+          Hyperstack::Internal::Component::RenderingContext.build do
+            Hyperstack::Internal::Component::RenderingContext.render(type, build_new_properties(class_name, args), &new_block)
           end
         )
       end
 
       def rendered?
-        Internal::RenderingContext.rendered? self
+        Hyperstack::Internal::Component::RenderingContext.rendered? self
       end
 
       def self.haml_class_name(class_name)

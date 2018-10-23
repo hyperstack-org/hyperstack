@@ -60,7 +60,7 @@ module Hyperstack
               end
             end
           end
-          return Hyperstack::Component::Internal::RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
+          return RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
           raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
         end
       end

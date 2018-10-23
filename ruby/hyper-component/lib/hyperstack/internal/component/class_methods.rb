@@ -26,7 +26,7 @@ module Hyperstack
           if container
             container = container.type if container.is_a? Hyperstack::Component::Element
             define_method :render do
-              Hyperstack::Component::Internal::RenderingContext.render(container, params) { instance_eval(&block) if block }
+              RenderingContext.render(container, params) { instance_eval(&block) if block }
             end
           else
             define_method(:render) { instance_eval(&block) }
@@ -46,7 +46,7 @@ module Hyperstack
           # makes sure to autoimport the component.  This is not needed here, as
           # we already have the class.
 
-          Hyperstack::Component::Internal::RenderingContext.render(
+          RenderingContext.render(
             self, class: Hyperstack::Component::Element.haml_class_name(name), &children
           )
         end

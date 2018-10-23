@@ -107,7 +107,7 @@ def register_component_dsl_method(component)
   parent = split_name.inject([Module]) { |nesting, next_const| nesting + [nesting.last.const_get(next_const)] }[-2]
   class << parent
     define_method component_name do |*args, &block|
-      React::RenderingContext.render(name, *args, &block)
+      RenderingContext.render(name, *args, &block)
     end
     define_method "#{component_name}_as_node" do |*args, &block|
       React::Component.deprecation_warning("..._as_node is deprecated.  Render component and then use the .node method instead")

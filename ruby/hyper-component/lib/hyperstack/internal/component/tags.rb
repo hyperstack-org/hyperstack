@@ -17,7 +17,7 @@ module Hyperstack
 
         # the present method is retained as a legacy behavior
         # def present(component, *params, &children)
-        #   Hyperstack::Component::Internal::RenderingContext.render(component, *params, &children)
+        #   RenderingContext.render(component, *params, &children)
         # end
 
         # define each predefined tag (upcase) as an instance method and a constant
@@ -26,7 +26,7 @@ module Hyperstack
         HTML_TAGS.each do |tag|
 
           define_method(tag.upcase) do |*params, &children|
-            Hyperstack::Component::Internal::RenderingContext.render(tag, *params, &children)
+            RenderingContext.render(tag, *params, &children)
           end
 
           const_set tag.upcase, tag
@@ -35,7 +35,7 @@ module Hyperstack
           if tag == 'p'
             define_method(tag) do |*params, &children|
               if children || params.count == 0 || (params.count == 1 && params.first.is_a?(Hash))
-                Hyperstack::Component::Internal::RenderingContext.render(tag, *params, &children)
+                RenderingContext.render(tag, *params, &children)
               else
                 Kernel.p(*params)
               end
@@ -59,7 +59,7 @@ module Hyperstack
 
         def method_missing(name, *params, &children)
           component = find_component(name)
-          return Hyperstack::Component::Internal::RenderingContext.render(component, *params, &children) if component
+          return RenderingContext.render(component, *params, &children) if component
           super
         end
 
@@ -71,11 +71,11 @@ module Hyperstack
             name, parent = find_name_and_parent(component)
             tag_names_module = Module.new do
               define_method name do |*params, &children|
-                Hyperstack::Component::Internal::RenderingContext.render(component, *params, &children)
+                RenderingContext.render(component, *params, &children)
               end
               # handle deprecated _as_node style
               define_method "#{name}_as_node" do |*params, &children|
-                Hyperstack::Component::Internal::RenderingContext.build_only(component, *params, &children)
+                RenderingContext.build_only(component, *params, &children)
               end
             end
             parent.extend(tag_names_module)
