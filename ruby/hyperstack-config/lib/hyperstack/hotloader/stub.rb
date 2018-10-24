@@ -8,7 +8,3 @@ module Hyperstack
     end
   end
 end
-
-if `(typeof(window) !== 'undefined') && (window.Hyperstack==undefined || window.Hyperstack.hotloader==undefined)`
-  `window.Hyperstack = { hotloader: function(port, ping) { }}`
-end
