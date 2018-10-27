@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
-describe 'React Integration', js: true do
+describe 'HyperComponent Integration', js: true do
   it "Hyper-components will update when their internal instance state is mutated" do
     mount "TestComp" do
       class TestComp
@@ -42,7 +42,7 @@ describe 'React Integration', js: true do
         param :id
 
         state_writer :click_count
-        
+
         def click_count
           @click_count ||= 0
         end

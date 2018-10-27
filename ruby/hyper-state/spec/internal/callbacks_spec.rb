@@ -1,27 +1,27 @@
 require 'spec_helper'
 
-describe 'Hyperstack::Internal::Component::Callbacks', js: true do
+describe 'Hyperstack::Internal::Callbacks', js: true do
   it 'defines callback' do
-    on_client do
-      class Foo
-        include Hyperstack::Internal::Component::Callbacks
-        define_callback :before_dinner
-        before_dinner :wash_hands
+    class Foo
+      include Hyperstack::Internal::Callbacks
+      define_callback :before_dinner
+      before_dinner :wash_hands
 
-        def wash_hands;end
-      end
+      def wash_hands;end
     end
 
-    expect_evaluate_ruby do
-      instance = Foo.new
-      [ instance.respond_to?(:wash_hands), instance.run_callback(:before_dinner) ]
-    end.to eq([true, ["wash_hands"]])
+    instance = Foo.new
+    expect(instance).to respond_to(:wash_hands)
+    expect(instance).to receive(:wash_hands)
+    expect(instance.run_callback(:before_dinner)).to eq([:wash_hands])
   end
+
+  # TODO: move all these to run on server as above
 
   it 'defines multiple callbacks' do
     on_client do
       class Foo
-        include Hyperstack::Internal::Component::Callbacks
+        include Hyperstack::Internal::Callbacks
         define_callback :before_dinner
         before_dinner :wash_hands, :turn_off_laptop
 
@@ -46,7 +46,7 @@ describe 'Hyperstack::Internal::Component::Callbacks', js: true do
         Hyperstack::Context.reset!
 
         class Foo
-          include Hyperstack::Internal::Component::Callbacks
+          include Hyperstack::Internal::Callbacks
           define_callback :before_dinner
 
           before_dinner :wash_hands, :turn_off_laptop
@@ -73,7 +73,7 @@ describe 'Hyperstack::Internal::Component::Callbacks', js: true do
   it 'defines block callback' do
     on_client do
       class Foo
-        include Hyperstack::Internal::Component::Callbacks
+        include Hyperstack::Internal::Callbacks
         attr_accessor :a
         attr_accessor :b
 
@@ -97,7 +97,7 @@ describe 'Hyperstack::Internal::Component::Callbacks', js: true do
   it 'defines multiple callback group' do
     on_client do
       class Foo
-        include Hyperstack::Internal::Component::Callbacks
+        include Hyperstack::Internal::Callbacks
         define_callback :before_dinner
         define_callback :after_dinner
         attr_accessor :a
@@ -118,7 +118,7 @@ describe 'Hyperstack::Internal::Component::Callbacks', js: true do
   it 'receives args as callback' do
     on_client do
       class Foo
-        include Hyperstack::Internal::Component::Callbacks
+        include Hyperstack::Internal::Callbacks
         define_callback :before_dinner
         define_callback :after_dinner
 

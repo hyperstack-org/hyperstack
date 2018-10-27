@@ -9,6 +9,8 @@ Hyperstack.import    'hyper-component'  # TODO: confirm this does not break anyt
 Hyperstack.import    'hyperstack/component/auto-import'  # TODO: confirm we can cancel the import
 
 if RUBY_ENGINE == 'opal'
+  require 'hyperstack/internal/callbacks'
+  require 'hyperstack/internal/auto_unmount'
   require 'native'
   require 'hyperstack/state/observer'
   require 'hyperstack/internal/component/validator'

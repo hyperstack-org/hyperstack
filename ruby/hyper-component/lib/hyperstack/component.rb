@@ -1,7 +1,7 @@
 require 'hyperstack/ext/component/string'
 require 'hyperstack/ext/component/hash'
 require 'active_support/core_ext/class/attribute'
-require 'hyperstack/internal/component/callbacks'
+require 'hyperstack/internal/auto_unmount'
 require 'hyperstack/internal/component/rendering_context'
 require 'hyperstack/internal/component'
 require 'hyperstack/internal/component/instance_methods'
@@ -14,7 +14,7 @@ module Hyperstack
     def self.included(base)
       base.include(Hyperstack::State::Observer)
       base.include(Hyperstack::Internal::Component::InstanceMethods)
-      base.include(Hyperstack::Internal::Component::Callbacks)
+      base.include(Hyperstack::Internal::AutoUnmount) # pulls in the CallBacks module as well
       base.include(Hyperstack::Internal::Component::Tags)
       base.include(Hyperstack::Internal::Component::ShouldComponentUpdate)
       base.class_eval do
@@ -24,7 +24,7 @@ module Hyperstack
         define_callback :before_receive_props
         define_callback :before_update
         define_callback :after_update
-        define_callback :before_unmount
+        #define_callback :before_unmount defined already by Async module
         define_callback(:after_error) { Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(base) }
       end
       base.extend(Hyperstack::Internal::Component::ClassMethods)
@@ -67,7 +67,9 @@ module Hyperstack
     end
 
     def component_did_mount
-      observing(update_objects: true) { run_callback(:after_mount) }
+      observing(update_objects: true) do
+        run_callback(:after_mount)
+      end
     end
 
     def component_will_receive_props(next_props)
@@ -89,8 +91,7 @@ module Hyperstack
 
     def component_will_unmount
       observing do
-        run_callback(:before_unmount)
-        remove
+        unmount # runs unmount callbacks as well
         Hyperstack::Internal::Component.mounted_components.delete self
       end
     end

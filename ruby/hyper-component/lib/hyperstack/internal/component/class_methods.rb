@@ -37,7 +37,7 @@ module Hyperstack
         # of the component, i.e. Foo::Bar.baz === Foo::Bar().baz
 
         def method_missing(name, *args, &children)
-          super unless args.empty?
+          super if args.any? || !Hyperstack::Component::Element.respond_to?(:haml_class_name)
           # this was:
           #   Object.method_missing(name, *args, &children) unless args.empty?
           # Which does not show the actual component that broke.

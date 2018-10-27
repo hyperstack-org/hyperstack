@@ -1,14 +1,12 @@
 module Hyperstack
   module State
     module Observable
-      def bazzo
-        puts 'hi'
-      end
       def self.bulk_update(&block)
         Internal::State::Mapper.bulk_update(&block)
       end
 
       def self.included(base)
+        base.include Internal::AutoUnmount
         %i[singleton_method method].each do |kind|
           base.send(:"define_#{kind}", :observe) do |&block|
             result = block.call if block
