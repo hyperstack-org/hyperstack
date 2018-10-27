@@ -27,8 +27,6 @@ You can find the older application source code here:
 
 Working knowledge of Rails and Hyperloop required
 
-## TUTORIAL
-
 ### Chapter 1: Setting Things Up
 
 Create a new rails application
