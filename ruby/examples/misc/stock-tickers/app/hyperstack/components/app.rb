@@ -5,7 +5,7 @@ class App < HyperComponent
       @symbols.sort.each do |symbol|
         LI(key: symbol) do
           DisplayTicker(symbol: symbol, key: symbol)
-          BUTTON { 'cancel' }.on(:click) { mutate @symbols.delete(symbol) }
+          .on(:cancel) { mutate @symbols.delete(symbol) }
         end
       end
     end
