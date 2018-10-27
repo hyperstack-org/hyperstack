@@ -1,5 +1,5 @@
 module React
-  class Router < React::NativeLibrary
+  class Router < Hyperstack::Component::NativeLibrary
     imports 'ReactRouter'
   end
 end

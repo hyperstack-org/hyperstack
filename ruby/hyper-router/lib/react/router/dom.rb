@@ -1,6 +1,6 @@
 module React
   class Router
-    class DOM < React::NativeLibrary
+    class DOM < Hyperstack::Component::NativeLibrary
       imports 'ReactRouterDOM'
     end
   end

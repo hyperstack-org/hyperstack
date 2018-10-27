@@ -2,9 +2,18 @@ module Hyperstack
   module Internal
     module Component
       class Validator
+
         attr_accessor :errors
         attr_reader :props_wrapper
         private :errors, :props_wrapper
+
+        def copy(new_props_wrapper)
+          Validator.new(new_props_wrapper).tap do |c|
+            %i[@allow_undefined_props @rules @errors].each do |var|
+              c.instance_variable_set(var, instance_variable_get(var).dup)
+            end
+          end
+        end
 
         def initialize(props_wrapper = Class.new(PropsWrapper))
           @props_wrapper = props_wrapper

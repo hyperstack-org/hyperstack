@@ -52,7 +52,12 @@ module Hyperstack
         end
 
         def validator
-          @validator ||= Validator.new(props_wrapper)
+          return @validator if @validator
+          if superclass.respond_to?(:validator)
+            @validator = superclass.validator.copy(props_wrapper)
+          else
+            @validator = Validator.new(props_wrapper)
+          end
         end
 
         def prop_types
@@ -79,7 +84,12 @@ module Hyperstack
         end
 
         def props_wrapper
-          @props_wrapper ||= Class.new(PropsWrapper)
+          return @props_wrapper if @props_wrapper
+          if superclass.respond_to? :props_wrapper
+            @props_wrapper = Class.new(superclass.props_wrapper)
+          else
+            @props_wrapper ||= Class.new(PropsWrapper)
+          end
         end
 
         def param(*args)
