@@ -93,6 +93,10 @@ module Hyperstack
             name = args[0]
             options = args[1] || {}
           end
+          if options[:type] == Proc
+            options[:default] ||= nil
+            options[:allow_nil] = true unless options.key?(:allow_nil)
+          end
           if options[:default]
             validator.optional(name, options)
           else
