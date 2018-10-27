@@ -12,6 +12,7 @@ class App < HyperComponent
     INPUT(placeholder: 'enter a stock symbol').on(:key_down) do |evt|
       next unless evt.key_code == 13
       mutate @symbols << evt.target.value
+      evt.target.value = ''
     end
   end
 end
