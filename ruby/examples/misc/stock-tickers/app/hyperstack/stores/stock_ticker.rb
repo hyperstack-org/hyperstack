@@ -3,17 +3,28 @@ class StockTicker
 
   state_reader :price
   attr_reader :symbol
+  state_reader :status
+  state_reader :reason
 
   def initialize(symbol, update_interval = 5.minutes)
     @symbol = symbol
+    @status = :loading
+    @update_interval = update_interval
     fetch
-    every(update_interval) { fetch }
   end
 
   def fetch
     puts "fetching #{@symbol}"
-    HTTP.get("https://api.iextrading.com/1.0/stock/#{@symbol}/delayed-quote").then do |response|
+    HTTP.get("https://api.iextrading.com/1.0/stock/#{@symbol}/delayed-quote")
+    .then do |response|
+      mutate @status = :success
       mutate @price = response.json[:delayedPrice]
+      after(@update_interval) { fetch }
+    end
+    .fail do |response|
+      mutate @status = :failed
+      mutate @reason = response.body.empty? ? 'Network error' : response.body
+      after(@update_interval) { fetch } unless @reason == "Unknown symbol"
     end
   end
 
