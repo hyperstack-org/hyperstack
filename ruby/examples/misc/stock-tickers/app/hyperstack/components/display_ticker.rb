@@ -2,15 +2,20 @@ class DisplayTicker < HyperComponent
   param :symbol
   param :on_cancel, type: Proc
   before_mount { @ticker = StockTicker.new(params.symbol, 10.seconds) }
-  render(DIV) do
+
+  def status
     case @ticker.status
     when :loading
-      SPAN { "#{params.symbol.upcase} loading..."}
+      'loading...'
     when :success
-      SPAN { "#{params.symbol.upcase} current price: #{@ticker.price}" }
+      "current price: #{@ticker.price}"
     when :failed
-      SPAN { "#{params.symbol.upcase} failed to get quote: #{@ticker.reason}"}
+      "failed to get quote: #{@ticker.reason}"
     end
+  end
+
+  render(DIV) do
+    SPAN { "#{params.symbol.upcase} #{status}" }
     BUTTON { 'cancel' }.on(:click) { params.on_cancel } unless @ticker.status == :loading
   end
 end

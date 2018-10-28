@@ -18,19 +18,18 @@ describe Hyperstack::Internal::AutoUnmount do
   end
 
   %i[every after].each do |meth|
-    it "will pass through to the super class when mounting and abort calls to the #{meth} method when unmounting" do
+    it "will pass through calls to #{meth} to the super class when mounted, and abort calls to the #{meth} method when unmounting" do
       timer = double('timer')
       expect(@async_obj).to receive(:"#{meth}_called").and_return(timer)
       @async_obj.send(meth)
       expect(timer).to receive(:abort)
       @async_obj.unmount
     end
-    it "will not auto_unmount #{meth} objects if requested using the manually_unmount method" do
-      timer = double('timer')
-      expect(@async_obj).to receive(:"#{meth}_called").and_return(timer)
-      @async_obj.send(meth).manually_unmount
-      expect(timer).not_to receive(:abort)
+
+    it "will ignore calls to the #{meth} method once unmounted" do
       @async_obj.unmount
+      expect(@async_obj).not_to receive(:"#{meth}_called")
+      expect(@async_obj.send(meth)).to be_nil
     end
   end
 
@@ -40,6 +39,13 @@ describe Hyperstack::Internal::AutoUnmount do
     @async_obj.receives(broadcaster)
     expect(broadcaster).to receive(:unmount)
     @async_obj.unmount
+  end
+
+  it "will ignore calls to the receives method once unmounted" do
+    broadcaster = double('Broadcaster')
+    @async_obj.unmount
+    expect(@async_obj).not_to receive(:receiver)
+    expect(@async_obj.receives(broadcaster)).to be_nil
   end
 
   it 'will unmount objects referenced by instance variables' do

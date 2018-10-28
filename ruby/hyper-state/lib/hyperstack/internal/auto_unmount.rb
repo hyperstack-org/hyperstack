@@ -8,6 +8,10 @@ module Hyperstack
         end
       end
 
+      def unmounted?
+        @__hyperstack_internal_auto_unmount_unmounted
+      end
+
       def unmount
         run_callback(:before_unmount)
         AutoUnmount.objects_to_unmount[self].each(&:unmount)
@@ -20,31 +24,29 @@ module Hyperstack
             nil
           end
         end
+        @__hyperstack_internal_auto_unmount_unmounted = true
       end
 
       def every(*args, &block)
+        return if unmounted?
         super.tap do |id|
           sself = self
           id.define_singleton_method(:unmount) { abort }
-          id.define_singleton_method(:manually_unmount) do
-            AutoUnmount.objects_to_unmount[sself].delete(id)
-          end
           AutoUnmount.objects_to_unmount[self] << id
         end
       end
 
       def after(*args, &block)
+        return if unmounted?
         super.tap do |id|
           sself = self
           id.define_singleton_method(:unmount) { abort }
-          id.define_singleton_method(:manually_unmount) do
-            AutoUnmount.objects_to_unmount[sself].delete(id)
-          end
           AutoUnmount.objects_to_unmount[self] << id
         end
       end
 
       def receives(broadcaster, *args, &block)
+        return if unmounted?
         broadcaster.receiver(self, *args, &block).tap do |id|
           # TODO: broadcaster classes should already defined manually_unmount
           # id.define_singleton_method(:manually_unmount) do

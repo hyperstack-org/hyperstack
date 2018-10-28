@@ -4,14 +4,15 @@ class App < HyperComponent
     UL do
       @symbols.sort.each do |symbol|
         LI(key: symbol) do
-          DisplayTicker(symbol: symbol, key: symbol)
+          DisplayTicker(symbol: symbol)
           .on(:cancel) { mutate @symbols.delete(symbol) }
         end
       end
     end
-    INPUT(placeholder: 'enter a stock symbol').on(:key_down) do |evt|
+    INPUT(placeholder: 'enter a new stock symbol')
+    .on(:key_down) do |evt|
       next unless evt.key_code == 13
-      mutate @symbols << evt.target.value
+      mutate @symbols << evt.target.value.upcase
       evt.target.value = ''
     end
   end
