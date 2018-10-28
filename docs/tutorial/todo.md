@@ -22,65 +22,26 @@ You will write less than 100 lines of code, and the tutorial should take about 1
 
 You can find the older application source code here:
 
-
 ### Skills required
 
-Working knowledge of Rails and Hyperloop required
+Working knowledge of Rails required
+
+#### Pre-Requisites
+
++ Yarn must be installed (https://yarnpkg.com/en/docs/install#mac-stable)
 
 ### Chapter 1: Setting Things Up
 
-Create a new rails application
-```ruby
-  rails _5.2.0_ new hyperloop_todo
+Simply run the command below to create a new Rails app with Hyperstack all configured:
+
 ```
-_5.2.0_  will insure you are creating a rails 5.2 appear (tested with 5.0 and 5.1)
-
-Add Hyperloop to your Gemfile
-
-Until our official release, add the following to your Gemfile:
-```ruby
-  ...
-  # lap0 will use the latest release candidate
-  gem 'hyperloop', '~> 1.0.0.lap0', git: 'https://github.com/ruby-hyperloop/hyperloop.git', branch: 'edge'
-  gem 'hyperloop-config', '~> 1.0.0.lap0', git: 'https://github.com/ruby-hyperloop/hyperloop-config.git', branch: 'edge'
-  ...
+rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
 ```
 
-then
-```ruby
-  bundle install
-```
+#### Start the Rails app
 
-Once the Hyperloop Gem and all its dependencies have been installed, it's time to run the hyperloop install generator.
-```ruby
-  rails g hyperloop:install
-```
-
-The generator creates the hyperloop structure inside the /app directory :
-```ruby
-  /app/hyperloop/
-  /app/hyperloop/components
-  /app/hyperloop/models
-  /app/hyperloop/operations
-  /app/hyperloop/stores
-```
-
-And updates your app/assets/javascripts/application.js file adding these lines:
-```ruby
-  //= require hyperloop-loader
-  Opal.OpalHotReloader.$listen() // optional (port, false, poll_seconds) i.e. (8081, false, 1)
-```
-
-To be sure everything is setting up correctly, check your app/assets/javascripts/application.js:
-```ruby
-  ...
-  //= require rails-ujs
-  //= require activestorage
-  //= require turbolinks
-  //= require_tree .
-  //= require hyperloop-loader
-  Opal.OpalHotReloader.$listen() // optional (port, false, poll_seconds) i.e. (8081, false, 1)
-```
++ `foreman start` to start Rails and OpalHotReloader
++ Navigate to `http://localhost:5000/`
 
 Run foreman
 ```ruby
