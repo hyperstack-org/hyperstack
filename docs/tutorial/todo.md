@@ -26,11 +26,11 @@ Working knowledge of Rails required
 
 ### Chapter 1: Setting Things Up
 
-1) `rails new MyApp`
-2) `cd MyApp` directory
-3) add `gem 'hyperloop'` to the Gemfile
-4) `bundle install`
-5) `run rails g hyperloop:install`
++ `rails new MyApp`
++ `cd MyApp` directory
++ add `gem 'hyperloop'` to the Gemfile
++ `bundle install`
++ `run rails g hyperloop:install`
 
 #### Start the Rails app
 
