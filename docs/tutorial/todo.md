@@ -1,5 +1,5 @@
 
-# TodoMVC Tutorial (Rails 5.2.0)
+# TodoMVC Tutorial (Rails 5.2.x)
 
 ### Prerequisites
 
@@ -7,7 +7,7 @@
 
 ### The Goals of this Tutorial
 
-In this tutorial you will build the classic [TodoMVC](http://todomvc.com) application using Hyperloop
+In this tutorial, you will build the classic [TodoMVC](http://todomvc.com) application using Hyperloop. This tutorial will demonstrate all Hyperloop concepts - client side Components and Isomorphic Models.
 
 The finished application will
 
@@ -20,35 +20,23 @@ The finished application will
 
 You will write less than 100 lines of code, and the tutorial should take about 1-2 hours to complete.
 
-You can find the older application source code here:
-
 ### Skills required
 
 Working knowledge of Rails required
 
-#### Pre-Requisites
-
-+ Yarn must be installed (https://yarnpkg.com/en/docs/install#mac-stable)
-
 ### Chapter 1: Setting Things Up
 
-Simply run the command below to create a new Rails app with Hyperstack all configured:
-
-```
-rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
-```
+1) `rails new MyApp`
+2) `cd MyApp` directory
+3) add `gem 'hyperloop'` to the Gemfile
+4) `bundle install`
+5) `run rails g hyperloop:install`
 
 #### Start the Rails app
 
-+ `foreman start` to start Rails and OpalHotReloader
-+ Navigate to `http://localhost:5000/`
++ `bundle exec foreman start` to start Rails and OpalHotReloader
 
-Run foreman
-```ruby
-  $ foreman start
-```
-
-Navigate to the given location and you should see the word **App** displayed on the page.
+Navigate to `http://localhost:5000/` and you should see the word **App** displayed on the page.
 
 ### Chapter 2:  Hyperloop Models are Rails Models
 
@@ -58,11 +46,11 @@ We are going to add our Todo Model, and discover that Hyperloop models are in fa
 + Changes to models on the server are synchronized with all participating browsers.
 + Data access is is protected by a robust *policy* mechanism.
 
->*A Rails ActiveRecord Model is a Ruby class that is backed by a database table.  In this example we will have one model class called `Todo`.  When manipulating models, Rails automatically generates the necessary SQL code for you.  So when `Todo.all` is evaluated Rails generates the appropriate SQL
-and turns the result of the query into appropriate Ruby data structures.*
+>A Rails ActiveRecord Model is a Ruby class that is backed by a database table.  In this example we will have one model class called `Todo`.  When manipulating models, Rails automatically generates the necessary SQL code for you.  So when `Todo.all` is evaluated Rails generates the appropriate SQL
+and turns the result of the query into appropriate Ruby data structures.
 
->*Hyperloop Models are extensions of ActiveRecord Models that synchronize the data between the client and server
-automatically for you.  So now `Todo.all` can be evaluated on the server or the client.*
+**Hyperloop Models are extensions of ActiveRecord Models that synchronize the data between the client and server
+automatically for you.  So now `Todo.all` can be evaluated on the server or the client.**
 
 Okay lets see it in action:
 
@@ -91,11 +79,13 @@ Okay lets see it in action:
   which will create the table.
 
 2. **Make Some Models Public:**  
-  *Move* `models/todo.rb` and `models/application_record.rb` to `hyperloop/models`.  
 
-   This will make the model accessible on the clients *and the server*, subject to any data access policies.  
++ *Move* `models/todo.rb` to `hyperloop/models`
++ Stop and restart your rails server
 
-   *Note: The hyperloop installer adds a policy that gives full permission to all clients but only in development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
+This will make the model accessible on the clients *and the server*, subject to any data access policies. 
+
+*Note: The hyperloop installer adds a policy that gives full permission to all clients but only in development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
 
 3. **Try It**
   Change your `App` component's render method to:  
@@ -927,4 +917,4 @@ end
 
 3: Its possible to get things so messed up the hot-reloader will not work.  Restart the server and reload the browser.
 
-You can find the final application source code here:
+4: Reach out to us on Gitter, we are always happy to help get you onboarded!
