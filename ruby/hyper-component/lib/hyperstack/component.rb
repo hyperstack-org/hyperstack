@@ -92,6 +92,7 @@ module Hyperstack
     def component_will_unmount
       observing do
         unmount # runs unmount callbacks as well
+        remove
         Hyperstack::Internal::Component.mounted_components.delete self
       end
     end

@@ -32,8 +32,11 @@ describe 'Auto Unmounting', js: true do
         class Mounted < HyperComponent
           param :keep_running
           after_mount do
-            timer = after(2) { puts "timer is going off!"; Mounter.timer_went_off! }
-            timer.manually_unmount if params.keep_running
+            if params.keep_running
+              Mounted.after(2) { puts "timer is going off!"; Mounter.timer_went_off! }
+            else
+              after(2) { puts "timer is going off!"; Mounter.timer_went_off! }
+            end
           end
           render do
             "Mounted!"
@@ -46,7 +49,7 @@ describe 'Auto Unmounting', js: true do
       mount 'Mounter', keep_running: false
       expect(page).to have_content("works!")
     end
-    it 'unless asked not to' do
+    it 'unless using the classes timer' do
       mount 'Mounter', keep_running: true
       expect(page).to have_content("works!")
     end

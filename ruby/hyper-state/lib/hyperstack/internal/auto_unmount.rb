@@ -24,7 +24,6 @@ module Hyperstack
             nil
           end
         end
-        remove
         @__hyperstack_internal_auto_unmount_unmounted = true
       end
 
