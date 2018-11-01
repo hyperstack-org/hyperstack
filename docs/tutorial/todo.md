@@ -1,5 +1,5 @@
 
-# TodoMVC Tutorial (Rails 5.2.0)
+# TodoMVC Tutorial (Rails 5.2.x)
 
 ### Prerequisites
 
@@ -7,7 +7,7 @@
 
 ### The Goals of this Tutorial
 
-In this tutorial you will build the classic [TodoMVC](http://todomvc.com) application using Hyperloop
+In this tutorial, you will build the classic [TodoMVC](http://todomvc.com) application using Hyperloop. This tutorial will demonstrate all Hyperloop concepts - client side Components and Isomorphic Models.
 
 The finished application will
 
@@ -20,74 +20,23 @@ The finished application will
 
 You will write less than 100 lines of code, and the tutorial should take about 1-2 hours to complete.
 
-You can find the older application source code here:
-
-
 ### Skills required
 
-Working knowledge of Rails and Hyperloop required
+Working knowledge of Rails required
 
 ### Chapter 1: Setting Things Up
 
-Create a new rails application
-```ruby
-  rails _5.2.0_ new hyperloop_todo
-```
-_5.2.0_  will insure you are creating a rails 5.2 appear (tested with 5.0 and 5.1)
++ `rails new MyApp`
++ `cd MyApp` directory
++ add `gem 'hyperloop'` to the Gemfile
++ `bundle install`
++ `run rails g hyperloop:install`
 
-Add Hyperloop to your Gemfile
+#### Start the Rails app
 
-Until our official release, add the following to your Gemfile:
-```ruby
-  ...
-  # lap0 will use the latest release candidate
-  gem 'hyperloop', '~> 1.0.0.lap0', git: 'https://github.com/ruby-hyperloop/hyperloop.git', branch: 'edge'
-  gem 'hyperloop-config', '~> 1.0.0.lap0', git: 'https://github.com/ruby-hyperloop/hyperloop-config.git', branch: 'edge'
-  ...
-```
++ `bundle exec foreman start` to start Rails and OpalHotReloader
 
-then
-```ruby
-  bundle install
-```
-
-Once the Hyperloop Gem and all its dependencies have been installed, it's time to run the hyperloop install generator.
-```ruby
-  rails g hyperloop:install
-```
-
-The generator creates the hyperloop structure inside the /app directory :
-```ruby
-  /app/hyperloop/
-  /app/hyperloop/components
-  /app/hyperloop/models
-  /app/hyperloop/operations
-  /app/hyperloop/stores
-```
-
-And updates your app/assets/javascripts/application.js file adding these lines:
-```ruby
-  //= require hyperloop-loader
-  Opal.OpalHotReloader.$listen() // optional (port, false, poll_seconds) i.e. (8081, false, 1)
-```
-
-To be sure everything is setting up correctly, check your app/assets/javascripts/application.js:
-```ruby
-  ...
-  //= require rails-ujs
-  //= require activestorage
-  //= require turbolinks
-  //= require_tree .
-  //= require hyperloop-loader
-  Opal.OpalHotReloader.$listen() // optional (port, false, poll_seconds) i.e. (8081, false, 1)
-```
-
-Run foreman
-```ruby
-  $ foreman start
-```
-
-Navigate to the given location and you should see the word **App** displayed on the page.
+Navigate to `http://localhost:5000/` and you should see the word **App** displayed on the page.
 
 ### Chapter 2:  Hyperloop Models are Rails Models
 
@@ -97,11 +46,11 @@ We are going to add our Todo Model, and discover that Hyperloop models are in fa
 + Changes to models on the server are synchronized with all participating browsers.
 + Data access is is protected by a robust *policy* mechanism.
 
->*A Rails ActiveRecord Model is a Ruby class that is backed by a database table.  In this example we will have one model class called `Todo`.  When manipulating models, Rails automatically generates the necessary SQL code for you.  So when `Todo.all` is evaluated Rails generates the appropriate SQL
-and turns the result of the query into appropriate Ruby data structures.*
+>A Rails ActiveRecord Model is a Ruby class that is backed by a database table.  In this example we will have one model class called `Todo`.  When manipulating models, Rails automatically generates the necessary SQL code for you.  So when `Todo.all` is evaluated Rails generates the appropriate SQL
+and turns the result of the query into appropriate Ruby data structures.
 
->*Hyperloop Models are extensions of ActiveRecord Models that synchronize the data between the client and server
-automatically for you.  So now `Todo.all` can be evaluated on the server or the client.*
+**Hyperloop Models are extensions of ActiveRecord Models that synchronize the data between the client and server
+automatically for you.  So now `Todo.all` can be evaluated on the server or the client.**
 
 Okay lets see it in action:
 
@@ -130,11 +79,13 @@ Okay lets see it in action:
   which will create the table.
 
 2. **Make Some Models Public:**  
-  *Move* `models/todo.rb` and `models/application_record.rb` to `hyperloop/models`.  
 
-   This will make the model accessible on the clients *and the server*, subject to any data access policies.  
++ *Move* `models/todo.rb` to `hyperloop/models`
++ Stop and restart your rails server
 
-   *Note: The hyperloop installer adds a policy that gives full permission to all clients but only in development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
+This will make the model accessible on the clients *and the server*, subject to any data access policies. 
+
+*Note: The hyperloop installer adds a policy that gives full permission to all clients but only in development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
 
 3. **Try It**
   Change your `App` component's render method to:  
@@ -966,4 +917,4 @@ end
 
 3: Its possible to get things so messed up the hot-reloader will not work.  Restart the server and reload the browser.
 
-You can find the final application source code here:
+4: Reach out to us on Gitter, we are always happy to help get you onboarded!
