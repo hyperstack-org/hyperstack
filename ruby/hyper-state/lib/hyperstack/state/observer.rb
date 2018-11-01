@@ -10,7 +10,7 @@ module Hyperstack
       end
 
       def remove
-        Internal::State::Mapper.remove
+        Internal::State::Mapper.remove(self)
       end
     end
   end

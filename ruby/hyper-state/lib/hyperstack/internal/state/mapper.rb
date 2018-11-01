@@ -130,6 +130,8 @@ module Hyperstack
           def remove(observer = @current_observer)
             remove_current_observers_and_objects(observer)
             new_objects.delete observer
+            # see run_delayed_updater for the purpose of @removed_observers
+            @removed_observers << observer if @removed_observers
           end
 
           # Internal (Private) Methods
@@ -166,11 +168,13 @@ module Hyperstack
           # lists by not adding an object hash key unless the object
           # already has pending state changes. (See the
           # schedule_delayed_updater method below)
+
           def update_exclusions
             @update_exclusions ||= Hash.new
           end
 
           # remove_current_observers_and_objects clears the hashes between renders
+
           def remove_current_observers_and_objects(observer)
             raise 'state management called outside of watch block' unless observer
             deleted_objects = current_objects.delete(observer)
@@ -190,6 +194,7 @@ module Hyperstack
           # Hyperstack.on_client? is true WITH ONE EXCEPTION:
           # observers can indicate that they need immediate updates in
           # case that the object being updated is themselves.
+
           def delay_updates?(object)
             @bulk_update_flag ||
               (Hyperstack.on_client? &&
@@ -211,21 +216,36 @@ module Hyperstack
           # If an object changes state again then the Set will be reinitialized, and all
           # the observers that might have been on a previous exclusion list, will now be
           # notified.
+
           def schedule_delayed_updater(object)
             update_exclusions[object] = Set.new
-            @delayed_updater ||= after(0) do
-              current_update_exclusions = @update_exclusions
-              @update_exclusions = @delayed_updater = nil
-              observers_to_update(current_update_exclusions).each do |observer, objects|
-                observer.mutations objects
-              end
+            @delayed_updater ||= after(0) { run_delayed_updater }
+          end
+
+          # run_delayed_updater will call the mutations method for each observer passing
+          # the entire list of objects that changed while waiting for the delay except
+          # those that the observer has already seen (the exclusion list).  The observers
+          # mutation method may cause some other observer already on the observers_to_update
+          # list to be removed.  To prevent these observers from receiving mutations we keep a
+          # temporary set of removed_observers.  This is initialized before the mutations,
+          # and then cleared as soon as we are done.
+
+          def run_delayed_updater
+            current_update_exclusions = @update_exclusions
+            @update_exclusions = @delayed_updater = nil
+            @removed_observers = Set.new
+            observers_to_update(current_update_exclusions).each do |observer, objects|
+              observer.mutations objects unless @removed_observers.include? observer
             end
+          ensure
+            @removed_observers = nil
           end
 
           # observers_to_update returns a hash with observers as keys, and lists of objects
           # as values. The hash is built by filtering the current_observers list
           # including only observers that have mutated objects, that are not on the exclusion
           # list.
+
           def observers_to_update(exclusions)
             Hash.new { |hash, key| hash[key] = Array.new }.tap do |updates|
               exclusions.each do |object, excluded_observers|

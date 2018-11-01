@@ -7,6 +7,7 @@ module Hyperstack
           def add_method(klass, method_name, opts = {})
             define_method(:"#{method_name}") do |*args|
               from = opts[:scope] == :shared ? klass.state.__from__ : __from__
+              from.init_store if from.respond_to? :init_store
               current_value = State.get_state(from, method_name.to_s)
 
               if args.count > 0

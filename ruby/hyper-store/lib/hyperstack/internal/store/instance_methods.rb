@@ -4,6 +4,7 @@ module Hyperstack
       module InstanceMethods
         def init_store
           return if @__hyperstack_store_initialized
+          @__hyperstack_store_initialized = true
           self.class.__instance_states.each do |instance_state|
             # If the scope is shared then we initialize at the class level
             next if instance_state[1][:scope] == :shared
@@ -21,7 +22,6 @@ module Hyperstack
             block_value = instance_eval(&instance_state[1][:block])
             mutate.__send__(:"#{instance_state[0]}", block_value)
           end
-          @__hyperstack_store_initialized = true
         end
 
         def state
