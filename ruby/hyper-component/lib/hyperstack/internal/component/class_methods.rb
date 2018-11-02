@@ -13,8 +13,8 @@ module Hyperstack
         end
 
         def backtrace(*args)
-          @dont_catch_exceptions = (args[0] == :none)
-          @backtrace_off = @dont_catch_exceptions || (args[0] == :off)
+          @__hyperstack_component_dont_catch_exceptions = (args[0] == :none)
+          @__hyperstack_component_backtrace_off = @__hyperstack_component_dont_catch_exceptions || (args[0] == :off)
         end
 
         def append_backtrace(message_array, backtrace)
@@ -52,11 +52,11 @@ module Hyperstack
         end
 
         def validator
-          return @validator if @validator
+          return @__hyperstack_component_validator if @__hyperstack_component_validator
           if superclass.respond_to?(:validator)
-            @validator = superclass.validator.copy(props_wrapper)
+            @__hyperstack_component_validator = superclass.validator.copy(props_wrapper)
           else
-            @validator = Validator.new(props_wrapper)
+            @__hyperstack_component_validator = Validator.new(props_wrapper)
           end
         end
 
@@ -84,11 +84,11 @@ module Hyperstack
         end
 
         def props_wrapper
-          return @props_wrapper if @props_wrapper
+          return @__hyperstack_component_props_wrapper if @__hyperstack_component_props_wrapper
           if superclass.respond_to? :props_wrapper
-            @props_wrapper = Class.new(superclass.props_wrapper)
+            @__hyperstack_component_props_wrapper = Class.new(superclass.props_wrapper)
           else
-            @props_wrapper ||= Class.new(PropsWrapper)
+            @__hyperstack_component_props_wrapper ||= Class.new(PropsWrapper)
           end
         end
 
@@ -147,7 +147,7 @@ module Hyperstack
         end
 
         def native_mixins
-          @native_mixins ||= []
+          @__hyperstack_component_native_mixins ||= []
         end
 
         def static_call_back(name, &block)
@@ -155,7 +155,7 @@ module Hyperstack
         end
 
         def static_call_backs
-          @static_call_backs ||= {}
+          @__hyperstack_component_static_call_backs ||= {}
         end
 
         def export_component(opts = {})
