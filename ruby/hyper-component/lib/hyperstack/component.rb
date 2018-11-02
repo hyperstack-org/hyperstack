@@ -78,13 +78,13 @@ module Hyperstack
       # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
       # for now we are just using it to clear processed_params
       observing(immediate_update: true) { run_callback(:before_receive_props, next_props) }
-      @_receiving_props = true
+      @__hyperstack_component_receiving_props = true
     end
 
     def component_will_update(next_props, next_state)
       observing { run_callback(:before_update, next_props, next_state) }
-      params._reset_all_others_cache if @_receiving_props
-      @_receiving_props = false
+      params._reset_all_others_cache if @__hyperstack_component_receiving_props
+      @__hyperstack_component_receiving_props = false
     end
 
     def component_did_update(prev_props, prev_state)
