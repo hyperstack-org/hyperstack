@@ -70,7 +70,7 @@ module Hyperstack
         def native_state_changed?(next_state_hash)
           # next_state = next_state_hash.to_n
           # %x{
-          #   var current_state = #{@native}.state
+          #   var current_state = #{@__hyperstack_component_native}.state
           #   var normalized_next_state =
           #     !next_state || Object.keys(next_state).length === 0 ? false : next_state
           #   var normalized_current_state =
@@ -84,7 +84,7 @@ module Hyperstack
           #   return (normalized_current_state['***_state_updated_at-***'] !=
           #           normalized_next_state['***_state_updated_at-***'])
           # }
-          state_hash = Hash.new(`#{@native}.state`)
+          state_hash = Hash.new(`#{@__hyperstack_component_native}.state`)
           next_state_hash != state_hash
         end
         # rubocop:enable Metrics/MethodLength
@@ -92,7 +92,7 @@ module Hyperstack
         # Do a shallow compare on the two hashes. Starting in 0.9 we will do a deep compare. ???
 
         def props_changed?(next_props)
-          props = Hash.new(`#{@native}.props`)
+          props = Hash.new(`#{@__hyperstack_component_native}.props`)
           next_props != props
         end
       end

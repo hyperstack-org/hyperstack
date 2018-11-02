@@ -15,7 +15,7 @@ module Hyperstack
     class NativeLibrary
       class << self
         def imports(native_name)
-          @native_prefix = "#{native_name}."
+          @__hyperstack_component_native_prefix = "#{native_name}."
           self
         end
 
@@ -66,7 +66,7 @@ module Hyperstack
         end
 
         def scope_native_name(js_name)
-          "#{@native_prefix}#{js_name}"
+          "#{@__hyperstack_component_native_prefix}#{js_name}"
         end
 
         def create_component_wrapper(klass, native_name, ruby_name)

@@ -47,7 +47,7 @@ module Hyperstack
     end
 
     def initialize(native_element)
-      @native = native_element
+      @__hyperstack_component_native = native_element
     end
 
     def emit(event_name, *args)
@@ -59,6 +59,7 @@ module Hyperstack
     end
 
     def component_will_mount
+      @__hyperstack_component_params_wrapper = self.class.props_wrapper.new(self)
       IsomorphicHelpers.load_context(true) if IsomorphicHelpers.on_opal_client?
       observing(immediate_update: true) do
         Hyperstack::Internal::Component.mounted_components << self
@@ -73,6 +74,7 @@ module Hyperstack
     end
 
     def component_will_receive_props(next_props)
+      @__hyperstack_component_params_wrapper.reload
       # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
       # for now we are just using it to clear processed_params
       observing(immediate_update: true) { run_callback(:before_receive_props, next_props) }
@@ -101,8 +103,6 @@ module Hyperstack
       observing { run_callback(:after_error, error, info) }
     end
 
-    attr_reader :waiting_on_resources
-
     def mutations(_objects)
       # if we have to we may have to require that all objects respond to a "name" method (see legacy method update_react_js_state below)
       set_state('***_state_updated_at-***' => `Date.now() + Math.random()`)
@@ -128,10 +128,14 @@ module Hyperstack
       raise 'no render defined'
     end unless method_defined?(:render)
 
+    def waiting_on_resources
+      @__hyperstack_component_waiting_on_resources
+    end
+
     def _render_wrapper
       observing(rendering: true) do
         element = Hyperstack::Internal::Component::RenderingContext.render(nil) { render || '' }
-        @waiting_on_resources =
+        @__hyperstack_component_waiting_on_resources =
           element.waiting_on_resources if element.respond_to? :waiting_on_resources
         element
       end

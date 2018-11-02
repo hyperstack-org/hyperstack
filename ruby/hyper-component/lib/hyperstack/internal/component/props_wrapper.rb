@@ -1,11 +1,20 @@
 module Hyperstack
   module Internal
     module Component
-
       class PropsWrapper
         attr_reader :component
 
-        def self.define_param(name, param_type)
+        def self.param_definitions
+          @param_definitions if @param_definitions
+          if superclass.respond_to? :param_definitions
+            @param_definitions = superclass.param_definitions.dup
+          else
+            @param_definitions = Hash.new
+          end
+        end
+
+        def self.define_param(name, param_type, aka = nil)
+          param_definitions[name] = [param_type, aka || name]
           if param_type == Proc
             define_method("#{name}") do |*args, &block|
               props[name].call(*args, &block) if props[name]
@@ -37,6 +46,26 @@ module Hyperstack
 
         def initialize(component)
           @component = component
+          self.class.param_definitions.each do |name, memo|
+            param_type, aka = memo
+            val = fetch_from_cache(name) do
+                    if param_type.respond_to? :_react_param_conversion
+                      param_type._react_param_conversion props[name], nil
+                    elsif param_type.is_a?(Array) &&
+                      param_type[0].respond_to?(:_react_param_conversion)
+                      props[name].collect do |param|
+                        param_type[0]._react_param_conversion param, nil
+                      end
+                    else
+                      props[name]
+                    end
+              @component.instance_variable_set(:"@#{aka}", val)
+            end
+          end
+        end
+
+        def reload
+          initialize(@component)
         end
 
         def [](prop)

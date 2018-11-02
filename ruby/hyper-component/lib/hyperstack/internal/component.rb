@@ -8,7 +8,7 @@ module Hyperstack
     module Component
       class << self
         def mounted_components
-          @mounted_components ||= Set.new
+          @__hyperstack_component_mounted_components ||= Set.new
         end
       end
     end
