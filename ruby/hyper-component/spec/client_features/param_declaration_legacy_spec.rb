@@ -7,7 +7,7 @@ describe 'the param macro', js: true do
         collect_other_params_as :foo
 
         def render
-          DIV { @foo[:bar] }
+          DIV { params.foo[:bar] }
         end
       end
     end
@@ -30,7 +30,7 @@ describe 'the param macro', js: true do
         collect_other_params_as :opts
 
         def render
-          DIV(id: :tp) { @opts[:another_param] }
+          DIV(id: :tp) { params.opts[:another_param] }
         end
       end
     end
@@ -45,20 +45,7 @@ describe 'the param macro', js: true do
         param :foo
 
         def render
-          DIV { @foo }
-        end
-      end
-    end
-    expect(page.body[-35..-19]).to include("<div>bar</div>")
-  end
-
-  it "can give a param an accessor alias" do
-    mount 'Foo', foo: :bar do
-      class Foo < HyperComponent
-        param :foo, alias: :bar
-
-        def render
-          DIV { @bar }
+          DIV { params.foo }
         end
       end
     end
@@ -75,7 +62,7 @@ describe 'the param macro', js: true do
         param :foo4, default: :no_bar4
 
         def render
-          DIV { "#{@foo1}-#{@foo2}-#{@foo3}-#{@foo4}" }
+          DIV { "#{params.foo1}-#{params.foo2}-#{params.foo3}-#{params.foo4}" }
         end
       end
     end
@@ -99,7 +86,7 @@ describe 'the param macro', js: true do
         param :foo2, type: String
 
         def render
-          DIV { "#{@foo1}-#{@foo2}" }
+          DIV { "#{params.foo1}-#{params.foo2}" }
         end
       end
     end
@@ -187,7 +174,7 @@ describe 'the param macro', js: true do
           param :bar, type: BazWoggle
           param :baz, type: [BazWoggle]
           def render
-            "#{@bar.kind}, #{@baz[0].kind}"
+            "#{params.bar.kind}, #{params.baz[0].kind}"
           end
         end
       end
@@ -206,8 +193,8 @@ describe 'the param macro', js: true do
           param  :d
           others :opts
           render do
-            DIV(@opts, id: :tp, class: "another-class", style: {marginLeft: 12}, data: {foo: :hi}) do
-              "flag: #{@flag}, a: #{@a}, b: #{@b}, c: #{@c}, d: #{@d}"
+            DIV(params.opts, id: :tp, class: "another-class", style: {marginLeft: 12}, data: {foo: :hi}) do
+              "flag: #{params.flag}, a: #{params.a}, b: #{params.b}, c: #{params.c}, d: #{params.d}"
             end
           end
         end
@@ -260,25 +247,12 @@ describe 'the param macro', js: true do
           Foo.class_eval do
             param :foo, type: BazWoggle
             def render
-              @foo.kind = @foo.kind+1
-              "#{@foo.kind}"
+              params.foo.kind = params.foo.kind+1
+              "#{params.foo.kind}"
             end
           end
         end
         expect(page.body[-60..-19]).to include('<span>2</span>')
-      end
-
-      it "will alias a Proc type param" do
-        evaluate_ruby do
-          Foo.class_eval do
-            param :foo, type: Proc
-            def render
-              @foo.call
-            end
-          end
-          Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: lambda { 'works!' })
-        end
-        expect(page.body[-60..-19]).to include('<span>works!</span>')
       end
 
       it "even if contains an embedded native object", skip: 'its not clear what this test was trying to accomplish...' do
@@ -296,7 +270,7 @@ describe 'the param macro', js: true do
         Bar.class_eval do
           param :foo, type: BazWoggle
           def render
-            @foo.kind.to_s
+            params.foo.kind.to_s
           end
         end
         Foo.class_eval do
@@ -314,5 +288,19 @@ describe 'the param macro', js: true do
         expect(`div.children[0].innerHTML`).to eq("updated")
       end
     end
+
+    it "will alias a Proc type param" do
+      evaluate_ruby do
+        Foo.class_eval do
+          param :foo, type: Proc
+          def render
+            params.foo
+          end
+        end
+        Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: lambda { 'works!' })
+      end
+      expect(page.body[-60..-19]).to include('<span>works!</span>')
+    end
+
   end
 end

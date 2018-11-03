@@ -46,9 +46,11 @@ module Hyperstack
             saved_context = [@current_observer, @immediate_update]
             @current_observer = observer
             @immediate_update = immediate_update && observer
-            @rendering_level += 1 if rendering
-            observed!(observer)
-            observed!(observer.class)
+            if rendering
+              @rendering_level += 1
+              observed!(observer)
+              observed!(observer.class)
+            end
             return_value = yield
             update_objects_to_observe(observer) if update_objects
             return_value

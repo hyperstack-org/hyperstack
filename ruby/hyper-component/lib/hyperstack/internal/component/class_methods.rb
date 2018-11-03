@@ -121,6 +121,13 @@ module Hyperstack
         alias other_params collect_other_params_as
         alias others collect_other_params_as
 
+        def raises(name, opts = {})
+          aka = opts[:alias] || "#{name}!"
+          name = name =~ /^<(.+)>$/ ? name.gsub(/^<(.+)>$/, '\1') : "on_#{name}"
+          validator.event(name)
+          define_method(aka) { props[name]&.call }
+        end
+
         def define_state(*states, &block)
           deprecation_warning "'define_state' is deprecated. Use the 'state' macro to declare states."
           default_initial_value = (block && block.arity == 0) ? yield : nil

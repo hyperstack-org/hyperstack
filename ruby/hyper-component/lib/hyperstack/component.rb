@@ -63,7 +63,7 @@ module Hyperstack
       IsomorphicHelpers.load_context(true) if IsomorphicHelpers.on_opal_client?
       observing(immediate_update: true) do
         Hyperstack::Internal::Component.mounted_components << self
-        run_callback(:before_mount)
+        run_callback(:before_mount, props)
       end
     end
 
@@ -74,7 +74,6 @@ module Hyperstack
     end
 
     def component_will_receive_props(next_props)
-      @__hyperstack_component_params_wrapper.reload
       # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
       # for now we are just using it to clear processed_params
       observing(immediate_update: true) { run_callback(:before_receive_props, next_props) }
@@ -83,7 +82,10 @@ module Hyperstack
 
     def component_will_update(next_props, next_state)
       observing { run_callback(:before_update, next_props, next_state) }
-      params._reset_all_others_cache if @__hyperstack_component_receiving_props
+      if @__hyperstack_component_receiving_props
+        params._reset_all_others_cache
+        @__hyperstack_component_params_wrapper.reload(next_props)
+      end
       @__hyperstack_component_receiving_props = false
     end
 

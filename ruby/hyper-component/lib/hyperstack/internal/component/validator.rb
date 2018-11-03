@@ -38,6 +38,10 @@ module Hyperstack
           define_rule(name, options)
         end
 
+        def event(name)
+          rules[name] = coerce_native_hash_values(default: nil)
+        end
+
         def all_other_params(name)
           @allow_undefined_props = true
           props_wrapper.define_all_others(name) { |props| props.reject { |name, value| rules[name] } }
@@ -77,7 +81,7 @@ module Hyperstack
 
         def define_rule(name, options = {})
           rules[name] = coerce_native_hash_values(options)
-          props_wrapper.define_param(name, options[:type])
+          props_wrapper.define_param(name, options[:type], options[:alias])
         end
 
         def errors
