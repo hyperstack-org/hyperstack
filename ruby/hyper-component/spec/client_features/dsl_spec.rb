@@ -32,7 +32,7 @@ describe 'the React DSL', js: true do
       on_client do
         class Bar < HyperComponent
           param :p1
-          render { "hello #{params.p1}" }
+          render { "hello #{@p1}" }
         end
         class Foo < HyperComponent
           render Bar, p1: "fred"
@@ -287,8 +287,8 @@ describe 'the React DSL', js: true do
         param :ele
         def render
           DIV do
-            params[:ele].render
-            params[:ele].render
+            @ele.render
+            @ele.render
           end
         end
       end

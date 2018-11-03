@@ -37,9 +37,9 @@ describe 'Hyperstack::Component::Element', js: true do
     it 'will subscribe to a component event param' do
       evaluate_ruby do
         class Foo < HyperComponent
-          param :on_event, type: Proc, default: nil, allow_nil: true
+          raises :event
           def render
-            params.on_event
+            event!
           end
         end
         Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event) {'works!'})
@@ -50,10 +50,10 @@ describe 'Hyperstack::Component::Element', js: true do
     it 'will subscribe to multiple component event params' do
       evaluate_ruby do
         class Foo < HyperComponent
-          param :on_event1, type: Proc, default: nil, allow_nil: true
-          param :on_event2, type: Proc, default: nil, allow_nil: true
+          raises :event1
+          raises :event2
           def render
-            params.on_event1+params.on_event2
+            event1! + event2!
           end
         end
         Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event1, :event2) {'works!'})
@@ -87,9 +87,9 @@ describe 'Hyperstack::Component::Element', js: true do
 
       evaluate_ruby do
         class Foo < HyperComponent
-          param :my_event, type: Proc, default: nil, allow_nil: true
+          raises '<my_event>', alias: :my_event!
           def render
-            params.my_event
+            my_event!
           end
         end
         Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on("<my_event>") {'works!'})

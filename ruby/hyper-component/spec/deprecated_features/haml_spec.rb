@@ -19,7 +19,7 @@ describe 'HAML notation', js: true do
           include Hyperstack::Component
           collect_other_params_as :attributes
           def render
-            "a man walks into a bar".span(params.attributes)
+            "a man walks into a bar".span(@attributes)
           end
         end
       end

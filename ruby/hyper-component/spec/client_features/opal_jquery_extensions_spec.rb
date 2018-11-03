@@ -7,7 +7,7 @@ describe 'opal-jquery extensions', js: true do
         class Foo < HyperComponent
           param :name
           def render
-            "hello #{params.name}"
+            "hello #{@name}"
           end
         end
         test_div = Element.new(:div)
@@ -33,7 +33,7 @@ describe 'opal-jquery extensions', js: true do
           end
 
           def render
-            "hello #{params.name} render-count: #{@render_count += 1}"
+            "hello #{@name} render-count: #{@render_count += 1}"
           end
 
           def self.rec_cnt
@@ -55,7 +55,7 @@ describe 'opal-jquery extensions', js: true do
         class Foo < HyperComponent
           param :name
           def render
-            "hello #{params.name}"
+            "hello #{@name}"
           end
         end
         test_div = Element.new(:div)

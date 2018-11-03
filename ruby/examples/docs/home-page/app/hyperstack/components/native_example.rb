@@ -29,12 +29,12 @@ class SelectDate < HyperComponent
   render(DIV) do
     # DatePicker is a JS Component imported with Webpack
     # Notice the lambda to pass a Ruby method as a callback
-    DatePicker(selected: state.date,
+    DatePicker(selected: @date,
                todayButton: "Today",
-               onChange: ->(date) { mutate.date date }
+               onChange: ->(date) { mutate @date = date }
     )
     # see how we use `` and #{} to b ridger JS and Ruby
-    H3 { `moment(#{state.date}).format('LL')` }
+    H3 { `moment(#{@date}).format('LL')` }
     #  or if you prefer..
     # H3 { Native(`moment`).call(state.date).format('LL') }
   end

@@ -49,7 +49,7 @@ describe Hyperstack::Internal::State::Mapper do
     Hyperstack::Internal::State::Mapper.observing(observer1, false, false, true) {}
   end
 
-  it "an observer always observes itself and its class" do
+  it "an observer when rendering always observes itself and its class" do
     observer1 = double('observer1')
 
     allow(Hyperstack).to receive(:on_client?) { true }
@@ -57,7 +57,7 @@ describe Hyperstack::Internal::State::Mapper do
     expect(Hyperstack::Internal::State::Mapper).to receive(:observed!).once.with(observer1)
     expect(Hyperstack::Internal::State::Mapper).to receive(:observed!).once.with(observer1.class)
 
-    Hyperstack::Internal::State::Mapper.observing(observer1, false, false, true) {}
+    Hyperstack::Internal::State::Mapper.observing(observer1, false, true, true) {}
   end
 
   it "an observer is only recorded once" do
@@ -158,13 +158,16 @@ describe Hyperstack::Internal::State::Mapper do
     expect(observer2).to receive(:mutations).twice.with([observer1])
 
     Hyperstack::Internal::State::Mapper.observing(observer1, false, false, true) do
+      Hyperstack::Internal::State::Mapper.observed!(observer1)
       Hyperstack::Internal::State::Mapper.observed!(observer2)
     end
     Hyperstack::Internal::State::Mapper.observing(observer2, false, false, true) do
+      Hyperstack::Internal::State::Mapper.observed!(observer2)
       Hyperstack::Internal::State::Mapper.observed!(observer1)
     end
 
     Hyperstack::Internal::State::Mapper.observing(observer1, true, false, false) do
+      Hyperstack::Internal::State::Mapper.observed!(observer1)
       Hyperstack::Internal::State::Mapper.mutated!(observer1)
       Hyperstack::Internal::State::Mapper.mutated!(observer2)
       Hyperstack::Internal::State::Mapper.observing(observer1, true, true, false) do
@@ -172,6 +175,7 @@ describe Hyperstack::Internal::State::Mapper do
         Hyperstack::Internal::State::Mapper.mutated!(observer2)
       end
       Hyperstack::Internal::State::Mapper.observing(observer1, true, false, false) do
+        Hyperstack::Internal::State::Mapper.observed!(observer1)
         Hyperstack::Internal::State::Mapper.mutated!(observer1)
         Hyperstack::Internal::State::Mapper.mutated!(observer2)
       end

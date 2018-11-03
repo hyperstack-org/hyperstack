@@ -1,1 +1,0 @@
-//= require 'hyperloop-loader'

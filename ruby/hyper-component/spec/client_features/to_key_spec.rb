@@ -43,7 +43,7 @@ describe 'to_key helper', js: true do
       class TestComponent2 < HyperComponent
         param :test_object
         render do
-          "to key was called!" if params.test_object.to_key_called
+          "to key was called!" if @test_object.to_key_called
         end
       end
     end

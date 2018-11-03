@@ -114,8 +114,8 @@ describe 'hyper-spec', js: true do
           def increment_click
             mutate @clicks += 1
             if @clicks % 3 == 0
-              params.click3(@clicks)
-              params._onClick3(@clicks)
+              @click3.call(@clicks)
+              @_onClick3.call(@clicks)
             end
           end
           render do

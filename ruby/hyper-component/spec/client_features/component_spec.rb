@@ -272,72 +272,16 @@ describe 'React::Component', js: true do
         end
       end
 
-      it 'reads from parent passed properties through `params`' do
-        mount 'Foo', prop: 'foobar' do
-          Foo.class_eval do
-            param :prop
-            def render
-              Hyperstack::Component::ReactAPI.create_element('div') { params[:prop] }
-            end
-          end
-        end
-        expect(page.body[-40..-19]).to include("<div>foobar</div>")
-      end
-
       it 'accesses nested params as orignal Ruby object' do
         mount 'Foo', prop: [{foo: 10}] do
           Foo.class_eval do
             param :prop
             def render
-              Hyperstack::Component::ReactAPI.create_element('div') { params[:prop][0][:foo] }
+              Hyperstack::Component::ReactAPI.create_element('div') { @prop[0][:foo] }
             end
           end
         end
         expect(page.body[-35..-19]).to include("<div>10</div>")
-      end
-    end
-
-    describe 'Props Updating', v13_only: true do
-      before do
-        on_client do
-          class Foo
-            include Hyperstack::Component
-          end
-        end
-      end
-
-      it '`setProps` as method `set_props` is no longer supported' do
-        expect_evaluate_ruby do
-          Foo.class_eval do
-            param :foo
-            def render
-              Hyperstack::Component::ReactAPI.create_element('div') { params[:foo] }
-            end
-          end
-          instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10)
-          begin
-            instance.set_props(foo: 20)
-          rescue
-            'got risen'
-          end
-        end.to eq('got risen')
-      end
-
-      it 'original `replaceProps` as method `set_props!` is no longer supported' do
-        expect_evaluate_ruby do
-          Foo.class_eval do
-            param :foo
-            def render
-              Hyperstack::Component::ReactAPI.create_element('div') { params[:foo] ? 'exist' : 'null' }
-            end
-          end
-          instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10)
-          begin
-            instance.set_props!(bar: 20)
-          rescue
-            'got risen'
-          end
-        end.to eq('got risen')
       end
     end
 
@@ -409,7 +353,7 @@ describe 'React::Component', js: true do
             end
 
             def render
-              DIV { params[:foo] + '-' + params[:bar]}
+              DIV { @foo + '-' + @bar}
             end
           end
         end
@@ -477,82 +421,6 @@ describe 'React::Component', js: true do
     end
   end
 
-  describe 'Event handling' do
-    before do
-      on_client do
-        class Foo
-          include Hyperstack::Component
-        end
-      end
-    end
-
-    it 'works in render method' do
-
-      expect_evaluate_ruby do
-        Foo.class_eval do
-
-          attr_reader :clicked
-
-          def render
-            Hyperstack::Component::ReactAPI.create_element('div').on(:click) do
-              @clicked = true
-            end
-          end
-        end
-        instance = Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo)
-        Hyperstack::Component::ReactTestUtils.simulate_click(instance)
-        instance.clicked
-      end.to eq(true)
-    end
-
-    it 'invokes handler on `this.props` using emit' do
-      on_client do
-        Foo.class_eval do
-          param :on_foo_fubmit, type: Proc
-          after_mount :setup
-
-          def setup
-            self.emit(:foo_submit, 'bar')
-          end
-
-          def render
-            Hyperstack::Component::ReactAPI.create_element('div')
-          end
-        end
-      end
-      evaluate_ruby do
-        element = Hyperstack::Component::ReactAPI.create_element(Foo).on(:foo_submit) { 'bar' }
-        Hyperstack::Component::ReactTestUtils.render_into_document(element)
-      end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to_not match(/Exception raised/)
-    end
-
-    it 'invokes handler with multiple params using emit' do
-      on_client do
-        Foo.class_eval do
-          param :on_foo_invoked, type: Proc
-          after_mount :setup
-
-          def setup
-            self.emit(:foo_invoked, [1,2,3], 'bar')
-          end
-
-          def render
-            Hyperstack::Component::ReactAPI.create_element('div')
-          end
-        end
-      end
-
-      evaluate_ruby do
-        element = Hyperstack::Component::ReactAPI.create_element(Foo).on(:foo_invoked) { return [1,2,3], 'bar' }
-        Hyperstack::Component::ReactTestUtils.render_into_document(element)
-      end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to_not match(/Exception raised/)
-    end
-  end
-
   describe '#render' do
     it 'supports element building helpers' do
       on_client do
@@ -561,7 +429,7 @@ describe 'React::Component', js: true do
           param :foo
           def render
             DIV do
-              SPAN { params[:foo] }
+              SPAN { @foo }
             end
           end
         end

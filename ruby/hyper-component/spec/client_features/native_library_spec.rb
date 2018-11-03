@@ -7,13 +7,13 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
         class Component < HyperComponent
           param :time_stamp
           backtrace :none
-          render { NativeComponent(name: "There - #{params.time_stamp}") }
+          render { NativeComponent(name: "There - #{@time_stamp}") }
         end
 
         class NestedComponent < HyperComponent
           param :time_stamp
           backtrace :none
-          render { NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{params.time_stamp}") }
+          render { NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{@time_stamp}") }
         end
       end
     end

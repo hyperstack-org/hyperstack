@@ -11,6 +11,7 @@ end
 
 class HyperComponent
   include Hyperstack::Component
+  param_accessor_style :legacy
   class << self
     def inherited(child)
       child.include Hyperstack::Legacy::Store

@@ -53,8 +53,8 @@ describe 'HyperComponent Integration', js: true do
 
         render(DIV) do
           @render_count += 1
-          DIV { "click_count = #{click_count}. StateTest(id: #{params.id}) rendered #{@render_count} times." }
-          BUTTON(id: "click_me_#{params.id}") { "CLICK ME" }
+          DIV { "click_count = #{click_count}. StateTest(id: #{@id}) rendered #{@render_count} times." }
+          BUTTON(id: "click_me_#{@id}") { "CLICK ME" }
           .on(:click) { self.click_count += 1 }
         end
       end
@@ -99,8 +99,8 @@ describe 'HyperComponent Integration', js: true do
 
         render(DIV) do
           @render_count += 1
-          DIV { "StateTest.count = #{StateTest.click_count}. StateTest(id: #{params.id}) rendered #{@render_count} times." }
-          BUTTON(id: "click_me_#{params.id}") { "CLICK ME" }
+          DIV { "StateTest.count = #{StateTest.click_count}. StateTest(id: #{@id}) rendered #{@render_count} times." }
+          BUTTON(id: "click_me_#{@id}") { "CLICK ME" }
           .on(:click) { StateTest.click_count += 1 }
         end
       end

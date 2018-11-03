@@ -2,15 +2,15 @@ module Hyperstack
   module Router
     module Helpers
       def match
-        params.match
+        @match
       end
 
       def location
-        params.location
+        @location
       end
 
       def history
-        params.history
+        @history
       end
 
       def self.included(base)

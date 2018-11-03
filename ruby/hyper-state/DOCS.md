@@ -294,13 +294,13 @@ class Cart < Hyperloop::Store
 
   receives Add do
     # notice we use mutate.items since we are modifying the hash
-    mutate.items[params.item] += params.qty
+    mutate.items[@item] += @qty
   end
 
   receives Remove do
-    mutate.items[params.item] -= params.qty
+    mutate.items[@item] -= @qty
     # remove any items with zero qty from the cart
-    mutate.items.delete(params.item) if state.items[params.item] < 1
+    mutate.items.delete(@item) if state.items[@item] < 1
   end
 end
 ```

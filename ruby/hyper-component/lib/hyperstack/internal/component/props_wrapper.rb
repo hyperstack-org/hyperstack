@@ -27,7 +27,9 @@ module Hyperstack
 
           def define_param(name, param_type, aka = nil)
             aka ||= name
-            param_definitions[name] = ->(props) { @component.instance_variable_set :"@#{aka}", fetch_from_cache(name, param_type, props) } #[param_type, aka || name]
+            param_definitions[name] = lambda do |props|
+              @component.instance_variable_set :"@#{aka}", fetch_from_cache(name, param_type, props)
+            end
             if param_type == Proc
               define_method(aka.to_sym) do |*args, &block|
                 props[name].call(*args, &block) if props[name]
@@ -40,7 +42,9 @@ module Hyperstack
           end
 
           def define_all_others(name)
-            param_definitions[name] = -> (props) { puts "setting @#{name} props = #{props} self = #{self}"; @component.instance_variable_set :"@#{name}", yield(props) } #[:__hyperstack_component_all_others_flag, name, block]
+            param_definitions[name] = lambda do |props|
+              @component.instance_variable_set :"@#{name}", yield(props)
+            end
             define_method(name.to_sym) do
               @_all_others_cache ||= yield(props)
             end
@@ -53,7 +57,7 @@ module Hyperstack
 
         def initialize(component, incoming = nil)
           @component = component
-          return if self.class.param_accessor_style == :legacy
+          return if param_accessor_style == :legacy
           self.class.param_definitions.each_value do |initializer|
             instance_exec(incoming || props, &initializer)
           end
@@ -73,12 +77,12 @@ module Hyperstack
         def fetch_from_cache(name, param_type, props)
           last, cached_value = cache[name]
           return cached_value if last.equal?(props[name])
-          convert_param(name, param_type).tap do |value|
+          convert_param(name, param_type, props).tap do |value|
             cache[name] = [props[name], value]
           end
         end
 
-        def convert_param(name, param_type)
+        def convert_param(name, param_type, props)
           if param_type.respond_to? :_react_param_conversion
             param_type._react_param_conversion props[name], nil
           elsif param_type.is_a?(Array) &&
