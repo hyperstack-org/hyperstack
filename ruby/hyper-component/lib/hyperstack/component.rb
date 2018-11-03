@@ -83,7 +83,6 @@ module Hyperstack
     def component_will_update(next_props, next_state)
       observing { run_callback(:before_update, next_props, next_state) }
       if @__hyperstack_component_receiving_props
-        params._reset_all_others_cache
         @__hyperstack_component_params_wrapper.reload(next_props)
       end
       @__hyperstack_component_receiving_props = false

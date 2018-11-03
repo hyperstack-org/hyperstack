@@ -12,6 +12,10 @@ module Hyperstack
           true
         end
 
+        def param_accessor_style(*args)
+          props_wrapper.param_accessor_style(*args)
+        end
+
         def backtrace(*args)
           @__hyperstack_component_dont_catch_exceptions = (args[0] == :none)
           @__hyperstack_component_backtrace_off = @__hyperstack_component_dont_catch_exceptions || (args[0] == :off)

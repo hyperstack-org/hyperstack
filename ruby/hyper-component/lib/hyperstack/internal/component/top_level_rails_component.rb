@@ -23,11 +23,11 @@ module Hyperstack
         def top_level_render
           paths_searched = []
           component = nil
-          if params.component_name.start_with?('::')
+          if @component_name.start_with?('::')
             # if absolute path of component is given, look it up and fail if not found
-            paths_searched << params.component_name
+            paths_searched << @component_name
             component = begin
-                          Object.const_get(params.component_name)
+                          Object.const_get(@component_name)
                         rescue NameError
                           nil
                         end
@@ -40,9 +40,9 @@ module Hyperstack
             # ::Foo::Bar will only resolve to some component named ::Foo::Bar
             # but Foo::Bar will check (in this order) ::Home::Foo::Bar, ::Components::Home::Foo::Bar, ::Foo::Bar, ::Components::Foo::Bar
             self.class.search_path.each do |scope|
-              paths_searched << "#{scope.name}::#{params.controller}::#{params.component_name}"
+              paths_searched << "#{scope.name}::#{@controller}::#{@component_name}"
               component = begin
-                            scope.const_get(params.controller, false).const_get(params.component_name, false)
+                            scope.const_get(@controller, false).const_get(@component_name, false)
                           rescue NameError
                             nil
                           end
@@ -50,9 +50,9 @@ module Hyperstack
             end
             unless component
               self.class.search_path.each do |scope|
-                paths_searched << "#{scope.name}::#{params.component_name}"
+                paths_searched << "#{scope.name}::#{@component_name}"
                 component = begin
-                              scope.const_get(params.component_name, false)
+                              scope.const_get(@component_name, false)
                             rescue NameError
                               nil
                             end
@@ -60,8 +60,8 @@ module Hyperstack
               end
             end
           end
-          return RenderingContext.render(component, params.render_params) if component && component.method_defined?(:render)
-          raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
+          return RenderingContext.render(component, @render_params) if component && component.method_defined?(:render)
+          raise "Could not find component class '#{@component_name}' for @controller '#{@controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
         end
       end
     end

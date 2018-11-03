@@ -4,54 +4,68 @@ module Hyperstack
       class PropsWrapper
         attr_reader :component
 
-        def self.param_definitions
-          @param_definitions ||=
-            if superclass.respond_to? :param_definitions
-              superclass.param_definitions.dup
+        class << self
+
+          def param_accessor_style(*args)
+            @param_accessor_style = args[0] if args.length > 0
+            @param_accessor_style ||=
+              if superclass.respond_to? :param_accessor_style
+                superclass.param_accessor_style
+              else
+                :hyperstack
+              end
+          end
+
+          def param_definitions
+            @param_definitions ||=
+              if superclass.respond_to? :param_definitions
+                superclass.param_definitions.dup
+              else
+                Hash.new
+              end
+          end
+
+          def define_param(name, param_type, aka = nil)
+            aka ||= name
+            param_definitions[name] = ->(props) { @component.instance_variable_set :"@#{aka}", fetch_from_cache(name, param_type, props) } #[param_type, aka || name]
+            if param_type == Proc
+              define_method(aka.to_sym) do |*args, &block|
+                props[name].call(*args, &block) if props[name]
+              end
             else
-              Hash.new
+              define_method(aka.to_sym) do
+                fetch_from_cache(name, param_type, props)
+              end
             end
-        end
+          end
 
-        def self.define_param(name, param_type, aka = nil)
-          aka ||= name
-          param_definitions[name] = ->(props) { @component.instance_variable_set :"@#{aka}", fetch_from_cache(name, param_type, props) } #[param_type, aka || name]
-          if param_type == Proc
-            define_method(aka.to_sym) do |*args, &block|
-              props[name].call(*args, &block) if props[name]
-            end
-          else
-            define_method(aka.to_sym) do
-              fetch_from_cache(name, param_type, props)
+          def define_all_others(name)
+            param_definitions[name] = -> (props) { puts "setting @#{name} props = #{props} self = #{self}"; @component.instance_variable_set :"@#{name}", yield(props) } #[:__hyperstack_component_all_others_flag, name, block]
+            define_method(name.to_sym) do
+              @_all_others_cache ||= yield(props)
             end
           end
         end
 
-        def self.define_all_others(name)
-          param_definitions[name] = -> (props) { puts "setting @#{name} props = #{props} self = #{self}"; @component.instance_variable_set :"@#{name}", yield(props) } #[:__hyperstack_component_all_others_flag, name, block]
-          define_method(name.to_sym) do
-            puts "calling good ole params.#{name} props = #{props} self = #{self}"
-            @_all_others_cache ||= yield(props)
-          end
+        def param_accessor_style
+          self.class.param_accessor_style
         end
 
         def initialize(component, incoming = nil)
           @component = component
+          return if self.class.param_accessor_style == :legacy
           self.class.param_definitions.each_value do |initializer|
             instance_exec(incoming || props, &initializer)
           end
         end
 
         def reload(next_props)
+          @_all_others_cache = nil # needed for legacy params wrapper
           initialize(@component, next_props)
         end
 
         def [](prop)
           props[prop]
-        end
-
-        def _reset_all_others_cache
-          @_all_others_cache = nil
         end
 
         private
