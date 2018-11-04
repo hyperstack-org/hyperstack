@@ -10,7 +10,6 @@ module Hyperstack
 
         def params
           if @__hyperstack_component_params_wrapper.param_accessor_style == :hyperstack
-            debugger
             raise "params are now directly accessible via instance variables.\n"\
                   '  to access the legacy behavior add `param_accessor_style = :legacy` '\
                     "to your component class\n"\

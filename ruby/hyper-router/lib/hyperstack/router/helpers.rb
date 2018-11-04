@@ -2,15 +2,27 @@ module Hyperstack
   module Router
     module Helpers
       def match
-        @match
+        if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
+          params.match
+        else
+          @match
+        end
       end
 
       def location
-        @location
+        if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
+          params.location
+        else
+          @location
+        end
       end
 
       def history
-        @history
+        if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
+          params.history
+        else
+          @history
+        end
       end
 
       def self.included(base)
