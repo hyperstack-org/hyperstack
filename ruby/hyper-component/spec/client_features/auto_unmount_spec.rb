@@ -23,16 +23,16 @@ describe 'Auto Unmounting', js: true do
             when :cancel_and_wait
               "waiting..."
             when :final_result
-              "works!" if !!Mounter.stayed_running == @keep_running
+              "works!" if !!Mounter.stayed_running == @KeepRunning
             else
-              Mounted(keep_running: @keep_running)
+              Mounted(keep_running: @KeepRunning)
             end
           end
         end
         class Mounted < HyperComponent
           param :keep_running
           after_mount do
-            if @keep_running
+            if @KeepRunning
               Mounted.after(2) { puts "timer is going off!"; Mounter.timer_went_off! }
             else
               after(2) { puts "timer is going off!"; Mounter.timer_went_off! }
@@ -83,9 +83,6 @@ describe 'Auto Unmounting', js: true do
       end
       class Mounted < HyperComponent
         param :observable_object
-        before_mount do
-          @observable_object = @observable_object
-        end
         render do
           "Mounted!"
         end

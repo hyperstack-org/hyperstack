@@ -8,7 +8,7 @@ module Components
     end
 
     def render
-      LI { @todo.to_s }
+      LI { @Todo.to_s }
     end
   end
 end

@@ -41,7 +41,8 @@ module Hyperstack
         # of the component, i.e. Foo::Bar.baz === Foo::Bar().baz
 
         def method_missing(name, *args, &children)
-          super if args.any? || !Hyperstack::Component::Element.respond_to?(:haml_class_name)
+          if args.any? || !Hyperstack::Component::Element.respond_to?(:haml_class_name)
+            super
           # this was:
           #   Object.method_missing(name, *args, &children) unless args.empty?
           # Which does not show the actual component that broke.
@@ -49,10 +50,11 @@ module Hyperstack
           # missing that calls Object._reactrb_import_component_class(name) which
           # makes sure to autoimport the component.  This is not needed here, as
           # we already have the class.
-
-          RenderingContext.render(
-            self, class: Hyperstack::Component::Element.haml_class_name(name), &children
-          )
+          else
+            RenderingContext.render(
+              self, class: Hyperstack::Component::Element.haml_class_name(name), &children
+            )
+          end
         end
 
         def validator

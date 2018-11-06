@@ -12,7 +12,6 @@
 
 // Opal.Hyperstack.$const_get('Loader').$listen() // optional (port, false, poll_seconds) i.e. (8081, false, 1)
 
-//
 //= require rails-ujs
 //= require activestorage
 //= require turbolinks

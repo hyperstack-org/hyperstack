@@ -1,3 +1,4 @@
+require 'active_support/core_ext/string'
 module Hyperstack
   module Internal
     module Component
@@ -5,6 +6,10 @@ module Hyperstack
         attr_reader :component
 
         class << self
+
+          def instance_var_name_for(name)
+            name.camelize
+          end
 
           def param_accessor_style(*args)
             @param_accessor_style = args[0] if args.length > 0
@@ -26,24 +31,26 @@ module Hyperstack
           end
 
           def define_param(name, param_type, aka = nil)
-            aka ||= name
+            meth_name = aka || name
+            var_name = aka || instance_var_name_for(name)
             param_definitions[name] = lambda do |props|
-              @component.instance_variable_set :"@#{aka}", fetch_from_cache(name, param_type, props)
+              @component.instance_variable_set :"@#{var_name}", fetch_from_cache(name, param_type, props)
             end
             if param_type == Proc
-              define_method(aka.to_sym) do |*args, &block|
+              define_method(meth_name.to_sym) do |*args, &block|
                 props[name].call(*args, &block) if props[name]
               end
             else
-              define_method(aka.to_sym) do
+              define_method(meth_name.to_sym) do
                 fetch_from_cache(name, param_type, props)
               end
             end
           end
 
           def define_all_others(name)
+            var_name = instance_var_name_for(name)
             param_definitions[name] = lambda do |props|
-              @component.instance_variable_set :"@#{name}", yield(props)
+              @component.instance_variable_set :"@#{var_name}", yield(props)
             end
             define_method(name.to_sym) do
               @_all_others_cache ||= yield(props)

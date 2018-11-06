@@ -1,5 +1,5 @@
 Hyperstack.configuration do |config|
-  config.prerendering = :on
+  config.prerendering = :off
   config.import 'jquery', client_only: true
   config.import 'hyperstack/component/jquery', client_only: true
   config.import 'browser/interval'

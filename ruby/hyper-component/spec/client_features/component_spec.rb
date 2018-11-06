@@ -277,7 +277,7 @@ describe 'React::Component', js: true do
           Foo.class_eval do
             param :prop
             def render
-              Hyperstack::Component::ReactAPI.create_element('div') { @prop[0][:foo] }
+              Hyperstack::Component::ReactAPI.create_element('div') { @Prop[0][:foo] }
             end
           end
         end
@@ -353,7 +353,7 @@ describe 'React::Component', js: true do
             end
 
             def render
-              DIV { @foo + '-' + @bar}
+              DIV { @Foo + '-' + @Bar}
             end
           end
         end
@@ -429,7 +429,7 @@ describe 'React::Component', js: true do
           param :foo
           def render
             DIV do
-              SPAN { @foo }
+              SPAN { @Foo }
             end
           end
         end

@@ -30,7 +30,8 @@ module Hyperstack
                                 (`!!#{component}.prototype.isReactComponent` ||
                                  `!!#{component}.prototype.render`)
           is_functional_component = `typeof #{component} === "function"`
-          unless is_component_class || is_functional_component
+          has_render_method = `typeof #{component}.render === "function"`
+          unless is_component_class || is_functional_component || has_render_method
             raise 'does not appear to be a native react component'
           end
           component
@@ -39,8 +40,9 @@ module Hyperstack
         def self.native_react_component?(name = nil)
           return false unless name
           eval_native_react_component(name)
+          true
         rescue
-          nil
+          false
         end
 
         def self.add_after_error_hook(klass)
@@ -241,20 +243,20 @@ module Hyperstack
             elsif key == "key"
               props["key"] = value.to_key
 
-            elsif key == 'ref' && value.respond_to?(:call)
-              # TODO: currently react still accepts the syntax ref: :foo meaning set refs.foo to the ref.
-              # in hyperstack release 0.1 we can put this behavior on a switch or use the notation `ref_key: :foo` for old school
-              props[key] = %x{
-                              function(dom_node){
-                                if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
-                                  #{ value.call(`dom_node.__opalInstance`) };
-                                } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
-                                  #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
-                                } else {
-                                  #{ value.call(`dom_node`) };
+            elsif key == 'ref'
+              if value.respond_to?(:call)
+                props[key] = %x{
+                                function(dom_node){
+                                  if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
+                                    #{ value.call(`dom_node.__opalInstance`) };
+                                  } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
+                                    #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
+                                  } else {
+                                    #{ value.call(`dom_node`) };
+                                  }
                                 }
                               }
-                            }
+              end
             elsif Hyperstack::Component::ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
               value.each { |k, v| props["#{key}-#{k.gsub(/__|_/, '__' => '_', '_' => '-')}"] = v.to_n }
             else

@@ -5,7 +5,7 @@ module Hyperstack
         if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
           params.match
         else
-          @match
+          @Match
         end
       end
 
@@ -13,7 +13,7 @@ module Hyperstack
         if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
           params.location
         else
-          @location
+          @Location
         end
       end
 
@@ -21,7 +21,7 @@ module Hyperstack
         if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
           params.history
         else
-          @history
+          @History
         end
       end
 

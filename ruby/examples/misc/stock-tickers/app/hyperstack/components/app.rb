@@ -1,19 +1,27 @@
 class App < HyperComponent
   before_mount { @symbols = Set.new }
-  render(DIV) do
-    UL do
+
+  def add_symbol
+    mutate @symbols << @SymbolInput.value.upcase
+    @SymbolInput.value = ''
+  end
+
+  render do
+    BS::Container(style: { margin: 20 }) do
       @symbols.sort.each do |symbol|
-        LI(key: symbol) do
-          DisplayTicker(symbol: symbol)
-          .on(:cancel) { mutate @symbols.delete(symbol) }
+        DisplayTicker(symbol: symbol, key: symbol)
+        .on(:cancel) { mutate @symbols.delete(symbol) }
+      end
+      BS::Row(style: { marginTop: 20 }) do
+        BS::Col(sm: 4) do
+          BS::InputGroup(class: 'mb-3') do
+            BS::FormControl(ref: assign_to(:SymbolInput), placeholder: 'New Stock Market Symbol')
+            .on(:enter) { add_symbol }
+            BS::InputGroup::Append() { BS::Button() { 'Add' } }
+            .on(:click) { add_symbol }
+          end
         end
       end
-    end
-    INPUT(placeholder: 'enter a new stock symbol')
-    .on(:key_down) do |evt|
-      next unless evt.key_code == 13
-      mutate @symbols << evt.target.value.upcase
-      evt.target.value = ''
     end
   end
 end

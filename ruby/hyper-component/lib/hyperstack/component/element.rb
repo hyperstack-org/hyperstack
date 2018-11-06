@@ -87,6 +87,8 @@ module Hyperstack
           merge_component_event_prop! event_name.gsub(/^<(.+)>$/, '\1'), &block
         elsif Event::BUILT_IN_EVENTS.include?(name = "on#{event_name.event_camelize}")
           merge_built_in_event_prop! name, &block
+        elsif event_name == :enter
+          merge_built_in_event_prop!('onKeyDown') { |evt| yield(evt) if evt.key_code == 13 }
         elsif @type.instance_variable_get('@native_import')
           merge_component_event_prop! name, &block
         else

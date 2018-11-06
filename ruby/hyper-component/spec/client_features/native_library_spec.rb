@@ -7,13 +7,13 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
         class Component < HyperComponent
           param :time_stamp
           backtrace :none
-          render { NativeComponent(name: "There - #{@time_stamp}") }
+          render { NativeComponent(name: "There - #{@TimeStamp}") }
         end
 
         class NestedComponent < HyperComponent
           param :time_stamp
           backtrace :none
-          render { NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{@time_stamp}") }
+          render { NativeLibrary::NativeNestedLibrary::NativeComponent(name: "There - #{@TimeStamp}") }
         end
       end
     end
@@ -54,7 +54,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
     end.to be_truthy
     expect_evaluate_ruby do
       Hyperstack::Internal::Component::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return {render: function render() {}}; })();'))
-    end.to be_falsy
+    end.to be_truthy
     expect_evaluate_ruby do
       Hyperstack::Internal::Component::ReactWrapper.native_react_component?(JS.call(:eval, '(function(){ return window.DoesntExist; })();'))
     end.to be_falsy

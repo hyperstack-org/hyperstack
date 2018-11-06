@@ -7,6 +7,27 @@ describe 'the param macro', js: true do
         collect_other_params_as :foo
 
         def render
+          DIV { @Foo[:bar] }
+        end
+      end
+    end
+    expect(page.body[-35..-19]).to include("<div>biz</div>")
+  end
+
+  it 'can override PropsWrapper.instance_var_name' do
+    mount 'Foo', bar: 'biz' do
+      class Hyperstack::Internal::Component::PropsWrapper
+        class << self
+          def instance_var_name_for(name)
+            name
+          end
+        end
+      end
+
+      class Foo < HyperComponent
+        collect_other_params_as :foo
+
+        def render
           DIV { @foo[:bar] }
         end
       end
@@ -30,7 +51,7 @@ describe 'the param macro', js: true do
         collect_other_params_as :opts
 
         def render
-          DIV(id: :tp) { @opts[:another_param] }
+          DIV(id: :tp) { @Opts[:another_param] }
         end
       end
     end
@@ -45,7 +66,7 @@ describe 'the param macro', js: true do
         param :foo
 
         def render
-          DIV { @foo }
+          DIV { @Foo }
         end
       end
     end
@@ -75,7 +96,7 @@ describe 'the param macro', js: true do
         param :foo4, default: :no_bar4
 
         def render
-          DIV { "#{@foo1}-#{@foo2}-#{@foo3}-#{@foo4}" }
+          DIV { "#{@Foo1}-#{@Foo2}-#{@Foo3}-#{@Foo4}" }
         end
       end
     end
@@ -99,7 +120,7 @@ describe 'the param macro', js: true do
         param :foo2, type: String
 
         def render
-          DIV { "#{@foo1}-#{@foo2}" }
+          DIV { "#{@Foo1}-#{@Foo2}" }
         end
       end
     end
@@ -187,7 +208,7 @@ describe 'the param macro', js: true do
           param :bar, type: BazWoggle
           param :baz, type: [BazWoggle]
           def render
-            "#{@bar.kind}, #{@baz[0].kind}"
+            "#{@Bar.kind}, #{@Baz[0].kind}"
           end
         end
       end
@@ -206,8 +227,8 @@ describe 'the param macro', js: true do
           param  :d
           others :opts
           render do
-            DIV(@opts, id: :tp, class: "another-class", style: {marginLeft: 12}, data: {foo: :hi}) do
-              "flag: #{@flag}, a: #{@a}, b: #{@b}, c: #{@c}, d: #{@d}"
+            DIV(@Opts, id: :tp, class: "another-class", style: {marginLeft: 12}, data: {foo: :hi}) do
+              "flag: #{@Flag}, a: #{@A}, b: #{@B}, c: #{@C}, d: #{@D}"
             end
           end
         end
@@ -260,8 +281,8 @@ describe 'the param macro', js: true do
           Foo.class_eval do
             param :foo, type: BazWoggle
             def render
-              @foo.kind = @foo.kind+1
-              "#{@foo.kind}"
+              @Foo.kind = @Foo.kind+1
+              "#{@Foo.kind}"
             end
           end
         end
@@ -273,7 +294,7 @@ describe 'the param macro', js: true do
           Foo.class_eval do
             param :foo, type: Proc
             def render
-              @foo.call
+              @Foo.call
             end
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: lambda { 'works!' })
@@ -296,7 +317,7 @@ describe 'the param macro', js: true do
         Bar.class_eval do
           param :foo, type: BazWoggle
           def render
-            @foo.kind.to_s
+            @Foo.kind.to_s
           end
         end
         Foo.class_eval do
