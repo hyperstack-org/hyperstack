@@ -12,7 +12,7 @@ module Hyperstack
           end
 
           def param_accessor_style(*args)
-            @param_accessor_style = args[0] if args.length > 0
+            @param_accessor_style = args[0] if args.length.positive?
             @param_accessor_style ||=
               if superclass.respond_to? :param_accessor_style
                 superclass.param_accessor_style

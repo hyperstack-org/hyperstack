@@ -29,6 +29,16 @@ module Hyperstack
             RenderingContext.render(tag, *params, &children)
           end
 
+          if tag == :p
+            define_method(:para) do |*params, &children|
+              RenderingContext.render(tag, *params, &children)
+            end
+          else
+            define_method(tag) do |*params, &children|
+              RenderingContext.render(tag, *params, &children)
+            end
+          end
+
           const_set tag.upcase, tag
         end
 
@@ -44,7 +54,7 @@ module Hyperstack
         # where there is no preceeding scope.
 
         def method_missing(name, *params, &children)
-          component = find_component(name)
+          component = find_component(name.camelize)
           return RenderingContext.render(component, *params, &children) if component
           super
         end
@@ -54,17 +64,27 @@ module Hyperstack
 
         class << self
           def included(component)
+            puts "running included thing for #{component}"
             name, parent = find_name_and_parent(component)
-            tag_names_module = Module.new do
-              define_method name do |*params, &children|
-                RenderingContext.render(component, *params, &children)
+            if name && parent
+              tag_names_module = Module.new do
+                define_method name do |*params, &children|
+                  RenderingContext.render(component, *params, &children)
+                end
+                # handle deprecated _as_node style
+                define_method "#{name}_as_node" do |*params, &children|
+                  RenderingContext.build_only(component, *params, &children)
+                end
               end
-              # handle deprecated _as_node style
-              define_method "#{name}_as_node" do |*params, &children|
-                RenderingContext.build_only(component, *params, &children)
-              end
+              parent.extend(tag_names_module)
+            else
+              name = component.name
+              parent = Object
             end
-            parent.extend(tag_names_module)
+            parent.define_method name.underscore do |*params, &children|
+              RenderingContext.render(component, *params, &children)
+            end
+            puts "Defined #{name.underscore} on #{parent}."
           end
 
           private

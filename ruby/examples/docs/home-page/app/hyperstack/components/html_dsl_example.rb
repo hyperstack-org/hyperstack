@@ -3,29 +3,29 @@ class HtmlDslExample < HyperComponent
   # You can specify the CSS class on any HTML element
 
   render(DIV) do
-    DIV(class: 'ui info message') do
-      H3 { 'Blue Box' }
+    div(class: 'ui info message') do
+      h3 { 'Blue Box' }
     end
 
-    TABLE(class: 'ui celled table') do
-      THEAD do
-        TR do
-          TH { 'One' }
-          TH { 'Two' }
-          TH { 'Three' }
+    table(class: 'ui celled table') do
+      thead do
+        tr do
+          th { 'One' }
+          th { 'Two' }
+          th { 'Three' }
         end
       end
-      TBODY do
-        TR do
-          TD { 'A' }
-          TD(class: 'negative') { 'B' }
-          TD { 'C' }
+      tbody do
+        tr do
+          td { 'A' }
+          td(class: 'negative') { 'B' }
+          td { 'C' }
         end
       end
     end
 
-    UL do
-      10.times { |n| LI { "Number #{n}" }}
+    ul do
+      10.times { |n| li { "Number #{n}" }}
     end
   end
 end

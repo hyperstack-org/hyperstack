@@ -7,21 +7,21 @@ class UsingState < HyperComponent
   render(DIV) do
     # the button method returns an HTML element
     # .on(:click) is an event handeler
-    button.on(:click) { mutate @show = !@show }
-    DIV do
-      input
+    hide_or_show_button.on(:click) { mutate @show = !@show }
+    div do
+      input_div
       output
       easter_egg
     end if @show
   end
 
-  def button
-    BUTTON(class: 'ui primary button') { @show ? 'Hide' : 'Show' }
+  def hide_or_show_button
+    button(class: 'ui primary button') { @show ? 'Hide' : 'Show' }
   end
 
-  def input
-    DIV(class: 'ui input fluid block') do
-      INPUT(type: :text).on(:change) do |evt|
+  def input_div
+    div(class: 'ui input fluid block') do
+      input(type: :text).on(:change) do |evt|
         # we are updating the value per keypress
         mutate @input_value = evt.target.value
       end
@@ -30,10 +30,10 @@ class UsingState < HyperComponent
 
   def output
     # this will re-render whenever input_value changes
-    P { "#{@input_value}" }
+    para { "#{@input_value}" }
   end
 
   def easter_egg
-    H2 {'you found it!'} if @input_value == 'egg'
+    h2 {'you found it!'} if @input_value == 'egg'
   end
 end

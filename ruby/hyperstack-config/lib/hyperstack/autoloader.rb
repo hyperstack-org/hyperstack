@@ -95,7 +95,7 @@ module Hyperstack
 
       begin
         result = require module_path
-      rescue Exception
+      rescue Exception => e
         loaded.delete module_path
         raise LoadError, "Unable to autoload: require_or_load #{module_path} failed"
       ensure
