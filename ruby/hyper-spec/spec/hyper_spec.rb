@@ -109,7 +109,7 @@ describe 'hyper-spec', js: true do
           include Hyperstack::Component
           include Hyperstack::State::Observable
           param :click3, type: Proc
-          raises :click3
+          triggers :click3
           before_mount { @clicks = 0 }
           def increment_click
             mutate @clicks += 1

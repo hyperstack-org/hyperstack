@@ -127,7 +127,7 @@ module Hyperstack
         alias other_params collect_other_params_as
         alias others collect_other_params_as
 
-        def raises(name, opts = {})
+        def triggers(name, opts = {})
           aka = opts[:alias] || "#{name}!"
           name = name =~ /^<(.+)>$/ ? name.gsub(/^<(.+)>$/, '\1') : "on_#{name}"
           validator.event(name)

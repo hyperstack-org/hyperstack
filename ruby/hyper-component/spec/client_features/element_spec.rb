@@ -37,7 +37,7 @@ describe 'Hyperstack::Component::Element', js: true do
     it 'will subscribe to a component event param' do
       evaluate_ruby do
         class Foo < HyperComponent
-          raises :event
+          triggers :event
           def render
             event!
           end
@@ -50,8 +50,8 @@ describe 'Hyperstack::Component::Element', js: true do
     it 'will subscribe to multiple component event params' do
       evaluate_ruby do
         class Foo < HyperComponent
-          raises :event1
-          raises :event2
+          triggers :event1
+          triggers :event2
           def render
             event1! + event2!
           end
@@ -87,7 +87,7 @@ describe 'Hyperstack::Component::Element', js: true do
 
       evaluate_ruby do
         class Foo < HyperComponent
-          raises '<my_event>', alias: :my_event!
+          triggers '<my_event>', alias: :my_event!
           def render
             my_event!
           end

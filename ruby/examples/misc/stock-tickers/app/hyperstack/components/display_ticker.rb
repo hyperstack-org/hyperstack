@@ -1,6 +1,6 @@
 class DisplayTicker < HyperComponent
-  param :symbol
-  raises :cancel
+  param    :symbol
+  triggers :cancel
   before_mount { @ticker = StockTicker.new(@Symbol, 10.seconds) }
 
   def status
