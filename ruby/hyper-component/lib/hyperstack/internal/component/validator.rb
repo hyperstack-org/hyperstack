@@ -39,7 +39,7 @@ module Hyperstack
         end
 
         def event(name)
-          rules[name] = coerce_native_hash_values(default: nil)
+          rules[name] = coerce_native_hash_values(default: nil, type: Proc)
         end
 
         def all_other_params(name)

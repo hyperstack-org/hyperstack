@@ -131,7 +131,7 @@ module Hyperstack
           aka = opts[:alias] || "#{name}!"
           name = name =~ /^<(.+)>$/ ? name.gsub(/^<(.+)>$/, '\1') : "on_#{name}"
           validator.event(name)
-          define_method(aka) { props[name]&.call }
+          define_method(aka) { |*args| props[name]&.call(*args) }
         end
 
         def define_state(*states, &block)

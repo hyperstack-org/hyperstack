@@ -2,6 +2,6 @@ class SayHello
   include Hyperstack::Component
   param :name
   render(DIV) do
-    "Hello there #{@name}"
+    "Hello there #{@Name}"
   end
 end

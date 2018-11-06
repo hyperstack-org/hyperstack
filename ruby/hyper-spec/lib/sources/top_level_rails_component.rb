@@ -24,15 +24,15 @@ module Hyperstack
           end
 
           def event_history_for(event_name)
-            event_history["_on#{event_name.event_camelize}"]
+            event_history["on_#{event_name}"]
           end
 
           def last_event_for(event_name)
-            event_history["_on#{event_name.event_camelize}"].last
+            event_history["on_#{event_name}"].last
           end
 
           def clear_event_history_for(event_name)
-            event_history["_on#{event_name.event_camelize}"] = []
+            event_history["on_#{event_name}"] = []
           end
         end
 
