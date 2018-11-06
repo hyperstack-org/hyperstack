@@ -12,28 +12,30 @@ end
 describe "Transport Tests", js: true do
 
   before(:each) do
-    stub_const "CreateTestModel", Class.new(Hyperloop::ServerOp)
-    stub_const "MyControllerOp", Class.new(Hyperloop::ControllerOp)
+    stub_const "CreateTestModel", Class.new(Hyperstack::ServerOp)
+    stub_const "MyControllerOp", Class.new(Hyperstack::ControllerOp)
     isomorphic do
-      class MyControllerOp < Hyperloop::ControllerOp
+      class MyControllerOp < Hyperstack::ControllerOp
         param :data
         dispatch_to { session_channel }
       end
-      class CreateTestModel < Hyperloop::ServerOp
+      class CreateTestModel < Hyperstack::ServerOp
         param :test_attribute
       end
     end
     on_client do
-      class TestComponent < React::Component::Base
+      class TestComponent
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
         before_mount do
-          mutate.items []
-          CreateTestModel.on_dispatch { |params| mutate.items state.items + [params.test_attribute] }
-          MyControllerOp.on_dispatch { |params| mutate.message params.data }
+          @items = []
+          CreateTestModel.on_dispatch { |params| mutate @items += [params.test_attribute] }
+          MyControllerOp.on_dispatch { |params| mutate @message = params.data }
         end
-        render(:div) do
-          div { "#{state.items.count} items" }
-          ul { state.items.each { |test_attribute| li { test_attribute }}}
-          div { state.message }
+        render(DIV) do
+          DIV { "#{@items.count} items" }
+          UL  { @items.each { |test_attribute| LI { test_attribute }}}
+          DIV { @message }
         end
       end
     end
@@ -51,9 +53,9 @@ describe "Transport Tests", js: true do
     end
     size_window(:small, :portrait)
     on_client do
-      # patch Hyperloop.connect so it doesn't execute until we say so
+      # patch Hyperstack.connect so it doesn't execute until we say so
       # this is NOT used by the polling connection FYI
-      module Hyperloop
+      module Hyperstack
         class << self
           alias old_connect connect
           def go_ahead_and_connect
@@ -82,7 +84,7 @@ describe "Transport Tests", js: true do
       Pusher.secret = "MY_TEST_SECRET"
       require "pusher-fake/support/base"
 
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.connect_session = false
         config.transport = :pusher
         config.opts = {
@@ -95,28 +97,28 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.refresh_channels_every)
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.refresh_channels_every)
+      wait_for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -133,7 +135,7 @@ describe "Transport Tests", js: true do
       # until we connect there should only be 5 items
       page.should have_content("0 items")
       # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       # once we connect it should change to 6
       page.should have_content("1 items")
       # now that we are connected the UI should keep updating
@@ -143,9 +145,9 @@ describe "Transport Tests", js: true do
     end
 
     it "broadcasts to the session channel" do
-      Hyperloop.connect_session = true
+      Hyperstack.connect_session = true
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       wait_for_ajax rescue nil
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
@@ -155,7 +157,7 @@ describe "Transport Tests", js: true do
   context "Action Cable" do
 
     before(:each) do
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.connect_session = false
         config.transport = :action_cable
         config.channel_prefix = "synchromesh"
@@ -164,27 +166,27 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      wait_for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -201,7 +203,7 @@ describe "Transport Tests", js: true do
       # until we connect there should only be 5 items
       page.should have_content("0 items")
       # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       # once we connect it should change to 6
       page.should have_content("1 items")
       # now that we are connected the UI should keep updating
@@ -211,9 +213,9 @@ describe "Transport Tests", js: true do
     end
 
     it "broadcasts to the session channel" do
-      Hyperloop.connect_session = true
+      Hyperstack.connect_session = true
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       wait_for_ajax rescue nil
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
@@ -226,7 +228,7 @@ describe "Transport Tests", js: true do
       require 'pusher'
       Object.send(:remove_const, :PusherFake) if defined?(PusherFake)
 
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.connect_session = false
         config.transport = :pusher
         config.opts = pusher_credentials
@@ -235,29 +237,29 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperloop::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
+      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       sleep 1 # needed so Pusher can catch up since its not controlled by timecop
       mount "TestComponent"
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
-      Timecop.travel(Time.now+Hyperloop::Connection.transport.refresh_channels_every)
-      wait_for { Hyperloop::Connection.active }.to eq([])
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      Timecop.travel(Time.now+Hyperstack::Connection.transport.refresh_channels_every)
+      wait_for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
@@ -274,7 +276,7 @@ describe "Transport Tests", js: true do
       # until we connect there should only be 5 items
       page.should have_content("0 items")
       # okay now we can go ahead and connect (this runs on the client)
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       # once we connect it should change to 6
       page.should have_content("1 items")
       # now that we are connected the UI should keep updating
@@ -284,10 +286,10 @@ describe "Transport Tests", js: true do
     end
 
     it "broadcasts to the session channel" do
-      Hyperloop.connect_session = true
+      Hyperstack.connect_session = true
       mount "TestComponent"
       sleep 0.25
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       wait_for_ajax rescue nil
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
@@ -297,7 +299,7 @@ describe "Transport Tests", js: true do
   context "Simple Polling" do
 
     before(:all) do
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.connect_session = false
         config.transport = :simple_poller
         # slow down the polling so wait_for_ajax works
@@ -307,7 +309,7 @@ describe "Transport Tests", js: true do
 
     it "opens the connection" do
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
     end
 
     it "sees the connection going offline" do
@@ -315,24 +317,24 @@ describe "Transport Tests", js: true do
       wait_for_ajax
       ApplicationController.acting_user = true
       mount "TestComponent"
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
-      Timecop.travel(Time.now+Hyperloop.expire_polled_connection_in)
-      wait(10.seconds).for { Hyperloop::Connection.active }.to eq([])
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Timecop.travel(Time.now+Hyperstack.expire_polled_connection_in)
+      wait(10.seconds).for { Hyperstack::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do
       mount "TestComponent"
       CreateTestModel.run(test_attribute: "I'm new here!")
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
       page.should have_content("1 items")
-      Hyperloop::Connection.active.should =~ ['ScopeIt::TestApplication']
+      Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
     end
 
     it "broadcasts to the session channel" do
-      Hyperloop.connect_session = true
+      Hyperstack.connect_session = true
       mount "TestComponent"
       sleep 0.25
-      evaluate_ruby "Hyperloop.go_ahead_and_connect"
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
       wait_for_ajax
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Hyperloop::Connection do
+describe Hyperstack::Connection do
 
   before(:all) do
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
     end
   end
 
@@ -13,24 +13,24 @@ describe Hyperloop::Connection do
 
   if ActiveRecord::Base.connection.respond_to? :data_sources
     it 'creates the tables (rails 5.x)' do
-      ActiveRecord::Base.connection.data_sources.should include('hyperloop_connections')
-      ActiveRecord::Base.connection.data_sources.should include('hyperloop_queued_messages')
+      ActiveRecord::Base.connection.data_sources.should include('hyperstack_connections')
+      ActiveRecord::Base.connection.data_sources.should include('hyperstack_queued_messages')
       described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
     end
   else
     it 'creates the tables (rails 4.x)' do
-      ActiveRecord::Base.connection.tables.should include('hyperloop_connections')
-      ActiveRecord::Base.connection.tables.should include('hyperloop_queued_messages')
+      ActiveRecord::Base.connection.tables.should include('hyperstack_connections')
+      ActiveRecord::Base.connection.tables.should include('hyperstack_queued_messages')
       described_class.column_names.should =~ ['id', 'channel', 'session', 'created_at', 'expires_at', 'refresh_at']
     end
   end
 
   it 'creates the messages queue' do
     channel = described_class.new
-    channel.messages << Hyperloop::Connection::QueuedMessage.new
+    channel.messages << Hyperstack::Connection::QueuedMessage.new
     channel.save
     channel.reload
-    channel.messages.should eq(Hyperloop::Connection::QueuedMessage.all)
+    channel.messages.should eq(Hyperstack::Connection::QueuedMessage.all)
   end
 
   it 'can set the root path' do
@@ -91,7 +91,7 @@ describe Hyperloop::Connection do
 
     it "will have the root path set for console access" do
       described_class.connect_to_transport('TestChannel', 0, "some_path")
-      expect(Hyperloop::Connection.root_path).to eq("some_path")
+      expect(Hyperstack::Connection.root_path).to eq("some_path")
     end
 
     it "the channel will still be active even after initial connection time is expired" do
@@ -106,7 +106,7 @@ describe Hyperloop::Connection do
     end
 
     it "will begin refreshing the channel list" do
-      allow(Hyperloop).to receive(:refresh_channels) {['AnotherChannel']}
+      allow(Hyperstack).to receive(:refresh_channels) {['AnotherChannel']}
       described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.connect_to_transport('AnotherChannel', 0, nil)
@@ -116,7 +116,7 @@ describe Hyperloop::Connection do
     end
 
     it "refreshing will not effect channels not connected to the transport" do
-      allow(Hyperloop).to receive(:refresh_channels) {['AnotherChannel']}
+      allow(Hyperstack).to receive(:refresh_channels) {['AnotherChannel']}
       described_class.open('AnotherChannel', 0)
       described_class.connect_to_transport('TestChannel', 0, nil)
       Timecop.travel(Time.now+described_class.transport.refresh_channels_every-1)
@@ -129,7 +129,7 @@ describe Hyperloop::Connection do
     end
 
     it "refreshing will not effect channels added during the refresh" do
-      allow(Hyperloop).to receive(:refresh_channels) do
+      allow(Hyperstack).to receive(:refresh_channels) do
         described_class.connect_to_transport('TestChannel', 0, nil)
         ['AnotherChannel']
       end
@@ -143,7 +143,7 @@ describe Hyperloop::Connection do
     end
 
     it "sends messages to the transport as well as open channels" do
-      expect(Hyperloop).to receive(:send_data).with('TestChannel', 'data2')
+      expect(Hyperstack).to receive(:send_data).with('TestChannel', 'data2')
       described_class.connect_to_transport('TestChannel', 0, nil)
       described_class.send_to_channel('TestChannel', 'data2')
       expect(described_class.read(1, 'path')).to eq(['data', 'data2'])

@@ -36,19 +36,19 @@ ActiveRecord::Schema.define(version: 2018_08_19_181111) do
     t.integer "todo_item_id"
   end
 
-  create_table "hyperloop_connections", force: :cascade do |t|
+  create_table "hyperstack_connections", force: :cascade do |t|
     t.string "channel"
     t.string "session"
     t.datetime "created_at"
     t.datetime "expires_at"
     t.datetime "refresh_at"
-    t.index ["expires_at"], name: "index_hyperloop_connections_on_expires_at"
+    t.index ["expires_at"], name: "index_hyperstack_connections_on_expires_at"
   end
 
-  create_table "hyperloop_queued_messages", force: :cascade do |t|
+  create_table "hyperstack_queued_messages", force: :cascade do |t|
     t.integer "connection_id"
     t.text "data"
-    t.index ["connection_id"], name: "index_hyperloop_queued_messages_on_connection_id"
+    t.index ["connection_id"], name: "index_hyperstack_queued_messages_on_connection_id"
   end
 
   create_table "test_models", force: :cascade do |t|

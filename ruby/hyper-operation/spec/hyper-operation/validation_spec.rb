@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe 'Hyperloop::Operation validations (server side)' do
+describe 'Hyperstack::Operation validations (server side)' do
 
   before(:each) do
-    stub_const 'MyOperation', Class.new(Hyperloop::Operation)
+    stub_const 'MyOperation', Class.new(Hyperstack::Operation)
   end
 
   it "will resolve the operation if the validation passes" do
@@ -52,9 +52,9 @@ describe 'Hyperloop::Operation validations (server side)' do
     expect(MyOperation.run.error.errors.keys).to eq(['param validation 2', 'param validation 3'])
   end
 
-  it "will not run validations after a Hyperloop::AccessViolation error" do
+  it "will not run validations after a Hyperstack::AccessViolation error" do
     MyOperation.class_eval do
-      validate { raise Hyperloop::AccessViolation }
+      validate { raise Hyperstack::AccessViolation }
       validate { MyOperation.dont_call_me }
     end
     expect(MyOperation).not_to receive(:dont_call_me)
@@ -103,11 +103,11 @@ describe 'Hyperloop::Operation validations (server side)' do
   end
 end
 
-RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
+RSpec::Steps.steps 'Hyperstack::Operation validations (client side)', js: true do
 
   it "will resolve the operation if the validation passes" do
     expect_evaluate_ruby do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         validate { true }
       end.run.resolved?
     end.to be_truthy
@@ -115,7 +115,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "will reject the operation if the validation fails" do
     expect_evaluate_ruby do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         validate { false }
       end.run.rejected?
     end.to be_truthy
@@ -123,7 +123,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "will reject the operation if the validation raises an exception" do
     expect_evaluate_ruby do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         validate { fail }
       end.run.rejected?
     end.to be_truthy
@@ -131,7 +131,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "will run all the validations even if some are rejected" do
     expect_evaluate_ruby do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         validate { true }
         validate { false }
         validate { true }
@@ -143,7 +143,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "will not run validations after an abort!" do
     expect_evaluate_ruby do
-      klass = Class.new(Hyperloop::Operation) do
+      klass = Class.new(Hyperstack::Operation) do
         class << self
           attr_accessor :i_got_called
           def self.dont_call_me
@@ -160,16 +160,16 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
     end.to eq [['param validation 2', 'param validation 3'], nil]
   end
 
-  it "will not run validations after a Hyperloop::AccessViolation error" do
+  it "will not run validations after a Hyperstack::AccessViolation error" do
     expect_evaluate_ruby do
-      klass = Class.new(Hyperloop::Operation) do
+      klass = Class.new(Hyperstack::Operation) do
         class << self
           attr_accessor :i_got_called
           def self.dont_call_me
             i_got_called = true
           end
         end
-        validate { raise Hyperloop::AccessViolation }
+        validate { raise Hyperstack::AccessViolation }
         validate { MyOperation.dont_call_me }
       end
       [klass.run.rejected?, klass.i_got_called]
@@ -178,7 +178,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "can add explicit errors using add_error in a validation" do
     expect_evaluate_ruby do
-      result = Class.new(Hyperloop::Operation) do
+      result = Class.new(Hyperstack::Operation) do
         validate { add_error(:foo, :manchu, "to you!") }
       end.run
       [result.rejected?, result.error.errors.message, result.error.errors.symbolic]
@@ -187,7 +187,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "can add explicit errors using the add_error macro" do
     expect_evaluate_ruby do
-      result = Class.new(Hyperloop::Operation) do
+      result = Class.new(Hyperstack::Operation) do
         add_error(:foo, :manchu, "to you!") { true }
       end.run
       [result.rejected?, result.error.errors.message, result.error.errors.symbolic]
@@ -196,7 +196,7 @@ RSpec::Steps.steps 'Hyperloop::Operation validations (client side)', js: true do
 
   it "can add explicit errors using the add_error macro after an abort" do
     expect_evaluate_ruby do
-      result = Class.new(Hyperloop::Operation) do
+      result = Class.new(Hyperstack::Operation) do
         add_error(:foo, :manchu, "to you!") { abort! }
       end.run
       [result.rejected?, result.error.errors.message, result.error.errors.symbolic]

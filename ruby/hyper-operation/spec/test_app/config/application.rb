@@ -22,7 +22,7 @@ module TestApp
     config.opal.dynamic_require_severity = :ignore
     config.opal.enable_specs = true
     config.opal.spec_location = 'spec-opal'
-    config.hyperloop.auto_config = false
+    config.hyperstack.auto_config = false
 
     config.assets.cache_store = :null_store
     # Settings in config/environments/* take precedence over those specified here.

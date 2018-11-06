@@ -1,7 +1,7 @@
-class InstallHyperloopConnections < ActiveRecord::Migration[5.2]
+class InstallHyperstackConnections < ActiveRecord::Migration[5.2]
   def change
 
-    create_table :hyperloop_connections do |t|
+    create_table :hyperstack_connections do |t|
       t.string :channel
       t.string :session
       t.datetime :created_at
@@ -9,7 +9,7 @@ class InstallHyperloopConnections < ActiveRecord::Migration[5.2]
       t.datetime :refresh_at
     end
 
-    create_table :hyperloop_queued_messages do |t|
+    create_table :hyperstack_queued_messages do |t|
       t.integer :connection_id, index: true
       t.text :data
     end

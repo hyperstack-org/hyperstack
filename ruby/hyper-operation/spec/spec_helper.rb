@@ -29,7 +29,7 @@ RSpec.configure do |config|
     unless example.exception
       #Object.send(:remove_const, :Application) rescue nil
       ObjectSpace.each_object(Class).each do |klass|
-        if klass < Hyperloop::Regulation || klass < Hyperloop::Operation
+        if klass < Hyperstack::Regulation || klass < Hyperstack::Operation
           klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
         end
       end
@@ -67,7 +67,7 @@ RSpec.configure do |config|
   Capybara.default_max_wait_time = 10.seconds
 
   config.before(:suite) do
-    #Hyperloop.define_setting :connect_session, false
+    #Hyperstack.define_setting :connect_session, false
     # -sfc george DatabaseCleaner.clean_with(:truncation)
   end
 
@@ -76,12 +76,12 @@ RSpec.configure do |config|
   # end
 
   config.before(:each) do |x|
-    Hyperloop.class_eval do
+    Hyperstack.class_eval do
       def self.on_server?
         true
       end
     end
-    # Hyperloop.configuration do |config|
+    # Hyperstack.configuration do |config|
     #   config.connect_session = false
     # end
   end

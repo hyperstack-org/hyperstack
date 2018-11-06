@@ -4,7 +4,9 @@ describe "isomorphic operations", js: true do
 
   before(:each) do
     on_client do
-      class Test < React::Component::Base
+      class Test
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
         def self.receive_count
           @@rc ||= 0
           @@rc
@@ -33,9 +35,9 @@ describe "isomorphic operations", js: true do
 
   context 'uplinking' do
     before(:each) do
-      stub_const "ServerFacts", Class.new(Hyperloop::ServerOp)
+      stub_const "ServerFacts", Class.new(Hyperstack::ServerOp)
       isomorphic do
-        class ServerFacts < Hyperloop::ServerOp
+        class ServerFacts < Hyperstack::ServerOp
           param :n, type: Integer, min: 0
 
           class << self
@@ -71,7 +73,7 @@ describe "isomorphic operations", js: true do
 
     it "pass validation failures back" do
       ServerFacts.param :acting_user, nils: true
-      class ServerFacts < Hyperloop::ServerOp
+      class ServerFacts < Hyperstack::ServerOp
         validate { false }
       end
       expect_promise do
@@ -82,7 +84,7 @@ describe "isomorphic operations", js: true do
     it "will reject uplinks that don't accept acting_user" do
       expect_promise do
         ServerFacts.run(n: 5).fail { |exception| Promise.new.resolve(exception) }
-      end.to include('Hyperloop::AccessViolation')
+      end.to include('Hyperstack::AccessViolation')
     end
   end
 
@@ -96,7 +98,7 @@ describe "isomorphic operations", js: true do
       Pusher.secret = "MY_TEST_SECRET"
       require "pusher-fake/support/base"
 
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.transport = :pusher
         config.channel_prefix = "synchromesh"
         config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -104,12 +106,12 @@ describe "isomorphic operations", js: true do
     end
 
     before(:each) do
-      stub_const "Operation", Class.new(Hyperloop::ServerOp)
+      stub_const "Operation", Class.new(Hyperstack::ServerOp)
     end
 
     it 'will dispatch to the client' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
           inbound :password
         end
@@ -124,7 +126,7 @@ describe "isomorphic operations", js: true do
 
     it 'will evaluate channels dynamically' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
           param :channels
           dispatch_to { params.channels }
@@ -140,7 +142,7 @@ describe "isomorphic operations", js: true do
 
     it 'will attach the channel with the regulate_connection' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
         end
       end
@@ -154,7 +156,7 @@ describe "isomorphic operations", js: true do
 
     it 'can regulate dispatches with the regulate_dispatches_from' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
           param :broadcast, default: false
         end
@@ -173,7 +175,7 @@ describe "isomorphic operations", js: true do
 
     it 'can regulate dispatches with the regulate_dispatch applied to a policy' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
           param :broadcast, default: false
         end
@@ -193,7 +195,7 @@ describe "isomorphic operations", js: true do
 
     it 'will regulate with the always_dispatch_from regulation' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
         end
       end
@@ -208,7 +210,7 @@ describe "isomorphic operations", js: true do
 
     it 'will dispatch to channel only once on run, even if dispatched multiple times during run' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :message
           param :channels
           dispatch_to { params.channels }
@@ -237,7 +239,7 @@ describe "isomorphic operations", js: true do
       Pusher.secret = "MY_TEST_SECRET"
       require "pusher-fake/support/base"
 
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.transport = :pusher
         config.channel_prefix = "synchromesh"
         config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -246,7 +248,7 @@ describe "isomorphic operations", js: true do
 
     it 'calls the subclasses serializer and deserializer methods' do
       isomorphic do
-        class Operation < Hyperloop::ServerOp
+        class Operation < Hyperstack::ServerOp
           param :acting_user, nils: true
           param :counter
           outbound :message

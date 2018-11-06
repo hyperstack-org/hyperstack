@@ -1,5 +1,5 @@
-module Hyperloop
-  # Tricky business here. Hyperloop::Store will define boot
+module Hyperstack
+  # Tricky business here. Hyperstack::Store will define boot
   # if it is not already defined.  It creates a minimal compatible
   # API that includes the run and on_dispatch methods.  This way
   # you can use the Boot interface without loading operations.

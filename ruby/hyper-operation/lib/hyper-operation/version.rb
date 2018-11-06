@@ -1,5 +1,5 @@
-module Hyperloop
+module Hyperstack
   class Operation
-    VERSION = '0.99.3'
+    VERSION = '0.1'
   end
 end
