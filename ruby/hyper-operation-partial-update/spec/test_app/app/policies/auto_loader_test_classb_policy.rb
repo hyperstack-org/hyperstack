@@ -1,3 +1,0 @@
-class AutoLoaderTestClassbPolicy
-  always_allow_connection
-end

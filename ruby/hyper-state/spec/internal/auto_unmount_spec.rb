@@ -33,21 +33,6 @@ describe Hyperstack::Internal::AutoUnmount do
     end
   end
 
-  it 'will receive from and close broadcast channels with the receives method' do
-    broadcaster = double('Broadcaster')
-    expect(broadcaster).to receive(:receiver).with(@async_obj).and_return(broadcaster)
-    @async_obj.receives(broadcaster)
-    expect(broadcaster).to receive(:unmount)
-    @async_obj.unmount
-  end
-
-  it "will ignore calls to the receives method once unmounted" do
-    broadcaster = double('Broadcaster')
-    @async_obj.unmount
-    expect(@async_obj).not_to receive(:receiver)
-    expect(@async_obj.receives(broadcaster)).to be_nil
-  end
-
   it 'will unmount objects referenced by instance variables' do
     unmountable_object = double('unmountable_object')
     regular_object = double('regular_object')

@@ -11,6 +11,7 @@ module Hyperstack
   class Application
     Operation.inherited(Boot) if defined? Boot
     class Boot < Operation
+      #broadcaster.receiver(self, *args, &block)
       def self.on_dispatch(&block)
         _Railway.add_receiver(&block)
       end

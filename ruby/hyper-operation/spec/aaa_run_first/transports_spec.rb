@@ -29,8 +29,8 @@ describe "Transport Tests", js: true do
         include Hyperstack::State::Observable
         before_mount do
           @items = []
-          CreateTestModel.on_dispatch { |params| mutate @items += [params.test_attribute] }
-          MyControllerOp.on_dispatch { |params| mutate @message = params.data }
+          receives(CreateTestModel) { |params| mutate @items += [params.test_attribute] }
+          receives(MyControllerOp)  { |params| mutate @message = params.data }
         end
         render(DIV) do
           DIV { "#{@items.count} items" }

@@ -47,7 +47,8 @@ describe "resetting contexts" do
 
   it "does not reset any predefined boot receivers", js: true do
     on_client do
-      class Store < Hyperstack::Store
+      class Store
+        include Hyperstack::State::Observable
         class << self
           attr_reader :boot_calls
           attr_reader :another_receiver_calls
@@ -66,7 +67,8 @@ describe "resetting contexts" do
       end
       puts ">>resetting"
       Hyperstack::Context.reset!(reboot = nil)
-      class Store < Hyperstack::Store
+      class Store
+        include Hyperstack::State::Observer
         receives Hyperstack::Application::Boot, :another_receiver
       end
     end

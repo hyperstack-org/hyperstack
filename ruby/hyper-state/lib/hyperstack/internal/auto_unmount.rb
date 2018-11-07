@@ -45,16 +45,6 @@ module Hyperstack
         end
       end
 
-      def receives(broadcaster, *args, &block)
-        return if unmounted?
-        broadcaster.receiver(self, *args, &block).tap do |id|
-          # TODO: broadcaster classes should already defined manually_unmount
-          # id.define_singleton_method(:manually_unmount) do
-          #   AutoUnmount.objects_to_unmount[self].delete(id)
-          # end
-          AutoUnmount.objects_to_unmount[self] << id
-        end
-      end
       class << self
         def objects_to_unmount
           @objects_to_unmount ||= Hash.new { |h, k| h[k] = Set.new }

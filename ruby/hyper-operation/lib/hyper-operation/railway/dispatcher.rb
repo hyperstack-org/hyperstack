@@ -14,7 +14,11 @@ module Hyperstack
         end
 
         def add_receiver(&block)
-          receivers << block
+          cloned_block = ->(*args, &b) { block.call(*args, &b) }
+          operation = self
+          cloned_block.define_singleton_method(:unmount) { operation.receivers.delete(cloned_block) }
+          receivers << cloned_block
+          cloned_block
         end
       end
 

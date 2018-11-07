@@ -25,9 +25,11 @@ describe "controller operations", js: true do
       config.connect_session = true
     end
     mount 'SessionApp' do
-      class SessionApp < Hyperstack::Component
-        after_mount { MyControllerOp.on_dispatch { |params| mutate.message params.data } }
-        render { state.message }
+      class SessionApp
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
+        after_mount { receives(MyControllerOp) { |params| mutate @message = params.data } }
+        render { @message }
       end
     end
     MyControllerOp.dispatch_to { session_channel }
@@ -41,10 +43,12 @@ describe "controller operations", js: true do
       config.connect_session = false
     end
     mount 'SessionApp' do
-      class SessionApp < Hyperstack::Component
+      class SessionApp
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
         after_mount { Hyperstack.connect_session }
-        after_mount { MyControllerOp.on_dispatch { |params| mutate.message params.data } }
-        render { state.message }
+        after_mount { receives(MyControllerOp) { |params| mutate @message = params.data } }
+        render { @message }
       end
     end
     MyControllerOp.dispatch_to { session_channel }

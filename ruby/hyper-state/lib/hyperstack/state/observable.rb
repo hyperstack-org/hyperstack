@@ -8,6 +8,9 @@ module Hyperstack
       def self.included(base)
         base.include Internal::AutoUnmount
         %i[singleton_method method].each do |kind|
+          base.send(:"define_#{kind}", :receives) do |*args, &block|
+            Internal::Receiver.mount(self, *args, &block)
+          end
           base.send(:"define_#{kind}", :observe) do |&block|
             result = block.call if block
             Internal::State::Mapper.observed! self

@@ -7,24 +7,26 @@ describe "isomorphic operations", js: true do
       class Test
         include Hyperstack::Component
         include Hyperstack::State::Observable
-        def self.receive_count
-          @@rc ||= 0
-          @@rc
-        end
-        def self.rc_inc
-          @@rc ||= 0
-          @@rc += 1
+        class << self
+          observer :receive_count do
+            @@rc ||= 0
+            @@rc
+          end
+          mutator :rc_inc do
+            @@rc ||= 0
+            @@rc += 1
+          end
         end
         before_mount do
-          Operation.on_dispatch do |params|
+          receives(Operation) do |params|
             self.class.rc_inc
             # password is for testing inbound param filtering
-            state.message! "#{params.message}#{params.try(:password)}"
+            mutate @message = "#{params.message}#{params.try(:password)}"
           end
         end
         render do
-          if state.message
-            "The server says '#{state.message}'!"
+          if @message
+            "The server says '#{@message}'!"
           else
             "No messages yet"
           end
@@ -122,6 +124,36 @@ describe "isomorphic operations", js: true do
       expect(page).to have_content('No messages yet')
       Operation.run(message: 'hello', password: 'better not see this')
       expect(page).to have_content("The server says 'hello'!")
+    end
+
+    it 'will unmount a receiver' do
+      isomorphic do
+        class Operation < Hyperstack::ServerOp
+          param :message
+          inbound :password
+        end
+      end
+      stub_const "OperationPolicy", Class.new
+      OperationPolicy.always_allow_connection
+      mount 'OuterTest' do
+        class OuterTest
+          include Hyperstack::Component
+          include Hyperstack::State::Observable
+          render do
+            if Test.receive_count.zero?
+              Test()
+            else
+              "test not mounted"
+            end
+          end
+        end
+      end
+      expect(page).to have_content("No messages yet")
+      Operation.run(message: 'hello', password: 'better not see this')
+      expect(page).to have_content('test not mounted')
+      Operation.run(message: 'hello again', password: 'better not see this')
+      wait_for_ajax
+      expect_evaluate_ruby('Test.receive_count').to eq(1)
     end
 
     it 'will evaluate channels dynamically' do
