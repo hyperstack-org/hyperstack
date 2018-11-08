@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
-  mount Hyperloop::Engine => "/hyperloop_engine"
+  mount Hyperstack::Engine => "/hyperstack_engine"
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

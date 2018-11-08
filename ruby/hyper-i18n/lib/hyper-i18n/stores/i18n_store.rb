@@ -1,6 +1,10 @@
 module HyperI18n
-  class I18nStore < Hyperloop::Store
-    state translations: {}, scope: :class, reader: true
-    state localizations: {}, scope: :class, reader: true
+  class I18nStore
+    include Hyperstack::State::Observable
+    class << self
+      observer(:translations)  { @translations ||= {} }
+      observer(:localizations) { @localizations ||= {} }
+      state_writer :translations, :localizations
+    end
   end
 end

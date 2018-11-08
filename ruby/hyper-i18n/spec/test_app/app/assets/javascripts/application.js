@@ -1,1 +1,1 @@
-//= require 'hyperloop-loader'
+//= require 'hyperstack-loader'

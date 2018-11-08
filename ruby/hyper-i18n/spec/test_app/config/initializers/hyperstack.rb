@@ -1,4 +1,4 @@
-Hyperloop.configuration do |config|
+Hyperstack.configuration do |config|
   config.transport = :none
   config.import 'hyper-model'
 end

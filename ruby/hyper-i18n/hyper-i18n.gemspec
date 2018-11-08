@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['adamcreekroad']
   spec.email         = ['adamgeorge.31@gmail.com']
 
-  spec.summary       = 'HyperI18n seamlessly brings Rails I18n into your Hyperloop application.'
-  spec.homepage      = 'https://www.github.com/ruby-hyperloop/hyper-i18n'
+  spec.summary       = 'HyperI18n seamlessly brings Rails I18n into your Hyperstack application.'
+  spec.homepage      = 'https://www.github.com/ruby-hyperstack/hyper-i18n'
   spec.license       = 'MIT'
 
   spec.files          = `git ls-files`.split("\n")

@@ -2,15 +2,15 @@
 module HyperI18n
   class I18n
     extend HelperMethods
-    include React::IsomorphicHelpers
+    include Hyperstack::Component::IsomorphicHelpers
 
     before_first_mount do
       if RUBY_ENGINE != 'opal'
         @server_data_cache = { t: {}, l: {} }
       else
         unless on_opal_server? || no_initial_data?
-          I18nStore.mutate.translations(JSON.from_object(`window.HyperI18nInitialData.t`))
-          I18nStore.mutate.localizations(JSON.from_object(`window.HyperI18nInitialData.l`))
+          I18nStore.translations = JSON.from_object(`window.HyperI18nInitialData.t`)
+          I18nStore.localizations = JSON.from_object(`window.HyperI18nInitialData.l`)
         end
       end
     end

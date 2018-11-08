@@ -1,5 +1,5 @@
 module HyperI18n
-  class Localize < Hyperloop::ServerOp
+  class Localize < Hyperstack::ServerOp
     include HelperMethods
 
     param :acting_user, nils: true

@@ -6,7 +6,8 @@ describe 'I18n client methods', js: true do
       class MyModel < ActiveRecord::Base
       end
       module Components
-        class TestComponent < Hyperloop::Component
+        class TestComponent
+          include Hyperstack::Component
           render(DIV) do
             DIV(id: :tp1) { t(:the_key) }
             DIV(id: :tp2) { I18n.t(:hello) }
