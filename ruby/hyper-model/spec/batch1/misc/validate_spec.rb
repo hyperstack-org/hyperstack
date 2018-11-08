@@ -44,8 +44,8 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
 
   it "the valid? method will return true if the model has no errors" do
     mount "Validator" do
-      class Validator < Hyperloop::Component
-        include React::IsomorphicHelpers
+      class Validator < HyperComponent
+        include Hyperstack::Component::IsomorphicHelpers
         class << self
           attr_reader :model
         end

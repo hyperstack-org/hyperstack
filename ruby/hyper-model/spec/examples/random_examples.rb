@@ -8,7 +8,7 @@ describe "random examples", js: true do
       class SubArray < Array
       end
 
-      class HelloWorld < React::Component::Base
+      class HelloWorld < HyperComponent
         param :array, type: SubArray
         render do
           i = 10
@@ -19,7 +19,7 @@ describe "random examples", js: true do
         end
       end
 
-      class Tester < React::Component::Base
+      class Tester < HyperComponent
         def render
           normal_array = [1, 2]
           sub_array = SubArray.new
@@ -40,7 +40,7 @@ describe "random examples", js: true do
   it "pass a native hash as a param" do
     mount "Tester" do
 
-      class React::RenderingContext
+      class Hyperstack::Internal::Component::RenderingContext
         def self.remove_nodes_from_args(args)
           args[0].each do |key, value|
             begin
@@ -51,7 +51,7 @@ describe "random examples", js: true do
         end
       end
 
-      class HelloWorld < React::Component::Base
+      class HelloWorld < HyperComponent
         param :hash
         render do
           debugger
@@ -59,7 +59,7 @@ describe "random examples", js: true do
         end
       end
 
-      class Tester < React::Component::Base
+      class Tester < HyperComponent
         def render
           HelloWorld(hash: `{key: 'the key'}`)
         end
@@ -77,7 +77,7 @@ describe "random examples", js: true do
     end
 
     mount "RecordsComp" do
-      class RecordsComp < React::Component::Base
+      class RecordsComp < HyperComponent
         # you had state.credits as an expression... not sure that is what you wanted
         render(:div, class: "state.credits") do
           h2.title { 'Records' }
@@ -97,7 +97,7 @@ describe "random examples", js: true do
         end
       end
 
-      class RecordComp < React::Component::Base
+      class RecordComp < HyperComponent
         param :key, type: String
         param :record, type: TestModel  # type is optional here
 

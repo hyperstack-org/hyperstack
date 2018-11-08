@@ -12,7 +12,7 @@ RSpec::Steps.steps 'Reading and Writing Enums', js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -33,7 +33,7 @@ RSpec::Steps.steps 'Reading and Writing Enums', js: true do
       ReactiveRecord.load { User.find(1).itself }.then do |user|
         user.test_enum = :no
         user.save.then do
-          React::IsomorphicHelpers.load_context
+          Hyperstack::Component::IsomorphicHelpers.load_context
           ReactiveRecord.load do
             User.find(1).test_enum
          end
@@ -43,12 +43,12 @@ RSpec::Steps.steps 'Reading and Writing Enums', js: true do
   end
 
   # async "can set it back" do
-  #   React::IsomorphicHelpers.load_context
+  #   Hyperstack::Component::IsomorphicHelpers.load_context
   #   set_acting_user "super-user"
   #   user = User.find(1)
   #   user.test_enum = :yes
   #   user.save.then do
-  #     React::IsomorphicHelpers.load_context
+  #     Hyperstack::Component::IsomorphicHelpers.load_context
   #     ReactiveRecord.load do
   #       User.find(1).test_enum
   #     end.then do |test_enum|

@@ -27,7 +27,7 @@ describe "speed tests", js: true do
   end
 
   before(:all) do
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :crud_only
     end
   end
@@ -41,9 +41,9 @@ describe "speed tests", js: true do
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
     on_client do
-      class SpeedTester < Hyperloop::Component
+      class SpeedTester < HyperComponent
         def self.load_all(id)
-          React::IsomorphicHelpers.load_context
+          Hyperstack::Component::IsomorphicHelpers.load_context
           start_time = Time.now
           timer_promise = Promise.new
           case id

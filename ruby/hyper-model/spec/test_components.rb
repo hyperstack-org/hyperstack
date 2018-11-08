@@ -1,14 +1,14 @@
 RSpec.configure do |config|
   config.before(:all) do
     on_client do
-      class TestComponent < React::Component::Base
+      class TestComponent < HyperComponent
         param scope: :all
-        render(:div) do
-          div { "#{TestModel.send(params.scope).count} items" }
-          ul { TestModel.send(params.scope).each { |model| li { model.test_attribute }}}
+        render(DIV) do
+          DIV { "#{TestModel.send(@Scope).count} items" }
+          UL { TestModel.send(@Scope).each { |model| LI { model.test_attribute }}}
         end
       end
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         render do
           "hello"
         end

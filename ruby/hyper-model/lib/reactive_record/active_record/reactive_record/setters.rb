@@ -92,7 +92,7 @@ module ReactiveRecord
           @attributes[attr] = new_value
           if !data_loading? ||
              (on_opal_client? && had_key && current_value.loaded? && current_value != new_value)
-            React::State.set_state(self, attr, new_value, data_loading?)
+            Hyperstack::Internal::Store::State.set_state(self, attr, new_value, data_loading?)
           end
         end
       end
@@ -101,7 +101,7 @@ module ReactiveRecord
     def set_change_status_and_notify_only(attr, changed)
       return if @virgin
       change_status_and_notify_helper(attr, changed) do
-        React::State.set_state(self, attr, nil) unless data_loading?
+        Hyperstack::Internal::Store::State.set_state(self, attr, nil) unless data_loading?
       end
     end
 
@@ -117,7 +117,7 @@ module ReactiveRecord
       yield @attributes.key?(attr), @attributes[attr]
       return unless empty_before != changed_attributes.empty?
       if on_opal_client? && !data_loading?
-        React::State.set_state(self, '!CHANGED!', !changed_attributes.empty?, true)
+        Hyperstack::Internal::Store::State.set_state(self, '!CHANGED!', !changed_attributes.empty?, true)
       end
       return unless aggregate_owner
       aggregate_owner.set_change_status_and_notify_only(
@@ -135,7 +135,7 @@ module ReactiveRecord
       return if value.nil?
       value.attributes[inverse_attr] = @ar_instance
       return if data_loading?
-      React::State.set_state(value.backing_record, inverse_attr, @ar_instance)
+      Hyperstack::Internal::Store::State.set_state(value.backing_record, inverse_attr, @ar_instance)
     end
 
     def update_inverse_collections(association, value)

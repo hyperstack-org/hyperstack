@@ -16,7 +16,7 @@ describe 'defaultValue special handling', js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -40,31 +40,31 @@ describe 'defaultValue special handling', js: true do
   it 'will not use the defaultValue param until data is loaded - unit test' do
     mount 'Tester' do
       class LoadableString
+        include Hyperstack::State::Observable
         def initialize(s)
           @s = s
         end
-        def to_s
-          if loading?
-            React::RenderingContext.waiting_on_resources = true
-            "loading..."
-          else
+        observer :to_s do
+          if @loaded
             @s
+          else
+            Hyperstack::Internal::Component::RenderingContext.waiting_on_resources = true
+            "loading..."
           end
         end
-        def loading?
-          !React::State.get_state(self, 'loaded?')
+        observer :loading? do
+          !@loaded
         end
         def value
           self
         end
-        def value=(x)
-          React::State.set_state(self, 'loaded?', Time.now)
+        mutator :value= do |x|
+          @loaded = true
           @s = x
         end
       end
-      class Tester < Hyperloop::Component
-        include React::IsomorphicHelpers
-        state :loaded, scope: :shared
+      class Tester < HyperComponent
+        include Hyperstack::Component::IsomorphicHelpers
         def self.loadable_string
           @loadable_string
         end
@@ -153,12 +153,12 @@ describe 'defaultValue special handling', js: true do
   it "will properly update input tags when data is loaded or changed" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "InputTester", {}, no_wait: true do
-        class MyNestedGuy < Hyperloop::Component
+        class MyNestedGuy < HyperComponent
           render(SPAN) do
             "#{User.find_by_first_name('Lily').last_name} is a dog"
           end
         end
-        class InputTester < Hyperloop::Component
+        class InputTester < HyperComponent
           before_mount do
             @test_model = TestModel.first
           end

@@ -1,4 +1,4 @@
-class Show < React::Component::Base
+class Show < HyperComponent
   render do
     "hello"
   end

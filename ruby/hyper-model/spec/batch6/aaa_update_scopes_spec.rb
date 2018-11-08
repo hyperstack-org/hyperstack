@@ -24,7 +24,7 @@ RSpec::Steps.steps "updating scopes", js: true do
 
   it "will update .all and rerender after saving a record" do
     mount "TestComponent" do
-      class TestComponent < React::Component::Base
+      class TestComponent < HyperComponent
         def render
           #div do
             "TodoItem.count = #{TodoItem.all.count}".span

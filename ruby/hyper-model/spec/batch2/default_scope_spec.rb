@@ -13,7 +13,7 @@ describe "default_scope" do
       Pusher.secret = "MY_TEST_SECRET"
       require "pusher-fake/support/base"
 
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.transport = :pusher
         config.channel_prefix = "synchromesh"
         config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -45,7 +45,7 @@ describe "default_scope" do
         end
       end
       mount "TestComponent2" do
-        class TestComponent2 < React::Component::Base
+        class TestComponent2 < HyperComponent
           render(:div) do
             "#{TestModel.count} items".br
             "#{TestModel.unscoped.count} unscoped items"
@@ -91,7 +91,7 @@ describe "default_scope" do
         end
       end
       mount "TestComponent2" do
-        class TestComponent2 < React::Component::Base
+        class TestComponent2 < HyperComponent
           render(:div) do
             "#{TestModel.count} items".br
             "#{TestModel.unscoped.count} unscoped items"

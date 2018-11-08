@@ -4,7 +4,7 @@ module ReactiveRecord
 
   class Base
 
-    include React::IsomorphicHelpers
+    include Hyperstack::Component::IsomorphicHelpers
 
     before_first_mount do |context|
       if RUBY_ENGINE != 'opal'
@@ -132,7 +132,7 @@ module ReactiveRecord
     end
 
     def self.schedule_fetch
-      React::State.set_state(WhileLoading, :quiet, false) # moved from while loading module see loading! method
+      Hyperstack::Internal::Store::State.set_state(WhileLoading, :quiet, false) # moved from while loading module see loading! method
       return if @fetch_scheduled
       @current_fetch_id = Time.now
       @fetch_scheduled = after(0) do
@@ -481,7 +481,7 @@ module ReactiveRecord
           saved_models = reactive_records.collect do |reactive_record_id, model|
             messages = model.errors.messages if validate && !model.valid?
             all_messages << [model, messages] if save && messages
-            attributes = model.__hyperloop_secure_attributes(acting_user)
+            attributes = model.__hyperstack_secure_attributes(acting_user)
             [reactive_record_id, model.class.name, attributes, messages]
           end
 

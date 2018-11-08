@@ -33,9 +33,9 @@ describe "regulate access allowed" do
     it "will disallow access if acting_user is not allowed to connect" do
       m = FactoryBot.create(:test_model, test_attribute: "hello")
       expect { m.check_permission_with_acting_user(nil, :view_permitted?, :test_attribute) }.
-      to raise_error(Hyperloop::AccessViolation)
+      to raise_error(Hyperstack::AccessViolation)
       expect { m.check_permission_with_acting_user(nil, :view_permitted?, :created_at) }.
-      to raise_error(Hyperloop::AccessViolation)
+      to raise_error(Hyperstack::AccessViolation)
     end
 
     it "will disallow access to attributes not broadcast by the model" do
@@ -43,7 +43,7 @@ describe "regulate access allowed" do
       expect { m.check_permission_with_acting_user("user", :view_permitted?, :test_attribute) }.
       not_to raise_error
       expect { m.check_permission_with_acting_user("user", :view_permitted?, :created_at) }.
-      to raise_error(Hyperloop::AccessViolation)
+      to raise_error(Hyperstack::AccessViolation)
     end
 
     it "will allow access to attributes broadcast over an instance channel" do
@@ -68,7 +68,7 @@ describe "regulate access allowed" do
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :test_attribute) }.
     not_to raise_error
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :created_at) }.
-    to raise_error(Hyperloop::AccessViolation)
+    to raise_error(Hyperstack::AccessViolation)
   end
 
   it "will include :id as read attribute as long as any other attribute is readable" do
@@ -91,7 +91,7 @@ describe "regulate access allowed" do
     end
     m = FactoryBot.create(:test_model)
     expect { m.check_permission_with_acting_user(nil, :view_permitted?, :id) }.
-    to raise_error(Hyperloop::AccessViolation)
+    to raise_error(Hyperstack::AccessViolation)
   end
 
   it "will ignore auto_connect: false " do

@@ -21,7 +21,7 @@ if RUBY_ENGINE == 'opal'
         module ClassMethods
           def rendering(title, &block)
             klass = Class.new do
-              include React::Component
+              include HyperComponent
 
               def self.block
                 @block
@@ -104,7 +104,7 @@ if RUBY_ENGINE != 'opal'
       unless example.exception
         #Object.send(:remove_const, :Application) rescue nil
         ObjectSpace.each_object(Class).each do |klass|
-          if klass < Hyperloop::Regulation
+          if klass < Hyperstack::Regulation
             klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
           end
         end
@@ -167,9 +167,9 @@ if RUBY_ENGINE != 'opal'
     def running?
       jscode = <<-CODE
       (function() {
-        if (typeof Opal !== "undefined" && Opal.Hyperloop !== undefined) {
+        if (typeof Opal !== "undefined" && Opal.Hyperstack !== undefined) {
           try {
-            return Opal.Hyperloop.$const_get("HTTP")["$active?"]();
+            return Opal.Hyperstack.$const_get("HTTP")["$active?"]();
           } catch(err) {
             if (typeof jQuery !== "undefined" && jQuery.active !== undefined) {
               return jQuery.active > 0;
@@ -195,7 +195,7 @@ if RUBY_ENGINE != 'opal'
     rescue Capybara::NotSupportedByDriverError
       true
     rescue Exception => e
-      e.message == "jQuery or Hyperloop::HTTP is not defined"
+      e.message == "jQuery or Hyperstack::HTTP is not defined"
     end
 
   end
@@ -236,7 +236,7 @@ if RUBY_ENGINE != 'opal'
 
     config.before(:suite) do
       #DatabaseCleaner.clean_with(:truncation)
-      Hyperloop.configuration do |config|
+      Hyperstack.configuration do |config|
         config.transport = :simple_poller
       end
     end
@@ -246,7 +246,7 @@ if RUBY_ENGINE != 'opal'
     # end
 
     config.before(:each) do |x|
-      Hyperloop.class_eval do
+      Hyperstack.class_eval do
         def self.on_server?
           true
         end

@@ -32,8 +32,8 @@ describe "regulate_broadcast" do
       end
       attr_accessor :id, :attrA, :attrB, :attrC, :attrD, :attrE
     end
-    allow(Hyperloop::Connection).to receive(:active).and_return(['Application', 'TestModel1-1', 'TestModel1-7', 'TestModel2-8'])
-    allow_any_instance_of(Hyperloop::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
+    allow(Hyperstack::Connection).to receive(:active).and_return(['Application', 'TestModel1-1', 'TestModel1-7', 'TestModel2-8'])
+    allow_any_instance_of(Hyperstack::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
   end
 
   it "will allow sending an attribute to a record"
@@ -50,7 +50,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -70,7 +70,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.
     to raise_error("TestModel1 instance broadcast policy not sent to any channel")
   end
 
@@ -83,7 +83,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -104,7 +104,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -133,7 +133,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -163,7 +163,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -196,7 +196,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -228,7 +228,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -239,7 +239,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
   end
 
   it "will adds the obj method to the policy which points back to the model being broadcast" do
@@ -254,7 +254,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -265,7 +265,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
   end
   it "will not broadcast an empty record" do
     stub_const "TestModel1Policy", Class.new
@@ -279,7 +279,7 @@ describe "regulate_broadcast" do
       end
     end
     model = TestModel1.new(id: 1, attr1: 1, attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -290,7 +290,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: 1, attr2: "NO", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.not_to yield_control
   end
   it "will apply the same policy to several models" do
     stub_const "ApplicationPolicy", Class.new
@@ -301,7 +301,7 @@ describe "regulate_broadcast" do
     end
     model1 = TestModel1.new(id: 7, attr1: 1)
     model2 = TestModel2.new(id: 8, attrA: 1)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model1, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model1, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-7',
@@ -311,7 +311,7 @@ describe "regulate_broadcast" do
         previous_changes: {id: 7}
       }
     )
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model2, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model2, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel2-8',
@@ -324,23 +324,23 @@ describe "regulate_broadcast" do
 
   end
 
-  it "exposes the policy methods on the hyperloop_internal_policy_object" do
+  it "exposes the policy methods on the hyperstack_internal_policy_object" do
     stub_const "TestModel1Policy", Class.new
     stub_const "Application", Class.new
     TestModel1Policy.class_eval do
       regulate_broadcast do | policy |
-        case policy.hyperloop_internal_policy_object.obj.attr1
+        case policy.hyperstack_internal_policy_object.obj.attr1
         when "send_all"
-          policy.hyperloop_internal_policy_object.send_all.to(self)
+          policy.hyperstack_internal_policy_object.send_all.to(self)
         when "send_all_but"
-          policy.hyperloop_internal_policy_object.send_all_but(:attr2).to(self)
+          policy.hyperstack_internal_policy_object.send_all_but(:attr2).to(self)
         when "send_only"
-          policy.hyperloop_internal_policy_object.send_only(:attr2).to(self)
+          policy.hyperstack_internal_policy_object.send_only(:attr2).to(self)
         end
       end
     end
     model = TestModel1.new(id: 1, attr1: "send_all", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -351,7 +351,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: "send_all_but", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',
@@ -362,7 +362,7 @@ describe "regulate_broadcast" do
       }
     )
     model = TestModel1.new(id: 1, attr1: "send_only", attr2: "YES", attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'TestModel1-1',

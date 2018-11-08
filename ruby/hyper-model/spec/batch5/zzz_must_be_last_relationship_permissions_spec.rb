@@ -20,7 +20,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -55,7 +55,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
   context 'on the server side' do
     it 'ActiveRecord::Base with by default leave unscoped and all scopes in a dont care state' do
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it 'will allow access to scopes' do
@@ -80,7 +80,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         regulate_scope(:all) { denied! }
       end
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "will leave any scope in a don't care state" do
@@ -89,7 +89,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       end
       test_scope = TodoItem.__secure_remote_access_to_test(TodoItem, nil)
       expect { test_scope.__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it 'will allow access to has_many relationships' do
@@ -107,14 +107,14 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       end
       new_todo = TodoItem.new
       expect { new_todo.__secure_remote_access_to_comments(new_todo, nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "will leave the has_many relationship in a don't care state" do
       new_todo = TodoItem.new
       comments = new_todo.__secure_remote_access_to_comments(new_todo, nil)
       expect { comments.__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "will not implicitly override a super classes scope access permission" do
@@ -133,7 +133,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         regulate_scope(:find_string) { |s| denied! if s == 'doa'}
       end
       expect { TodoItem.__secure_remote_access_to_find_string(TodoItem, nil, 'doa') }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "finder methods have access to the acting_user methods" do
@@ -141,7 +141,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         regulate_scope(:all) { acting_user }
       end
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, true).__secure_collection_check(nil) }
       .not_to raise_error
     end
@@ -151,7 +151,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         finder_method(:pow) { denied! }
       end
       expect { TodoItem.__secure_remote_access_to__pow(TodoItem, nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "server methods have access to the acting_user" do
@@ -167,7 +167,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         server_method(:pow) { denied! }
       end
       expect { TodoItem.new.__secure_remote_access_to_pow(TodoItem, 'Omar') }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "can set the policy directly on the scope with a proc" do
@@ -177,7 +177,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       expect { TodoItem.__secure_remote_access_to_test(TodoItem, true).__secure_collection_check(nil) }
       .not_to raise_error
       expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it 'can set the policy directly on the default scope method' do
@@ -185,7 +185,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         default_scope -> () { all }, regulate: -> () { denied! if acting_user }
       end
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, true) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil) }
       .not_to raise_error
     end
@@ -195,7 +195,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         regulate_default_scope { denied! if acting_user }
       end
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, true) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
       expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil) }
       .not_to raise_error
     end
@@ -214,7 +214,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       end
       test_scope = TodoItem.__secure_remote_access_to_test(TodoItem, nil)
       expect { test_scope.__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     %i[denied! denied deny].each do |value|
@@ -223,7 +223,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
           scope :test, -> () { all }, regulate: value
         end
         expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil) }
-        .to raise_error(Hyperloop::AccessViolation)
+        .to raise_error(Hyperstack::AccessViolation)
       end
     end
 
@@ -235,7 +235,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       .not_to raise_error
       new_todo = TodoItem.new
       expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     it "can use 'regulate: truthy-value' to allow access directly on the scope" do
@@ -252,7 +252,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       new_todo = TodoItem.new
       comments = new_todo.__secure_remote_access_to_comments(new_todo, nil)
       expect { comments.__secure_collection_check(nil) }
-      .to raise_error(Hyperloop::AccessViolation)
+      .to raise_error(Hyperstack::AccessViolation)
     end
 
     %i[denied! denied deny].each do |value|
@@ -261,7 +261,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         TodoItem.has_many :comments, regulate: value
         new_todo = TodoItem.new
         expect { new_todo.__secure_remote_access_to_comments(new_todo, nil) }
-        .to raise_error(Hyperloop::AccessViolation)
+        .to raise_error(Hyperstack::AccessViolation)
       end
     end
   end
@@ -284,7 +284,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         end
         TodoItem.create
         mount 'TestComponentZ' do
-          class TestComponentZ < Hyperloop::Component
+          class TestComponentZ < HyperComponent
             render do
               DIV { "There is #{TodoItem.annuder_scope.test_scope.count} TodoItem" }
             end
@@ -327,7 +327,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
             end
           end
 
-          class TestComponentZ < Hyperloop::Component
+          class TestComponentZ < HyperComponent
             render do
               DIV { "There is #{TodoItem.count} TodoItem" }
             end
@@ -343,7 +343,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         todo_item = TodoItem.create
         Comment.create(todo_item: todo_item)
         mount 'TestComponentZ' do
-          class TestComponentZ < Hyperloop::Component
+          class TestComponentZ < HyperComponent
             render do
               DIV { "There is #{TodoItem.find(1).comments.count} comments on the first TodoItem" }
             end
@@ -360,7 +360,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         end
         2.times { TodoItem.create }
         mount 'TestComponentZ' do
-          class TestComponentZ < Hyperloop::Component
+          class TestComponentZ < HyperComponent
             render do
               DIV { "There is #{TodoItem.test_scope.count} TodoItem" }
             end
@@ -379,7 +379,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         todo_item = TodoItem.create
         2.times { Comment.create(todo_item: todo_item) }
         mount 'TestComponentZ' do
-          class TestComponentZ < Hyperloop::Component
+          class TestComponentZ < HyperComponent
             render do
               DIV { "There are #{TodoItem.find(1).comments.count} comments on the first TodoItem" }
             end
@@ -396,7 +396,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         todo_item = TodoItem.create
         2.times { Comment.create(todo_item: todo_item) }
         mount 'TestComponentZ' do
-          class TestComponentZ < Hyperloop::Component
+          class TestComponentZ < HyperComponent
             render do
               DIV { "There are #{TodoItem.find(1).comments.all.count} comments on the first TodoItem" }
             end
@@ -416,7 +416,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
           end
         end
         mount 'DummyComponent' do
-          class DummyComponent < Hyperloop::Component
+          class DummyComponent < HyperComponent
             render(DIV) { 'hello' }
           end
           module ReactiveRecord

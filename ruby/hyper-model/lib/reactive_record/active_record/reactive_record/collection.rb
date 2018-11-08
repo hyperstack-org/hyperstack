@@ -132,7 +132,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
         # the broadcast record and the value on the client is out of sync
         # not running set_pre_sync_related_records will cause sync scopes
         # to refresh all related scopes
-        React::State.bulk_update do
+        Hyperstack::Internal::State::Mapper.bulk_update do
           record = broadcast.record_with_current_values
           apply_to_all_collections(
             :set_pre_sync_related_records,
@@ -292,7 +292,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     # end of stuff to move
 
     def reload_from_db(force = nil)
-      if force || React::State.has_observers?(self, :collection)
+      if force || Hyperstack::Internal::Store::State.observed?(self, :collection)
         @out_of_date = false
         ReactiveRecord::Base.load_from_db(nil, *@vector, '*all') if @collection
         ReactiveRecord::Base.load_from_db(nil, *@vector, '*count')
@@ -308,15 +308,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
         @observing = true
         link_to_parent
         reload_from_db(true) if @out_of_date
-        React::State.get_state(self, :collection)
+        Hyperstack::Internal::Store::State.get_state(self, :collection)
       ensure
         @observing = false
       end
     end
 
     def set_count_state(val)
-      unless ReactiveRecord::WhileLoading.has_observers?
-        React::State.set_state(self, :collection, collection, true)
+      unless ReactiveRecord::WhileLoading.observed?
+        Hyperstack::Internal::Store::State.set_state(self, :collection, collection, true)
       end
       @count = val
     end
@@ -549,7 +549,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def notify_of_change(value = nil)
-      React::State.set_state(self, "collection", collection) unless ReactiveRecord::Base.data_loading?
+      Hyperstack::Internal::Store::State.set_state(self, "collection", collection) unless ReactiveRecord::Base.data_loading?
       value
     end
 

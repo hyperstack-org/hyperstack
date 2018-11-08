@@ -180,10 +180,10 @@ module ReactiveRecord
 
     def changed?(*args)
       if args.count == 0
-        React::State.get_state(self, "!CHANGED!")
+        Hyperstack::Internal::Store::State.get_state(self, "!CHANGED!")
         !changed_attributes.empty?
       else
-        React::State.get_state(self, args[0])
+        Hyperstack::Internal::Store::State.get_state(self, args[0])
         changed_attributes.include? args[0]
       end
     end
@@ -288,7 +288,7 @@ module ReactiveRecord
     end
 
     def saving!
-      React::State.set_state(self, self, :saving) unless data_loading?
+      Hyperstack::Internal::Store::State.set_state(self, self, :saving) unless data_loading?
       @saving = true
     end
 
@@ -306,9 +306,9 @@ module ReactiveRecord
       notify_waiting_for_save
       return self if save_only
       if errors.empty?
-        React::State.set_state(self, self, :saved)
+        Hyperstack::Internal::Store::State.set_state(self, self, :saved)
       elsif !data_loading?
-        React::State.set_state(self, self, :error)
+        Hyperstack::Internal::Store::State.set_state(self, self, :error)
       end
       self
     end
@@ -334,7 +334,7 @@ module ReactiveRecord
     end
 
     def saving?
-      React::State.get_state(self, self)
+      Hyperstack::Internal::Store::State.get_state(self, self)
       @saving
     end
 
@@ -387,7 +387,7 @@ module ReactiveRecord
         @catch_db_requests = true
         yield
       rescue DbRequestMade => e
-        React::IsomorphicHelpers.log "Warning: request for server side data during scope evaluation: #{e.message}", :warning
+        Hyperstack::Component::IsomorphicHelpers.log "Warning: request for server side data during scope evaluation: #{e.message}", :warning
         return_val
       ensure
         @catch_db_requests = false

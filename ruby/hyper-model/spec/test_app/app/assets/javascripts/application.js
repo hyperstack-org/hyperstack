@@ -2,5 +2,5 @@
 //= require 'react_ujs'
 //= require 'components'
 //= require action_cable
-//= require 'hyperloop/pusher'
+//= require 'hyperstack/pusher'
 Opal.load('components');

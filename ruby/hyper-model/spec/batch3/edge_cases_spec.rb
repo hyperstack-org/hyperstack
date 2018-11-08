@@ -4,7 +4,7 @@ require 'test_components'
 describe "reactive-record edge cases", js: true do
 
   before(:all) do
-    # Hyperloop.configuration do |config|
+    # Hyperstack.configuration do |config|
     #   config.transport = :simple_poller
     #   # slow down the polling so wait_for_ajax works
     #   config.opts = { seconds_between_poll: 2 }
@@ -17,7 +17,7 @@ describe "reactive-record edge cases", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -44,7 +44,7 @@ describe "reactive-record edge cases", js: true do
     user_item = User.create(name: 'Fred')
     todo_item = TodoItem.create(title: 'test-todo', user: user_item)
     mount "PrerenderTest", {}, render_on: :server_only do
-      class PrerenderTest < Hyperloop::Component
+      class PrerenderTest < HyperComponent
         render(DIV) do
           TodoItem.first.user.name
         end
@@ -86,7 +86,7 @@ describe "reactive-record edge cases", js: true do
     # cause spec to fail if there are attempts to fetch data after prerendering
     hide_const 'ReactiveRecord::Operations::Fetch'
     mount "TestComponent77", {}, render_on: :both do
-      class TestComponent77 < Hyperloop::Component
+      class TestComponent77 < HyperComponent
         render(UL) do
           Todo.each do |todo|
             LI { todo.title }
@@ -104,7 +104,7 @@ describe "reactive-record edge cases", js: true do
       FactoryBot.create(:todo, title: "Todo #{i}")
     end
     mount "TestComponent77" do
-      class TestComponent77 < Hyperloop::Component
+      class TestComponent77 < HyperComponent
         render(UL) do
           Todo.limit(2).offset(3).each do |todo|
             LI { todo.title }

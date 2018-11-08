@@ -1,6 +1,6 @@
 # Monkey patches to ActiveRecord for scoping, security, and to synchronize models
 module ActiveRecord
-  # hyperloop adds new features to scopes to allow for computing scopes on client side
+  # hyperstack adds new features to scopes to allow for computing scopes on client side
   # and for hinting at what joins are involved in a scope.  _synchromesh_scope_args_check
   # processes these arguments, and the will always leave the true server side scoping
   # proc in the `:server` opts.   This method is common to client and server.
@@ -43,7 +43,7 @@ module ActiveRecord
         return self if __synchromesh_permission_granted
         return self if __secure_remote_access_to_all(self, acting_user).__synchromesh_permission_granted
         return self if __secure_remote_access_to_unscoped(self, acting_user).__synchromesh_permission_granted
-        Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_permission_not_granted, "Last relation: #{self}, acting_user: #{acting_user}")
+        Hyperstack::InternalPolicy.raise_operation_access_violation(:scoped_permission_not_granted, "Last relation: #{self}, acting_user: #{acting_user}")
       end
     end
     # Monkey patches and extensions to base
@@ -53,11 +53,11 @@ module ActiveRecord
         # __secure_remote_access_to_
 
         # The wrapper method may simply return the normal result or may act to secure the data.
-        # The simpliest case is for the method to call `denied!` which will raise a Hyperloop
+        # The simpliest case is for the method to call `denied!` which will raise a Hyperstack
         # access protection fault.
 
         def denied!
-          Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self} regulation denies scope access.  Called from #{caller_locations(1)}")
+          Hyperstack::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self} regulation denies scope access.  Called from #{caller_locations(1)}")
         end
 
         # Here we set up the base `all` and `unscoped` methods.  See below for more on how
@@ -199,7 +199,7 @@ module ActiveRecord
           regulate_scope(:all, &block)
         end
 
-        # monkey patch scope and default_scope macros to process hyperloop special opts,
+        # monkey patch scope and default_scope macros to process hyperstack special opts,
         # and add regulations if present
 
         alias pre_synchromesh_scope scope
@@ -276,7 +276,7 @@ module ActiveRecord
       end
 
       def denied!
-        Hyperloop::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self.class} regulation denies scope access.  Called from #{caller_locations(1)}")
+        Hyperstack::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self.class} regulation denies scope access.  Called from #{caller_locations(1)}")
       end
 
       # call do_not_synchronize to block synchronization of a model
@@ -314,9 +314,9 @@ module ActiveRecord
         ReactiveRecord::Broadcast.after_commit :destroy, self
       end
 
-      def __hyperloop_secure_attributes(acting_user)
+      def __hyperstack_secure_attributes(acting_user)
         accessible_attributes =
-          Hyperloop::InternalPolicy.accessible_attributes_for(self, acting_user)
+          Hyperstack::InternalPolicy.accessible_attributes_for(self, acting_user)
         attributes.select { |attr| accessible_attributes.include? attr.to_sym }
       end
 

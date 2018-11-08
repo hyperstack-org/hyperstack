@@ -12,101 +12,205 @@ module ComponentTestHelpers
 
 
   TOP_LEVEL_COMPONENT_PATCH = lambda { |&block| Opal.compile(block.source.split("\n")[1..-2].join("\n"))}.call do #ComponentTestHelpers.compile_to_opal do
-    module React
-      class TopLevelRailsComponent # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
+    module Hyperstack
+      module Internal
+        module Component
+          class TopLevelRailsComponent
 
-        class << self
-          attr_accessor :event_history
+            # original class declares these params:
+            # param :component_name
+            # param :controller
+            # param :render_params
 
-          def callback_history_for(proc_name)
-            event_history[proc_name]
-          end
+            class << self
+              attr_accessor :event_history
 
-          def last_callback_for(proc_name)
-            event_history[proc_name].last
-          end
+              def callback_history_for(proc_name)
+                event_history[proc_name]
+              end
 
-          def clear_callback_history_for(proc_name)
-            event_history[proc_name] = []
-          end
+              def last_callback_for(proc_name)
+                event_history[proc_name].last
+              end
 
-          def event_history_for(event_name)
-            event_history["_on#{event_name.event_camelize}"]
-          end
+              def clear_callback_history_for(proc_name)
+                event_history[proc_name] = []
+              end
 
-          def last_event_for(event_name)
-            event_history["_on#{event_name.event_camelize}"].last
-          end
+              def event_history_for(event_name)
+                event_history["on_#{event_name}"]
+              end
 
-          def clear_event_history_for(event_name)
-            event_history["_on#{event_name.event_camelize}"] = []
-          end
+              def last_event_for(event_name)
+                event_history["on_#{event_name}"].last
+              end
 
-        end
-
-        def component
-          return @component if @component
-          paths_searched = []
-          component = nil
-          if params.component_name.start_with?('::')
-            # if absolute path of component is given, look it up and fail if not found
-            paths_searched << params.component_name
-            component = begin
-                          Object.const_get(params.component_name)
-                        rescue NameError
-                          nil
-                        end
-          else
-            # if relative path is given, look it up like this
-            # 1) we check each path + controller-name + component-name
-            # 2) if we can't find it there we check each path + component-name
-            # if we can't find it we just try const_get
-            # so (assuming controller name is Home)
-            # ::Foo::Bar will only resolve to some component named ::Foo::Bar
-            # but Foo::Bar will check (in this order) ::Home::Foo::Bar, ::Components::Home::Foo::Bar, ::Foo::Bar, ::Components::Foo::Bar
-            self.class.search_path.each do |scope|
-              paths_searched << "#{scope.name}::#{params.controller}::#{params.component_name}"
-              component = begin
-                            scope.const_get(params.controller, false).const_get(params.component_name, false)
-                          rescue NameError
-                            nil
-                          end
-              break if component != nil
+              def clear_event_history_for(event_name)
+                event_history["on_#{event_name}"] = []
+              end
             end
-            unless component
-              self.class.search_path.each do |scope|
-                paths_searched << "#{scope.name}::#{params.component_name}"
+
+            def component
+              return @component if @component
+              paths_searched = []
+              component = nil
+              if @ComponentName.start_with?('::')
+                # if absolute path of component is given, look it up and fail if not found
+                paths_searched << @ComponentName
                 component = begin
-                              scope.const_get(params.component_name, false)
+                              Object.const_get(@ComponentName)
                             rescue NameError
                               nil
                             end
-                break if component != nil
+              else
+                # if relative path is given, look it up like this
+                # 1) we check each path + controller-name + component-name
+                # 2) if we can't find it there we check each path + component-name
+                # if we can't find it we just try const_get
+                # so (assuming controller name is Home)
+                # ::Foo::Bar will only resolve to some component named ::Foo::Bar
+                # but Foo::Bar will check (in this order) ::Home::Foo::Bar, ::Components::Home::Foo::Bar, ::Foo::Bar, ::Components::Foo::Bar
+                self.class.search_path.each do |scope|
+                  paths_searched << "#{scope.name}::#{@Controller}::#{@ComponentName}"
+                  component = begin
+                                scope.const_get(@Controller, false).const_get(@ComponentName, false)
+                              rescue NameError
+                                nil
+                              end
+                  break if component != nil
+                end
+                unless component
+                  self.class.search_path.each do |scope|
+                    paths_searched << "#{scope.name}::#{@ComponentName}"
+                    component = begin
+                                  scope.const_get(@ComponentName, false)
+                                rescue NameError
+                                  nil
+                                end
+                    break if component != nil
+                  end
+                end
+              end
+              @component = component
+              return @component if @component && @component.method_defined?(:render)
+              raise "Could not find component class '#{@ComponentName}' for @Controller '#{@Controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
+            end
+
+            before_mount do
+              TopLevelRailsComponent.event_history = Hash.new { |h, k| h[k] = [] }
+              component.validator.rules.each do |name, rules|
+                next unless rules[:type] == Proc
+
+                TopLevelRailsComponent.event_history[name] = []
+                @RenderParams[name] = lambda do |*args|
+                  TopLevelRailsComponent.event_history[name] << args
+                end
               end
             end
-          end
-          @component = component
-          return @component if @component && @component.method_defined?(:render)
-          raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
-        end
 
-        before_mount do
-          # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
-          TopLevelRailsComponent.event_history = Hash.new {|h,k| h[k] = [] }
-          component.validator.rules.each do |name, rules|
-            if rules[:type] == Proc
-              # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
-              TopLevelRailsComponent.event_history[name] = []
-              params.render_params[name] = lambda { |*args|  TopLevelRailsComponent.event_history[name] << args.collect { |arg| Native(arg).to_n } }
+            def render
+              Hyperstack::Internal::Component::RenderingContext.render(component, @RenderParams)
             end
           end
-        end
-
-        def render
-          React::RenderingContext.render(component, params.render_params)
         end
       end
     end
+
+    # module React
+    #   class TopLevelRailsComponent # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
+    #
+    #     class << self
+    #       attr_accessor :event_history
+    #
+    #       def callback_history_for(proc_name)
+    #         event_history[proc_name]
+    #       end
+    #
+    #       def last_callback_for(proc_name)
+    #         event_history[proc_name].last
+    #       end
+    #
+    #       def clear_callback_history_for(proc_name)
+    #         event_history[proc_name] = []
+    #       end
+    #
+    #       def event_history_for(event_name)
+    #         event_history["_on#{event_name.event_camelize}"]
+    #       end
+    #
+    #       def last_event_for(event_name)
+    #         event_history["_on#{event_name.event_camelize}"].last
+    #       end
+    #
+    #       def clear_event_history_for(event_name)
+    #         event_history["_on#{event_name.event_camelize}"] = []
+    #       end
+    #
+    #     end
+    #
+    #     def component
+    #       return @component if @component
+    #       paths_searched = []
+    #       component = nil
+    #       if params.component_name.start_with?('::')
+    #         # if absolute path of component is given, look it up and fail if not found
+    #         paths_searched << params.component_name
+    #         component = begin
+    #                       Object.const_get(params.component_name)
+    #                     rescue NameError
+    #                       nil
+    #                     end
+    #       else
+    #         # if relative path is given, look it up like this
+    #         # 1) we check each path + controller-name + component-name
+    #         # 2) if we can't find it there we check each path + component-name
+    #         # if we can't find it we just try const_get
+    #         # so (assuming controller name is Home)
+    #         # ::Foo::Bar will only resolve to some component named ::Foo::Bar
+    #         # but Foo::Bar will check (in this order) ::Home::Foo::Bar, ::Components::Home::Foo::Bar, ::Foo::Bar, ::Components::Foo::Bar
+    #         self.class.search_path.each do |scope|
+    #           paths_searched << "#{scope.name}::#{params.controller}::#{params.component_name}"
+    #           component = begin
+    #                         scope.const_get(params.controller, false).const_get(params.component_name, false)
+    #                       rescue NameError
+    #                         nil
+    #                       end
+    #           break if component != nil
+    #         end
+    #         unless component
+    #           self.class.search_path.each do |scope|
+    #             paths_searched << "#{scope.name}::#{params.component_name}"
+    #             component = begin
+    #                           scope.const_get(params.component_name, false)
+    #                         rescue NameError
+    #                           nil
+    #                         end
+    #             break if component != nil
+    #           end
+    #         end
+    #       end
+    #       @component = component
+    #       return @component if @component && @component.method_defined?(:render)
+    #       raise "Could not find component class '#{params.component_name}' for params.controller '#{params.controller}' in any component directory. Tried [#{paths_searched.join(", ")}]"
+    #     end
+    #
+    #     before_mount do
+    #       # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
+    #       TopLevelRailsComponent.event_history = Hash.new {|h,k| h[k] = [] }
+    #       component.validator.rules.each do |name, rules|
+    #         if rules[:type] == Proc
+    #           # NEEDS TO BE Hyperstack::Internal::Component::TopLevelRailsComponent
+    #           TopLevelRailsComponent.event_history[name] = []
+    #           params.render_params[name] = lambda { |*args|  TopLevelRailsComponent.event_history[name] << args.collect { |arg| Native(arg).to_n } }
+    #         end
+    #       end
+    #     end
+    #
+    #     def render
+    #       Hyperstack::Internal::Component::RenderingContext.render(component, params.render_params)
+    #     end
+    #   end
+    # end
   end
 
   def build_test_url_for(controller)
@@ -308,7 +412,7 @@ module ComponentTestHelpers
             }
           end
         end
-        class React::Component::HyperTestDummy < React::Component::Base
+        class HyperComponent::HyperTestDummy < HyperComponent
           def render; end
         end
         #{@client_code}
@@ -316,13 +420,13 @@ module ComponentTestHelpers
       code
       opts[:code] = Opal.compile(block_with_helpers)
     end
-    component_name ||= 'React::Component::HyperTestDummy'
+    component_name ||= 'HyperComponent::HyperTestDummy'
     ::Rails.cache.write(test_url, [component_name, params, opts])
 
     # this code copied from latest hyper-spec
     test_code_key = "hyper_spec_prerender_test_code.js"
-    #::Rails.configuration.react.server_renderer_options[:files] ||= ['hyperloop-prerender-loader.js']
-    @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files] || [] #'hyperloop-prerender-loader.js']
+    #::Rails.configuration.react.server_renderer_options[:files] ||= ['hyperstack-prerender-loader.js']
+    @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files] || [] #'hyperstack-prerender-loader.js']
     if opts[:render_on] == :both || opts[:render_on] == :server_only
       unless opts[:code].blank?
         ::Rails.cache.write(test_code_key, opts[:code])

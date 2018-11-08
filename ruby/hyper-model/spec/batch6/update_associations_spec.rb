@@ -52,7 +52,7 @@ RSpec::Steps.steps "updating associations", js: true do
 
   it "and will reconstruct the association and values on reloading" do
     expect_promise do
-      React::IsomorphicHelpers.load_context
+      Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
         User.find_by_first_name("Jon").todo_items.collect { | todo | todo.title }
       end
@@ -92,7 +92,7 @@ RSpec::Steps.steps "updating associations", js: true do
 
   it "a belongs to association can be set to nil and the model saved" do
     expect_promise do
-      React::IsomorphicHelpers.load_context
+      Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
         TodoItem.find_by_title("Jon's first todo!").tap { | todo | todo.user }
       end.then do | todo |
@@ -110,7 +110,7 @@ RSpec::Steps.steps "updating associations", js: true do
 
   it "and will not belong to the previous owner anymore" do
     expect_promise do
-      React::IsomorphicHelpers.load_context
+      Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
         User.find_by_first_name("Jan").todo_items.count
       end
@@ -152,7 +152,7 @@ RSpec::Steps.steps "updating associations", js: true do
 
   it "and it won't exist after being destroyed" do
     expect_promise do
-      React::IsomorphicHelpers.load_context
+      Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
         TodoItem.find_by_title("Jon's first todo!").id
       end
@@ -167,7 +167,7 @@ RSpec::Steps.steps "updating associations", js: true do
 
   it "and can be reloaded" do
     expect_promise do
-      React::IsomorphicHelpers.load_context
+      Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
         TodoItem.find_by_title("round to it").id.to_i
       end

@@ -19,7 +19,7 @@ describe "while loading", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -42,12 +42,12 @@ describe "while loading", js: true do
   it "will display the while loading message for a fetch within a nested component" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class MyNestedGuy < Hyperloop::Component
+        class MyNestedGuy < HyperComponent
           render(SPAN) do
             "#{User.find_by_first_name('Lily').last_name} is a dog"
           end
         end
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
           render do
             DIV do
               MyNestedGuy {}
@@ -68,7 +68,7 @@ describe "while loading", js: true do
   it "loading and loaded blocks can return strings" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
           render do
             DIV do
               User.find_by_first_name('Lily').last_name
@@ -90,13 +90,13 @@ describe "while loading", js: true do
   it "The inner most while_loading will display only" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class MyNestedGuy < Hyperloop::Component
+        class MyNestedGuy < HyperComponent
           render do
             DIV { User.find_by_first_name('Lily').last_name }
             .while_loading { SPAN { 'loading...' } }
           end
         end
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
           render do
             DIV do
               MyNestedGuy {}
@@ -116,7 +116,7 @@ describe "while loading", js: true do
   it "while loading can take a string param instead of a block" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
           render do
             DIV do
               User.find_by_first_name('Lily').last_name
@@ -135,7 +135,7 @@ describe "while loading", js: true do
   it "while loading can take an element param instead of a block" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
           render do
             DIV do
               User.find_by_first_name('Lily').last_name
@@ -154,25 +154,25 @@ describe "while loading", js: true do
   it "achieving while_loading behavior with state variables" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class MyComponent < Hyperloop::Component
+        class MyComponent < HyperComponent
           render do
             SPAN { 'loading...' }
           end
         end
 
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
 
           before_mount do
             ReactiveRecord.load do
               User.find_by_first_name('Lily').last_name
             end.then do |last_name|
-              mutate.last_name last_name
+              mutate @last_name = last_name
             end
           end
 
           render do
-            if state.last_name
-              DIV { state.last_name }
+            if @last_name
+              DIV { @last_name }
             else
               MyComponent {}
             end
@@ -189,12 +189,12 @@ describe "while loading", js: true do
   it "while loading display an application defined element" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
-        class MyComponent < Hyperloop::Component
+        class MyComponent < HyperComponent
           render do
             SPAN { 'loading...' }
           end
         end
-        class WhileLoadingTester < Hyperloop::Component
+        class WhileLoadingTester < HyperComponent
           render do
             DIV do
               User.find_by_first_name('Lily').last_name
@@ -214,23 +214,23 @@ describe "while loading", js: true do
 
   it "will display the while loading message on condition" do
     isomorphic do
-      class FetchNow < Hyperloop::ServerOp
+      class FetchNow < Hyperstack::ServerOp
         dispatch_to { TestApplication }
       end
     end
     mount "WhileLoadingTester", {}, no_wait: true do
-      class MyNestedGuy < Hyperloop::Component
-        state fetch: false, scope: :shared
-        FetchNow.on_dispatch { mutate.fetch(true) }
+      class MyNestedGuy < HyperComponent
+        self.class.attr_reader :fetch
+        receives(FetchNow) { mutate @fetch = true }
         render(SPAN) do
-          if state.fetch
+          if self.class.fetch
             User.find_by_first_name('Lily').last_name
           else
             'no fetch yet chet'
           end
         end
       end
-      class WhileLoadingTester < Hyperloop::Component
+      class WhileLoadingTester < HyperComponent
         render do
           DIV do
             MyNestedGuy {}

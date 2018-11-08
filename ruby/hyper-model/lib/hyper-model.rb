@@ -1,5 +1,5 @@
 require 'set'
-require 'hyperloop-config'
+require 'hyperstack-config'
 require 'hyper-component'
 if RUBY_ENGINE == 'opal'
   require 'hyper-operation'
@@ -9,6 +9,8 @@ if RUBY_ENGINE == 'opal'
   require 'kernel/itself' unless Object.instance_methods.include?(:itself)
   require 'object/tap'
   require 'active_model_client_stubs'
+  require 'hyper-state'
+  require 'hyper-store'
   require "reactive_record/active_record_error"
   require "reactive_record/active_record/errors"
   require "reactive_record/active_record/error"
@@ -36,14 +38,14 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/instance_methods"
   require "reactive_record/active_record/base"
   require 'hyper_react/input_tags'
-  require 'hyperloop/model/load'
+  require 'hyperstack/model/load'
   require_relative 'hyper_model/version'
   require_relative 'opal/parse_patch'
   require_relative 'opal/set_patches'
   require_relative 'opal/equality_patches'
-  React::IsomorphicHelpers.log(
+  Hyperstack::Component::IsomorphicHelpers.log(
     "The gem 'hyper-mesh' is deprecated.  Use gem 'hyper-model' instead.", :warning
-  ) unless defined? Hyperloop::Model
+  ) unless defined? Hyperstack::Model
 else
   require 'opal'
   require 'hyper-operation'

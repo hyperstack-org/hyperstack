@@ -11,7 +11,7 @@ describe "example scopes", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -60,9 +60,9 @@ describe "example scopes", js: true do
   it "a complex client side scope" do
 
     mount "TestComponent3" do
-      class UserTodos < React::Component::Base
+      class UserTodos < HyperComponent
         render(DIV) do
-          div { "todos by user with comments" }
+          DIV { "todos by user with comments" }
           User.each do |user|
             DIV do
               DIV { "#{user.first_name}'s Todos'" }
@@ -76,7 +76,7 @@ describe "example scopes", js: true do
                       end
                     end unless todo.comments.by_manager.empty?
                   end; end; end; end; end; end; end
-      class ManagerComments < React::Component::Base
+      class ManagerComments < HyperComponent
         render(DIV) do
           if Todo.with_managers_comments.any?
             DIV { "managers comments" }
@@ -91,10 +91,10 @@ describe "example scopes", js: true do
           else
             DIV { "no manager comments" }
           end; end; end
-      class TestComponent3 < React::Component::Base
+      class TestComponent3 < HyperComponent
         def render
           puts "RENDERING TESTCOMPONENT3"
-          div do
+          DIV do
             UserTodos {}
             ManagerComments {}
           end; end; end; end
@@ -140,7 +140,7 @@ describe "example scopes", js: true do
     user1.commentz << FactoryBot.create(:comment, comment: "frank made this comment", todoz: user2.assigned_todos.first)
     user2.commentz << FactoryBot.create(:comment, comment: "bob made this comment", todoz: user1.assigned_todos.first)
     # evaluate_ruby do
-    #   Hyperloop::IncomingBroadcast.hypertrace do
+    #   Hyperstack::IncomingBroadcast.hypertrace do
     #     break_on_exit?(:merge_current_values) { Todo.find(5).comments.last.todo.nil? rescue nil }
     #   end
     #   ReactiveRecord::ScopeDescription.hypertrace do

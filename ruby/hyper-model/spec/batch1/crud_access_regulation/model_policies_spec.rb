@@ -14,7 +14,7 @@ describe "regulate access allowed" do
   after(:each) do
     class ActiveRecord::Base
       def view_permitted?(attribute)
-        Hyperloop::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
+        Hyperstack::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
       end
       [:create, :update, :destroy].each do |access|
         define_method("#{access}_permitted?".to_sym) { false }
@@ -22,7 +22,7 @@ describe "regulate access allowed" do
     end
   end
 
-  Hyperloop::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+  Hyperstack::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
 
     it "will define a basic allow_#{policy} policy" do
       stub_const 'DummyModelPolicy', Class.new
@@ -60,7 +60,7 @@ describe "regulate access allowed" do
     DummyModelPolicy.class_eval do
       send("allow_change") { "called change" }
     end
-    Hyperloop::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+    Hyperstack::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
       DummyModel.new.send("#{policy}_permitted?").should eq("called change")
     end
   end
@@ -70,7 +70,7 @@ describe "regulate access allowed" do
     ApplicationPolicy.class_eval do
       send("allow_change", DummyModel) { "called change" }
     end
-    Hyperloop::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+    Hyperstack::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
       DummyModel.new.send("#{policy}_permitted?").should eq("called change")
     end
   end
@@ -84,7 +84,7 @@ describe "regulate access allowed" do
     FooModel.class_eval do
       self.table_name = 'test_models'
     end
-    Hyperloop::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
+    Hyperstack::InternalClassPolicy::CHANGE_POLICIES.each do |policy|
       DummyModel.new.send("#{policy}_permitted?").should eq("called change on DummyModel")
       FooModel.new.send("#{policy}_permitted?").should eq("called change on FooModel")
     end

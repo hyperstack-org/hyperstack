@@ -6,7 +6,7 @@ require 'rspec-steps'
 RSpec::Steps.steps 'Load From Json', js: true do
 
   before(:all) do
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :crud_only
     end
     seed_database

@@ -7,7 +7,7 @@ module ReactiveRecord
 
   module Operations
     # to make debug easier we convert all the object_id strings to be hex representation
-    class Base < Hyperloop::ControllerOp
+    class Base < Hyperstack::ControllerOp
       param :acting_user, nils: true
 
       FORMAT = '0x%x'
@@ -66,7 +66,7 @@ module ReactiveRecord
       end
       failed do |e|
         # AccessViolations are already sent to on_error
-        Hyperloop.on_error(e, :fetch_error, params.to_h) unless e.is_a? Hyperloop::AccessViolation
+        Hyperstack.on_error(e, :fetch_error, params.to_h) unless e.is_a? Hyperstack::AccessViolation
         raise e
       end
     end

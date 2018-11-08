@@ -4,7 +4,7 @@ require 'test_components'
 describe "dictionary examples", js: true do
 
 
-  Hyperloop.configuration do |config|
+  Hyperstack.configuration do |config|
     config.transport = :action_cable
     config.channel_prefix = "synchromesh"
   end
@@ -85,14 +85,14 @@ describe "dictionary examples", js: true do
       votes: 4, dictionary_entry: ruby
     )
 
-    hyperloop = DictionaryEntry.create(word: 'hyperloop', pronunciation: 'hahy-per-loop')
+    hyperstack = DictionaryEntry.create(word: 'hyperstack', pronunciation: 'hahy-per-loop')
     Definition.create(
       definition: 'every programmers favorite UI framework',
-      votes: 25, dictionary_entry: hyperloop
+      votes: 25, dictionary_entry: hyperstack
     )
     Definition.create(
       definition: 'high speed rail for the 21st century',
-      votes: 24, dictionary_entry: hyperloop
+      votes: 24, dictionary_entry: hyperstack
     )
 
   end
@@ -100,7 +100,7 @@ describe "dictionary examples", js: true do
   it "displays a word" do
     mount "WordOfTheDay" do
 
-class WordOfTheDay < React::Component::Base
+class WordOfTheDay < HyperComponent
 
   # The current word displayed is stored in the
   # entry state variable.   We use a state
@@ -143,7 +143,7 @@ class WordOfTheDay < React::Component::Base
   end
 end
 
-class ShowDefinition < React::Component::Base
+class ShowDefinition < HyperComponent
 
   # The ShowDefinition component has one param
   # of type as "Definition". Typing  is not
@@ -177,7 +177,7 @@ class ShowDefinition < React::Component::Base
   end
 end
 
-class AddDefinition < React::Component::Base
+class AddDefinition < HyperComponent
 
   # The AddDefinition component takes a
   # DictionaryEntry, and will allow the user

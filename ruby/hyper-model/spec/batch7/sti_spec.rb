@@ -12,7 +12,7 @@ RSpec::Steps.steps "class inheritance", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -147,7 +147,7 @@ RSpec::Steps.steps "class inheritance", js: true do
   end
 
   it "will scope STI classes based on the class type" do
-    evaluate_ruby "React::IsomorphicHelpers.load_context"
+    evaluate_ruby "Hyperstack::Component::IsomorphicHelpers.load_context"
     expect_promise("ReactiveRecord.load { Sti::SubClass1.count }").to eq(Sti::SubClass1.count)
     expect_promise("ReactiveRecord.load { Sti::Base.count }").to eq(Sti::Base.count)
     expect_promise("ReactiveRecord.load { Sti::NoSyncSubClass1.count }").to eq(Sti::NoSyncSubClass1.count)

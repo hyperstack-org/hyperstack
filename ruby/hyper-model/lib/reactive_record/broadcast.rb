@@ -2,23 +2,23 @@ module ReactiveRecord
   class Broadcast
 
     def self.after_commit(operation, model)
-      Hyperloop::InternalPolicy.regulate_broadcast(model) do |data|
-        if !Hyperloop.on_server? && Hyperloop::Connection.root_path
+      Hyperstack::InternalPolicy.regulate_broadcast(model) do |data|
+        if !Hyperstack.on_server? && Hyperstack::Connection.root_path
           send_to_server(operation, data) rescue nil # server no longer running so ignore
         else
           SendPacket.run(data, operation: operation)
         end
       end
     rescue ActiveRecord::StatementInvalid => e
-      raise e unless e.message == "Could not find table 'hyperloop_connections'"
+      raise e unless e.message == "Could not find table 'hyperstack_connections'"
     end unless RUBY_ENGINE == 'opal'
 
     def self.send_to_server(operation, data)
       salt = SecureRandom.hex
-      authorization = Hyperloop.authorization(salt, data[:channel], data[:broadcast_id])
-      raise 'no server running' unless Hyperloop::Connection.root_path
+      authorization = Hyperstack.authorization(salt, data[:channel], data[:broadcast_id])
+      raise 'no server running' unless Hyperstack::Connection.root_path
       SendPacket.remote(
-        Hyperloop::Connection.root_path,
+        Hyperstack::Connection.root_path,
         data,
         operation: operation,
         salt: salt,
@@ -26,7 +26,7 @@ module ReactiveRecord
       ).tap { |p| raise p.error if p.rejected? }
     end unless RUBY_ENGINE == 'opal'
 
-    class SendPacket < Hyperloop::ServerOp
+    class SendPacket < Hyperstack::ServerOp
       param authorization: nil, nils: true
       param salt: nil
       param :operation
@@ -41,7 +41,7 @@ module ReactiveRecord
       unless RUBY_ENGINE == 'opal'
         validate do
           params.authorization.nil? ||
-          Hyperloop.authorization(
+          Hyperstack.authorization(
             params.salt, params.channel, params.broadcast_id
           ) == params.authorization
         end
@@ -152,7 +152,7 @@ module ReactiveRecord
 
     def receive(params)
       @destroyed = params.operation == :destroy
-      @channels ||= Hyperloop::IncomingBroadcast.open_channels.intersection params.channels
+      @channels ||= Hyperstack::IncomingBroadcast.open_channels.intersection params.channels
       @received << params.channel
       @klass ||= params.klass
       @record.merge! params.record
@@ -184,7 +184,7 @@ module ReactiveRecord
     def integrity_check
       @previous_changes.each do |attr, value|
         next if @record.key?(attr) && @record[attr] == value.last
-        React::IsomorphicHelpers.log "Broadcast contained change to #{attr} -> #{value.last} "\
+        Hyperstack::Component::IsomorphicHelpers.log "Broadcast contained change to #{attr} -> #{value.last} "\
                                      "without corresponding value in attributes (#{@record}).\n",
                                      :error
         raise "Broadcast Integrity Error"
@@ -209,7 +209,7 @@ module ReactiveRecord
         if br.attributes.key?(attr) &&
            br.attributes[attr] != br.convert(attr, value) &&
            br.attributes[attr] != br.convert(attr, values.last)
-          React::IsomorphicHelpers.log "warning #{attr} has changed locally - will force a reload.\n"\
+          Hyperstack::Component::IsomorphicHelpers.log "warning #{attr} has changed locally - will force a reload.\n"\
                "local value: #{br.attributes[attr]} remote value: #{br.convert(attr, value)}->#{br.convert(attr, values.last)}",
                :warning
           return nil

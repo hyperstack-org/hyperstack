@@ -1,5 +1,5 @@
-module Hyperloop
-  define_setting :public_model_directories, [File.join('app','hyperloop','models'), File.join('app','models','public')]
+module Hyperstack
+  define_setting :public_model_directories, [File.join('app','hyperstack','models'), File.join('app','models','public')]
 end
 
 module ActiveRecord
@@ -9,7 +9,7 @@ module ActiveRecord
     def self.public_columns_hash
       return @public_columns_hash if @public_columns_hash && Rails.env.production?
       files = []
-      Hyperloop.public_model_directories.each do |dir|
+      Hyperstack.public_model_directories.each do |dir|
         dir_length = Rails.root.join(dir).to_s.length + 1
         Dir.glob(Rails.root.join(dir, '**', '*.rb')).each do |file|
           require_dependency(file) # still the file is loaded to make sure for development and test env

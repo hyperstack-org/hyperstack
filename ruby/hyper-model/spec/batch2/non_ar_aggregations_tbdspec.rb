@@ -11,7 +11,7 @@ RSpec::Steps.steps 'using non-ar aggregations', js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -57,7 +57,7 @@ RSpec::Steps.steps 'using non-ar aggregations', js: true do
   #   user = User.find_by_first_name("Data")
   #   user.data.string = "goodby"
   #   user.save(force: true).then do
-  #     React::IsomorphicHelpers.load_context
+  #     Hyperstack::Component::IsomorphicHelpers.load_context
   #     ReactiveRecord.load do
   #       User.find_by_first_name("Data").data
   #     end.then do |data|
@@ -70,7 +70,7 @@ RSpec::Steps.steps 'using non-ar aggregations', js: true do
   #   user = User.find_by_first_name("Data")
   #   user.data = TestData.new("the end", 1)
   #   user.save.then do
-  #     React::IsomorphicHelpers.load_context
+  #     Hyperstack::Component::IsomorphicHelpers.load_context
   #     ReactiveRecord.load do
   #       User.find_by_first_name("Data").data
   #     end.then do |data|
@@ -83,7 +83,7 @@ RSpec::Steps.steps 'using non-ar aggregations', js: true do
   #   user = User.find_by_first_name("Data")
   #   user.data = nil
   #   user.save.then do
-  #     React::IsomorphicHelpers.load_context
+  #     Hyperstack::Component::IsomorphicHelpers.load_context
   #     ReactiveRecord.load do
   #       User.find_by_first_name("Data").data
   #     end.then do |data|

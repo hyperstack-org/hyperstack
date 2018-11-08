@@ -12,7 +12,7 @@ RSpec::Steps.steps "has_many through relationships", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -96,7 +96,7 @@ RSpec::Steps.steps "has_many through relationships", js: true do
 
   it "will load has_many :through relationships" do
     mount "PhysicianSchedule" do
-      class PhysicianSchedule < React::Component::Base
+      class PhysicianSchedule < HyperComponent
         render(DIV) do
           Physician.all.each do |doc|
             DIV do

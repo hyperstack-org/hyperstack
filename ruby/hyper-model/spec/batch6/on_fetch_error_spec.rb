@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'test_components'
 
-describe "Hyperloop.on_error (for fetches) ", js: true do
+describe "Hyperstack.on_error (for fetches) ", js: true do
 
   before(:all) do
     require 'pusher'
@@ -11,7 +11,7 @@ describe "Hyperloop.on_error (for fetches) ", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -39,7 +39,7 @@ describe "Hyperloop.on_error (for fetches) ", js: true do
     ApplicationController.acting_user = nil
   end
 
-  it 'call Hyperloop.on_error for access violations' do
+  it 'call Hyperstack.on_error for access violations' do
     TodoItem.class_eval do
       TodoItem.regulate_relationship(:comments) { acting_user == user }
     end
@@ -47,8 +47,8 @@ describe "Hyperloop.on_error (for fetches) ", js: true do
     todo_item2 = TodoItem.create(user: nil)
     Comment.create(todo_item: todo_item1)
     Comment.create(todo_item: todo_item1)
-    # expect(Hyperloop).to receive(:on_error).once.with(
-    #   Hyperloop::AccessViolation,
+    # expect(Hyperstack).to receive(:on_error).once.with(
+    #   Hyperstack::AccessViolation,
     #   :fetch_error,
     #   'acting_user' => ApplicationController.acting_user,
     #   'controller' => kind_of(ActionController::Base),
@@ -56,8 +56,8 @@ describe "Hyperloop.on_error (for fetches) ", js: true do
     #   'models' => [],
     #   'associations' => []
     # )
-    expect(Hyperloop).to receive(:on_error).once.with(
-      Hyperloop::AccessViolation,
+    expect(Hyperstack).to receive(:on_error).once.with(
+      Hyperstack::AccessViolation,
       :scoped_permission_not_granted,
       anything
     )
@@ -74,7 +74,7 @@ describe "Hyperloop.on_error (for fetches) ", js: true do
       end
     end
     TodoItem.create(user: nil)
-    expect(Hyperloop).to receive(:on_error).once.with(
+    expect(Hyperstack).to receive(:on_error).once.with(
       Exception,
       :fetch_error,
       hash_including(:acting_user, :controller, :pending_fetches, :models, :associations)

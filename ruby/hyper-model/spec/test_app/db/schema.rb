@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 20160731182106) do
     t.integer  "todo_item_id"
   end
 
-  create_table "hyperloop_connections", force: :cascade do |t|
+  create_table "hyperstack_connections", force: :cascade do |t|
     t.string   "channel"
     t.string   "session"
     t.datetime "created_at"
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(version: 20160731182106) do
     t.datetime "refresh_at"
   end
 
-  create_table "hyperloop_queued_messages", force: :cascade do |t|
+  create_table "hyperstack_queued_messages", force: :cascade do |t|
     t.text    "data"
     t.integer "connection_id"
   end

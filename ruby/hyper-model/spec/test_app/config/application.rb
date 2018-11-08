@@ -15,7 +15,7 @@ module TestApp
     config.eager_load_paths += %W(#{config.root}/app/models/public)
     config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s
-    config.hyperloop.auto_config = false
+    config.hyperstack.auto_config = false
     config.opal.method_missing = true
     config.opal.optimized_operators = true
     config.opal.arity_check = false
@@ -25,7 +25,7 @@ module TestApp
     config.opal.spec_location = 'spec-opal'
 
     config.assets.cache_store = :null_store
-    config.hyperloop.auto_config = false
+    config.hyperstack.auto_config = false
 
     config.react.server_renderer_options = {
       files: ['server_rendering.js']

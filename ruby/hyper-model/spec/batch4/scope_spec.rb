@@ -11,7 +11,7 @@ describe "synchronized scopes", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -52,7 +52,7 @@ describe "synchronized scopes", js: true do
 
   it "can use the all scope" do
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         render do
           "count = #{TestModel.all.count}"
         end
@@ -73,19 +73,19 @@ describe "synchronized scopes", js: true do
       end
     end
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         before_mount do
           @render_count = 1
         end
         before_update do
           @render_count = @render_count + 1
         end
-        render(:div) do
-          div { "rendered #{@render_count} times"}
-          div { "scope1 count = #{TestModel.scope1.count}" }
-          div { "scope2 count = #{TestModel.scope2.count}"} if TestModel.scope1.count < 2
+        render(DIV) do
+          DIV { "rendered #{@render_count} times"}
+          DIV { "scope1 count = #{TestModel.scope1.count}" }
+          DIV { "scope2 count = #{TestModel.scope2.count}"} if TestModel.scope1.count < 2
           TestModel.scope1.each do |model|
-            div { model.test_attribute }
+            DIV { model.test_attribute }
           end
         end
       end
@@ -145,7 +145,7 @@ describe "synchronized scopes", js: true do
     end
     m1 = FactoryBot.create(:test_model, test_attribute: "123")
     mount "TestComponent2", m: m1 do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         param :m, type: TestModel
         before_mount do
           @render_count = 1
@@ -153,9 +153,9 @@ describe "synchronized scopes", js: true do
         before_update do
           @render_count = @render_count + 1
         end
-        render(:div) do
-          div { "rendered #{@render_count} times"}
-          div { "with_args('match').count = #{TestModel.with_args(params.m.test_attribute, :foo).count}" }
+        render(DIV) do
+          DIV { "rendered #{@render_count} times"}
+          DIV { "with_args('match').count = #{TestModel.with_args(@M.test_attribute, :foo).count}" }
         end
       end
     end
@@ -175,9 +175,9 @@ describe "synchronized scopes", js: true do
       end
     end
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
-        render(:div) do
-          div { "scope1.scope2.count = #{TestModel.scope1.with_args(:foo).count}" }
+      class TestComponent2 < HyperComponent
+        render(DIV) do
+          DIV { "scope1.scope2.count = #{TestModel.scope1.with_args(:foo).count}" }
         end
       end
     end
@@ -201,10 +201,10 @@ describe "synchronized scopes", js: true do
     todos = user.authored_todos.active
 
     mount 'TestComponent2', todos: todos do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         param :todos, type: [Todo]
-        render(:div) do
-          P { "params.todos = #{params.todos.count}" }
+        render(DIV) do
+          P { "params.todos = #{@Todos.count}" }
           P { "params.user.authored_todos.active = #{User.find(1).authored_todos.active.count}" }
         end
       end
@@ -224,7 +224,7 @@ describe "synchronized scopes", js: true do
         end
       end
       mount 'TestComponent2' do
-        class TestComponent2 < React::Component::Base
+        class TestComponent2 < HyperComponent
           render { "TestModel.joined.count = #{TestModel.joined.count}" }
         end
       end
@@ -244,7 +244,7 @@ describe "synchronized scopes", js: true do
         end
       end
       mount 'TestComponent2' do
-        class TestComponent2 < React::Component::Base
+        class TestComponent2 < HyperComponent
           render { "TestModel.joined.count = #{TestModel.joined.count}" }
         end
       end
@@ -265,16 +265,16 @@ describe "synchronized scopes", js: true do
     end
 
     mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         before_mount do
           @render_count = 1
         end
         before_update do
           @render_count = @render_count + 1
         end
-        render(:div) do
-          div { "rendered #{@render_count} times"}
-          div { "quicker.count = #{TestModel.quicker.count}" }
+        render(DIV) do
+          DIV { "rendered #{@render_count} times"}
+          DIV { "quicker.count = #{TestModel.quicker.count}" }
         end
       end
     end
@@ -323,20 +323,20 @@ describe "synchronized scopes", js: true do
     end
 
     mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         before_mount do
           @render_count = 1
         end
         before_update do
           @render_count = @render_count + 1
         end
-        render(:div) do
-          div { "rendered #{@render_count} times"}
-          div { "filter_and_sort.count = #{TestModel.filter_and_sort.count}" }
+        render(DIV) do
+          DIV { "rendered #{@render_count} times"}
+          DIV { "filter_and_sort.count = #{TestModel.filter_and_sort.count}" }
           if TestModel.filter_and_sort.any?
-            div { "test attributes: #{TestModel.filter_and_sort.collect { |r| r.test_attribute }.join(', ')}" }
+            DIV { "test attributes: #{TestModel.filter_and_sort.collect { |r| r.test_attribute }.join(', ')}" }
           else
-            div { "no test attributes" }
+            DIV { "no test attributes" }
           end
         end
       end
@@ -398,9 +398,12 @@ describe "synchronized scopes", js: true do
     end
 
     mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
-        export_state pat: :foo
-        export_state dir: :asc
+      class TestComponent2 < HyperComponent
+        class << self
+          observer(:pat) { @pat ||= :foo }
+          observer(:dir) { @dir ||= :asc }
+          state_writer :pat, :dir
+        end
         before_mount do
           @render_count = 1
         end
@@ -411,13 +414,13 @@ describe "synchronized scopes", js: true do
           puts "scoping: #{TestComponent2.pat}, #{TestComponent2.dir}"
           TestModel.matches(TestComponent2.pat).sorted(TestComponent2.dir)
         end
-        render(:div) do
-          div { "rendered #{@render_count} times"}
-          div { "matches(#{TestComponent2.pat}).count = #{TestModel.matches(TestComponent2.pat).count}" }
+        render(DIV) do
+          DIV { "rendered #{@render_count} times"}
+          DIV { "matches(#{TestComponent2.pat}).count = #{TestModel.matches(TestComponent2.pat).count}" }
           if scoped.any?
-            div { "test attributes: #{scoped.collect { |r| r.test_attribute[0] }.join(', ')}" }
+            DIV { "test attributes: #{scoped.collect { |r| r.test_attribute[0] }.join(', ')}" }
           else
-            div { "no test attributes" }
+            DIV { "no test attributes" }
           end
         end
       end
@@ -444,7 +447,7 @@ describe "synchronized scopes", js: true do
     page.should have_content('rendered 5 times')
     page.should have_content('test attributes: A, N, Z')
     evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
-    evaluate_ruby("TestComponent2.dir! :desc")
+    evaluate_ruby("TestComponent2.dir = :desc")
     page.should have_content('test attributes: Z, N, A')
     page.should have_content('rendered 7 times')
     starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
@@ -457,7 +460,7 @@ describe "synchronized scopes", js: true do
     page.should have_content('rendered 9 times')
     page.should have_content('test attributes: A')
     evaluate_ruby("ReactiveRecord::Base.current_fetch_id").should eq(starting_fetch_time)
-    evaluate_ruby('TestComponent2.pat! :bar')
+    evaluate_ruby('TestComponent2.pat = :bar')
     page.should have_content('.count = 1')
     page.should have_content('test attributes: Z')
     page.should have_content('rendered 11 times')
@@ -479,7 +482,7 @@ describe "synchronized scopes", js: true do
       end
     end
     mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         render { "TestModel.has_children.count = #{TestModel.has_children.count}" }
       end
     end
@@ -515,7 +518,7 @@ describe "synchronized scopes", js: true do
       end
     end
     mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         render(DIV) do
           DIV { "TestModel.has_children_joins_all.count = #{TestModel.has_children_joins_all.count}" }
           DIV { "TestModel.has_children_no_joins.count = #{TestModel.has_children_no_joins.count}" }
@@ -548,7 +551,7 @@ describe "synchronized scopes", js: true do
       end
     end
     mount 'TestComponent2' do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         render do
           "test attributes: #{TestModel.rev.collect { |r| r.test_attribute }.join(', ')}"
         end
@@ -570,7 +573,7 @@ describe "synchronized scopes", js: true do
     end
     mount 'TestComponent2' do
 
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         before_mount do
           @reverse_collection = []
         end

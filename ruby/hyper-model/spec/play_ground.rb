@@ -7,7 +7,7 @@ describe "playground", js: true do
       module SuperTest
       end
 
-      SuperTest.const_set :Derp, Class.new(React::Component::Base)
+      SuperTest.const_set :Derp, Class.new(HyperComponent)
       SuperTest::Derp.class_eval do
       	inherited(self)
       	def render
@@ -29,7 +29,7 @@ describe "playground", js: true do
       # YOU HAVE TO have the parens otherwise ruby rules say that
       # the block will be sent to const_set (where it is ignored)
 
-      SuperTest.const_set(:Derp, Class.new(React::Component::Base) do
+      SuperTest.const_set(:Derp, Class.new(HyperComponent) do
         inherited(self)
         def render
           p {"hi"}
@@ -48,7 +48,7 @@ describe "playground", js: true do
       end
 
       SuperTest.const_set(:Derp, Class.new do
-        #include React::Component
+        #include HyperComponent
         #inherited(self)
         def render
           p {"hi"}

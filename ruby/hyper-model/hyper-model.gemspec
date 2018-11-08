@@ -13,11 +13,11 @@ Gem::Specification.new do |spec|
                        'API. HyperModel also implements push notifications (via a number of '\
                        'possible technologies) so changes to records on the server are '\
                        'dynamically updated on all authorised clients.'
-  spec.homepage      = 'http://ruby-hyperloop.org'
+  spec.homepage      = 'http://ruby-hyperstack.org'
   spec.license       = 'MIT'
   # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperloop.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
+  #   "homepage_uri" => 'http://ruby-hyperstack.org',
+  #   "source_code_uri" => 'https://github.com/ruby-hyperstack/hyper-component'
   # }
 
   spec.files          = `git ls-files`.split("\n").reject { |f| f.match(%r{^(examples|gemfiles|pkg|reactive_record_test_app|spec)/}) }
@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', HyperModel::VERSION
   spec.add_dependency 'hyper-operation', HyperModel::VERSION
+  spec.add_dependency 'hyper-store', HyperModel::VERSION # only for Hyperstack::Internal::Store::State which should be moved
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper', '1.2.0'

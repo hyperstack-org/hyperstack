@@ -31,8 +31,8 @@ describe "regulate_all_broadcasts" do
       end
       attr_accessor :attrA, :attrB, :attrC, :attrD, :attrE
     end
-    allow_any_instance_of(Hyperloop::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
-    allow(Hyperloop::Connection).to receive(:active).and_return(['Application', 'AnotherApplication', 'Class1', 'Class2'])
+    allow_any_instance_of(Hyperstack::InternalPolicy).to receive(:id).and_return(:unique_broadcast_id)
+    allow(Hyperstack::Connection).to receive(:active).and_return(['Application', 'AnotherApplication', 'Class1', 'Class2'])
   end
 
   it "will broadcast to a single channel" do
@@ -43,7 +43,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Application',
@@ -69,7 +69,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Application',
@@ -103,7 +103,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Application',
@@ -139,7 +139,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'AnotherApplication',
@@ -175,7 +175,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'AnotherApplication',
@@ -212,7 +212,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'AnotherApplication',
@@ -241,7 +241,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Application',
@@ -261,7 +261,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Application',
@@ -272,7 +272,7 @@ describe "regulate_all_broadcasts" do
       }
     )
     model = TestModel2.new(attrA: "A")
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Application',
@@ -293,7 +293,7 @@ describe "regulate_all_broadcasts" do
       end
     end
     model = TestModel1.new(attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
-    expect { |b| Hyperloop::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.to yield_successive_args(
       {
         broadcast_id: :unique_broadcast_id,
         channel: 'Class1',

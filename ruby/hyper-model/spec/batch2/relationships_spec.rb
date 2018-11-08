@@ -11,7 +11,7 @@ describe "synchronizing relationships", js: true do
     Pusher.secret = "MY_TEST_SECRET"
     require "pusher-fake/support/base"
 
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -34,11 +34,11 @@ describe "synchronizing relationships", js: true do
   it "belongs_to with count" do
     parent = FactoryBot.create(:test_model)
     mount "TestComponent2", model: parent do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         param :model, type: TestModel
-        render(:div) do
-          puts "RENDERING! #{params.model.child_models.count} items"
-          div { "#{params.model.child_models.count} items" }
+        render(DIV) do
+          puts "RENDERING! #{@Model.child_models.count} items"
+          DIV { "#{@Model.child_models.count} items" }
           #ul { model.child_models.each { |model| li { model.child_attribute }}}
         end
       end
@@ -56,10 +56,10 @@ describe "synchronizing relationships", js: true do
   it "belongs_to without the associated record" do
     parent = FactoryBot.create(:test_model)
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
-        render(:div) do
-          div { "#{ChildModel.count} items" }
-          ul { ChildModel.each { |model| li { model.child_attribute }}}
+      class TestComponent2 < HyperComponent
+        render(DIV) do
+          DIV { "#{ChildModel.count} items" }
+          UL { ChildModel.each { |model| LI { model.child_attribute }}}
         end
       end
     end
@@ -74,8 +74,7 @@ describe "synchronizing relationships", js: true do
 
   it "adding child to a new model on client" do
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
-        define_state :foo
+      class TestComponent2 < HyperComponent
         before_mount do
           @parent = TestModel.new
           @child = ChildModel.new
@@ -86,7 +85,7 @@ describe "synchronizing relationships", js: true do
             @parent.save
           end
         end
-        render(:div) do
+        render(DIV) do
           "parent has #{@parent.child_models.count} children"
         end
       end
@@ -96,13 +95,13 @@ describe "synchronizing relationships", js: true do
   end
 
   it "adding child to a new model on client after render" do
-    # Hyperloop.configuration do |config|
+    # Hyperstack.configuration do |config|
     #   #config.transport = :none
     # end
     m = FactoryBot.create(:test_model)
     m.child_models << FactoryBot.create(:child_model)
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
+      class TestComponent2 < HyperComponent
         def self.parent
           @parent ||= TestModel.find(1)
         end
@@ -110,7 +109,7 @@ describe "synchronizing relationships", js: true do
           parent.child_models << ChildModel.new
           parent.save
         end
-        render(:div) do
+        render(DIV) do
           "parent has #{TestComponent2.parent.child_models.count} children".tap { |s| puts s}
         end
       end
@@ -125,8 +124,8 @@ describe "synchronizing relationships", js: true do
   it "will re-render the count after an item is added or removed from a model" do
     m1 = FactoryBot.create(:test_model)
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
-        render(:div) do
+      class TestComponent2 < HyperComponent
+        render(DIV) do
           "Count of TestModel: #{TestModel.count}".span
         end
       end
@@ -143,8 +142,8 @@ describe "synchronizing relationships", js: true do
   it "will re-render the model's all scope after an item is added or removed" do
     m1 = FactoryBot.create(:test_model)
     mount "TestComponent2" do
-      class TestComponent2 < React::Component::Base
-        render(:div) do
+      class TestComponent2 < HyperComponent
+        render(DIV) do
           puts "Count of TestModel: #{TestModel.collect { |i| i.id}.length}"
           "Count of TestModel: #{TestModel.collect { |i| i.id}.length}".span
         end
@@ -173,7 +172,7 @@ describe "synchronizing relationships", js: true do
       FactoryBot.create(:child_model, test_model: m)
 
       mount "TestComponent3" do
-        class TestComponent3 < React::Component::Base
+        class TestComponent3 < HyperComponent
           render(OL) do
             TestModel.all[0].child_models.boo_ha.each do |child|
               LI { "child id = #{child.id} "}
@@ -219,7 +218,7 @@ describe "synchronizing relationships", js: true do
       FactoryBot.create(:child_model, test_model: m)
 
       mount "TestComponent3" do
-        class TestComponent3 < React::Component::Base
+        class TestComponent3 < HyperComponent
           render(OL) do
             TestModel.all[0].child_models.each do |child|
               LI { "child id = #{child.id} "}

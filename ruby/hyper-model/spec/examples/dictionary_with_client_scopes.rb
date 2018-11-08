@@ -4,7 +4,7 @@ require 'test_components'
 describe "dictionary examples", js: true do
 
 
-  Hyperloop.configuration do |config|
+  Hyperstack.configuration do |config|
     config.transport = :action_cable
     config.channel_prefix = "synchromesh"
   end
@@ -64,7 +64,7 @@ describe "dictionary examples", js: true do
 
   it "displays a word" do
     mount "WordOfTheDay" do
-      class WordOfTheDay < React::Component::Base
+      class WordOfTheDay < HyperComponent
 
         define_state :entry
 
@@ -96,7 +96,7 @@ describe "dictionary examples", js: true do
         end
       end
 
-      class ShowDefinition < React::Component::Base
+      class ShowDefinition < HyperComponent
 
         # The ShowDefinition component has one param
         # of type as "Definition". Typing  is not
@@ -130,7 +130,7 @@ describe "dictionary examples", js: true do
         end
       end
 
-      class AddDefinition < React::Component::Base
+      class AddDefinition < HyperComponent
 
         # The AddDefinition component takes a
         # DictionaryEntry, and will allow the user

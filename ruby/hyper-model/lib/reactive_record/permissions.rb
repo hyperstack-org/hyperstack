@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class InternalPolicy
 
     def self.accessible_attributes_for(model, acting_user)
@@ -26,7 +26,7 @@ class ActiveRecord::Base
   attr_accessor :acting_user
 
   def view_permitted?(attribute)
-    Hyperloop::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
+    Hyperstack::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
   end
 
   def create_permitted?
@@ -103,7 +103,7 @@ class ActiveRecord::Base
       self.acting_user = old
       self
     else
-      Hyperloop::InternalPolicy.raise_operation_access_violation(:crud_access_violation, "for #{self} - #{permission}(#{args}) acting_user: #{user}")
+      Hyperstack::InternalPolicy.raise_operation_access_violation(:crud_access_violation, "for #{self} - #{permission}(#{args}) acting_user: #{user}")
     end
   end
 

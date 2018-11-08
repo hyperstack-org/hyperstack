@@ -19,6 +19,11 @@ module Hyperstack
             Hyperstack::Internal::State::Mapper.mutated!(map_object.object_id)
             value
           end
+
+          def observed?(obj, name)
+            map_object = legacy_map[obj][name]
+            Hyperstack::Internal::State::Mapper.observed?(map_object.object_id)
+          end
         end
       end
     end

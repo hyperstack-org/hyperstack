@@ -33,7 +33,7 @@ end
 
 describe "ActiveRecord" do
 
-  before(:all) { React::IsomorphicHelpers.load_context }
+  before(:all) { Hyperstack::Component::IsomorphicHelpers.load_context }
 
   after(:each) { React::API.clear_component_class_cache }
 

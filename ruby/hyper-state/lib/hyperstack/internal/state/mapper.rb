@@ -25,6 +25,7 @@ module Hyperstack
         @rendering_level = 0
 
         class << self
+          attr_reader :current_observer
           # Entry Points:
           #   observing                 setup an observer
           #   observed!                 indicate an object has been observed
@@ -78,7 +79,7 @@ module Hyperstack
             elsif @rendering_level.zero?
               current_observers[object].each do |observer|
                 observer.mutations([object])
-              end
+              end if current_observers.key? object
             end
           end
 
@@ -86,7 +87,7 @@ module Hyperstack
           def observed?(object)
             # we don't want to unnecessarily create a reference to ourselves
             # in the current_observers hash so we just look for the key.
-            current_observers.key? object
+            current_observers.key?(object)# && current_observers[object].any?
           end
 
           # Code can be wrapped in the bulk_update method, and
@@ -254,7 +255,7 @@ module Hyperstack
                 current_observers[object].each do |observer|
                   next if excluded_observers.include?(observer)
                   updates[observer] << object
-                end
+                end if current_observers.key? object
               end
             end
           end
