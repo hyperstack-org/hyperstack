@@ -27,10 +27,6 @@ module Hyperstack
           Hash.new(`#{@__hyperstack_component_native}.refs`)
         end
 
-        def assign_to(sym)
-          ->(ref) { instance_variable_set("@#{sym}", ::Element[ref]) }
-        end
-
         def dom_node
           `ReactDOM.findDOMNode(#{self}.__hyperstack_component_native)` # react >= v0.15.0
         end

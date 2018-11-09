@@ -2,7 +2,7 @@
 module ActiveModel
   class Name
     def human
-      HyperI18n::I18n.t("activerecord.models.#{i18n_key}")
+      Hyperstack::Internal::I18n.t("activerecord.models.#{i18n_key}")
     end
   end
 end

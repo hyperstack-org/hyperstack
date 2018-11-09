@@ -31,6 +31,21 @@ describe Hyperstack::State::Observable do
     end
   end
 
+  context 'set instance method' do
+    it "will mutate if the instance variable begins with a lower case letter" do
+      expect(Hyperstack::Internal::State::Mapper).to receive(:mutated!).with(store)
+      [123].each(&store.set(:var))
+      expect(store.instance_variable_get(:@var)).to eq(123)
+    end
+    it "will not mutate if the instance variable does not begin with a lower case letter" do
+      expect(Hyperstack::Internal::State::Mapper).not_to receive(:mutated!).with(store)
+      [123].each(&store.set(:Var))
+      expect(store.instance_variable_get(:@Var)).to eq(123)
+      [123].each(&store.set(:_var))
+      expect(store.instance_variable_get(:@_var)).to eq(123)
+    end
+  end
+
   context 'observe class method' do
     it "can be passed a block" do
       expect(Hyperstack::Internal::State::Mapper).to receive(:observed!).with(Store)
@@ -51,6 +66,21 @@ describe Hyperstack::State::Observable do
     it "can be used without a block" do
       expect(Hyperstack::Internal::State::Mapper).to receive(:mutated!).with(Store)
       Store.instance_eval { mutate }
+    end
+  end
+
+  context 'set class method' do
+    it "will mutate if the instance variable begins with a lower case letter" do
+      expect(Hyperstack::Internal::State::Mapper).to receive(:mutated!).with(Store)
+      [123].each(&Store.set(:var))
+      expect(Store.instance_variable_get(:@var)).to eq(123)
+    end
+    it "will not mutate if the instance variable does not begin with a lower case letter" do
+      expect(Hyperstack::Internal::State::Mapper).not_to receive(:mutated!).with(Store)
+      [123].each(&Store.set(:Var))
+      expect(Store.instance_variable_get(:@Var)).to eq(123)
+      [123].each(&Store.set(:_var))
+      expect(Store.instance_variable_get(:@_var)).to eq(123)
     end
   end
 

@@ -44,3 +44,5 @@ Element.instance_eval do
   }
   Element.expose :mount_components
 end
+
+DOM = Element

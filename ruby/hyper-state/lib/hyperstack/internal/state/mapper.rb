@@ -25,7 +25,6 @@ module Hyperstack
         @rendering_level = 0
 
         class << self
-          attr_reader :current_observer
           # Entry Points:
           #   observing                 setup an observer
           #   observed!                 indicate an object has been observed
@@ -74,6 +73,7 @@ module Hyperstack
           # schedule the update notification for later, immediately
           # notify any observers, or do nothing.
           def mutated!(object)
+            return if @ignore_mutations
             if delay_updates?(object)
               schedule_delayed_updater(object)
             elsif @rendering_level.zero?
@@ -100,6 +100,14 @@ module Hyperstack
             yield
           ensure
             @bulk_update_flag = saved_bulk_update_flag
+          end
+
+          def ignore_mutations
+            saved_ignore_mutations_flag = @ignore_mutations
+            @ignore_mutations = true
+            yield
+          ensure
+            @ignore_mutations = saved_ignore_mutations_flag
           end
 
           # Call after each component updates. (in the after_update/after_mount callbacks)

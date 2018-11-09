@@ -92,4 +92,18 @@ describe 'Refs callback', js: true do
     end
     expect_evaluate_ruby('Foo.rec_cnt').to eq(2)
   end
+
+  it 'can get the reference using the state set method' do
+    mount 'Foo' do
+      class Foo
+        render do
+          DIV(ref: set(:the_ref)) { "I am #{@the_ref}" }
+        end
+        after_mount do
+          force_update!
+        end
+      end
+    end
+    expect(page).to have_content('I am [object HTMLDivElement]')
+  end
 end

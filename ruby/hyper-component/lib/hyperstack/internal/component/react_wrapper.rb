@@ -244,19 +244,48 @@ module Hyperstack
               props["key"] = value.to_key
 
             elsif key == 'ref'
-              if value.respond_to?(:call)
-                props[key] = %x{
-                                function(dom_node){
-                                  if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
-                                    #{ value.call(`dom_node.__opalInstance`) };
-                                  } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
-                                    #{ value.call(`ReactDOM.findDOMNode(dom_node)`) };
-                                  } else {
-                                    #{ value.call(`dom_node`) };
-                                  }
+              unless value.respond_to?(:call)
+                raise "The ref and dom params must be given a Proc.\n"\
+                      "If you want to capture the ref in an instance variable use the `set` method.\n"\
+                      "For example `ref: set(:TheRef)` will capture assign the ref to `@TheRef`\n"
+              end
+              props[key] = %x{
+                              function(dom_node){
+                                if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
+                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(`dom_node.__opalInstance`) } };
+                                } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
+                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(`ReactDOM.findDOMNode(dom_node)`) } };
+                                } else if(dom_node !== null){
+                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(`dom_node`) } };
                                 }
                               }
+                            }
+
+            elsif key == 'dom'
+              unless value.respond_to?(:call)
+                raise "The ref and dom params must be given a Proc.\n"\
+                      "If you want to capture the dom node in an instance variable use the `set` method.\n"\
+                      "For example `dom: set(:DomNode)` will assign the dom node to `@DomNode`\n"
               end
+              unless Module.const_defined? 'Element'
+                raise "You must include 'hyperstack/component/jquery' "\
+                      "in your manifest to use the `dom` reference key.\n"\
+                      'For example if using rails include '\
+                      "`config.import 'hyperstack/component/jquery', client_only: true`"\
+                      'in your config/initializer/hyperstack.rb file'
+              end
+              props[:ref] = %x{
+                              function(dom_node){
+                                if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
+                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(::Element[`dom_node.__opalInstance`]) } };
+                                } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
+                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(::Element[`ReactDOM.findDOMNode(dom_node)`]) } };
+                                } else if(dom_node !== null) {
+                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(::Element[`dom_node`]) } };
+                                }
+                              }
+                            }
+                            
             elsif Hyperstack::Component::ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
               value.each { |k, v| props["#{key}-#{k.gsub(/__|_/, '__' => '_', '_' => '-')}"] = v.to_n }
             else

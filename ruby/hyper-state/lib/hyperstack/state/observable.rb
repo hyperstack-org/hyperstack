@@ -16,10 +16,26 @@ module Hyperstack
             Internal::State::Mapper.observed! self
             result
           end
-          base.send(:"define_#{kind}", :mutate) do |&block|
+          base.send(:"define_#{kind}", :mutate) do |*_args, &block|
+            # any args will be ignored thus allowing us to say `mutate @foo = 123, @bar[:x] = 7` etc
             result = block.call if block
             Internal::State::Mapper.mutated! self
             result
+          end
+          if RUBY_ENGINE == 'opal'
+            base.send(:"define_#{kind}", :set) do |var|
+              lambda do |val|
+                `self[#{var}] = #{val}`
+                mutate if var =~ /^[a-z]/
+              end
+            end
+          else
+            base.send(:"define_#{kind}", :set) do |var|
+              lambda do |val|
+                instance_variable_set(:"@#{var}", val)
+                mutate if var =~ /^[a-z]/
+              end
+            end
           end
           base.singleton_class.send(:"define_#{kind}", :observer) do |name, &block|
             define_method(name) do |*args|

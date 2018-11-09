@@ -8,6 +8,7 @@ describe 'I18n client methods', js: true do
       module Components
         class TestComponent
           include Hyperstack::Component
+          include Hyperstack::I18n
           render(DIV) do
             DIV(id: :tp1) { t(:the_key) }
             DIV(id: :tp2) { I18n.t(:hello) }
