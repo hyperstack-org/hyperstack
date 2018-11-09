@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
-gem 'hyperstack-config', path: '../hyperloop-config'
+gem 'hyperstack-config', path: '../hyperstack-config'
 # Specify your gem's dependencies in hyper-trace.gemspec
 gemspec

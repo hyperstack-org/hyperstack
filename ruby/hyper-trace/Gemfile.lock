@@ -1,19 +1,73 @@
 PATH
+  remote: ../hyperstack-config
+  specs:
+    hyperstack-config (0.1)
+      libv8 (~> 6.3.0)
+      listen (~> 3.0)
+      mini_racer (~> 0.1.15)
+      opal (>= 0.11.0, < 0.12.0)
+      opal-browser (~> 0.2.0)
+      uglifier
+      websocket
+
+PATH
   remote: .
   specs:
-    hyper-trace (0.3.1)
+    hyper-trace (0.1.0)
+      hyperstack-config (= 0.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    archive-zip (0.11.0)
+      io-like (~> 0.3.0)
+    ast (2.4.0)
+    chromedriver-helper (2.1.0)
+      archive-zip (~> 0.10)
+      nokogiri (~> 1.8)
+    execjs (2.7.0)
+    ffi (1.9.25)
+    hike (1.2.3)
+    io-like (0.3.0)
+    libv8 (6.3.292.48.1-x86_64-darwin-15)
+    listen (3.1.5)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+      ruby_dep (~> 1.2)
+    mini_portile2 (2.3.0)
+    mini_racer (0.1.15)
+      libv8 (~> 6.3)
+    nokogiri (1.8.5)
+      mini_portile2 (~> 2.3.0)
+    opal (0.11.3)
+      ast (>= 2.3.0)
+      hike (~> 1.2)
+      parser (= 2.3.3.1)
+      sourcemap (~> 0.1.0)
+    opal-browser (0.2.0)
+      opal
+      paggio
+    paggio (0.2.6)
+    parser (2.3.3.1)
+      ast (~> 2.2)
     rake (10.5.0)
+    rb-fsevent (0.10.3)
+    rb-inotify (0.9.10)
+      ffi (>= 0.5.0, < 2)
+    ruby_dep (1.5.0)
+    sourcemap (0.1.1)
+    uglifier (4.1.19)
+      execjs (>= 0.3.0, < 3)
+    websocket (1.2.8)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   bundler (~> 1.12)
+  chromedriver-helper
   hyper-trace!
+  hyperstack-config!
   rake (~> 10.0)
 
 BUNDLED WITH
