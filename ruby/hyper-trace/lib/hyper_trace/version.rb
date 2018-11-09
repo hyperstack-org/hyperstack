@@ -1,3 +1,3 @@
 module HyperTrace
-  VERSION = '0.99.3'
+  VERSION = '0.1.0'
 end

@@ -1,6 +1,6 @@
 # HyperTrace
 
-Method tracing and conditional break points for [Opal](http://opalrb.org/) and [Hyperloop](http://ruby-hyperloop.io) debug.
+Method tracing and conditional break points for [Opal](http://opalrb.org/) and [Hyperstack](http://hyperstack.org) debug.
 
 Typically you are going to use this in Capybara or Opal-RSpec examples that you are debugging.
 

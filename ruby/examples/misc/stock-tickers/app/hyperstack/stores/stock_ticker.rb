@@ -18,7 +18,8 @@ class StockTicker
     HTTP.get("https://api.iextrading.com/1.0/stock/#{@symbol}/delayed-quote")
         .then do |resp|
           mutate @status = :success, @price = resp.json[:delayedPrice],
-                 @time = Time.at(resp.json[:delayedPriceTime] / 1000)
+                 @time = Time.at(resp.json[:delayedPriceTime] / 1000),
+                 @update_time = Time.now
           after(@update_interval) { fetch }
         end
         .fail do |resp|
@@ -35,3 +36,4 @@ class StockTicker
     puts "cancelling #{@symbol} ticker"
   end
 end
+StockTicker.hypertrace instrument: :all

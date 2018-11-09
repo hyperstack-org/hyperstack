@@ -1,4 +1,4 @@
-Hyperloop.import 'hyper-trace'
+Hyperstack.import 'hyper-trace'
 if RUBY_ENGINE=='opal'
   require 'hyper_trace/hyper_trace.rb'
   require 'hyper_trace/react_trace.rb'

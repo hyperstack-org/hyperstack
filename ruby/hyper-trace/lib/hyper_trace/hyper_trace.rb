@@ -1,6 +1,6 @@
 class Class
   def hyper_trace(*args, &block)
-    return unless React::IsomorphicHelpers.on_opal_client?
+    return self unless Hyperstack::Component::IsomorphicHelpers.on_opal_client?
     HyperTrace.hyper_trace(self, *args, &block)
   end
   alias hypertrace hyper_trace
@@ -106,6 +106,7 @@ module HyperTrace
         end
         selected_methods.each { |method| instrument_method(method, config) }
       end
+      klass
     end
 
     def exclusions
@@ -254,7 +255,7 @@ module HyperTrace
       filtered_instance_variables = if filter
           filter
         else
-          instance.instance_variables
+          instance.instance_variables.reject { |var| var =~ /@__hyperstack_/ }
         end
       return if filtered_instance_variables.empty? && block.nil?
       group "self:#{instance_tag(instance,' ')}", collapsed: true do

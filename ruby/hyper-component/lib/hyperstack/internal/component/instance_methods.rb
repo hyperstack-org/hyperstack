@@ -32,7 +32,7 @@ module Hyperstack
         end
 
         def mounted?
-          `(#{self}.is_mounted === undefined) ? false : #{self}.is_mounted`
+          `(#{self}.__hyperstack_component_is_mounted === undefined) ? false : #{self}.__hyperstack_component_is_mounted`
         end
 
         def force_update!

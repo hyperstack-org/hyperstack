@@ -37,6 +37,12 @@ PATH
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
+  remote: ../../../hyper-trace
+  specs:
+    hyper-trace (0.1.0)
+      hyperstack-config (= 0.1.0)
+
+PATH
   remote: ../../../hyperstack-config
   specs:
     hyperstack-config (0.1)
@@ -355,6 +361,7 @@ DEPENDENCIES
   hyper-component!
   hyper-spec!
   hyper-state!
+  hyper-trace!
   hyperstack-config!
   jbuilder (~> 2.5)
   listen (>= 3.0.5, < 3.2)

@@ -103,7 +103,7 @@ module Hyperstack
                   }
                 }
                 componentDidMount() {
-                  this.__opalInstance.is_mounted = true
+                  this.__opalInstance.__hyperstack_component_is_mounted = true
                   if (#{type.method_defined? :component_did_mount}) {
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_did_mount();
@@ -139,7 +139,7 @@ module Hyperstack
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_will_unmount();
                   }
-                  this.__opalInstance.is_mounted = false;
+                  this.__opalInstance.__hyperstack_component_is_mounted = false;
                 }
 
                 render() {
@@ -285,7 +285,7 @@ module Hyperstack
                                 }
                               }
                             }
-                            
+
             elsif Hyperstack::Component::ReactAPI::HASH_ATTRIBUTES.include?(key) && value.is_a?(Hash)
               value.each { |k, v| props["#{key}-#{k.gsub(/__|_/, '__' => '_', '_' => '-')}"] = v.to_n }
             else
