@@ -9,6 +9,7 @@ require 'rspec/rails'
 require 'hyper-spec'
 require 'rails-hyperstack'
 require 'puma'
+require 'turbolinks'
 
 Capybara.server = :puma
 

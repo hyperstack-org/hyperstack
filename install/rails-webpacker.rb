@@ -9,8 +9,7 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'hyperloop', github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
-gem 'opal_hot_reloader', github: 'hyperstack-org/opal-hot-reloader'
+gem 'rails-hyperstack', github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
 
 gem_group :development do
   gem 'foreman'
@@ -18,27 +17,38 @@ end
 
 # ----------------------------------- Create the folders
 
-run 'mkdir app/hyperloop'
-run 'mkdir app/hyperloop/components'
-run 'mkdir app/hyperloop/stores'
-run 'mkdir app/hyperloop/models'
-run 'mkdir app/hyperloop/operations'
+run 'mkdir app/hyperstack'
+run 'mkdir app/hyperstack/components'
+run 'mkdir app/hyperstack/stores'
+run 'mkdir app/hyperstack/models'
+run 'mkdir app/hyperstack/operations'
 
 # ----------------------------------- Add .keep files
 
-run 'touch app/hyperloop/components/.keep'
-run 'touch app/hyperloop/stores/.keep'
-run 'touch app/hyperloop/models/.keep'
-run 'touch app/hyperloop/operations/.keep'
+run 'touch app/hyperstack/stores/.keep'
+run 'touch app/hyperstack/models/.keep'
+run 'touch app/hyperstack/operations/.keep'
 
-# ----------------------------------- Create the Hyperloop config
+# ----------------------------------- Create the HyperCompnent base class
 
-file 'config/initializers/hyperloop.rb', <<-CODE
-Hyperloop.configuration do |config|
+file 'app/hyperstack/components/hyper_component.rb', <<-CODE
+class HyperComponent
+  include Hyperstack::Component
+  include Hyperstack::State::Observer
+end
+CODE
+
+# ----------------------------------- Create the Hyperstack config
+
+file 'config/initializers/hyperstack.rb', <<-CODE
+# config/initializers/hyperstack.rb
+# If you are not using ActionCable, see http://hyperstack.orgs/docs/models/configuring-transport/
+Hyperstack.configuration do |config|
   # config.transport = :action_cable
-  config.import 'reactrb/auto-import'
-  config.import 'opal_hot_reloader'
+  config.prerendering = :off # or :on
   config.cancel_import 'react/react-source-browser' # bring your own React and ReactRouter via Yarn/Webpacker
+  config.import 'hyperstack/component/jquery', client_only: true # remove this line if you don't need jquery
+  config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?
 end
 CODE
 
@@ -55,7 +65,7 @@ file 'app/javascript/packs/hyperstack.js', <<-CODE
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// for opal/hyperloop modules to find React and others they must explicitly be saved
+// for opal/hyperstack modules to find React and others they must explicitly be saved
 // to the global space, otherwise webpack will encapsulate them locally here
 global.React = React;
 global.ReactDOM = ReactDOM;
@@ -75,7 +85,7 @@ inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require
 <<-CODE
 //= require jquery
 //= require jquery_ujs
-//= require hyperloop-loader
+//= require hyperstack-loader
 CODE
 end
 
@@ -83,32 +93,25 @@ end
 
 file 'Procfile', <<-CODE
 web: bundle exec puma
-hot: opal-hot-reloader -p 25222 -d app/hyperloop/
-CODE
-
-# ----------------------------------- OpalHotReloader client
-
-file 'app/hyperloop/components/hot_loader.rb', <<-CODE
-require 'opal_hot_reloader'
-OpalHotReloader.listen(25222, false)
+hot: hyperstack-hotloader -p 25222 -d app/hyperstack/
 CODE
 
 # ----------------------------------- Mount point
 
-route "mount Hyperloop::Engine => '/hyperloop'"
+route "mount Hyperstack::Engine => '/hyperstack'"
 
 # ----------------------------------- Hello World
 
-route "root 'hyperloop#HelloWorld'"
-file 'app/hyperloop/components/hello_world.rb', <<-CODE
-class HelloWorld < Hyperloop::Component
+route "root 'hyperstack#HelloWorld'"
+file 'app/hyperstack/components/hello_world.rb', <<-CODE
+class HelloWorld < HyperComponent
   render do
     H1 { "Hello world from Hyperstack edge!" }
   end
 end
 CODE
 
-# ----------------------------------- Commit Hyperloop setup
+# ----------------------------------- Commit Hyperstack setup
 
 after_bundle do
   run 'bundle exec rails webpacker:install'
