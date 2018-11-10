@@ -5,7 +5,7 @@ require 'hyperstack/version'
 
 Gem::Specification.new do |spec|
   spec.name        = 'rails-hyperstack'
-  spec.version     = '0.0.1' #Hyperstack::VERSION
+  spec.version     = Hyperstack::VERSION
   spec.summary     = 'Hyperstack for Rails with generators'
   spec.description = 'This gem provide a full hyperstack for rails plus generators for Hyperstack elements'
   spec.authors     = ['Loic Boutet', 'Adam George', 'Mitch VanDuyn', 'Jan Biedermann']
