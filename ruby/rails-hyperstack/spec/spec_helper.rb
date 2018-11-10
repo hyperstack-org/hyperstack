@@ -1,5 +1,6 @@
 require 'pry'
 require 'opal-browser'
+require 'database_cleaner'
 
 ENV['RAILS_ENV'] ||= 'development'
 require File.expand_path('../test_app/config/environment', __FILE__)

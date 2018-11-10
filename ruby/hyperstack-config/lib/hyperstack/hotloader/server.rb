@@ -4,7 +4,6 @@ require 'fiber'
 require 'listen'
 require 'optparse'
 require 'json'
-require 'pry'
 
 module Hyperstack
   class Hotloader

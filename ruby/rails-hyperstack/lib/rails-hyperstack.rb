@@ -1,5 +1,6 @@
 require 'hyperstack-config'
 require 'rails/generators'
+require 'hyper-state'
 
 # remove these once lap29 is released ...
 Hyperstack.js_import 'react/react-source-browser', client_only: true, defines: ['ReactDOM', 'React']
@@ -10,6 +11,7 @@ Hyperstack.js_import 'react_ujs', defines: 'ReactRailsUJS'
 
 Hyperstack.import 'hyper-router'
 Hyperstack.import 'hyper-model'
+Hyperstack.import 'hyper-state'
 
 require 'generators/hyperstack/install_generator'
 require 'generators/hyper/component_generator'
