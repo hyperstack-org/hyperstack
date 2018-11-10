@@ -86,7 +86,7 @@ PATH
 PATH
   remote: .
   specs:
-    rails-hyperstack (0.0.1)
+    rails-hyperstack (0.1.0)
       hyper-model (= 0.1.0)
       hyper-router (= 0.1.0)
       hyperstack-config (= 0.1.0)
