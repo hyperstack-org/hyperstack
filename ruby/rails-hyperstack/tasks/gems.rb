@@ -1,6 +1,6 @@
-namespace :hyperloop do
+namespace :hyperstack do
   namespace :gems do
-    desc "build all hyperloop gems"
+    desc "build all hyperstack gems"
     task :build do
       HYPERLOOP_REPOS.each do |repo|
         Dir.chdir(File.join('..', repo)) do
@@ -10,7 +10,7 @@ namespace :hyperloop do
       end
     end
 
-    desc "upload all hyperloop gems to the inabox gem server, accepts host as argument"
+    desc "upload all hyperstack gems to the inabox gem server, accepts host as argument"
     task :inabox, [:host] do |_, arg|
       host = arg[:host]
       HYPERLOOP_REPOS.each do |repo|
@@ -20,7 +20,7 @@ namespace :hyperloop do
             mtime = File.stat(gem).mtime
             mtime > gem_fst[0] ? [mtime, gem] : gem_fst
           end
-          
+
           if host
             puts "pushing #{last_created_gem_fst[1]} to #{host}"
             `gem inabox #{last_created_gem_fst[1]} -g #{host}`
@@ -32,7 +32,7 @@ namespace :hyperloop do
       end
     end
 
-    desc "upload all hyperloop gems to rubygems"
+    desc "upload all hyperstack gems to rubygems"
     task :push do
       HYPERLOOP_REPOS.each do |repo|
         Dir.chdir(File.join('..', repo)) do

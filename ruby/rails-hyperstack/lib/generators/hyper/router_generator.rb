@@ -11,13 +11,13 @@ module Hyper
       @file_name = component_array.last
       @indent = 0
       template 'router_template.rb',
-               File.join('app/hyperloop/components',
+               File.join('app/hyperstack/components',
                          @modules.map(&:downcase).join('/'),
                          "#{@file_name.underscore}.rb")
     end
 
     def add_route
-      route "get '#{options['path']}', to: 'hyperloop##{@file_name.underscore}'"
+      route "get '#{options['path']}', to: 'hyperstack##{@file_name.underscore}'"
     end
   end
 end

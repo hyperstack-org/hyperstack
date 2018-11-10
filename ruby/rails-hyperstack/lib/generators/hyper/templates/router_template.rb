@@ -1,9 +1,9 @@
 <%- @modules.each do |module_name| %><%= "  "* @indent %>module <%= module_name.camelize %><%- @indent += 1 %>
-<%- end %><%="  "* @indent %>class <%= @file_name %> < Hyperloop::Router
-<%="  "* @indent %>
-<%="  "* @indent %>  route do
+<%- end %><%="  "* @indent %>class <%= @file_name %> < HyperComponent
+<%="  "* @indent %>  include Hyperstack::State::Observer
+<%="  "* @indent %>  render do
 <%="  "* @indent %>    DIV do
-<%="  "* @indent %>      "<%= (@modules+[@file_name]).join('::') %>"
+<%="  "* @indent %>      '<%= (@modules+[@file_name]).join('::') %>'
 <%="  "* @indent %>      # define routes using the Route psuedo component.  Examples:
 <%="  "* @indent %>      # Route('/foo', mounts: Foo)                : match the path beginning with /foo and mount component Foo here
 <%="  "* @indent %>      # Route('/foo') { Foo(...) }                : display the contents of the block

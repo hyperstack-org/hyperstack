@@ -1,5 +1,5 @@
 <%- @modules.each do |module_name| %><%= "  "* @indent %>module <%= module_name.camelize %><%- @indent += 1 %>
-<%- end %><%="  "* @indent %>class <%= @file_name %> < Hyperloop::Component
+<%- end %><%="  "* @indent %>class <%= @file_name %> < Hyperstack::Component
 
 <%="  "* @indent %>  # param :my_param
 <%="  "* @indent %>  # param param_with_default: "default value"

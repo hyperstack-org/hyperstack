@@ -11,7 +11,7 @@ module Hyper
         @file_name = component_array.last
         @indent = 0
         template 'component_template.rb',
-                 File.join('app/hyperloop/components',
+                 File.join('app/hyperstack/components',
                            @modules.map(&:downcase).join('/'),
                            "#{@file_name.underscore}.rb")
       end

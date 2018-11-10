@@ -23,4 +23,4 @@ before_script:
   - if [[ "$DRIVER" == "google-chrome" ]]; then bundle exec chromedriver --version; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then google-chrome --version; fi
   - if [[ "$DRIVER" == "google-chrome" ]]; then which google-chrome; fi
-script: echo "Needs tests!!"
+script: bundle exec rake spec:prepare spec

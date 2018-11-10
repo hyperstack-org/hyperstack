@@ -138,7 +138,7 @@ module Hyperstack
         end
         controller.session.delete 'hyperstack-dummy-init' unless controller.session.id
         id = "#{SecureRandom.uuid}-#{controller.session.id}"
-        auto_connections = Hyperstack::AutoConnect.channels(id, controller.acting_user)
+        auto_connections = Hyperstack::AutoConnect.channels(id, controller.acting_user) rescue []
       end
       config_hash = {
         transport: Hyperstack.transport,

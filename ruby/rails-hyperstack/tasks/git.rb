@@ -1,10 +1,10 @@
-namespace :hyperloop do
+namespace :hyperstack do
   namespace :git do
-    desc "create new branch in local hyperloop repos, requires branch name as argument"
+    desc "create new branch in local hyperstack repos, requires branch name as argument"
     task :create_branch, [:branch_name] do |_, arg|
       branch = arg[:branch_name]
       if branch.nil?
-        puts "please use: rake hyperloop:git:create_branch[your_branch_name]"
+        puts "please use: rake hyperstack:git:create_branch[your_branch_name]"
         return
       end
       HYPERLOOP_REPOS.each do |repo|
@@ -14,11 +14,11 @@ namespace :hyperloop do
       end
     end
 
-    desc "checkout branch in local hyperloop repos, requires branch name as argument"
+    desc "checkout branch in local hyperstack repos, requires branch name as argument"
     task :co_branch, [:branch_name] do |_, arg|
       branch = arg[:branch_name]
       if branch.nil?
-        puts "please use: rake hyperloop:git:co_branch[your_branch_name]"
+        puts "please use: rake hyperstack:git:co_branch[your_branch_name]"
         return
       end
       HYPERLOOP_REPOS.each do |repo|
@@ -28,7 +28,7 @@ namespace :hyperloop do
       end
     end
 
-    desc "show current branch in local hyperloop repos"
+    desc "show current branch in local hyperstack repos"
     task :show_branch do
       HYPERLOOP_REPOS.each do |repo|
         Dir.chdir(File.join('..', repo)) do
@@ -41,7 +41,7 @@ namespace :hyperloop do
     task :commit, [:commit_message] do |_, arg|
       message = arg[:commit_message]
       if message.nil?
-        puts "please use: rake hyperloop:git:commit[your_commit_message]"
+        puts "please use: rake hyperstack:git:commit[your_commit_message]"
         return
       end
       HYPERLOOP_REPOS.each do |repo|
@@ -51,7 +51,7 @@ namespace :hyperloop do
       end
     end
 
-    desc "push all local hyperloop repos, accepts remote and branch as arguments, defaults to origin and current branch"
+    desc "push all local hyperstack repos, accepts remote and branch as arguments, defaults to origin and current branch"
     task :push, [:remote, :branch] do |_, arg|
       HYPERLOOP_REPOS.each do |repo|
         Dir.chdir(File.join('..', repo)) do
@@ -68,12 +68,12 @@ namespace :hyperloop do
       end
     end
 
-    desc "update remotes and show git status for local hyperloop repos"
+    desc "update remotes and show git status for local hyperstack repos"
     task :status do
       HYPERLOOP_REPOS.each do |repo|
         Dir.chdir(File.join('..', repo)) do
           puts "\033[0;32mStatus for #{repo}:\033[0;30m"
-          `git remote update`    
+          `git remote update`
           puts
           puts `git status`
           puts

@@ -1,19 +1,19 @@
-namespace :hyperloop do
+namespace :hyperstack do
   namespace :version do
 
     def file_version_for(repo)
       case repo
-      when 'hyper-component' then ['./lib/hyperloop/component/version', 'Hyperloop::Component::VERSION']
-      when 'hyper-console' then ['./lib/hyperloop/console/version', 'Hyperloop::Console::VERSION']
+      when 'hyper-component' then ['./lib/hyperstack/component/version', 'Hyperloop::Component::VERSION']
+      when 'hyper-console' then ['./lib/hyperstack/console/version', 'Hyperloop::Console::VERSION']
       when 'hyper-mesh' then ['./lib/hypermesh/version', 'Hypermesh::VERSION']
-      when 'hyper-model' then ['./lib/hyperloop/model/version', 'Hyperloop::Model::VERSION']
+      when 'hyper-model' then ['./lib/hyperstack/model/version', 'Hyperloop::Model::VERSION']
       when 'hyper-operation' then ['./lib/hyper-operation/version', 'Hyperloop::Operation::VERSION']
       when 'hyper-react' then ['./lib/reactive-ruby/version', 'React::VERSION']
       when 'hyper-router' then ['./lib/hyper-router/version', 'HyperRouter::VERSION']
       when 'hyper-spec' then ['./lib/hyper-spec/version', 'HyperSpec::VERSION']
       when 'hyper-store' then ['./lib/hyper-store/version', 'HyperStore::VERSION']
-      when 'hyperloop' then ['./lib/hyperloop/version', 'Hyperloop::VERSION']
-      when 'hyperloop-config' then ['./lib/hyperloop/config/version', 'Hyperloop::Config::VERSION']
+      when 'hyperstack' then ['./lib/hyperstack/version', 'Hyperloop::VERSION']
+      when 'hyperstack-config' then ['./lib/hyperstack/config/version', 'Hyperloop::Config::VERSION']
       end
     end
 
@@ -43,7 +43,7 @@ namespace :hyperloop do
       version = arg[:version]
       hrversion = arg[:hrversion]
       if version.nil? || hrversion.nil?
-        puts "please use: rake hyperloop:version:set[the_new_gem_version,the_new_hyper_router_version]"
+        puts "please use: rake hyperstack:version:set[the_new_gem_version,the_new_hyper_router_version]"
         return
       end
       HYPERLOOP_REPOS.each do |repo|
@@ -51,7 +51,7 @@ namespace :hyperloop do
           if repo == 'hyper-router'
             set_version(repo, hrversion, version)
             sv = hrversion
-          elsif repo == 'hyperloop'
+          elsif repo == 'hyperstack'
             set_version(repo, version, hrversion)
             sv = "#{version} #{hrversion}"
           else
