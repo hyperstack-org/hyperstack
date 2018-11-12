@@ -22,6 +22,7 @@ run 'mkdir app/hyperstack/components'
 run 'mkdir app/hyperstack/stores'
 run 'mkdir app/hyperstack/models'
 run 'mkdir app/hyperstack/operations'
+run 'mkdir app/policies'
 
 # ----------------------------------- Add .keep files
 
@@ -50,6 +51,36 @@ Hyperstack.configuration do |config|
   config.import 'hyperstack/component/jquery', client_only: true # remove this line if you don't need jquery
   config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?
 end
+
+# useful for debugging
+module Hyperstack
+  def self.on_error(*args)
+    ::Rails.logger.debug "\033[0;31;1mHYPERSTACK APPLICATION ERROR: #{args.join(", ")}\n"\
+                         "To further investigate you may want to add a debugging "\
+                         "breakpoint in config/initializers/hyperstack.rb\033[0;30;21m"
+  end
+end if Rails.env.development?
+CODE
+
+# ----------------------------------- Add a default policy
+file 'app/policies/application_policy.rb', <<-CODE
+# Policies regulate access to your public models
+# The following policy will open up full access (but only in development)
+# The policy system is very flexible and powerful.  See the documentation
+# for complete details.
+class Hyperstack::ApplicationPolicy
+  # Allow any session to connect:
+  always_allow_connection
+  # Send all attributes from all public models
+  regulate_all_broadcasts { |policy| policy.send_all }
+  # Allow all changes to public models
+  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
+  # allow remote access to all scopes - i.e. you can count or get a list of ids
+  # for any scope or relationship
+  ApplicationRecord.regulate_scope :all
+end unless Rails.env.production?
+# don't forget to provide a policy before production...
+raise "You need to define a Hyperstack policy for production" if Rails.env.production?
 CODE
 
 # ----------------------------------- Add NPM modules
