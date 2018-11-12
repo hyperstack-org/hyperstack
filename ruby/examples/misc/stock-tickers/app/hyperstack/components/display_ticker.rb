@@ -1,7 +1,7 @@
 class DisplayTicker < HyperComponent
   param    :symbol
   triggers :cancel
-  before_mount { @_ticker = StockTicker.new(@_symbol, 10.seconds) }
+  before_mount { @_ticker = StockTicker.new(@Symbol, 10.seconds) }
 
   def status
     case @_ticker.status
@@ -18,7 +18,7 @@ class DisplayTicker < HyperComponent
 
   render do
     BS::Row() do
-      BS::Col(sm: 1) { @_symbol.upcase }
+      BS::Col(sm: 1) { @Symbol.upcase }
       status
       BS::Col(sm: 1) do
         BS::Button(class: :close) { "\u00D7" }

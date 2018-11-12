@@ -1,6 +1,6 @@
-def Hyperstack.naming_convention
-  :prefix_params
-end
+# def Hyperstack.naming_convention
+#   :prefix_params
+# end
 
 class HyperComponent
   include Hyperstack::Component
