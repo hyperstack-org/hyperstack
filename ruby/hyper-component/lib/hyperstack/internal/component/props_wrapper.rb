@@ -6,13 +6,19 @@ module Hyperstack
         attr_reader :component
 
         class << self
-
           def instance_var_name_for(name)
-            name.camelize
+            case Hyperstack::State::Observable.naming_convention
+            when :camelize_params
+              name.camelize
+            when :prefix_params
+              "_#{name}"
+            else
+              name
+            end
           end
 
-          def param_accessor_style(*args)
-            @param_accessor_style = args[0] if args.length > 0
+          def param_accessor_style(style = nil)
+            @param_accessor_style = style if style
             @param_accessor_style ||=
               if superclass.respond_to? :param_accessor_style
                 superclass.param_accessor_style

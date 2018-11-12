@@ -1,28 +1,28 @@
 class DisplayTicker < HyperComponent
   param    :symbol
   triggers :cancel
-  before_mount { @ticker = StockTicker.new(@Symbol, 10.seconds) }
+  before_mount { @_ticker = StockTicker.new(@_symbol, 10.seconds) }
 
   def status
-    case @ticker.status
+    case @_ticker.status
     when :loading
       BS::Col(sm: 10) { 'loading...' }
     when :success
       BS::Col(class: 'text-right', sm: 3) { 'price' }
-      BS::Col(class: 'text-right', sm: 3) { '%.2f' % @ticker.price }
-      BS::Col(sm: 4) { "at #{@ticker.time.strftime('%I:%M:%S')}" }
+      BS::Col(class: 'text-right', sm: 3) { '%.2f' % @_ticker.price }
+      BS::Col(sm: 4) { "at #{@_ticker.time.strftime('%I:%M:%S')}" }
     when :failed
-      BS::Col(sm: 10) { "failed to get quote: #{@ticker.reason}" }
+      BS::Col(sm: 10) { "failed to get quote: #{@_ticker.reason}" }
     end
   end
 
   render do
     BS::Row() do
-      BS::Col(sm: 1) { @Symbol.upcase }
+      BS::Col(sm: 1) { @_symbol.upcase }
       status
       BS::Col(sm: 1) do
         BS::Button(class: :close) { "\u00D7" }
-        .on(:click) { cancel! } unless @ticker.status == :loading
+        .on(:click) { cancel! } unless @_ticker.status == :loading
       end
     end
   end

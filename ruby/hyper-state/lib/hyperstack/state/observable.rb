@@ -5,6 +5,10 @@ module Hyperstack
         Internal::State::Mapper.bulk_update(&block)
       end
 
+      def self.naming_convention
+        :camelize_params
+      end
+
       def self.included(base)
         base.include Internal::AutoUnmount
         %i[singleton_method method].each do |kind|
@@ -24,16 +28,26 @@ module Hyperstack
           end
           if RUBY_ENGINE == 'opal'
             base.send(:"define_#{kind}", :set) do |var|
+              if Hyperstack::State::Observable.naming_convention == :prefix_state
+                var = "_#{var}" if var !~ /^_/
+              elsif var =~ /^[a-z]/
+                add_mutate = true
+              end
               lambda do |val|
                 `self[#{var}] = #{val}`
-                mutate if var =~ /^[a-z]/
+                mutate if add_mutate
               end
             end
           else
             base.send(:"define_#{kind}", :set) do |var|
+              if Hyperstack::State::Observable.naming_convention == :prefix_state
+                var = "_#{var}" if var !~ /^_/
+              elsif var =~ /^[a-z]/
+                add_mutate = true
+              end
               lambda do |val|
                 instance_variable_set(:"@#{var}", val)
-                mutate if var =~ /^[a-z]/
+                mutate if add_mutate
               end
             end
           end
@@ -53,15 +67,25 @@ module Hyperstack
           end
           base.singleton_class.send(:"define_#{kind}", :state_reader) do |*names|
             names.each do |name|
+              var_name = if Hyperstack::State::Observable.naming_convention == :prefix_state && name !~ /^_/
+                           "_#{name}"
+                         else
+                           name
+                         end
               define_method(name) do
-                instance_variable_get(:"@#{name}").tap { Internal::State::Mapper.observed!(self) }
+                instance_variable_get(:"@#{var_name}").tap { Internal::State::Mapper.observed!(self) }
               end
             end
           end
           base.singleton_class.send(:"define_#{kind}", :state_writer) do |*names|
             names.each do |name|
+              var_name = if Hyperstack::State::Observable.naming_convention == :prefix_state && name !~ /^_/
+                           "_#{name}"
+                         else
+                           name
+                         end
               define_method(:"#{name}=") do |x|
-                instance_variable_set(:"@#{name}", x).tap { Internal::State::Mapper.mutated!(self) }
+                instance_variable_set(:"@#{var_name}", x).tap { Internal::State::Mapper.mutated!(self) }
               end
             end
           end
