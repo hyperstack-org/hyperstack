@@ -5,10 +5,6 @@ module Hyperstack
         Internal::State::Mapper.bulk_update(&block)
       end
 
-      def self.naming_convention
-        :camelize_params
-      end
-
       def self.included(base)
         base.include Internal::AutoUnmount
         %i[singleton_method method].each do |kind|
@@ -28,26 +24,26 @@ module Hyperstack
           end
           if RUBY_ENGINE == 'opal'
             base.send(:"define_#{kind}", :set) do |var|
-              if Hyperstack::State::Observable.naming_convention == :prefix_state
+              if Hyperstack.naming_convention == :prefix_state
                 var = "_#{var}" if var !~ /^_/
-              elsif var =~ /^[a-z]/
-                add_mutate = true
+              elsif Hyperstack.naming_convention != :none && var !~ /^[a-z]/
+                dont_mutate = true
               end
               lambda do |val|
                 `self[#{var}] = #{val}`
-                mutate if add_mutate
+                mutate unless dont_mutate
               end
             end
           else
             base.send(:"define_#{kind}", :set) do |var|
-              if Hyperstack::State::Observable.naming_convention == :prefix_state
+              if Hyperstack.naming_convention == :prefix_state
                 var = "_#{var}" if var !~ /^_/
-              elsif var =~ /^[a-z]/
-                add_mutate = true
+              elsif Hyperstack.naming_convention != :none && var !~ /^[a-z]/
+                dont_mutate = true
               end
               lambda do |val|
                 instance_variable_set(:"@#{var}", val)
-                mutate if add_mutate
+                mutate unless dont_mutate
               end
             end
           end
@@ -67,7 +63,7 @@ module Hyperstack
           end
           base.singleton_class.send(:"define_#{kind}", :state_reader) do |*names|
             names.each do |name|
-              var_name = if Hyperstack::State::Observable.naming_convention == :prefix_state && name !~ /^_/
+              var_name = if Hyperstack.naming_convention == :prefix_state && name !~ /^_/
                            "_#{name}"
                          else
                            name
@@ -79,7 +75,7 @@ module Hyperstack
           end
           base.singleton_class.send(:"define_#{kind}", :state_writer) do |*names|
             names.each do |name|
-              var_name = if Hyperstack::State::Observable.naming_convention == :prefix_state && name !~ /^_/
+              var_name = if Hyperstack.naming_convention == :prefix_state && name !~ /^_/
                            "_#{name}"
                          else
                            name

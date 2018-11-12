@@ -1,11 +1,5 @@
-module Hyperstack
-  module State
-    module Observable
-      def self.naming_convention
-        :prefix_params
-      end
-    end
-  end
+def Hyperstack.naming_convention
+  :prefix_params
 end
 
 class HyperComponent

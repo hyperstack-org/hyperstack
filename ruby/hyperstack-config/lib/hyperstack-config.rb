@@ -1,4 +1,9 @@
 require 'hyperstack/boot'
+module Hyperstack
+  def self.naming_convention
+    :camelize_params
+  end
+end
 if RUBY_ENGINE == 'opal'
   require 'hyperstack/deprecation_warning'
   require 'hyperstack/string'

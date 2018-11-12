@@ -7,7 +7,7 @@ module Hyperstack
 
         class << self
           def instance_var_name_for(name)
-            case Hyperstack::State::Observable.naming_convention
+            case Hyperstack.naming_convention
             when :camelize_params
               name.camelize
             when :prefix_params
