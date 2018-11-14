@@ -71,7 +71,7 @@ module Hyperstack
             define_method(:"#{method_name}") do
               from = opts[:scope] == :shared ? klass.state.__from__ : @__from__
               from.init_store if from.respond_to? :init_store
-              State.get_state(from, method_name.to_s)
+              State::Variable.get(from, method_name.to_s)
             end
           end
 

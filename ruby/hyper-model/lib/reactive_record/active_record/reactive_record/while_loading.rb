@@ -92,7 +92,7 @@ module ReactiveRecord
     end
 
     def self.has_observers?
-      Hyperstack::Internal::Store::State.observed?(self, :loaded_at)
+      Hyperstack::Internal::State::Variable.observed?(self, :loaded_at)
     end
 
     class << self
@@ -126,28 +126,28 @@ module ReactiveRecord
 
         def loading!
           Hyperstack::Internal::Component::RenderingContext.waiting_on_resources = true
-          Hyperstack::Internal::Store::State.get_state(self, :loaded_at)
+          Hyperstack::Internal::State::Variable.get(self, :loaded_at)
           # this was moved to where the fetch is actually pushed on to the fetch array in isomorphic base
-          # Hyperstack::Internal::Store::State.set_state(self, :quiet, false)
+          # Hyperstack::Internal::State::Variable.set(self, :quiet, false)
           @is_loading = true
         end
 
         def loaded_at(loaded_at)
-          Hyperstack::Internal::Store::State.set_state(self, :loaded_at, loaded_at)
+          Hyperstack::Internal::State::Variable.set(self, :loaded_at, loaded_at)
           @is_loading = false
         end
 
         def quiet?
-          Hyperstack::Internal::Store::State.get_state(self, :quiet)
+          Hyperstack::Internal::State::Variable.get(self, :quiet)
         end
 
         def page_loaded?
-          Hyperstack::Internal::Store::State.get_state(self, :page_loaded)
+          Hyperstack::Internal::State::Variable.get(self, :page_loaded)
         end
 
         def quiet!
-          Hyperstack::Internal::Store::State.set_state(self, :quiet, true)
-          after(1) { Hyperstack::Internal::Store::State.set_state(self, :page_loaded, true) } unless on_opal_server? or @page_loaded
+          Hyperstack::Internal::State::Variable.set(self, :quiet, true)
+          after(1) { Hyperstack::Internal::State::Variable.set(self, :page_loaded, true) } unless on_opal_server? or @page_loaded
           @page_loaded = true
         end
 

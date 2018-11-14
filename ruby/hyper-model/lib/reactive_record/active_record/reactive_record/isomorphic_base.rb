@@ -132,7 +132,7 @@ module ReactiveRecord
     end
 
     def self.schedule_fetch
-      Hyperstack::Internal::Store::State.set_state(WhileLoading, :quiet, false) # moved from while loading module see loading! method
+      Hyperstack::Internal::State::Variable.set(WhileLoading, :quiet, false) # moved from while loading module see loading! method
       return if @fetch_scheduled
       @current_fetch_id = Time.now
       @fetch_scheduled = after(0) do

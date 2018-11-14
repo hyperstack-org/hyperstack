@@ -1,6 +1,6 @@
 typically we see this:
 
-`State.get_state(obj_or_class, key)` and  `State.set_state(obj_or_class, key, val)`
+`State::Variable.get(obj_or_class, key)` and  `State::Variable.set(obj_or_class, key, val)`
 
 we would like to see this:
 
@@ -66,11 +66,11 @@ internally without reaction
 so one approach would be to just provide two methods: `observed!` and `mutated!`
 ```ruby
 def observed!
-  State.get_state(self, self)
+  State::Variable.get(self, self)
 end
 
 def mutated!
-  State.set_state(self, self, self)
+  State::Variable.set(self, self, self)
 end
 ```
 

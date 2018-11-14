@@ -149,7 +149,7 @@ module ActiveRecord
     end
 
     def errors
-      Hyperstack::Internal::Store::State.get_state(@backing_record, @backing_record)
+      Hyperstack::Internal::State::Variable.get(@backing_record, @backing_record)
       @backing_record.errors
     end
 

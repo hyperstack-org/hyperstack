@@ -8,15 +8,15 @@ module Hyperstack
             define_method(:"#{method_name}") do |*args|
               from = opts[:scope] == :shared ? klass.state.__from__ : __from__
               from.init_store if from.respond_to? :init_store
-              current_value = State.get_state(from, method_name.to_s)
+              current_value = State::Variable.get(from, method_name.to_s)
 
               if args.count > 0
-                State.set_state(from, method_name.to_s, args[0])
+                State::Variable.set(from, method_name.to_s, args[0])
                 current_value
               else
-                State.set_state(from, method_name.to_s, current_value)
+                State::Variable.set(from, method_name.to_s, current_value)
                 Observable.new(current_value) do |update|
-                  State.set_state(from, method_name.to_s, update)
+                  State::Variable.set(from, method_name.to_s, update)
                 end
               end
             end

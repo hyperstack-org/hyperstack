@@ -5,6 +5,7 @@ require 'hyperstack/internal/callbacks'
 require 'hyperstack/internal/auto_unmount'
 
 require 'hyperstack/internal/state/mapper'
+require 'hyperstack/internal/state/variable'
 require 'hyperstack/internal/auto_unmount'
 require 'hyperstack/internal/receiver'
 require 'hyperstack/state/observable'

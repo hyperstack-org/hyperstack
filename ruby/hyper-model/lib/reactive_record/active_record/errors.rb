@@ -210,7 +210,7 @@ module ActiveModel
     alias :blank? :empty?
 
     def reactive_empty?
-      Hyperstack::Internal::Store::State.get_state(self, 'ERRORS?')
+      Hyperstack::Internal::State::Variable.get(self, 'ERRORS?')
     end
 
     # Clear the error messages.
@@ -368,7 +368,7 @@ module ActiveModel
     end
 
     def reactive_empty!(state = empty?)
-      Hyperstack::Internal::Store::State.set_state(self, 'ERRORS?', state) unless ReactiveRecord::Base.data_loading?
+      Hyperstack::Internal::State::Variable.set(self, 'ERRORS?', state) unless ReactiveRecord::Base.data_loading?
     end
   end
 end

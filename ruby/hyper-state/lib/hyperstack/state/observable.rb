@@ -22,6 +22,13 @@ module Hyperstack
             Internal::State::Mapper.mutated! self
             result
           end
+          base.send(:"define_#{kind}", :toggle) do |var|
+            # @var = !@var
+            var = "@#{var}"
+            result = instance_variable_set(var, !instance_variable_get(var))
+            Internal::State::Mapper.mutated! self
+            result
+          end
           if RUBY_ENGINE == 'opal'
             base.send(:"define_#{kind}", :set) do |var|
               if Hyperstack.naming_convention == :prefix_state

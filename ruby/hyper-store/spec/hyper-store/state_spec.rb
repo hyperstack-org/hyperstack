@@ -756,7 +756,7 @@ describe 'StateWrapper' do
           Object.send(:remove_const, :Foo)
 
           # We're very basically mocking React::State so we can run these outside of Opal
-          Hyperstack::Internal::Store::State.reset!
+          Hyperstack::Internal::State::Variable.reset!
         end
 
         context 'with an initial value' do
@@ -1077,7 +1077,7 @@ describe 'StateWrapper' do
           Object.send(:remove_const, :Foo)
 
           # We're very basically mocking React::State so we can run these outside of Opal
-          Hyperstack::Internal::Store::State.reset!
+          Hyperstack::Internal::State::Variable.reset!
         end
 
         context 'name' do

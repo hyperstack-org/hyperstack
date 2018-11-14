@@ -99,7 +99,7 @@ module ReactiveRecord
       else
         virtual_fetch_on_server_warning(attribute) if on_opal_server? && changed?
         yield false, attribute
-      end.tap { |value| Hyperstack::Internal::Store::State.get_state(self, attribute) unless data_loading? }
+      end.tap { |value| Hyperstack::Internal::State::Variable.get(self, attribute) unless data_loading? }
     end
 
     def find_association(association, id)

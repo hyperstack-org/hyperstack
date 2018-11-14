@@ -20,11 +20,11 @@ end
 # Stubbing the React calls so we can test outside of Opal
 module Hyperstack
   module Internal
-    module Store
-      class State
+    module State
+      module Variable
         class << self
           def reset!
-            @states = nil
+            @legacy_map = nil
           end
 
           # def get_state(from, key)

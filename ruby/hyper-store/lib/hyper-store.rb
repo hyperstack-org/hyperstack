@@ -20,8 +20,6 @@ require 'hyperstack/internal/store/mutator_wrapper'
 require 'hyperstack/internal/store/observable'
 require 'hyperstack/internal/store/state_wrapper/argument_validator'
 require 'hyperstack/internal/store/state_wrapper'
-require 'hyperstack/internal/store/state'
-
 require 'hyperstack/legacy/store'
 require 'hyperstack/legacy/store/version'
 

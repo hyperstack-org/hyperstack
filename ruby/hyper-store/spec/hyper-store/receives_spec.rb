@@ -24,7 +24,7 @@ describe 'the receives macro' do
     Object.send(:remove_const, :Bar)
 
     # We're very basically mocking React::State so we can run these outside of Opal
-    Hyperstack::Internal::Store::State.reset!
+    Hyperstack::Internal::State::Variable.reset!
   end
 
   context 'arguments' do

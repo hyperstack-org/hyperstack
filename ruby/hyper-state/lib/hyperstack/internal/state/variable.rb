@@ -1,19 +1,19 @@
 module Hyperstack
   module Internal
-    module Store
-      class State
+    module State
+      module Variable
         class << self
           def legacy_map
             @legacy_map ||= Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = Array.new }}
           end
 
-          def get_state(obj, name)
+          def get(obj, name)
             map_object = legacy_map[obj][name]
             Hyperstack::Internal::State::Mapper.observed!(map_object.object_id)
             map_object[0]
           end
 
-          def set_state(obj, name, value)
+          def set(obj, name, value)
             map_object = legacy_map[obj][name]
             map_object[0] = value
             Hyperstack::Internal::State::Mapper.mutated!(map_object.object_id)

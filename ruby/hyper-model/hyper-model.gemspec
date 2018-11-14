@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', HyperModel::VERSION
   spec.add_dependency 'hyper-operation', HyperModel::VERSION
-  spec.add_dependency 'hyper-store', HyperModel::VERSION # only for Hyperstack::Internal::Store::State which should be moved
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper', '1.2.0'

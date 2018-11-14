@@ -180,10 +180,10 @@ module ReactiveRecord
 
     def changed?(*args)
       if args.count == 0
-        Hyperstack::Internal::Store::State.get_state(self, "!CHANGED!")
+        Hyperstack::Internal::State::Variable.get(self, "!CHANGED!")
         !changed_attributes.empty?
       else
-        Hyperstack::Internal::Store::State.get_state(self, args[0])
+        Hyperstack::Internal::State::Variable.get(self, args[0])
         changed_attributes.include? args[0]
       end
     end
@@ -288,7 +288,7 @@ module ReactiveRecord
     end
 
     def saving!
-      Hyperstack::Internal::Store::State.set_state(self, self, :saving) unless data_loading?
+      Hyperstack::Internal::State::Variable.set(self, self, :saving) unless data_loading?
       @saving = true
     end
 
@@ -306,9 +306,9 @@ module ReactiveRecord
       notify_waiting_for_save
       return self if save_only
       if errors.empty?
-        Hyperstack::Internal::Store::State.set_state(self, self, :saved)
+        Hyperstack::Internal::State::Variable.set(self, self, :saved)
       elsif !data_loading?
-        Hyperstack::Internal::Store::State.set_state(self, self, :error)
+        Hyperstack::Internal::State::Variable.set(self, self, :error)
       end
       self
     end
@@ -334,7 +334,7 @@ module ReactiveRecord
     end
 
     def saving?
-      Hyperstack::Internal::Store::State.get_state(self, self)
+      Hyperstack::Internal::State::Variable.get(self, self)
       @saving
     end
 

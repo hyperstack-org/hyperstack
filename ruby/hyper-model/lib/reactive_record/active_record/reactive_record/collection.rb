@@ -292,7 +292,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     # end of stuff to move
 
     def reload_from_db(force = nil)
-      if force || Hyperstack::Internal::Store::State.observed?(self, :collection)
+      if force || Hyperstack::Internal::State::Variable.observed?(self, :collection)
         @out_of_date = false
         ReactiveRecord::Base.load_from_db(nil, *@vector, '*all') if @collection
         ReactiveRecord::Base.load_from_db(nil, *@vector, '*count')
@@ -308,7 +308,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
         @observing = true
         link_to_parent
         reload_from_db(true) if @out_of_date
-        Hyperstack::Internal::Store::State.get_state(self, :collection)
+        Hyperstack::Internal::State::Variable.get(self, :collection)
       ensure
         @observing = false
       end
@@ -316,7 +316,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def set_count_state(val)
       unless ReactiveRecord::WhileLoading.observed?
-        Hyperstack::Internal::Store::State.set_state(self, :collection, collection, true)
+        Hyperstack::Internal::State::Variable.set(self, :collection, collection, true)
       end
       @count = val
     end
@@ -549,7 +549,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def notify_of_change(value = nil)
-      Hyperstack::Internal::Store::State.set_state(self, "collection", collection) unless ReactiveRecord::Base.data_loading?
+      Hyperstack::Internal::State::Variable.set(self, "collection", collection) unless ReactiveRecord::Base.data_loading?
       value
     end
 

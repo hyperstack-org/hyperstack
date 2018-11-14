@@ -4,18 +4,18 @@ cache:
   directories:
   - node_modules # NPM packages
 env:
-  # - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # #- COMPONENT=hyper-console               LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-state                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  #- COMPONENT=hyper-console               LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-state                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
 jobs:
   include:
     - stage: test
@@ -52,7 +52,7 @@ jobs:
       before_script:
         - cd $LANGUAGE/$COMPONENT
       script:
-        - echo deploying $COMPONENT 
+        - echo deploying $COMPONENT
       deploy:
         - provider: rubygems
           api_key:

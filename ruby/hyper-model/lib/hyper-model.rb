@@ -10,7 +10,6 @@ if RUBY_ENGINE == 'opal'
   require 'object/tap'
   require 'active_model_client_stubs'
   require 'hyper-state'
-  require 'hyper-store'
   require "reactive_record/active_record_error"
   require "reactive_record/active_record/errors"
   require "reactive_record/active_record/error"
