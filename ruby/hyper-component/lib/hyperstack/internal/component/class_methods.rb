@@ -12,6 +12,10 @@ module Hyperstack
           true
         end
 
+        def mounted_components
+          Hyperstack::Component.mounted_components.select { |c| c.class <= self }
+        end
+
         def param_accessor_style(*args)
           props_wrapper.param_accessor_style(*args)
         end

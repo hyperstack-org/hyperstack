@@ -1,7 +1,7 @@
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (1.0.rc1)
+    hyper-spec (1.0.alpha1)
       capybara
       chromedriver-helper (= 1.2.0)
       libv8 (~> 6.3.0)
@@ -20,22 +20,22 @@ PATH
 PATH
   remote: ../hyper-state
   specs:
-    hyper-state (1.0.rc1)
-      hyperstack-config (= 1.0.rc1)
+    hyper-state (1.0.alpha1)
+      hyperstack-config (= 1.0.alpha1)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyper-store
   specs:
-    hyper-store (1.0.rc1)
-      hyper-state (= 1.0.rc1)
-      hyperstack-config (= 1.0.rc1)
+    hyper-store (1.0.alpha1)
+      hyper-state (= 1.0.alpha1)
+      hyperstack-config (= 1.0.alpha1)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperstack-config
   specs:
-    hyperstack-config (1.0.rc1)
+    hyperstack-config (1.0.alpha1)
       libv8 (~> 6.3.0)
       listen (~> 3.0)
       mini_racer (~> 0.1.15)
@@ -47,9 +47,9 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-component (1.0.rc1)
-      hyper-state (= 1.0.rc1)
-      hyperstack-config (= 1.0.rc1)
+    hyper-component (1.0.alpha1)
+      hyper-state (= 1.0.alpha1)
+      hyperstack-config (= 1.0.alpha1)
       libv8 (~> 6.3.0)
       mini_racer (~> 0.1.15)
       opal (>= 0.11.0, < 0.12.0)
