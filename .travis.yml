@@ -3,55 +3,52 @@ cache:
   bundler: true
   directories:
   - node_modules # NPM packages
-  env:
-    - OUTERENV=true
+env:
+  - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-state                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  # - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+      - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+        key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+    packages:
+      - chromium-chromedriver
+      - google-chrome-stable
+      - yarn
+  mariadb: '10.3'
+before_install:
+  - echo installing $COMPONENT
+  # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
+  # must remove this zombie for new yarn to work
+  - sudo rm -f /usr/local/bin/yarn
+  - gem install bundler
+  - nvm install 10
+  - if [[ "$LANGUAGE" == "ruby" ]]; then rvm install $LANGUAGE_VERSION; fi
+  - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
+before_script:
+  - echo before_script $COMPONENT
+  - cd $LANGUAGE/$COMPONENT
+  - if [[ "$LANGUAGE" == "ruby" ]]; then bundle install --jobs=3 --retry=3; fi
+  - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake spec:prepare; fi
+  - google-chrome --version
+  - which google-chrome
+  - yarn install
+script:
+  - echo running script $COMPONENT
+  - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
 jobs:
   include:
-    - stage: test
-      env:
-        - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-state                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-        - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-      addons:
-        apt:
-          sources:
-            - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
-              key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
-            - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
-              key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
-          packages:
-            - chromium-chromedriver
-            - google-chrome-stable
-            - yarn
-        mariadb: '10.3'
-      before_install:
-        - echo installing $COMPONENT
-        # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
-        # must remove this zombie for new yarn to work
-        - sudo rm -f /usr/local/bin/yarn
-        - gem install bundler
-        - nvm install 10
-        - if [[ "$LANGUAGE" == "ruby" ]]; then rvm install $LANGUAGE_VERSION; fi
-        - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
-      before_script:
-        - echo before_script $COMPONENT
-        - cd $LANGUAGE/$COMPONENT
-        - if [[ "$LANGUAGE" == "ruby" ]]; then bundle install --jobs=3 --retry=3; fi
-        - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake spec:prepare; fi
-        - google-chrome --version
-        - which google-chrome
-        - yarn install
-      script:
-        - echo running script $COMPONENT
-        - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
     - stage: deploy
       before_script:
         - cd $LANGUAGE/$COMPONENT
