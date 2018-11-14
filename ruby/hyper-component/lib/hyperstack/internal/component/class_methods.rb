@@ -4,6 +4,14 @@ module Hyperstack
       # class level methods (macros) for components
       module ClassMethods
 
+        def create_element(*params, &children)
+          ReactWrapper.create_element(self, *params, &children)
+        end
+
+        def insert_element(*params, &children)
+          RenderingContext.render(self, *params, &children)
+        end
+
         def deprecation_warning(message)
           Hyperstack.deprecation_warning(self, message)
         end

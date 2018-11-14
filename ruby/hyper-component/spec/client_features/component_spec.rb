@@ -178,6 +178,35 @@ describe 'React::Component', js: true do
       expect_evaluate_ruby('Foo.instance == Foo.instance.force_update!').to be_truthy
     end
 
+    it 'can buffer an element' do
+      mount 'Foo' do
+        class Bar < HyperComponent
+          param :p
+          render { DIV { @P.span; children.render } }
+        end
+        class Foo < HyperComponent
+          def render
+            Bar.insert_element(p: "param") { "child"}
+          end
+        end
+      end
+      expect(page).to have_content("paramchild")
+    end
+
+    it 'can create an element without buffering' do
+      mount 'Foo' do
+        class Bar < HyperComponent
+          param :p
+          render { SPAN { @P.span; children.render } }
+        end
+        class Foo < HyperComponent
+          before_mount { @e = Bar.create_element(p: "param") { "child" } }
+          render { DIV { 2.times { @e.render } } }
+        end
+      end
+      expect(page).to have_content("paramchildparamchild")
+    end
+
     it 'has a class components method' do
       mount 'Foo' do
         class Bar < HyperComponent

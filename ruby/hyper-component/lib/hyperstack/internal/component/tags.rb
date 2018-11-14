@@ -59,10 +59,6 @@ module Hyperstack
               define_method name do |*params, &children|
                 RenderingContext.render(component, *params, &children)
               end
-              # handle deprecated _as_node style
-              define_method "#{name}_as_node" do |*params, &children|
-                RenderingContext.build_only(component, *params, &children)
-              end
             end
             parent.extend(tag_names_module)
           end
