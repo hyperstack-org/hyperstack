@@ -3,22 +3,9 @@ cache:
   bundler: true
   directories:
   - node_modules # NPM packages
-addons:
-  apt:
-    sources:
-      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
-        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
-      - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
-        key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
-    packages:
-      - chromium-chromedriver
-      - google-chrome-stable
-      - yarn
-  mariadb: '10.3'
 env:
-  - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  #- COMPONENT=hyper-console               LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
@@ -31,6 +18,18 @@ env:
 jobs:
   include:
     - stage: test
+      addons:
+        apt:
+          sources:
+            - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+              key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+            - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+              key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+          packages:
+            - chromium-chromedriver
+            - google-chrome-stable
+            - yarn
+        mariadb: '10.3'
       before_install:
         - echo installing $COMPONENT
         # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
