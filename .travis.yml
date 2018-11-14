@@ -1,8 +1,4 @@
 language: bash
-cache:
-  bundler: true
-  directories:
-  - node_modules # NPM packages
 env:
   - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   #- COMPONENT=hyper-console               LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
@@ -19,6 +15,10 @@ env:
 jobs:
   include:
     - stage: test
+      cache:
+        bundler: true
+        directories:
+        - node_modules # NPM packages
       addons:
         apt:
           sources:
@@ -32,6 +32,7 @@ jobs:
             - yarn
         mariadb: '10.3'
       before_install:
+        - echo installing $COMPONENT
         # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
         # must remove this zombie for new yarn to work
         - sudo rm -f /usr/local/bin/yarn
@@ -40,6 +41,7 @@ jobs:
         - if [[ "$LANGUAGE" == "ruby" ]]; then rvm install $LANGUAGE_VERSION; fi
         - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
       before_script:
+        - echo before_script $COMPONENT
         - cd $LANGUAGE/$COMPONENT
         - if [[ "$LANGUAGE" == "ruby" ]]; then bundle install --jobs=3 --retry=3; fi
         - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake spec:prepare; fi
@@ -47,6 +49,7 @@ jobs:
         - which google-chrome
         - yarn install
       script:
+        - echo running script $COMPONENT
         - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
     - stage: deploy
       before_script:
