@@ -95,31 +95,30 @@ Hyperstack Component DSL is a set of class and instance methods that are used to
 
 The DSL has the following major areas:  
 
-+ The `Hyperstack::Component` class or `Hyperstack::Component` mixin
++ The `HyperComponent` class or `Hyperstack::Component` mixin
 + HTML DSL elements
 + Component Lifecycle Methods (`before_mount`, `render`, `after_mount`, `after_update`, `after_error`)
 + The four data accessors methods: `params`, `state`, `mutate`, and `children`
 + Event handlers
 + Miscellaneous methods
 
-## Hyperstack::Component
+## HyperComponent
 
-Hyperstack Components classes either include `Hyperstack::Component` or are subclasses of `Hyperstack::Component`.  
+Hyperstack Components classes include the `Hyperstack::Component` mixin or (for ease of use) are a subclass of a `HyperComponent` class which includes the mixin:
 
 ```ruby
-class Component < Hyperstack::Component
+class HyperComponent
+  include Hyperstack::Component
 end
 
-# if subclassing is inappropriate, you can mixin instead
-class AnotherComponent
-  include Hyperstack::Component
+class AnotherComponent < HyperComponent
 end
 ```
 
 At a minimum every component class must define a `render` method which returns **one single** child element. That child may in turn have an arbitrarily deep structure.
 
 ```ruby
-class Component < Hyperstack::Component
+class Component < HyperComponent
   render do
     DIV { } # render an empty div
   end
@@ -129,7 +128,7 @@ end
 You may also include the top level element to be rendered:
 
 ```ruby
-class Component < Hyperstack::Component
+class Component < HyperComponent
   render(DIV, class: 'my-special-class') do
     # everything will be rendered in a div
   end
@@ -139,7 +138,7 @@ end
 To render a component, you reference its class name in the DSL as a method call.  This creates a new instance, passes any parameters proceeds with the component lifecycle.  
 
 ```ruby
-class FirstComponent < Hyperstack::Component
+class FirstComponent < HyperComponent
   render do
     NextComponent() # ruby syntax requires either () or {} following the class name
   end
@@ -171,28 +170,29 @@ By building modular components that reuse other components with well-defined int
 Let's create a simple Avatar component which shows a profile picture and username using the Facebook Graph API.
 
 ```ruby
-class Avatar < Hyperstack::Component
+class Avatar < HyperComponent
   param :user_name
 
   render(DIV) do
-    ProfilePic(user_name: params.user_name)
-    ProfileLink(user_name: params.user_name)
+    # the user_name param has been converted to @UserName immutable instance variable
+    ProfilePic(user_name: @UserName)
+    ProfileLink(user_name: @UserName)
   end
 end
 
-class ProfilePic < Hyperstack::Component
+class ProfilePic < HyperComponent
   param :user_name
 
   render do
-    IMG(src: "https://graph.facebook.com/#{params.user_name}/picture")
+    IMG(src: "https://graph.facebook.com/#{@UserName}/picture")
   end
 end
 
-class ProfileLink < Hyperstack::Component
+class ProfileLink < HyperComponent
   param :user_name
   render do
-    A(href: "https://www.facebook.com/#{params.user_name}") do
-      params.user_name
+    A(href: "https://www.facebook.com/#{@UserName}") do
+      @UserName
     end
   end
 end
@@ -221,7 +221,7 @@ the items will be completely rerendered:
 
 ```ruby
 render do
-  params.items.each do |item|
+  @Items.each do |item|
     PARA do
       item[:text]
     end
@@ -256,7 +256,7 @@ The situation gets more complicated when the children are shuffled around (as in
   param :results, type: [Hash] # each result is a hash of the form {id: ..., text: ....}
   render do
     OL do
-      params.results.each do |result|
+      @Results.each do |result|
         LI(key: result[:id]) { result[:text] }
       end
     end
@@ -269,17 +269,18 @@ The `key` should *always* be supplied directly to the components in the array, n
 
 ```ruby
 # WRONG!
-class ListItemWrapper < Hyperstack::Component
+class ListItemWrapper < HyperComponent
   param :data
   render do
-    LI(key: params.data[:id]) { params.data[:text] }
+    LI(key: @Data[:id]) { @Data[:text] }
   end
-end    
-class MyComponent < Hyperstack::Component
+end  
+
+class MyComponent < HyperComponent
   param :results
   render do
     UL do
-      params.result.each do |result|
+      @Result.each do |result|
         ListItemWrapper data: result
       end
     end
@@ -289,17 +290,18 @@ end
 
 ```ruby
 # CORRECT
-class ListItemWrapper < Hyperstack::Component
+class ListItemWrapper < HyperComponent
   param :data
   render do
-    LI { params.data[:text] }
+    LI { @Data[:text] }
   end
 end
-class MyComponent < Hyperstack::Component
+
+class MyComponent < HyperComponent
   param :results
   render do
     UL do
-      params.result.each do |result|
+      @Result.each do |result|
         ListItemWrapper key: result[:id], data: result
       end
     end
@@ -314,7 +316,7 @@ Along with params components may be passed a block which is used to build the co
 The instance method `children` returns an enumerable that is used to access the unrendered children of a component.
 
 ```ruby
-class Indenter < Hyperstack::Component
+class Indenter < HyperComponent
   render(DIV) do
     IndentEachLine(by: 100) do # see IndentEachLine below
       DIV {"Line 1"}
@@ -324,12 +326,12 @@ class Indenter < Hyperstack::Component
   end
 end
 
-class IndentEachLine < Hyperstack::Component
+class IndentEachLine < HyperComponent
   param by: 20, type: Integer
 
   render(DIV) do
     children.each_with_index do |child, i|
-      child.render(style: {"margin-left" => params.by*i})
+      child.render(style: {"margin-left" => @By*i})
     end
   end
 end
@@ -350,20 +352,10 @@ When designing interfaces, break down the common design elements (buttons, form 
 
 ## Params
 
-The `params` method gives *read-only* access to each of the scalar params passed to the Component.
+The `param` method gives *read-only* access to each of the scalar params passed to the Component. The params are accessed as instance variables converted to CamelCase.
 
 Within a React Component the `param` method is used to define the parameter signature of the component.  You can think of params as
 the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is rerendered.  
-
-The param method has the following syntax:
-
-```ruby
-param symbol, ...options... # or
-param symbol => default_value, ...options...
-```
-
-Available options are `:default_value => ...any value...` and `:type => ...class_spec...`
-where class_spec is either a class name, or `[]` (shorthand for Array), or `[ClassName]` (meaning array of `ClassName`.)
 
 Note that the default value can be supplied either as the hash value of the symbol, or explicitly using the `:default_value` key.
 
@@ -371,6 +363,7 @@ Examples:
 
 ```ruby
 param :foo # declares that we must be provided with a parameter foo when the component is instantiated or re-rerendered.
+param :foo, alias: :something       # the alias name will be used for the param (instead of @Foo)
 param :foo => "some default"        # declares that foo is optional, and if not present the value "some default" will be used.
 param foo: "some default"           # same as above using ruby 1.9 JSON style syntax
 param :foo, default: "some default" # same as above but uses explicit default key
@@ -378,16 +371,20 @@ param :foo, type: String            # foo is required and must be of type String
 param :foo, type: [String]          # foo is required and must be an array of Strings
 param foo: [], type: [String]       # foo must be an array of strings, and has a default value of the empty array.
 ```
+
 #### Accessing param values
 
-The component instance method `params` gives access to all declared params.  So for example
+Params are accessible in the Component class as instance variables in **CamelCase**. The CamelCase syntax is used to indicate that params are immutable.
+
+For example:
 
 ```ruby
-class Hello < Hyperstack::Component
-  param visitor: "World", type: String # params.name is immutable and will validate as a String
+class Hello < HyperComponent
+  # an immutable parameter, with a default of type String
+  param visitor: "World", type: String
 
   render do
-    "Hello #{params.visitor}" # notice how you access name through parans
+    "Hello #{@Visitor}" # notice how you CamelCase for immutable params
   end
 end
 ```
@@ -404,12 +401,12 @@ In Hyperstack, there are **two exceptions** to this rule:
 In the example below, clicking on the button will cause the Component to re-render (even though `book` is a `param`) because `book` is a Model. If `book` were not a Model (or Store) then the Component would not re-render.
 
 ```ruby
-class Likes < Hyperstack::Component
+class Likes < HyperComponent
   param :book # book is an instance of the Book model
 
   render(DIV) do
-    P { "#{params.book.likes.count} likes" }
-    BUTTON { "Like" }.on(:click) { params.book.likes += 1}
+    P { "#{@Book.likes.count} likes" }
+    BUTTON { "Like" }.on(:click) { @Book.likes += 1}
   end
 end
 ```
@@ -422,7 +419,7 @@ end
 As your app grows it's helpful to ensure that your components are used correctly. We do this by allowing you to specify the expected ruby class of your parameters. When an invalid value is provided for a param, a warning will be shown in the JavaScript console. Note that for performance reasons type checking is only done in development mode. Here is an example showing typical type specifications:
 
 ```ruby
-class ManyParams < Hyperstack::Component
+class ManyParams < HyperComponent
   param :an_array,         type: [] # or type: Array
   param :a_string,         type: String
   param :array_of_strings, type: [String]
@@ -439,7 +436,7 @@ Note that if the param can be nil, add `allow_nil: true` to the specification.
 React lets you define default values for your `params`:
 
 ```ruby
-class ManyParams < Hyperstack::Component
+class ManyParams < HyperComponent
   param :an_optional_param, default: "hello", type: String, allow_nil: true
 ```
 
@@ -459,14 +456,14 @@ params.all_done(data) # instead of params.all_done.call(data)
 Proc params can be optional, using the `default: nil` and `allow_nil: true` options.  Invoking a nil proc param will do nothing.  This is handy for allowing optional callbacks.
 
 ```ruby
-class Alarm < Hyperstack::Component
+class Alarm < HyperComponent
   param :at, type: Time
   param :notify, type: Proc
 
   after_mount do
     @clock = every(1) do
-      if Time.now > params.at
-        params.notify
+      if Time.now > @At
+        @Notify
         @clock.stop
       end
       force_update!
@@ -491,11 +488,11 @@ You can pass a Component as a `param` and then render it in the receiving Compon
 button = MyButton().as_node
 ButtonBar(button: button)
 
-class ButtonBar < Hyperstack::Component
+class ButtonBar < HyperComponent
   param :button
 
   render do
-    params.button.render
+    @Button.render
   end
 end
 ```
@@ -505,16 +502,16 @@ end
 `render` can be applied to the objects returned by `as_node` and `children` to actually render the node.
 
 ```ruby
-class Test < Hyperstack::Component
+class Test < HyperComponent
   param :node
 
   render do
     DIV do
       children.each do |child|
-        params.node.render
+        @Node.render
         child.render
       end
-      params.node.render
+      @Node.render
     end
   end
 end
@@ -527,11 +524,11 @@ A common type of React component is one that extends a basic HTML element in a s
 To do this use the `collect_other_params_as` method which will gather all the params you did not declare into a hash. Then you can pass this hash on to the child component
 
 ```ruby
-class CheckLink < Hyperstack::Component
+class CheckLink < HyperComponent
   collect_other_params_as :attributes
   render do
     # we just pass along any incoming attributes
-    a(attributes) { '√ '.span; children.each &:render }
+    a(@Attributes) { '√ '.span; children.each &:render }
   end
 end
 # CheckLink(href: "/checked.html")
@@ -548,7 +545,7 @@ State variables are accessed via the `state` instance method which works like th
 The `mutate` method initializes (or updates) a reactive state variable. State variables are like *reactive* instance variables.  They can only be changed using the `mutate` method, and when they change they will cause a re-render.  
 
 ```ruby
-class Counter < Hyperstack::Component
+class Counter < HyperComponent
   state count: 0 # optional initialization
 
   render(DIV) do
@@ -561,7 +558,7 @@ end
 A Simple example:
 
 ```ruby
-class LikeButton < Hyperstack::Component
+class LikeButton < HyperComponent
   render(DIV) do
     P do
       "You #{state.liked ? 'like' : 'haven\'t liked'} this. Click to toggle."
@@ -646,7 +643,7 @@ module ReactInterval
   end
 end
 
-class TickTock < Hyperstack::Component
+class TickTock < HyperComponent
   include ReactInterval
 
   before_mount do
@@ -682,7 +679,7 @@ A component may define lifecycle methods for each phase of the components lifecy
 All the Component Lifecycle methods may take a block or the name of an instance method to be called.
 
 ```ruby
-class MyComponent < Hyperstack::Component
+class MyComponent < HyperComponent
   before_mount do
     # initialize stuff here
   end
@@ -784,7 +781,7 @@ Normally Hyperstack will only update a component if some state variable or param
 cannot update using the normal `state.funky!` update method.  So what we can do is override `should_component_update?` call `super`, and then double check if the `funky` has changed by doing an explicit comparison.
 
 ```ruby
-class RerenderMore < Hyperstack::Component
+class RerenderMore < HyperComponent
   def should_component_update?(new_params_hash, new_state_hash)
     super || new_state_hash[:funky] != state.funky
   end
@@ -885,7 +882,7 @@ Your event handlers will be passed instances of `React::Event`, a wrapper around
 For example:
 
 ```ruby
-class YouSaid < Hyperstack::Component
+class YouSaid < HyperComponent
 
   render(DIV) do
     INPUT(value: state.value).
@@ -1172,11 +1169,11 @@ window.SayHello = React.createClass({
 Assuming that this component is loaded some place in your assets, you can then access this from Hyperstack by creating a wrapper Component:
 
 ```ruby
-class SayHello < Hyperstack::Component
+class SayHello < HyperComponent
   imports 'SayHello'
 end
 
-class MyBigApp < Hyperstack::Component
+class MyBigApp < HyperComponent
   render(DIV) do
     # SayHello will now act like any other Hyperstack component
     SayHello name: 'Matz'
@@ -1207,7 +1204,7 @@ end
 We can now access our bootstrap components as components defined within the RBS scope:
 
 ```ruby
-class Show < Hyperstack::Component
+class Show < HyperComponent
 
   def say_hello(i)
     alert "Hello from number #{i}"
@@ -1268,7 +1265,7 @@ In Ruby all module and class names normally begin with an uppercase letter.  How
 
 Likewise MyLib::MyComponent would match any of the following in the Javascript namespace: `MyLib.MyComponent`, `myLib.MyComponent`, `MyLib.myComponent`, `myLib.myComponent`
 
-*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of Hyperstack::Component or React::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
+*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of HyperComponent or React::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
 
 ### Including React Source  
 
