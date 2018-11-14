@@ -5,7 +5,7 @@ require 'hyper_trace/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "hyper-trace"
-  spec.version       = '0.0.1.abogus1' #HyperTrace::VERSION
+  spec.version       = '0.0.1.abogus2' #HyperTrace::VERSION
   spec.authors       = ["catmando"]
   spec.email         = ["mitch@catprint.com"]
 

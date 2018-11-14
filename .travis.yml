@@ -51,6 +51,8 @@ jobs:
     - stage: deploy
       before_script:
         - cd $LANGUAGE/$COMPONENT
+      script:
+        - echo deploying $COMPONENT 
       deploy:
         - provider: rubygems
           api_key:
