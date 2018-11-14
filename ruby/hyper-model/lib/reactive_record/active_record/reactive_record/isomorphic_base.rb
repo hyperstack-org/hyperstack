@@ -308,7 +308,6 @@ module ReactiveRecord
           backing_records.each { |_id, record| record.saved!(true) rescue nil } if save
         end
       rescue Exception => e
-        debugger
         log("Exception raised while saving - #{e}", :error)
         yield false, e.message, [] if block
         promise.resolve({success: false, message: e.message, models: []})

@@ -9,7 +9,7 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'rails-hyperstack', github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
+gem 'rails-hyperstack', '~> 1.0.alpha' # github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
 
 gem_group :development do
   gem 'foreman'

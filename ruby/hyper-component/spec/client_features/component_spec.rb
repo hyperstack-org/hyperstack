@@ -177,6 +177,80 @@ describe 'React::Component', js: true do
       end
       expect_evaluate_ruby('Foo.instance == Foo.instance.force_update!').to be_truthy
     end
+
+    it 'can buffer an element' do
+      mount 'Foo' do
+        class Bar < HyperComponent
+          param :p
+          render { DIV { @P.span; children.render } }
+        end
+        class Foo < HyperComponent
+          def render
+            Bar.insert_element(p: "param") { "child"}
+          end
+        end
+      end
+      expect(page).to have_content("paramchild")
+    end
+
+    it 'can create an element without buffering' do
+      mount 'Foo' do
+        class Bar < HyperComponent
+          param :p
+          render { SPAN { @P.span; children.render } }
+        end
+        class Foo < HyperComponent
+          before_mount { @e = Bar.create_element(p: "param") { "child" } }
+          render { DIV { 2.times { @e.render } } }
+        end
+      end
+      expect(page).to have_content("paramchildparamchild")
+    end
+
+    it 'has a class components method' do
+      mount 'Foo' do
+        class Bar < HyperComponent
+          param :id
+          render { inspect }
+        end
+        class Baz < HyperComponent
+          param :id
+          render { inspect }
+        end
+        class BarChild < Bar
+        end
+        class Foo
+          include Hyperstack::Component
+          def render
+            DIV do
+              Bar(id: 1)
+              Bar(id: 2)
+              Baz(id: 3)
+              Baz(id: 4)
+              BarChild(id: 5)
+              BarChild(id: 6)
+            end
+          end
+        end
+        module Hyperstack::Component
+          def to_s
+            "#{self.class.name}#{':' + @Id.to_s if @Id}"
+          end
+        end
+      end
+      expect_evaluate_ruby("Hyperstack::Component.mounted_components")
+        .to contain_exactly("Hyperstack::Internal::Component::TopLevelRailsComponent", "Foo", "Bar:1", "Bar:2", "Baz:3", "Baz:4", "BarChild:5", "BarChild:6")
+      expect_evaluate_ruby("HyperComponent.mounted_components")
+        .to contain_exactly("Bar:1", "Bar:2", "Baz:3", "Baz:4", "BarChild:5", "BarChild:6")
+      expect_evaluate_ruby("Bar.mounted_components")
+        .to contain_exactly("Bar:1", "Bar:2", "BarChild:5", "BarChild:6")
+      expect_evaluate_ruby("Baz.mounted_components")
+        .to contain_exactly("Baz:3", "Baz:4")
+      expect_evaluate_ruby("BarChild.mounted_components")
+        .to contain_exactly("BarChild:5", "BarChild:6")
+      expect_evaluate_ruby("Foo.mounted_components")
+        .to contain_exactly("Foo")
+    end
   end
 
   describe 'state management' do

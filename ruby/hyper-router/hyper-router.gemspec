@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = 'hyper-router for Opal, part of the hyperstack framework'
 
   spec.description   = 'Adds the ability to write and use the react-router in Ruby through Opal'
-  spec.files = Dir['{lib}/**/*'] + ['LICENSE', 'Rakefile', 'README.md']
+  spec.files = Dir['{lib}/**/*'] + ['Rakefile']
 
   spec.add_dependency 'hyper-component', HyperRouter::VERSION
   spec.add_dependency 'hyper-state', HyperRouter::VERSION
@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-spec', HyperRouter::VERSION
+  spec.add_development_dependency 'hyper-store', HyperRouter::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mini_racer', '~> 0.1.15'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'

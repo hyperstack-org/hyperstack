@@ -30,10 +30,15 @@ module Hyperstack
       base.extend(Hyperstack::Internal::Component::ClassMethods)
     end
 
+    def self.mounted_components
+      @__hyperstack_component_mounted_components ||= Set.new
+    end
+
     def self.force_update!
-      components = Hyperstack::Internal::Component.mounted_components.to_a
+      components = mounted_components.to_a # need a copy as force_update may change the list
       components.each do |comp|
-        next unless Hyperstack::Internal::Component.mounted_components.include? comp
+        # check if its still mounted
+        next unless mounted_components.include? comp
         comp.force_update!
       end
     end
@@ -62,7 +67,7 @@ module Hyperstack
       @__hyperstack_component_params_wrapper = self.class.props_wrapper.new(self)
       IsomorphicHelpers.load_context(true) if IsomorphicHelpers.on_opal_client?
       observing(immediate_update: true) do
-        Hyperstack::Internal::Component.mounted_components << self
+        Hyperstack::Component.mounted_components << self
         run_callback(:before_mount, props)
       end
     end
@@ -96,7 +101,7 @@ module Hyperstack
       observing do
         unmount # runs unmount callbacks as well
         remove
-        Hyperstack::Internal::Component.mounted_components.delete self
+        Hyperstack::Component.mounted_components.delete self
       end
     end
 

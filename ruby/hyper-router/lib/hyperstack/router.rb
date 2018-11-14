@@ -18,7 +18,7 @@ module Hyperstack
 
         after_mount do
           @_react_router_unlisten = history.listen do |location, _action|
-            Hyperstack::Internal::State::Mapper.observed! Hyperstack::Router::Location
+            Hyperstack::Internal::State::Mapper.mutated! Hyperstack::Router::Location
           end
         end
 
