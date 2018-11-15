@@ -12,7 +12,7 @@ env:
   # - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   # - COMPONENT=hyper-state                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   # - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-  # - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   # - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   # - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
 addons:
@@ -61,6 +61,7 @@ _deploy_ruby_gem: &_deploy_ruby_gem
         tags: true
 jobs:
   include:
+    - stage: test
     - <<: *_deploy_ruby_gem
       env:
         - COMPONENT=hyper-i18n
