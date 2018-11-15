@@ -8,7 +8,7 @@ describe 'Hyperstack::Component::Children', js: true do
           def self.get_children
             component = Class.new do
               include Hyperstack::Component
-              def render
+              render do
                 DIV { 'lorem' }
               end
             end
@@ -62,7 +62,7 @@ describe 'Hyperstack::Component::Children', js: true do
           def self.get_children
             component = Class.new do
               include Hyperstack::Component
-              def render
+              render do
                 DIV { 'lorem' }
               end
             end
@@ -100,7 +100,7 @@ describe 'Hyperstack::Component::Children', js: true do
           def self.get_children
             component = Class.new do
               include Hyperstack::Component
-              def render
+              render do
                 DIV { 'lorem' }
               end
             end

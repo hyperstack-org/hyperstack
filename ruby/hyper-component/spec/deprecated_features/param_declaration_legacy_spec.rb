@@ -18,7 +18,7 @@ describe 'the param macro', js: true do
 
           attr_reader :clicked
 
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div').on(:click) do
               @clicked = true
             end
@@ -40,7 +40,7 @@ describe 'the param macro', js: true do
             self.emit(:foo_submit, 'bar')
           end
 
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div')
           end
         end
@@ -63,7 +63,7 @@ describe 'the param macro', js: true do
             self.emit(:foo_invoked, [1,2,3], 'bar')
           end
 
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div')
           end
         end
@@ -93,7 +93,7 @@ describe 'the param macro', js: true do
         mount 'Foo', prop: 'foobar' do
           Foo.class_eval do
             param :prop
-            def render
+            render do
               Hyperstack::Component::ReactAPI.create_element('div') { params.prop }
             end
           end
@@ -109,7 +109,7 @@ describe 'the param macro', js: true do
         param_accessor_style :legacy
         collect_other_params_as :foo
 
-        def render
+        render do
           DIV { params.foo[:bar] }
         end
       end
@@ -134,7 +134,7 @@ describe 'the param macro', js: true do
         param_accessor_style :legacy
         collect_other_params_as :opts
 
-        def render
+        render do
           DIV(id: :tp) { params.opts[:another_param] }
         end
       end
@@ -150,7 +150,7 @@ describe 'the param macro', js: true do
         param_accessor_style :legacy
         param :foo
 
-        def render
+        render do
           DIV { params.foo }
         end
       end
@@ -168,7 +168,7 @@ describe 'the param macro', js: true do
         param :foo3, default: :no_bar3
         param :foo4, default: :no_bar4
 
-        def render
+        render do
           DIV { "#{params.foo1}-#{params.foo2}-#{params.foo3}-#{params.foo4}" }
         end
       end
@@ -193,7 +193,7 @@ describe 'the param macro', js: true do
         param :foo1, type: String
         param :foo2, type: String
 
-        def render
+        render do
           DIV { "#{params.foo1}-#{params.foo2}" }
         end
       end
@@ -211,7 +211,7 @@ describe 'the param macro', js: true do
         param :foo
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
-        def render; DIV; end
+        render { DIV }
       end
 
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo2, bar: 10, lorem: Lorem.new)
@@ -229,7 +229,7 @@ describe 'the param macro', js: true do
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
 
-        def render; DIV; end
+        render { DIV }
       end
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
     end
@@ -242,7 +242,7 @@ describe 'the param macro', js: true do
       on_client do
         class Foo < Hyperloop::Component
           param_accessor_style :legacy
-          def render; ""; end
+          render { "" }
         end
       end
     end
@@ -284,7 +284,7 @@ describe 'the param macro', js: true do
           param :foo, type: BazWoggle
           param :bar, type: BazWoggle
           param :baz, type: [BazWoggle]
-          def render
+          render do
             "#{params.bar.kind}, #{params.baz[0].kind}"
           end
         end
@@ -359,7 +359,7 @@ describe 'the param macro', js: true do
           end
           Foo.class_eval do
             param :foo, type: BazWoggle
-            def render
+            render do
               params.foo.kind = params.foo.kind+1
               "#{params.foo.kind}"
             end
@@ -382,7 +382,7 @@ describe 'the param macro', js: true do
         end
         Bar.class_eval do
           param :foo, type: BazWoggle
-          def render
+          render do
             params.foo.kind.to_s
           end
         end
@@ -391,7 +391,7 @@ describe 'the param macro', js: true do
           before_mount do
             Foo.change_me! "initial"
           end
-          def render
+          render do
             Bar(foo: Native([`{bazwoggle: #{Foo.change_me}}`]))
           end
         end
@@ -406,7 +406,7 @@ describe 'the param macro', js: true do
       evaluate_ruby do
         Foo.class_eval do
           param :foo, type: Proc
-          def render
+          render do
             params.foo
           end
         end

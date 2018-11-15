@@ -18,13 +18,13 @@ describe 'HAML notation', js: true do
         class Bar
           include Hyperstack::Component
           collect_other_params_as :attributes
-          def render
+          render do
             "a man walks into a bar".span(@Attributes)
           end
         end
       end
       class Foo < Hyperloop::Component
-        def render
+        render do
           div.div_class do
             Mod::Bar().the_class.other_class
           end
@@ -39,7 +39,7 @@ describe 'HAML notation', js: true do
       class Foo
         include Hyperstack::Component
 
-        def render
+        render do
           DIV {
             p(class_name: 'foo')
             p {}
@@ -73,7 +73,7 @@ describe 'HAML notation', js: true do
           @@result_two = p 'second'
         end
 
-        def render
+        render do
           p do
             'third'
           end

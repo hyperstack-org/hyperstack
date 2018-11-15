@@ -20,7 +20,7 @@ describe 'Refs callback', js: true do
     expect_evaluate_ruby do
       class Bar
         include Hyperstack::Component
-        def render
+        render do
           Hyperstack::Component::ReactAPI.create_element('div')
         end
       end
@@ -30,7 +30,7 @@ describe 'Refs callback', js: true do
           Foo.bar = bars
         end
 
-        def render
+        render do
           Hyperstack::Component::ReactAPI.create_element(Bar, ref: method(:my_bar=).to_proc)
         end
       end
@@ -53,7 +53,7 @@ describe 'Refs callback', js: true do
           Foo.bar = a_div
         end
 
-        def render
+        render do
           Hyperstack::Component::ReactAPI.create_element('div', ref: method(:my_div=).to_proc)
         end
       end

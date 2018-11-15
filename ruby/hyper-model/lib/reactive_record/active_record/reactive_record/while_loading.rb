@@ -204,7 +204,7 @@ module ReactiveRecord
         @waiting_on_resources = @Loading
       end
 
-      def render
+      render do
         props = @ElementProps.dup
         classes = [props[:class], props[:className], "reactive_record_while_loading_container_#{@uniq_id}"].compact.join(" ")
         props.merge!({

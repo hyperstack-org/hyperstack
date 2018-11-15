@@ -41,7 +41,7 @@ describe 'React Integration', js: true do
     mount "Foo" do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           "initial_state = #{initial_state.inspect}"
         end
       end

@@ -219,7 +219,7 @@ module HyperSpec
           end
           class Hyperstack::Internal::Component::TestDummy
             include Hyperstack::Component
-                def render; end
+                render {}
           end
           #{@client_code}
           #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}

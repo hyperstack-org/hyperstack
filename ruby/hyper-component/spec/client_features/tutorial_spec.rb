@@ -5,7 +5,7 @@ describe 'An Example from the react.rb doc', js: true do
     mount 'HelloMessage' do
       class HelloMessage
         include Hyperstack::Component
-        def render
+        render do
           DIV { "Hello World!" }
         end
       end
@@ -20,7 +20,7 @@ describe 'Adding state to a component (second tutorial example)', js: true do
       class HelloMessage2
         include Hyperstack::Component
         before_mount { @user_name = '@catmando' }
-        def render
+        render do
           DIV { "Hello #{@user_name}" }
         end
       end

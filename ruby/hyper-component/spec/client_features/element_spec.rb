@@ -23,7 +23,7 @@ describe 'Hyperstack::Component::Element', js: true do
       mount 'Foo' do
         class Foo
           include Hyperstack::Component
-          def render
+          render do
             INPUT(value: nil, type: 'text').on(:change) {}
           end
         end
@@ -38,7 +38,7 @@ describe 'Hyperstack::Component::Element', js: true do
       evaluate_ruby do
         class Foo < Hyperloop::Component
           triggers :event
-          def render
+          render do
             event!
           end
         end
@@ -52,7 +52,7 @@ describe 'Hyperstack::Component::Element', js: true do
         class Foo < Hyperloop::Component
           triggers :event1
           triggers :event2
-          def render
+          render do
             event1! + event2!
           end
         end
@@ -88,7 +88,7 @@ describe 'Hyperstack::Component::Element', js: true do
       evaluate_ruby do
         class Foo < Hyperloop::Component
           triggers '<my_event>', alias: :my_event!
-          def render
+          render do
             my_event!
           end
         end

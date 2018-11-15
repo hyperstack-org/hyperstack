@@ -32,7 +32,7 @@ describe 'React::State', js: true do
           # if we don't do this, then updating boom will have no effect on the first render
           update_objects_to_observe
         end
-        def render
+        render do
           (StateTest.boom ? "Boom" : "No Boom").tap { mutate StateTest.boom = !StateTest.boom }
         end
       end

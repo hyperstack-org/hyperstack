@@ -69,7 +69,7 @@ describe 'React', js: true do
               @native = native
             end
 
-            def render
+            render do
               Hyperstack::Component::ReactAPI.create_element("div") { "lorem" }
             end
 
@@ -145,7 +145,7 @@ describe 'React', js: true do
               self.a = 20
             end
 
-            def render
+            render do
               Hyperstack::Component::ReactAPI.create_element("div") { self.a.to_s }
             end
           end
@@ -160,7 +160,7 @@ describe 'React', js: true do
               @@count ||= 0
               @@count += 1
             end
-            def render
+            render do
               Hyperstack::Component::ReactAPI.create_element("div")
             end
             def self.count

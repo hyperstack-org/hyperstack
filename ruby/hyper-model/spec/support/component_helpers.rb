@@ -413,7 +413,7 @@ module ComponentTestHelpers
           end
         end
         class HyperComponent::HyperTestDummy < HyperComponent
-          def render; end
+          render {}
         end
         #{@client_code}
         #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}

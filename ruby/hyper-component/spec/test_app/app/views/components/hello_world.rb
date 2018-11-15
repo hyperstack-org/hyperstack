@@ -2,7 +2,7 @@ module Components
   class HelloWorld
     include Hyperstack::Component
 
-    def render
+    render do
       DIV do
         "Hello, World!".span
       end

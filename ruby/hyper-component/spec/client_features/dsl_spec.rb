@@ -47,7 +47,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV { "hello" }
         end
       end
@@ -60,7 +60,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           INPUT(data: {foo: 12}).on(:change) {}
         end
       end
@@ -72,7 +72,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV { "hello" }
         end
       end
@@ -84,7 +84,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV { "hello".span; "goodby".span }
         end
       end
@@ -98,7 +98,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV { "hello".br }
         end
       end
@@ -110,7 +110,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           TABLE {
             TBODY {
               TR { "hello".td }
@@ -126,7 +126,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV { "hello".para }
         end
       end
@@ -144,14 +144,14 @@ describe 'the React DSL', js: true do
         class Comp
           include Hyperstack::Component
           param :test
-          def render
+          render do
              "Mod::Comp"
           end
         end
         module NestedMod
           class NestedComp
             include Hyperstack::Component
-            def render
+            render do
               Comp(test: 'string')
             end
           end
@@ -205,13 +205,13 @@ describe 'the React DSL', js: true do
       module Mod
         class Bar
           include Hyperstack::Component
-          def render
+          render do
             "a man walks into a bar"
           end
         end
       end
       class Foo < Hyperloop::Component
-        def render
+        render do
           Mod::Bar()
         end
       end
@@ -224,7 +224,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           SPAN(class: "the-class") { "hello" }
         end
       end
@@ -236,7 +236,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           SPAN(data: {size: 12}) { "hello".span.as_node.class.name }.as_node.render
         end
       end
@@ -248,7 +248,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV(dangerously_set_inner_HTML:  { __html: "Hello and Goodby" })
         end
       end
@@ -260,7 +260,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV(data: { foo: :bar }, aria: { label: "title" })
         end
       end
@@ -272,7 +272,7 @@ describe 'the React DSL', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           DIV(title: { bar: :foo })
         end
       end
@@ -285,7 +285,7 @@ describe 'the React DSL', js: true do
       class X2
         include Hyperstack::Component
         param :ele
-        def render
+        render do
           DIV do
             @Ele.render
             @Ele.render
@@ -294,7 +294,7 @@ describe 'the React DSL', js: true do
       end
       class Foo
         include Hyperstack::Component
-        def render
+        render do
           X2(ele: B { "hello" })
         end
       end

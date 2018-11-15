@@ -69,7 +69,6 @@ describe 'event callbacks', js: true do
             children.each(&:render)
           end.on(:click) do |evt|
             Btn.clicked = true
-            puts "calling bungo!"
             bungo!
             evt.stop_propagation
           end
@@ -77,7 +76,6 @@ describe 'event callbacks', js: true do
       end
       class Test < HyperComponent
         render do
-          puts "rendering Test clicked  = #{@clicked}"
           Btn { "CLICK ME" }.on(:bungo) { toggle :clicked } unless @clicked
         end
       end

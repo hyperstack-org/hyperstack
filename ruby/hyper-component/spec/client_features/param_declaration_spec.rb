@@ -6,7 +6,7 @@ describe 'the param macro', js: true do
       class Foo < Hyperloop::Component
         collect_other_params_as :foo
 
-        def render
+        render do
           DIV { @Foo[:bar] }
         end
       end
@@ -27,7 +27,7 @@ describe 'the param macro', js: true do
       class Foo < Hyperloop::Component
         collect_other_params_as :foo
 
-        def render
+        render do
           DIV { @foo[:bar] }
         end
       end
@@ -50,7 +50,7 @@ describe 'the param macro', js: true do
       class Foo2 < Hyperloop::Component
         collect_other_params_as :opts
 
-        def render
+        render do
           DIV(id: :tp) { @Opts[:another_param] }
         end
       end
@@ -65,7 +65,7 @@ describe 'the param macro', js: true do
       class Foo < Hyperloop::Component
         param :foo
 
-        def render
+        render do
           DIV { @Foo }
         end
       end
@@ -78,7 +78,7 @@ describe 'the param macro', js: true do
       class Foo < Hyperloop::Component
         param :foo, alias: :bar
 
-        def render
+        render do
           DIV { @bar }
         end
       end
@@ -95,7 +95,7 @@ describe 'the param macro', js: true do
         param :foo3, default: :no_bar3
         param :foo4, default: :no_bar4
 
-        def render
+        render do
           DIV { "#{@Foo1}-#{@Foo2}-#{@Foo3}-#{@Foo4}" }
         end
       end
@@ -119,7 +119,7 @@ describe 'the param macro', js: true do
         param :foo1, type: String
         param :foo2, type: String
 
-        def render
+        render do
           DIV { "#{@Foo1}-#{@Foo2}" }
         end
       end
@@ -136,7 +136,7 @@ describe 'the param macro', js: true do
         param :foo
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
-        def render; DIV; end
+        render { DIV }
       end
 
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo2, bar: 10, lorem: Lorem.new)
@@ -153,7 +153,7 @@ describe 'the param macro', js: true do
         param :lorem, type: Lorem
         param :bar, default: nil, type: String
 
-        def render; DIV; end
+        render { DIV }
       end
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
     end
@@ -165,7 +165,7 @@ describe 'the param macro', js: true do
     before(:each) do
       on_client do
         class Foo < Hyperloop::Component
-          def render; ""; end
+          render { "" }
         end
       end
     end
@@ -207,7 +207,7 @@ describe 'the param macro', js: true do
           param :foo, type: BazWoggle
           param :bar, type: BazWoggle
           param :baz, type: [BazWoggle]
-          def render
+          render do
             "#{@Bar.kind}, #{@Baz[0].kind}"
           end
         end
@@ -280,7 +280,7 @@ describe 'the param macro', js: true do
           end
           Foo.class_eval do
             param :foo, type: BazWoggle
-            def render
+            render do
               @Foo.kind = @Foo.kind+1
               "#{@Foo.kind}"
             end
@@ -293,7 +293,7 @@ describe 'the param macro', js: true do
         evaluate_ruby do
           Foo.class_eval do
             param :foo, type: Proc
-            def render
+            render do
               @Foo.call
             end
           end
@@ -316,7 +316,7 @@ describe 'the param macro', js: true do
         end
         Bar.class_eval do
           param :foo, type: BazWoggle
-          def render
+          render do
             @Foo.kind.to_s
           end
         end
@@ -325,7 +325,7 @@ describe 'the param macro', js: true do
           before_mount do
             Foo.change_me! "initial"
           end
-          def render
+          render do
             Bar(foo: Native([`{bazwoggle: #{Foo.change_me}}`]))
           end
         end

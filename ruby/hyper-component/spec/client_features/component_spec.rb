@@ -9,7 +9,7 @@ describe 'React::Component', js: true do
         def initialize(native = nil)
         end
 
-        def render
+        render do
           Hyperstack::Component::ReactAPI.create_element('div')
         end
       end
@@ -36,7 +36,7 @@ describe 'React::Component', js: true do
           def self.call_history
             @call_history ||= []
           end
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end
         end
@@ -79,7 +79,7 @@ describe 'React::Component', js: true do
             @call_history ||= []
           end
           def bar2; self.class.call_history << "bar2"; end
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end
         end
@@ -109,7 +109,7 @@ describe 'React::Component', js: true do
         class ErrorFoo
           include Hyperstack::Component
           param :just
-          def render
+          render do
             raise 'ErrorFoo Error'
           end
         end
@@ -122,7 +122,7 @@ describe 'React::Component', js: true do
             @@info
           end
 
-          def render
+          render do
             DIV { ErrorFoo(just: :a_param) }
           end
 
@@ -149,7 +149,7 @@ describe 'React::Component', js: true do
             Foo.render_counter = 0
             Foo.instance = self
           end
-          def render
+          render do
             Foo.render_counter += 1
             DIV { "I have been rendered #{Foo.render_counter} times" }
           end
@@ -170,7 +170,7 @@ describe 'React::Component', js: true do
           before_mount do
             Foo.instance = self
           end
-          def render
+          render do
             DIV { "I have been rendered" }
           end
         end
@@ -185,7 +185,7 @@ describe 'React::Component', js: true do
           render { DIV { @P.span; children.render } }
         end
         class Foo < Hyperloop::Component
-          def render
+          render do
             Bar.insert_element(p: "param") { "child"}
           end
         end
@@ -221,7 +221,7 @@ describe 'React::Component', js: true do
         end
         class Foo
           include Hyperstack::Component
-          def render
+          render do
             DIV do
               Bar(id: 1)
               Bar(id: 2)
@@ -259,7 +259,7 @@ describe 'React::Component', js: true do
         class Foo
           include Hyperstack::Component
           include Hyperstack::State::Observable
-          def render
+          render do
             DIV { @foo }
           end
         end
@@ -283,7 +283,7 @@ describe 'React::Component', js: true do
             @@render_count += 1
           end
 
-          def render
+          render do
             StateFoo.incr_render_count
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end
@@ -312,7 +312,7 @@ describe 'React::Component', js: true do
             mutate
           end
 
-          def render
+          render do
             StateFoo.incr_render_count
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end
@@ -323,7 +323,7 @@ describe 'React::Component', js: true do
             mutate @foo = 25
           end
 
-          def render
+          render do
             DIV { StateFoo(drinks: @foo) }
           end
 
@@ -350,7 +350,7 @@ describe 'React::Component', js: true do
         mount 'Foo', prop: [{foo: 10}] do
           Foo.class_eval do
             param :prop
-            def render
+            render do
               Hyperstack::Component::ReactAPI.create_element('div') { @Prop[0][:foo] }
             end
           end
@@ -390,7 +390,7 @@ describe 'React::Component', js: true do
               optional :bar, type: String
             end
 
-            def render; DIV {}; end
+            render { DIV {} }
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
         end
@@ -408,7 +408,7 @@ describe 'React::Component', js: true do
               optional :bar, type: String
             end
 
-            def render; DIV {}; end
+            render { DIV {} }
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
         end
@@ -426,7 +426,7 @@ describe 'React::Component', js: true do
               optional :bar, default: 'bar'
             end
 
-            def render
+            render do
               DIV { @Foo + '-' + @Bar}
             end
           end
@@ -444,7 +444,7 @@ describe 'React::Component', js: true do
       evaluate_ruby do
         foo = Class.new(Hyperloop::Component)
         foo.class_eval do
-          def render; "hello" end
+          render { "hello" }
         end
 
         Hyperstack::Component::ReactTestUtils.render_component_into_document(foo)
@@ -460,7 +460,7 @@ describe 'React::Component', js: true do
     it "will generate a message if render returns something other than an Element or a String" do
       mount 'Foo' do
         class Foo < Hyperloop::Component
-          def render; Hash.new; end
+          render { Hash.new }
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
@@ -469,7 +469,7 @@ describe 'React::Component', js: true do
     it "will generate a message if render returns a Component class" do
       mount 'Foo' do
         class Foo < Hyperloop::Component
-          def render; Foo; end
+          render { Foo }
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
@@ -478,7 +478,7 @@ describe 'React::Component', js: true do
     it "will generate a message if more than 1 element is generated" do
       mount 'Foo' do
         class Foo < Hyperloop::Component
-          def render; "hello".span; "goodby".span; end
+          render { "hello".span; "goodby".span }
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
@@ -487,7 +487,7 @@ describe 'React::Component', js: true do
     it "will generate a message if the element generated is not the element returned" do
       mount 'Foo' do
         class Foo < Hyperloop::Component
-          def render; "hello".span; "goodby".span.delete; end
+          render { "hello".span; "goodby".span.delete }
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
@@ -501,7 +501,7 @@ describe 'React::Component', js: true do
         class Foo
           include Hyperstack::Component
           param :foo
-          def render
+          render do
             DIV do
               SPAN { @Foo }
             end
@@ -510,7 +510,7 @@ describe 'React::Component', js: true do
 
         class Bar
           include Hyperstack::Component
-          def render
+          render do
             DIV do
               Hyperstack::Internal::Component::RenderingContext.render(Foo, foo: 'astring')
             end
@@ -528,7 +528,7 @@ describe 'React::Component', js: true do
         class Foo
           include Hyperstack::Component
 
-          def render
+          render do
             DIV()
           end
         end
@@ -543,7 +543,7 @@ describe 'React::Component', js: true do
         class Foo
           include Hyperstack::Component
 
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div')
           end
         end
@@ -697,7 +697,7 @@ describe 'React::Component', js: true do
       on_client do
         class Foo
           include Hyperstack::Component
-          def render
+          render do
             Hyperstack::Component::ReactAPI.create_element('div') { 'lorem' }
           end
         end

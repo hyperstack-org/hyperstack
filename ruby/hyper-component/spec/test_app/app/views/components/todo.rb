@@ -7,7 +7,7 @@ module Components
       requires :todo
     end
 
-    def render
+    render do
       LI { @Todo.to_s }
     end
   end

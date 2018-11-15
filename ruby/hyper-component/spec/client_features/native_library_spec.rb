@@ -237,7 +237,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
         imports "NativeComponent"
       end
       class Wrapper < Hyperloop::Component
-        def render
+        render do
           Foo(user: JS.call(:eval, "(function () { return {name: 'David'}; })();"))
         end
       end

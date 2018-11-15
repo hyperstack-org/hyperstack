@@ -6,7 +6,7 @@ describe 'opal-jquery extensions', js: true do
       expect_evaluate_ruby do
         class Foo < Hyperloop::Component
           param :name
-          def render
+          render do
             "hello #{@Name}"
           end
         end
@@ -32,7 +32,7 @@ describe 'opal-jquery extensions', js: true do
             @render_count = 0
           end
 
-          def render
+          render do
             "hello #{@Name} render-count: #{@render_count += 1}"
           end
 
@@ -54,7 +54,7 @@ describe 'opal-jquery extensions', js: true do
       expect_evaluate_ruby do
         class Foo < Hyperloop::Component
           param :name
-          def render
+          render do
             "hello #{@Name}"
           end
         end
@@ -77,7 +77,7 @@ describe 'opal-jquery extensions', js: true do
     it 'will find the DOM node given a react element' do
       expect_evaluate_ruby do
         class Foo < Hyperloop::Component
-          def render
+          render do
             DIV { 'hello' }
           end
         end

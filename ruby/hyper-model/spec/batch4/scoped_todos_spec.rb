@@ -92,7 +92,7 @@ describe "example scopes", js: true do
             DIV { "no manager comments" }
           end; end; end
       class TestComponent3 < HyperComponent
-        def render
+        render do
           puts "RENDERING TESTCOMPONENT3"
           DIV do
             UserTodos {}

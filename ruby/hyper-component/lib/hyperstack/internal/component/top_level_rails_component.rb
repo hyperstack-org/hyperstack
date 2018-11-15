@@ -16,6 +16,10 @@ module Hyperstack
 
         backtrace :off
 
+        def self.allow_deprecated_render_definition?
+          true
+        end
+
         def render
           top_level_render
         end

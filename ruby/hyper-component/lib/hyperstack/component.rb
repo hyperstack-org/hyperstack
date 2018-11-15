@@ -28,6 +28,24 @@ module Hyperstack
         define_callback(:after_error) { Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(base) }
       end
       base.extend(Hyperstack::Internal::Component::ClassMethods)
+      unless `Opal.__hyperstack_component_original_defn`
+        %x{
+         Opal.__hyperstack_component_original_defn = Opal.defn
+         Opal.defn = function(klass, name, fn) {
+           #{
+             if `klass`.respond_to?(:hyper_component?)
+               if `name == '$render'` && !`klass`.allow_deprecated_render_definition?
+                 Hyperstack.deprecation_warning(`klass`, 'Do not directly define the render method. Use the render macro instead.')
+               elsif `name == '$__hyperstack_component_render'`
+                 `name = '$render'`
+               end
+             end
+            }
+           Opal.__hyperstack_component_original_defn(klass, name, fn)
+           }
+         }
+         nil
+       end
     end
 
     def self.mounted_components

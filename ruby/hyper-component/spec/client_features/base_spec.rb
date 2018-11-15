@@ -4,12 +4,12 @@ describe 'Hyperloop::Component', js: true do
 
   before :each do
     on_client do
-      class Foo < Hyperloop::Component
+      class Foo < HyperComponent
         before_mount do
-          @instance_data = ["working"]
+          @_instance_data = ["working"]
         end
-        def render
-          @instance_data.first
+        render do
+          @_instance_data.first
         end
       end
     end
@@ -24,13 +24,30 @@ describe 'Hyperloop::Component', js: true do
     mount 'Bar' do
       class Bar < Foo
         before_mount do
-          @instance_data << "well"
+          @_instance_data << "well"
         end
-        def render
-          @instance_data.join(" ")
+        render do
+          @_instance_data.join(" ")
         end
       end
     end
     expect(page.body[-50..-19]).to match(/<span>working well<\/span>/)
+  end
+
+  it "can create an inherited component's  insert_element alias" do
+    mount 'Tester' do
+      module Container
+        class Base < Foo
+        end
+        class Thing < Base
+          before_mount { @_instance_data << "well"}
+          render { @_instance_data.join(' ') }
+        end
+      end
+      class Tester < HyperComponent
+        render { Container::Thing() }
+      end
+    end
+    expect(page).to have_content('working well')
   end
 end

@@ -10,7 +10,7 @@ describe "playground", js: true do
       SuperTest.const_set :Derp, Class.new(HyperComponent)
       SuperTest::Derp.class_eval do
       	inherited(self)
-      	def render
+      	render do
       		p {"hi"}
       	end
       end
@@ -31,7 +31,7 @@ describe "playground", js: true do
 
       SuperTest.const_set(:Derp, Class.new(HyperComponent) do
         inherited(self)
-        def render
+        render do
           p {"hi"}
         end
       end)
@@ -50,7 +50,7 @@ describe "playground", js: true do
       SuperTest.const_set(:Derp, Class.new do
         #include HyperComponent
         #inherited(self)
-        def render
+        render do
           p {"hi"}
         end
       end)

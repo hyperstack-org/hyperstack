@@ -20,7 +20,7 @@ describe "random examples", js: true do
       end
 
       class Tester < HyperComponent
-        def render
+        render do
           normal_array = [1, 2]
           sub_array = SubArray.new
           sub_array << 1; sub_array << 2
@@ -60,7 +60,7 @@ describe "random examples", js: true do
       end
 
       class Tester < HyperComponent
-        def render
+        render do
           HelloWorld(hash: `{key: 'the key'}`)
         end
       end
@@ -107,7 +107,7 @@ describe "random examples", js: true do
           end
         end
 
-        def render
+        render do
           tr do
             # currently you should access attributes using
             # dot notation only.  Currently the [] operator

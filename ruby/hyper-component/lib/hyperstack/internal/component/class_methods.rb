@@ -20,6 +20,10 @@ module Hyperstack
           true
         end
 
+        def allow_deprecated_render_definition?
+          false
+        end
+
         def mounted_components
           Hyperstack::Component.mounted_components.select { |c| c.class <= self }
         end
@@ -39,13 +43,14 @@ module Hyperstack
         end
 
         def render(container = nil, params = {}, &block)
+          Tags.included(self)
           if container
             container = container.type if container.is_a? Hyperstack::Component::Element
-            define_method :render do
+            define_method :__hyperstack_component_render do
               RenderingContext.render(container, params) { instance_eval(&block) if block }
             end
           else
-            define_method(:render) { instance_eval(&block) }
+            define_method(:__hyperstack_component_render) { instance_eval(&block) }
           end
         end
 
