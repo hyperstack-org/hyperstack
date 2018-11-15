@@ -133,12 +133,12 @@ describe 'Hyperstack::Component::Children', js: true do
   describe 'other methods' do
     it 'responds to to_proc' do
       mount 'Children' do
-        class ChildTester < HyperComponent
+        class ChildTester < Hyperloop::Component
           render do
             DIV(id: :tp, &children)
           end
         end
-        class Children < HyperComponent
+        class Children < Hyperloop::Component
           render do
             ChildTester { "one".span; "two".span; "three".span }
           end
@@ -150,12 +150,12 @@ describe 'Hyperstack::Component::Children', js: true do
     end
     it 'responds to render' do
       mount 'Children' do
-        class ChildTester < HyperComponent
+        class ChildTester < Hyperloop::Component
           render do
             DIV(id: :tp) { children.render }
           end
         end
-        class Children < HyperComponent
+        class Children < Hyperloop::Component
           render do
             ChildTester { "one".span; "two".span; "three".span }
           end

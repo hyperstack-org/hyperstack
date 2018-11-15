@@ -6,7 +6,7 @@ describe 'redefining builtin tags', js: true do
       Hyperstack::Internal::Component::Tags.remove_method :DIV
       Hyperstack::Internal::Component::Tags.send(:remove_const, :DIV)
 
-      class Hyperstack::Internal::Component::Tags::DIV #< HyperComponent
+      class Hyperstack::Internal::Component::Tags::DIV #< Hyperloop::Component
         include Hyperstack::Component
         others :opts
         render do

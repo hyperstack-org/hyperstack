@@ -30,11 +30,11 @@ describe 'the React DSL', js: true do
 
     it "can define the render method with the render macro with a application defined container" do
       on_client do
-        class Bar < HyperComponent
+        class Bar < Hyperloop::Component
           param :p1
           render { "hello #{@P1}" }
         end
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           render Bar, p1: "fred"
         end
       end
@@ -166,7 +166,7 @@ describe 'the React DSL', js: true do
     mount 'Mod::NestedMod::NestedComp' do
       module Mod
         module NestedMod
-          class NestedComp < HyperComponent
+          class NestedComp < Hyperloop::Component
             backtrace :none
             render do
               Comp(test: 'string')
@@ -184,7 +184,7 @@ describe 'the React DSL', js: true do
     client_option render_on: :both
     client_option raise_on_js_errors: :off
     expect_evaluate_ruby do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         backtrace :none
         render do
           _undefined_method
@@ -210,7 +210,7 @@ describe 'the React DSL', js: true do
           end
         end
       end
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         def render
           Mod::Bar()
         end

@@ -34,13 +34,13 @@ describe 'to_key helper', js: true do
           super
         end
       end
-      class TestComponent < HyperComponent
+      class TestComponent < Hyperloop::Component
         before_mount { @test_object = MyTestClass.new }
         render do
           DIV(key: @test_object) { TestComponent2(test_object: @test_object) }
         end
       end
-      class TestComponent2 < HyperComponent
+      class TestComponent2 < Hyperloop::Component
         param :test_object
         render do
           "to key was called!" if @TestObject.to_key_called

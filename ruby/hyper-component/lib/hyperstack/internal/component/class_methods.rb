@@ -141,7 +141,13 @@ module Hyperstack
 
         def triggers(name, opts = {})
           aka = opts[:alias] || "#{name}!"
-          name = name =~ /^<(.+)>$/ ? name.gsub(/^<(.+)>$/, '\1') : "on_#{name}"
+          name = if name =~ /^<(.+)>$/
+                   name.gsub(/^<(.+)>$/, '\1')
+                 elsif Hyperstack::Component::Event::BUILT_IN_EVENTS.include?("on#{name.event_camelize}")
+                   "on#{name.event_camelize}"
+                 else
+                   "on_#{name}"
+                 end
           validator.event(name)
           define_method(aka) { |*args| props[name]&.call(*args) }
         end

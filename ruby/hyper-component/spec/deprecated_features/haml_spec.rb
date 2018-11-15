@@ -23,7 +23,7 @@ describe 'HAML notation', js: true do
           end
         end
       end
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         def render
           div.div_class do
             Mod::Bar().the_class.other_class

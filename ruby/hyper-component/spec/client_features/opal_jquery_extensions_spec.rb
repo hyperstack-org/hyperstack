@@ -4,7 +4,7 @@ describe 'opal-jquery extensions', js: true do
   describe 'Element' do
     it 'will render a block into an element' do
       expect_evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           param :name
           def render
             "hello #{@Name}"
@@ -26,7 +26,7 @@ describe 'opal-jquery extensions', js: true do
 
     it 'will reuse the wrapper component class for the same Element' do
       evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           param :name
           before_mount do
             @render_count = 0
@@ -52,7 +52,7 @@ describe 'opal-jquery extensions', js: true do
         [ Element[test_div].find('span').html, Foo.rec_cnt]
       end.to eq(['hello freddy render-count: 2', 0])
       expect_evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           param :name
           def render
             "hello #{@Name}"
@@ -76,7 +76,7 @@ describe 'opal-jquery extensions', js: true do
 
     it 'will find the DOM node given a react element' do
       expect_evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def render
             DIV { 'hello' }
           end
@@ -95,12 +95,12 @@ describe 'opal-jquery extensions', js: true do
 
     it "can dynamically mount components" do
       on_client do
-        class DynoMount < HyperComponent
+        class DynoMount < Hyperloop::Component
           render(DIV) { 'I got rendered' }
         end
       end
       mount 'MountPoint' do
-        class MountPoint < HyperComponent
+        class MountPoint < Hyperloop::Component
           render(DIV) do
             # simulate what react-rails render_component output
             DIV(

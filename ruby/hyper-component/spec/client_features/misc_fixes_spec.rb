@@ -2,9 +2,9 @@ require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
 describe 'React Integration', js: true do
-  it "The hyper-component gem can use HyperComponent to create components" do
+  it "The hyper-component gem can use Hyperloop::Component to create components" do
     mount "TestComp" do
-      class TestComp < HyperComponent
+      class TestComp < Hyperloop::Component
         render(DIV) { 'hello'}
       end
     end
@@ -21,7 +21,7 @@ describe 'React Integration', js: true do
   end
   it "The hyper-component gem can use hyper-store state syntax" do
     mount "TestComp" do
-      class TestComp < HyperComponent
+      class TestComp < Hyperloop::Component
         before_mount do
           mutate.foo 'hello'
         end
@@ -34,7 +34,7 @@ describe 'React Integration', js: true do
   end
   # it "and it can still use the deprecated mutate syntax" do
   #   mount "TestComp" do
-  #     class TestComp < HyperComponent
+  #     class TestComp < Hyperloop::Component
   #       before_mount do
   #         state.foo! 'hello'
   #       end
@@ -50,7 +50,7 @@ describe 'React Integration', js: true do
   # end
   # it "can use the hyper-store syntax to declare component states" do
   #   mount "TestComp" do
-  #     class TestComp < HyperComponent
+  #     class TestComp < Hyperloop::Component
   #       state foo: 'hello'
   #       render(DIV) do
   #         " foo = #{state.foo}"
@@ -62,7 +62,7 @@ describe 'React Integration', js: true do
   # end
   # it "can use the hyper-store syntax to declare component states and use deprecated mutate syntax" do
   #   mount "TestComp" do
-  #     class TestComp < HyperComponent
+  #     class TestComp < Hyperloop::Component
   #       state foo: true
   #       after_mount do
   #         state.foo! 'hello' if state.foo
@@ -76,7 +76,7 @@ describe 'React Integration', js: true do
   # end
   # it "can still use the deprecated syntax to declare component states" do
   #   mount "TestComp" do
-  #     class TestComp < HyperComponent
+  #     class TestComp < Hyperloop::Component
   #       define_state foo: 'hello'
   #       render(DIV) do
   #         state.foo
@@ -90,7 +90,7 @@ describe 'React Integration', js: true do
   # end
   # it "can use the hyper-store syntax to declare class states" do
   #   mount "TestComp" do
-  #     class TestComp < HyperComponent
+  #     class TestComp < Hyperloop::Component
   #       state foo: 'hello', scope: :class, reader: true
   #       render(DIV) do
   #         TestComp.foo
@@ -102,7 +102,7 @@ describe 'React Integration', js: true do
   # end
   # it "can still use the deprecated syntax to declare component states" do
   #   mount "TestComp" do
-  #     class TestComp < HyperComponent
+  #     class TestComp < Hyperloop::Component
   #       export_state foo: 'hello'
   #       render(DIV) do
   #         TestComp.foo
@@ -129,7 +129,7 @@ describe 'React Integration', js: true do
 
   # DUPLICATE: it 'allows block for life cycle callback' do
   #   mount "Foo" do
-  #     class Foo < HyperComponent
+  #     class Foo < Hyperloop::Component
   #       before_mount do
   #         set_state({ foo: "bar" })
   #       end
@@ -143,7 +143,7 @@ describe 'React Integration', js: true do
 
   # DUPLICATE it 'allows kernal method names like "format" to be used as state variable names' do
   #   mount 'Foo' do
-  #     class Foo < HyperComponent
+  #     class Foo < Hyperloop::Component
   #       before_mount do
   #         mutate.format 'hello'
   #       end

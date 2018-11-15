@@ -140,7 +140,7 @@ describe 'React::Component', js: true do
   describe 'Misc Methods' do
     it 'has a force_update! method' do
       mount 'Foo' do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           class << self
             attr_accessor :render_counter
             attr_accessor :instance
@@ -163,7 +163,7 @@ describe 'React::Component', js: true do
 
     it 'has its force_update! method return itself' do
       mount 'Foo' do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           class << self
             attr_accessor :instance
           end
@@ -180,11 +180,11 @@ describe 'React::Component', js: true do
 
     it 'can buffer an element' do
       mount 'Foo' do
-        class Bar < HyperComponent
+        class Bar < Hyperloop::Component
           param :p
           render { DIV { @P.span; children.render } }
         end
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def render
             Bar.insert_element(p: "param") { "child"}
           end
@@ -195,11 +195,11 @@ describe 'React::Component', js: true do
 
     it 'can create an element without buffering' do
       mount 'Foo' do
-        class Bar < HyperComponent
+        class Bar < Hyperloop::Component
           param :p
           render { SPAN { @P.span; children.render } }
         end
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           before_mount { @e = Bar.create_element(p: "param") { "child" } }
           render { DIV { 2.times { @e.render } } }
         end
@@ -209,11 +209,11 @@ describe 'React::Component', js: true do
 
     it 'has a class components method' do
       mount 'Foo' do
-        class Bar < HyperComponent
+        class Bar < Hyperloop::Component
           param :id
           render { inspect }
         end
-        class Baz < HyperComponent
+        class Baz < Hyperloop::Component
           param :id
           render { inspect }
         end
@@ -240,7 +240,7 @@ describe 'React::Component', js: true do
       end
       expect_evaluate_ruby("Hyperstack::Component.mounted_components")
         .to contain_exactly("Hyperstack::Internal::Component::TopLevelRailsComponent", "Foo", "Bar:1", "Bar:2", "Baz:3", "Baz:4", "BarChild:5", "BarChild:6")
-      expect_evaluate_ruby("HyperComponent.mounted_components")
+      expect_evaluate_ruby("Hyperloop::Component.mounted_components")
         .to contain_exactly("Bar:1", "Bar:2", "Baz:3", "Baz:4", "BarChild:5", "BarChild:6")
       expect_evaluate_ruby("Bar.mounted_components")
         .to contain_exactly("Bar:1", "Bar:2", "BarChild:5", "BarChild:6")
@@ -442,7 +442,7 @@ describe 'React::Component', js: true do
   describe 'Anonymous Component' do
     it "will not generate spurious warning messages" do
       evaluate_ruby do
-        foo = Class.new(HyperComponent)
+        foo = Class.new(Hyperloop::Component)
         foo.class_eval do
           def render; "hello" end
         end
@@ -459,7 +459,7 @@ describe 'React::Component', js: true do
   describe 'Render Error Handling' do
     it "will generate a message if render returns something other than an Element or a String" do
       mount 'Foo' do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def render; Hash.new; end
         end
       end
@@ -468,7 +468,7 @@ describe 'React::Component', js: true do
     end
     it "will generate a message if render returns a Component class" do
       mount 'Foo' do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def render; Foo; end
         end
       end
@@ -477,7 +477,7 @@ describe 'React::Component', js: true do
     end
     it "will generate a message if more than 1 element is generated" do
       mount 'Foo' do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def render; "hello".span; "goodby".span; end
         end
       end
@@ -486,7 +486,7 @@ describe 'React::Component', js: true do
     end
     it "will generate a message if the element generated is not the element returned" do
       mount 'Foo' do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def render; "hello".span; "goodby".span.delete; end
         end
       end
@@ -558,7 +558,7 @@ describe 'React::Component', js: true do
 
     before(:each) do
       on_client do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def needs_update?(next_params, next_state)
             next_params.changed?
           end
@@ -595,7 +595,7 @@ describe 'React::Component', js: true do
 
     before(:each) do
       on_client do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           def needs_update?(next_params, next_state)
             next_state.changed?
           end

@@ -19,7 +19,7 @@ describe 'React::State', js: true do
   it 'ignores state updates during rendering' do
     client_option render_on: :both
     evaluate_ruby do
-      class StateTest < HyperComponent
+      class StateTest < Hyperloop::Component
         include Hyperstack::State::Observable
         class << self
           state_accessor :boom

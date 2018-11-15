@@ -105,7 +105,7 @@ describe 'the param macro', js: true do
   
   it 'defines collect_other_params_as method on params proxy' do
     mount 'Foo', bar: 'biz' do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
         collect_other_params_as :foo
 
@@ -119,7 +119,7 @@ describe 'the param macro', js: true do
 
   it 'defines collect_other_params_as method on params proxy' do
     mount 'Foo' do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
         state s: :beginning, scope: :shared
         def self.update_s(x)
@@ -130,7 +130,7 @@ describe 'the param macro', js: true do
         end
       end
 
-      class Foo2 < HyperComponent
+      class Foo2 < Hyperloop::Component
         param_accessor_style :legacy
         collect_other_params_as :opts
 
@@ -146,7 +146,7 @@ describe 'the param macro', js: true do
 
   it "can create and access a required param" do
     mount 'Foo', foo: :bar do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
         param :foo
 
@@ -160,7 +160,7 @@ describe 'the param macro', js: true do
 
   it "can create and access an optional params" do
     mount 'Foo', foo1: :bar1, foo3: :bar3 do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
 
         param foo1: :no_bar1
@@ -178,7 +178,7 @@ describe 'the param macro', js: true do
 
   it 'can specify validation rules with the type option' do
     expect_evaluate_ruby do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
         param :foo, type: String
       end
@@ -188,7 +188,7 @@ describe 'the param macro', js: true do
 
   it "can type check params" do
     mount 'Foo', foo1: 12, foo2: "string" do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
         param :foo1, type: String
         param :foo2, type: String
@@ -206,7 +206,7 @@ describe 'the param macro', js: true do
   it 'logs error in warning if validation failed' do
     evaluate_ruby do
       class Lorem; end
-      class Foo2 < HyperComponent
+      class Foo2 < Hyperloop::Component
         param_accessor_style :legacy
         param :foo
         param :lorem, type: Lorem
@@ -223,7 +223,7 @@ describe 'the param macro', js: true do
   it 'should not log anything if validation passes' do
     evaluate_ruby do
       class Lorem; end
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :legacy
         param :foo
         param :lorem, type: Lorem
@@ -240,7 +240,7 @@ describe 'the param macro', js: true do
   describe 'advanced type handling' do
     before(:each) do
       on_client do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           param_accessor_style :legacy
           def render; ""; end
         end
@@ -296,7 +296,7 @@ describe 'the param macro', js: true do
 
     it 'allows passing and merging complex arguments to params' do
       mount 'Tester' do
-        class TakesParams < HyperComponent
+        class TakesParams < Hyperloop::Component
           param_accessor_style :legacy
           param  :flag
           param  :a
@@ -310,7 +310,7 @@ describe 'the param macro', js: true do
             end
           end
         end
-        class Tester < HyperComponent
+        class Tester < Hyperloop::Component
           render do
             TakesParams(
               :flag,
@@ -331,7 +331,7 @@ describe 'the param macro', js: true do
 
     it 'allows passing nil for class and style params' do
       mount 'Tester' do
-        class Tester < HyperComponent
+        class Tester < Hyperloop::Component
           param_accessor_style :legacy
           render do
             DIV(id: 'tp', class: nil, style: nil) { 'Tester' }
@@ -369,7 +369,7 @@ describe 'the param macro', js: true do
       end
 
       it "even if contains an embedded native object", skip: 'its not clear what this test was trying to accomplish...' do
-        stub_const "Bar", Class.new(HyperComponent)
+        stub_const "Bar", Class.new(Hyperloop::Component)
         stub_const "BazWoggle", Class.new
         BazWoggle.class_eval do
           def initialize(kind)

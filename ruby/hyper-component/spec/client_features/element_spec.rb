@@ -36,7 +36,7 @@ describe 'Hyperstack::Component::Element', js: true do
 
     it 'will subscribe to a component event param' do
       evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           triggers :event
           def render
             event!
@@ -49,7 +49,7 @@ describe 'Hyperstack::Component::Element', js: true do
 
     it 'will subscribe to multiple component event params' do
       evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           triggers :event1
           triggers :event2
           def render
@@ -74,7 +74,7 @@ describe 'Hyperstack::Component::Element', js: true do
         render() { return React.createElement("span", null, this.props.onEvent()); }
       }')
       evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           imports "NativeComponent"
         end
         Hyperstack::Component::ReactTestUtils.render_into_document(Hyperstack::Component::ReactAPI.create_element(Foo).on(:event) {'works!'})
@@ -86,7 +86,7 @@ describe 'Hyperstack::Component::Element', js: true do
     it 'will subscribe to a component event param with a non-default name' do
 
       evaluate_ruby do
-        class Foo < HyperComponent
+        class Foo < Hyperloop::Component
           triggers '<my_event>', alias: :my_event!
           def render
             my_event!

@@ -4,7 +4,7 @@ describe 'Auto Unmounting', js: true do
   context 'Of timers' do
     before(:each) do
       on_client do
-        class Mounter < HyperComponent
+        class Mounter < Hyperloop::Component
           include Hyperstack::State::Observable
           param :keep_running
           class << self
@@ -29,7 +29,7 @@ describe 'Auto Unmounting', js: true do
             end
           end
         end
-        class Mounted < HyperComponent
+        class Mounted < Hyperloop::Component
           param :keep_running
           after_mount do
             if @KeepRunning
@@ -66,7 +66,7 @@ describe 'Auto Unmounting', js: true do
         end
         before_unmount { mutate @state = :unmounted }
       end
-      class Mounter < HyperComponent
+      class Mounter < Hyperloop::Component
         include Hyperstack::State::Observable
         before_mount { @observable_object = ObservableObject.new }
         render do
@@ -81,7 +81,7 @@ describe 'Auto Unmounting', js: true do
           end
         end
       end
-      class Mounted < HyperComponent
+      class Mounted < Hyperloop::Component
         param :observable_object
         render do
           "Mounted!"

@@ -4,7 +4,7 @@ describe 'param macro vs instance var access', js: true do
 
   it "instance var is a lot faster" do
     mount 'Foo', foo: :bar do
-      class Foo < HyperComponent
+      class Foo < Hyperloop::Component
         param_accessor_style :both
         param :foo
 

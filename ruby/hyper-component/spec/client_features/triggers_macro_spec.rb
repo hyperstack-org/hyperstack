@@ -59,6 +59,36 @@ describe 'event callbacks', js: true do
     expect(page).to have_content('works!')
   end
 
+  it "can work with builtin events" do
+    mount 'Test' do
+      class Btn < HyperComponent
+        triggers :bungo
+        Btn.class.attr_accessor :clicked
+        render do
+          BUTTON(id: :btn) do
+            children.each(&:render)
+          end.on(:click) do |evt|
+            Btn.clicked = true
+            puts "calling bungo!"
+            bungo!
+            evt.stop_propagation
+          end
+        end
+      end
+      class Test < HyperComponent
+        render do
+          puts "rendering Test clicked  = #{@clicked}"
+          Btn { "CLICK ME" }.on(:bungo) { toggle :clicked } unless @clicked
+        end
+      end
+    end
+    expect(page).to have_content('CLICK ME')
+    expect_evaluate_ruby('Btn.clicked').to be_falsy
+    find('#btn').click
+    expect(page).not_to have_content('CLICK ME', wait: 0.1)
+    expect_evaluate_ruby('Btn.clicked').to be_truthy
+  end
+
   it "the event name can use a non-standard format" do
     mount 'FooBar' do
       class Foo
