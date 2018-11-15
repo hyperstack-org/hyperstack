@@ -3,18 +3,7 @@ cache:
   bundler: true
   directories:
   - node_modules # NPM packages
-# env:
-#   - COMPONENT=hyper-i18n                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyper-component             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyper-model                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyper-operation             LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyper-router                LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyper-spec                  LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   - COMPONENT=hyper-state                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyper-store                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
-#   # - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+  
 _test_gem: &_test_gem
   stage: test
   addons:
@@ -36,19 +25,19 @@ _test_gem: &_test_gem
     - sudo rm -f /usr/local/bin/yarn
     - gem install bundler
     - nvm install 10
-    - if [[ "$LANGUAGE" == "ruby" ]]; then rvm install $LANGUAGE_VERSION; fi
+    - rvm install $RUBY_VERSION
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
   before_script:
     - echo before_script $COMPONENT
-    - cd $LANGUAGE/$COMPONENT
-    - if [[ "$LANGUAGE" == "ruby" ]]; then bundle install --jobs=3 --retry=3; fi
-    - if [[ "$LANGUAGE" == "ruby" ]]; then bundle exec rake spec:prepare; fi
+    - cd ruby/$COMPONENT
+    - bundle install --jobs=3 --retry=3
+    - bundle exec rake spec:prepare
     - google-chrome --version
     - which google-chrome
     - yarn install
   script:
     - echo running script $COMPONENT
-    - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
+    - DRIVER=travis bundle exec rake
 
 _deploy_gem: &_deploy_gem
   stage: release gems
@@ -62,17 +51,31 @@ _deploy_gem: &_deploy_gem
         secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
       on:
         tags: true
+
 jobs:
   include:
-    # - stage: release gems
-    #   script:
-    #     - echo deploying something
     - <<: *_test_gem
-      env: COMPONENT=hyper-i18n LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+      env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1
     - <<: *_test_gem
-      env: COMPONENT=hyper-trace LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+      env: COMPONENT=hyper-trace       RUBY_VERSION=2.5.1
     - <<: *_test_gem
-      env: COMPONENT=hyper-state LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+      env: COMPONENT=hyper-state       RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-component   RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-router      RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1
+    - <<: *_test_gem
+      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1
 
     - <<: *_deploy_gem
       env: COMPONENT=hyper-i18n
@@ -80,27 +83,19 @@ jobs:
       env: COMPONENT=hyper-trace
     - <<: *_deploy_gem
       env: COMPONENT=hyper-state
-# jobs:
-#   include:
-#     - stage: deploy
-#       before_script:
-#         - cd ruby/hyper-i18n
-#       script:
-#         - echo deploying hyper-trace
-#       deploy:
-#         - provider: rubygems
-#           api_key:
-#             secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
-#           on:
-#             tags: true
-#     - stage: deploy
-#       before_script:
-#         - cd ruby/hyper-trace
-#       script:
-#         - echo deploying hyper-trace
-#       deploy:
-#         - provider: rubygems
-#           api_key:
-#             secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
-#           on:
-#             tags: true
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-component
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-model
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-operation
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-router
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-spec
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-store
+    - <<: *_deploy_gem
+      env: COMPONENT=rails-hyperstack
+    - <<: *_deploy_gem
+      env: COMPONENT=hyperstack-config
