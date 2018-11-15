@@ -15,6 +15,18 @@ env:
   - COMPONENT=hyper-trace                 LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   # - COMPONENT=rails-hyperstack            LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
   # - COMPONENT=hyperstack-config           LANGUAGE=ruby LANGUAGE_VERSION=2.5.1
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+      - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+        key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+    packages:
+      - chromium-chromedriver
+      - google-chrome-stable
+      - yarn
+  mariadb: '10.3'
 before_install:
   - echo installing $COMPONENT
   # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
@@ -36,7 +48,7 @@ script:
   - echo running script $COMPONENT
   - if [[ "$LANGUAGE" == "ruby" ]]; then DRIVER=travis bundle exec rake; fi
 # _deploy_ruby_gem: &_deploy_ruby_gem
-#   stage: deploy
+#   stage: release gems
 #   before_script:
 #     - cd ruby/$COMPONENT
 #   script:
@@ -49,28 +61,18 @@ script:
 #         tags: true
 jobs:
   include:
-    - stage: test
-      addons:
-        apt:
-          sources:
-            - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
-              key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
-            - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
-              key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
-          packages:
-            - chromium-chromedriver
-            - google-chrome-stable
-            - yarn
-        mariadb: '10.3'
-    - stage: release gems
-      script:
-        - echo deploying something
-    # - <<: *_deploy_ruby_gem
-    #   env:
-    #     - COMPONENT=hyper-i18n
-    # - <<: *_deploy_ruby_gem
-    #   env:
-    #     - COMPONENT=hyper-trace
+    # - stage: release gems
+    #   script:
+    #     - echo deploying something
+    - <<: *_deploy_ruby_gem
+      env:
+        - COMPONENT=hyper-i18n
+    - <<: *_deploy_ruby_gem
+      env:
+        - COMPONENT=hyper-trace
+    - <<: *_deploy_ruby_gem
+      env:
+        - COMPONENT=hyper-state
 # jobs:
 #   include:
 #     - stage: deploy
