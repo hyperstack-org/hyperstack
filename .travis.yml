@@ -65,8 +65,7 @@ jobs:
     #   script:
     #     - echo deploying something
     - <<: *_deploy_ruby_gem
-      env:
-        - COMPONENT=hyper-i18n
+      env: COMPONENT=hyper-i18n
     - <<: *_deploy_ruby_gem
       env:
         - COMPONENT=hyper-trace
