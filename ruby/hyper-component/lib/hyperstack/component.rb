@@ -33,7 +33,7 @@ module Hyperstack
          Opal.__hyperstack_component_original_defn = Opal.defn
          Opal.defn = function(klass, name, fn) {
            #{
-             if `klass`.respond_to?(:hyper_component?)
+             if `klass`.respond_to?(:hyper_component?) && !(`klass` < Hyperstack::Component::NativeLibrary)
                if `name == '$render'` && !`klass`.allow_deprecated_render_definition?
                  Hyperstack.deprecation_warning(`klass`, 'Do not directly define the render method. Use the render macro instead.')
                elsif `name == '$__hyperstack_component_render'`

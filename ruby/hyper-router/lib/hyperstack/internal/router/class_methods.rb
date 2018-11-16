@@ -52,7 +52,7 @@ module Hyperstack
         end
 
         def render_router(&block)
-          define_method(:render) do
+          define_method(:__hyperstack_component_render) do
             self.class.history :browser unless history
 
             React::Router::Router(history: history.to_n) do
@@ -62,7 +62,7 @@ module Hyperstack
         end
 
         def prerender_router(&block)
-          define_method(:render) do
+          define_method(:__hyperstack_component_render) do
             location = {}.tap do |hash|
               pathname, search = IsomorphicMethods.request_fullpath.split('?', 2)
               hash[:pathname] = pathname
