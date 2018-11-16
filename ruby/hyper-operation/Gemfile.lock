@@ -1,9 +1,9 @@
 PATH
   remote: ../hyper-component
   specs:
-    hyper-component (0.1)
-      hyper-state (= 0.1)
-      hyperstack-config (= 0.1)
+    hyper-component (1.0.alpha1.2)
+      hyper-state (= 1.0.alpha1.2)
+      hyperstack-config (= 1.0.alpha1.2)
       libv8 (~> 6.3.0)
       mini_racer (~> 0.1.15)
       opal (>= 0.11.0, < 0.12.0)
@@ -13,7 +13,7 @@ PATH
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (0.1)
+    hyper-spec (1.0.alpha1.2)
       capybara
       chromedriver-helper (= 1.2.0)
       libv8 (~> 6.3.0)
@@ -32,14 +32,14 @@ PATH
 PATH
   remote: ../hyper-state
   specs:
-    hyper-state (0.1)
-      hyperstack-config (= 0.1)
+    hyper-state (1.0.alpha1.2)
+      hyperstack-config (= 1.0.alpha1.2)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperstack-config
   specs:
-    hyperstack-config (0.1)
+    hyperstack-config (1.0.alpha1.2)
       libv8 (~> 6.3.0)
       listen (~> 3.0)
       mini_racer (~> 0.1.15)
@@ -51,9 +51,9 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-operation (0.1)
+    hyper-operation (1.0.alpha1.2)
       activerecord (>= 4.0.0)
-      hyper-component (= 0.1)
+      hyper-component (= 1.0.alpha1.2)
       mutations
       opal-activesupport (~> 0.3.1)
 
@@ -116,7 +116,7 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     builder (3.2.3)
-    capybara (3.10.0)
+    capybara (3.11.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -281,7 +281,7 @@ GEM
       execjs
       railties (>= 3.2)
       tilt
-    regexp_parser (1.2.0)
+    regexp_parser (1.3.0)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -309,7 +309,7 @@ GEM
       rspec (>= 3, < 4)
     ruby_dep (1.5.0)
     rubyzip (1.2.2)
-    selenium-webdriver (3.14.1)
+    selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2, >= 1.2.2)
     sourcemap (0.1.1)
