@@ -130,6 +130,10 @@ module Hyperstack
             options[:default] ||= nil
             options[:allow_nil] = true unless options.key?(:allow_nil)
           end
+          if name == :class
+            name = :className
+            options[:alias] ||= :Class
+          end
           if options[:default]
             validator.optional(name, options)
           else

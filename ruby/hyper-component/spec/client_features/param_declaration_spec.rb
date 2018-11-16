@@ -129,6 +129,20 @@ describe 'the param macro', js: true do
           .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo1` could not be converted to String/)
   end
 
+  it "will properly handle params named class" do
+    mount 'Foo', className: 'a-class' do
+      class Foo < Hyperloop::Component
+
+        param :class
+
+        render do
+          DIV { "class = #{@Class}" }
+        end
+      end
+    end
+    expect(page).to have_content('class = a-class')
+  end
+
   it 'logs error in warning if validation failed' do
     evaluate_ruby do
       class Lorem; end

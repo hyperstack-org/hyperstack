@@ -63,14 +63,6 @@ PATH
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
-  remote: ../hyper-store
-  specs:
-    hyper-store (1.0.alpha1.1)
-      hyper-state (= 1.0.alpha1.1)
-      hyperstack-config (= 1.0.alpha1.1)
-      opal (>= 0.11.0, < 0.12.0)
-
-PATH
   remote: ../hyperstack-config
   specs:
     hyperstack-config (1.0.alpha1.1)
@@ -412,7 +404,6 @@ DEPENDENCIES
   hyper-router!
   hyper-spec!
   hyper-state!
-  hyper-store!
   hyperstack-config!
   jbuilder (~> 2.5)
   pry

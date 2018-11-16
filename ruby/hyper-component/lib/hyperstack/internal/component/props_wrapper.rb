@@ -42,6 +42,7 @@ module Hyperstack
             param_definitions[name] = lambda do |props|
               @component.instance_variable_set :"@#{var_name}", fetch_from_cache(name, param_type, props)
             end
+            return if param_accessor_style == :hyperstack
             if param_type == Proc
               define_method(meth_name.to_sym) do |*args, &block|
                 props[name].call(*args, &block) if props[name]
