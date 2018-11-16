@@ -7,7 +7,7 @@ class UsingState < HyperComponent
   render(DIV) do
     # the button method returns an HTML element
     # .on(:click) is an event handeler
-    button.on(:click) { mutate @show = !@show }
+    button.on(:click) { toggle :show }
     DIV do
       input
       output

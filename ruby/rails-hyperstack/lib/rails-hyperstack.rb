@@ -1,7 +1,6 @@
 require 'hyperstack-config'
 require 'rails/generators'
 require 'hyper-state'
-require 'hyper-store'
 
 # remove these once lap29 is released ...
 Hyperstack.js_import 'react/react-source-browser', client_only: true, defines: ['ReactDOM', 'React']
