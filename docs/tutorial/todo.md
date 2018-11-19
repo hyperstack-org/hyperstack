@@ -7,7 +7,7 @@
 
 ### The Goals of this Tutorial
 
-In this tutorial, you will build the classic [TodoMVC](http://todomvc.com) application using Hyperloop. This tutorial will demonstrate all Hyperloop concepts - client side Components and Isomorphic Models.
+In this tutorial, you will build the classic [TodoMVC](http://todomvc.com) application using Hyperstack. This tutorial will demonstrate several key Hyperstack concepts - client side Components and Isomorphic Models.
 
 The finished application will
 
@@ -22,41 +22,89 @@ You will write less than 100 lines of code, and the tutorial should take about 1
 
 ### Skills required
 
-Working knowledge of Rails required
+Basic knowledge of Rails is helpful.
 
 ### Chapter 1: Setting Things Up
 
-+ `rails new MyApp`
-+ `cd MyApp` directory
-+ add `gem 'hyperloop'` to the Gemfile
-+ `bundle install`
-+ `run rails g hyperloop:install`
++ `rails new todo-demo -T -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb`
++ `cd todo-demo`
+
+*Note you can name the app anything you want, we recommend todo-demo, but whatever you do DON'T call it todo, as this name
+will be needed later!*
 
 #### Start the Rails app
 
-+ `bundle exec foreman start` to start Rails and OpalHotReloader
+For the rest of the tutorial you will want to have two console windows open in the `todo` directory, one running the Rails app, and the
+other to execute various commands.
 
-Navigate to `http://localhost:5000/` and you should see the word **App** displayed on the page.
+In one of the consoles run:
 
-### Chapter 2:  Hyperloop Models are Rails Models
++ `bundle exec foreman start` to start Rails and Hotloader
 
-We are going to add our Todo Model, and discover that Hyperloop models are in fact Rails models.
+Navigate to `http://localhost:5000/` in your browser and you should see the word **Hello world from Hyperstack!** displayed on the page.
+
+*Note: you will be using port 5000 not the more typical 3000, this is because of the way the Hotloader is configured*
+
+#### Make a Simple Change
+
+Bring up your favorite editor on the `todo-demo` directory.  You will see a folders like `app`, `bin`, `config` and `db`.  These have
+all been preinitialized by Rails and the Hyperstack template you used to build the app.
+
+Now find the `app/hyperstack/components/app.rb` file.  It looks like this:
+
+```ruby
+# app/hyperstack/component/app.rb
+
+# This is your top level component, the rails router will
+# direct all requests to mount this component.  You may
+# then use the Route psuedo component to mount specific
+# subcomponents depending on the URL.
+
+class App < HyperComponent
+  include Hyperstack::Router
+
+  # define routes using the Route psuedo component.  Examples:
+  # Route('/foo', mounts: Foo)                : match the path beginning with /foo and mount component Foo here
+  # Route('/foo') { Foo(...) }                : display the contents of the block
+  # Route('/', exact: true, mounts: Home)     : match the exact path / and mount the Home component
+  # Route('/user/:id/name', mounts: UserName) : path segments beginning with a colon will be captured in the match param
+  # see the hyper-router gem documentation for more details
+
+  render do
+    H1 { "Hello world from Hyperstack!" }
+  end
+end
+```
+
+Change the string displayed to something like: `"Todo App Coming Soon"`.  You will see the display instantly change when you save the file.
+
+You can also delete the comments as we will go over details of routing later.
+
+>The Hyperstack UI is built from components.  Each component is defined by a subclass of HyperComponent.  In some cases there will only be one instance of
+the class displayed, and as we will see at other times the class is reused to display multiple components.  If you are familiar with Rails or the MVC structure
+then you can think of Components as views that continuously update as the state of the application changes.  
+
+### Chapter 2:  Hyperstack Models are Rails Models
+
+We are going to add our Todo Model, and discover that Hyperstack models are in fact Rails ActiveRecord models.
 + You can access the your rails models on the client using the same syntax you use on the server.
 + Changes on the client are mirrored on the server.
 + Changes to models on the server are synchronized with all participating browsers.
 + Data access is is protected by a robust *policy* mechanism.
 
->A Rails ActiveRecord Model is a Ruby class that is backed by a database table.  In this example we will have one model class called `Todo`.  When manipulating models, Rails automatically generates the necessary SQL code for you.  So when `Todo.all` is evaluated Rails generates the appropriate SQL
-and turns the result of the query into appropriate Ruby data structures.
+>A Rails ActiveRecord Model is a Ruby class that is backed by a database table.  In this example we will have one model class called `Todo`.
+When manipulating models, Rails automatically generates the necessary SQL code for you.  So when `Todo.all` is evaluated Rails
+generates the appropriate SQL and turns the result of the query into appropriate Ruby data structures.
 
-**Hyperloop Models are extensions of ActiveRecord Models that synchronize the data between the client and server
+**Hyperstack Models are extensions of ActiveRecord Models that synchronize the data between the client and server
 automatically for you.  So now `Todo.all` can be evaluated on the server or the client.**
 
 Okay lets see it in action:
 
 1. **Add the Todo Model:**  
-  In a new terminal window run **on a single line**:   
-  ```ruby
+
+  In your second terminal window run **on a single line**:   
+  ```text
     bundle exec rails g model Todo title:string completed:boolean priority:integer
   ```
 
@@ -78,28 +126,27 @@ Okay lets see it in action:
   ```
   which will create the table.
 
-2. **Make Some Models Public:**  
+2. **Make Your Model Public:**   
 
-+ *Move* `models/todo.rb` to `hyperloop/models`
-+ Stop and restart your rails server
+  *Move* `models/todo.rb` to `hyperstack/models`
 
-This will make the model accessible on the clients *and the server*, subject to any data access policies. 
+  This will make the model accessible on the clients *and the server*, subject to any data access policies.
 
-*Note: The hyperloop installer adds a policy that gives full permission to all clients but only in development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
+  *Note: The hyperstack installer adds a policy that gives full permission to all clients but only in development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
 
-3. **Try It**
-  Change your `App` component's render method to:  
+3. **Try It**  
+
+  Now change your `App` component's render method to:  
   ```ruby
-    # app/hyperloop/components/app.rb
-    class App < Hyperloop::Component
-     render(DIV) do
-       "Number of Todos: #{Todo.count}"
-     end
+  class App < HyperComponent
+    include Hyperstack::Router
+    render do
+       H1 { "Number of Todos: #{Todo.count}" }
     end
+  end
   ```  
 
-   **Reload the Page**
-   You will now see *Number of Todos: 0* displayed.  *You must reload the page as you have changed the class of App from `Router` to `Component`*
+   You will now see **Number of Todos: 0** displayed.
 
    Now start a rails console
    ```ruby
@@ -109,7 +156,8 @@ This will make the model accessible on the clients *and the server*, subject to 
    ```ruby
      Todo.create(title: 'my first todo')
    ```  
-   This is telling the server to create a new todo, which will update your hyperloop application, and you will see the count change to 1!   
+   This will create a new Todo in the server's database, which will cause your Hyperstack application to be
+   updated and you will see the count change to 1!   
 
    Try it again:  
    ```ruby
@@ -117,7 +165,7 @@ This will make the model accessible on the clients *and the server*, subject to 
    ```  
    and you will see the count change to 2!   
 
-Are we having fun yet?  I hope so!  As you can see Hyperloop is synchronizing the Todo model between the client and server.  As the state of the database changes, HyperReact buzzes around updating whatever parts of the DOM were dependent on that data (in this case the count of Todos).
+Are we having fun yet?  I hope so!  As you can see Hyperstack is synchronizing the Todo model between the client and server.  As the state of the database changes, Hyperstack buzzes around updating whatever parts of the DOM were dependent on that data (in this case the count of Todos).
 
 Notice that we did not create any APIs to achieve this.  Data on the server is synchronized with data on the client for you.
 
@@ -128,8 +176,9 @@ Now that we have all of our pieces in place, lets build our application.
 Replace the entire contents of `app.rb` with:
 
 ```ruby
-# app/hyperloop/components/app.rb
-class App < Hyperloop::Component
+# app/hyperstack/components/app.rb
+class App < HyperComponent
+  include Hyperstack::Router
   render(SECTION) do
     Header()
     Index()
@@ -138,13 +187,19 @@ class App < Hyperloop::Component
 end
 ```
 
-The browser screen will go blank because we have not defined the three subcomponents.  Lets define them now:
+After saving you will see the following error displayed:
 
-Add three new ruby files to the `app/hyperloop/components` folder:
+**Uncaught error: Header: undefined method `Header' for #<App:0x970>  
+in App (created by Hyperstack::Internal::Component::TopLevelRailsComponent)  
+in Hyperstack::Internal::Component::TopLevelRailsComponent**
+
+because have not defined the three subcomponents.  Lets define them now:
+
+Add three new ruby files to the `app/hyperstack/components` folder:
 
 ```ruby
-# app/hyperloop/components/header.rb
-class Header < Hyperloop::Component
+# app/hyperstack/components/header.rb
+class Header < HyperComponent
   render(HEADER) do
     'Header will go here'
   end
@@ -152,8 +207,8 @@ end
 ```
 
 ```ruby
-# app/hyperloop/components/index.rb
-class Index < Hyperloop::Component
+# app/hyperstack/components/index.rb
+class Index < HyperComponent
   render(SECTION) do
     'List of Todos will go here'
   end
@@ -161,8 +216,8 @@ end
 ```
 
 ```ruby
-# app/hyperloop/components/footer.rb
-class Footer < Hyperloop::Component
+# app/hyperstack/components/footer.rb
+class Footer < HyperComponent
   render(DIV) do
     'Footer will go here'
   end
@@ -173,25 +228,29 @@ Once you add the Footer component you should see:
 
   <div style="border:solid; margin-left: 10px; padding: 10px">
     <div>Header will go here</div>
-    <div>List of Todos will go here</div>  
-    <div>Footer will go here</div>  
+    <div>List of Todos will go here</div>
+    <div>Footer will go here</div>
   </div>
   <br>
-
 If you don't, restart the server, and reload the browser.
 
 Notice how the usual HTML tags such as DIV, SECTION, and HEADER are all available as well as all the other HTML and SVG tags.
 
-### Chapter 4: Listing the Todos, HyperReact Params, and Prerendering
+>Hyperstack uses the following conventions to easily distinguish between HTML tags, application defined components and other helper methods:
+> + HTML tags are in all caps
+> + Application components are CamelCased
+> + other helper methods are snake_cased
+
+### Chapter 4: Listing the Todos, Hyperstack Params, and Prerendering
 
 To display each Todo we will create a TodoItem component that takes a parameter:
 
 ```ruby
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    params.todo.title
+    @Todo.title
   end
 end
 ```
@@ -199,8 +258,8 @@ end
 We can use this component in our Index component:
 
 ```ruby
-# app/hyperloop/components/index.rb
-class Index < Hyperloop::Component
+# app/hyperstack/components/index.rb
+class Index < HyperComponent
   render(SECTION) do
     UL do
       Todo.each do |todo|
@@ -214,7 +273,7 @@ end
 Now you will see something like
 
   <div style="border:solid; margin-left: 10px; padding: 10px">
-    <div>Header will go here</div>
+    <div>Header will go here</div>  
     <ul>
       <li>my first todo</li>
       <li>my second todo</li>
@@ -225,10 +284,13 @@ Now you will see something like
 
 As you can see components can take parameters (or props in react.js terminology.)
 
->*Rails uses the terminology params (short for parameters) which have a similar purpose to React props, so to make the transition more natural for Rails programmers Hyperloop uses params, rather than props.*
+>*Rails uses the terminology params (short for parameters) which have a similar purpose to React props, so to make the transition more natural for Rails programmers Hyperstack uses params, rather than props.*
 
-Params are declared using the `param` macro and are accessed via the `params` object.
-In our case we *mount* a new TodoItem with each Todo record and pass the Todo as the parameter.   
+Params are declared using the `param` macro and are accessed via Ruby *instance variables*.  Notice that the instance variable name
+is *CamelCased* so that it is easily distinguished from other
+instance variables.
+
+Our `Index` component *mounts* a new `TodoItem` with each `Todo` record and passes the `Todo` to the `TodoItem` component as the parameter.   
 
 Now go back to Rails console and type
 ```ruby
@@ -246,12 +308,12 @@ So far we have seen how our components are synchronized to the data that they di
 First add an `INPUT` html tag to your TodoItem component like this:
 
 ```ruby
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    INPUT(type: :checkbox, checked: params.todo.completed)
-    params.todo.title
+    INPUT(type: :checkbox, checked: @Todo.completed)
+    @Todo.title
   end
 end
 ```
@@ -267,39 +329,38 @@ and you should see the last Todo's `completed` checkbox changing state.
 To make our checkbox input change its own state, we will add an `event handler` for the change event:
 
 ```ruby
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    INPUT(type: :checkbox, checked: params.todo.completed)
-      .on(:click) { params.todo.update(completed: !params.todo.completed) }
-    params.todo.title
+    INPUT(type: :checkbox, checked: @Todo.completed)
+    .on(:change) { @Todo.update(completed: !@Todo.completed) }
+    @Todo.title
   end
 end
 ```
-It reads like a good novel doesn't it?  On a `click` event update the todo, setting the completed attribute to the opposite of its current value.
+It reads like a good novel doesn't it?  On the `change` event update the todo, setting the completed attribute to the opposite of its current value.  The rest of coordination between the database and the display is taken care of for you by the Hyperstack.  
 
-Meanwhile HyperReact sees the value of `params.todo.checked` changing, and this causes the associated HTML INPUT tag to be re-rendered.
+After saving your changes you should be able change the `completed` state of each Todo, and check on the rails console (say by checking `Todo.last.completed`) and you will see that the value has been persisted to the database.  You can also demonstrate this by refreshing the page.
 
-We will finish up by adding a delete link at the end of the Todo item:
+We will finish up by adding a *delete* link at the end of the Todo item:
 
 ```ruby
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    INPUT(type: :checkbox, checked: params.todo.completed)
-      .on(:click) { params.todo.update(completed: !params.todo.completed) }
-    SPAN { params.todo.title } # See note below...
-    A { ' -X-' }.on(:click) { params.todo.destroy }
+    INPUT(type: :checkbox, checked: @Todo.completed)
+    .on(:change) { @Todo.update(completed: !@Todo.completed) }
+    SPAN { @Todo.title } # See note below...
+    A { ' -X-' }.on(:click) { @Todo.destroy }
   end
 end
 ```
-
 *Note: If a component or tag block returns a string it is automatically wrapped in a SPAN, to insert a string in the middle you have to wrap it a SPAN like we did above.*
 
-I hope you are starting to see a pattern here.  HyperReact components determine what to display based on the `state` of some
-objects.  External events, such as mouse clicks, the arrival of new data from the server, and even timers update the `state`.  HyperReact recomputes whatever portion of the display depends on the `state` so that the display is always in sync with the `state`.  In our case the objects are the Todo model and its associated records, which have a number of associated internal `states`.  
+I hope you are starting to see a pattern here.  Hyperstack components determine what to display based on the `state` of some
+objects.  External events, such as mouse clicks, the arrival of new data from the server, and even timers update the `state`.  Hyperstack recomputes whatever portion of the display depends on the `state` so that the display is always in sync with the `state`.  In our case the objects are the Todo model and its associated records, which have a number of associated internal `states`.  
 
 By the way, you don't have to use Models to have states.  We will see later that states can be as simple as boolean instance variables.
 
@@ -313,7 +374,7 @@ So `/all` will display all todos, `/completed` will display the completed Todos,
 To achieve this we first need to be able to *scope* (or filter) the Todo Model. So let's edit the Todo model file so it looks like this:
 
 ```ruby
-# app/hyperloop/models/todo.rb
+# app/hyperstack/models/todo.rb
 class Todo < ApplicationRecord
   scope :completed, -> () { where(completed: true)  }
   scope :active,    -> () { where(completed: false) }
@@ -335,10 +396,10 @@ Having the application display different data (or whole different components) ba
 Lets change `App` to look like this:
 
 ```ruby
-# app/hyperloop/components/app.rb
-class App < Hyperloop::Router
-  history :browser
-  route do # note instead of render we use the route method
+# app/hyperstack/components/app.rb
+class App < HyperComponent
+  include Hyperstack::Router
+  render do
     SECTION do
       Header()
       Route('/', exact: true) { Redirect('/all') }
@@ -351,8 +412,9 @@ end
 and the `Index` component to look like this:
 
 ```ruby
-# app/hyperloop/components/index.rb
-class Index < Hyperloop::Router::Component
+# app/hyperstack/components/index.rb
+class Index < HyperComponent
+  include Hyperstack::Router::Helpers
   render(SECTION) do
     UL do
       Todo.send(match.params[:scope]).each do |todo|
@@ -362,18 +424,12 @@ class Index < Hyperloop::Router::Component
   end
 end
 ```
-*Note that because we have changed the class of these components the hot reloader will break, and you will have to refresh the page and possibly your local server.*
 
 Lets walk through the changes:
-+ `App` now inherits from `Hyperloop::Router` which is a subclass of `Hyperloop::Component` with *router* capabilities added.
-+ The `history` macro tells the router how to track the history (back/forward buttons).  
-The `:browser` history tracks the history invisibly in the html5 browser history.
-The other common option is the `:hash` history which tracks the history in the url hash.
-+ The `render` macro is replaced by `route`, and the `DIV` tag is moved inside the route block.
 + We mount the `Header` components as before.
 + We then check to see if the current route exactly matches `/` and if it does, redirect to `/all`.
 + Then instead of directly mounting the `Index` component, we *route* to it based on the URL.  In this case if the url must look like `/xxx`.
-+ `Index` now inherits from `Hyperloop::Router::Component` which is a subclass of `Hyperloop::Component` with methods like `match` added.
++ `Index` now includes (mixes-in) the `Hyperstack::Router::Helpers` module which has methods like `match`.
 + Instead of simply enumerating all the Todos, we decide which *scope* to filter using the URL fragment *matched* by `:scope`.  
 
 Notice the relationship between `Route('/:scope', mounts: Index)` and `match.params[:scope]`:
@@ -383,19 +439,19 @@ indicated component is mounted, and the match parameters are saved for that comp
 
 You should now be able to change the url from `/all`, to `/completed`, to `/active`, and see a different set of Todos.  For example if you are displaying the `/active` Todos, you will only see the Todos that are not complete.  If you check one of these it will disappear from the list.
 
->*Rails also has the concept of routing, so how do the Rails and Hyperloop routers interact?  Have a look at the config/routes.rb file.  You will see a line like this:  
-`  get '/(*other)', to: 'hyperloop#app'`  
-This is telling Rails to accept all requests and to process them using the `hyperloop` controller, which will attempt to mount a component named `App` in response to the request.  The mounted App component is then responsible for further processing the URL*  
-
->*For more complex scenarios Hyperloop provides Rails helper methods that can be used to mount components from your controllers, layouts, and views*
+>Rails also has the concept of routing, so how do the Rails and Hyperstack routers interact?  Have a look at the config/routes.rb file.  You will see a line like this:  
+  `get '/(*other)', to: 'hyperstack#app'`  
+This is telling Rails to accept all requests and to process them using the `Hyperstack` controller, which will attempt to mount a component named `App` in response to the request.  The mounted App component is then responsible for further processing the URL.  
+>
+>For more complex scenarios Hyperstack provides Rails helper methods that can be used to mount components from your controllers, layouts, and views.
 
 ### Chapter 7:  Helper Methods, Inline Styling, Active Support and Router Nav Links
 
 Of course we will want to add navigation to move between these routes.  We will put the navigation in the footer:
 
 ```ruby
-# app/hyperloop/components/footer.rb
-class Footer < Hyperloop::Component
+# app/hyperstack/components/footer.rb
+class Footer < HyperComponent
   def link_item(path)
     A(href: "/#{path}", style: { marginRight: 10 }) { path.camelize }
   end
@@ -409,9 +465,9 @@ end
 Save the file, and you will now have 3 links, that you will change the path between the three options.  
 
 Here is how the changes work:
-+ Hyperloop is just Ruby, so you are free to use all of Ruby's rich feature set to structure your code. For example the `link_item` method is just a *helper* method to save us some typing.
++ Hyperstack is just Ruby, so you are free to use all of Ruby's rich feature set to structure your code. For example the `link_item` method is just a *helper* method to save us some typing.
 + The `link_item` method uses the `path` argument to construct an HTML *Anchor* tag.
-+ Hyperloop comes with a large portion of the Rails active-support library.  For the text of the anchor tag we use the active-support method `camelize`.
++ Hyperstack comes with a large portion of the Rails active-support library.  For the text of the anchor tag we use the active-support method `camelize`.
 + Later we will add proper css classes, but for now we use an inline style.  Notice that the css `margin-right` is written `marginRight`, and that `10px` can be expressed as the integer 10.
 
 Notice that as you click each link the page reloads.  **However** what we really want is for the links to simply change the route, without reloading the page.
@@ -429,14 +485,15 @@ to
 
 ```ruby
   NavLink("/#{path}", style: { marginRight: 10 }) { path.camelize }
+  # note that there is no href key in NavLink
 ```
 
 Our component should now look like this:
 
 ```ruby
-# app/hyperloop/components/footer.rb
-class Footer < Hyperloop::Component
-  include HyperRouter::ComponentMethods
+# app/hyperstack/components/footer.rb
+class Footer < HyperComponent
+  include Hyperstack::Router::Helpers
   def link_item(path)
     NavLink("/#{path}", style: { marginRight: 10 }) { path.camelize }
   end
@@ -450,7 +507,7 @@ end
 After this change you will notice that changing routes *does not* reload the page, and after clicking to different routes, you can use the browsers forward and back buttons.
 
 How does it work?  The `NavLink` component reacts to a click just like an anchor tag, but instead of changing the window's URL directly, it updates the *HTML5 history object.*
-Associated with this history is a (you guessed it, I hope) *state*.  So when the history changes it causes any components depending on the current URL to be re-rendered.
+Associated with this history is (hope you guessed it) *state*.  So when the history changes it causes any components depending on the state of the URL to be re-rendered.
 
 ### Chapter 8: Create a Basic EditItem Component
 So far we can mark Todos as completed, delete them, and filter them.  Now we create an `EditItem` component so we can change the Todo title.
@@ -458,32 +515,31 @@ So far we can mark Todos as completed, delete them, and filter them.  Now we cre
 Add a new component like this:
 
 ```ruby
-# app/hyperloop/components/edit_item.rb
-class EditItem < Hyperloop::Component
+# app/hyperstack/components/edit_item.rb
+class EditItem < HyperComponent
   param :todo
   render do
-    INPUT(defaultValue: params.todo.title)
-      .on(:key_down) do |evt|
-        next unless evt.key_code == 13
-        params.todo.update(title: evt.target.value)
-      end
+    INPUT(defaultValue: @Todo.title)
+    .on(:enter) do |evt|
+      @Todo.update(title: evt.target.value)
+    end
   end
 end
 ```
 Before we use this component let's understand how it works.
 + It receives a `todo` param which will be edited by the user;
 + The `title` of the todo is displayed as the initial value of the input;
-+ When the user types the enter key (key code 13) the todo is saved.
++ When the user types the enter key updated.
 
 Now update the `TodoItem` component replacing
 
 ```ruby
-  SPAN { params.todo.title }
+  SPAN { @Todo.title }
 ```
 with
 
 ```ruby
-  EditItem(todo: params.todo)
+  EditItem(todo: @Todo)
 ```
 Try it out by changing the text of some our your Todos followed by the enter key.  Then refresh the page to see that the Todos have changed.
 
@@ -497,121 +553,115 @@ To summarize:
 + User double clicks on any Todo title: editing changes to `true`.
 + User saves the Todo being edited: editing changes to `false`.
 + User changes focus away (`blur`) from the Todo being edited: editing changes to `false`.
-In order to accomplish this our `EditItem` component is going to communicate via two callbacks - `on_save` and `on_cancel` - with the parent component.  We can think of these callbacks as custom events, and indeed as we shall see they will work just like any other event.
+
+In order to accomplish this our `EditItem` component is going to communicate to its parent via two application defined events - `save` and `cancel` .  
 Add the following 5 lines to the `EditItem` component like this:
 
 ```ruby
-# app/hyperloop/components/edit_item.rb
-class EditItem < Hyperloop::Component
+# app/hyperstack/components/edit_item.rb
+class EditItem < HyperComponent
   param :todo
-  param :on_save, type: Proc               # add
-  param :on_cancel, type: Proc             # add
-  after_mount { Element[dom_node].focus }  # add
+  triggers :save                             # add
+  triggers :cancel                           # add
+  after_mount { DOM[dom_node].focus }        # add
 
   render do
-    INPUT(defaultValue: params.todo.title)
-      .on(:key_down) do |evt|
-        next unless evt.key_code == 13
-        params.todo.update(title: evt.target.value)
-        params.on_save                       # add
-      end
-      .on(:blur) { params.on_cancel }        # add
+    INPUT(defaultValue: @Todo.title)
+    .on(:enter) do |evt|
+      @Todo.update(title: evt.target.value)
+      save!                                  # add
+    end
+    .on(:blur) { cancel! }                   # add
   end
 end
 ```
-The first two lines add our callbacks.  In HyperReact (and React.js) callbacks are just params.
-Giving them `type: Proc` and beginning their name with `on_` means that HyperReact will treat them syntactically like events (as we will see.)  
+The first two new lines add our custom events.  
 
-The next line uses one of several *Lifecycle Callbacks*.  In this case we need to move the focus to the `EditItem` component after is mounted.
-The `Element` class is Hyperloop's jQuery wrapper, and `dom_node`
+The next new line uses one of several *Lifecycle Callbacks*.  In this case we need to move the focus to the `EditItem` component after is mounted.
+The `DOM` class is Hyperstack's jQuery wrapper, and `dom_node`
 is the method that returns the actual dom node where this instance of the component is mounted.
 
-The `params.on_save` line will call the provided callback.  Notice that because we declared `on_save` as type `Proc`,
-when we refer to it in the component it invokes the callback rather than returning the value.
-For example, if we had left off `type: Proc` we would have to say `params.on_save.call`.
+The `save!` line will trigger the save event in the parent component.  Notice that the method to trigger a custom event is the name of the event followed by a bang (!).
 
-Finally we add the `blur` event handler and simply transform it into our custom `cancel` event.
+Finally we add the `blur` event handler and trigger our `cancel` event.
 
 Now we can update our `TodoItem` component to be a little state machine, which will react to three events:  `double_click`, `save` and `cancel`.
 
 ```ruby
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
-  state editing: false
   render(LI) do
-    if state.editing
-      EditItem(todo: params.todo)
-        .on(:save, :cancel) { mutate.editing false }
+    if @editing
+      EditItem(todo: @Todo)
+      .on(:save, :cancel) { mutate @editing = false }
     else
-      INPUT(type: :checkbox, checked: params.todo.completed)
-        .on(:click) { params.todo.update(completed: !params.todo.completed) }
-      LABEL { params.todo.title }
-        .on(:double_click) { mutate.editing true }
+      INPUT(type: :checkbox, checked: @Todo.completed)
+      .on(:change) { @Todo.update(completed: !@Todo.completed) }
+      LABEL { @Todo.title }
+      .on(:double_click) { mutate @editing = true }
       A { ' -X-' }
-        .on(:click) { params.todo.destroy }
+      .on(:click) { @Todo.destroy }
     end
   end
 end
 ```
-First we declare a *state variable* called `editing` that is initialized to `false`.
+All states in Hyperstack are simply Ruby instance variables (ivars).  Here we use the `@editing` ivar.
 
-We have already used a lot of states that are built into the HyperModel and HyperRouter. The state machines in these complex objects are built out of simple state variables like the `editing`.
+We have already used a lot of states that are built into the HyperModel and HyperRouter. The state machines in these complex objects are built out collections of instance variables like `@editing`.
 
-State variables are *just like instance variables* with the added power that when they change, any dependent components will be updated with the change.
+In the `TodoItem` component the value of `@editing ...` controls whether to render the `EditItem` or the INPUT, LABEL, and Anchor tags.
 
-You read a state variable using the `state` method (similar to the `params` method) and you change state variables using the `mutate` method.  Whenever you want to change a state variable whether its a simple assignment or changing the internal value of a complex structure like a hash or array you use the `mutate` method.
+Because `@editing` (like all ivars) starts off as nil, when the `TodoItem` first mounts, it renders the INPUT, LABEL, and Anchor tags.  Attached to the label tag is a `double_click` handler which does one thing:  *mutates* the component's state setting `@editing` to true.  This then causes the component to re-render, and now instead of the three tags, we will render the `EditItem` component.  
 
-Lets read on:  Next, we see `if state.editing...`.  When the component executes this `if` statement, it reads the value of the `editing` state variable and will either render the `EditItem` or the input, label, and anchor tags.  In this way the `editing` state variable is acting no different than any other Ruby instance variable.  *But here is the key: The component now knows that if the value of the editing state changes, it must re-render this TodoItem.  When state variables are referenced by a component the component will keep track of this, and will re-rerender when the state changes.*
+Attached to the `EditItem` component is the `save` and `cancel` handler (which is shared between the two events) that *mutates* the component's state, setting `@editing` back to false.
 
-Because `editing` starts off false, when the TodoItem first mounts, it renders the input, label, and anchor tags.  Attached to the label tag is a `double_click` handler which does one thing:  *mutates* the editing state.  This then causes the component to re-render, and now instead of the three tags, we will render the `EditItem` component.
-
-Attached to the `EditItem` component is the `save` and `cancel` handler (which is shared between the two events) that *mutates* the editing state, setting it back to false.
-
-Notice that just as you read params using the `params` method, you read state variables using the `state` method.  Note that `state` is singular because we commonly think of the 'state' of an object as singular entity.
+Using and changing state in a component is a simple as reading or changing the value of some instance variables.
+The only caveat is that whenever you want to change a state variable whether its a simple assignment or changing the internal value of a complex structure like a hash or array you use the `mutate` method to signal Hyperstack that that state is changing.
 
 ### Chapter 10: Using EditItem to create new Todos
 
-Our EditItem component has a good robust interface.  It takes a Todo, and lets the user edit the title, and then either save or cancel, using two event style callbacks to communicate back outwards.
+Our `EditItem` component has a good robust interface.  It takes a Todo, and lets the user edit the title, and then either save or cancel, using two custom events to communicate back outwards.
 
-Because of this we can easily reuse EditItem to create new Todos.  Not only does this save us time, but it also insures that the user interface acts consistently.
+Because of this we can easily reuse `EditItem` to create new Todos.  Not only does this save us time, but it also insures that the user interface acts consistently.
 
-Update the `Header` component to use EditItem like this:
+Update the `Header` component to use `EditItem` like this:
 
 ```ruby
-# app/hyperloop/components/header.
-class Header < Hyperloop::Component
-  state(:new_todo) { Todo.new }
+# app/hyperstack/components/header.
+class Header < HyperComponent
+  before_mount { @new_todo = Todo.new }
   render(HEADER) do
-    EditItem(todo: state.new_todo)
-      .on(:save) { mutate.new_todo Todo.new }
+    EditItem(todo: @new_todo)
+    .on(:save) { mutate @new_todo = Todo.new }
   end
 end
 ```
-What we have done is create a state variable called `new_todo` and we have initialized it using a block that will return `Todo.new`.  The reason we use a block is to insure that we don't call `Todo.new` until after the system is loaded, at which point all state initialization blocks will be run.  A good rule of thumb is to use the block notation unless the initial value is a constant.
+What we have done is initialize an instance variable `@new_todo` to a new unsaved `Todo` item in the `before_mount` lifecycle method.  
 
-Then we pass the value of the state variable to EditItem, and when it is saved, we generate another new Todo and save it the `new_todo` state variable.
+Then we pass the value `@new_todo` to EditItem, and when it is saved, we generate another new Todo and save it in the `new_todo` state variable.
 
-Notice `new_todo` is a state variable that is used in Header, so when it is mutated, it will cause a re-render of the Header, which will then pass the new value of `new_todo`, to EditItem, causing that component to re-render.  
+When `Header`'s state is mutated, it will cause a re-render of the Header, which will then pass the new value of `@new_todo`, to `EditItem`, causing that component to also re-render.  
 
 We don't care if the user cancels the edit, so we simply don't provide a `:cancel` event handler.
 
 Once the code is added a new input box will appear at the top of the window, and when you type enter a new Todo will be added to the list.
 
-However you will notice that the value of new Todo input box does not clear.  This is subtle problem that is easy to fix.
+However you will notice that the value of new Todo input box does not clear.  This is subtle problem but it's easy to fix.
 
-React treats the `INPUT` tags `defaultValue` specially.  It is only read when the `INPUT` is first mounted, so it *does not react* to changes like normal
+React treats the `INPUT` tag's `defaultValue` specially.  It is only read when the `INPUT` is first mounted, so it *does not react* to changes like normal
 parameters.  Our `Header` component does pass in
 new Todo records, but even though they are changing React *does not* update the INPUT.
 
-We can easily fix this by adding a `key` param to the `INPUT` that is associated with each unique Todo.
-In Ruby this is easy as every object has an `object_id` method that is guaranteed to return a unique value.
+React has a special param called `key`.  React uses this to uniquely identify mounted components.  It is used to keep track of lists of components,
+it can also used in this case to indicate that the component needs to be remounted by changing the value of key.
 
-Changing the value of the key, will inform React that we are referring to a new Todo, and thus a  new `INPUT` element will have to be mounted.
+All objects in Hyperstack respond to the `to_key` method which will return a suitable unique key id, so all we have to pass `@Todo` as the key param it
+this will insure that as `@Todo` changes, we will re-initialize the `INPUT` tag.
 
 ```ruby
   ...
-  INPUT(defaultValue: params.todo.title, key: params.todo.object_id)
+  INPUT(defaultValue: @Todo.title, key: @Todo) # add the special key param
   ...
 ```
 
@@ -619,7 +669,7 @@ Changing the value of the key, will inform React that we are referring to a new 
 
 We are just going to steal the style sheet from the benchmark Todo app, and add it to our assets.
 
-**Go grab the file in this repo here:** https://github.com/ruby-hyperloop/todo-tutorial/blob/master/app/assets/stylesheets/todo.css
+**Go grab the file in this repo here:** https://github.com/hyperstack-org/hyperstack/blob/edge/docs/tutorial/assets/todo.css
 and copy it to a new file called `todo.css` in the `app/assets/stylesheets/` directory.
 
 You will have to refresh the page after changing the style sheet.
@@ -629,8 +679,8 @@ Now its a matter of updating the css classes which are passed to components via 
 Let's start with the `App` component.  With styling it will look like this:
 
 ```ruby
-# app/hyperloop/components/app.rb
-class App < Hyperloop::Router
+# app/hyperstack/components/app.rb
+class App < Hyperstack::Router
   history :browser
   route do
     SECTION(class: 'todo-app') do # add the class param
@@ -645,9 +695,9 @@ The `Footer` components needs have a `UL` added to hold the links nicely,
 and we can also use the `NavLinks` `active_class` param to highlight the link that is currently active:
 
 ```ruby
-# app/hyperloop/components/footer.rb
-class Footer < Hyperloop::Component
-  include HyperRouter::ComponentMethods
+# app/hyperstack/components/footer.rb
+class Footer < HyperComponent
+  include Hyperstack::Router::Helpers
   def link_item(path)
     # wrap the NavLink in a LI and
     # tell the NavLink to change the class to :selected when
@@ -666,8 +716,9 @@ end
 For the Index component just add the `main` and `todo-list` classes.
 
 ```ruby
-# app/hyperloop/components/index.rb
-class Index < Hyperloop::Router::Component
+# app/hyperstack/components/index.rb
+class Index < HyperComponent
+  include Hyperstack::Router::Helpers
   render(SECTION, class: :main) do         # add class main
     UL(class: 'todo-list') do              # add class todo-list
       Todo.send(match.params[:scope]).each do |todo|
@@ -677,50 +728,45 @@ class Index < Hyperloop::Router::Component
   end
 end
 ```
-For the EditItem component we want the caller specify the class.  To keep things compatible with React.js we need to call the param `className`,
-but we can still send it to EditItem with the usual hyperloop style `class` param.  
+For the EditItem component we want the parent to pass any html parameters such as `class` along to the INPUT tag.  We do this by adding the special
+`others` param that will collect any extra params, we then pass it along in to the INPUT tag.  Hyperstack will take care of merging all the params
+together sensibly.
 
 ```ruby
-# app/hyperloop/components/edit_item.rb
-class EditItem < Hyperloop::Component
+# app/hyperstack/components/edit_item.rb
+class EditItem < HyperComponent
   param :todo
-  param :on_save, type: Proc
-  param :on_cancel, type: Proc
-  param :className # recieves class params
-  after_mount { Element[dom_node].focus }
+  triggers :save                             
+  triggers :cancel    
+  others   :etc  # can be named anything you want                       
+  after_mount { DOM[dom_node].focus }        
   render do
-    # pass the className param as the INPUT's class
-    INPUT(
-      class: params.className,
-      defaultValue: params.todo.title,
-      key: params.todo.object_id
-    ).on(:key_down) do |evt|
-      next unless evt.key_code == 13
-      params.todo.update(title: evt.target.value)
-      params.on_save
+    INPUT(@Etc, defaultValue: @Todo.title, key: @Todo)
+    .on(:enter) do |evt|
+      @Todo.update(title: evt.target.value)
+      save!
     end
-    .on(:blur) { params.on_cancel }
+    .on(:blur) { cancel! }                   
   end
 end
 ```
 Now we can add classes to the TodoItem's list-item, input, anchor tags, and to the `EditItem` component:
 
 ```ruby
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
-  state editing: false
-  render(LI, class: 'todo-item') do
-    if state.editing
-      EditItem(class: :edit, todo: params.todo)
-        .on(:save, :cancel) { mutate.editing false }
+  render(LI, class: 'todo-item') do # add the todo-item class
+    if @editing
+      EditItem(class: :edit, todo: @Todo)  # add the edit class
+      .on(:save, :cancel) { mutate @editing = false }
     else
-      INPUT(type: :checkbox, class: :toggle, checked: params.todo.completed)
-        .on(:click) { params.todo.update(completed: !params.todo.completed) }
-      LABEL { params.todo.title }
-        .on(:double_click) { mutate.editing true }
-      A(class: :destroy) # also remove the { '-X-' } placeholder
-        .on(:click) { params.todo.destroy }
+      INPUT(type: :checkbox, class: :toggle, checked: @Todo.completed) # add the toggle class
+      .on(:change) { @Todo.update(completed: !@Todo.completed) }
+      LABEL { @Todo.title }
+      .on(:double_click) { mutate @editing = true }
+      A(class: :destroy) # add the destroy class and remove the -X- placeholder
+      .on(:click) { @Todo.destroy }
     end
   end
 end
@@ -729,13 +775,21 @@ In the Header we can send a different class to the `EditItem` component.  While 
 we will add the `H1 { 'todos' }` hero unit.
 
 ```ruby
-# app/hyperloop/components/header.rb
-class Header < Hyperloop::Component
-  state(:new_todo) { Todo.new }
+# app/hyperstack/components/header.
+class Header < HyperComponent
+  before_mount { @new_todo = Todo.new }
   render(HEADER, class: :header) do                   # add the 'header' class
     H1 { 'todos' }                                    # Add the hero unit.
-    EditItem(class: 'new-todo', todo: state.new_todo) # add 'new-todo' class
-      .on(:save) { mutate.new_todo Todo.new }
+    EditItem(class: 'new-todo', todo: @new_todo) # add 'new-todo' class
+    .on(:save) { mutate @new_todo = Todo.new }
+  end
+end
+# app/hyperstack/components/header.
+class Header < HyperComponent
+  before_mount { @new_todo = Todo.new }
+  render(HEADER) do
+    EditItem(todo: @new_todo)
+    .on(:save) { mutate @new_todo = Todo.new }
   end
 end
 ```
@@ -760,12 +814,9 @@ EditItem should display a meaningful placeholder hint if the title is blank:
 
   ```ruby
     ...
-    INPUT(
-      class: params.className,
-      defaultValue: params.todo.title,
-      key: params.todo.object_id,
-      placeholder: 'What is left to do today?'
-    ).on(:key_down) do |evt| ...
+    INPUT(@Etc, placeholder: 'What is left to do today?',
+                defaultValue: @Todo.title, key: @Todo)
+    .on(:enter) do |evt| ...
     ...
   ```
 + **Don't Show the Footer If There are No Todos**  
@@ -789,23 +840,23 @@ SLOC
 --------------  
 App:        11  
 Header:      8
-Index:       9  
-TodoItem:   17  
-EditItem:   21  
+Index:      10  
+TodoItem:   16  
+EditItem:   16  
 Footer:     16  
 Todo Model:  4  
-Rails Route: 1  
+Rails Route: 2  
 --------------  
-Total:      87  
+Total:      83  
 ```
 
 The complete application is shown here:
 
 ```ruby
-# app/hyperloop/components/app.rb
-class App < Hyperloop::Router
-  history :browser
-  route do # note instead of render we use the route method
+# app/hyperstack/components/app.rb
+class App < HyperComponent
+  include Hyperstack::Router
+  render do
     SECTION(class: 'todo-app') do
       Header()
       Route('/', exact: true) { Redirect('/all') }
@@ -815,18 +866,19 @@ class App < Hyperloop::Router
   end
 end
 
-# app/hyperloop/components/header.rb
-class Header < Hyperloop::Component
-  state(:new_todo) { Todo.new }
+# app/hyperstack/components/header.
+class Header < HyperComponent
+  before_mount { @new_todo = Todo.new }
   render(HEADER, class: :header) do
     H1 { 'todos' }
-    EditItem(class: 'new-todo', todo: state.new_todo)
-      .on(:save) { mutate.new_todo Todo.new }
+    EditItem(class: 'new-todo', todo: @new_todo)
+    .on(:save) { mutate @new_todo = Todo.new }
   end
 end
 
-# app/hyperloop/components/index.rb
-class Index < Hyperloop::Router::Component
+# app/hyperstack/components/index.rb
+class Index < HyperComponent
+  include Hyperstack::Router::Helpers
   render(SECTION, class: :main) do
     UL(class: 'todo-list') do
       Todo.send(match.params[:scope]).each do |todo|
@@ -836,9 +888,9 @@ class Index < Hyperloop::Router::Component
   end
 end
 
-# app/hyperloop/components/footer.rb
-class Footer < Hyperloop::Component
-  include HyperRouter::ComponentMethods
+# app/hyperstack/components/footer.rb
+class Footer < HyperComponent
+  include Hyperstack::Router::Helpers
   def link_item(path)
     LI { NavLink("/#{path}", active_class: :selected) { path.camelize } }
   end
@@ -854,48 +906,43 @@ class Footer < Hyperloop::Component
   end
 end
 
-# app/hyperloop/components/todo_item.rb
-class TodoItem < Hyperloop::Component
+# app/hyperstack/components/todo_item.rb
+class TodoItem < HyperComponent
   param :todo
-  state editing: false
   render(LI, class: 'todo-item') do
-    if state.editing
-      EditItem(todo: params.todo, class: :edit)
-        .on(:save, :cancel) { mutate.editing false }
+    if @editing
+      EditItem(class: :edit, todo: @Todo)  # add the edit class
+      .on(:save, :cancel) { mutate @editing = false }
     else
-      INPUT(type: :checkbox, class: :toggle, checked: params.todo.completed)
-        .on(:click) { params.todo.update(completed: !params.todo.completed) }
-      LABEL { params.todo.title }
-        .on(:double_click) { mutate.editing true }
-      A(class: :destroy).on(:click) { params.todo.destroy }
+      INPUT(type: :checkbox, class: :toggle, checked: @Todo.completed) # add the toggle class
+      .on(:change) { @Todo.update(completed: !@Todo.completed) }
+      LABEL { @Todo.title }
+      .on(:double_click) { mutate @editing = true }
+      A(class: :destroy) # add the destroy class and remove the -X- placeholder
+      .on(:click) { @Todo.destroy }
     end
   end
 end
 
-# app/hyperloop/components/edit_item.rb
-class EditItem < Hyperloop::Component
+# app/hyperstack/components/edit_item.rb
+class EditItem < HyperComponent
   param :todo
-  param :on_save, type: Proc               
-  param :on_cancel, type: Proc             
-  param :className
-  after_mount { Element[dom_node].focus }  
-
+  triggers :save
+  triggers :cancel
+  others   :etc
+  after_mount { DOM[dom_node].focus }
   render do
-    INPUT(
-      class: params.className,
-      defaultValue: params.todo.title,
-      key: params.todo.object_id,
-      placeholder: 'What is left to do today?'
-    ).on(:key_down) do |evt|
-      next unless evt.key_code == 13
-      params.todo.update(title: evt.target.value)
-      params.on_save                       
+    INPUT(@Etc, placeholder: 'What is left to do today?',
+                defaultValue: @Todo.title, key: @Todo)
+    .on(:enter) do |evt|
+      @Todo.update(title: evt.target.value)
+      save!
     end
-    .on(:blur) { params.on_cancel }
+    .on(:blur) { cancel! }
   end
 end
 
-# app/hyperloop/models/todo.rb
+# app/hyperstack/models/todo.rb
 class Todo < ApplicationRecord
   scope :completed, -> () { where(completed: true)  }
   scope :active,    -> () { where(completed: false) }
@@ -903,9 +950,8 @@ end
 
 # config/routes.rb
 Rails.application.routes.draw do
-  mount Hyperloop::Engine => '/hyperloop'
-  get '/(*other)', to: 'hyperloop#app'
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  mount Hyperstack::Engine => '/hyperstack'
+  get '/(*other)', to: 'hyperstack#app'
 end
 ```
 
