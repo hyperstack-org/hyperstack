@@ -539,8 +539,9 @@ class Counter < HyperComponent
   end
 
   render(DIV) do
+    # note how we mutate count
     BUTTON { "+" }.on(:click) { mutate @count += 1) }
-    P { @count.to_s } # note how we access the count variable
+    P { @count.to_s }
   end
 end  
 ```
