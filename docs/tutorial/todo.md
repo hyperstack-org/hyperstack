@@ -680,11 +680,12 @@ Let's start with the `App` component.  With styling it will look like this:
 
 ```ruby
 # app/hyperstack/components/app.rb
-class App < Hyperstack::Router
-  history :browser
-  route do
+class App < HyperComponent
+  include Hyperstack::Router
+  render do
     SECTION(class: 'todo-app') do # add the class param
       Header()
+      Route('/', exact: true) { Redirect('/all') }
       Route('/:scope', mounts: Index)
       Footer()
     end
