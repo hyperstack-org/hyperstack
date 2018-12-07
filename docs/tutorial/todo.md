@@ -3,7 +3,7 @@
 
 ### Prerequisites
 
-{ [Ruby On Rails](http://rubyonrails.org/) }\
+{ [Ruby On Rails](http://rubyonrails.org/) }  
 { [Yarn](https://yarnpkg.com/en/docs/install) }
 
 ### The Goals of this Tutorial
@@ -30,35 +30,35 @@ Basic knowledge of Ruby is needed, knowledge of Ruby on Rails is helpful.
 ### Chapter 1: Setting Things Up
 
 First you need to create a new project for this tutorial.
-  ```shell
-    rails new todo-demo --skip-test --template=https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
-  ```
+```shell
+rails new todo-demo --skip-test --template=https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+```
 This command will create a new Rails project and run the template file to set up Hyperstack within this project.
 
-***Caution:** you can name the app anything you want, we recommend todo-demo, but whatever you do DON'T call it todo,
+**Caution:** *you can name the app anything you want, we recommend todo-demo, but whatever you do DON'T call it todo,
 as this name will be needed later!*
 
-***Note:** if you like you can read the contents of the template file by pasting the
+**Note:** *if you like you can read the contents of the template file by pasting the
 [url](https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb) (the part after `--template=`) in a browser.
 It shows how a Hyperstack Rails project differs from a plain Rails project.*
-  ```shell
-    cd todo-demo
-  ```
+```shell
+cd todo-demo
+```
 Will change the working directory to your new todo rails project.
 
 #### Start the Rails app
 
 In the console run the following command to start the Rails server and Hotloader.
-  ```shell
-    bundle exec foreman start
-  ```
+```shell
+bundle exec foreman start
+```
 For the rest of the tutorial you will want to keep foreman running in the background
 and have a second console window open in the `todo-demo` directory to execute various commands.
 
 Navigate to http://localhost:5000/ in your browser and you should see the word **Hello world from Hyperstack!** displayed on the page.
 Hyperstack will need a moment to start and pre-compile with the first request.
 
-***Note:** you will be using port 5000 not the more typical 3000, this is because of the way the Hotloader is configured.*
+**Note:** *you will be using port 5000 not the more typical 3000, this is because of the way the Hotloader is configured.*
 
 #### Make a Simple Change
 
@@ -122,70 +122,70 @@ Okay lets see it in action:
 
 1. **Add the Todo Model:**
 
-  As stated earlier we keep *foreman* running in the first console and open a second console.
-  In this second console window run **on a single line**:
-  ```shell
-    bundle exec rails g model Todo title:string completed:boolean priority:integer
-  ```
-  This runs a Rails *generator* which will create the skeleton Todo model class, and create a *migration* which will
-  add the necessary tables and columns to the database.
+As stated earlier we keep *foreman* running in the first console and open a second console.
+In this second console window run **on a single line**:
+```shell
+bundle exec rails g model Todo title:string completed:boolean priority:integer
+```
+This runs a Rails *generator* which will create the skeleton Todo model class, and create a *migration* which will
+add the necessary tables and columns to the database.
 
-  Now look in the db/migrate/ directory, and edit the migration file you have just created.
-  The file will be titled with a long string of numbers then "create_todos" at the end.
-  Change the line creating the completed boolean field so that it looks like this:
-  ```ruby
-    ...
-    t.boolean :completed, null: false, default: false
-    ...
-  ```
-  For details on 'why' see [this blog post.](https://robots.thoughtbot.com/avoid-the-threestate-boolean-problem)
-  Basically this insures `completed` is treated as a true boolean, and will avoid having to check between `false` and `null` later on.
+Now look in the db/migrate/ directory, and edit the migration file you have just created.
+The file will be titled with a long string of numbers then "create_todos" at the end.
+Change the line creating the completed boolean field so that it looks like this:
+```ruby
+...
+t.boolean :completed, null: false, default: false
+...
+```
+For details on 'why' see [this blog post.](https://robots.thoughtbot.com/avoid-the-threestate-boolean-problem)
+Basically this insures `completed` is treated as a true boolean, and will avoid having to check between `false` and `null` later on.
 
-  Now run:
-  ```shell
-    bundle exec rails db:migrate
-  ```
-  which will create the table.
+Now run:
+```shell
+bundle exec rails db:migrate
+```
+which will create the table.
 
 2. **Make Your Model Public:**
 
-  Move `models/todo.rb` to `hyperstack/models`
+Move `models/todo.rb` to `hyperstack/models`
 
-  This will make the model accessible on the clients *and the server*, subject to any data access policies.
+This will make the model accessible on the clients *and the server*, subject to any data access policies.
 
-  ***Note:** The hyperstack installer adds a policy that gives full permission to all clients but only in
-  development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
+**Note:** *The hyperstack installer adds a policy that gives full permission to all clients but only in
+development and test modes.  Have a look at `app/policies/application_policy` if you are interested.*
 
 3. **Try It:**
 
-  Now change your `App` component's render method to:
-  ```ruby
-  class App < HyperComponent
-    include Hyperstack::Router
-    render do
-       H1 { "Number of Todos: #{Todo.count}" }
-    end
+Now change your `App` component's render method to:
+```ruby
+class App < HyperComponent
+  include Hyperstack::Router
+  render do
+    H1 { "Number of Todos: #{Todo.count}" }
   end
-  ```
+end
+```
 
-   You will now see **Number of Todos: 0** displayed.
+You will now see **Number of Todos: 0** displayed.
 
-   Now start a rails console
-   ```shell
-    bundle exec rails c
-   ```
-   and type:
-   ```ruby
-     Todo.create(title: 'my first todo')
-   ```
-   This will create a new Todo in the server's database, which will cause your Hyperstack application to be
-   updated and you will see the count change to 1!
+Now start a rails console
+```shell
+bundle exec rails c
+```
+and type:
+```ruby
+Todo.create(title: 'my first todo')
+```
+This will create a new Todo in the server's database, which will cause your Hyperstack application to be
+updated and you will see the count change to 1!
 
-   Try it again:
-   ```ruby
-     Todo.create(title: 'my second todo')
-   ```
-   and you will see the count change to 2!
+Try it again:
+```ruby
+Todo.create(title: 'my second todo')
+```
+and you will see the count change to 2!
 
 Are we having fun yet?  I hope so!  As you can see Hyperstack is synchronizing the Todo model between the client and server.
 As the state of the database changes, Hyperstack buzzes around updating whatever parts of the DOM were dependent on that data
@@ -214,7 +214,7 @@ end
 
 After saving you will see the following error displayed:
 
-**Uncaught error: Header: undefined method `Header' for #<App:0x970>
+**Uncaught error: Header: undefined method `Header' for #\<App:0x970\>
 in App (created by Hyperstack::Internal::Component::TopLevelRailsComponent)
 in Hyperstack::Internal::Component::TopLevelRailsComponent**
 
@@ -251,12 +251,12 @@ end
 
 Once you add the Footer component you should see:
 
-  <div style="border:solid; margin-left: 10px; padding: 10px">
-    <div>Header will go here</div>
-    <div>List of Todos will go here</div>
-    <div>Footer will go here</div>
-  </div>
-  <br>
+<div style="border:solid; margin-left: 10px; padding: 10px">
+  <div>Header will go here</div>
+  <div>List of Todos will go here</div>
+  <div>Footer will go here</div>
+</div>
+<br>
 
 If you don't, restart the server (*foreman* in the first console), and reload the browser.
 
@@ -299,15 +299,15 @@ end
 
 Now you will see something like
 
-  <div style="border:solid; margin-left: 10px; padding: 10px">
-    <div>Header will go here</div>
-    <ul>
-      <li>my first todo</li>
-      <li>my second todo</li>
-    </ul>
-    <div>Footer will go here</div>
-  </div>
-  <br>
+<div style="border:solid; margin-left: 10px; padding: 10px">
+  <div>Header will go here</div>
+  <ul>
+    <li>my first todo</li>
+    <li>my second todo</li>
+  </ul>
+  <div>Footer will go here</div>
+</div>
+<br>
 
 As you can see components can take parameters (or props in react.js terminology.)
 
@@ -321,7 +321,7 @@ Our `Index` component *mounts* a new `TodoItem` with each `Todo` record and pass
 
 Now go back to Rails console and type
 ```ruby
-  Todo.last.update(title: 'updated todo')
+Todo.last.update(title: 'updated todo')
 ```
 and you will see the last Todo in the list changing.
 
@@ -350,7 +350,7 @@ You will notice that while it does display the checkboxes, you can not change th
 
 For now we can change them via the console like we did before.  Try executing
 ```ruby
-  Todo.last.update(completed: true)
+Todo.last.update(completed: true)
 ```
 and you should see the last Todo's `completed` checkbox changing state.
 
@@ -389,7 +389,7 @@ class TodoItem < HyperComponent
   end
 end
 ```
-***Note:** If a component or tag block returns a string it is automatically wrapped in a SPAN, to insert a string
+**Note:** *If a component or tag block returns a string it is automatically wrapped in a SPAN, to insert a string
 in the middle you have to wrap it a SPAN like we did above.*
 
 I hope you are starting to see a pattern here.
@@ -419,8 +419,8 @@ end
 ```
 
 Now we can say `Todo.all`, `Todo.completed`, and `Todo.active`, and get the desired subset of Todos.
-You might want to try it now in the rails console.\
-***Note:** you will have to do a `reload!` to load the changes to the Model.*
+You might want to try it now in the rails console.  
+**Note:** *you will have to do a `reload!` to load the changes to the Model.*
 
 We would like the URL of our App to reflect which of these *filters* is being displayed.  So if we load
 
@@ -527,13 +527,13 @@ Then we can replace the anchor tag with the Router's `NavLink` component:
 Change
 
 ```ruby
-  A(href: "/#{path}", style: { marginRight: 10 }) { path.camelize }
+A(href: "/#{path}", style: { marginRight: 10 }) { path.camelize }
 ```
 to
 
 ```ruby
-  NavLink("/#{path}", style: { marginRight: 10 }) { path.camelize }
-  # note that there is no href key in NavLink
+NavLink("/#{path}", style: { marginRight: 10 }) { path.camelize }
+# note that there is no href key in NavLink
 ```
 
 Our component should now look like this:
@@ -587,12 +587,12 @@ Before we use this component let's understand how it works.
 Now update the `TodoItem` component replacing
 
 ```ruby
-  SPAN { @Todo.title }
+SPAN { @Todo.title }
 ```
 with
 
 ```ruby
-  EditItem(todo: @Todo)
+EditItem(todo: @Todo)
 ```
 Try it out by changing the text of some our your Todos followed by the enter key.  Then refresh the page to see that the Todos have changed.
 
@@ -725,9 +725,9 @@ All objects in Hyperstack respond to the `to_key` method which will return a sui
 this will insure that as `@Todo` changes, we will re-initialize the `INPUT` tag.
 
 ```ruby
-  ...
-  INPUT(defaultValue: @Todo.title, key: @Todo) # add the special key param
-  ...
+...
+INPUT(defaultValue: @Todo.title, key: @Todo) # add the special key param
+...
 ```
 
 
@@ -857,36 +857,36 @@ At this point your Todo App should be properly styled.
 
 ### Chapter 12: Other Features
 
-+ **Show How Many Items Left In Footer**\
++ **Show How Many Items Left In Footer**  
 This is just a span that we add before the link tags list in the `Footer` component:
 
-  ```ruby
-  ...
-  render(DIV, class: :footer) do
-    SPAN(class: 'todo-count') do
-      "#{Todo.active.count} item#{'s' if Todo.active.count != 1} left"
-    end
-    UL(class: :filters) do
-    ...
-  ```
+```ruby
+...
+render(DIV, class: :footer) do
+  SPAN(class: 'todo-count') do
+    "#{Todo.active.count} item#{'s' if Todo.active.count != 1} left"
+  end
+  UL(class: :filters) do
+...
+```
 + **Add 'placeholder' Text To Edit Item**\
 `EditItem` should display a meaningful placeholder hint if the title is blank:
 
-  ```ruby
-    ...
-    INPUT(@Etc, placeholder: 'What is left to do today?',
-                defaultValue: @Todo.title, key: @Todo)
-    .on(:enter) do |evt|
-    ...
-  ```
+```ruby
+...
+INPUT(@Etc, placeholder: 'What is left to do today?',
+            defaultValue: @Todo.title, key: @Todo)
+.on(:enter) do |evt|
+...
+```
 + **Don't Show the Footer If There are No Todos**\
 In the `App` component add a *guard* so that we won't show the Footer if there are no Todos:
 
-  ```ruby
-  ...
-      Footer() unless Todo.count.zero?
-  ...
-  ```
+```ruby
+...
+Footer() unless Todo.count.zero?
+...
+```
 
 
 Congratulations! you have completed the tutorial.
