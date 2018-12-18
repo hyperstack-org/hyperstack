@@ -30,8 +30,8 @@ PATH
   remote: ../hyperloop-config
   specs:
     hyperloop-config (0.99.4)
-      libv8
-      mini_racer
+      libv8 (~> 6.7.0)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
@@ -346,7 +346,7 @@ GEM
     uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
     unicode-display_width (1.4.0)
-    unparser (0.2.8)
+    unparser (0.3.0)
       abstract_type (~> 0.0.7)
       adamantium (~> 0.2.0)
       concord (~> 0.1.5)
@@ -404,7 +404,7 @@ DEPENDENCIES
   spring-commands-rspec
   sqlite3
   timecop (~> 0.8.1)
-  unparser
+  unparser (~> 0.3.0)
 
 BUNDLED WITH
-   1.16.1
+   1.17.2
