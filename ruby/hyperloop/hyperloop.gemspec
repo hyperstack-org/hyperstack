@@ -28,9 +28,9 @@ Gem::Specification.new do |spec|
   #spec.add_dependency 'hyperloop-config', Hyperloop::VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
-  spec.add_dependency 'mini_racer', '~> 0.1.15'
-  # https://github.com/discourse/mini_racer/issues/92
-  spec.add_dependency 'libv8', '~> 6.3.0'
+  spec.add_dependency 'libv8', '~> 6.7.0'
+  spec.add_dependency 'mini_racer', '~> 0.2.4'
+  
   spec.add_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'geminabox', '>= 0.13.11'

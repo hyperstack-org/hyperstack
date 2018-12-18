@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-spec', HyperRouter::HYPERLOOP_VERSION
   spec.add_development_dependency 'listen'
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_development_dependency 'mini_racer', '~> 0.2.4'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
   spec.add_development_dependency 'parser'
   spec.add_development_dependency 'puma'

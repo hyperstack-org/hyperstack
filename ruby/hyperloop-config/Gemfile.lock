@@ -1,20 +1,12 @@
-GIT
-  remote: https://github.com/opal/opal-jquery.git
-  revision: 6249dfaf406ecd7199079b4f4d9dc67cfdf4d602
-  branch: master
-  specs:
-    opal-jquery (0.4.3)
-      opal (>= 0.10.0, < 0.12.0)
-
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (1.0.0.lap28)
+    hyper-spec (0.99.4)
       capybara
-      chromedriver-helper
-      libv8 (~> 6.3.0)
+      chromedriver-helper (= 1.2.0)
+      libv8 (~> 6.7.0)
       method_source
-      mini_racer (~> 0.1.15)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       parser (>= 2.3.3.1)
       pry
@@ -28,9 +20,9 @@ PATH
 PATH
   remote: .
   specs:
-    hyperloop-config (1.0.0.lap28)
-      libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
+    hyperloop-config (0.99.4)
+      libv8 (~> 6.7.0)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
@@ -90,13 +82,14 @@ GEM
     arel (9.0.0)
     ast (2.4.0)
     builder (3.2.3)
-    capybara (3.7.2)
+    capybara (3.12.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
       rack (>= 1.6.0)
       rack-test (>= 0.6.3)
-      xpath (~> 3.1)
+      regexp_parser (~> 1.2)
+      xpath (~> 3.2)
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     chromedriver-helper (1.2.0)
@@ -124,7 +117,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    libv8 (6.3.292.48.1)
+    libv8 (6.7.288.46.1)
     loofah (2.2.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -138,9 +131,10 @@ GEM
     mimemagic (0.3.2)
     mini_mime (1.0.1)
     mini_portile2 (2.3.0)
-    mini_racer (0.1.15)
-      libv8 (~> 6.3)
+    mini_racer (0.2.4)
+      libv8 (>= 6.3)
     minitest (5.11.3)
+    net_http_ssl_fix (0.0.10)
     nio4r (2.3.1)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
@@ -154,6 +148,8 @@ GEM
     opal-browser (0.2.0)
       opal
       paggio
+    opal-jquery (0.4.3)
+      opal (>= 0.10.0, < 0.12.0)
     opal-rails (0.9.5)
       jquery-rails
       opal (>= 0.11.0, < 0.12)
@@ -207,6 +203,7 @@ GEM
     rainbow (2.2.2)
       rake
     rake (12.3.1)
+    regexp_parser (1.3.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -237,9 +234,9 @@ GEM
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.10.0)
     rubyzip (1.2.2)
-    selenium-webdriver (3.14.0)
+    selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
-      rubyzip (~> 1.2)
+      rubyzip (~> 1.2, >= 1.2.2)
     sourcemap (0.1.1)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
@@ -255,10 +252,10 @@ GEM
     timecop (0.8.1)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    uglifier (4.1.19)
+    uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
     unicode-display_width (1.4.0)
-    unparser (0.2.8)
+    unparser (0.4.2)
       abstract_type (~> 0.0.7)
       adamantium (~> 0.2.0)
       concord (~> 0.1.5)
@@ -266,14 +263,15 @@ GEM
       equalizer (~> 0.0.9)
       parser (>= 2.3.1.2, < 2.6)
       procto (~> 0.0.2)
-    webdrivers (3.4.0)
+    webdrivers (3.5.2)
+      net_http_ssl_fix
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
-    xpath (3.1.0)
+    xpath (3.2.0)
       nokogiri (~> 1.8)
 
 PLATFORMS
@@ -284,7 +282,6 @@ DEPENDENCIES
   chromedriver-helper
   hyper-spec!
   hyperloop-config!
-  opal-jquery!
   opal-rails (~> 0.9.4)
   pry
   puma

@@ -1,3 +1,3 @@
 module Hyperloop
-  ROUTERVERSION = VERSION = '0.99.3'
+  ROUTERVERSION = VERSION = '0.99.4'
 end
