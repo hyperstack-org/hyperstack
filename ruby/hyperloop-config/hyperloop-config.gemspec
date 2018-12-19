@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'uglifier'
 
 
-  spec.add_development_dependency 'bundler', '~> 1.16.0'
+  spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperloop::Config::VERSION
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'

@@ -4,9 +4,9 @@ PATH
     hyper-spec (0.99.4)
       capybara
       chromedriver-helper (= 1.2.0)
-      libv8
+      libv8 (~> 6.7.0)
       method_source
-      mini_racer
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       parser (>= 2.3.3.1)
       pry
@@ -14,7 +14,7 @@ PATH
       selenium-webdriver
       timecop (~> 0.8.1)
       uglifier
-      unparser
+      unparser (~> 0.3.0)
       webdrivers
 
 PATH
@@ -28,8 +28,8 @@ PATH
   remote: ../hyperloop-config
   specs:
     hyperloop-config (0.99.4)
-      libv8
-      mini_racer
+      libv8 (~> 6.7.0)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
@@ -298,7 +298,7 @@ GEM
     uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
     unicode-display_width (1.4.0)
-    unparser (0.4.2)
+    unparser (0.3.0)
       abstract_type (~> 0.0.7)
       adamantium (~> 0.2.0)
       concord (~> 0.1.5)
@@ -321,7 +321,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.16.0)
+  bundler (~> 1.16)
   chromedriver-helper
   hyper-component!
   hyper-spec!
@@ -345,4 +345,4 @@ DEPENDENCIES
   timecop (~> 0.8.1)
 
 BUNDLED WITH
-   1.16.1
+   1.17.2

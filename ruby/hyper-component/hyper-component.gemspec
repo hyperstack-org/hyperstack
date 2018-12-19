@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
-  spec.add_development_dependency 'bundler', '~> 1.16.0'
+  spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperloop::Component::VERSION
   spec.add_development_dependency 'jquery-rails'
