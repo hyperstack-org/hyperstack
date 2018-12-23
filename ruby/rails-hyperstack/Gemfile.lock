@@ -5,7 +5,7 @@ PATH
       hyper-state (= 1.0.alpha1.2)
       hyperstack-config (= 1.0.alpha1.2)
       libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-activesupport (~> 0.3.1)
       react-rails (>= 2.4.0, < 2.5.0)
@@ -44,7 +44,7 @@ PATH
       chromedriver-helper (= 1.2.0)
       libv8 (~> 6.3.0)
       method_source
-      mini_racer (~> 0.1.15)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       parser (>= 2.3.3.1)
       pry
@@ -66,9 +66,8 @@ PATH
   remote: ../hyperstack-config
   specs:
     hyperstack-config (1.0.alpha1.2)
-      libv8 (~> 6.3.0)
       listen (~> 3.0)
-      mini_racer (~> 0.1.15)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
@@ -82,7 +81,7 @@ PATH
       hyper-router (= 1.0.alpha1.2)
       hyperstack-config (= 1.0.alpha1.2)
       libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
+      mini_racer (~> 0.2.4)
       opal-browser (~> 0.2.0)
       opal-rails (~> 0.9.4)
       rails (>= 4.0.0)
@@ -149,7 +148,7 @@ GEM
     bootsnap (1.3.2)
       msgpack (~> 1.0)
     builder (3.2.3)
-    capybara (3.11.0)
+    capybara (3.12.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -218,8 +217,8 @@ GEM
     mimemagic (0.3.2)
     mini_mime (1.0.1)
     mini_portile2 (2.3.0)
-    mini_racer (0.1.15)
-      libv8 (~> 6.3)
+    mini_racer (0.2.4)
+      libv8 (>= 6.3)
     minitest (5.11.3)
     msgpack (1.2.4)
     multi_json (1.13.1)
@@ -369,7 +368,7 @@ GEM
     uglifier (4.1.19)
       execjs (>= 0.3.0, < 3)
     unicode-display_width (1.4.0)
-    unparser (0.2.8)
+    unparser (0.3.0)
       abstract_type (~> 0.0.7)
       adamantium (~> 0.2.0)
       concord (~> 0.1.5)
@@ -393,7 +392,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
-  bundler (~> 1.16.0)
+  bundler (~> 1.16)
   chromedriver-helper
   coffee-rails (~> 4.2)
   database_cleaner
@@ -418,4 +417,4 @@ DEPENDENCIES
   uglifier (>= 1.3.0)
 
 BUNDLED WITH
-   1.16.0
+   1.17.1
