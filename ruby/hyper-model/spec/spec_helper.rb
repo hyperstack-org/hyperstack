@@ -271,13 +271,13 @@ if RUBY_ENGINE != 'opal'
     #   DatabaseCleaner.start
     # end
 
-    config.after(:each) do |example|
-      unless example.exception
-        # Clear session data
-        Capybara.reset_sessions!
-        # Rollback transaction
-        DatabaseCleaner.clean
-      end
+    config.after(:each) do # |example|
+      # unless example.exception
+      # Clear session data
+      Capybara.reset_sessions!
+      # Rollback transaction
+      DatabaseCleaner.clean
+      # end
     end
 
     config.after(:all, :js => true) do
