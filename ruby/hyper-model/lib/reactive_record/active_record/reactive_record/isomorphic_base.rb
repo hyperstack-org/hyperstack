@@ -242,7 +242,7 @@ module ReactiveRecord
           end if record.new? || record.changed? || (record == record_being_saved && force)
           record_index += 1
         end
-        [models, associations, backing_records]
+        [models.sort_by { |model| model[:id] }, associations, backing_records]
       end
 
       def save_or_validate(save, validate, force, &block)
