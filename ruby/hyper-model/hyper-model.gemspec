@@ -29,11 +29,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', HyperModel::VERSION
   spec.add_dependency 'hyper-operation', HyperModel::VERSION
-  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.0']
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper', '1.2.0'
-  spec.add_development_dependency 'libv8', '~> 6.3.0' # see https://github.com/discourse/mini_racer/issues/92
-  spec.add_development_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_development_dependency 'libv8'
+  spec.add_development_dependency 'mini_racer', '~> 0.2.4'
   spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
