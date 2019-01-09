@@ -96,9 +96,6 @@ describe "synchronizing relationships", js: true do
   end
 
   it "adding child to a new model on client after render" do
-    # Hyperloop.configuration do |config|
-    #   #config.transport = :none
-    # end
     m = FactoryBot.create(:test_model)
     m.child_models << FactoryBot.create(:child_model)
     mount "TestComponent2" do
@@ -120,6 +117,30 @@ describe "synchronizing relationships", js: true do
     m.child_models << FactoryBot.create(:child_model)
     evaluate_ruby("TestComponent2.add_child")
     page.should have_content("parent has 3 children")
+  end
+
+  it "preserves the order of children" do
+    isomorphic do
+      ChildModel.class_eval do
+        server_method :do_some_calc do
+          child_attribute
+        end
+      end
+      TestModel.class_eval do
+        server_method :do_some_calc do
+          child_models.collect(&:child_attribute).join(', ')
+        end
+      end
+    end
+    expect_promise do
+      parent = TestModel.new
+      4.times do |i|
+        parent.child_models << ChildModel.new(child_attribute: i.to_s)
+      end
+      ReactiveRecord.load do
+        parent.do_some_calc.tap { parent.child_models[3].do_some_calc }
+      end
+    end.to eq('0, 1, 2, 3')
   end
 
   it "will re-render the count after an item is added or removed from a model" do
