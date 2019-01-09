@@ -1322,6 +1322,62 @@ end
 
 Note that the `rename` directive can be used to rename both components and sublibraries, giving you full control over the ruby names of the components and libraries.
 
+### Importing Webpack Images
+
+If you store your images in app/javascript/images directory and want to display them in components, please add the following code to app/javascript/packs/application.js
+
+```javascript
+var webpackImagesMap = {};
+var imagesContext = require.context('../images/', true, /\.(gif|jpg|png|svg)$/i);
+
+function importAll (r) {
+  r.keys().forEach(key => webpackImagesMap[key] = r(key));
+}
+
+importAll(imagesContext);
+
+global.webpackImagesMap = webpackImagesMap;
+```
+
+The above code creates an images map and stores it in webpackImagesMap variable. It looks something like this
+
+```javascript
+{
+     "./logo.png": "/packs/images/logo-3e11ad2e3d31a175aec7bb2f20a7e742.png",
+     ...
+}
+```
+Add the following helper
+
+```ruby
+# app/hyperstack/helpers/images_import.rb
+
+module ImagesImport
+  def img_src(filepath)
+    img_map = Native(`webpackImagesMap`) 
+    img_map["./#{filepath}"]
+  end
+end
+```
+
+Include it into HyperComponent
+
+```ruby
+require 'helpers/images_import'
+class HyperComponent
+  ...
+  include ImagesImport
+end
+```
+
+After that you will be able to display the images in your components like this
+
+```ruby
+IMG(src: img_src('logo.png'))               # app/javascript/images/logo.png
+IMG(src: img_src('landing/some_image.png')) # app/javascript/images/landing/some_image.png
+```
+
+
 ### Auto Import
 
 If you use a lot of libraries and are using a Javascript tool chain with Webpack, having to import the libraries in both Hyperstack and Webpack is redundant and just hard work.
