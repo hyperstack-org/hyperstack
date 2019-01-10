@@ -95,10 +95,10 @@ Hyperstack Component DSL is a set of class and instance methods that are used to
 
 The DSL has the following major areas:  
 
-+ The `HyperComponent` class or `Hyperstack::Component` mixin
++ The `Hyperstack::Component` mixin or your own `HyperComponent` class
 + HTML DSL elements
 + Component Lifecycle Methods (`before_mount`, `render`, `after_mount`, `after_update`, `after_error`)
-+ The four data accessors methods: `params`, `state`, `mutate`, and `children`
++ The `param` and `render` methods
 + Event handlers
 + Miscellaneous methods
 
@@ -216,11 +216,12 @@ Parent { Child() }
 
 ### Child Reconciliation
 
-**Reconciliation is the process by which React updates the DOM with each new render pass.** In general, children are reconciled according to the order in which they are rendered. For example, suppose we have the following render method displaying a list of items.  On each pass
-the items will be completely rerendered:
+**Reconciliation is the process by which React updates the DOM with each new render pass.** In general, children are reconciled according to the order in which they are rendered. For example, suppose we have the following render method displaying a list of items.  On each pass the items will be completely re-rendered:
 
 ```ruby
+param :items
 render do
+  # notice how the items param is accessed in CamelCase (to indicate that it is read-only)
   @Items.each do |item|
     PARA do
       item[:text]
@@ -231,22 +232,6 @@ end
 
 What if the first time items was `[{text: "foo"}, {text: "bar"}]`, and the second time items was `[{text: "bar"}]`?
 Intuitively, the paragraph `<p>foo</p>` was removed. Instead, React will reconcile the DOM by changing the text content of the first child and destroying the last child. React reconciles according to the *order* of the children.
-
-### Stateful Children
-
-For most components, this is not a big deal. However, for stateful components that maintain data in `state` across render passes, this can be very problematic.
-
-In most cases, this can be sidestepped by hiding elements based on some property change:
-
-```ruby
-render do
-  state.items.each do |item|
-    PARA(style: {display: item[:some_property] == "some state" ? :block : :none}) do
-      item[:text]
-    end
-  end
-end
-```
 
 ### Dynamic Children
 
@@ -337,14 +322,13 @@ class IndentEachLine < HyperComponent
 end
 ```
 
-
 ### Data Flow
 
 In React, data flows from owner to owned component through the params as discussed above. This is effectively one-way data binding: owners bind their owned component's param to some value the owner has computed based on its `params` or `state`. Since this process happens recursively, data changes are automatically reflected everywhere they are used.
 
 ### Stores
 
-Managing state between components is best done using Stores as many Components can access one store. This saves passing data btween Components. Please see the [Store documentation](/docs/stores/overview) for details.
+Managing state between components is best done using Stores as many Components can access one store. This saves passing data btween Components. Please see the [Store documentation](/docs/dsl-client/hyper-store) for details.
 
 ### Reusable Components
 
@@ -355,7 +339,7 @@ When designing interfaces, break down the common design elements (buttons, form 
 The `param` method gives *read-only* access to each of the scalar params passed to the Component. The params are accessed as instance variables converted to CamelCase.
 
 Within a React Component the `param` method is used to define the parameter signature of the component.  You can think of params as
-the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is rerendered.  
+the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is re-rendered.  
 
 Note that the default value can be supplied either as the hash value of the symbol, or explicitly using the `:default_value` key.
 
@@ -374,7 +358,7 @@ param foo: [], type: [String]       # foo must be an array of strings, and has a
 
 #### Accessing param values
 
-Params are accessible in the Component class as instance variables in **CamelCase**. The CamelCase syntax is used to indicate that params are immutable.
+> Params are accessible in the Component class as instance variables in **CamelCase**. The CamelCase syntax is used to indicate that params are immutable.
 
 For example:
 
@@ -412,7 +396,6 @@ end
 ```
 
 >Note: Non-scalar params (objects) which are mutable through their methods are not read only. Care should be taken here as changes made to these objects will **not** cause a re-render of the Component. Specifically, if you pass a non-scalar param into a Component, and modify the internal data of that param, Hyperstack will not be notified to re-render the Component (as it does not know about the internal structure of your object). To achieve a re-render in this circumstance you will need to ensure that the parts of your object which are mutable are declared as state in a higher-order parent Component so that data can flow down from the parent to the child as per the React pattern.
-
 
 ### Param Validation
 
@@ -538,32 +521,38 @@ Note: `collect_other_params_as` builds a hash, so you can merge other data in or
 
 ## State
 
-In React (and Hyperstack) state is mutable. Changes to state variables cause Components to re-render and where state is passed into a child Component as a param, it will cause a re-rendering of that child Component. Change flows from a parent to a child - change does not flow upward and this is why params are not mutable.
+In React (and Hyperstack) state is mutable. Changes (mutations) to state variables cause Components to re-render. Where state is passed into a child Component as a `param`, it will cause a re-rendering of that child Component. Change flows from a parent to a child - change does not flow upward and this is why params are not mutable.
 
-State variables are accessed via the `state` instance method which works like the `params` method. Like normal instance variables, state variables are created when they are first accessed, so there is no explicit declaration.  
+State variables are normal instance variables or objects. When a state variable changes, we use the `mutate` method to get React's attention and cause a re-render. Like normal instance variables, state variables are created when they are first accessed, so there is no explicit declaration.  
 
-The `mutate` method initializes (or updates) a reactive state variable. State variables are like *reactive* instance variables.  They can only be changed using the `mutate` method, and when they change they will cause a re-render.  
+The syntax of `mutate` is simple - its `mutate` and any other number of parameters and/or a block. Normal evaluation means the parameters are going to be evaluated first, and then `mutate` gets called.
+
++ `mutate @foo = 12, @bar[:zap] = 777` executes the two assignments first, then calls mutate
++ or you can say `mutate { @foo = 12; @bar[:zap] = 777 }` which is more explicit, and does the same thing
+
+Here are some examples:
 
 ```ruby
 class Counter < HyperComponent
-  state count: 0 # optional initialization
+  before_mount do
+    @count = 0 # optional initialization
+  end
 
   render(DIV) do
-    BUTTON { "+" }.on(:click) { mutate.count(state.count + 1) }
-    P { state.count.to_s } # note how we access the count variable
+    # note how we mutate count
+    BUTTON { "+" }.on(:click) { mutate @count += 1) }
+    P { @count.to_s }
   end
 end  
 ```
 
-A Simple example:
-
 ```ruby
 class LikeButton < HyperComponent
   render(DIV) do
-    P do
-      "You #{state.liked ? 'like' : 'haven\'t liked'} this. Click to toggle."
+    BUTTON do
+      "You #{@liked ? 'like' : 'haven\'t liked'} this. Click to toggle."
     end.on(:click) do
-      mutate.liked !state.liked
+      mutate @liked = !@liked
     end
   end
 end
@@ -575,55 +564,139 @@ React thinks of UIs as simple state machines. By thinking of a UI as being in va
 
 In React, you simply update a component's state, and then the new UI will be rendered on this new state. React takes care of updating the DOM for you in the most efficient way.
 
-### How State Works
-
-To change a state variable you use `mutate.state_variable` and pass the new value.  For example `mutate.liked(!state.like)` *gets* the current value of like, toggles it, and then *updates* it.  This in turn causes the component to be rerendered. For more details on how this works, and the full syntax of the update method see [the component API reference](#top-level-api)
-
 ### What Components Should Have State?
 
 Most of your components should simply take some params and render based on their value. However, sometimes you need to respond to user input, a server request or the passage of time. For this you use state.
 
 **Try to keep as many of your components as possible stateless.** By doing this you'll isolate the state to its most logical place and minimize redundancy, making it easier to reason about your application.
 
-A common pattern is to create several stateless components that just render data, and have a stateful component above them in the hierarchy that passes its state to its children via `params`. The stateful component encapsulates all of the interaction logic, while the stateless components take care of rendering data in a declarative way.
+A common pattern is to create several stateless components that just render data, and have a stateful component above them in the hierarchy that passes its state to its children via `param`s. The stateful component encapsulates all of the interaction logic, while the stateless components take care of rendering data in a declarative way.
+
+State can be held in any object (not just a Component). For example:
+
+```ruby
+class TestIt
+  def self.swap_state
+    @@test = !@@test
+  end
+
+  def self.result
+    @@test ? 'pass' : 'fail'
+  end
+end
+
+class TestResults < HyperComponent
+  render(DIV) do
+    P { "Test is #{TestIt.result}" }
+    BUTTON { 'Swap' }.on(:click) do
+      mutate TestIt::swap_state
+    end
+  end
+end
+```
+
+In the example above, the singleton class `TestIt` holds its own internal state which is changed through a `swap_state` class method. The `TestResults` Component has no knowledge of the internal workings of the `TestIt` class.
+
+When the BUTTON is pressed, we call `mutate`, passing the object which is being mutated. The actual mutated value is not important, it is the fact that the *observed* object (our `TestIt` class) is being mutated that will cause a re-render of the *observing* `TestResults` Component. Think about `mutate` as a way of telling React that the Component needs to be re-rendered as the state has changed.
+
+In the example above, we could also move the *observing* and *mutating* behaviour out of the Component completely and manage it in the `TestIt` class - in this case, we would call it a Store. Stores are covered in the Hyper-Store documentation later.
 
 ### What Should Go in State?
 
-**State should contain data that a component's event handlers, timers, or http requests may change and trigger a UI update.**
+**State should contain data that a component's instance variables, event handlers, timers, or http requests may change and trigger a UI update.**
 
-When building a stateful component, think about the minimal possible representation of its state, and only store those properties in `state`.  Add to your class methods to compute higher level values from your state variables.  Avoid adding redundant or computed values as state variables as
-these values must then be kept in sync whenever state changes.
+When building a stateful component, think about the minimal possible representation of its state, and only store those properties in `state`.  Add to your class methods to compute higher level values from your state variables.  Avoid adding redundant or computed values as state variables as these values must then be kept in sync whenever state changes.
 
 ### What Shouldn't Go in State?
 
-`state` should only contain the minimal amount of data needed to represent your UI's state. As such, it should not contain:
+State should contain the minimal amount of data needed to represent your UI's state. As such, it should not contain:
 
-* **Computed data:** Don't worry about precomputing values based on state — it's easier to ensure that your UI is consistent if you do all computation during rendering.  For example, if you have an array of list items in state and you want to render the count as a string, simply render `"#{state.list_items.length} list items'` in your `render` method rather than storing the count as another state.
-* **Data that does not effect rendering:** For example handles on timers, that need to be cleaned up when a component unmounts should go
-in plain old instance variables.
++ **Computed data:** Don't worry about precomputing values based on state — it's easier to ensure that your UI is consistent if you do all computation during rendering.  For example, if you have an array of list items in state and you want to render the count as a string, simply render `"#{@list_items.length} list items'` in your `render` method rather than storing the count as another state.
 
-### Non-scalar state
++ **Data that does not effect rendering:** Changing an instance variable (or any object) that does not affect rendering does not need to be mutated (i.e you do not need to call `mutate`).
 
-Often state variables have complex values with their own internal state, an array for example.  The problem is as you push new values onto the array you are not changing the object pointed to by the state variable, but its internal state.
+The rule is simple: anytime you are updating a state variable use `mutate` and your UI will be re-rendered appropriately.
 
-To handle this use the same `mutate` prefix with **no** parameter, and then apply any update methods to the resulting value.  The underlying value will be updated, **and** the underlying system will be notified that a state change has occurred.
+### State and user input
 
-For example:
+Often in a UI you gather input from a user and re-render the Component as they type. For example:
 
 ```ruby
-  mutate.foo []    # initialize foo (returns nil)
-    #...later...
-  mutate.foo << 12  # push 12 onto foo's array
-    #...or...
-  mutate.foo {}
-  mutate.foo[:house => :boat]
+class UsingState < HyperComponent
+
+  render(DIV) do
+    # the button method returns an HTML element
+    # .on(:click) is an event handeler
+    # notice how we use the mutate method to get
+    # React's attention. This will cause a
+    # re-render of the Component
+    button.on(:click) { mutate(@show = !@show) }
+    DIV do
+      input
+      output
+      easter_egg
+    end if @show
+  end
+
+  def button
+    BUTTON(class: 'ui primary button') do
+      @show ? 'Hide' : 'Show'
+    end
+  end
+
+  def input
+    DIV(class: 'ui input fluid block') do
+      INPUT(type: :text).on(:change) do |evt|
+        # we are updating the value per keypress
+        # using mutate will cause a rerender
+        mutate @input_value = evt.target.value
+      end
+    end
+  end
+
+  def output
+    # rerender whenever input_value changes
+	P { "#{@input_value}" }
+  end
+
+  def easter_egg
+    H2 {'you found it!'} if @input_value == 'egg'
+  end
+end
 ```
 
-The rule is simple:  anytime you are updating a state variable use `mutate`.
+### State and HTTP responses
 
-### Updating interval
+Often your UI will re-render based on the response to a HTTP request to a remote service. Hyperstack does not need to understand the internals of the HTTP response JSON, but does need to *observe* the object holding that response so we call `mutate` when updating our response object in the block which executes when the HTTP.get promise resolves.
 
-One common use case is a component wanting to update itself on a time interval. It's easy to use the kernel method `every`, but it's important to cancel your interval when you don't need it anymore to save memory. React provides [lifecycle methods](/docs/working-with-the-browser.html#component-lifecycle) that let you know when a component is about to be created or destroyed. Let's create a simple mixin that uses these methods to provide a React friendly `every` function that will automatically get cleaned up when your component is destroyed.
+```ruby
+class FaaS < HyperComponent
+  render(DIV) do
+    BUTTON { 'faastruby.io' }.on(:click) do
+      faast_ruby
+    end
+
+    DIV(class: :block) do
+      P { @hello_response['function_response'].to_s }
+      P { "executed in #{@hello_response['execution_time']} ms" }
+    end if @hello_response
+  end
+
+  def faast_ruby
+    HTTP.get('https://api.faastruby.io/paulo/hello-world',
+      data: {time: true}
+    ) do |response|
+      # this code executes when the promise resolves
+      # notice that we call mutate when updating the state instance variable
+      mutate @hello_response = response.json if response.ok?
+    end
+  end
+end
+```
+
+### State and updating interval
+
+One common use case is a component wanting to update itself on a time interval. It's easy to use the kernel method `every`, but it's important to cancel your interval when you don't need it anymore to save memory. Hyperstack provides Lifecycle Methods (covered in the next section) that let you know when a component is about to be created or destroyed. Let's create a simple mixin that uses these methods to provide a React friendly `every` function that will automatically get cleaned up when your component is destroyed.
 
 ```ruby
 module ReactInterval
@@ -647,20 +720,20 @@ class TickTock < HyperComponent
   include ReactInterval
 
   before_mount do
-    state.seconds! 0
+    @seconds = 0
   end
 
   after_mount do
-    every(1) { mutate.seconds state.seconds+1}
+    every(1) { mutate @seconds = @seconds + 1 }
   end
 
   render(DIV) do
-    "Hyperstack has been running for #{state.seconds} seconds".para
+    P { "Hyperstack has been running for #{@seconds} seconds" }
   end
 end
 ```
 
-Notice that TickTock effectively has two `before_mount` methods, one that is called to initialize the `@intervals` array and another to initialize `state.seconds`
+Notice that TickTock effectively has two `before_mount` methods, one that is called to initialize the `@intervals` array and another to initialize `@seconds`
 
 ## Lifecycle Methods
 
@@ -674,7 +747,7 @@ A component may define lifecycle methods for each phase of the components lifecy
 * `after_update`
 * `before_unmount`
 
->Note: A `render` method must be defined and must return just one HTML element.
+>Note: At a minimum, one `render` method must be defined and must return just one HTML element.
 
 All the Component Lifecycle methods may take a block or the name of an instance method to be called.
 
@@ -735,8 +808,7 @@ before_mount do ...
 end
 ```
 
-Invoked once when the component is first instantiated, immediately before the initial rendering occurs. This is where state variables should
-be initialized.
+Invoked once when the component is first instantiated, immediately before the initial rendering occurs. This is where state variables should be initialized.
 
 This is the only life cycle method that is called during `render_to_string` used in server side pre-rendering.
 
@@ -758,7 +830,6 @@ If you want to integrate with other JavaScript frameworks, set timers using the 
 before_receive_props do |new_params_hash| ...
 end
 ```
-
 Invoked when a component is receiving *new* params (React.js props). This method is not called for the initial render.
 
 Use this as an opportunity to react to a prop transition before `render` is called by updating any instance or state variables. The
@@ -766,14 +837,14 @@ new_props block parameter contains a hash of the new values.
 
 ```ruby
 before_receive_props do |next_props|
-  state.likes_increasing! (next_props[:like_count] > params.like_count)
+  mutate @likes_increasing = (next_props[:like_count] > @LikeCount)
 end
 ```
 
 > Note:
->
 > There is no analogous method `before_receive_state`. An incoming param may cause a state change, but the opposite is not true. If you need to perform operations in response to a state change, use `before_update`.
 
+TODO: The above needs to be checked and a better example provided. PR very welcome.
 
 ### Controlling Updates
 
@@ -804,7 +875,7 @@ before_update do ...
 end
 ```
 
-Invoked immediately before rendering when new params or state are bein#g received.  
+Invoked immediately before rendering when new params or state are being received.  
 
 
 ### After Updating (re-rendering)
@@ -1250,6 +1321,62 @@ end
 ```
 
 Note that the `rename` directive can be used to rename both components and sublibraries, giving you full control over the ruby names of the components and libraries.
+
+### Importing Webpack Images
+
+If you store your images in app/javascript/images directory and want to display them in components, please add the following code to app/javascript/packs/application.js
+
+```javascript
+var webpackImagesMap = {};
+var imagesContext = require.context('../images/', true, /\.(gif|jpg|png|svg)$/i);
+
+function importAll (r) {
+  r.keys().forEach(key => webpackImagesMap[key] = r(key));
+}
+
+importAll(imagesContext);
+
+global.webpackImagesMap = webpackImagesMap;
+```
+
+The above code creates an images map and stores it in webpackImagesMap variable. It looks something like this
+
+```javascript
+{
+     "./logo.png": "/packs/images/logo-3e11ad2e3d31a175aec7bb2f20a7e742.png",
+     ...
+}
+```
+Add the following helper
+
+```ruby
+# app/hyperstack/helpers/images_import.rb
+
+module ImagesImport
+  def img_src(filepath)
+    img_map = Native(`webpackImagesMap`) 
+    img_map["./#{filepath}"]
+  end
+end
+```
+
+Include it into HyperComponent
+
+```ruby
+require 'helpers/images_import'
+class HyperComponent
+  ...
+  include ImagesImport
+end
+```
+
+After that you will be able to display the images in your components like this
+
+```ruby
+IMG(src: img_src('logo.png'))               # app/javascript/images/logo.png
+IMG(src: img_src('landing/some_image.png')) # app/javascript/images/landing/some_image.png
+```
+
 
 ### Auto Import
 
