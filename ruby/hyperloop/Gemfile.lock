@@ -1,9 +1,9 @@
 PATH
   remote: ../hyper-component
   specs:
-    hyper-component (0.99.4)
-      hyper-store (= 0.99.4)
-      hyperloop-config (= 0.99.4)
+    hyper-component (0.99.5)
+      hyper-store (= 0.99.5)
+      hyperloop-config (= 0.99.5)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -13,39 +13,39 @@ PATH
 PATH
   remote: ../hyper-model
   specs:
-    hyper-model (0.99.4)
+    hyper-model (0.99.5)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.4)
-      hyper-operation (= 0.99.4)
+      hyper-component (= 0.99.5)
+      hyper-operation (= 0.99.5)
 
 PATH
   remote: ../hyper-operation
   specs:
-    hyper-operation (0.99.4)
+    hyper-operation (0.99.5)
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.4)
+      hyper-component (= 0.99.5)
       mutations
       opal-activesupport (~> 0.3.1)
 
 PATH
   remote: ../hyper-router
   specs:
-    hyper-router (0.99.4)
-      hyper-component (= 0.99.4)
+    hyper-router (0.99.5)
+      hyper-component (= 0.99.5)
       opal-browser (~> 0.2.0)
 
 PATH
   remote: ../hyper-store
   specs:
-    hyper-store (0.99.4)
-      hyperloop-config (= 0.99.4)
+    hyper-store (0.99.5)
+      hyperloop-config (= 0.99.5)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperloop-config
   specs:
-    hyperloop-config (0.99.4)
+    hyperloop-config (0.99.5)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -55,9 +55,9 @@ PATH
 PATH
   remote: .
   specs:
-    hyperloop (0.99.4)
-      hyper-model (= 0.99.4)
-      hyper-router (= 0.99.4)
+    hyperloop (0.99.5)
+      hyper-model (= 0.99.5)
+      hyper-router (= 0.99.5)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal-browser (~> 0.2.0)
@@ -124,7 +124,7 @@ GEM
     concurrent-ruby (1.1.4)
     connection_pool (2.2.2)
     crass (1.0.4)
-    erubi (1.7.1)
+    erubi (1.8.0)
     execjs (2.7.0)
     faraday (0.15.2)
       multipart-post (>= 1.2, < 3)
@@ -139,7 +139,7 @@ GEM
       activesupport (>= 4.2.0)
     hike (1.2.3)
     httpclient (2.8.3)
-    i18n (1.2.0)
+    i18n (1.5.1)
       concurrent-ruby (~> 1.0)
     io-like (0.3.0)
     jquery-rails (4.3.3)
@@ -155,7 +155,7 @@ GEM
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     method_source (0.9.2)
-    mimemagic (0.3.2)
+    mimemagic (0.3.3)
     mini_mime (1.0.1)
     mini_portile2 (2.3.0)
     mini_racer (0.2.4)
@@ -163,7 +163,7 @@ GEM
     minitest (5.11.3)
     multipart-post (2.0.0)
     mustermann (1.0.2)
-    mutations (0.8.3)
+    mutations (0.9.0)
       activesupport
     nesty (1.0.2)
     nio4r (2.3.1)
@@ -272,4 +272,4 @@ DEPENDENCIES
   hyperloop-config!
 
 BUNDLED WITH
-   1.16.1
+   1.17.2

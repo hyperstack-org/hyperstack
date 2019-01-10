@@ -1,20 +1,62 @@
 PATH
+  remote: ../hyperloop-config
+  specs:
+    hyperloop-config (0.99.5)
+      libv8 (~> 6.7.0)
+      mini_racer (~> 0.2.4)
+      opal (>= 0.11.0, < 0.12.0)
+      opal-browser (~> 0.2.0)
+      uglifier
+
+PATH
   remote: .
   specs:
-    hyper-trace (0.3.1)
+    hyper-trace (0.99.5)
+      hyperloop-config (= 0.99.5)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    archive-zip (0.11.0)
+      io-like (~> 0.3.0)
+    ast (2.4.0)
+    chromedriver-helper (2.1.0)
+      archive-zip (~> 0.10)
+      nokogiri (~> 1.8)
+    execjs (2.7.0)
+    hike (1.2.3)
+    io-like (0.3.0)
+    libv8 (6.7.288.46.1)
+    mini_portile2 (2.4.0)
+    mini_racer (0.2.4)
+      libv8 (>= 6.3)
+    nokogiri (1.10.0)
+      mini_portile2 (~> 2.4.0)
+    opal (0.11.4)
+      ast (>= 2.3.0)
+      hike (~> 1.2)
+      parser (= 2.3.3.1)
+      sourcemap (~> 0.1.0)
+    opal-browser (0.2.0)
+      opal
+      paggio
+    paggio (0.2.6)
+    parser (2.3.3.1)
+      ast (~> 2.2)
     rake (10.5.0)
+    sourcemap (0.1.1)
+    uglifier (4.1.20)
+      execjs (>= 0.3.0, < 3)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   bundler (~> 1.12)
+  chromedriver-helper
   hyper-trace!
+  hyperloop-config!
   rake (~> 10.0)
 
 BUNDLED WITH
-   1.16.1
+   1.17.2
