@@ -73,10 +73,14 @@ end
 
 # useful for debugging
 module Hyperstack
-  def self.on_error(*args)
-    ::Rails.logger.debug "\033[0;31;1mHYPERSTACK APPLICATION ERROR: #{args.join(", ")}\n"\\
-                         "To further investigate you may want to add a debugging "\\
-                         "breakpoint in config/initializers/hyperstack.rb\033[0;30;21m"
+  def self.on_error(operation, err, params, formatted_error_message)
+    ::Rails.logger.debug(
+      "#{formatted_error_message}\n\n" +
+      Pastel.new.red(
+        'To further investigate you may want to add a debugging '\
+        'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+      )
+    )
   end
 end if Rails.env.development?
 CODE

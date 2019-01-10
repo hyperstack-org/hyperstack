@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-component', Hyperstack::Operation::VERSION
   spec.add_dependency 'mutations'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
+  spec.add_dependency 'tty-table'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'

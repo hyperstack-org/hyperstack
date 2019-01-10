@@ -90,7 +90,7 @@ class ActiveRecord::Base
     def belongs_to(attr_name, *args)
       belongs_to_without_reactive_record_add_is_method(attr_name, *args).tap do
         define_method "#{attr_name}_is?".to_sym do |model|
-          self.class.reflections[attr_name].foreign_key == model.id
+          self.class.reflections[attr_name.to_s].foreign_key == model.id
         end
       end
     end
@@ -103,7 +103,19 @@ class ActiveRecord::Base
       self.acting_user = old
       self
     else
-      Hyperstack::InternalPolicy.raise_operation_access_violation(:crud_access_violation, "for #{self} - #{permission}(#{args}) acting_user: #{user}")
+      acting_user_string =
+        if acting_user
+          id = user.respond_to?(:id) ? user.id : user
+          "not allowed for acting_user: <##{user.class} id: #{user}>"
+        else
+          "not allowed without acting_user (acting_user = nil)"
+        end
+
+      message = "CRUD access violation: <##{self.class} id: #{self.id}> - #{permission}(#{args}) #{acting_user_string}"
+      if permission == :view_permitted?
+        details = Hyperstack::PolicyDiagnostics.policy_dump_for(self, user)
+      end
+      Hyperstack::InternalPolicy.raise_operation_access_violation(message, details || '')
     end
   end
 

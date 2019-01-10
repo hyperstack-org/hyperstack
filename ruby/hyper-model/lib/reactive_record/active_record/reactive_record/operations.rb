@@ -65,8 +65,9 @@ module ReactiveRecord
         ]
       end
       failed do |e|
-        # AccessViolations are already sent to on_error
-        Hyperstack.on_error(e, :fetch_error, params.to_h) unless e.is_a? Hyperstack::AccessViolation
+        e.define_singleton_method(:__hyperstack_on_error) do |operation, params, fmted_message|
+          Hyperstack.on_error(operation, self, params, fmted_message)
+        end
         raise e
       end
     end

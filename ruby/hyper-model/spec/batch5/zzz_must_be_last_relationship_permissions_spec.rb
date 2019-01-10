@@ -38,6 +38,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     end
     ApplicationController.acting_user = nil
     size_window(:small, :portrait)
+    @dummy_cache_item = double("Dummy Cache Item", vector: nil, acting_user: nil)
   end
 
   before(:each) do
@@ -54,7 +55,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
 
   context 'on the server side' do
     it 'ActiveRecord::Base with by default leave unscoped and all scopes in a dont care state' do
-      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 
@@ -62,7 +63,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_scope :all
       end
-      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -71,7 +72,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         regulate_scope :all
       end
       r1 = TodoItem.__secure_remote_access_to_all(TodoItem,nil)
-      expect { r1.__secure_remote_access_to_important(r1, nil).__secure_collection_check(nil) }
+      expect { r1.__secure_remote_access_to_important(r1, nil).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -88,7 +89,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         scope :test, -> () { all }
       end
       test_scope = TodoItem.__secure_remote_access_to_test(TodoItem, nil)
-      expect { test_scope.__secure_collection_check(nil) }
+      expect { test_scope.__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 
@@ -97,7 +98,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         regulate_relationship :comments
       end
       new_todo = TodoItem.new
-      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -113,7 +114,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     it "will leave the has_many relationship in a don't care state" do
       new_todo = TodoItem.new
       comments = new_todo.__secure_remote_access_to_comments(new_todo, nil)
-      expect { comments.__secure_collection_check(nil) }
+      expect { comments.__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 
@@ -124,7 +125,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }
       end
-      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -140,9 +141,9 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         regulate_scope(:all) { acting_user }
       end
-      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, nil).__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
-      expect { TodoItem.__secure_remote_access_to_all(TodoItem, true).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_all(TodoItem, true).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -174,9 +175,9 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }, regulate: -> () { acting_user }
       end
-      expect { TodoItem.__secure_remote_access_to_test(TodoItem, true).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, true).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
-      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 
@@ -204,7 +205,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.class_eval do
         scope :test, -> () { all }, regulate: :always_allow
       end
-      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(nil) }
+      expect { TodoItem.__secure_remote_access_to_test(TodoItem, nil).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -213,7 +214,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         scope :test, -> () { all }, regulate: nil
       end
       test_scope = TodoItem.__secure_remote_access_to_test(TodoItem, nil)
-      expect { test_scope.__secure_collection_check(nil) }
+      expect { test_scope.__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 
@@ -231,10 +232,10 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       stub_const 'TodoItem', Class.new(ApplicationRecord)
       TodoItem.has_many :comments, regulate: -> () { acting_user }
       new_todo = TodoItem.new
-      expect { new_todo.__secure_remote_access_to_comments(new_todo, true).__secure_collection_check(nil) }
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, true).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
       new_todo = TodoItem.new
-      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 
@@ -242,7 +243,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       stub_const 'TodoItem', Class.new(ApplicationRecord)
       TodoItem.has_many :comments, regulate: :always_allow
       new_todo = TodoItem.new
-      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(nil) }
+      expect { new_todo.__secure_remote_access_to_comments(new_todo, nil).__secure_collection_check(@dummy_cache_item) }
       .not_to raise_error
     end
 
@@ -251,7 +252,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       TodoItem.has_many :comments, regulate: nil
       new_todo = TodoItem.new
       comments = new_todo.__secure_remote_access_to_comments(new_todo, nil)
-      expect { comments.__secure_collection_check(nil) }
+      expect { comments.__secure_collection_check(@dummy_cache_item) }
       .to raise_error(Hyperstack::AccessViolation)
     end
 

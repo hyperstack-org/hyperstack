@@ -261,10 +261,10 @@ module ActiveRecord
     end
 
     def finder_method(name)
-      ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
+      ReactiveRecord::ScopeDescription.new(self, "_#{name}", {}) # was adding _ to front
       [name, "#{name}!"].each do |method|
         singleton_class.send(:define_method, method) do |*vargs|
-          all.apply_scope("_#{method}", *vargs).first
+          all.apply_scope("_#{method}", *vargs).first # was adding _ to front
         end
       end
     end

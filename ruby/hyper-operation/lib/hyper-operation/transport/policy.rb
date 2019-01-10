@@ -379,8 +379,7 @@ module Hyperstack
     end
 
     def self.raise_operation_access_violation(message, details)
-      Hyperstack.on_error(Hyperstack::AccessViolation, message, details)
-      raise Hyperstack::AccessViolation
+      raise Hyperstack::AccessViolation.new(message, details)
     end
 
     def self.regulate_connection(acting_user, channel_string)
@@ -406,16 +405,17 @@ module Hyperstack
       internal_policy.broadcast &block
     end
 
-    def initialize(obj, attribute_names, available_channels)
+    def initialize(obj, attribute_names, available_channels = :all)
       @obj = obj
-      attribute_names = attribute_names.map(&:to_sym).to_set
+      @attribute_names = attribute_names.map(&:to_sym).to_set
       @unassigned_send_sets = []
-      @channel_sets = Hash.new { |hash, key| hash[key] = attribute_names }
+      @channel_sets = Hash.new { |hash, key| hash[key] = @attribute_names }
       @available_channels = available_channels
     end
 
     def channel_available?(channel)
-      channel && @available_channels.include?(channel_to_string(channel))
+      return false unless channel
+      @available_channels == :all || @available_channels.include?(channel_to_string(channel))
     end
 
     def id
