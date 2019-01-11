@@ -13,7 +13,7 @@ describe 'Hyperstack::Internal::Callbacks', js: true do
     instance = Foo.new
     expect(instance).to respond_to(:wash_hands)
     expect(instance).to receive(:wash_hands)
-    expect(instance.run_callback(:before_dinner)).to eq([:wash_hands])
+    expect(instance.run_callback(:before_dinner, 1, 2, 3)).to eq([1, 2, 3])
   end
 
   # TODO: move all these to run on server as above
@@ -33,8 +33,8 @@ describe 'Hyperstack::Internal::Callbacks', js: true do
       instance = Foo.new
       [ instance.respond_to?(:wash_hands),
         instance.respond_to?(:turn_off_laptop),
-        instance.run_callback(:before_dinner) ]
-    end.to eq([true, true, ["wash_hands", "turn_off_laptop" ]])
+        instance.run_callback(:before_dinner, 1, 2, 3) ]
+    end.to eq([true, true, [1, 2, 3]])
   end
 
   context 'using Hyperloop::Context.reset!' do
@@ -65,8 +65,8 @@ describe 'Hyperstack::Internal::Callbacks', js: true do
           before_dinner :wash_hands
         end
 
-        instance.run_callback(:before_dinner)
-      end.to eq(["wash_hands"])
+        instance.run_callback(:before_dinner, 1, 2, 3)
+      end.to eq([1, 2, 3])
     end
   end
 
@@ -137,6 +137,6 @@ describe 'Hyperstack::Internal::Callbacks', js: true do
       foo.run_callback(:before_dinner, 1, 2)
       res1 = foo.run_callback(:after_dinner, 4, 5, 6)
       [res1, foo.lorem]
-    end.to eq([["eat_ice_cream"], '1-2'])
+    end.to eq([[4, 5, 6], '1-2'])
   end
 end
