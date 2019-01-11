@@ -33,7 +33,7 @@ describe "save while loading", js: true do
     end.to include('success' => true)
     expect(user.todo_items).to match_array([TodoItem.first])
   end
-  
+
   it "with assignment" do
     user = FactoryBot.create(:user, first_name: 'Ima')
     expect_promise do

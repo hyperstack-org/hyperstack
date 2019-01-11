@@ -92,7 +92,7 @@ module ReactiveRecord
       # https://github.com/hyperstack-org/hyperstack/issues/81
       # TODO: if this works then remove the || [] below (2 of them)
       if !@collection || !other_collection.collection
-        return @vector == other_collection.vector
+        return @vector == other_collection.vector && unsaved_children == other_collection.unsaved_children
       end
       my_children = (@collection || []).select { |target| target != @dummy_record }
       if other_collection
