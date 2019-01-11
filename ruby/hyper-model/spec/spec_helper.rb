@@ -286,6 +286,12 @@ if RUBY_ENGINE != 'opal'
       #size_window(:default)
     end
 
+    config.before(:all) do
+      # reset this variable so if any specs are setting up models locally
+      # the correct has gets sent to the client.
+      ActiveRecord::Base.instance_variable_set('@public_columns_hash', nil)
+    end
+
     config.after(:each, :js => true) do
       page.instance_variable_set("@hyper_spec_mounted", false)
     end

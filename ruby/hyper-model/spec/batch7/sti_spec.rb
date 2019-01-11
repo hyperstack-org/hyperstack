@@ -23,9 +23,6 @@ RSpec::Steps.steps "class inheritance", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-  end
-
-  before(:each) do
 
     class ActiveRecord::Base
       class << self
@@ -34,6 +31,9 @@ RSpec::Steps.steps "class inheritance", js: true do
         end
       end
     end
+  end
+
+  before(:each) do
 
     isomorphic do
 

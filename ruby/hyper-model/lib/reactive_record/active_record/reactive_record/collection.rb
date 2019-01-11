@@ -273,7 +273,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def link_to_parent
-      puts "#{self}.link_to_parent @linked = #{!!@linked}, collection? #{!!@collection}"
+      # puts "#{self}.link_to_parent @linked = #{!!@linked}, collection? #{!!@collection}"
       # always check that parent is synced  - fixes issue https://github.com/hyperstack-org/hyperstack/issues/82
       # note that sync_collection_with_parent checks to make sure that is NOT a collection and that there IS a parent
 
@@ -294,23 +294,23 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def sync_collection_with_parent
-      puts "#{self}.sync_collection_with_parent"
+      # puts "#{self}.sync_collection_with_parent"
       return if @collection || !@parent || @parent.dummy_collection # fixes issue https://github.com/hyperstack-org/hyperstack/issues/78 and supports /82
       if @parent.collection
-        puts ">>> @parent.collection present"
+        # puts ">>> @parent.collection present"
         if @parent.collection.empty?
-          puts ">>>>> @parent.collection is empty!"
+          # puts ">>>>> @parent.collection is empty!"
           @collection = []
         elsif filter?
-          puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
-          @collection = filter_records(@parent.collection).tap { |rr| puts "returns #{rr} #{rr.to_a}" }
+          # puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
+          @collection = filter_records(@parent.collection) # .tap { |rr| puts "returns #{rr} #{rr.to_a}" }
         end
       elsif !@linked && @parent._count_internal(false).zero?
         # don't check _count_internal if already linked as this cause an unnecessary rendering cycle
-        puts ">>> @parent._count_internal(false).zero? is true!"
+        # puts ">>> @parent._count_internal(false).zero? is true!"
         @count = 0
       else
-        puts ">>> NOP"
+        # puts ">>> NOP"
       end
     end
 
