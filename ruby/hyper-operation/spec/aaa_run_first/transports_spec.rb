@@ -107,6 +107,7 @@ describe "Transport Tests", js: true do
       Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
       wait_for { Hyperstack::Connection.active }.to eq([])
+      sleep 1
     end
 
     it "sees the connection going offline" do

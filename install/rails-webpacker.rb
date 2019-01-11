@@ -75,9 +75,9 @@ end
 module Hyperstack
   def self.on_error(operation, err, params, formatted_error_message)
     ::Rails.logger.debug(
-      "#{formatted_error_message}\n\n" +
+      "\#{formatted_error_message}\\n\\n" +
       Pastel.new.red(
-        'To further investigate you may want to add a debugging '\
+        'To further investigate you may want to add a debugging '\\
         'breakpoint to the on_error method in config/initializers/hyperstack.rb'
       )
     )
