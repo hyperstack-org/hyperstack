@@ -37,6 +37,7 @@ describe "while loading", js: true do
     end
     # size_window(:small, :portrait)
     FactoryBot.create(:user, first_name: 'Lily', last_name: 'DaDog')
+    FactoryBot.create(:user, first_name: 'Coffee', last_name: 'Boxer')
   end
 
   it "will display the while loading message for a fetch within a nested component" do
@@ -54,6 +55,32 @@ describe "while loading", js: true do
             end
             .while_loading do
               SPAN { 'loading...' }
+            end
+          end
+        end
+      end
+      expect(page).to have_content('loading...')
+      expect(page).not_to have_content('is a dog', wait: 0)
+    end
+    expect(page).to have_content('DaDog is a dog')
+    expect(page).not_to have_content('loading...', wait: 0)
+  end
+
+  it "will display the while loading message for a fetch within a nested component when attached to that component", skip: 'not implemented' do
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      mount "WhileLoadingTester", {}, no_wait: true do
+        class MyNestedGuy < HyperComponent
+          param :data-reactive_record_enclosing_while_loading_container_id
+          render(SPAN) do
+            "#{User.find_by_first_name('Lily').last_name} is a dog"
+          end
+        end
+        class WhileLoadingTester < HyperComponent
+          render do
+            DIV do
+              MyNestedGuy {}.while_loading do
+                SPAN { 'loading...' }
+              end
             end
           end
         end
@@ -211,6 +238,32 @@ describe "while loading", js: true do
     expect(page).to have_content('DaDog')
     expect(page).not_to have_content('loading...', wait: 0)
   end
+
+  it "while loading works when number of children changes (i.e. relationships)" do
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      mount "WhileLoadingTester", {}, no_wait: true do
+        class MyComponent < HyperComponent
+          render do
+            SPAN { 'loading...' }
+          end
+        end
+        class WhileLoadingTester < HyperComponent
+          render do
+            UL do
+              User.each { |user| LI { user.last_name } }
+            end.while_loading 'loading...'
+          end
+        end
+      end
+      expect(page).to have_content('loading...')
+      expect(page).not_to have_content('DaDog', wait: 0)
+      expect(page).not_to have_content('Boxer', wait: 0)
+    end
+    expect(page).to have_content('DaDog')
+    expect(page).to have_content('Boxer')
+    expect(page).not_to have_content('loading...', wait: 0)
+  end
+
 
   it "will display the while loading message on condition" do
     isomorphic do

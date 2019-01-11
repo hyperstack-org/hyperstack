@@ -44,7 +44,7 @@ module ActiveRecord
         @owner_class = owner_class
         @macro =       macro
         @options =     options
-        @klass_name =  options[:class_name] || (collection? && name.camelize.sub(/s$/, '')) || name.camelize
+        @klass_name =  options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
         @association_foreign_key = options[:foreign_key] || (macro == :belongs_to && "#{name}_id") || "#{@owner_class.name.underscore}_id"
         @source = options[:source] || @klass_name.underscore if options[:through]
         @attribute = name
@@ -97,9 +97,15 @@ module ActiveRecord
           next if association.attribute == attribute
           return association if klass == association.owner_class
         end
-        raise "Association #{@owner_class}.#{attribute} "\
-              "(foreign_key: #{@association_foreign_key}) "\
-              "has no inverse in #{@klass_name}"
+        # instead of raising an error go ahead and create the inverse relationship if it does not exist.
+        # https://github.com/hyperstack-org/hyperstack/issues/89
+        if macro == :belongs_to
+          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{klass}.has_many :#{@owner_class.name.underscore.pluralize}, foreign_key: #{@association_foreign_key}", :warning
+          klass.has_many @owner_class.name.underscore.pluralize, foreign_key: @association_foreign_key
+        else
+          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{klass}.belongs_to :#{@owner_class.name.underscore}, foreign_key: #{@association_foreign_key}", :warning
+          klass.belongs_to @owner_class.name.underscore, foreign_key: @association_foreign_key
+        end
       end
 
       def klass

@@ -10,6 +10,7 @@ module ReactiveRecord
       if RUBY_ENGINE != 'opal'
         @server_data_cache = ReactiveRecord::ServerDataCache.new(context.controller.acting_user, {})
       else
+        Hyperstack::Internal::State::Variable.set(WhileLoading, :quiet, true)
         @public_columns_hash = get_public_columns_hash
         define_attribute_methods
         @outer_scopes = Set.new

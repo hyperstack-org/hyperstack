@@ -2,7 +2,7 @@ module Hyperstack
 
   class Engine < ::Rails::Engine
   end
-  
+
   define_setting :add_hyperstack_paths, true
 
   define_setting :prerendering_files, ['hyperstack-prerender-loader.js']
@@ -20,6 +20,8 @@ module Hyperstack
             config.eager_load_paths += %W(#{config.root}/app/hyperstack/models)
             config.eager_load_paths += %W(#{config.root}/app/hyperstack/models/concerns)
             config.eager_load_paths += %W(#{config.root}/app/hyperstack/operations)
+            config.eager_load_paths += %W(#{config.root}/app/hyperstack/shared)
+
             # rails will add everything immediately below app to eager and auto load, so we need to remove it
             delete_first config.eager_load_paths, "#{config.root}/app/hyperstack"
 
@@ -27,6 +29,8 @@ module Hyperstack
               config.autoload_paths += %W(#{config.root}/app/hyperstack/models)
               config.autoload_paths += %W(#{config.root}/app/hyperstack/models/concerns)
               config.autoload_paths += %W(#{config.root}/app/hyperstack/operations)
+              config.autoload_paths += %W(#{config.root}/app/hyperstack/shared)
+
               # config.eager_load_paths += %W(#{config.root}/app/hyperstack/stores)
               # config.autoload_paths += %W(#{config.root}/app/hyperstack/stores)
               delete_first config.autoload_paths, "#{config.root}/app/hyperstack"
@@ -52,6 +56,9 @@ module Hyperstack
             # delete_first config.autoload_paths, "#{config.root}/app/hyperstack/stores"
             delete_first config.eager_load_paths, "#{config.root}/app/hyperstack/operations"
             delete_first config.autoload_paths, "#{config.root}/app/hyperstack/operations"
+            delete_first config.eager_load_paths, "#{config.root}/app/hyperstack/shared"
+            delete_first config.autoload_paths, "#{config.root}/app/hyperstack/shared"
+
 
             delete_first config.assets.paths, ::Rails.root.join('app', 'hyperstack').to_s
           end

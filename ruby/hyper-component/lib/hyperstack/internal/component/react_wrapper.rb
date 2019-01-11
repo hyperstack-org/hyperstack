@@ -153,7 +153,7 @@ module Hyperstack
             # that responds to render to act as a component we have to make sure that
             # we have a callbacks_for method.  This all becomes much easier once issue
             # #270 is resolved.
-            if type.respond_to?(:callbacks_for) && type.callbacks_for(:after_error) != []
+            if type.respond_to?(:callbacks?) && type.callbacks?(:after_error)
               add_after_error_hook_to_native comp
             end
             comp

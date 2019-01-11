@@ -25,6 +25,9 @@ module Hyperstack
 
         def Redirect(to, opts = {})
           opts[:to] = to.to_n
+          status = opts.delete(:status)
+          status ||= 302
+          `#{IsomorphicMethods.ctx}.status = #{status}`
           React::Router::Redirect(opts)
         end
 
@@ -37,6 +40,8 @@ module Hyperstack
         end
 
         def Route(to, opts = {}, &block)
+          Hyperstack::Internal::State::Mapper.observed! Hyperstack::Router::Location
+
           opts[:path] = to.to_n
 
           if opts[:mounts]
@@ -53,7 +58,7 @@ module Hyperstack
             opts[:render] = lambda do |e|
               route_params = format_params(e)
 
-              yield(route_params.values).to_n
+              yield(*route_params.values).to_n
             end
           end
 

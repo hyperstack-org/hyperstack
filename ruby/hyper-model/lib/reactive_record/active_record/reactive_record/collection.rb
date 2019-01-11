@@ -52,6 +52,9 @@ module ReactiveRecord
     def all
       observed
       @dummy_collection.notify if @dummy_collection
+      # unless false && @collection # this fixes https://github.com/hyperstack-org/hyperstack/issues/82 in very limited cases, and breaks otherthings
+      #   sync_collection_with_parent
+      # end
       unless @collection
         @collection = []
         if ids = ReactiveRecord::Base.fetch_from_db([*@vector, "*all"])
@@ -80,8 +83,17 @@ module ReactiveRecord
 
     def ==(other_collection)
       observed
+      # https://github.com/hyperstack-org/hyperstack/issues/84
+      # the following seems wrong.  It results in loading collection (i.e. @collection is nil) being equal to anything that is not a collection!!!
+      # TODO: try changing to something more robust like `return (@collection || []) == other_collection unless other_collection.is_a? collection
       return !@collection unless other_collection.is_a? Collection
       other_collection.observed
+      # if either collection has not been created then compare the vectors
+      # https://github.com/hyperstack-org/hyperstack/issues/81
+      # TODO: if this works then remove the || [] below (2 of them)
+      if !@collection || !other_collection.collection
+        return @vector == other_collection.vector
+      end
       my_children = (@collection || []).select { |target| target != @dummy_record }
       if other_collection
         other_children = (other_collection.collection || []).select { |target| target != other_collection.dummy_record }
@@ -261,11 +273,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def link_to_parent
-      return if @linked
+      puts "#{self}.link_to_parent @linked = #{!!@linked}, collection? #{!!@collection}"
+      # always check that parent is synced  - fixes issue https://github.com/hyperstack-org/hyperstack/issues/82
+      # note that sync_collection_with_parent checks to make sure that is NOT a collection and that there IS a parent
+
+      return sync_collection_with_parent if @linked
       @linked = true
       if @parent
         @parent.link_child self
-        sync_collection_with_parent unless collection
+        sync_collection_with_parent
       else
         ReactiveRecord::Base.add_to_outer_scopes self
       end
@@ -278,14 +294,23 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def sync_collection_with_parent
+      puts "#{self}.sync_collection_with_parent"
+      return if @collection || !@parent || @parent.dummy_collection # fixes issue https://github.com/hyperstack-org/hyperstack/issues/78 and supports /82
       if @parent.collection
+        puts ">>> @parent.collection present"
         if @parent.collection.empty?
+          puts ">>>>> @parent.collection is empty!"
           @collection = []
         elsif filter?
-          @collection = filter_records(@parent.collection)
+          puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
+          @collection = filter_records(@parent.collection).tap { |rr| puts "returns #{rr} #{rr.to_a}" }
         end
-      elsif @parent._count_internal(false).zero?  # just changed this from count.zero?
+      elsif !@linked && @parent._count_internal(false).zero?
+        # don't check _count_internal if already linked as this cause an unnecessary rendering cycle
+        puts ">>> @parent._count_internal(false).zero? is true!"
         @count = 0
+      else
+        puts ">>> NOP"
       end
     end
 
@@ -327,7 +352,9 @@ To determine this sync_scopes first asks if the record being changed is in the s
       # when count is called on a leaf, count_internal is called for each
       # ancestor.  Only the outermost count has load_from_client == true
       observed
-      if @collection
+      if @count && @dummy_collection
+        @count # fixes https://github.com/hyperstack-org/hyperstack/issues/79
+      elsif @collection
         @collection.count
       elsif @count ||= ReactiveRecord::Base.fetch_from_db([*@vector, "*count"])
         @count

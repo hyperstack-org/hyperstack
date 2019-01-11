@@ -2,8 +2,22 @@ module Hyperstack
   module Internal
     module Component
       class RenderingContext
+        class NotQuiet < Exception; end
         class << self
           attr_accessor :waiting_on_resources
+
+          def raise_if_not_quiet?
+            @raise_if_not_quiet
+          end
+
+          def raise_if_not_quiet=(x)
+            @raise_if_not_quiet = x
+          end
+
+          def quiet_test(component)
+            return unless component.waiting_on_resources && raise_if_not_quiet? && component.class != RescueMetaWrapper
+            raise NotQuiet.new("#{component} is waiting on resources")
+          end
 
           def render(name, *args, &block)
             was_outer_most = !@not_outer_most
@@ -12,7 +26,7 @@ module Hyperstack
             @buffer ||= [] unless @buffer
             if block
               element = build do
-                saved_waiting_on_resources = waiting_on_resources
+                saved_waiting_on_resources = nil #waiting_on_resources  what was the purpose of this its used below to or in with the current elements waiting_for_resources
                 self.waiting_on_resources = nil
                 run_child_block(name.nil?, &block)
                 if name
@@ -129,7 +143,7 @@ module Hyperstack
 end
 
 class Object
-  [:span, :td, :th, :while_loading].each do |tag|
+  [:span, :td, :th].each do |tag|
     define_method(tag) do |*args, &block|
       args.unshift(tag)
       # legacy hyperloop allowed tags to be lower case as well so if self is a component

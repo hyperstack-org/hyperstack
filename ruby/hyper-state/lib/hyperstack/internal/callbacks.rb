@@ -3,7 +3,7 @@ module Hyperstack
     module Callbacks
       if RUBY_ENGINE != 'opal'
         class Hyperstack::Hotloader
-          def self.record(*args); end
+          def self.when_file_updates(&block); end
         end
       end
       def self.included(base)
@@ -11,13 +11,15 @@ module Hyperstack
       end
 
       def run_callback(name, *args)
-        self.class.callbacks_for(name).each do |callback|
-          if callback.is_a?(Proc)
-            instance_exec(*args, &callback)
-          else
-            send(callback, *args)
-          end
+        self.class.callbacks_for(name).flatten.each do |callback|
+          result = if callback.is_a?(Proc)
+                     instance_exec(*args, &callback)
+                   else
+                     send(callback, *args)
+                   end
+          args = yield(result) if block_given?
         end
+        args
       end
 
       module ClassMethods
@@ -27,9 +29,11 @@ module Hyperstack
             Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
           end
           define_singleton_method(callback_name) do |*args, &block|
-            send(wrapper_name).concat(args)
-            send(wrapper_name).push(block) if block_given?
-            Hotloader.record(self, "@#{wrapper_name}", 4, *args, block)
+            args << block if block_given?
+            send(wrapper_name).push args
+            Hotloader.when_file_updates do
+              send(wrapper_name).delete_if { |item| item.equal? args }
+            end
             after_define_hook.call(*args, &block) if after_define_hook
           end
         end
@@ -41,6 +45,10 @@ module Hyperstack
           else
             []
           end + send(wrapper_name)
+        end
+
+        def callbacks?(name)
+          callbacks_for(name).any?
         end
       end
     end

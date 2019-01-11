@@ -74,6 +74,191 @@ module ReactiveRecord
   # To notify React that something is loading use React::WhileLoading.loading!
   # once everything is loaded then do React::WhileLoading.loaded_at message (typically a time stamp just for debug purposes)
 
+  #   class WhileLoading
+  #
+  #     include Hyperstack::Component::IsomorphicHelpers
+  #
+  #     before_first_mount do
+  #       @css_to_preload = ""
+  #       @while_loading_counter = 0
+  #     end
+  #
+  #     def self.get_next_while_loading_counter
+  #       @while_loading_counter += 1
+  #     end
+  #
+  #     def self.preload_css(css)
+  #       @css_to_preload += "#{css}\n"
+  #     end
+  #
+  #     def self.has_observers?
+  #       Hyperstack::Internal::State::Variable.observed?(self, :loaded_at)
+  #     end
+  #
+  #     class << self
+  #       alias :observed? :has_observers?
+  #     end
+  #
+  #     prerender_footer do
+  #       "<style>\n#{@css_to_preload}\n</style>".tap { @css_to_preload = ""}
+  #     end
+  #
+  #     if RUBY_ENGINE == 'opal'
+  #
+  #       # +: I DONT THINK WE USE opal-jquery in this module anymore - require 'opal-jquery' if opal_client?
+  #       # -: You think wrong. add_style_sheet uses the jQuery $, after_mount too, others too
+  #       # -: I removed those references. Now you think right.
+  #
+  #       include Hyperstack::Component
+  #
+  #       param :render_original_child
+  #       param :loading
+  #
+  #       class << self
+  #
+  #         def loading?
+  #           @is_loading
+  #         end
+  #
+  #         def loading!
+  #           Hyperstack::Internal::Component::RenderingContext.waiting_on_resources = true
+  #           Hyperstack::Internal::State::Variable.get(self, :loaded_at)
+  #           # this was moved to where the fetch is actually pushed on to the fetch array in isomorphic base
+  #           # Hyperstack::Internal::State::Variable.set(self, :quiet, false)
+  #           @is_loading = true
+  #         end
+  #
+  #         def loaded_at(loaded_at)
+  #           Hyperstack::Internal::State::Variable.set(self, :loaded_at, loaded_at)
+  #           @is_loading = false
+  #         end
+  #
+  #         def quiet?
+  #           Hyperstack::Internal::State::Variable.get(self, :quiet)
+  #         end
+  #
+  #         def page_loaded?
+  #           Hyperstack::Internal::State::Variable.get(self, :page_loaded)
+  #         end
+  #
+  #         def quiet!
+  #           Hyperstack::Internal::State::Variable.set(self, :quiet, true)
+  #           after(1) { Hyperstack::Internal::State::Variable.set(self, :page_loaded, true) } unless on_opal_server? or @page_loaded
+  #           @page_loaded = true
+  #         end
+  #
+  #         def add_style_sheet
+  #           # directly assigning the code to the variable triggers a opal 0.10.5 compiler bug.
+  #           unless @style_sheet_added
+  #             %x{
+  #               var style_el = document.createElement("style");
+  #               style_el.setAttribute("type", "text/css");
+  #               style_el.innerHTML = ".reactive_record_is_loading > .reactive_record_show_when_loaded { display: none !important; }\n" +
+  #                                    ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none !important; }";
+  #               document.head.append(style_el);
+  #             }
+  #             @style_sheet_added = true
+  #           end
+  #         end
+  #
+  #       end
+  #
+  #       def after_mount_and_update
+  #         @waiting_on_resources = @Loading
+  #         node = dom_node
+  #         %x{
+  #           Array.from(node.children).forEach(
+  #             function(current_node, current_index, list_obj) {
+  #               if (current_index > 0 && current_node.className.indexOf('reactive_record_show_when_loaded') === -1) {
+  #                 current_node.className = current_node.className + ' reactive_record_show_when_loaded';
+  #               } else if (current_index == 0 && current_node.className.indexOf('reactive_record_show_while_loading') === -1) {
+  #                 current_node.className = current_node.className + ' reactive_record_show_while_loading';
+  #               }
+  #             }
+  #           );
+  #         }
+  #         nil
+  #       end
+  #
+  #       before_mount do
+  #         @uniq_id = WhileLoading.get_next_while_loading_counter
+  #         WhileLoading.preload_css(
+  #           ":not(.reactive_record_is_loading).reactive_record_while_loading_container_#{@uniq_id} > :nth-child(1) {\n"+
+  #           "  display: none;\n"+
+  #           "}\n"
+  #         )
+  #       end
+  #
+  #       after_mount do
+  #         WhileLoading.add_style_sheet
+  #         after_mount_and_update
+  #       end
+  #
+  #       after_update :after_mount_and_update
+  #
+  #       render do
+  #         @RenderOriginalChild.call(@uniq_id)
+  #       end
+  #
+  #     end
+  #
+  #   end
+  #
+  # end
+  #
+  # module Hyperstack
+  #   module Component
+  #
+  #     class Element
+  #
+  #       def while_loading(display = "", &loading_display_block)
+  #         original_block = block || -> () {}
+  #
+  #         if display.respond_to? :as_node
+  #           display = display.as_node
+  #           block = lambda { display.render; instance_eval(&original_block) }
+  #         elsif !loading_display_block
+  #           block = lambda { display; instance_eval(&original_block) }
+  #         else
+  #           block = ->() { instance_eval(&loading_display_block); instance_eval(&original_block) }
+  #         end
+  #          loading_child = Internal::Component::RenderingContext.build do |buffer|
+  #            Hyperstack::Internal::Component::RenderingContext.render(:span, key: 1, &loading_display_block) #{ to_s }
+  #            buffer.dup
+  #          end
+  #         children = `#{@native}.props.children.slice(0)`
+  #         children.unshift(loading_child[0].instance_eval { @native })
+  #         @native = `React.cloneElement(#{@native}, #{@properties.shallow_to_n}, #{children})`
+  #        render_original_child = lambda do |uniq_id|
+  #          classes = [
+  #            @properties[:class], @properties[:className],
+  #            "reactive_record_while_loading_container_#{uniq_id}"
+  #          ].compact.join(' ')
+  #          @properties.merge!({
+  #            "data-reactive_record_while_loading_container_id" => uniq_id,
+  #            "data-reactive_record_enclosing_while_loading_container_id" => uniq_id,
+  #            className: classes
+  #          })
+  #          @native = `React.cloneElement(#{@native}, #{@properties.shallow_to_n})`
+  #          render
+  #        end
+  #        delete
+  #        ReactAPI.create_element(
+  #           ReactiveRecord::WhileLoading,
+  #           loading: waiting_on_resources,
+  #           render_original_child: render_original_child)
+  #       end
+  #
+  #       def hide_while_loading
+  #         while_loading
+  #       end
+  #
+  #     end
+  #   end
+  # end
+  #
+
+
   class WhileLoading
 
     include Hyperstack::Component::IsomorphicHelpers
@@ -116,6 +301,7 @@ module ReactiveRecord
       param :loading_children
       param :element_type
       param :element_props
+      others :other_props
       param :display, default: ''
 
       class << self
@@ -157,8 +343,8 @@ module ReactiveRecord
             %x{
               var style_el = document.createElement("style");
               style_el.setAttribute("type", "text/css");
-              style_el.innerHTML = ".reactive_record_is_loading > .reactive_record_show_when_loaded { display: none; }\n" +
-                                   ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none; }";
+              style_el.innerHTML = ".reactive_record_is_loading > .reactive_record_show_when_loaded { display: none !important; }\n" +
+                                   ".reactive_record_is_loaded > .reactive_record_show_while_loading { display: none !important; }";
               document.head.append(style_el);
             }
             @style_sheet_added = true
@@ -167,53 +353,57 @@ module ReactiveRecord
 
       end
 
+      def after_mount_and_update
+        @waiting_on_resources = @Loading
+        node = dom_node
+        %x{
+          Array.from(node.children).forEach(
+            function(current_node, current_index, list_obj) {
+              if (current_index > 0 && current_node.className.indexOf('reactive_record_show_when_loaded') === -1) {
+                current_node.className = current_node.className + ' reactive_record_show_when_loaded';
+              } else if (current_index == 0 && current_node.className.indexOf('reactive_record_show_while_loading') === -1) {
+                current_node.className = current_node.className + ' reactive_record_show_while_loading';
+              }
+            }
+          );
+        }
+        nil
+      end
+
       before_mount do
         @uniq_id = WhileLoading.get_next_while_loading_counter
         WhileLoading.preload_css(
-          ".reactive_record_while_loading_container_#{@uniq_id} > :nth-child(1n+#{@LoadedChildren.count+1}) {\n"+
+          ":not(.reactive_record_is_loading).reactive_record_while_loading_container_#{@uniq_id} > :nth-child(1) {\n"+
           "  display: none;\n"+
           "}\n"
         )
       end
 
       after_mount do
-        @waiting_on_resources = @Loading
         WhileLoading.add_style_sheet
-        node = dom_node
-        %x{
-          var nodes = node.querySelectorAll(':nth-child(-1n+'+#{@LoadedChildren.count}+')');
-          nodes.forEach(
-            function(current_node, current_index, list_obj) {
-              if (current_node.className.indexOf('reactive_record_show_when_loaded') === -1) {
-                current_node.className = current_node.className + ' reactive_record_show_when_loaded';
-              }
-            }
-          );
-          nodes = node.querySelectorAll(':nth-child(1n+'+#{@LoadedChildren.count+1}+')');
-          nodes.forEach(
-            function(current_node, current_index, list_obj) {
-              if (current_node.className.indexOf('reactive_record_show_while_loading') === -1) {
-                current_node.className = current_node.className + ' reactive_record_show_while_loading';
-              }
-            }
-          );
-        }
+        after_mount_and_update
       end
 
-      after_update do
-        @waiting_on_resources = @Loading
-      end
+      after_update :after_mount_and_update
 
       render do
+        # return ReactAPI.create_element(@ElementType[0], @ElementProps.dup) do
+        #   @LoadedChildren
+        # end
         props = @ElementProps.dup
-        classes = [props[:class], props[:className], "reactive_record_while_loading_container_#{@uniq_id}"].compact.join(" ")
+        classes = [
+          props[:class], props[:className],
+          @OtherProps.delete(:class), @OtherProps.delete(:className),
+          "reactive_record_while_loading_container_#{@uniq_id}"
+        ].compact.join(" ")
         props.merge!({
           "data-reactive_record_while_loading_container_id" => @uniq_id,
           "data-reactive_record_enclosing_while_loading_container_id" => @uniq_id,
           class: classes
         })
+        props.merge!(@OtherProps)
         ReactAPI.create_element(@ElementType[0], props) do
-          @LoadedChildren + @LoadingChildren
+          @LoadingChildren + @LoadedChildren
         end.tap { |e| e.waiting_on_resources = @Loading }
       end
 
@@ -231,6 +421,10 @@ module Hyperstack
       def while_loading(display = "", &loading_display_block)
         loaded_children = []
         loaded_children = block.call.dup if block
+        if loaded_children.last.is_a? String
+          loaded_children <<
+            Hyperstack::Internal::Component::ReactWrapper.create_element(:span) { loaded_children.pop }
+        end
         if display.respond_to? :as_node
           display = display.as_node
           loading_display_block = lambda { display.render }
@@ -238,12 +432,10 @@ module Hyperstack
           loading_display_block = lambda { display }
         end
         loading_children = Internal::Component::RenderingContext.build do |buffer|
-          result = loading_display_block.call
-          result = result.to_s if result.try :acts_as_string?
-          result.span.tap { |e| e.waiting_on_resources = Internal::Component::RenderingContext.waiting_on_resources } if result.is_a? String
+          Hyperstack::Internal::Component::RenderingContext.render(:span, &loading_display_block) #{ to_s }
           buffer.dup
         end
-
+       as_node
        new_element = ReactAPI.create_element(
           ReactiveRecord::WhileLoading,
           loading: waiting_on_resources,
@@ -252,7 +444,7 @@ module Hyperstack
           element_type: [type],
           element_props: properties)
 
-        Internal::Component::RenderingContext.replace(self, new_element)
+        #Internal::Component::RenderingContext.replace(self, new_element)
       end
 
       def hide_while_loading
@@ -266,6 +458,10 @@ end
 if RUBY_ENGINE == 'opal'
   module Hyperstack
     module Component
+
+      def quiet?
+        Hyperstack::Internal::State::Variable.get(ReactiveRecord::WhileLoading, :quiet)
+      end
 
       alias_method :original_component_did_mount, :component_did_mount
 

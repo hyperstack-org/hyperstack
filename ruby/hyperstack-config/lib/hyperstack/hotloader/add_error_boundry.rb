@@ -3,7 +3,7 @@ module Hyperstack
     module AddErrorBoundry
       def self.included(base)
         base.after_error do |*err|
-          @err = err
+          @err = Hyperstack::Internal::Component::RescueWrapper.after_error_args || err
           Hyperstack::Component.force_update!
         end
         base.define_method :render do

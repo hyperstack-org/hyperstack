@@ -21,9 +21,11 @@ module Hyperstack
         class_attribute :initial_state
         define_callback :before_mount
         define_callback :after_mount
-        define_callback :before_receive_props
+        define_callback :before_new_params
         define_callback :before_update
         define_callback :after_update
+        define_callback :__hyperstack_component_after_render_hook
+        define_callback :__hyperstack_component_rescue_hook
         #define_callback :before_unmount defined already by Async module
         define_callback(:after_error) { Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(base) }
       end
@@ -93,13 +95,14 @@ module Hyperstack
     def component_did_mount
       observing(update_objects: true) do
         run_callback(:after_mount)
+        Hyperstack::Internal::Component::RenderingContext.quiet_test(self)
       end
     end
 
     def component_will_receive_props(next_props)
       # need to rethink how this works in opal-react, or if its actually that useful within the react.rb environment
       # for now we are just using it to clear processed_params
-      observing(immediate_update: true) { run_callback(:before_receive_props, next_props) }
+      observing(immediate_update: true) { run_callback(:before_new_params, next_props) }
       @__hyperstack_component_receiving_props = true
     end
 
@@ -112,7 +115,10 @@ module Hyperstack
     end
 
     def component_did_update(prev_props, prev_state)
-      observing(update_objects: true) { run_callback(:after_update, prev_props, prev_state) }
+      observing(update_objects: true) do
+        run_callback(:after_update, prev_props, prev_state)
+        Hyperstack::Internal::Component::RenderingContext.quiet_test(self)
+      end
     end
 
     def component_will_unmount
@@ -124,7 +130,9 @@ module Hyperstack
     end
 
     def component_did_catch(error, info)
-      observing { run_callback(:after_error, error, info) }
+      observing do
+        run_callback(:after_error, error, info)
+      end
     end
 
     def mutations(_objects)
@@ -156,9 +164,15 @@ module Hyperstack
       @__hyperstack_component_waiting_on_resources
     end
 
+    def __hyperstack_component_run_post_render_hooks(element)
+      run_callback(:__hyperstack_component_after_render_hook, element) { |*args| args }.first
+    end
+
     def _render_wrapper
       observing(rendering: true) do
-        element = Hyperstack::Internal::Component::RenderingContext.render(nil) { render || '' }
+        element = Hyperstack::Internal::Component::RenderingContext.render(nil) do
+          render || ''
+        end
         @__hyperstack_component_waiting_on_resources =
           element.waiting_on_resources if element.respond_to? :waiting_on_resources
         element

@@ -14,3 +14,10 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym 'RESTful'
 # end
+
+# ActiveSupport::Inflector.inflections(:en) do |inflect|
+#   inflect.plural(/^(i)tem$/i, '\1temz')
+#   inflect.singular(/^(i)temz$/i, '\1tem')
+# end
+
+INFLECTORS_LOADED = true

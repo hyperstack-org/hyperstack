@@ -137,6 +137,38 @@ describe "synchronized scopes", js: true do
     TestModel.scope2_count.should eq(5)
   end
 
+  it "will not use a dummy count if the count is already known" do
+    # https://github.com/hyperstack-org/hyperstack/issues/79
+    ReactiveRecord::Operations::Fetch.class_eval do
+      def self.semaphore
+        @semaphore ||= Mutex.new
+      end
+      validate { self.class.semaphore.synchronize { true } }
+    end
+    isomorphic do
+      TestModel.class_eval do
+        scope :even, -> { where(test_attribute: 'even') }
+      end
+    end
+    4.times { |i| FactoryBot.create(:test_model, test_attribute: i.even? ? 'even' : 'odd' ) }
+    mount 'TestComponent2' do
+      class TestComponent2 < HyperComponent
+        class << self
+          state_accessor :scope
+        end
+        render(DIV) do
+          UL { TestModel.send(TestComponent2.scope || :all).each { |test_model| LI { test_model.test_attribute }}}
+          DIV { "even.count = #{TestModel.even.count}" }
+        end
+      end
+    end
+    page.should have_content('even.count = 2')
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      evaluate_ruby 'TestComponent2.scope = :even'
+      page.should have_content('even.count = 2')
+    end
+  end
+
   it "can have params" do
     isomorphic do
       TestModel.class_eval do
@@ -311,6 +343,88 @@ describe "synchronized scopes", js: true do
     page.should have_content('rendered 6 times')
     TestModel.quicker_count.should eq(3)
   end
+
+  it 'the client filter will not be applied to unloaded scope but will be applied once the scope is loaded' do
+    # https://github.com/hyperstack-org/hyperstack/issues/78
+    # https://github.com/hyperstack-org/hyperstack/issues/82
+    isomorphic do
+      TestModel.class_eval do
+        scope :quicker, -> { where(completed: true) }, client: -> { completed }
+      end
+    end
+
+    FactoryBot.create(:test_model, test_attribute: 'model-1', completed: false)
+    FactoryBot.create(:test_model, test_attribute: 'model-2', completed: true)
+    FactoryBot.create(:test_model, test_attribute: 'model-3', completed: false)
+    FactoryBot.create(:test_model, test_attribute: 'model-4', completed: true)
+
+    mount 'TestComponent2' do
+      class TestComponent2 < HyperComponent
+        class << self
+          state_accessor :scope
+        end
+        before_mount do
+          @render_count = 1
+        end
+        before_update do
+          @render_count = @render_count + 1
+        end
+        render(DIV) do
+          DIV { "rendered #{@render_count} times"}
+          # render the all scope first, which will create a unloaded/dummy collection for all (issue 78)
+          # also get completed, so that when we rerender with the quicker scope, we already have the value of completed (issue 82)
+          UL { TestModel.send(TestComponent2.scope || :all).each { |test_model| LI { "#{test_model.test_attribute} #{test_model.completed}" }}}
+          # now get the count of the quicker (client side) scope, which must NOT use the dummy all collection as a base
+          DIV { "quicker.count = #{TestModel.quicker.count}" }
+        end
+      end
+    end
+    page.should have_content('.count = 2')
+    evaluate_ruby do
+      TestComponent2.scope = :quicker
+    end
+    page.should have_content('model-2')
+    page.should have_content('model-4')
+    page.should_not have_content('model-1', wait: 0)
+    page.should_not have_content('model-3', wait: 0)
+    # check to make sure we don't fetch/rerender, but instead just filtered client side (issue 82)
+    page.should have_content('rendered 3 times')
+  end
+
+  it 'will not treat an unloaded scope as equal to an empty loaded scope' do
+    # https://github.com/hyperstack-org/hyperstack/issues/81
+
+    FactoryBot.create(:test_model, test_attribute: 'model-1', completed: false)
+    FactoryBot.create(:test_model, test_attribute: 'model-2', completed: false)
+
+    mount 'TestComponent2' do
+      class TestComponent2 < HyperComponent
+        class << self
+          state_accessor :scope
+        end
+        before_mount do
+          TestComponent2.scope = :completed
+        end
+        render(DIV) do
+          if @current_scope_name != TestComponent2.scope
+            @current_scope_name = TestComponent2.scope
+            @previous_scope = @scope
+            @scope = TestModel.send(TestComponent2.scope)
+          end
+          DIV { "current scope #{@scope == @previous_scope ? '==' : '!='} previous_scope"}
+        end
+      end
+    end
+    # https://github.com/hyperstack-org/hyperstack/issues/84
+    # currently page will initially show that @scope == @previous_scope even though
+    # previous scope is nil
+    # page.should have_content('current scope != previous_scope')
+    evaluate_ruby do
+      TestComponent2.scope = :active
+    end
+    page.should have_content('current scope != previous_scope')
+  end
+
 
   it 'can have a client collector method' do
 

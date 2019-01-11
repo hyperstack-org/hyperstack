@@ -44,9 +44,19 @@ module Hyperstack
       import client_and_server_manifest.split("/").last, at_head: true if client_and_server_manifest
     end
 
+    def add_inflections(sys)
+      return [] unless sys
+      ["puts \"require 'config/initializers/inflections.rb'\""] +
+        File.open(Rails.root.join('config', 'initializers', 'inflections.rb'), &:readlines).tap do
+          puts "    require 'config/initializers/inflections.rb'"
+        end
+    rescue Errno::ENOENT
+      []
+    end
+
     def generate_requires(mode, sys, file)
       handle_webpack
-      import_list.collect do |value, cancelled, render_on_server, render_on_client, kind|
+      (import_list.collect do |value, cancelled, render_on_server, render_on_client, kind|
         next if cancelled
         next if (sys && kind == :tree) || (!sys && kind != :tree)
         next if mode == :client && !render_on_client
@@ -60,7 +70,7 @@ module Hyperstack
         else
           generate_directive(:require, value, file, render_on_server, render_on_client)
         end
-      end.compact.join("\n")
+      end + add_inflections(sys)).compact.join("\n")
     end
 
     def generate_directive(directive, to, file, render_on_server, render_on_client)

@@ -272,12 +272,14 @@ if RUBY_ENGINE != 'opal'
     # end
 
     config.after(:each) do |example|
-      unless example.exception
+      # I am assuming the unless was there just to aid in debug when using pry.rescue
+      # perhaps it could be on a switch detecting presence of pry.rescue?
+      #unless example.exception
         # Clear session data
         Capybara.reset_sessions!
         # Rollback transaction
         DatabaseCleaner.clean
-      end
+      #end
     end
 
     config.after(:all, :js => true) do

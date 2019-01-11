@@ -45,7 +45,7 @@ module Hyperstack
       # Used for elements that are not yet in DOM, i.e. they are provided as children
       # or they have been explicitly removed from the rendering context using the delete method.
 
-      def render(props = {}, &new_block)
+      def render(*props, &new_block)
         if props.empty?
           Hyperstack::Internal::Component::RenderingContext.render(self)
         else

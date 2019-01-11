@@ -103,6 +103,36 @@ describe 'React::Component', js: true do
       end.to eq('bar')
     end
 
+    it 'has a before_render method that is called before_mount and before_update' do
+      mount 'Foo' do
+        class Foo
+          include Hyperstack::Component
+          before_mount { @count = 0}
+          before_render do
+            @count += 1
+          end
+          after_mount { after(0) { force_update! } }
+          render(DIV) { "I got called #{@count} times" }
+        end
+      end
+      expect(page).to have_content('I got called 2 times')
+    end
+
+    it 'has an after_render method that is called after_mount and after_update' do
+      mount 'Foo' do
+        class Foo
+          include Hyperstack::Component
+          before_mount { @count = 0}
+          after_render do
+            @count += 1
+            after(0) { force_update! } if @count <= 2
+          end
+          render(DIV) { "I got called #{@count} times" }
+        end
+      end
+      expect(page).to have_content('I got called 2 times')
+    end
+
     it 'invokes :after_error when componentDidCatch' do
       client_option raise_on_js_errors: :off
       mount 'Foo' do
@@ -292,7 +322,7 @@ describe 'React::Component', js: true do
       expect_evaluate_ruby('StateFoo.render_count').to eq(1)
     end
 
-    it 'doesnt cause extra render when calling mutate in :before_receive_props' do
+    it 'doesnt cause extra render when calling mutate in :before_new_params' do
       mount 'Foo' do
         class StateFoo
           include Hyperstack::Component
@@ -308,7 +338,7 @@ describe 'React::Component', js: true do
             @@render_count += 1
           end
 
-          before_receive_props do |new_params|
+          before_new_params do |new_params|
             mutate
           end
 

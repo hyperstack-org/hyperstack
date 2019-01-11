@@ -15,35 +15,33 @@ end
 module Hyperstack
 
   class Hotloader
-    def self.callbackmaps
-      @@callbackmaps ||= Hash.new { |h, k| h[k] = Hash.new { |h1, k1| h1[k1] = Hash.new { |h2, k2| h2[k2] = Array.new }}}
+    def self.callbacks
+      @@callbacks ||= Hash.new { |h, k| h[k] = Array.new }
     end
 
-    def self.record(klass, instance_var, depth, *items)
-      if $_hyperstack_reloader_file_name
-        callbackmaps[$_hyperstack_reloader_file_name][klass][instance_var].concat items
-      else
-        callback = lambda do |stack_frames|
-          file_name = `#{stack_frames[depth]}.fileName`
-          match = /^(.+\/assets\/)(.+\/)\2/.match(file_name)
-          if match
-            file_name = file_name.gsub(match[1]+match[2], '')
-            callbackmaps[file_name][klass][instance_var].concat items
-          end
-        end
-        error = lambda do |err|
-          `console.error(#{"hyperstack hot loader could not find source file for callback: #{err}"})`
-        end
-        `StackTrace.get().then(#{callback}).catch(#{error})`
-       end
+    STACKDIRS = ['hyperstack/', 'corelib/']
+
+    def self.file_name(frame)
+      file_name = `#{frame}.fileName`
+      match = %r{^(.+\/assets\/)(.+\/)(.+\/)}.match(file_name)
+      return unless match && match[2] == match[3] && !STACKDIRS.include?(match[2])
+      file_name.gsub(match[1] + match[2], '')
+    end
+
+    def self.when_file_updates(&block)
+      return callbacks[$_hyperstack_reloader_file_name] << block if $_hyperstack_reloader_file_name
+      callback = lambda do |frames|
+        frames.collect(&method(:file_name)).each { |name| callbacks[name] << block if name }
+      end
+      error = lambda do |e|
+        `console.error(#{"hyperstack hot loader could not find source file for callback: #{e}"})`
+      end
+      `StackTrace.get().then(#{callback}).catch(#{error})`
     end
 
     def self.remove(file_name)
-      callbackmaps[file_name].each do |klass, instance_vars|
-        instance_vars.each do |instance_var, items|
-          klass.instance_variable_get(instance_var).reject! { |item| items.include? item }
-        end
-      end
+      callbacks[file_name].each(&:call)
+      callbacks[file_name] = []
     end
 
     def connect_to_websocket(port)
@@ -82,7 +80,7 @@ module Hyperstack
         puts "Reloading #{reload_request[:filename]} (asset_path: #{reload_request[:asset_path]})"
         begin
           #Hyperstack::Context.reset! false
-          file_name = reload_request[:asset_path] #.gsub(/.+hyperstack\//, '')
+          file_name = reload_request[:asset_path].gsub(/.+hyperstack\//, '')  # this gsub we need sometimes????
           Hotloader.remove(file_name)
           $eval_proc.call file_name, reload_request[:source_code]
         rescue

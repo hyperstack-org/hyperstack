@@ -348,6 +348,21 @@ describe 'the param macro', js: true do
         Foo.change_me! "updated"
         expect(`div.children[0].innerHTML`).to eq("updated")
       end
+
+      it "can use accessor style param names" do
+        mount 'TestAccessorStyle', loaded: true, foo_bar: "WORKS!" do
+          class TestAccessorStyle
+            include Hyperstack::Component
+            param_accessor_style :accessors
+            param :foo_bar
+            param :loaded, alias: :loaded?
+            render(DIV) do
+              foo_bar if loaded?
+            end
+          end
+        end
+        expect(page).to have_content('WORKS!')
+      end
     end
   end
 end

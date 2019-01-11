@@ -9,7 +9,7 @@ module Hyperstack
         end
 
         def params
-          if @__hyperstack_component_params_wrapper.param_accessor_style == :hyperstack
+          if [:hyperstack, :accessors].include? @__hyperstack_component_params_wrapper.param_accessor_style
             raise "params are now directly accessible via instance variables.\n"\
                   '  to access the legacy behavior add `param_accessor_style = :legacy` '\
                     "to your component class\n"\
@@ -31,6 +31,16 @@ module Hyperstack
           `(#{self}.__hyperstack_component_is_mounted === undefined) ? false : #{self}.__hyperstack_component_is_mounted`
         end
 
+        def pluralize(count, singular, plural = nil)
+          word = if (count == 1 || count =~ /^1(\.0+)?$/)
+            singular
+          else
+            plural || singular.pluralize
+          end
+
+          "#{count || 0} #{word}"
+        end
+
         def force_update!
           `#{self}.__hyperstack_component_native.forceUpdate()`
           self
@@ -46,6 +56,29 @@ module Hyperstack
         end
 
         private
+
+        # can be overriden by the Router include
+        def __hyperstack_router_wrapper(&block)
+          ->() { instance_eval(&block) }
+        end
+
+        # can be overriden by including WhileLoading include
+        def __hyperstack_component_rescue_wrapper(child)
+          if self.class.callbacks?(:__hyperstack_component_rescue_hook)
+            Hyperstack::Internal::Component::RescueWrapper(child: self, children_elements: child)
+          else
+            child.call
+          end
+        end
+
+        def __hyperstack_component_select_wrappers(&block)
+          RescueWrapper.after_error_args = nil
+          __hyperstack_component_run_post_render_hooks(
+            __hyperstack_component_rescue_wrapper(
+              __hyperstack_router_wrapper(&block)
+            )
+          )
+        end
 
         def set_or_replace_state_or_prop(state_or_prop, method, &block)
           raise "No native ReactComponent associated" unless @__hyperstack_component_native

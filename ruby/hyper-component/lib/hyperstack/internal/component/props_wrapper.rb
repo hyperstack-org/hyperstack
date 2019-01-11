@@ -9,9 +9,20 @@ module Hyperstack
           def instance_var_name_for(name)
             case Hyperstack.naming_convention
             when :camelize_params
-              name.camelize
+              fix_suffix(name.camelize)
             when :prefix_params
               "_#{name}"
+            else
+              name
+            end
+          end
+
+          def fix_suffix(name)
+            return unless name
+            if name =~ /\?$/
+              name[0..-2] + '_q'
+            elsif name =~ /\!$/
+              name[0..-2] + '_b'
             else
               name
             end
@@ -38,11 +49,14 @@ module Hyperstack
 
           def define_param(name, param_type, aka = nil)
             meth_name = aka || name
-            var_name = aka || instance_var_name_for(name)
+            var_name = fix_suffix(aka) || instance_var_name_for(name)
             param_definitions[name] = lambda do |props|
-              @component.instance_variable_set :"@#{var_name}", fetch_from_cache(name, param_type, props)
+              @component.instance_variable_set :"@#{var_name}", val = fetch_from_cache(name, param_type, props)
+              next unless param_accessor_style == :accessors
+              `#{@component}[#{"$#{meth_name}"}] = function() { return #{val} }`
+              # @component.define_singleton_method(name) { val } if param_accessor_style == :accessors
             end
-            return if param_accessor_style == :hyperstack
+            return if %i[hyperstack accessors].include? param_accessor_style
             if param_type == Proc
               define_method(meth_name.to_sym) do |*args, &block|
                 props[name].call(*args, &block) if props[name]
@@ -57,7 +71,10 @@ module Hyperstack
           def define_all_others(name)
             var_name = instance_var_name_for(name)
             param_definitions[name] = lambda do |props|
-              @component.instance_variable_set :"@#{var_name}", yield(props)
+              @component.instance_variable_set :"@#{var_name}", val = yield(props)
+              next unless param_accessor_style == :accessors
+              `#{@component}[#{"$#{name}"}] = function() { return #{val} }`
+              # @component.define_singleton_method(name) { val } if param_accessor_style == :accessors
             end
             define_method(name.to_sym) do
               @_all_others_cache ||= yield(props)

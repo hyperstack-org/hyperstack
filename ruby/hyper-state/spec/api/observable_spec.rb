@@ -14,6 +14,11 @@ describe Hyperstack::State::Observable do
       store.instance_eval { @var = 12 }
       expect(store.instance_eval { observe { @var } }).to eq(12)
     end
+    it "can be passed args" do
+      expect(Hyperstack::Internal::State::Mapper).to receive(:observed!).with(store)
+      store.instance_eval { @var = 12 }
+      expect(store.instance_eval { observe @var }).to eq(12)
+    end
     it "can be used without a block" do
       expect(Hyperstack::Internal::State::Mapper).to receive(:observed!).with(store)
       store.instance_eval { observe }
@@ -24,6 +29,10 @@ describe Hyperstack::State::Observable do
     it "can be passed a block" do
       expect(Hyperstack::Internal::State::Mapper).to receive(:mutated!).with(store)
       expect(store.instance_eval { mutate { @var = 12 } }).to eq(12)
+    end
+    it "can be passed args" do
+      expect(Hyperstack::Internal::State::Mapper).to receive(:mutated!).with(store)
+      expect(store.instance_eval { mutate @other_var = 13, @var = 12 }).to eq(12)
     end
     it "can be used without a block" do
       expect(Hyperstack::Internal::State::Mapper).to receive(:mutated!).with(store)

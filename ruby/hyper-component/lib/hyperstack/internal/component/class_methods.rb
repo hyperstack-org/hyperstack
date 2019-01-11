@@ -42,17 +42,73 @@ module Hyperstack
           backtrace[1..-1].each { |line| message_array << line }
         end
 
+        def before_receive_props(*args, &block)
+          deprecation_warning "'before_receive_props' is deprecated. Use the 'before_new_params' macro instead."
+          before_new_params(*args, &block)
+        end
+
         def render(container = nil, params = {}, &block)
           Tags.included(self)
           if container
             container = container.type if container.is_a? Hyperstack::Component::Element
-            define_method :__hyperstack_component_render do
-              RenderingContext.render(container, params) { instance_eval(&block) if block }
+            define_method(:__hyperstack_component_render) do
+              __hyperstack_component_select_wrappers do
+                RenderingContext.render(container, params) do
+                  instance_eval(&block) if block
+                end
+              end
             end
           else
-            define_method(:__hyperstack_component_render) { instance_eval(&block) }
+            define_method(:__hyperstack_component_render) do
+              __hyperstack_component_select_wrappers do
+                instance_eval(&block)
+              end
+            end
           end
         end
+
+        # def while_loading(*args, &block)
+        #   __hyperstack_component_after_render_hook do |element|
+        #     element.while_loading(*args) { |*aargs| instance_exec(*aargs, &block) }
+        #   end
+        # end
+
+        def on(*args, &block)
+          __hyperstack_component_after_render_hook  do |element|
+            element.on(*args) { |*aargs| instance_exec(*aargs, &block) }
+          end
+        end
+
+        def rescues(*klasses, &block)
+          klasses = [StandardError] if klasses.empty?
+          __hyperstack_component_rescue_hook do |found, *args|
+            next [found, *args] if found || !klasses.detect { |klass| args[0].is_a? klass }
+            instance_exec(*args, &block)
+            [true, *args]
+          end
+        end
+
+        def before_render(*args, &block)
+          before_mount(*args, &block)
+          before_update(*args, &block)
+        end
+
+        def after_render(*args, &block)
+          after_mount(*args, &block)
+          after_update(*args, &block)
+        end
+
+        # [:while_loading, :on].each do |method|
+        #   define_method(method) do |*args, &block|
+        #     @@alias_id ||= 0
+        #     @@alias_id += 1
+        #     alias_name = "__hyperstack_attach_post_render_hook_#{@@alias_id}"
+        #     alias_method alias_name, :__hyperstack_attach_post_render_hook
+        #     define_method(:__hyperstack_attach_post_render_hook) do |element|
+        #       send(alias_name, element.while_loading(*args) { instance_eval(&block) })
+        #     end
+        #   end
+        # end
 
         # method missing will assume the method is a class name, and will treat this a render of
         # of the component, i.e. Foo::Bar.baz === Foo::Bar().baz
@@ -147,8 +203,9 @@ module Hyperstack
 
         alias other_params collect_other_params_as
         alias others collect_other_params_as
+        alias opts collect_other_params_as
 
-        def triggers(name, opts = {})
+        def fires(name, opts = {})
           aka = opts[:alias] || "#{name}!"
           name = if name =~ /^<(.+)>$/
                    name.gsub(/^<(.+)>$/, '\1')
@@ -160,6 +217,8 @@ module Hyperstack
           validator.event(name)
           define_method(aka) { |*args| props[name]&.call(*args) }
         end
+
+        alias triggers fires
 
         def define_state(*states, &block)
           deprecation_warning "'define_state' is deprecated. Use the 'state' macro to declare states."

@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe 'event callbacks', js: true do
-  it 'the triggers macro will create an event method' do
+  it 'the fires macro will create an event method' do
     mount 'FooBar' do
       class Foo
         include Hyperstack::Component
-        triggers :foo_bar
+        fires :foo_bar
         after_mount { foo_bar! }
         render { 'render' }
       end
@@ -28,7 +28,7 @@ describe 'event callbacks', js: true do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
-        triggers :foo_bar
+        fires :foo_bar
         after_mount { foo_bar! }
         render { 'render' }
       end
@@ -40,7 +40,7 @@ describe 'event callbacks', js: true do
     mount 'FooBar' do
       class Foo
         include Hyperstack::Component
-        triggers :foo_bar, alias: :foo_bar
+        fires :foo_bar, alias: :foo_bar
         after_mount { foo_bar }  # notice no !
         render { 'render' }
       end
@@ -62,7 +62,7 @@ describe 'event callbacks', js: true do
   it "can work with builtin events" do
     mount 'Test' do
       class Btn < HyperComponent
-        triggers :bungo
+        fires :bungo
         Btn.class.attr_accessor :clicked
         render do
           BUTTON(id: :btn) do
@@ -91,7 +91,7 @@ describe 'event callbacks', js: true do
     mount 'FooBar' do
       class Foo
         include Hyperstack::Component
-        triggers '<FooBar>', alias: :foo_bar!
+        fires '<FooBar>', alias: :foo_bar!
         after_mount { foo_bar! }
         render { 'render' }
       end

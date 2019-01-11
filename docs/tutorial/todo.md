@@ -987,8 +987,8 @@ end
 
 # app/hyperstack/components/edit_item.rb
 class EditItem < HyperComponent
-  param :todo
-  triggers :saved
+  param    :todo
+  triggers :save
   triggers :cancel
   others   :etc
   after_mount { DOM[dom_node].focus }

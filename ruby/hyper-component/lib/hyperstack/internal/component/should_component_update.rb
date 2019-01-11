@@ -30,7 +30,7 @@ module Hyperstack
             if respond_to?(:needs_update?)
               !!call_needs_update(next_props, next_state)
             else
-              (props_changed?(next_props) || native_state_changed?(next_state))
+              props_changed?(next_props) || native_state_changed?(next_state)
             end
             # rubocop:enable Style/DoubleNegation
           end
