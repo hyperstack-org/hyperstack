@@ -5,8 +5,12 @@ task :part1 do
   (1..2).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
 end
 
-task :part2 do 
-  (3..7).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+task :part2 do
+  (3..4).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+end
+
+task :part3 do
+  (5..7).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
 end
 
 task :spec do

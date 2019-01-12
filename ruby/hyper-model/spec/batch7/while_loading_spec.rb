@@ -43,6 +43,27 @@ describe "while loading", js: true do
     FactoryBot.create(:user, first_name: 'Coffee', last_name: 'Boxer')
   end
 
+  it "will display the while loading message for a fetch within a component" do
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      mount "WhileLoadingTester", {}, no_wait: true do
+        class WhileLoadingTester < HyperComponent
+          include Hyperstack::Component::WhileLoading
+          render(DIV) do
+            if resources_loaded?
+              "#{User.find_by_first_name('Lily').last_name} is a dog"
+            else
+              'loading...'
+            end
+          end
+        end
+      end
+      expect(page).to have_content('loading...')
+      expect(page).not_to have_content('is a dog', wait: 0)
+    end
+    expect(page).to have_content('DaDog is a dog')
+    expect(page).not_to have_content('loading...', wait: 0)
+  end
+
   it "will display the while loading message for a fetch within a nested component" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
@@ -71,6 +92,54 @@ describe "while loading", js: true do
     expect(page).not_to have_content('loading...', wait: 0)
   end
 
+  it "while loading works along side rescues" do
+    # double check because WhileLoading is built on top of rescues
+    ReactiveRecord::Operations::Fetch.semaphore.synchronize do
+      mount "WhileLoadingTester", {}, no_wait: true do
+        class WhileLoadingTester < HyperComponent
+          include Hyperstack::Component::WhileLoading
+          class << self
+            mutator :raise_error! do
+              @raise_error = true
+            end
+            def check_error
+              if @raise_error
+                @raise_error = false
+                raise 'Error Raised'
+              end
+            end
+          end
+          render(DIV) do
+            WhileLoadingTester.check_error
+            if @rescued
+              @rescued = false
+              "rescued"
+            elsif resources_loaded?
+              "#{User.find_by_first_name('Lily').last_name} is a dog"
+            else
+              'loading...'
+            end
+          end
+          rescues do
+            @rescued = true
+          end
+        end
+      end
+      expect(page).to have_content('loading...')
+      expect(page).not_to have_content('is a dog', wait: 0)
+    end
+    expect(page).to have_content('DaDog is a dog')
+    expect(page).not_to have_content('loading...', wait: 0)
+    evaluate_ruby do
+      WhileLoadingTester.raise_error!
+    end
+    expect(page).to have_content('rescued')
+    evaluate_ruby do
+      Hyperstack::Component.force_update!
+    end
+    expect(page).to have_content('DaDog is a dog')
+  end
+
   it "will display the while loading message for a fetch within a nested component when attached to that component" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do
       mount "WhileLoadingTester", {}, no_wait: true do
@@ -82,11 +151,7 @@ describe "while loading", js: true do
         class WhileLoadingTester < HyperComponent
           include Hyperstack::Component::WhileLoading
           render(DIV) do
-            if resources_loaded?
-              MyNestedGuy {}
-            else
-              SPAN { 'loading...' }
-            end
+            resources_loading? ? 'loading...' : MyNestedGuy {}
           end
         end
       end
@@ -129,105 +194,6 @@ describe "while loading", js: true do
     expect(page).to have_content('DaDog is a dog')
     expect(page).not_to have_content('i should not display', wait: 0)
   end
-
-  # it "while loading can take a string param instead of a block" do
-  #   ReactiveRecord::Operations::Fetch.semaphore.synchronize do
-  #     mount "WhileLoadingTester", {}, no_wait: true do
-  #       class WhileLoadingTester < HyperComponent
-  #         render do
-  #           DIV do
-  #             User.find_by_first_name('Lily').last_name
-  #           end
-  #           .while_loading 'loading...'
-  #         end
-  #       end
-  #     end
-  #     expect(page).to have_content('loading...')
-  #     expect(page).not_to have_content('DaDog', wait: 0)
-  #   end
-  #   expect(page).to have_content('DaDog')
-  #   expect(page).not_to have_content('loading...', wait: 0)
-  # end
-  #
-  # it "while loading can take an element param instead of a block" do
-  #   ReactiveRecord::Operations::Fetch.semaphore.synchronize do
-  #     mount "WhileLoadingTester", {}, no_wait: true do
-  #       class WhileLoadingTester < HyperComponent
-  #         render do
-  #           DIV do
-  #             User.find_by_first_name('Lily').last_name
-  #           end
-  #           .while_loading(DIV { 'loading...' })
-  #         end
-  #       end
-  #     end
-  #     expect(page).to have_content('loading...')
-  #     expect(page).not_to have_content('DaDog', wait: 0)
-  #   end
-  #   expect(page).to have_content('DaDog')
-  #   expect(page).not_to have_content('loading...', wait: 0)
-  # end
-  #
-  # it "achieving while_loading behavior with state variables" do
-  #   ReactiveRecord::Operations::Fetch.semaphore.synchronize do
-  #     mount "WhileLoadingTester", {}, no_wait: true do
-  #       class MyComponent < HyperComponent
-  #         render do
-  #           SPAN { 'loading...' }
-  #         end
-  #       end
-  #
-  #       class WhileLoadingTester < HyperComponent
-  #
-  #         before_mount do
-  #           ReactiveRecord.load do
-  #             User.find_by_first_name('Lily').last_name
-  #           end.then do |last_name|
-  #             mutate @last_name = last_name
-  #           end
-  #         end
-  #
-  #         render do
-  #           if @last_name
-  #             DIV { @last_name }
-  #           else
-  #             MyComponent {}
-  #           end
-  #         end
-  #       end
-  #     end
-  #     expect(page).to have_content('loading...')
-  #     expect(page).not_to have_content('DaDog', wait: 0)
-  #   end
-  #   expect(page).to have_content('DaDog')
-  #   expect(page).not_to have_content('loading...', wait: 0)
-  # end
-  #
-  # it "while loading display an application defined element" do
-  #   ReactiveRecord::Operations::Fetch.semaphore.synchronize do
-  #     mount "WhileLoadingTester", {}, no_wait: true do
-  #       class MyComponent < HyperComponent
-  #         render do
-  #           SPAN { 'loading...' }
-  #         end
-  #       end
-  #       class WhileLoadingTester < HyperComponent
-  #         render do
-  #           DIV do
-  #             User.find_by_first_name('Lily').last_name
-  #           end
-  #           .while_loading do
-  #             MyComponent {}
-  #           end
-  #         end
-  #       end
-  #     end
-  #     expect(page).to have_content('loading...')
-  #     expect(page).not_to have_content('DaDog', wait: 0)
-  #   end
-  #   expect(page).to have_content('DaDog')
-  #   expect(page).not_to have_content('loading...', wait: 0)
-  # end
 
   it "while loading works when number of children changes (i.e. relationships)" do
     ReactiveRecord::Operations::Fetch.semaphore.synchronize do

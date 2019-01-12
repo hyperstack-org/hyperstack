@@ -67,6 +67,8 @@ jobs:
     - <<: *_test_gem
       env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part2
     - <<: *_test_gem
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part3
+    - <<: *_test_gem
       env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1
     - <<: *_test_gem
       env: COMPONENT=hyper-router      RUBY_VERSION=2.5.1
