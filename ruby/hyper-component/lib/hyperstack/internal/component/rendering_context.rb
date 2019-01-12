@@ -15,7 +15,7 @@ module Hyperstack
           end
 
           def quiet_test(component)
-            return unless component.waiting_on_resources && raise_if_not_quiet? && component.class != RescueMetaWrapper
+            return unless component.waiting_on_resources && raise_if_not_quiet? #&& component.class != RescueMetaWrapper <- WHY  can't create a spec that this fails without this, but several fail with it.
             raise NotQuiet.new("#{component} is waiting on resources")
           end
 

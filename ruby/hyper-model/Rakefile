@@ -1,6 +1,14 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 
+task :part1 do
+  (1..2).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+end
+
+task :part2 do 
+  (3..7).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+end
+
 task :spec do
   (1..7).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
 end

@@ -3,7 +3,7 @@ cache:
   bundler: true
   directories:
   - node_modules # NPM packages
-  
+
 _test_gem: &_test_gem
   stage: test
   addons:
@@ -37,7 +37,7 @@ _test_gem: &_test_gem
     - yarn install
   script:
     - echo running script $COMPONENT
-    - DRIVER=travis bundle exec rake
+    - DRIVER=travis bundle exec rake $TASK
 
 _deploy_gem: &_deploy_gem
   stage: release gems
@@ -63,7 +63,9 @@ jobs:
     - <<: *_test_gem
       env: COMPONENT=hyper-component   RUBY_VERSION=2.5.1
     - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part1
+    - <<: *_test_gem
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part2
     - <<: *_test_gem
       env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1
     - <<: *_test_gem
