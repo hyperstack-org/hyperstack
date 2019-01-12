@@ -114,7 +114,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 1; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
