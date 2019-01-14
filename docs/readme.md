@@ -33,7 +33,10 @@ Our website serves as a Hyperstack example application. All the doc content is l
 
 You can be up and running in **less than 5 minutes**. Just follow the simple setup guide for a new Rails application all correctly configured and ready to go with Hyperstack.
 
-+ Setup and Installation: [https://hyperstack.org/edge/docs/installation)
++ Setup and Installation: https://hyperstack.org/edge/docs/installation
+
+Beyond the installation we strongly suggest new developers work trough the [ToDo tutorial](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/tutorial/todo.md).
+As it gives a minial understanding of the Hyperstack framework.
 
 ## Community and support
 
@@ -49,7 +52,12 @@ Please see the [ROADMAP](https://github.com/hyperstack-org/hyperstack/blob/edge/
 
 ## Contributing
 
-If you would like to help, please read the [CONTRIBUTING](https://github.com/hyperstack-org/hyperstack/blob/edge/CONTRIBUTING.md) file for suggestions.
+We have a [Feature Matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md) that needs to be filled with missing features.
+The idea is that you can check here what the implementation status is of a Ruby (on Rails) feature.
+And if you have the time and skill you're more then encuraged to implement or fix one or two.
+But if you're not in a position to contribute code, just expanding and maintaining this table would be very excellent.
+
+If you would like to help in any other way, please read the [CONTRIBUTING](https://github.com/hyperstack-org/hyperstack/blob/edge/CONTRIBUTING.md) file for suggestions.
 
 ## Links
 
