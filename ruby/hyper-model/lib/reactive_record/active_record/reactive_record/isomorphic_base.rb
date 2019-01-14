@@ -316,21 +316,23 @@ module ReactiveRecord
 
     else
 
-      def self.find_record(model, id, vector, save)
+      def self.find_record(model, id, acting_user, vector, save)
         if !save
           found = vector[1..-1].inject(vector[0]) do |object, method|
             if object.nil? # happens if you try to do an all on empty scope followed by more scopes
               object
-            elsif method.is_a? Array
+            elsif method.is_a? Array #__secure_remote_access_to_
               if method[0] == 'new'
                 object.new
-              else
+              elsif method[0] == 'find_by'
                 object.send(*method)
+              else
+                object.send(:"__secure_remote_access_to_#{method[0]}", object, acting_user, *method[1..-1])
               end
-            elsif method.is_a? String and method[0] == '*'
+            elsif method.is_a?(String) && method[0] == '*'
               object[method.gsub(/^\*/,'').to_i]
             else
-              object.send(method)
+              object.send(:"__secure_remote_access_to_#{method}", object, acting_user)
             end
           end
           if id and (found.nil? or !(found.class <= model) or (found.id and found.id.to_s != id.to_s))
@@ -362,13 +364,13 @@ module ReactiveRecord
           id = attributes.delete(model.primary_key) if model.respond_to? :primary_key # if we are saving existing model primary key value will be present
           vector = model_to_save[:vector]
           vector = [vector[0].constantize] + vector[1..-1].collect do |method|
-            if method.is_a?(Array) and method.first == "find_by_id"
+            if method.is_a?(Array) && method.first == "find_by_id"
               ["find", method.last]
             else
               method
             end
           end
-          reactive_records[model_to_save[:id]] = vectors[vector] = record = find_record(model, id, vector, save) # ??? || validate ???
+          reactive_records[model_to_save[:id]] = vectors[vector] = record = find_record(model, id, acting_user, vector, save) # ??? || validate ???
           next unless record
           if attributes.empty?
             dont_save_list << record unless save
@@ -507,7 +509,7 @@ module ReactiveRecord
         if save || validate
           {success: false, saved_models: saved_models, message: e}
         else
-          {}
+          raise e # was returning {} TODO verify that just raising the error at least reports the error
         end
       end
 

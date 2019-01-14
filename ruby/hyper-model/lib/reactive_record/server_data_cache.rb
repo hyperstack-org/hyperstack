@@ -229,6 +229,26 @@ module ReactiveRecord
             @db_cache.add_item_to_cache self
           end
 
+          def to_s
+            acting_user_string =
+              if acting_user
+                " - with acting user: <#{acting_user.class.name} id: #{acting_user.id}>"
+              else
+                ' - with no acting user'
+              end
+            vector.collect do |e|
+              if e.is_a? String
+                e
+              elsif e.is_a? Array
+                e.length > 1 ? "#{e.first}(#{e[1..-1].join(', ')})" : e.first
+              else
+                e.name
+              end
+            end.join('.') + acting_user_string
+          rescue
+            vector.to_s + acting_user_string
+          end
+
           def start_timing(&block)
             ServerDataCache.class.start_timing(&block)
           end
@@ -245,11 +265,11 @@ module ReactiveRecord
                   cache_item.apply_star || representative
                 elsif method == "*all"
                   # if we secure the collection then we assume its okay to read the ids
-                  secured_value = cache_item.value.__secure_collection_check(@acting_user)
+                  secured_value = cache_item.value.__secure_collection_check(cache_item)
                   cache_item.build_new_cache_item(timing(:active_record) { secured_value.collect { |record| record.id } }, method, method)
                 elsif method == "*count"
-                  secured_value = cache_item.value.__secure_collection_check(@acting_user)
-                  cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.__secure_collection_check(@acting_user).count }, method, method)
+                  secured_value = cache_item.value.__secure_collection_check(cache_item)
+                  cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.__secure_collection_check(cache_item).count }, method, method)
                 elsif preloaded_value = @preloaded_records[cache_item.absolute_vector + [method]]
                   # no security check needed since we already evaluated this
                   cache_item.build_new_cache_item(preloaded_value, method, method)
@@ -273,10 +293,10 @@ module ReactiveRecord
                       else
                         raise "method missing"
                       end
-                    rescue Exception => e # this check may no longer be needed as we are quite explicit now on which methods we apply
-                      # ReactiveRecord::Pry::rescued(e)
-                      ::Rails.logger.debug "\033[0;31;1mERROR: HyperModel exception caught when applying #{method} to db object #{cache_item.value}: #{e}\033[0;30;21m"
-                      raise e, "HyperModel fetching records failed, exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
+                    # rescue Exception => e # this check may no longer be needed as we are quite explicit now on which methods we apply
+                    #   # ReactiveRecord::Pry::rescued(e)
+                    #   #::Rails.logger.debug "\033[0;31;1mERROR: HyperModel exception caught when applying #{method} to db object #{cache_item.value}: #{e}\033[0;30;21m"
+                    #   raise e, "HyperModel fetching records failed, exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
                     end
                   end
                 end
@@ -296,7 +316,7 @@ module ReactiveRecord
           end
 
           def apply_star
-            if @value && @value.__secure_collection_check(@acting_user) && @value.length > 0
+            if @value && @value.__secure_collection_check(self) && @value.length > 0
               i = -1
               @value.inject(nil) do |representative, current_value|
                 i += 1

@@ -29,7 +29,7 @@ module ActiveRecord
     class ReactiveRecordPsuedoRelationArray < Array
       attr_accessor :__synchromesh_permission_granted
       attr_accessor :acting_user
-      def __secure_collection_check(_acting_user)
+      def __secure_collection_check(*)
         self
       end
     end
@@ -39,11 +39,13 @@ module ActiveRecord
     class Relation
       attr_accessor :__synchromesh_permission_granted
       attr_accessor :acting_user
-      def __secure_collection_check(acting_user)
+
+      def __secure_collection_check(cache_item)
         return self if __synchromesh_permission_granted
-        return self if __secure_remote_access_to_all(self, acting_user).__synchromesh_permission_granted
-        return self if __secure_remote_access_to_unscoped(self, acting_user).__synchromesh_permission_granted
-        Hyperstack::InternalPolicy.raise_operation_access_violation(:scoped_permission_not_granted, "Last relation: #{self}, acting_user: #{acting_user}")
+        return self if __secure_remote_access_to_all(self, cache_item.acting_user).__synchromesh_permission_granted
+        return self if __secure_remote_access_to_unscoped(self, cache_item.acting_user).__synchromesh_permission_granted
+        Hyperstack::InternalPolicy.raise_operation_access_violation(
+          :scoped_permission_not_granted, "Access denied for #{cache_item}")
       end
     end
     # Monkey patches and extensions to base
@@ -89,6 +91,9 @@ module ActiveRecord
             ensure
               this.acting_user = old
             end
+          end
+          singleton_class.send(:define_method, "_#{name}") do |*args|
+            all.instance_exec(*args, &block)
           end
           singleton_class.send(:define_method, name) do |*args|
             all.instance_exec(*args, &block)

@@ -57,9 +57,10 @@ describe "Hyperstack.on_error (for fetches) ", js: true do
     #   'associations' => []
     # )
     expect(Hyperstack).to receive(:on_error).once.with(
-      Hyperstack::AccessViolation,
-      :scoped_permission_not_granted,
-      anything
+      "ReactiveRecord::Operations::Fetch",
+      instance_of(Hyperstack::AccessViolation),
+      instance_of(Hash),
+      instance_of(String)
     )
     expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).comments.count }")
       .to eq(2)
@@ -68,18 +69,20 @@ describe "Hyperstack.on_error (for fetches) ", js: true do
   end
 
   it 'call ReactiveRecord.on_fetch_error for errors raised by models' do
-    TodoItem.class_eval do
-      def title
-        raise 'Bogus'
+    allow_any_instance_of(TodoItem).to receive(:view_permitted?).and_return(true)
+    isomorphic do
+      TodoItem.class_eval do
+        server_method(:explode) { raise RuntimeError }
       end
     end
     TodoItem.create(user: nil)
     expect(Hyperstack).to receive(:on_error).once.with(
-      Exception,
-      :fetch_error,
-      hash_including(:acting_user, :controller, :pending_fetches, :models, :associations)
+      'ReactiveRecord::Operations::Fetch',
+      instance_of(RuntimeError),
+      hash_including(:acting_user, :controller, 'associations', 'pending_fetches', 'models'),
+      instance_of(String)
     )
-    evaluate_ruby('TodoItem.find(1).title')
+    evaluate_ruby('TodoItem.find(1).explode')
     wait_for_ajax
   end
 end

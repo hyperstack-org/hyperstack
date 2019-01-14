@@ -74,7 +74,7 @@ module Hyperstack
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
           elsif !_Railway.params_wrapper.method_defined?(security_param)
-            raise AccessViolation
+            raise AccessViolation.new(:remote_access_not_allowed)
           end
           run(deserialize_params(params))
           .then { |r| return { json: { response: serialize_response(r) } } }
@@ -85,10 +85,13 @@ module Hyperstack
       end
 
       def handle_exception(e, operation, params)
-        if defined? ::Rails
-          params.delete(:controller)
-          ::Rails.logger.debug "\033[0;31;1mERROR: Hyperstack::ServerOp exception caught when running "\
-                               "#{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+        if e.respond_to? :__hyperstack_on_error
+          params = params.to_h
+          message = []
+          message << Pastel.new.red("HYPERSTACK ERROR during #{operation} #{e.inspect}")
+          params.each { |param, value| message << "  #{param} => #{value.inspect.truncate(120, separator: '...')}" }
+          message << "\n#{e.details}" if e.respond_to? :details
+          e.__hyperstack_on_error(operation, params, message.join("\n"))
         end
         { json: { error: e }, status: 500 }
       end

@@ -29,6 +29,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-operation/server_op'
   require 'hyper-operation/boot'
 else
+  require 'tty-table'
   require 'hyperstack-config'
   require 'mutations'
   Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
@@ -40,6 +41,7 @@ else
   require 'hyper-operation/transport/connection'
   require 'hyper-operation/transport/hyperstack'
   require 'hyper-operation/transport/policy'
+  require 'hyper-operation/transport/policy_diagnostics'
   require 'hyper-operation/transport/client_drivers'
   require 'hyper-operation/transport/acting_user'
   require 'opal-activesupport'
