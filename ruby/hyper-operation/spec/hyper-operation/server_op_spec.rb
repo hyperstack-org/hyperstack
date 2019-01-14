@@ -2,7 +2,14 @@ require 'spec_helper'
 
 describe "isomorphic operations", js: true do
 
+  let(:response_spy) { spy('response_spy') }
+
   before(:each) do
+
+    allow(Hyperstack::ServerOp).to receive(:run_from_client).and_wrap_original do |m, *args|
+      m.call(*args).tap { |r| response_spy.status = r[:status] }
+    end
+
     on_client do
       class Test
         include Hyperstack::Component
@@ -65,28 +72,65 @@ describe "isomorphic operations", js: true do
 
     it "will pass server failures back" do
       ServerFacts.param :acting_user, nils: true
+
       expect_promise do
-        ServerFacts.run(n: -1).fail { |exception| Promise.new.resolve(exception) }
-      end.to eq('N is too small')
+        ServerFacts.run(n: -1).fail { |exception| Promise.new.resolve(exception.inspect) }
+      end.to eq('#<Hyperstack::Operation::ValidationException: n is too small>')
+      expect(response_spy).to have_received(:status=).with(400)
       expect_promise do
-        ServerFacts.run(n: 10000000000).fail { |exception| Promise.new.resolve(exception) }
-      end.to eq('stack level too deep')
+        ServerFacts.run(n: 10000000000).fail { |exception| Promise.new.resolve(exception.inspect) }
+      end.to eq('#<Exception: stack level too deep>')
+      expect(response_spy).to have_received(:status=).with(500)
+    end
+
+    it "pass abort status back" do
+      # just to check we will actually interrogate the structure of the exception in this spec
+      ServerFacts.param :acting_user, nils: true
+      class ServerFacts < Hyperstack::ServerOp
+        step { abort! }
+      end
+      expect_promise do
+        ServerFacts.run(n: 5).fail do |exception|
+          Promise.new.resolve(exception.inspect)
+        end
+      end.to eq('#<Hyperstack::Operation::Exit: Hyperstack::Operation::Exit>')
+      expect(response_spy).to have_received(:status=).with(500)
+    end
+
+    it "pass failure data back" do
+      # just to check we will actually interrogate the structure of the exception in this spec
+      ServerFacts.param :acting_user, nils: true
+      class ServerFacts < Hyperstack::ServerOp
+        step { raise 'failure' }
+        failed { [{'some' => 'data'}] }
+      end
+      expect_promise do
+        ServerFacts.run(n: 5).fail do |exception|
+          Promise.new.resolve(exception)
+        end
+      end.to eq([{'some' => 'data'}])
+      expect(response_spy).to have_received(:status=).with(500)
     end
 
     it "pass validation failures back" do
+      # just to check we will actually interrogate the structure of the exception in this spec
       ServerFacts.param :acting_user, nils: true
       class ServerFacts < Hyperstack::ServerOp
         validate { false }
       end
       expect_promise do
-        ServerFacts.run(n: 5).fail { |exception| Promise.new.resolve(exception) }
-      end.to include('param validation 1 failed')
+        ServerFacts.run(n: 5).fail do |exception|
+          Promise.new.resolve(exception.errors.message_list)
+        end
+      end.to eq(['param validation 1 failed'])
+      expect(response_spy).to have_received(:status=).with(400)
     end
 
     it "will reject uplinks that don't accept acting_user" do
       expect_promise do
         ServerFacts.run(n: 5).fail { |exception| Promise.new.resolve(exception) }
       end.to include('Hyperstack::AccessViolation')
+      expect(response_spy).to have_received(:status=).with(403)
     end
   end
 

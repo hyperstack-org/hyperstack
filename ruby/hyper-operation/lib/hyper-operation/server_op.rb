@@ -20,7 +20,11 @@ module Hyperstack
               deserialize_response response.json[:response]
             end
             .fail do |response|
-              Exception.new response.json[:error]
+              begin
+                const_get(response.json[:error_class]).new(response.json[:error])
+              rescue
+                Exception.new response.json[:error]
+              end
             end
           end
         elsif on_opal_server?
@@ -84,6 +88,16 @@ module Hyperstack
         handle_exception(e, operation, params)
       end
 
+      def status(e)
+        if e.is_a? AccessViolation
+          403
+        elsif e.is_a? Operation::ValidationException
+          400
+        else
+          500
+        end
+      end
+
       def handle_exception(e, operation, params)
         if e.respond_to? :__hyperstack_on_error
           params = params.to_h
@@ -93,7 +107,8 @@ module Hyperstack
           message << "\n#{e.details}" if e.respond_to? :details
           e.__hyperstack_on_error(operation, params, message.join("\n"))
         end
-        { json: { error: e }, status: 500 }
+
+        { json: { error_class: e.class.to_s, error: e}, status: status(e) }
       end
 
 
