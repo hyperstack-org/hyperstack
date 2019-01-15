@@ -99,14 +99,14 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
       Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq([])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq([])
       sleep 1
     end
 
@@ -114,7 +114,7 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { sleep 1; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
@@ -169,21 +169,21 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
       Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq([])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline" do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
@@ -240,27 +240,27 @@ describe "Transport Tests", js: true do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
     end
 
     it "will not keep the temporary polled connection open" do
       mount "TestComponent"
       Hyperstack::Connection.active.should =~ ['ScopeIt::TestApplication']
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq([])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq([])
     end
 
     it "sees the connection going offline", skip: 'this keeps failing intermittently, but not due to functional issues' do
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.expire_new_connection_in)
-      wait_for { Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq(['ScopeIt::TestApplication'])
       ApplicationController.acting_user = true
       sleep 1 # needed so Pusher can catch up since its not controlled by timecop
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
       Timecop.travel(Time.now+Hyperstack::Connection.transport.refresh_channels_every)
-      wait_for { Hyperstack::Connection.active }.to eq([])
+      wait_for { sleep 0.25; Hyperstack::Connection.active }.to eq([])
     end
 
     it "receives change notifications" do

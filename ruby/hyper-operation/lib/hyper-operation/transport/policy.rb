@@ -21,7 +21,7 @@ module Hyperstack
     EXPOSED_METHODS = [
       :regulate_class_connection, :always_allow_connection, :regulate_instance_connections,
       :regulate_all_broadcasts, :regulate_broadcast,
-      :dispatch_to, :regulate_dispatches_from, :always_dispatch_from,
+      :regulate_dispatches_from, :always_dispatch_from,
       :allow_change, :allow_create, :allow_read, :allow_update, :allow_destroy
     ]
 
@@ -56,21 +56,6 @@ module Hyperstack
 
     def always_dispatch_from(*args, &regulation)
       regulate_dispatches_from(*args) { true }
-    end
-
-    def dispatch_to(*args, &regulation)
-      actual_klass = if regulated_klass.is_a?(Class)
-                       regulated_klass
-                     else
-                       begin
-                         regulated_klass.constantize
-                       rescue NameError
-                         nil
-                       end
-                     end
-      raise 'you can only dispatch_to Operation classes' unless actual_klass.respond_to? :dispatch_to
-      actual_klass.dispatch_to(actual_klass)
-      actual_klass.dispatch_to(*args, &regulation)
     end
 
     CHANGE_POLICIES = [:create, :update, :destroy]

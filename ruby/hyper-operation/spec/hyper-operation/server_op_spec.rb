@@ -249,26 +249,6 @@ describe "isomorphic operations", js: true do
       expect(page).to have_content("The server says 'goodby'!")
     end
 
-    it 'can regulate dispatches with the regulate_dispatch applied to a policy' do
-      isomorphic do
-        class Operation < Hyperstack::ServerOp
-          param :message
-          param :broadcast, default: false
-        end
-      end
-      stub_const "ApplicationPolicy", Class.new
-      stub_const "OperationPolicy", Class.new
-      ApplicationPolicy.always_allow_connection
-      OperationPolicy.dispatch_to { ['Application'] if params.broadcast }
-      mount 'Test'
-      expect(page).to have_content('No messages yet')
-      Operation.run(message: 'hello')
-      wait_for_ajax
-      expect(page).not_to have_content("The server says 'hello'!", wait: 0)
-      Operation.run(message: 'goodby', broadcast: true)
-      expect(page).to have_content("The server says 'goodby'!")
-    end
-
     it 'will regulate with the always_dispatch_from regulation' do
       isomorphic do
         class Operation < Hyperstack::ServerOp
