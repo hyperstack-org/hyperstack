@@ -62,21 +62,21 @@ describe 'event callbacks', js: true do
   it "can work with builtin events" do
     mount 'Test' do
       class Btn < HyperComponent
-        fires :bungo
+        fires :click
         Btn.class.attr_accessor :clicked
         render do
           BUTTON(id: :btn) do
             children.each(&:render)
           end.on(:click) do |evt|
             Btn.clicked = true
-            bungo!
+            click!
             evt.stop_propagation
           end
         end
       end
       class Test < HyperComponent
         render do
-          Btn { "CLICK ME" }.on(:bungo) { toggle :clicked } unless @clicked
+          Btn { "CLICK ME" }.on(:click) { toggle :clicked } unless @clicked
         end
       end
     end

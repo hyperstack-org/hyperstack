@@ -18,4 +18,9 @@ describe "Hyperstack::Router", js: true do
     expect(page).to have_content('more on components...')
     expect(page.current_path).to eq('/topics/components')
   end
+
+  it 'a routers render method can return a string', skip: 'breaking - see issue #64' do
+    mount 'SimpleStringRouter'
+    expect(page).to have_content('a simple string')
+  end
 end
