@@ -288,7 +288,7 @@ if RUBY_ENGINE != 'opal'
 
     config.before(:all) do
       # reset this variable so if any specs are setting up models locally
-      # the correct has gets sent to the client.
+      # the correct hash gets sent to the client.
       ActiveRecord::Base.instance_variable_set('@public_columns_hash', nil)
       class ActiveRecord::Base
         class << self

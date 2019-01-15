@@ -38,6 +38,13 @@ describe "reactive-record edge cases", js: true do
     size_window(:small, :portrait)
   end
 
+  it "will load all the policies before the first broadcast" do
+    expect(defined? SomeModelPolicy).to be_falsy
+    User.create(name: 'Fred')
+    expect(defined? SomeModelPolicy).to be_truthy
+  end
+
+
   it "prerenders a belongs to relationship" do
     # must be first otherwise check for ajax fails because of race condition
     # with previous test

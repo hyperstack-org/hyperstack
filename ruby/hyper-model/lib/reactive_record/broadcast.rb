@@ -2,9 +2,12 @@ module ReactiveRecord
   class Broadcast
 
     def self.after_commit(operation, model)
+      # Calling public_columns_hash once insures all policies are loaded
+      # before the first broadcast.
+      @public_columns_hash ||= ActiveRecord::Base.public_columns_hash
       Hyperstack::InternalPolicy.regulate_broadcast(model) do |data|
         if !Hyperstack.on_server? && Hyperstack::Connection.root_path
-          send_to_server(operation, data) rescue nil # server no longer running so ignore
+          send_to_server(operation, data) rescue nil # fails if server no longer running so ignore
         else
           SendPacket.run(data, operation: operation)
         end
