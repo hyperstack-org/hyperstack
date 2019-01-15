@@ -509,6 +509,7 @@ from Mitch...
 These work very similar to pundit, and by design you can even mix pundit and hyperloop policies.
 Here is an example pundit policy from the pundit tutorial:
 
+```ruby
 # app/policies/article_policy.rb
 class ArticlePolicy < ApplicationPolicy
   def index?
@@ -533,9 +534,9 @@ class ArticlePolicy < ApplicationPolicy
       record
     end
 end
-
+```
 --------------
-
+```ruby
 class ArticlePolicy < ApplicationPolicy
   # def index?
   #   true
@@ -583,9 +584,11 @@ class ArticlePolicy < ApplicationPolicy
   #     record
   #   end
 end
+```
 
 without comments....
 
+```
 class ArticlePolicy < ApplicationPolicy
   regulate_broadcast { |policy| policy.send_all.to Application }
 
@@ -593,6 +596,7 @@ class ArticlePolicy < ApplicationPolicy
 
   allow_change(on: [:update, :destroy]) { acting_user == user }
 end
+```
 
 BTW what if you want to restrict what data is broadcast? In Hyperloop you just update the regulation. In pundit you may have to edit both the index controller method and
 Policy class.
