@@ -203,6 +203,7 @@ module Hyperstack
 
         alias other_params collect_other_params_as
         alias others collect_other_params_as
+        alias other collect_other_params_as
         alias opts collect_other_params_as
 
         def fires(name, opts = {})
