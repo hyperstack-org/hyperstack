@@ -419,6 +419,7 @@ describe "synchronized scopes", js: true do
     # currently page will initially show that @scope == @previous_scope even though
     # previous scope is nil
     # page.should have_content('current scope != previous_scope')
+    binding.pry
     evaluate_ruby do
       TestComponent2.scope = :active
     end
