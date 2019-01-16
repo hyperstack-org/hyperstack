@@ -21,12 +21,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-operation', Hyperloop::Console::VERSION
   spec.add_dependency 'hyper-store', Hyperloop::Console::VERSION
 
-  spec.add_development_dependency 'bundler', '~> 1.12'
+  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperloop::Console::VERSION
   spec.add_development_dependency 'hyper-operation', Hyperloop::Console::VERSION
   spec.add_development_dependency 'hyper-store', Hyperloop::Console::VERSION
-  spec.add_development_dependency 'hyperloop-config', Hyperloop::Console::VERSION
+  spec.add_development_dependency 'hyperstack-config', Hyperloop::Console::VERSION
   spec.add_development_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_development_dependency 'opal-browser'
   spec.add_development_dependency 'opal-jquery'

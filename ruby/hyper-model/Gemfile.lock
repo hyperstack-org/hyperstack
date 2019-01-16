@@ -31,7 +31,6 @@ PATH
   remote: ../hyperstack-config
   specs:
     hyperstack-config (1.0.alpha1.2)
-      libv8 (~> 6.7.0)
       listen (~> 3.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -395,7 +394,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler
+  bundler (>= 1.17.3, < 2.1)
   capybara
   chromedriver-helper (= 1.2.0)
   database_cleaner
@@ -405,7 +404,7 @@ DEPENDENCIES
   hyper-operation!
   hyper-state!
   hyperstack-config!
-  libv8 (~> 6.7.0)
+  libv8
   mini_racer (~> 0.2.4)
   mysql2
   opal-activesupport (~> 0.3.1)
@@ -438,4 +437,4 @@ DEPENDENCIES
   unparser
 
 BUNDLED WITH
-   1.17.1
+   2.0.1

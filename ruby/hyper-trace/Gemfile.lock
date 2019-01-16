@@ -2,7 +2,6 @@ PATH
   remote: ../hyperstack-config
   specs:
     hyperstack-config (1.0.alpha1.2)
-      libv8 (~> 6.7.0)
       listen (~> 3.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -64,7 +63,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler
+  bundler (>= 1.17.3, < 2.1)
   chromedriver-helper
   hyper-trace!
   hyperstack-config!

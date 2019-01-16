@@ -1,5 +1,5 @@
 module Hyperloop
   module Console
-    VERSION = '0.99.3'
+    VERSION = '1.0.alpha1.2'
   end
 end
