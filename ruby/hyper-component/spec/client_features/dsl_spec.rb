@@ -244,6 +244,20 @@ describe 'the React DSL', js: true do
     expect(page.body[-80..-19]).to include('<span data-size="12">Hyperstack::Component::Element</span>')
   end
 
+  it "has a dom_node method" do
+    mount 'Foo' do
+      class Foo
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
+        after_mount { mutate @my_node_id = JQ[dom_node].id }
+        render do
+          SPAN(id: 'foo') { "my id is '#{@my_node_id}'" }
+        end
+      end
+    end
+    expect(page).to have_content("my id is 'foo'")
+  end
+
   it "can use the dangerously_set_inner_HTML param" do
     mount 'Foo' do
       class Foo

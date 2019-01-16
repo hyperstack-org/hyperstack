@@ -45,4 +45,16 @@ Element.instance_eval do
   Element.expose :mount_components
 end
 
+module Hyperstack
+  module Internal
+    module Component
+      module InstanceMethods
+        def set_jq(var)
+          ->(val) { set(var).call(JQ[val]) }
+        end
+      end
+    end
+  end
+end
+
 JQ = Element

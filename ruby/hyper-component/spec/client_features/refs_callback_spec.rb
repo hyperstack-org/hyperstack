@@ -77,4 +77,18 @@ describe 'Refs callback', js: true do
     end
     expect(page).to have_content('I am [object HTMLDivElement]')
   end
+
+  it 'can get the a jquery wrapped reference using the set_jq method' do
+    mount 'Foo' do
+      class Foo
+        render do
+          DIV(ref: set_jq(:the_ref)) { @the_ref.inspect }
+        end
+        after_mount do
+          force_update!
+        end
+      end
+    end
+    expect(page).to have_content('#<Element [<div>]>')
+  end
 end
