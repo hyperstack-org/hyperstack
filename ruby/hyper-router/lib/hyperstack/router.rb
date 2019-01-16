@@ -10,11 +10,24 @@ module Hyperstack
       end
     end
 
+    def __eval_block(block)
+      result = instance_eval(&block)
+      if result.is_a?(String) ||
+         (result.respond_to?(:acts_as_string?) && result.acts_as_string?)
+        # hyper-mesh DummyValues respond to acts_as_string, and must
+        # be converted to spans INSIDE the parent, otherwise the waiting_on_resources
+        # flag will get set in the wrong context
+        result = Hyperstack::Internal::Component::RenderingContext
+                 .render(:span) { result.to_s }
+      end
+      result
+    end
+
     def __hyperstack_render_router(&block)
       instance_eval do
         self.class.history :browser unless history
         React::Router::Router(history: history.to_n) do
-          instance_eval(&block)
+          __eval_block(block)
         end
       end
     end
@@ -27,7 +40,7 @@ module Hyperstack
           location: location,
           context: Hyperstack::Internal::Router::IsomorphicMethods.ctx
         ) do
-          instance_eval(&block)
+          __eval_block(block)
         end
       end
     end

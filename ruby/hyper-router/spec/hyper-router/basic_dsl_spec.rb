@@ -19,8 +19,11 @@ describe "Hyperstack::Router", js: true do
     expect(page.current_path).to eq('/topics/components')
   end
 
-  it 'a routers render method can return a string', skip: 'breaking - see issue #64' do
-    mount 'SimpleStringRouter'
-    expect(page).to have_content('a simple string')
+  [:server_only, :client_only].each do |render_on|
+    it "a routers render method can return a string (#{render_on})" do
+      client_option render_on: render_on
+      mount 'SimpleStringRouter'
+      expect(page).to have_content('a simple string')
+    end
   end
 end
