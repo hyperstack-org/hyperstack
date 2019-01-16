@@ -261,7 +261,7 @@ module Hyperstack
                               }
                             }
 
-            elsif key == 'dom'
+            elsif key == 'jq_ref'
               unless value.respond_to?(:call)
                 raise "The ref and dom params must be given a Proc.\n"\
                       "If you want to capture the dom node in an instance variable use the `set` method.\n"\

@@ -27,6 +27,10 @@ module Hyperstack
           `ReactDOM.findDOMNode(#{self}.__hyperstack_component_native)` # react >= v0.15.0
         end
 
+        def jq_node
+          ::Element[dom_node]
+        end
+
         def mounted?
           `(#{self}.__hyperstack_component_is_mounted === undefined) ? false : #{self}.__hyperstack_component_is_mounted`
         end
