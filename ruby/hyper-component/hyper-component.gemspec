@@ -23,13 +23,13 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hyper-state', Hyperstack::Component::VERSION
   spec.add_dependency 'hyperstack-config', Hyperstack::Component::VERSION
-  spec.add_dependency 'libv8', '~> 6.3.0' # see https://github.com/discourse/mini_racer/issues/92
-  spec.add_dependency 'mini_racer', '~> 0.1.15'
+  spec.add_dependency 'libv8', '~> 6.7.0'
+  spec.add_dependency 'mini_racer', '~> 0.2.4'
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
-  spec.add_development_dependency 'bundler', '~> 1.16.0'
+  spec.add_development_dependency 'bundler' #, '~> 1.16'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperstack::Component::VERSION
   spec.add_development_dependency 'jquery-rails'

@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-operation', Hyperstack::I18n::VERSION
   spec.add_dependency 'i18n'
 
-  spec.add_development_dependency 'bundler', '~> 1.16.0'
+  spec.add_development_dependency 'bundler' #, '~> 1.16'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-model', Hyperstack::I18n::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperstack::I18n::VERSION
