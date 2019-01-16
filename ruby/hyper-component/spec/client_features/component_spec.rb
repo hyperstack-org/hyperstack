@@ -237,6 +237,23 @@ describe 'React::Component', js: true do
       expect(page).to have_content("paramchildparamchild")
     end
 
+    it 'can receive and render a component class' do
+      mount 'Baz' do
+        class Bar < Hyperloop::Component
+          param :p
+          render { @P.span }
+        end
+        class Foo < Hyperloop::Component
+          param :c
+          render { @C.insert_element(p: 123) }
+        end
+        class Baz < Hyperloop::Component
+          render { Foo(c: Bar) }
+        end
+      end
+      expect(page).to have_content("123")
+    end
+
     it 'has a class components method' do
       mount 'Foo' do
         class Bar < Hyperloop::Component
