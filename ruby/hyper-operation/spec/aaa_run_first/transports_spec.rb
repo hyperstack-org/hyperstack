@@ -74,10 +74,6 @@ describe "Transport Tests", js: true do
     wait_for_ajax
   end
 
-  it 'has a anti_csrf_token' do
-    expect_evaluate_ruby('Hyperstack.anti_csrf_token').to be_present
-  end
-
   context "Pusher-Fake" do
     before(:all) do
 
@@ -153,7 +149,7 @@ describe "Transport Tests", js: true do
       Hyperstack.connect_session = true
       mount "TestComponent"
       evaluate_ruby "Hyperstack.go_ahead_and_connect"
-      wait_for_ajax rescue nil
+      wait_for_ajax #rescue nil
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
     end
@@ -343,6 +339,12 @@ describe "Transport Tests", js: true do
       wait_for_ajax
       evaluate_ruby "MyControllerOp.run(data: 'hello')"
       page.should have_content("hello")
+    end
+  end
+
+  context 'Misc Tests' do
+    it 'has a anti_csrf_token' do
+      expect_evaluate_ruby('Hyperstack.anti_csrf_token').to be_present
     end
   end
 end
