@@ -50,11 +50,15 @@ module Hyperstack
     module Component
       module InstanceMethods
         def set_jq(var)
-          ->(val) { set(var).call(JQ[val]) }
+          ->(val) { set(var).call(jQ[val]) }
         end
       end
     end
   end
 end
 
-JQ = Element
+class Object
+  def jQ
+    Element
+  end
+end

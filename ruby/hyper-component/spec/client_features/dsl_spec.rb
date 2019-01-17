@@ -249,7 +249,7 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         include Hyperstack::State::Observable
-        after_mount { mutate @my_node_id = JQ[dom_node].id }
+        after_mount { mutate @my_node_id = jQ[dom_node].id }
         render do
           SPAN(id: 'foo') { "my id is '#{@my_node_id}'" }
         end
