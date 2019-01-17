@@ -1,7 +1,7 @@
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (1.0.alpha1.2)
+    hyper-spec (1.0.alpha1.3)
       capybara
       chromedriver-helper (= 1.2.0)
       libv8
@@ -20,7 +20,7 @@ PATH
 PATH
   remote: .
   specs:
-    hyperstack-config (1.0.alpha1.2)
+    hyperstack-config (1.0.alpha1.3)
       listen (~> 3.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)

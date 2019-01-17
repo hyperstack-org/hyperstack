@@ -1,11 +1,11 @@
 PATH
   remote: ../../../hyper-component
   specs:
-    hyper-component (1.0.alpha1.2)
-      hyper-state (= 1.0.alpha1.2)
-      hyperstack-config (= 1.0.alpha1.2)
-      libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
+    hyper-component (1.0.alpha1.3)
+      hyper-state (= 1.0.alpha1.3)
+      hyperstack-config (= 1.0.alpha1.3)
+      libv8 (~> 6.7.0)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-activesupport (~> 0.3.1)
       react-rails (>= 2.4.0, < 2.5.0)
@@ -13,43 +13,43 @@ PATH
 PATH
   remote: ../../../hyper-model
   specs:
-    hyper-model (1.0.alpha1.2)
+    hyper-model (1.0.alpha1.3)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-component (= 1.0.alpha1.2)
-      hyper-operation (= 1.0.alpha1.2)
+      hyper-component (= 1.0.alpha1.3)
+      hyper-operation (= 1.0.alpha1.3)
 
 PATH
   remote: ../../../hyper-operation
   specs:
-    hyper-operation (1.0.alpha1.2)
+    hyper-operation (1.0.alpha1.3)
       activerecord (>= 4.0.0)
-      hyper-component (= 1.0.alpha1.2)
+      hyper-component (= 1.0.alpha1.3)
       mutations
       opal-activesupport (~> 0.3.1)
+      tty-table
 
 PATH
   remote: ../../../hyper-router
   specs:
-    hyper-router (1.0.alpha1.2)
-      hyper-component (= 1.0.alpha1.2)
-      hyper-state (= 1.0.alpha1.2)
+    hyper-router (1.0.alpha1.3)
+      hyper-component (= 1.0.alpha1.3)
+      hyper-state (= 1.0.alpha1.3)
       opal-browser (~> 0.2.0)
 
 PATH
   remote: ../../../hyper-state
   specs:
-    hyper-state (1.0.alpha1.2)
-      hyperstack-config (= 1.0.alpha1.2)
+    hyper-state (1.0.alpha1.3)
+      hyperstack-config (= 1.0.alpha1.3)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../../../hyperstack-config
   specs:
-    hyperstack-config (1.0.alpha1.2)
-      libv8 (~> 6.3.0)
+    hyperstack-config (1.0.alpha1.3)
       listen (~> 3.0)
-      mini_racer (~> 0.1.15)
+      mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
       opal-browser (~> 0.2.0)
       uglifier
@@ -58,12 +58,12 @@ PATH
 PATH
   remote: ../../../rails-hyperstack
   specs:
-    rails-hyperstack (1.0.alpha1.2)
-      hyper-model (= 1.0.alpha1.2)
-      hyper-router (= 1.0.alpha1.2)
-      hyperstack-config (= 1.0.alpha1.2)
-      libv8 (~> 6.3.0)
-      mini_racer (~> 0.1.15)
+    rails-hyperstack (1.0.alpha1.3)
+      hyper-model (= 1.0.alpha1.3)
+      hyper-router (= 1.0.alpha1.3)
+      hyperstack-config (= 1.0.alpha1.3)
+      libv8 (~> 6.7.0)
+      mini_racer (~> 0.2.4)
       opal-browser (~> 0.2.0)
       opal-rails (~> 0.9.4)
       rails (>= 4.0.0)
@@ -150,6 +150,7 @@ GEM
     concurrent-ruby (1.1.3)
     connection_pool (2.2.2)
     crass (1.0.4)
+    equatable (0.5.0)
     erubi (1.7.1)
     execjs (2.7.0)
     ffi (1.9.25)
@@ -168,7 +169,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    libv8 (6.3.292.48.1-x86_64-darwin-15)
+    libv8 (6.7.288.46.1)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -184,13 +185,14 @@ GEM
     mimemagic (0.3.2)
     mini_mime (1.0.1)
     mini_portile2 (2.3.0)
-    mini_racer (0.1.15)
-      libv8 (~> 6.3)
+    mini_racer (0.2.4)
+      libv8 (>= 6.3)
     minitest (5.11.3)
     msgpack (1.2.4)
     multi_json (1.13.1)
-    mutations (0.8.3)
+    mutations (0.9.0)
       activesupport
+    necromancer (0.4.0)
     nio4r (2.3.1)
     nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
@@ -221,6 +223,9 @@ GEM
     paggio (0.2.6)
     parser (2.3.3.1)
       ast (~> 2.2)
+    pastel (0.7.2)
+      equatable (~> 0.5.0)
+      tty-color (~> 0.4.0)
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.6)
@@ -290,9 +295,22 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     sqlite3 (1.3.13)
+    strings (0.1.4)
+      strings-ansi (~> 0.1.0)
+      unicode-display_width (~> 1.4.0)
+      unicode_utils (~> 1.4.0)
+    strings-ansi (0.1.0)
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.8)
+    tty-color (0.4.3)
+    tty-screen (0.6.5)
+    tty-table (0.10.0)
+      equatable (~> 0.5.0)
+      necromancer (~> 0.4.0)
+      pastel (~> 0.7.2)
+      strings (~> 0.1.0)
+      tty-screen (~> 0.6.4)
     turbolinks (5.2.0)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
@@ -300,6 +318,8 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.1.19)
       execjs (>= 0.3.0, < 3)
+    unicode-display_width (1.4.1)
+    unicode_utils (1.4.0)
     web-console (3.7.0)
       actionview (>= 5.0)
       activemodel (>= 5.0)
@@ -348,4 +368,4 @@ RUBY VERSION
    ruby 2.4.1p111
 
 BUNDLED WITH
-   1.16.0
+   2.0.1

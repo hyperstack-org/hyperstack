@@ -5,7 +5,7 @@ class App < HyperComponent
   #   @snake_case  : reactive instance variable that will trigger rerenders
   #   @_snake_case : non-reactive instance variable that will never be mutated
   #   @CamelCase   : a component param (this convention is inforced by Hyperstack)
-  
+
   before_mount { @symbols = Set.new }
 
   def add_symbol
@@ -22,7 +22,7 @@ class App < HyperComponent
       BS::Row(style: { marginTop: 20 }) do
         BS::Col(sm: 4) do
           BS::InputGroup(class: 'mb-3') do
-            BS::FormControl(dom: set(:_symbol_input), placeholder: 'New Stock Market Symbol')
+            BS::FormControl(ref: set_jq(:_symbol_input), placeholder: 'New Stock Market Symbol')
             .on(:enter) { add_symbol }
             BS::InputGroup::Append() { BS::Button() { 'Add' } }
             .on(:click) { add_symbol }

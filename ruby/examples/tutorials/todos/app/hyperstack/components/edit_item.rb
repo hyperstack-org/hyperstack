@@ -1,14 +1,17 @@
-# app/hyperloop/components/edit_item.rb
+# app/hyperstack/components/edit_item.rb
 class EditItem < HyperComponent
-  param    :todo
-  triggers :save
-  triggers :cancel
-  others   :others
-  after_mount { DOM[dom_node].focus }
+  param :todo
+  fires :save
+  fires :cancel
+  other :etc
+  after_mount { jQ[dom_node].focus }
   render do
-    INPUT(@Others, defaultValue: @Todo.title, placeholder: 'What is left to do today?',
-                   dom: set(:_input), key: @Todo)
-    .on(:enter) { @Todo.update(title: @_input.value) and save! }
-    .on(:blur)  { cancel! }
+    INPUT(@Etc, placeholder: 'What is left to do today?',
+                defaultValue: @Todo.title, key: @Todo)
+    .on(:enter) do |evt|
+      @Todo.update(title: evt.target.value)
+      saved!
+    end
+    .on(:blur) { cancel! }
   end
 end

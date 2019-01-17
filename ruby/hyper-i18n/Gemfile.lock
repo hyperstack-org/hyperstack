@@ -1,9 +1,9 @@
 PATH
   remote: ../hyper-component
   specs:
-    hyper-component (1.0.alpha1.2)
-      hyper-state (= 1.0.alpha1.2)
-      hyperstack-config (= 1.0.alpha1.2)
+    hyper-component (1.0.alpha1.3)
+      hyper-state (= 1.0.alpha1.3)
+      hyperstack-config (= 1.0.alpha1.3)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -13,18 +13,18 @@ PATH
 PATH
   remote: ../hyper-model
   specs:
-    hyper-model (1.0.alpha1.2)
+    hyper-model (1.0.alpha1.3)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-component (= 1.0.alpha1.2)
-      hyper-operation (= 1.0.alpha1.2)
+      hyper-component (= 1.0.alpha1.3)
+      hyper-operation (= 1.0.alpha1.3)
 
 PATH
   remote: ../hyper-operation
   specs:
-    hyper-operation (1.0.alpha1.2)
+    hyper-operation (1.0.alpha1.3)
       activerecord (>= 4.0.0)
-      hyper-component (= 1.0.alpha1.2)
+      hyper-component (= 1.0.alpha1.3)
       mutations
       opal-activesupport (~> 0.3.1)
       tty-table
@@ -32,7 +32,7 @@ PATH
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (1.0.alpha1.2)
+    hyper-spec (1.0.alpha1.3)
       capybara
       chromedriver-helper (= 1.2.0)
       libv8
@@ -51,22 +51,22 @@ PATH
 PATH
   remote: ../hyper-state
   specs:
-    hyper-state (1.0.alpha1.2)
-      hyperstack-config (= 1.0.alpha1.2)
+    hyper-state (1.0.alpha1.3)
+      hyperstack-config (= 1.0.alpha1.3)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyper-store
   specs:
-    hyper-store (1.0.alpha1.2)
-      hyper-state (= 1.0.alpha1.2)
-      hyperstack-config (= 1.0.alpha1.2)
+    hyper-store (1.0.alpha1.3)
+      hyper-state (= 1.0.alpha1.3)
+      hyperstack-config (= 1.0.alpha1.3)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperstack-config
   specs:
-    hyperstack-config (1.0.alpha1.2)
+    hyperstack-config (1.0.alpha1.3)
       listen (~> 3.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -77,8 +77,8 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-i18n (1.0.alpha1.2)
-      hyper-operation (= 1.0.alpha1.2)
+    hyper-i18n (1.0.alpha1.3)
+      hyper-operation (= 1.0.alpha1.3)
       i18n
 
 GEM

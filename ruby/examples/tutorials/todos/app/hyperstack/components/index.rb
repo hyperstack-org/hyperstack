@@ -1,4 +1,4 @@
-# app/hyperloop/components/index.rb
+# app/hyperstack/components/index.rb
 class Index < HyperComponent
   include Hyperstack::Router::Helpers
   render(SECTION, class: :main) do

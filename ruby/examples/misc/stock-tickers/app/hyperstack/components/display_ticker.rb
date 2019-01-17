@@ -1,7 +1,7 @@
 class DisplayTicker < HyperComponent
 
-  param    :symbol  # hyperstack will copy the param to @Symbol when it changes
-  triggers :cancel  # this is an outgoing event.  You trigger it by calling cancel!
+  param :symbol  # hyperstack will copy the param to @Symbol when it changes
+  fires :cancel  # this is an outgoing event.  You fire it by calling cancel!
 
   # when the component mounts (is created) we create a corresponding ticker
   # from our StockTicker store.  We will never within the component change the

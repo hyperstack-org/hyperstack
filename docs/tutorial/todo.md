@@ -1,4 +1,4 @@
-
+fires
 # TodoMVC Tutorial (Rails 5.2.x)
 
 ### Prerequisites
@@ -437,13 +437,11 @@ Lets change `App` to look like this:
 # app/hyperstack/components/app.rb
 class App < HyperComponent
   include Hyperstack::Router
-  render do
-    SECTION do
-      Header()
-      Route('/', exact: true) { Redirect('/all') }
-      Route('/:scope', mounts: Index)
-      Footer()
-    end
+  render(SECTION) do
+    Header()
+    Route('/', exact: true) { Redirect('/all') }
+    Route('/:scope', mounts: Index)
+    Footer()
   end
 end
 ```
@@ -609,16 +607,17 @@ To summarize:
 + User saves the Todo being edited: editing changes to `false`.
 + User changes focus away (`blur`) from the Todo being edited: editing changes to `false`.
 
-In order to accomplish this our `EditItem` component is going to communicate to its parent via two application defined events - `saved` and `cancel` .
+In order to accomplish this our `EditItem` component is going to communicate to its parent via two application defined events - `saved` and `cancel`.
+
 Add the following 5 lines to the `EditItem` component like this:
 
 ```ruby
 # app/hyperstack/components/edit_item.rb
 class EditItem < HyperComponent
   param :todo
-  triggers :saved                            # add
-  triggers :cancel                           # add
-  after_mount { DOM[dom_node].focus }        # add
+  fires :saved                               # add
+  fires :cancel                              # add
+  after_mount { jQ[dom_node].focus }         # add
 
   render do
     INPUT(defaultValue: @Todo.title)
@@ -630,17 +629,17 @@ class EditItem < HyperComponent
   end
 end
 ```
-The first two new lines add our custom events.
+The first two new lines add our custom events which will be *fired* by the component.
 
 The next new line uses one of several *Lifecycle Callbacks*.  In this case we need to move the focus to the `EditItem` component after it is mounted.
-The `DOM` class is Hyperstack's jQuery wrapper, and `dom_node`
+The `jQ` method is Hyperstack's jQuery wrapper, and `dom_node`
 is the method that returns the actual dom node where this *instance* of the component is mounted.
 This is the `INPUT` html element as defined in the render method.
 
-The `saved!` line will trigger the saved event in the parent component.
-Notice that the method to trigger a custom event is the name of the event followed by a bang (!).
+The `saved!` line will fire the saved event in the parent component.
+Notice that the method to fire a custom event is the name of the event followed by a bang (!).
 
-Finally we add the `blur` event handler and trigger our `cancel` event.
+Finally we add the `blur` event handler and fire our `cancel` event.
 
 Now we can update our `TodoItem` component to react to three events:  `double_click`, `saved` and `cancel`.
 
@@ -663,7 +662,7 @@ class TodoItem < HyperComponent
   end
 end
 ```
-All states in Hyperstack are simply Ruby instance variables (ivars, variables with a leading @).  Here we use the `@editing` ivar.
+All states in Hyperstack are simply Ruby instance variables (ivars for short which are variables with a leading @).  Here we use the `@editing` ivar.
 
 We have already used a lot of states that are built into the HyperModel and HyperRouter.
 The states of these components are built out collections of instance variables like `@editing`.
@@ -748,17 +747,15 @@ Let's start with the `App` component.  With styling it will look like this:
 # app/hyperstack/components/app.rb
 class App < HyperComponent
   include Hyperstack::Router
-  render do
-    SECTION(class: 'todo-app') do # add class todo-app
-      Header()
-      Route('/', exact: true) { Redirect('/all') }
-      Route('/:scope', mounts: Index)
-      Footer()
-    end
+  render(SECTION, class: 'todo-app') do # add class todo-app
+    Header()
+    Route('/', exact: true) { Redirect('/all') }
+    Route('/:scope', mounts: Index)
+    Footer()
   end
 end
 ```
-The `Footer` components needs have a `UL` added to hold the links nicely,
+The `Footer` component needs to have a `UL` added to hold the links nicely,
 and we can also use the `NavLinks` `active_class` param to highlight the link that is currently active:
 
 ```ruby
@@ -772,7 +769,7 @@ class Footer < HyperComponent
     LI { NavLink("/#{path}", active_class: :selected) { path.camelize } }
   end
   render(DIV, class: :footer) do   # add class footer
-    UL(class: :filters) do         # wrap links in a UL element with class filers
+    UL(class: :filters) do         # wrap links in a UL element with class filters
       link_item(:all)
       link_item(:active)
       link_item(:completed)
@@ -796,17 +793,17 @@ class Index < HyperComponent
 end
 ```
 For the EditItem component we want the parent to pass any html parameters such as `class` along to the INPUT tag.
-We do this by adding the special `others` param that will collect any extra params, we then pass it along in to the INPUT tag.
+We do this by adding the special `other` param that will collect any extra params, we then pass it along in to the INPUT tag.
 Hyperstack will take care of merging all the params together sensibly.
 
 ```ruby
 # app/hyperstack/components/edit_item.rb
 class EditItem < HyperComponent
   param :todo
-  triggers :saved
-  triggers :cancel
-  others   :etc  # can be named anything you want
-  after_mount { DOM[dom_node].focus }
+  fires :saved
+  fires :cancel
+  other :etc  # can be named anything you want
+  after_mount { jQ[dom_node].focus }
   render do
     INPUT(@Etc, defaultValue: @Todo.title, key: @Todo)
     .on(:enter) do |evt|
@@ -864,12 +861,14 @@ This is just a span that we add before the link tags list in the `Footer` compon
 ...
 render(DIV, class: :footer) do
   SPAN(class: 'todo-count') do
-    "#{Todo.active.count} item#{'s' if Todo.active.count != 1} left"
+    # pluralize returns the second param (item) properly
+    # pluralized depending on the first param's value.
+    "#{pluralize(Todo.active.count, 'item')} left"
   end
   UL(class: :filters) do
 ...
 ```
-+ **Add 'placeholder' Text To Edit Item**\
++ **Add 'placeholder' Text To Edit Item**  
 `EditItem` should display a meaningful placeholder hint if the title is blank:
 
 ```ruby
@@ -879,7 +878,7 @@ INPUT(@Etc, placeholder: 'What is left to do today?',
 .on(:enter) do |evt|
 ...
 ```
-+ **Don't Show the Footer If There are No Todos**\
++ **Don't Show the Footer If There are No Todos**  
 In the `App` component add a *guard* so that we won't show the Footer if there are no Todos:
 
 ```ruby
@@ -899,7 +898,7 @@ You have built a small but feature rich full stack Todo application in less than
 ```text
 SLOC  
 --------------
-App:        11
+App:         9
 Header:      8
 Index:      10
 TodoItem:   16
@@ -908,7 +907,7 @@ Footer:     16
 Todo Model:  4
 Rails Route: 4
 --------------
-Total:      85
+Total:      83
 ```
 
 The complete application is shown here:
@@ -917,13 +916,11 @@ The complete application is shown here:
 # app/hyperstack/components/app.rb
 class App < HyperComponent
   include Hyperstack::Router
-  render do
-    SECTION(class: 'todo-app') do
-      Header()
-      Route('/', exact: true) { Redirect('/all') }
-      Route('/:scope', mounts: Index)
-      Footer() unless Todo.count.zero?
-    end
+  render(SECTION, class: 'todo-app') do
+    Header()
+    Route('/', exact: true) { Redirect('/all') }
+    Route('/:scope', mounts: Index)
+    Footer() unless Todo.count.zero?
   end
 end
 
@@ -956,9 +953,7 @@ class Footer < HyperComponent
     LI { NavLink("/#{path}", active_class: :selected) { path.camelize } }
   end
   render(DIV, class: :footer) do
-    SPAN(class: 'todo-count') do
-      "#{Todo.active.count} item#{'s' if Todo.active.count != 1} left"
-    end
+    SPAN(class: 'todo-count') { "#{pluralize(Todo.active.count, 'item')} left" }
     UL(class: :filters) do
       link_item(:all)
       link_item(:active)
@@ -987,11 +982,11 @@ end
 
 # app/hyperstack/components/edit_item.rb
 class EditItem < HyperComponent
-  param    :todo
-  triggers :save
-  triggers :cancel
-  others   :etc
-  after_mount { DOM[dom_node].focus }
+  param :todo
+  fires :save
+  fires :cancel
+  other :etc
+  after_mount { jQ[dom_node].focus }
   render do
     INPUT(@Etc, placeholder: 'What is left to do today?',
                 defaultValue: @Todo.title, key: @Todo)
