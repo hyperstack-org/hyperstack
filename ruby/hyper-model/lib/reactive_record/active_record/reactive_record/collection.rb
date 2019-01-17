@@ -86,7 +86,7 @@ module ReactiveRecord
       # https://github.com/hyperstack-org/hyperstack/issues/84
       # the following seems wrong.  It results in loading collection (i.e. @collection is nil) being equal to anything that is not a collection!!!
       # TODO: try changing to something more robust like `return (@collection || []) == other_collection unless other_collection.is_a? collection
-      return !@collection unless other_collection.is_a? Collection
+      return (@collection || []) == other_collection unless other_collection.is_a? Collection
       other_collection.observed
       # if either collection has not been created then compare the vectors
       # https://github.com/hyperstack-org/hyperstack/issues/81

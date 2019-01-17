@@ -417,9 +417,9 @@ describe "synchronized scopes", js: true do
     end
     # https://github.com/hyperstack-org/hyperstack/issues/84
     # currently page will initially show that @scope == @previous_scope even though
-    # previous scope is nil
-    # page.should have_content('current scope != previous_scope')
-    binding.pry
+    #   previous scope is nil
+    # once issue 84 is fixed uncomment the following line
+    page.should have_content('current scope != previous_scope')
     evaluate_ruby do
       TestComponent2.scope = :active
     end
