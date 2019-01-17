@@ -9,7 +9,12 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'rails-hyperstack', '~> 1.0.alpha' # github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
+gem 'rails-hyperstack', '~> 1.0.alpha', path: "/Users/d067570/src/privat/hyperstack/ruby/rails-hyperstack" #github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
+gem 'hyperstack-config', '~> 1.0.alpha', path: "/Users/d067570/src/privat/hyperstack/ruby/hyperstack-config"
+gem 'hyper-component', '~> 1.0.alpha', path: "/Users/d067570/src/privat/hyperstack/ruby/hyper-component"
+gem 'hyper-store', '~> 1.0.alpha', path: "/Users/d067570/src/privat/hyperstack/ruby/hyper-store"
+gem 'hyper-model', '~> 1.0.alpha', path: "/Users/d067570/src/privat/hyperstack/ruby/hyper-model"
+gem 'hyper-router', '~> 1.0.alpha', path: "/Users/d067570/src/privat/hyperstack/ruby/hyper-router"
 
 gem_group :development do
   gem 'foreman'

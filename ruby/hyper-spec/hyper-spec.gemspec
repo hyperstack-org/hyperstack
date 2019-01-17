@@ -26,7 +26,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.add_dependency 'capybara'
   spec.add_dependency 'chromedriver-helper', '1.2.0'
-  spec.add_dependency 'libv8', '~> 6.7.0' # see https://github.com/discourse/mini_racer/issues/92
+  spec.add_dependency 'libv8'
   spec.add_dependency 'method_source'
   spec.add_dependency 'mini_racer', '~> 0.2.4'
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
@@ -39,7 +39,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'unparser', '>= 0.2', '< 0.4' # 0.4 is incompatible
   spec.add_dependency 'webdrivers'
 
-  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
   spec.add_development_dependency 'hyper-component', HyperSpec::VERSION
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
