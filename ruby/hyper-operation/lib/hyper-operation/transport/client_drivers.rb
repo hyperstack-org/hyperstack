@@ -6,6 +6,10 @@ module Hyperstack
   # We use ERB to determine the configuration and implement the appropriate
   # client interface to sync_change or sync_destroy
 
+  def self.anti_csrf_token
+    ClientDrivers.opts[:form_authenticity_token]
+  end
+
   class Application
     extend Component::IsomorphicHelpers::ClassMethods
 

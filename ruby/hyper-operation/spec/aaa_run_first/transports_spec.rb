@@ -74,6 +74,10 @@ describe "Transport Tests", js: true do
     wait_for_ajax
   end
 
+  it 'has a anti_csrf_token' do
+    expect_evaluate_ruby('Hyperstack.anti_csrf_token').to be_present
+  end
+
   context "Pusher-Fake" do
     before(:all) do
 

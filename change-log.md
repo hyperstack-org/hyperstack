@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 + [#89](https://github.com/hyperstack-org/hyperstack/issues/89) Automatically create ActiveRecord inverse relationships as needed.  Previously both sides of the relationship had to be declared.
 + [#90](https://github.com/hyperstack-org/hyperstack/issues/90) Automatically load `config/initializers/inflections.rb` if present
 + [#99](https://github.com/hyperstack-org/hyperstack/issues/99) Better diagnostics for server access violations and other errors
++ [#94](https://github.com/hyperstack-org/hyperstack/issues/94) `Hyperstack.anti_csrf_token` returns the stack specific anti_csrf_token.
 
 ### Changed
 + [#62](https://github.com/hyperstack-org/hyperstack/issues/62) jQuery now accessed by global `jQ` method (replacing `DOM` class)
