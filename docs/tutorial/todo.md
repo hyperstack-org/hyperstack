@@ -1,4 +1,3 @@
-fires
 # TodoMVC Tutorial (Rails 5.2.x)
 
 ### Prerequisites
