@@ -44,7 +44,9 @@ module ActiveRecord
         @owner_class = owner_class
         @macro =       macro
         @options =     options
-        @klass_name =  options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
+        unless options[:polymorphic]
+          @klass_name =  options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
+        end
         @association_foreign_key = options[:foreign_key] || (macro == :belongs_to && "#{name}_id") || "#{@owner_class.name.underscore}_id"
         @source = options[:source] || @klass_name.underscore if options[:through]
         @attribute = name
@@ -81,16 +83,24 @@ module ActiveRecord
         end.flatten
       end
 
-      def inverse
-        @inverse ||=
-          through_association ? through_association.inverse : find_inverse
+      def polymorphic?
+        !@klass_name
       end
 
-      def inverse_of
-        @inverse_of ||= inverse.attribute
+      def inverse(model)
+        return @inverse if @inverse
+        found = through_association ? through_association.inverse(model) : find_inverse(model)
+        @inverse = found unless polymorphic?
+        found
       end
 
-      def find_inverse
+      def inverse_of(model)
+        inverse(model)&.attribute
+      end
+
+      def find_inverse(model)
+        the_klass = klass || model.class
+        return nil unless the_klass
         klass.reflect_on_all_associations.each do |association|
           next if association.association_foreign_key != @association_foreign_key
           next if association.klass != @owner_class

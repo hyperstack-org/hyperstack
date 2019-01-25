@@ -93,7 +93,8 @@ module ReactiveRecord
         vector = []
         path.split('.').inject(@model) do |model, attribute|
           association = model.reflect_on_association(attribute)
-          raise build_error(path, model, attribute) unless association
+          inverse_of = association.inverse_of(nil) if association
+          raise build_error(path, model, attribute) unless inverse_of
           vector = [association.inverse_of, *vector]
           @joins[association.klass] << vector
           association.klass
