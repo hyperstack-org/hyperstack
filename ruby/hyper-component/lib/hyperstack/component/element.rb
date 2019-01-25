@@ -96,7 +96,7 @@ module Hyperstack
         end
       end
 
-      def merge_built_in_event_prop!(prop_name)
+      def merge_built_in_event_prop!(prop_name, &block)
         @properties.merge!(
           prop_name => %x{
             function(){
@@ -106,9 +106,17 @@ module Hyperstack
               if (arguments.length > 1) {
                 all_args = Array.prototype.slice.call(arguments);
                 other_args = all_args.slice(1, arguments.length);
-                return #{yield(Event.new(`react_event`), *(`other_args`))};
+                return #{
+                  Internal::State::Mapper.ignore_bulk_updates(
+                    Event.new(`react_event`), *(`other_args`), &block
+                  )
+                };
               } else {
-                return #{yield(Event.new(`react_event`))};
+                return #{
+                  Internal::State::Mapper.ignore_bulk_updates(
+                    Event.new(`react_event`), &block
+                  )
+                };
               }
             }
           }

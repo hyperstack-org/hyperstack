@@ -102,6 +102,18 @@ module Hyperstack
             @bulk_update_flag = saved_bulk_update_flag
           end
 
+          # React already will batch together updates inside of event handlers
+          # so we don't have to, and having Hyperstack batch them outside of the
+          # event handler causes INPUT/TEXT/SELECT s not to work properly.
+          # This method is called by the Component event wrapper.
+          def ignore_bulk_updates(*args)
+            saved_ignore_bulk_update_flag = @ignore_bulk_update_flag
+            @ignore_bulk_update_flag = true
+            yield(*args)
+          ensure
+            @ignore_bulk_update_flag = saved_ignore_bulk_update_flag
+          end
+
           def ignore_mutations
             saved_ignore_mutations_flag = @ignore_mutations
             @ignore_mutations = true
@@ -207,9 +219,10 @@ module Hyperstack
           # case that the object being updated is themselves.
 
           def delay_updates?(object)
-            @bulk_update_flag ||
-              (Hyperstack.on_client? &&
-                (@immediate_update != @current_observer || @current_observer != object))
+            return false if @ignore_bulk_update_flag
+            return true  if @bulk_update_flag
+            return false unless Hyperstack.on_client?
+            (@immediate_update != @current_observer || @current_observer != object)
           end
 
           # schedule_delayed_updater adds a new set to the
