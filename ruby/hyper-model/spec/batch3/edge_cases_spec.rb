@@ -123,4 +123,23 @@ describe "reactive-record edge cases", js: true do
       page.should have_content(todo.title)
     end
   end
+
+  it 'can use find_by method on scopes' do
+    isomorphic do
+      Todo.finder_method :with_title do |title|
+        find_by_title(title)
+      end
+      Todo.scope :completed, -> () { where(completed: true) }
+    end
+    FactoryBot.create(:todo, title: 'todo 1', completed: true)
+    FactoryBot.create(:todo, title: 'todo 2', completed: true)
+    FactoryBot.create(:todo, title: 'todo 1', completed: false)
+    FactoryBot.create(:todo, title: 'todo 2', completed: false)
+    expect_promise do
+      Hyperstack::Model.load do
+        Todo.completed.find_by_title('todo 2').id
+      end
+    end.to eq(Todo.completed.find_by_title('todo 2').id)
+  end
+
 end

@@ -329,6 +329,10 @@ module ActiveRecord
       %i[limit offset].each do |scope|
         regulate_scope(scope) {}
       end
+
+      finder_method :__hyperstack_internal_scoped_find_by do |hash|
+        find_by(hash)
+      end
     end
   end
 

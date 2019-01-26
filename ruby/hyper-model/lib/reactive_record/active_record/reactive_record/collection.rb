@@ -252,6 +252,9 @@ To determine this sync_scopes first asks if the record being changed is in the s
       collection = build_child_scope(description, *description.name, *vector)
       collection.reload_from_db if name == "#{description.name}!"
       collection
+    rescue
+      debugger
+      nil
     end
 
     def child_scopes
@@ -551,7 +554,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       elsif ScopeDescription.find(@target_klass, method)
         apply_scope(method, *args)
       elsif args.count == 1 && method.start_with?('find_by_')
-        apply_scope(:find_by, method.sub(/^find_by_/, '') => args.first)
+        apply_scope(:___hyperstack_internal_scoped_find_by, method.sub(/^find_by_/, '') => args.first).first
       elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
         apply_scope("_#{method}", *args).first
       else

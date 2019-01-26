@@ -213,9 +213,6 @@ module ActiveRecord
       singleton_class.send(:define_method, name) do |*vargs|
         all.build_child_scope(scope_description, *name, *vargs)
       end
-      # singleton_class.send(:define_method, "#{name}=") do |_collection|
-      #   raise 'NO LONGER IMPLEMENTED - DOESNT PLAY WELL WITH SYNCHROMESH'
-      # end
     end
 
     def default_scope(*args, &block)
@@ -261,10 +258,10 @@ module ActiveRecord
     end
 
     def finder_method(name)
-      ReactiveRecord::ScopeDescription.new(self, "_#{name}", {}) # was adding _ to front
+      ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
       [name, "#{name}!"].each do |method|
         singleton_class.send(:define_method, method) do |*vargs|
-          all.apply_scope("_#{method}", *vargs).first # was adding _ to front
+          all.apply_scope("_#{method}", *vargs).first
         end
       end
     end
