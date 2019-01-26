@@ -27,7 +27,9 @@ module Hyperstack
           Hyperstack::Internal::Component::RenderingContext.replace(
             self,
             Hyperstack::Internal::Component::RenderingContext.build do
-              Hyperstack::Internal::Component::RenderingContext.render(type, build_new_properties(class_name, args), &new_block)
+              Hyperstack::Internal::Component::RenderingContext.render(
+                type, @properties, args, class: haml_class_name(class_name), &new_block
+              )
             end
           )
         end
@@ -38,17 +40,6 @@ module Hyperstack
 
         def haml_class_name(class_name)
           class_name.gsub(/__|_/, '__' => '_', '_' => '-')
-        end
-
-        private
-
-        def build_new_properties(class_name, args)
-          class_name = haml_class_name(class_name)
-          new_props = @properties.dup
-          new_props[:className] = "\
-            #{class_name} #{new_props[:className]} #{args.delete(:class)} #{args.delete(:className)}\
-          ".split(' ').uniq.join(' ')
-          new_props.merge! args
         end
       end
     end

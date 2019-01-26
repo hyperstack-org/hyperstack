@@ -262,18 +262,22 @@ module Hyperstack
                       "If you want to capture the ref in an instance variable use the `set` method.\n"\
                       "For example `ref: set(:TheRef)` will capture assign the ref to `@TheRef`\n"
               end
-              props[key] = %x{
-                              function(dom_node){
-                                if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
-                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(`dom_node.__opalInstance`) } };
-                                } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
-                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(`ReactDOM.findDOMNode(dom_node)`) } };
-                                } else if(dom_node !== null){
-                                  #{ Hyperstack::Internal::State::Mapper.ignore_mutations { value.call(`dom_node`) } };
-                                }
-                              }
+              unless `value.__hyperstack_component_ref_is_already_wrapped`
+                fn = value
+                value = %x{
+                          function(dom_node){
+                            if (dom_node !== null && dom_node.__opalInstance !== undefined && dom_node.__opalInstance !== null) {
+                              #{ Hyperstack::Internal::State::Mapper.ignore_mutations { fn.call(`dom_node.__opalInstance`) } };
+                            } else if(dom_node !== null && ReactDOM.findDOMNode !== undefined && dom_node.nodeType === undefined) {
+                              #{ Hyperstack::Internal::State::Mapper.ignore_mutations { fn.call(`ReactDOM.findDOMNode(dom_node)`) } };
+                            } else if(dom_node !== null){
+                              #{ Hyperstack::Internal::State::Mapper.ignore_mutations { fn.call(`dom_node`) } };
                             }
-
+                          }
+                        }
+                `value.__hyperstack_component_ref_is_already_wrapped = true`
+              end
+              props[key] = value
             elsif key == 'jq_ref'
               unless value.respond_to?(:call)
                 raise "The ref and dom params must be given a Proc.\n"\

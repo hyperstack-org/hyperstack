@@ -58,14 +58,14 @@ module Hyperstack
       # Used for elements that are not yet in DOM, i.e. they are provided as children
       # or they have been explicitly removed from the rendering context using the delete method.
 
-      def render(*props, &new_block)
+      def render(*props)
         if props.empty?
           Hyperstack::Internal::Component::RenderingContext.render(self)
         else
-          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(*props)
+          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(@type, @properties, *props)
           @_child_element = Hyperstack::Internal::Component::RenderingContext.render(
             Element.new(`React.cloneElement(#{@native}, #{props.shallow_to_n})`,
-                        type, @properties.merge(props), block)
+                        type, props, block)
           )
         end
       end

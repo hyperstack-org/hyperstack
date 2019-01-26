@@ -31,7 +31,7 @@ describe 'HAML notation', js: true do
         end
       end
     end
-    expect(page.body).to include('<div class="div-class"><span class="other-class the-class">a man walks into a bar</span></div>')
+    expect(page.body).to include('<div class="div-class"><span class="the-class other-class">a man walks into a bar</span></div>')
   end
 
   it 'redefines `p` to make method missing work' do
