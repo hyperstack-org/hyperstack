@@ -178,8 +178,9 @@ module Hyperstack
           end
 
           # Convert Passed in properties
-          ele = nil
-          properties = convert_props(type, { ref: ->(ref) { ele._update_ref(ref) } }, *args)
+          ele = nil # create nil var for the ref to use
+          ref = ->(ref) { ele._update_ref(ref) } unless `typeof ncc === 'function'`
+          properties = convert_props(type, { ref: ref }, *args)
           params << properties.shallow_to_n
 
           # Children Nodes
@@ -257,6 +258,7 @@ module Hyperstack
               props[key] = value
 
             elsif key == 'ref'
+              next unless value
               unless value.respond_to?(:call)
                 raise "The ref and dom params must be given a Proc.\n"\
                       "If you want to capture the ref in an instance variable use the `set` method.\n"\
