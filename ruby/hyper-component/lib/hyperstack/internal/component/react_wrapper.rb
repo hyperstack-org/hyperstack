@@ -178,7 +178,8 @@ module Hyperstack
           end
 
           # Convert Passed in properties
-          properties = convert_props(args)
+          ele = nil
+          properties = convert_props(type, { ref: ->(ref) { ele._update_ref(ref) } }, *args)
           params << properties.shallow_to_n
 
           # Children Nodes
@@ -190,14 +191,14 @@ module Hyperstack
               }
             }
           end
-          Hyperstack::Component::Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
+          ele = Hyperstack::Component::Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
         end
 
         def self.clear_component_class_cache
           @@component_classes = {}
         end
 
-        def self.convert_props(args)
+        def self.convert_props(type, *args)
           # merge args together into a single properties hash
           properties = {}
           args.each do |arg|
@@ -234,14 +235,26 @@ module Hyperstack
           # process properties according to react rules
           props = {}
           properties.each do |key, value|
-            if ["style", "dangerously_set_inner_HTML"].include? key
+            if %w[style dangerously_set_inner_HTML].include? key
               props[lower_camelize(key)] = value.to_n
 
-            elsif key == "className"
+            elsif key == :className
               props[key] = value.join(' ')
 
-            elsif key == "key"
-              props["key"] = value.to_key
+            elsif key == :key
+              props[:key] = value.to_key
+
+            elsif key == :init
+              if %w[select textarea].include? type
+                key = :defaultValue
+              elsif type == :input
+                key = if %w[radio checkbox].include? properties[:type]
+                        :defaultChecked
+                      else
+                        :defaultValue
+                      end
+              end
+              props[key] = value
 
             elsif key == 'ref'
               unless value.respond_to?(:call)

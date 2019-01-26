@@ -47,6 +47,7 @@ describe 'React Integration', js: true do
     input.send_keys 'hello'
     expect(input.value).to eq('123hello4567890')
   end
+
   # it "and it can still use the deprecated mutate syntax" do
   #   mount "TestComp" do
   #     class TestComp < Hyperloop::Component

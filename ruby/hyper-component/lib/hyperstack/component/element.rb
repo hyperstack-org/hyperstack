@@ -33,6 +33,19 @@ module Hyperstack
         @native = native_element
       end
 
+      def _update_ref(x)
+        @ref = x
+        @_child_element._update_ref(x) if @_child_element
+      end
+
+      def ref
+        @ref || raise("#{self} has not been mounted yet")
+      end
+
+      def dom_node
+        @type.is_a?(String) ? ref : ref.dom_node
+      end
+
       # Attach event handlers.
 
       def on(*event_names, &block)
@@ -49,8 +62,8 @@ module Hyperstack
         if props.empty?
           Hyperstack::Internal::Component::RenderingContext.render(self)
         else
-          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(props)
-          Hyperstack::Internal::Component::RenderingContext.render(
+          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(*props)
+          @_child_element = Hyperstack::Internal::Component::RenderingContext.render(
             Element.new(`React.cloneElement(#{@native}, #{props.shallow_to_n})`,
                         type, @properties.merge(props), block)
           )
