@@ -135,19 +135,16 @@ describe "reactive-record edge cases", js: true do
     FactoryBot.create(:todo, title: 'todo 2', completed: true)
     FactoryBot.create(:todo, title: 'todo 1', completed: false)
     FactoryBot.create(:todo, title: 'todo 2', completed: false)
-    #evaluate_ruby "Hyperstack::Model.load { Todo.completed.find_by_title('todo 2').id }"
     expect_promise do
       Hyperstack::Model.load do
         Todo.completed.find_by_title('todo 2').id
       end
     end.to eq(Todo.completed.find_by_title('todo 2').id)
-    binding.pry
-    evaluate_ruby "Hyperstack::Model.load { Todo.completed.find_by_title('todo 3').present? }"
-    evaluate_ruby do
+    expect_promise do
       Hyperstack::Model.load do
         Todo.completed.find_by_title('todo 3').present?
       end
-    end #.to be_falsy
+    end.to be_falsy
   end
 
 end
