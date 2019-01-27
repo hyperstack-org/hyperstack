@@ -201,7 +201,8 @@ module Hyperstack
               }
             }
           end
-          Hyperstack::Component::Element.new(
+          # assign to ele so that the ref callback can use it
+          ele = Hyperstack::Component::Element.new(
             `React.createElement.apply(null, #{params})`, type, properties, block
           )
         end
