@@ -18,6 +18,16 @@ module Hyperstack
       class ReactWrapper
         @@component_classes = {}
 
+        def self.stateless?(ncc)
+          %x{
+            typeof #{ncc} === 'function' // can be various things
+            && !(
+              #{ncc}.prototype // native arrows don't have prototypes
+              && #{ncc}.prototype.isReactComponent // special property
+            )
+          }
+        end
+
         def self.import_native_component(opal_class, native_class)
           opal_class.instance_variable_set("@native_import", true)
           @@component_classes[opal_class] = native_class
@@ -29,9 +39,8 @@ module Hyperstack
           is_component_class = `#{component}.prototype !== undefined` &&
                                 (`!!#{component}.prototype.isReactComponent` ||
                                  `!!#{component}.prototype.render`)
-          is_functional_component = `typeof #{component} === "function"`
           has_render_method = `typeof #{component}.render === "function"`
-          unless is_component_class || is_functional_component || has_render_method
+          unless is_component_class || stateless?(component) || has_render_method
             raise 'does not appear to be a native react component'
           end
           component
@@ -179,7 +188,7 @@ module Hyperstack
 
           # Convert Passed in properties
           ele = nil # create nil var for the ref to use
-          ref = ->(ref) { ele._update_ref(ref) } unless `typeof ncc === 'function'`
+          ref = ->(ref) { ele._update_ref(ref) } unless stateless?(ncc)
           properties = convert_props(type, { ref: ref }, *args)
           params << properties.shallow_to_n
 
@@ -192,7 +201,9 @@ module Hyperstack
               }
             }
           end
-          ele = Hyperstack::Component::Element.new(`React.createElement.apply(null, #{params})`, type, properties, block)
+          Hyperstack::Component::Element.new(
+            `React.createElement.apply(null, #{params})`, type, properties, block
+          )
         end
 
         def self.clear_component_class_cache

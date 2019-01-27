@@ -34,6 +34,7 @@ module Hyperstack
       end
 
       def _update_ref(x)
+        puts "#{self}._update_ref(#{x})"
         @ref = x
         @_child_element._update_ref(x) if @_child_element
       end
