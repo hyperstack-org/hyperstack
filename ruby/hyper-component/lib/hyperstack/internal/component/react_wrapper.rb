@@ -19,13 +19,7 @@ module Hyperstack
         @@component_classes = {}
 
         def self.stateless?(ncc)
-          %x{
-            typeof #{ncc} === 'function' // can be various things
-            && !(
-              #{ncc}.prototype // native arrows don't have prototypes
-              && #{ncc}.prototype.isReactComponent // special property
-            )
-          }
+          `typeof #{ncc} === 'function' && !(#{ncc}.prototype && #{ncc}.prototype.isReactComponent)`
         end
 
         def self.import_native_component(opal_class, native_class)
