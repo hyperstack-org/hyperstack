@@ -252,9 +252,6 @@ To determine this sync_scopes first asks if the record being changed is in the s
       collection = build_child_scope(description, *description.name, *vector)
       collection.reload_from_db if name == "#{description.name}!"
       collection
-    rescue
-      debugger
-      nil
     end
 
     def child_scopes
