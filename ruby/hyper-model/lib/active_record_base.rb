@@ -87,7 +87,7 @@ module ActiveRecord
               this.acting_user = acting_user
               # returns a PsuedoRelationArray which will respond to the
               # __secure_collection_check method
-              ReactiveRecordPsuedoRelationArray.new([this.instance_exec(*args, &block)])
+              ReactiveRecordPsuedoRelationArray.new([*this.instance_exec(*args, &block)])
             ensure
               this.acting_user = old
             end

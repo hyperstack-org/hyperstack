@@ -124,22 +124,54 @@ describe "reactive-record edge cases", js: true do
     end
   end
 
-  it 'can use find_by method on scopes' do
-    isomorphic do
-      Todo.finder_method :with_title do |title|
-        find_by_title(title)
+  describe 'can use finder methods on scopes' do
+    before(:each) do
+      isomorphic do
+        Todo.finder_method :with_title do |title|
+          find_by_title(title)
+        end
+        Todo.scope :completed, -> () { where(completed: true) }
       end
-      Todo.scope :completed, -> () { where(completed: true) }
+      FactoryBot.create(:todo, title: 'todo 1', completed: true)
+      FactoryBot.create(:todo, title: 'todo 2', completed: true)
+      FactoryBot.create(:todo, title: 'todo 1', completed: false)
+      FactoryBot.create(:todo, title: 'todo 2', completed: false)
     end
-    FactoryBot.create(:todo, title: 'todo 1', completed: true)
-    FactoryBot.create(:todo, title: 'todo 2', completed: true)
-    FactoryBot.create(:todo, title: 'todo 1', completed: false)
-    FactoryBot.create(:todo, title: 'todo 2', completed: false)
-    expect_promise do
-      Hyperstack::Model.load do
-        Todo.completed.find_by_title('todo 2').id
-      end
-    end.to eq(Todo.completed.find_by_title('todo 2').id)
+    it 'find_by_xxx' do
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find_by_title('todo 2').id
+        end
+      end.to eq(Todo.completed.find_by_title('todo 2').id)
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find_by_title('todo 3')
+        end
+      end.to be_falsy
+    end
+    it 'find' do
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find(2).title
+        end
+      end.to eq(Todo.completed.find(2).title)
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find(3)
+        end
+      end.to be_falsy
+    end
+    it 'find_by' do
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find_by(title: 'todo 2').id
+        end
+      end.to eq(Todo.completed.find_by(title: 'todo 2').id)
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find_by(title: 'todo 3')
+        end
+      end.to be_falsy
+    end
   end
-
 end

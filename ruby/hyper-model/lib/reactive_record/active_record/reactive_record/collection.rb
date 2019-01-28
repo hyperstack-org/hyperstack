@@ -546,12 +546,16 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def method_missing(method, *args, &block)
-      if [].respond_to? method
+      if args.count == 1 && method.start_with?('find_by_')
+        apply_scope(:___hyperstack_internal_scoped_find_by, method.sub(/^find_by_/, '') => args.first).first
+      elsif args.count == 1 && method == :find_by
+        apply_scope(:___hyperstack_internal_scoped_find_by, args.first).first
+      elsif args.count == 1 && method == :find
+        apply_scope(:___hyperstack_internal_scoped_find_by, @target_klass.primary_key => args.first).first
+      elsif [].respond_to? method
         all.send(method, *args, &block)
       elsif ScopeDescription.find(@target_klass, method)
         apply_scope(method, *args)
-      elsif args.count == 1 && method.start_with?('find_by_')
-        apply_scope(:___hyperstack_internal_scoped_find_by, method.sub(/^find_by_/, '') => args.first).first
       elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
         apply_scope("_#{method}", *args).first
       else
