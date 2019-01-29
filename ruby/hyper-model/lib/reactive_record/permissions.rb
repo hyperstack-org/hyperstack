@@ -115,7 +115,6 @@ class ActiveRecord::Base
       if permission == :view_permitted?
         details = Hyperstack::PolicyDiagnostics.policy_dump_for(self, user)
       end
-      binding.pry
       Hyperstack::InternalPolicy.raise_operation_access_violation(message, details || '')
     end
   end
