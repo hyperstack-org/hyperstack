@@ -325,8 +325,6 @@ module ReactiveRecord
             elsif method.is_a? Array #__secure_remote_access_to_
               if method[0] == 'new'
                 object.new
-              elsif method[0] == 'find_by'
-                object.send(*method)
               else
                 object.send(:"__secure_remote_access_to_#{method[0]}", object, acting_user, *method[1..-1])
               end

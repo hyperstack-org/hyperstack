@@ -52,13 +52,16 @@ module ActiveRecord
     end
 
     def find(id)
-      ReactiveRecord::Base.find(self, primary_key => id)
+      all.find(id)
+      #ReactiveRecord::Base.find(self, primary_key => id)
     end
 
     def find_by(opts = {})
-      dealiased_opts = {}
-      opts.each { |attr, value| dealiased_opts[_dealias_attribute(attr)] = value }
-      ReactiveRecord::Base.find(self, dealiased_opts)
+      all.find_by(opts)
+
+      # dealiased_opts = {}
+      # opts.each { |attr, value| dealiased_opts[_dealias_attribute(attr)] = value }
+      # ReactiveRecord::Base.find(self, dealiased_opts)
     end
 
     def enum(*args)
@@ -176,7 +179,7 @@ module ActiveRecord
 
     def method_missing(name, *args, &block)
       if args.count == 1 && name.start_with?("find_by_") && !block
-        find_by(_dealias_attribute(name.sub(/^find_by_/, "")) => args[0])
+        all.find_by(name.sub(/^find_by_/, "") => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
       elsif name.end_with?('!')

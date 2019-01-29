@@ -256,18 +256,16 @@ module ActiveRecord
         end
 
         # add secure access for find, find_by, and belongs_to and has_one relations.
-        # No explicit security checks are needed here, as the data returned by these objects
-        # will be further processedand checked before returning.  I.e. it is not possible to
-        # simply return `find(1)` but if you try returning `find(1).name` the permission system
-        # will check to see if the name attribute can be legally sent to the current acting user.
+        # __hyperstack_internal_scoped_find_by will return nil if record is found, but
+        # access to the id (at least) is not allowed.  See that method for details on why
 
-        def __secure_remote_access_to_find(_self, _acting_user, *args)
-          find(*args)
-        end
-
-        def __secure_remote_access_to_find_by(_self, _acting_user, *args)
-          find_by(*args)
-        end
+        # def __secure_remote_access_to_find(object, acting_user, id)
+        #   __secure_remote_access_to_find_by(object, acting_user, id: id).first
+        # end
+        #
+        # def __secure_remote_access_to_find_by(object, acting_user, hash)
+        #   __secure_remote_access_to____hyperstack_internal_scoped_find_by(object, acting_user, hash).first
+        # end
 
         %i[belongs_to has_one].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
@@ -330,8 +328,15 @@ module ActiveRecord
         regulate_scope(scope) {}
       end
 
+      # implements find_by inside of scopes.  For security reasons return nil
+      # if we cannot view at least the id of found record.  Otherwise a hacker
+      # could tell if a record exists depending on whether an access violation
+      # (i.e. it exists) or nil (it doesn't exist is returned.)  Note that
+      # view of id is permitted as long as any attribute of the record is
+      # accessible.
       finder_method :__hyperstack_internal_scoped_find_by do |hash|
-        find_by(hash)
+        found = find_by(hash)
+        next found if found && found.view_permitted?(:id)
       end
     end
   end

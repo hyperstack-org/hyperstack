@@ -547,9 +547,12 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def method_missing(method, *args, &block)
       if args.count == 1 && method.start_with?('find_by_')
-        apply_scope(:___hyperstack_internal_scoped_find_by, method.sub(/^find_by_/, '') => args.first).first
+        attr = @target_klass._dealias_attribute(method.sub(/^find_by_/, ''))
+        apply_scope(:___hyperstack_internal_scoped_find_by,  attr => args.first).first
       elsif args.count == 1 && method == :find_by
-        apply_scope(:___hyperstack_internal_scoped_find_by, args.first).first
+        dealiased_opts = {}
+        args.first.each { |attr, value| dealiased_opts[@target_klass._dealias_attribute(attr)] = value }
+        apply_scope(:___hyperstack_internal_scoped_find_by, dealiased_opts).first
       elsif args.count == 1 && method == :find
         apply_scope(:___hyperstack_internal_scoped_find_by, @target_klass.primary_key => args.first).first
       elsif [].respond_to? method
