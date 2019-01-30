@@ -127,7 +127,7 @@ module React
       end
     end
 
-    def merge_built_in_event_prop!(prop_name)
+    def merge_built_in_event_prop!(prop_name, &block)
       @properties.merge!(
         prop_name => %x{
           function(){
@@ -137,9 +137,17 @@ module React
             if (arguments.length > 1) {
               all_args = Array.prototype.slice.call(arguments);
               other_args = all_args.slice(1, arguments.length);
-              return #{yield(React::Event.new(`react_event`), *(`other_args`))};
+              return #{
+                React::State.ignore_bulk_updates(
+                  React::Event.new(`react_event`), *(`other_args`), &block
+                )
+              };
             } else {
-              return #{yield(React::Event.new(`react_event`))};
+              return #{
+                React::State.ignore_bulk_updates(
+                  React::Event.new(`react_event`), &block
+                )
+              };
             }
           }
         }
