@@ -1,9 +1,9 @@
 PATH
   remote: ../hyper-component
   specs:
-    hyper-component (0.99.5)
-      hyper-store (= 0.99.5)
-      hyperloop-config (= 0.99.5)
+    hyper-component (0.99.6)
+      hyper-store (= 0.99.6)
+      hyperloop-config (= 0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -13,39 +13,39 @@ PATH
 PATH
   remote: ../hyper-model
   specs:
-    hyper-model (0.99.5)
+    hyper-model (0.99.6)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.5)
-      hyper-operation (= 0.99.5)
+      hyper-component (= 0.99.6)
+      hyper-operation (= 0.99.6)
 
 PATH
   remote: ../hyper-operation
   specs:
-    hyper-operation (0.99.5)
+    hyper-operation (0.99.6)
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.5)
+      hyper-component (= 0.99.6)
       mutations
       opal-activesupport (~> 0.3.1)
 
 PATH
   remote: ../hyper-router
   specs:
-    hyper-router (0.99.5)
-      hyper-component (= 0.99.5)
+    hyper-router (0.99.6)
+      hyper-component (= 0.99.6)
       opal-browser (~> 0.2.0)
 
 PATH
   remote: ../hyper-store
   specs:
-    hyper-store (0.99.5)
-      hyperloop-config (= 0.99.5)
+    hyper-store (0.99.6)
+      hyperloop-config (= 0.99.6)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperloop-config
   specs:
-    hyperloop-config (0.99.5)
+    hyperloop-config (0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -55,9 +55,9 @@ PATH
 PATH
   remote: .
   specs:
-    hyperloop (0.99.5)
-      hyper-model (= 0.99.5)
-      hyper-router (= 0.99.5)
+    hyperloop (0.99.6)
+      hyper-model (= 0.99.6)
+      hyper-router (= 0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal-browser (~> 0.2.0)
@@ -135,11 +135,11 @@ GEM
       nesty
       reentrant_flock
       sinatra (>= 1.2.7)
-    globalid (0.4.1)
+    globalid (0.4.2)
       activesupport (>= 4.2.0)
     hike (1.2.3)
     httpclient (2.8.3)
-    i18n (1.5.1)
+    i18n (1.5.3)
       concurrent-ruby (~> 1.0)
     io-like (0.3.0)
     jquery-rails (4.3.3)
@@ -272,4 +272,4 @@ DEPENDENCIES
   hyperloop-config!
 
 BUNDLED WITH
-   1.17.2
+   1.17.3

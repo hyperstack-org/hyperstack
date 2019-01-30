@@ -1,9 +1,9 @@
 PATH
   remote: ../hyper-component
   specs:
-    hyper-component (0.99.5)
-      hyper-store (= 0.99.5)
-      hyperloop-config (= 0.99.5)
+    hyper-component (0.99.6)
+      hyper-store (= 0.99.6)
+      hyperloop-config (= 0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -13,23 +13,23 @@ PATH
 PATH
   remote: ../hyper-operation
   specs:
-    hyper-operation (0.99.5)
+    hyper-operation (0.99.6)
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.5)
+      hyper-component (= 0.99.6)
       mutations
       opal-activesupport (~> 0.3.1)
 
 PATH
   remote: ../hyper-store
   specs:
-    hyper-store (0.99.5)
-      hyperloop-config (= 0.99.5)
+    hyper-store (0.99.6)
+      hyperloop-config (= 0.99.6)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperloop-config
   specs:
-    hyperloop-config (0.99.5)
+    hyperloop-config (0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -39,11 +39,11 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-model (0.99.5)
+    hyper-model (0.99.6)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.5)
-      hyper-operation (= 0.99.5)
+      hyper-component (= 0.99.6)
+      hyper-operation (= 0.99.6)
 
 GEM
   remote: https://rubygems.org/
@@ -407,4 +407,4 @@ DEPENDENCIES
   unparser (~> 0.3.0)
 
 BUNDLED WITH
-   1.17.2
+   1.17.3

@@ -1,9 +1,9 @@
 PATH
   remote: ../hyper-component
   specs:
-    hyper-component (0.99.5)
-      hyper-store (= 0.99.5)
-      hyperloop-config (= 0.99.5)
+    hyper-component (0.99.6)
+      hyper-store (= 0.99.6)
+      hyperloop-config (= 0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -13,25 +13,25 @@ PATH
 PATH
   remote: ../hyper-model
   specs:
-    hyper-model (0.99.5)
+    hyper-model (0.99.6)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.5)
-      hyper-operation (= 0.99.5)
+      hyper-component (= 0.99.6)
+      hyper-operation (= 0.99.6)
 
 PATH
   remote: ../hyper-operation
   specs:
-    hyper-operation (0.99.5)
+    hyper-operation (0.99.6)
       activerecord (>= 4.0.0)
-      hyper-component (= 0.99.5)
+      hyper-component (= 0.99.6)
       mutations
       opal-activesupport (~> 0.3.1)
 
 PATH
   remote: ../hyper-spec
   specs:
-    hyper-spec (0.99.5)
+    hyper-spec (0.99.6)
       capybara
       chromedriver-helper (= 1.2.0)
       libv8 (~> 6.7.0)
@@ -50,14 +50,14 @@ PATH
 PATH
   remote: ../hyper-store
   specs:
-    hyper-store (0.99.5)
-      hyperloop-config (= 0.99.5)
+    hyper-store (0.99.6)
+      hyperloop-config (= 0.99.6)
       opal (>= 0.11.0, < 0.12.0)
 
 PATH
   remote: ../hyperloop-config
   specs:
-    hyperloop-config (0.99.5)
+    hyperloop-config (0.99.6)
       libv8 (~> 6.7.0)
       mini_racer (~> 0.2.4)
       opal (>= 0.11.0, < 0.12.0)
@@ -67,8 +67,8 @@ PATH
 PATH
   remote: .
   specs:
-    hyper-i18n (0.99.5)
-      hyper-operation (= 0.99.5)
+    hyper-i18n (0.99.6)
+      hyper-operation (= 0.99.6)
       i18n
 
 GEM
@@ -119,7 +119,7 @@ GEM
     adamantium (0.2.0)
       ice_nine (~> 0.11.0)
       memoizable (~> 0.4.0)
-    addressable (2.5.2)
+    addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
     archive-zip (0.11.0)
       io-like (~> 0.3.0)
@@ -130,7 +130,7 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     builder (3.2.3)
-    capybara (3.12.0)
+    capybara (3.13.2)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -273,7 +273,7 @@ GEM
     rspec-mocks (3.8.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
-    rspec-rails (3.8.1)
+    rspec-rails (3.8.2)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       railties (>= 3.0)
@@ -353,4 +353,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
