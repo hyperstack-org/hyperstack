@@ -32,6 +32,23 @@ describe 'React Integration', js: true do
     end
     expect(page).to have_content('hello')
   end
+
+  it "does not shift cursor position during controlled input updates" do
+    mount "TestComp" do
+      class TestComp < Hyperloop::Component
+        render(DIV) do
+          INPUT(id: :input, value: state.input_value)
+            .on(:change) { |e| mutate.input_value(e.target.value) }
+        end
+      end
+    end
+    input = find('#input')
+    input.send_keys '1234567890'
+    evaluate_script "$('#input').focus()[0].setSelectionRange(3, 3)"
+    input.send_keys 'hello'
+    expect(input.value).to eq('123hello4567890')
+  end
+
   it "and it can still use the deprecated mutate syntax" do
     mount "TestComp" do
       class TestComp < Hyperloop::Component

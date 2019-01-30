@@ -19,6 +19,18 @@ module React
         @bulk_update_flag = saved_bulk_update_flag
       end
 
+      # React already will batch together updates inside of event handlers
+      # so we don't have to, and having Hyperstack batch them outside of the
+      # event handler causes INPUT/TEXT/SELECT s not to work properly.
+      # This method is called by the Component event wrapper.
+      def ignore_bulk_updates(*args)
+        saved_ignore_bulk_update_flag = @ignore_bulk_update_flag
+        @ignore_bulk_update_flag = true
+        yield(*args)
+      ensure
+        @ignore_bulk_update_flag = saved_ignore_bulk_update_flag
+      end
+
       def set_state2(object, name, value, updates, exclusions = nil)
         # set object's name state to value, tell all observers it has changed.
         # Observers must implement update_react_js_state
@@ -59,7 +71,7 @@ module React
       def set_state(object, name, value, delay=ALWAYS_UPDATE_STATE_AFTER_RENDER)
         states[object][name] = value
         delay = false if object.respond_to?(:set_state_synchronously?) && object.set_state_synchronously?
-        if delay || @bulk_update_flag
+        if !@ignore_bulk_update_flag && (delay || @bulk_update_flag)
           @delayed_updates ||= Hash.new { |h, k| h[k] = {} }
           @delayed_updates[object][name] = [value, Set.new]
           @delayed_updater ||= after(0.001) do
@@ -80,6 +92,8 @@ module React
           updates.each { |observer, args| observer.update_react_js_state(*args) }
         end
         value
+      ensure
+        'Disabling JIT for Safari bug'
       end
 
       def will_be_observing?(object, name, current_observer)
