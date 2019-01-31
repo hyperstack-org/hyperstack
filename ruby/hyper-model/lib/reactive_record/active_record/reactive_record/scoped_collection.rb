@@ -9,10 +9,10 @@ module ReactiveRecord
     def set_pre_sync_related_records(related_records, _record = nil)
       @pre_sync_related_records = nil
       ReactiveRecord::Base.catch_db_requests do
-        puts "#{self}.set_pre_sync_related_records filter_records(#{related_records})"
+        # puts "#{self}.set_pre_sync_related_records filter_records(#{related_records})"
 
         @pre_sync_related_records = filter_records(related_records)
-        puts "returns #{@pre_sync_related_records}"
+        # puts "returns #{@pre_sync_related_records}"
         live_scopes.each do |scope|
           scope.set_pre_sync_related_records(@pre_sync_related_records)
         end
@@ -35,9 +35,9 @@ module ReactiveRecord
       if collector?
         update_collector_scope(related_records)
       else
-        puts "#{self}.update_collection calling filter_records(#{related_records})"
+        # puts "#{self}.update_collection calling filter_records(#{related_records})"
         related_records = filter_records(related_records)
-        puts "returns #{related_records}"
+        # puts "returns #{related_records}"
         update_filter_scope(@pre_sync_related_records, related_records)
       end
     end

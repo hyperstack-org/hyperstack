@@ -126,9 +126,6 @@ describe "reactive-record edge cases", js: true do
 
   it 'will return nil instead of raising an access violation for finder methods' do
     FactoryBot.create(:todo, title: 'secret')
-    # FactoryBot.create(:todo, title: 'not secret')
-    # evaluate_ruby "Hyperstack::Model.load { Todo.find_by_title('secret') }"
-    # binding.pry
     expect_promise do
       Hyperstack::Model.load do
         Todo.find_by_title('secret')
@@ -196,7 +193,7 @@ describe "reactive-record edge cases", js: true do
         end
       end.to be_nil
     end
-    it "will return nil unless access is allowed" do
+    it "and will return nil unless access is allowed" do
       expect_promise do
         Hyperstack::Model.load do
           Todo.completed.find_by_title('secret')

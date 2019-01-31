@@ -67,30 +67,34 @@ module ReactiveRecord
       load_data { ServerDataCache.load_from_json(json, target) }
     end
 
+    def self.find_locally(model, attrs)
+      if (id_to_find = attrs[model.primary_key])
+        lookup_by_id(model, id_to_find)
+      else
+        @records[model].detect do |r|
+          !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
+        end
+      end
+    end
+
+    def self.find_by_id(model, id)
+      find(model, model.primary_key => id)
+    end
+
     def self.find(model, attrs)
       # will return the unique record with this attribute-value pair
       # value cannot be an association or aggregation
 
       # add the inheritance column if this is an STI subclass
 
-      inher_col = model.inheritance_column
-      if inher_col && model < model.base_class && !attrs.key?(inher_col)
-        attrs = attrs.merge(inher_col => model.model_name.to_s)
-      end
+      attrs = model.__hyperstack_preprocess_attrs(attrs)
 
       model = model.base_class
       primary_key = model.primary_key
 
       # already have a record with these attribute-value pairs?
 
-      record =
-        if (id_to_find = attrs[primary_key])
-          lookup_by_id(model, id_to_find)
-        else
-          @records[model].detect do |r|
-            !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
-          end
-        end
+      record = find_locally(model, attrs)
 
       unless record
         # if not, and then the record may be loaded, but not have this attribute set yet,
@@ -260,7 +264,7 @@ module ReactiveRecord
 
       if value.is_a? Collection
         @synced_attributes[attribute] = value.dup_for_sync
-      elsif aggregation = model.reflect_on_aggregation(attribute) and (aggregation.klass < ActiveRecord::Base)
+      elsif (aggregation = model.reflect_on_aggregation(attribute)) && (aggregation.klass < ActiveRecord::Base)
         value.backing_record.sync!
       elsif aggregation
         @synced_attributes[attribute] = aggregation.deserialize(aggregation.serialize(value))

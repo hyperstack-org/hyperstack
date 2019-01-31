@@ -51,17 +51,26 @@ module ActiveRecord
       @model_name ||= ActiveModel::Name.new(self)
     end
 
+    def __hyperstack_preprocess_attrs(attrs)
+      if inheritance_column && self < base_class && !attrs.key?(inheritance_column)
+        attrs = attrs.merge(inheritance_column => model_name.to_s)
+      end
+      dealiased_attrs = {}
+      attrs.each { |attr, value| dealiased_attrs[_dealias_attribute(attr)] = value }
+    end
+
     def find(id)
-      all.find(id)
+      find_by(primary_key => id)
       #ReactiveRecord::Base.find(self, primary_key => id)
     end
 
-    def find_by(opts = {})
-      all.find_by(opts)
-
-      # dealiased_opts = {}
-      # opts.each { |attr, value| dealiased_opts[_dealias_attribute(attr)] = value }
-      # ReactiveRecord::Base.find(self, dealiased_opts)
+    def find_by(attrs = {})
+      attrs = __hyperstack_preprocess_attrs(attrs)
+      if (record = ReactiveRecord::Base.find_locally(base_class, attrs))
+        record
+      else
+        all.find_by(attrs)
+      end
     end
 
     def enum(*args)
@@ -179,7 +188,7 @@ module ActiveRecord
 
     def method_missing(name, *args, &block)
       if args.count == 1 && name.start_with?("find_by_") && !block
-        all.find_by(name.sub(/^find_by_/, "") => args[0])
+        find_by(name.sub(/^find_by_/, '') => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
       elsif name.end_with?('!')
@@ -195,16 +204,6 @@ module ActiveRecord
     # of all instead.
     # Any method ending with ! just means apply the method after forcing a reload
     # from the DB.
-
-    # alias pre_synchromesh_method_missing method_missing
-    #
-    # def method_missing(name, *args, &block)
-    #   return all.send(name, *args, &block) if [].respond_to?(name)
-    #   if name.end_with?('!')
-    #     return send(name.chop, *args, &block).send(:reload_from_db) rescue nil
-    #   end
-    #   pre_synchromesh_method_missing(name, *args, &block)
-    # end
 
     def create(*args, &block)
       new(*args).save(&block)
@@ -370,7 +369,8 @@ module ActiveRecord
             # TODO: changed values as changes while just updating the synced values.
             target =
               if param[primary_key]
-                find(param[primary_key])
+                ReactiveRecord::Base.find(self, primary_key => param[primary_key])
+                #find(param[primary_key])
               else
                 new
               end

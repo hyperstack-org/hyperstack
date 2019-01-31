@@ -433,12 +433,14 @@ keys:
 
 
       def self.load_from_json(tree, target = nil)
-
         # have to process *all before any other items
         # we leave the "*all" key in just for debugging purposes, and then skip it below
 
         if sorted_collection = tree["*all"]
-          target.replace sorted_collection.collect { |id| target.proxy_association.klass.find(id) }
+          loaded_collection = sorted_collection.collect do |id|
+            ReactiveRecord::Base.find_by_id(target.proxy_association.klass, id)
+          end
+          target.replace loaded_collection
         end
 
         if id_value = tree["id"] and id_value.is_a? Array
@@ -456,14 +458,13 @@ keys:
             target.set_count_state(value.first)
           elsif method.is_a? Integer or method =~ /^[0-9]+$/
             new_target = target.push_and_update_belongs_to(method)
-            #target << (new_target = target.proxy_association.klass.find(method))
           elsif method.is_a? Array
             if method[0] == "new"
               new_target = ReactiveRecord::Base.lookup_by_object_id(method[1])
             elsif !(target.class < ActiveRecord::Base)
               new_target = target.send(*method)
               # value is an array if scope returns nil, so we destroy the bogus record
-              new_target.destroy and new_target = nil if value.is_a? Array
+              new_target.destroy && (new_target = nil) if value.is_a? Array
             else
               target.backing_record.update_simple_attribute([method], target.backing_record.convert(method, value.first))
             end
@@ -479,7 +480,7 @@ keys:
             target.backing_record.set_attr_value(method, value.first) unless method == :id
           elsif value.is_a? Hash and value[:id] and value[:id].first and association = target.class.reflect_on_association(method)
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
-            new_target = association.klass.find(value[:id].first)
+            new_target = ReactiveRecord::Base.find_by_id(association.klass, value[:id].first)
             target.send "#{method}=", new_target
           elsif !(target.class < ActiveRecord::Base)
             new_target = target.send(*method)

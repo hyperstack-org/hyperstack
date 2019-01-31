@@ -59,7 +59,7 @@ module ReactiveRecord
         @collection = []
         if ids = ReactiveRecord::Base.fetch_from_db([*@vector, "*all"])
           ids.each do |id|
-            @collection << @target_klass.find_by(@target_klass.primary_key => id)
+            @collection << ReactiveRecord::Base.find_by_id(@target_klass, id)
           end
         else
           @dummy_collection = ReactiveRecord::Base.load_from_db(nil, *@vector, "*all")
@@ -391,7 +391,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       # child.test_model = 1
       # so... we go back starting at this collection and look for the first
       # collection with an owner... that is our guy
-      child = proxy_association.klass.find(id)
+      child = ReactiveRecord::Base.find_by_id(proxy_association.klass, id)
       push child
       set_belongs_to child
     end
@@ -539,22 +539,36 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @dummy_collection.loading?
     end
 
+    def loaded?
+      @collection && (!@dummy_collection || !@dummy_collection.loading?)
+    end
+
     def empty?
       # should be handled by method missing below, but opal-rspec does not deal well
       # with method missing, so to test...
       all.empty?
     end
 
+    def find_by(attrs)
+      attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
+      if loaded?
+        @collection.detect do |r|
+          !attrs.detect { |attr, value| r.attributes[attr] != value }
+        end
+      else
+        __hyperstack_internal_scoped_find_by(attrs).tap do |r|
+          attrs.each { |attr, value| r.backing_record.sync_attribute(attr, value) } if r
+        end
+      end
+    end
+
+    def find(id)
+      find_by @target_klass.primary_key => id
+    end
+
     def method_missing(method, *args, &block)
       if args.count == 1 && method.start_with?('find_by_')
-        attr = @target_klass._dealias_attribute(method.sub(/^find_by_/, ''))
-        apply_scope(:___hyperstack_internal_scoped_find_by,  attr => args.first).first
-      elsif args.count == 1 && method == :find_by
-        dealiased_opts = {}
-        args.first.each { |attr, value| dealiased_opts[@target_klass._dealias_attribute(attr)] = value }
-        apply_scope(:___hyperstack_internal_scoped_find_by, dealiased_opts).first
-      elsif args.count == 1 && method == :find
-        apply_scope(:___hyperstack_internal_scoped_find_by, @target_klass.primary_key => args.first).first
+        find_by(method.sub(/^find_by_/, '') => args[0])
       elsif [].respond_to? method
         all.send(method, *args, &block)
       elsif ScopeDescription.find(@target_klass, method)

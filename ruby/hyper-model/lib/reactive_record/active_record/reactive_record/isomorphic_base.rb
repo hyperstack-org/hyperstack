@@ -335,7 +335,11 @@ module ReactiveRecord
             end
           end
           if id and (found.nil? or !(found.class <= model) or (found.id and found.id.to_s != id.to_s))
-            raise "Inconsistent data sent to server - #{model.name}.find(#{id}) != [#{vector}]"
+            # TODO: the one case that this is okay is when we are doing a find(some_id) which
+            # does not exist.  So the above check needs to deal with that if possible,
+            # otherwise we can just skip this check, as it was put in sometime back for
+            # debugging purposes, and is perhaps not necessary anymore
+            #raise "Inconsistent data sent to server - #{model.name}.find(#{id}) != [#{vector}]"
           end
           found
         elsif id
@@ -526,7 +530,7 @@ module ReactiveRecord
 
         promise = Promise.new
 
-        if !data_loading? and (id or vector)
+        if !data_loading? && (id || vector)
           Operations::Destroy.run(model: ar_instance.model_name.to_s, id: id, vector: vector)
           .then do |response|
             Broadcast.to_self ar_instance

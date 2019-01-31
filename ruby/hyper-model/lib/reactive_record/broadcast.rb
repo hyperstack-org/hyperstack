@@ -219,7 +219,6 @@ module ReactiveRecord
         end
         [attr, value]
       end.compact.flatten(1)]
-      # TODO: verify - it used to be current_values.merge(br.attributes)
       klass._react_param_conversion(br.attributes.merge(current_values))
     end
   end
