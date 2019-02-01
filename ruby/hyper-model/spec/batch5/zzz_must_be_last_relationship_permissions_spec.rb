@@ -34,11 +34,16 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     stub_const 'TestApplicationPolicy', Class.new
     TestApplicationPolicy.class_eval do
       regulate_class_connection { self }
-      #regulate_all_broadcasts { |policy| policy.send_all }
     end
     ApplicationController.acting_user = nil
     size_window(:small, :portrait)
     @dummy_cache_item = double("Dummy Cache Item", vector: nil, acting_user: nil)
+    TodoItem.class_eval do
+      # set TodoItem's view_permitted? method back to the normal mechanism for these tests
+      def view_permitted?(attribute)
+        Hyperstack::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
+      end
+    end
   end
 
   before(:each) do
