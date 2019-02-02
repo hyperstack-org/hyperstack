@@ -316,6 +316,14 @@ module ActiveRecord
         regulate_scope(scope) {}
       end
 
+        def __secure_remote_access_to_find(_self, _acting_user, *args)
+          find(*args)
+        end
+
+        def __secure_remote_access_to_find_by(_self, _acting_user, *args)
+          find_by(*args)
+        end
+
       # implements find_by inside of scopes.  For security reasons return nil
       # if we cannot view at least the id of found record.  Otherwise a hacker
       # could tell if a record exists depending on whether an access violation
@@ -324,9 +332,19 @@ module ActiveRecord
       # accessible.
       finder_method :__hyperstack_internal_scoped_find_by do |attrs|
         begin
-          found = find_by(attrs)
+          found = find(attrs)
           found && found.check_permission_with_acting_user(acting_user, :view_permitted?, :id)
-        rescue Hyperstack::AccessViolation
+        rescue Hyperstack::AccessViolation => e
+          message = []
+          message << Pastel.new.red("\n\nHYPERSTACK Access violation during find_by operation.")
+          message << Pastel.new.red("Access to the found record's id is not permitted. nil will be returned")
+          message << "    #{self.name}.find_by("
+          message << attrs.collect do |attr, value|
+            "      #{attr}: '#{value.inspect.truncate(120, separator: '...')}'"
+          end.join(",\n")
+          message << "    )"
+          message << "\n#{e.details}\n"
+          Hyperstack.on_error('find_by', self, attrs, message.join("\n"))
           nil
         end
       end

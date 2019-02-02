@@ -38,12 +38,6 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     ApplicationController.acting_user = nil
     size_window(:small, :portrait)
     @dummy_cache_item = double("Dummy Cache Item", vector: nil, acting_user: nil)
-    TodoItem.class_eval do
-      # set TodoItem's view_permitted? method back to the normal mechanism for these tests
-      def view_permitted?(attribute)
-        Hyperstack::InternalPolicy.accessible_attributes_for(self, acting_user).include? attribute.to_sym
-      end
-    end
   end
 
   before(:each) do
@@ -438,12 +432,17 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         end
       end
       it 'will control access via relationships' do
+        class TodoItem < ApplicationRecord
+          def view_permitted?(attribute)
+            true
+          end
+        end
+
         todo_item1 = TodoItem.create(user: ApplicationController.acting_user)
         todo_item2 = TodoItem.create(user: nil)
 
         Comment.create(todo_item: todo_item1)
         Comment.create(todo_item: todo_item1)
-
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).comments.count }").to eq(2)
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item2.id}).comments.count }").not_to eq(0)
         expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
@@ -455,6 +454,11 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
       end
       it 'will allow server_methods to control access' do
+        class TodoItem < ApplicationRecord
+          def view_permitted?(attribute)
+            true
+          end
+        end
         todo_item1 = TodoItem.create(user: ApplicationController.acting_user)
         todo_item2 = TodoItem.create(user: User.create(first_name: 'fred'))
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).pow }").to eq('fred')

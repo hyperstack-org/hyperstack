@@ -58,7 +58,11 @@ module ReactiveRecord
 
     isomorphic_method(:find_in_db) do |f, klass, attrs|
       f.send_to_server klass.name, attrs if RUBY_ENGINE == 'opal'
-      f.when_on_server { @server_data_cache[klass, ['find_by', attrs], 'id'] }
+      f.when_on_server do
+        @server_data_cache[
+          klass, 'all', [:___hyperstack_internal_scoped_find_by, attrs], '*0', 'id'
+        ]
+      end
     end
 
     class << self

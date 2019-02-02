@@ -291,9 +291,11 @@ module ReactiveRecord
                         cache_item.value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
                         cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(*method) }, method, method)
                       else
-                        raise "method missing"
+                        raise "Method missing while fetching data: \`#{cache_item.value}##{[*method].first}\` "\
+                        'should either be an attribute or a method defined using the server_method of finder_method macros.'
                       end
                     # rescue Exception => e # this check may no longer be needed as we are quite explicit now on which methods we apply
+                    #   binding.pry
                     #   # ReactiveRecord::Pry::rescued(e)
                     #   #::Rails.logger.debug "\033[0;31;1mERROR: HyperModel exception caught when applying #{method} to db object #{cache_item.value}: #{e}\033[0;30;21m"
                     #   raise e, "HyperModel fetching records failed, exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace

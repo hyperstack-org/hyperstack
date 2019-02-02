@@ -295,6 +295,17 @@ if RUBY_ENGINE != 'opal'
           alias original_public_columns_hash public_columns_hash
         end
       end
+      module Hyperstack
+        def self.on_error(_operation, _err, _params, formatted_error_message)
+          ::Rails.logger.debug(
+            "#{formatted_error_message}\n\n" +
+            Pastel.new.red(
+              'To further investigate you may want to add a debugging '\
+              'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+            )
+          )
+        end
+      end
     end
 
     config.after(:all) do
