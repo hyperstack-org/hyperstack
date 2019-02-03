@@ -332,7 +332,7 @@ module ActiveRecord
       # accessible.
       finder_method :__hyperstack_internal_scoped_find_by do |attrs|
         begin
-          found = find(attrs)
+          found = find_by(attrs)
           found && found.check_permission_with_acting_user(acting_user, :view_permitted?, :id)
         rescue Hyperstack::AccessViolation => e
           message = []
