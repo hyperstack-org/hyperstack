@@ -136,15 +136,7 @@ module ReactiveRecord
     end
 
     def fetch_by_id(*vector)
-      Base.fetch_from_db(
-        [
-          @model,
-          'all',
-          [:___hyperstack_internal_scoped_find_by, { @model.primary_key => id }],
-          '*0',
-          *vector
-        ]
-      )
+      Base.fetch_from_db([@model, *find_by_vector(@model.primary_key => id), *vector])
     end
   end
 end

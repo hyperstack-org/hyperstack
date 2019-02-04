@@ -77,6 +77,10 @@ module ReactiveRecord
       end
     end
 
+    def self.find_by_vector(attrs)
+      [:all, [:___hyperstack_internal_scoped_find_by, attrs], '*0']
+    end
+
     def self.find_by_id(model, id)
       find(model, model.primary_key => id)
     end
@@ -107,7 +111,7 @@ module ReactiveRecord
         end
         # if we don't have a record then create one
         # (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
-        record ||= set_vector_lookup(new(model), [model, [:find_by, attrs]])
+        record ||= set_vector_lookup(new(model), [model, *find_by_vector(attrs)])
         # and set the values
         attrs.each { |attr, value| record.sync_attribute(attr, value) }
       end
@@ -215,7 +219,7 @@ module ReactiveRecord
 
     def initialize_collections
       if (!vector || vector.empty?) && id && id != ''
-        Base.set_vector_lookup(self, [@model, [:find_by, @model.primary_key => id]])
+        Base.set_vector_lookup(self, [@model, *find_by_vector(@model.primary_key => id)])
       end
       Base.load_data do
         @model.reflect_on_all_associations.each do |assoc|

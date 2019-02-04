@@ -26,11 +26,28 @@ module ReactiveRecord
     end
 
     def loading_details
-      "[loading #{vector}]"
+      "[loading #{pretty_vector}]"
     end
 
     def dirty_details
       "[changed id: #{id} #{changes}]"
+    end
+
+    def pretty_vector
+      v = []
+      i = 0
+      while i < vector.length
+        if vector[i] == 'all' && vector[i + 1].is_a?(Array) &&
+           vector[i + 1][0] == '___hyperstack_internal_scoped_find_by' &&
+           vector[i + 2] == '*0'
+          v << ['find_by', vector[i + 1][1]]
+          i += 3
+        else
+          v << vector[i]
+          i += 1
+        end
+      end
+      v
     end
   end
 end
