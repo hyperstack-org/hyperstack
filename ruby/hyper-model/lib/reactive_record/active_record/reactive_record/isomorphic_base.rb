@@ -47,6 +47,15 @@ module ReactiveRecord
       self.class.instance_variable_get(:@records)
     end
 
+    # constructs vector for find_by
+    def self.find_by_vector(attrs)
+      [:all, [:___hyperstack_internal_scoped_find_by, attrs], '*0']
+    end
+
+    def find_by_vector(attrs)
+      self.class.find_by_vector(attrs)
+    end
+
     # Prerendering db access (returns nil if on client):
     # at end of prerendering dumps all accessed records in the footer
 

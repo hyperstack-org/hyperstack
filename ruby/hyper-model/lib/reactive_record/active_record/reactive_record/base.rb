@@ -77,10 +77,6 @@ module ReactiveRecord
       end
     end
 
-    def self.find_by_vector(attrs)
-      [:all, [:___hyperstack_internal_scoped_find_by, attrs], '*0']
-    end
-
     def self.find_by_id(model, id)
       find(model, model.primary_key => id)
     end
