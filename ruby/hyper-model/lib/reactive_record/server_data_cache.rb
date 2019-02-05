@@ -433,7 +433,6 @@ keys:
     if value is a hash
 =end
 
-
       def self.load_from_json(tree, target = nil)
         # have to process *all before any other items
         # we leave the "*all" key in just for debugging purposes, and then skip it below
@@ -441,6 +440,11 @@ keys:
         if sorted_collection = tree["*all"]
           loaded_collection = sorted_collection.collect do |id|
             ReactiveRecord::Base.find_by_id(target.proxy_association.klass, id)
+          end
+          if loaded_collection[0] && target.scope_description&.name == '___hyperstack_internal_scoped_find_by'
+            attrs = target.vector[-1][1]
+            attrs.delete(target.proxy_association.klass.primary_key)
+            loaded_collection[0].backing_record.sync_attributes(attrs)
           end
           target.replace loaded_collection
         end

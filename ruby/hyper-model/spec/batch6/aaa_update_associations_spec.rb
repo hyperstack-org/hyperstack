@@ -151,6 +151,7 @@ RSpec::Steps.steps "updating associations", js: true do
   end
 
   it "and it won't exist after being destroyed" do
+    binding.pry
     expect_promise do
       Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do

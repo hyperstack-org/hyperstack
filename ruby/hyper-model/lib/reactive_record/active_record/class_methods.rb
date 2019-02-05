@@ -65,8 +65,9 @@ module ActiveRecord
     end
 
     def find_by(attrs = {})
+      puts "****** find_by(#{attrs}) ********"
       attrs = __hyperstack_preprocess_attrs(attrs)
-      if (record = ReactiveRecord::Base.find_locally(base_class, attrs))
+      if false && (record = ReactiveRecord::Base.find_locally(base_class, attrs))
         record.set_ar_instance!
       else
         all.find_by(attrs)

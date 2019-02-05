@@ -29,7 +29,8 @@ module ReactiveRecord
       @owner = owner  # can be nil if this is an outer most scope
       @association = association
       @target_klass = target_klass
-      if owner and !owner.id and vector.length <= 1
+      if owner && !owner.id && vector.length <= 1
+        puts "INITIALIZING COLLECTION!!!!"
         @collection = []
       elsif vector.length > 0
         @vector = vector
@@ -56,6 +57,7 @@ module ReactiveRecord
       #   sync_collection_with_parent
       # end
       unless @collection
+        puts "CALLING ALL and initializing zee old collection"
         @collection = []
         if ids = ReactiveRecord::Base.fetch_from_db([*@vector, "*all"])
           ids.each do |id|
@@ -103,7 +105,7 @@ module ReactiveRecord
     end
     # todo move following to a separate module related to scope updates ******************
     attr_reader   :vector
-    attr_writer   :scope_description
+    attr_accessor :scope_description
     attr_writer   :parent
     attr_reader   :pre_sync_related_records
 
@@ -297,10 +299,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
       if @parent.collection
         # puts ">>> @parent.collection present"
         if @parent.collection.empty?
-          # puts ">>>>> @parent.collection is empty!"
+          puts ">>>>> @parent.collection is empty!"
           @collection = []
         elsif filter?
-          # puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
+          puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
           @collection = filter_records(@parent.collection) # .tap { |rr| puts "returns #{rr} #{rr.to_a}" }
         end
       elsif !@linked && @parent._count_internal(false).zero?
@@ -496,6 +498,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       end
 
       @collection.dup.each { |item| delete(item) } if @collection  # this line is a big nop I think
+      puts "INTERNAL REPLACE"
       @collection = []
       if new_array.is_a? Collection
         @dummy_collection = new_array.dummy_collection
@@ -540,7 +543,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def loaded?
-      @collection && (!@dummy_collection || !@dummy_collection.loading?)
+      false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
     end
 
     def empty?
@@ -551,13 +554,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
+      puts "find_by(#{attrs}) loaded? #{!!loaded?}"
       if loaded?
+        puts "loaded? really? #{@owner} #{@owner&.id} #{@vector} #{@vector.length}"
         @collection.detect do |r|
           !attrs.detect { |attr, value| r.attributes[attr] != value }
         end
       else
         __hyperstack_internal_scoped_find_by(attrs).tap do |r|
-          attrs.each { |attr, value| r.backing_record.sync_attribute(attr, value) } if r
+          r.backing_record.sync_attributes(attrs) if r
         end
       end
     end

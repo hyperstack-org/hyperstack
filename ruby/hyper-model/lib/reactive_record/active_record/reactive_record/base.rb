@@ -106,10 +106,8 @@ module ReactiveRecord
           attrs = attrs.merge primary_key => id
         end
         # if we don't have a record then create one
-        # (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
         record ||= set_vector_lookup(new(model), [model, *find_by_vector(attrs)])
-        # and set the values
-        attrs.each { |attr, value| record.sync_attribute(attr, value) }
+        record.sync_attributes(attrs)
       end
       # finally initialize and return the ar_instance
       record.set_ar_instance!
@@ -126,7 +124,6 @@ module ReactiveRecord
       # record = @records[model].detect { |record| record.vector == vector }
       record = lookup_by_vector(vector)
       unless record
-
         record = new model
         set_vector_lookup(record, vector)
       end
@@ -255,8 +252,11 @@ module ReactiveRecord
       @synced_with_unscoped = !@synced_with_unscoped
     end
 
-    def sync_attribute(attribute, value)
+    def sync_attributes(attrs)
+      attrs.each { |attr, value| sync_attribute(attr, value) }
+    end
 
+    def sync_attribute(attribute, value)
       @synced_attributes[attribute] = @attributes[attribute] = value
       Base.set_id_lookup(self) if attribute == primary_key
 
