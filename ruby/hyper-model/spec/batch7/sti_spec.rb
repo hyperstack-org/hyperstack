@@ -135,7 +135,6 @@ RSpec::Steps.steps "class inheritance", js: true do
 
   it "will return the correct class when finding the record" do
     Sti::NoSyncSubClass1.create(data: 'record 2')
-    binding.pry
     expect(evaluate_ruby("Sti::Base.find_by_data('record 2').itself.class")).to eq('Sti::Base')
     expect_promise do
       ReactiveRecord.load { Sti::Base.find_by_data("record 2").itself.class }
