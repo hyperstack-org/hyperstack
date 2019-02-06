@@ -49,8 +49,7 @@ describe "Hyperstack.on_error (for fetches) ", js: true do
     todo_item = TodoItem.create(user: nil, title: 'secret')
     expect(Hyperstack).to receive(:on_error).at_least(:once)
     .with('find_by', kind_of(ActiveRecord::Relation), kind_of(Hash), kind_of(String))
-    expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item.id}).title }")
-      .not_to eq('secret')
+    expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item.id}) }").to be_nil
   end
 
   it 'call Hyperstack.on_error for access violations on other operations' do
