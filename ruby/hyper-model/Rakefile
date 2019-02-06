@@ -1,20 +1,33 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 
+def run_batches(batches)
+  failed = false
+  batches.each do |batch|
+    begin
+      Rake::Task["spec:batch#{batch}"].invoke
+    rescue SystemExit
+      failed = true
+    end
+  end
+  exit 1 if failed
+end
+
+
 task :part1 do
-  (1..2).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+  run_batches(1..2)
 end
 
 task :part2 do
-  (3..4).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+  run_batches(3..4)
 end
 
 task :part3 do
-  (5..7).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+  run_batches(5..7)
 end
 
 task :spec do
-  (1..7).each { |batch| Rake::Task["spec:batch#{batch}"].invoke rescue nil }
+  run_batches(1..7)
 end
 
 namespace :spec do
@@ -23,7 +36,6 @@ namespace :spec do
   end
   (1..7).each do |batch|
     RSpec::Core::RakeTask.new(:"batch#{batch}") do |t|
-      t.fail_on_error = false unless batch == 7
       t.pattern = "spec/batch#{batch}/**/*_spec.rb"
     end
   end
