@@ -144,9 +144,11 @@ module ActiveRecord
       @backing_record.destroyed
     end
 
-    def new?
+    def new_record?
       @backing_record.new?
     end
+
+    alias new? new_record?
 
     def errors
       Hyperstack::Internal::State::Variable.get(@backing_record, @backing_record)

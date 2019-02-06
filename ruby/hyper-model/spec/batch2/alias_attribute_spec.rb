@@ -58,6 +58,7 @@ RSpec::Steps.steps 'alias_attribute', js: true do
   end
 
   it "works with find_by without fetching from the DB" do
+    binding.pry
     expect_evaluate_ruby do
       User.find_by(first_name: 'M.', last_name: 'Pantel').id
     end.to eq(@user.id)

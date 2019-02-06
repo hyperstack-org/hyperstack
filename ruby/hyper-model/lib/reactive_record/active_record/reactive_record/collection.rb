@@ -553,12 +553,26 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
+      # r = @collection&.detect { |lr| lr.new_record? && !attrs.detect { |k, v| lr.attributes[k] != v } }
+      # return r if r
       (r = __hyperstack_internal_scoped_find_by(attrs)) || return
       r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
 
     def find(id)
       find_by @target_klass.primary_key => id
+    end
+
+    def _find_by_initializer(scope, attrs)
+      found =
+        if scope.is_a? Collection
+          scope.parent.collection&.detect { |lr| !attrs.detect { |k, v| lr.attributes[k] != v } }
+        else
+          ReactiveRecord::Base.find_locally(@target_klass, attrs)&.ar_instance
+        end
+      return first unless found
+      @collection = [found]
+      found
     end
 
     def method_missing(method, *args, &block)
@@ -593,7 +607,6 @@ To determine this sync_scopes first asks if the record being changed is in the s
       Hyperstack::Internal::State::Variable.set(self, "collection", collection) unless ReactiveRecord::Base.data_loading?
       value
     end
-
   end
 
 end

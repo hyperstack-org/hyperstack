@@ -65,6 +65,8 @@ module ActiveRecord
 
     def find_by(attrs = {})
       attrs = __hyperstack_preprocess_attrs(attrs)
+      # r = ReactiveRecord::Base.find_locally(self, attrs, new_only: true)
+      # return r.ar_instance if r
       (r = __hyperstack_internal_scoped_find_by(attrs)) || return
       r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
@@ -255,7 +257,12 @@ module ActiveRecord
       ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
       [name, "#{name}!"].each do |method|
         singleton_class.send(:define_method, method) do |*vargs|
-          all.apply_scope("_#{method}", *vargs).first
+          collection = all.apply_scope("_#{method}", *vargs)
+          if !collection.collection && name == '__hyperstack_internal_scoped_find_by'
+            collection._find_by_initializer(self, *vargs)
+          else
+            collection.first
+          end
         end
       end
     end

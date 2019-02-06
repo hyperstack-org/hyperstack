@@ -137,11 +137,12 @@ RSpec::Steps.steps "has_many through relationships", js: true do
   it "can add to existing relationships on the client" do
     evaluate_ruby do
       Appointment.create(
-        appointment_date: Time.now+1.day,
+        appointment_date: Time.at(Time.now.to_i)+1.day,
         physician: Physician.find_by_name('Stop'),
         patient: Patient.find_by_name('B. Legg')
       )
     end
+    binding.pry
     page.should have_content("Dr. Stop has a total of 2 appointments with: H. Chrondriac, B. Legg")
     page.should have_content("Dr. Faith has no appointments.")
     page.should have_content("Dr. Quack has no appointments.")

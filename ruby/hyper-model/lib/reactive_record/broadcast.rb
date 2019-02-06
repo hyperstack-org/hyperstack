@@ -145,11 +145,6 @@ module ReactiveRecord
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
       @previous_changes = record.changes
-      # attributes = record.attributes
-      # data.each do |k, v|
-      #   next if klass.reflect_on_association(k) || attributes[k] == v
-      #   @previous_changes[k] = [attributes[k], v]
-      # end
       self
     end
 

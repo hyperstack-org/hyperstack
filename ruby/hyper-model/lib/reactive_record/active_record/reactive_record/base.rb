@@ -67,12 +67,13 @@ module ReactiveRecord
       load_data { ServerDataCache.load_from_json(json, target) }
     end
 
-    def self.find_locally(model, attrs)
+    def self.find_locally(model, attrs, new_only: nil)
       if (id_to_find = attrs[model.primary_key])
-        lookup_by_id(model, id_to_find)
+        !new_only && lookup_by_id(model, id_to_find)
       else
         @records[model].detect do |r|
-          !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
+          (r.new? || !new_only) &&
+            !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
         end
       end
     end

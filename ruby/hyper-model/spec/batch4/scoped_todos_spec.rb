@@ -56,7 +56,7 @@ describe "example scopes", js: true do
     expect(Todo.with_managers_comments).to match_array [todo]
     expect(Comment.by_manager).to match_array [comment]
   end
-
+# FAILS
   it "a complex client side scope" do
 
     mount "TestComponent3" do
