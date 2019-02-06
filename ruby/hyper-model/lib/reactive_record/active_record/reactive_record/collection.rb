@@ -553,15 +553,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
-      if loaded?
-        @collection.detect do |r|
-          !attrs.detect { |attr, value| r.attributes[attr] != value }
-        end
-      else
-        __hyperstack_internal_scoped_find_by(attrs).tap do |r|
-          r.backing_record.sync_attributes(attrs) if r
-        end
-      end
+      (r = __hyperstack_internal_scoped_find_by(attrs)) || return
+      r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
 
     def find(id)

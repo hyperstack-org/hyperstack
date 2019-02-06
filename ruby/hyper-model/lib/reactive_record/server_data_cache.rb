@@ -380,6 +380,8 @@ module ReactiveRecord
               if method == "*"
                 if @value.is_a? Array  # this happens when a scope is empty there is test case, but
                   @parent.as_hash({})  # does it work for all edge cases?
+                elsif (@value.class < ActiveRecord::Base) && children.is_a?(Hash)
+                  @parent.as_hash({@value.id => merge_inheritance_column(children)})
                 else
                   @parent.as_hash({@value.id => children})
                 end

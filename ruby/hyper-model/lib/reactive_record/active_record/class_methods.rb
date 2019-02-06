@@ -61,18 +61,12 @@ module ActiveRecord
 
     def find(id)
       find_by(primary_key => id)
-      #ReactiveRecord::Base.find(self, primary_key => id)
     end
 
     def find_by(attrs = {})
       attrs = __hyperstack_preprocess_attrs(attrs)
-      if false && (record = ReactiveRecord::Base.find_locally(base_class, attrs))
-        record.set_ar_instance!
-      else
-        __hyperstack_internal_scoped_find_by(attrs).tap do |r|
-          r.backing_record.sync_attributes(attrs) if r
-        end
-      end
+      (r = __hyperstack_internal_scoped_find_by(attrs)) || return
+      r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
 
     def enum(*args)

@@ -254,6 +254,7 @@ module ReactiveRecord
 
     def sync_attributes(attrs)
       attrs.each { |attr, value| sync_attribute(attr, value) }
+      self
     end
 
     def sync_attribute(attribute, value)
