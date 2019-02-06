@@ -8,8 +8,8 @@ module ActiveRecord
     scope :offset, ->() {}
 
     finder_method :__hyperstack_internal_scoped_find_by
-    def self.___hyperstack_internal_scoped_find_by(attrs)
-      attrs.is_a?(Hash) ? find_by(attrs) : find(attrs)
-    end
+    # def self.___hyperstack_internal_scoped_find_by(attrs)
+    #   attrs.is_a?(Hash) ? find_by(attrs) : find(attrs)
+    # end
   end
 end

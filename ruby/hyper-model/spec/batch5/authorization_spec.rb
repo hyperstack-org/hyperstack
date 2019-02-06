@@ -115,6 +115,7 @@ describe "authorization integration", js: true do
     model1 = FactoryBot.create(:test_model, test_attribute: "hello")
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})
+    wait_for_ajax
     ApplicationController.acting_user = User.new(name: "fred")
     page.evaluate_ruby('Hyperstack.connect("TestApplication")')
     wait_for_ajax
@@ -142,6 +143,7 @@ describe "authorization integration", js: true do
     m1_attr_cl2[:completed].should eq(true)
     m1_attr_cl2[:created_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.created_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
     m1_attr_cl2[:updated_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.updated_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
+    binding.pry
   end
 
   it "will fail on illegal class connections" do

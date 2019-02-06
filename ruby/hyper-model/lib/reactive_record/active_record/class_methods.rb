@@ -65,12 +65,13 @@ module ActiveRecord
     end
 
     def find_by(attrs = {})
-      puts "****** find_by(#{attrs}) ********"
       attrs = __hyperstack_preprocess_attrs(attrs)
       if false && (record = ReactiveRecord::Base.find_locally(base_class, attrs))
         record.set_ar_instance!
       else
-        all.find_by(attrs)
+        __hyperstack_internal_scoped_find_by(attrs).tap do |r|
+          r.backing_record.sync_attributes(attrs) if r
+        end
       end
     end
 
@@ -248,10 +249,6 @@ module ActiveRecord
         defining_class_is_base_class || !ic || self[ic] == defining_model_name
       end
     end
-
-    # def all=(_collection)
-    #   raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
-    # end
 
     def unscoped
       ReactiveRecord::Base.unscoped[self] ||=

@@ -30,7 +30,6 @@ module ReactiveRecord
       @association = association
       @target_klass = target_klass
       if owner && !owner.id && vector.length <= 1
-        puts "INITIALIZING COLLECTION!!!!"
         @collection = []
       elsif vector.length > 0
         @vector = vector
@@ -57,7 +56,6 @@ module ReactiveRecord
       #   sync_collection_with_parent
       # end
       unless @collection
-        puts "CALLING ALL and initializing zee old collection"
         @collection = []
         if ids = ReactiveRecord::Base.fetch_from_db([*@vector, "*all"])
           ids.each do |id|
@@ -65,6 +63,8 @@ module ReactiveRecord
           end
         else
           @dummy_collection = ReactiveRecord::Base.load_from_db(nil, *@vector, "*all")
+          # this calls back to all now that the collection is initialized,
+          # so it has the side effect of creating a dummy value in collection[0]
           @dummy_record = self[0]
         end
       end
@@ -299,10 +299,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
       if @parent.collection
         # puts ">>> @parent.collection present"
         if @parent.collection.empty?
-          puts ">>>>> @parent.collection is empty!"
+          # puts ">>>>> @parent.collection is empty!"
           @collection = []
         elsif filter?
-          puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
+          # puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
           @collection = filter_records(@parent.collection) # .tap { |rr| puts "returns #{rr} #{rr.to_a}" }
         end
       elsif !@linked && @parent._count_internal(false).zero?
@@ -498,7 +498,6 @@ To determine this sync_scopes first asks if the record being changed is in the s
       end
 
       @collection.dup.each { |item| delete(item) } if @collection  # this line is a big nop I think
-      puts "INTERNAL REPLACE"
       @collection = []
       if new_array.is_a? Collection
         @dummy_collection = new_array.dummy_collection
@@ -554,9 +553,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
-      puts "find_by(#{attrs}) loaded? #{!!loaded?}"
       if loaded?
-        puts "loaded? really? #{@owner} #{@owner&.id} #{@vector} #{@vector.length}"
         @collection.detect do |r|
           !attrs.detect { |attr, value| r.attributes[attr] != value }
         end

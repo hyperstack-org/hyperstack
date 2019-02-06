@@ -442,8 +442,8 @@ keys:
             ReactiveRecord::Base.find_by_id(target.proxy_association.klass, id)
           end
           if loaded_collection[0] && target.scope_description&.name == '___hyperstack_internal_scoped_find_by'
-            attrs = target.vector[-1][1]
-            attrs.delete(target.proxy_association.klass.primary_key)
+            primary_key = target.proxy_association.klass.primary_key
+            attrs = target.vector[-1][1].reject { |key, _| key == primary_key }
             loaded_collection[0].backing_record.sync_attributes(attrs)
           end
           target.replace loaded_collection
