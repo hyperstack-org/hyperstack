@@ -142,7 +142,6 @@ RSpec::Steps.steps "has_many through relationships", js: true do
         patient: Patient.find_by_name('B. Legg')
       )
     end
-    binding.pry
     page.should have_content("Dr. Stop has a total of 2 appointments with: H. Chrondriac, B. Legg")
     page.should have_content("Dr. Faith has no appointments.")
     page.should have_content("Dr. Quack has no appointments.")
