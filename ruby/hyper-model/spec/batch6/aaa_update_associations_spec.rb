@@ -154,7 +154,7 @@ RSpec::Steps.steps "updating associations", js: true do
     expect_promise do
       Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
-        TodoItem.find_by_title("Jon's first todo!").id
+        TodoItem.find_by_title("Jon's first todo!")
       end
     end.to be_nil
   end

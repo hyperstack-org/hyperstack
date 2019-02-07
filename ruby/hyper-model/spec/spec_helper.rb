@@ -267,9 +267,9 @@ if RUBY_ENGINE != 'opal'
       size_window
     end
 
-    # config.before(:each) do
-    #   DatabaseCleaner.start
-    # end
+    config.before(:each) do
+      DatabaseCleaner.start
+    end
 
     config.after(:each) do |example|
       # I am assuming the unless was there just to aid in debug when using pry.rescue

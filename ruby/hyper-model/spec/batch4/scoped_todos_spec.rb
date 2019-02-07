@@ -57,7 +57,7 @@ describe "example scopes", js: true do
     expect(Comment.by_manager).to match_array [comment]
   end
 # FAILS
-  it "a complex client side scope", skip: 'currently failing' do
+  it "a complex client side scope", skip: 'failing' do
 
     mount "TestComponent3" do
       class UserTodos < HyperComponent
@@ -139,6 +139,7 @@ describe "example scopes", js: true do
     user1.assigned_todos << FactoryBot.create(:todo, title: 'frank todo 2')
     user2.assigned_todos << FactoryBot.create(:todo, title: 'bob todo 1')
     user2.assigned_todos << FactoryBot.create(:todo, title: 'bob todo 2')
+    binding.pry
     user1.commentz << FactoryBot.create(:comment, comment: "frank made this comment", todoz: user2.assigned_todos.first)
     user2.commentz << FactoryBot.create(:comment, comment: "bob made this comment", todoz: user1.assigned_todos.first)
     # evaluate_ruby do
