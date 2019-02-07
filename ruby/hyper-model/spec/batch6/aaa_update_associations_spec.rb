@@ -151,7 +151,7 @@ RSpec::Steps.steps "updating associations", js: true do
   end
 
   it "and it won't exist after being destroyed" do
-]    expect_promise do
+    expect_promise do
       Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
         TodoItem.find_by_title("Jon's first todo!").id
