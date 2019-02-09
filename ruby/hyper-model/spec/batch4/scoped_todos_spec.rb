@@ -57,7 +57,7 @@ describe "example scopes", js: true do
     expect(Comment.by_manager).to match_array [comment]
   end
 # FAILS
-  it "a complex client side scope", skip: 'failing' do
+  it "a complex client side scope" do
 
     mount "TestComponent3" do
       class UserTodos < HyperComponent
@@ -134,12 +134,10 @@ describe "example scopes", js: true do
     mgr   = FactoryBot.create(:user, role: :manager, first_name: :sally)
     #pause "frank, bob, and sally added"
     wait_for_ajax
-    binding.pry
     user1.assigned_todos << FactoryBot.create(:todo, title: 'frank todo 1')
     user1.assigned_todos << FactoryBot.create(:todo, title: 'frank todo 2')
     user2.assigned_todos << FactoryBot.create(:todo, title: 'bob todo 1')
     user2.assigned_todos << FactoryBot.create(:todo, title: 'bob todo 2')
-    binding.pry
     user1.commentz << FactoryBot.create(:comment, comment: "frank made this comment", todoz: user2.assigned_todos.first)
     user2.commentz << FactoryBot.create(:comment, comment: "bob made this comment", todoz: user1.assigned_todos.first)
     # evaluate_ruby do
@@ -154,9 +152,8 @@ describe "example scopes", js: true do
     #     break_on_exit?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
     #   end
     # end
-pause "frank and bob add some comments"
+
     mgr.commentz << FactoryBot.create(:comment, comment: "Me BOSS", todoz: user1.assigned_todos.last)
-pause "mgr comments on franks last todo"
     page.should have_content('MANAGER SAYS: The Boss Speaks')
     page.should have_content('BOSS SAYS: The Boss Speaks')
     wait_for_ajax

@@ -233,16 +233,22 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @live_scopes ||= Set.new
     end
 
+    def in_this_collection(related_records)
+      return related_records unless @association
+      related_records.select do |r|
+        r.backing_record.attributes[@association.inverse_of] == @owner
+      end
+    end
+
     def set_pre_sync_related_records(related_records, _record = nil)
-      #related_records = related_records.intersection([*@collection]) <- deleting this works
-      @pre_sync_related_records = related_records #in_this_collection related_records <- not sure if this works
+      @pre_sync_related_records = in_this_collection(related_records)
       live_scopes.each { |scope| scope.set_pre_sync_related_records(@pre_sync_related_records) }
     end
 
     # NOTE sync_scopes is overridden in scope_description.rb
     def sync_scopes(related_records, record, filtering = true)
       #related_records = related_records.intersection([*@collection])
-      #related_records = in_this_collection related_records
+      related_records = in_this_collection(related_records) if filtering
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
       notify_of_change unless related_records.empty?
     ensure

@@ -35,9 +35,7 @@ module ReactiveRecord
       if collector?
         update_collector_scope(related_records)
       else
-        # puts "#{self}.update_collection calling filter_records(#{related_records})"
         related_records = filter_records(related_records)
-        # puts "returns #{related_records}"
         update_filter_scope(@pre_sync_related_records, related_records)
       end
     end
@@ -46,7 +44,6 @@ module ReactiveRecord
       current = Set.new([*@collection])
       (related_records - @pre_sync_related_records).each { |r| current << r }
       (@pre_sync_related_records - related_records).each { |r| current.delete(r) }
-      puts "#{self}.update_collector_scope calling replace(filter_records(#{current}))"
       replace(filter_records(current).tap { |rr| puts "returns #{rr}" })
       Set.new([*@collection])
     end
