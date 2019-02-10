@@ -177,6 +177,7 @@ module ReactiveRecord
         @ar_instance.instance_variable_set(:@backing_record, existing_record)
         existing_record.attributes.merge!(attributes) { |key, v1, v2| v1 }
       end
+      @id = value
       value
     end
 
@@ -282,6 +283,14 @@ module ReactiveRecord
     # if a record has local changes that are out of sync.
     def self.exists?(model, id)
       Base.lookup_by_id(model, id)
+    end
+
+    def id_loaded?
+      @id
+    end
+
+    def loaded_id=(id)
+      @id = id
     end
 
     def revert

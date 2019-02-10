@@ -258,11 +258,7 @@ module ActiveRecord
       [name, "#{name}!"].each do |method|
         singleton_class.send(:define_method, method) do |*vargs|
           collection = all.apply_scope("_#{method}", *vargs)
-          if !collection.collection && name == '__hyperstack_internal_scoped_find_by'
-            collection._find_by_initializer(self, *vargs)
-          else
-            collection.first
-          end
+          collection.first
         end
       end
     end

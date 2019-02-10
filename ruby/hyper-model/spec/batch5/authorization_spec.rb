@@ -127,10 +127,6 @@ describe "authorization integration", js: true do
     # make sure time zone doesn't matter, as it is about time in space
     # we get only seconds precision, millisecs are dropped in AR adapters here, but they are in the db with pg
     # compare only with seconds precision
-
-    # TestModel.find(1) will still be nil, until we load it again.  This may be fixed if we
-    # do some client side optimization of the find_by scope
-    expect_promise("Hyperstack::Model.load { TestModel.find(#{model1.id}) }").not_to be_nil
     m1_attr_cl1 = model1.attributes_on_client(page)
     m1_attr_cl1[:id].should eq(1)
     m1_attr_cl1[:created_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.created_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
@@ -157,6 +153,7 @@ describe "authorization integration", js: true do
     model1.update_attribute(:test_attribute, 'george')
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})
+    expect_promise('Hyperstack::Model.load { TestModel.find_by_test_attribute("hello") }').to be_nil
   end
 
   it "will fail on illegal instance connections" do

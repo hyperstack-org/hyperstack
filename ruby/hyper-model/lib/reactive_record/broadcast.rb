@@ -157,7 +157,11 @@ module ReactiveRecord
       @previous_changes.merge! params.previous_changes
       ReactiveRecord::Base.when_not_saving(klass) do
         @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
-        @is_new = params.operation == :create && !@backing_record
+        # as a result of issue 117 this changed from params.operation == :create && !@backing_record
+        # to just @backing_record.id_loaded.  I.e. we ignore whether the record is being created or
+        # not, and just check and see if in our local copy we have ever loaded this id before.
+        @is_new = !@backing_record || !@backing_record.id_loaded?
+        @backing_record&.loaded_id = params.record[:id]
         yield complete! if @channels == @received
       end
     end

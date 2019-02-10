@@ -224,7 +224,6 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def filter_records(related_records)
-      # possibly we should never get here???
       scope_args = @vector.last.is_a?(Array) ? @vector.last[1..-1] : []
       @scope_description.filter_records(related_records, scope_args)
     end

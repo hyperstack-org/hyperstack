@@ -56,7 +56,7 @@ describe "example scopes", js: true do
     expect(Todo.with_managers_comments).to match_array [todo]
     expect(Comment.by_manager).to match_array [comment]
   end
-# FAILS
+
   it "a complex client side scope" do
 
     mount "TestComponent3" do
@@ -98,10 +98,6 @@ describe "example scopes", js: true do
             UserTodos {}
             ManagerComments {}
           end; end; end; end
-    # evaluate_ruby do
-    #   ReactiveRecord::Collection.hypertrace instrument: :all
-    #   UserTodos.hypertrace instrument: :all
-    # end
     starting_fetch_time = evaluate_ruby("ReactiveRecord::Base.current_fetch_id")
     # pause "about to add the boss"
     boss = FactoryBot.create(:user, first_name: :boss)
@@ -120,9 +116,6 @@ describe "example scopes", js: true do
     fred.assigned_todos << FactoryBot.create(:todo, title: 'fred todo')
     # pause "added another todo to fred" # HAPPENS AFTER HERE.....
     evaluate_ruby do
-      #   ReactiveRecord::Collection.hypertrace instrument: :all
-      #   UserTodos.hypertrace instrument: :all
-
       mitch = User.new(first_name: :mitch)
       mitch.assigned_todos << Todo.new(title: 'mitch todo')
       mitch.save
@@ -140,19 +133,7 @@ describe "example scopes", js: true do
     user2.assigned_todos << FactoryBot.create(:todo, title: 'bob todo 2')
     user1.commentz << FactoryBot.create(:comment, comment: "frank made this comment", todoz: user2.assigned_todos.first)
     user2.commentz << FactoryBot.create(:comment, comment: "bob made this comment", todoz: user1.assigned_todos.first)
-    # evaluate_ruby do
-    #   Hyperstack::IncomingBroadcast.hypertrace do
-    #     break_on_exit?(:merge_current_values) { Todo.find(5).comments.last.todo.nil? rescue nil }
-    #   end
-    #   ReactiveRecord::ScopeDescription.hypertrace do
-    #     break_on_enter?(:filter_records) { Todo.find(5).comments.last.todo.nil? rescue nil }
-    #   end
-    #   ReactiveRecord::Collection.hypertrace do
-    #     break_on_enter?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
-    #     break_on_exit?(:all) { Todo.find(5).comments.last.todo.nil? rescue nil }
-    #   end
-    # end
-
+    
     mgr.commentz << FactoryBot.create(:comment, comment: "Me BOSS", todoz: user1.assigned_todos.last)
     page.should have_content('MANAGER SAYS: The Boss Speaks')
     page.should have_content('BOSS SAYS: The Boss Speaks')
