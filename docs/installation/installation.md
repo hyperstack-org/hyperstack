@@ -2,6 +2,8 @@
 
 **Work in progress - ALPHA (docs and code)**
 
+### Current installation documenation is found in ./install/readme.md this file is outdated and should be removed.
+
 This template will create a new Rails app with Webpacker from Hyperstack edge branch
 
 ## Usage
