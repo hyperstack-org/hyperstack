@@ -160,8 +160,10 @@ module ReactiveRecord
         # as a result of issue 117 this changed from params.operation == :create && !@backing_record
         # to just @backing_record.id_loaded.  I.e. we ignore whether the record is being created or
         # not, and just check and see if in our local copy we have ever loaded this id before.
-        @is_new = !@backing_record || !@backing_record.id_loaded?
+        # HOWEVER if the record is being destroyed, then it can't be new regardless
+        @is_new = !@destroyed && (!@backing_record || !@backing_record.id_loaded?)
         @backing_record&.loaded_id = params.record[:id]
+        puts "receiving.  operation: #{params.operation} @backing_record: #{@backing_record&.inspect} loaded_id: #{@backing_record&.id_loaded?} @is_new: #{@is_new}"
         yield complete! if @channels == @received
       end
     end

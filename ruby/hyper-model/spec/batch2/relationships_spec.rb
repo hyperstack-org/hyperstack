@@ -120,7 +120,7 @@ describe "synchronizing relationships", js: true do
     evaluate_ruby("TestComponent2.add_child")
     page.should have_content("parent has 3 children")
   end
-  
+
   it "preserves the order of children" do
     isomorphic do
       ChildModel.class_eval do

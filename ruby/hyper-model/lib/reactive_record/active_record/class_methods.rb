@@ -351,6 +351,7 @@ module ActiveRecord
     def _react_param_conversion(param, opt = nil)
       param = Native(param)
       param = JSON.from_object(param.to_n) if param.is_a? Native::Object
+      puts "_react_param_conversion(#{param}) param[primary_key] : #{param[primary_key]}"
       result =
         if param.is_a? self
           param
@@ -364,8 +365,10 @@ module ActiveRecord
             # TODO: changed values as changes while just updating the synced values.
             target =
               if param[primary_key]
-                ReactiveRecord::Base.find(self, primary_key => param[primary_key])
-                #find(param[primary_key])
+                ReactiveRecord::Base.find(self, primary_key => param[primary_key]).tap do |r|
+                  puts "setting id "
+                  r.backing_record.loaded_id = param[primary_key]
+                end
               else
                 new
               end

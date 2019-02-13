@@ -316,13 +316,19 @@ module ActiveRecord
         regulate_scope(scope) {}
       end
 
-        def __secure_remote_access_to_find(_self, _acting_user, *args)
-          find(*args)
-        end
+      def __secure_remote_access_to_find(_self, _acting_user, *args)
+        find(*args)
+      end
 
-        def __secure_remote_access_to_find_by(_self, _acting_user, *args)
-          find_by(*args)
-        end
+      def __secure_remote_access_to_find_by(_self, _acting_user, *args)
+        find_by(*args)
+      end
+
+      finder_method :__hyperstack_internal_scoped_last do
+        last
+      end
+
+      scope :__hyperstack_internal_scoped_last_n, ->(n) { last(n) }
 
       # implements find_by inside of scopes.  For security reasons return nil
       # if we cannot view at least the id of found record.  Otherwise a hacker

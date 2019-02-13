@@ -55,9 +55,11 @@ module ReactiveRecord
       # unless false && @collection # this fixes https://github.com/hyperstack-org/hyperstack/issues/82 in very limited cases, and breaks otherthings
       #   sync_collection_with_parent
       # end
+      puts "#{inspect}.all [#{@collection}] collection.count: #{@collection&.count}"
       unless @collection
+        puts "no collection"
         @collection = []
-        if ids = ReactiveRecord::Base.fetch_from_db([*@vector, "*all"])
+        if (ids = ReactiveRecord::Base.fetch_from_db([*@vector, "*all"]))
           ids.each do |id|
             @collection << ReactiveRecord::Base.find_by_id(@target_klass, id)
           end
@@ -66,6 +68,7 @@ module ReactiveRecord
           # this calls back to all now that the collection is initialized,
           # so it has the side effect of creating a dummy value in collection[0]
           @dummy_record = self[0]
+          puts "set the dummy record to self[0] = #{self[0]}"
         end
       end
       @collection
@@ -146,11 +149,13 @@ To determine this sync_scopes first asks if the record being changed is in the s
         # to refresh all related scopes
         Hyperstack::Internal::State::Mapper.bulk_update do
           record = broadcast.record_with_current_values
+          puts "1: ---- syncing scopes with #{record.inspect} with current values.  new? #{!!broadcast.new?}"
           apply_to_all_collections(
             :set_pre_sync_related_records,
             record, broadcast.new?
           ) if record
           record = broadcast.record_with_new_values
+          puts "2: ---- syncing scopes with #{record.inspect} with new values.  destroyed? #{!!broadcast.destroyed?}"
           apply_to_all_collections(
             :sync_scopes,
             record, record.destroyed?
@@ -248,6 +253,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
     def sync_scopes(related_records, record, filtering = true)
       #related_records = related_records.intersection([*@collection])
       related_records = in_this_collection(related_records) if filtering
+      puts "#{inspect}.related_records(#{related_records.to_a}, #{record.inspect}, #{filtering})"
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
       notify_of_change unless related_records.empty?
     ensure
@@ -307,8 +313,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
           # puts ">>>>> @parent.collection is empty!"
           @collection = []
         elsif filter?
-          # puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
-          @collection = filter_records(@parent.collection) # .tap { |rr| puts "returns #{rr} #{rr.to_a}" }
+          puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
+          @collection = filter_records(@parent.collection).to_a.tap { |a| puts "returns [#{a.join(",")}] (a.count = #{a.count})"}
         end
       elsif !@linked && @parent._count_internal(false).zero?
         # don't check _count_internal if already linked as this cause an unnecessary rendering cycle
@@ -470,13 +476,29 @@ To determine this sync_scopes first asks if the record being changed is in the s
       notify_of_change self
     end
 
-    [:first, :last].each do |method|
-      define_method method do |*args|
-        if args.count == 0
-          all.send(method)
-        else
-          apply_scope(method, *args)
-        end
+    # [:first, :last].each do |method|
+    #   define_method method do |*args|
+    #     if args.count == 0
+    #       all.send(method)
+    #     else
+    #       apply_scope(method, *args)
+    #     end
+    #   end
+    # end
+
+    def first(n=nil)
+      if n
+        apply_scope(:first, n)
+      else
+        self[0]
+      end
+    end
+
+    def last(n = nil)
+      if n
+        apply_scope(:__hyperstack_internal_scoped_last_n, n)
+      else
+        __hyperstack_internal_scoped_last
       end
     end
 
@@ -569,12 +591,17 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def _find_by_initializer(scope, attrs)
+      puts "#{inspect}._find_by_initializer(scope, #{attrs})"
       found =
         if scope.is_a? Collection
+          puts "scope is a collection"
           scope.parent.collection&.detect { |lr| !attrs.detect { |k, v| lr.attributes[k] != v } }
         else
+          puts "going to lookup locally"
           ReactiveRecord::Base.find_locally(@target_klass, attrs)&.ar_instance
         end
+      puts "found = #{found.inspect}"
+      puts "first = #{first}" unless found
       return first unless found
       @collection = [found]
       found

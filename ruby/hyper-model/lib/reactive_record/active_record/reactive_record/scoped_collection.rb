@@ -44,7 +44,7 @@ module ReactiveRecord
       current = Set.new([*@collection])
       (related_records - @pre_sync_related_records).each { |r| current << r }
       (@pre_sync_related_records - related_records).each { |r| current.delete(r) }
-      replace(filter_records(current).tap { |rr| puts "returns #{rr}" })
+      replace(filter_records(current))
       Set.new([*@collection])
     end
 
