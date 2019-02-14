@@ -7,12 +7,12 @@ module ActiveRecord
     scope :limit, ->() {}
     scope :offset, ->() {}
 
+    finder_method :__hyperstack_internal_scoped_last
+    scope :__hyperstack_internal_scoped_last_n, ->(n) { last(n) }
+
     ReactiveRecord::ScopeDescription.new(
       self, :___hyperstack_internal_scoped_find_by,
-      client: ->(attrs) {
-        puts "evaluating find_by(#{attrs}) with #{inspect} #{attributes}"
-        (!attrs.detect { |attr, value| attributes[attr] != value }).tap { |result| puts "returning #{!!result}"}
-      }
+      client: ->(attrs) { !attrs.detect { |attr, value| attributes[attr] != value } }
     )
 
     def self.__hyperstack_internal_scoped_find_by(attrs)

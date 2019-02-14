@@ -308,7 +308,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
           @collection = []
         elsif filter?
           # puts "#{self}.sync_collection_with_parent (@parent = #{@parent}) calling filter records on (#{@parent.collection})"
-          @collection = filter_records(@parent.collection) # .tap { |rr| puts "returns #{rr} #{rr.to_a}" }
+          @collection = filter_records(@parent.collection).to_a
         end
       elsif !@linked && @parent._count_internal(false).zero?
         # don't check _count_internal if already linked as this cause an unnecessary rendering cycle
@@ -470,13 +470,29 @@ To determine this sync_scopes first asks if the record being changed is in the s
       notify_of_change self
     end
 
-    [:first, :last].each do |method|
-      define_method method do |*args|
-        if args.count == 0
-          all.send(method)
-        else
-          apply_scope(method, *args)
-        end
+    # [:first, :last].each do |method|
+    #   define_method method do |*args|
+    #     if args.count == 0
+    #       all.send(method)
+    #     else
+    #       apply_scope(method, *args)
+    #     end
+    #   end
+    # end
+
+    def first(n = nil)
+      if n
+        apply_scope(:first, n)
+      else
+        self[0]
+      end
+    end
+
+    def last(n = nil)
+      if n
+        apply_scope(:__hyperstack_internal_scoped_last_n, n)
+      else
+        __hyperstack_internal_scoped_last
       end
     end
 

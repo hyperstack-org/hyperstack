@@ -364,8 +364,9 @@ module ActiveRecord
             # TODO: changed values as changes while just updating the synced values.
             target =
               if param[primary_key]
-                ReactiveRecord::Base.find(self, primary_key => param[primary_key])
-                #find(param[primary_key])
+                ReactiveRecord::Base.find(self, primary_key => param[primary_key]).tap do |r|
+                  r.backing_record.loaded_id = param[primary_key]
+                end
               else
                 new
               end

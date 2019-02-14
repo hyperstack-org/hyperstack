@@ -316,15 +316,13 @@ module ActiveRecord
         regulate_scope(scope) {}
       end
 
-        def __secure_remote_access_to_find(_self, _acting_user, *args)
-          find(*args)
-        end
+      finder_method :__hyperstack_internal_scoped_last do
+        last
+      end
 
-        def __secure_remote_access_to_find_by(_self, _acting_user, *args)
-          find_by(*args)
-        end
+      scope :__hyperstack_internal_scoped_last_n, ->(n) { last(n) }
 
-      # implements find_by inside of scopes.  For security reasons return nil
+      # implements find_by inside of scopes.  For security reasons we return nil
       # if we cannot view at least the id of found record.  Otherwise a hacker
       # could tell if a record exists depending on whether an access violation
       # (i.e. it exists) or nil (it doesn't exist is returned.)  Note that
