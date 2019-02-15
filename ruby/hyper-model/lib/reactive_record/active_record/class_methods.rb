@@ -51,14 +51,24 @@ module ActiveRecord
       @model_name ||= ActiveModel::Name.new(self)
     end
 
-    def find(id)
-      ReactiveRecord::Base.find(self, primary_key => id)
+    def __hyperstack_preprocess_attrs(attrs)
+      if inheritance_column && self < base_class && !attrs.key?(inheritance_column)
+        attrs = attrs.merge(inheritance_column => model_name.to_s)
+      end
+      dealiased_attrs = {}
+      attrs.each { |attr, value| dealiased_attrs[_dealias_attribute(attr)] = value }
     end
 
-    def find_by(opts = {})
-      dealiased_opts = {}
-      opts.each { |attr, value| dealiased_opts[_dealias_attribute(attr)] = value }
-      ReactiveRecord::Base.find(self, dealiased_opts)
+    def find(id)
+      find_by(primary_key => id)
+    end
+
+    def find_by(attrs = {})
+      attrs = __hyperstack_preprocess_attrs(attrs)
+      # r = ReactiveRecord::Base.find_locally(self, attrs, new_only: true)
+      # return r.ar_instance if r
+      (r = __hyperstack_internal_scoped_find_by(attrs)) || return
+      r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
 
     def enum(*args)
@@ -176,7 +186,7 @@ module ActiveRecord
 
     def method_missing(name, *args, &block)
       if args.count == 1 && name.start_with?("find_by_") && !block
-        find_by(_dealias_attribute(name.sub(/^find_by_/, "")) => args[0])
+        find_by(name.sub(/^find_by_/, '') => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
       elsif name.end_with?('!')
@@ -192,16 +202,6 @@ module ActiveRecord
     # of all instead.
     # Any method ending with ! just means apply the method after forcing a reload
     # from the DB.
-
-    # alias pre_synchromesh_method_missing method_missing
-    #
-    # def method_missing(name, *args, &block)
-    #   return all.send(name, *args, &block) if [].respond_to?(name)
-    #   if name.end_with?('!')
-    #     return send(name.chop, *args, &block).send(:reload_from_db) rescue nil
-    #   end
-    #   pre_synchromesh_method_missing(name, *args, &block)
-    # end
 
     def create(*args, &block)
       new(*args).save(&block)
@@ -246,10 +246,6 @@ module ActiveRecord
       end
     end
 
-    # def all=(_collection)
-    #   raise "NO LONGER IMPLEMENTED DOESNT PLAY WELL WITH SYNCHROMESH"
-    # end
-
     def unscoped
       ReactiveRecord::Base.unscoped[self] ||=
         ReactiveRecord::Collection
@@ -261,7 +257,8 @@ module ActiveRecord
       ReactiveRecord::ScopeDescription.new(self, "_#{name}", {})
       [name, "#{name}!"].each do |method|
         singleton_class.send(:define_method, method) do |*vargs|
-          all.apply_scope("_#{method}", *vargs).first
+          collection = all.apply_scope("_#{method}", *vargs)
+          collection.first
         end
       end
     end
@@ -367,7 +364,9 @@ module ActiveRecord
             # TODO: changed values as changes while just updating the synced values.
             target =
               if param[primary_key]
-                find(param[primary_key])
+                ReactiveRecord::Base.find(self, primary_key => param[primary_key]).tap do |r|
+                  r.backing_record.loaded_id = param[primary_key]
+                end
               else
                 new
               end

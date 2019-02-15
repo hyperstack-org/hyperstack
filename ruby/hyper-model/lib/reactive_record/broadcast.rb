@@ -63,7 +63,7 @@ module ReactiveRecord
           ReactiveRecord::Collection.sync_scopes broadcast.process_previous_changes
         end
       end
-    end
+    end if RUBY_ENGINE == 'opal'
 
     def self.to_self(record, data = {})
       # simulate incoming packet after a local save
@@ -145,11 +145,6 @@ module ReactiveRecord
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
       @previous_changes = record.changes
-      # attributes = record.attributes
-      # data.each do |k, v|
-      #   next if klass.reflect_on_association(k) || attributes[k] == v
-      #   @previous_changes[k] = [attributes[k], v]
-      # end
       self
     end
 
@@ -162,7 +157,26 @@ module ReactiveRecord
       @previous_changes.merge! params.previous_changes
       ReactiveRecord::Base.when_not_saving(klass) do
         @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
-        @is_new = params.operation == :create && !@backing_record
+
+        # first check to see if we already destroyed it and if so exit the block
+        return if @backing_record&.destroyed
+
+        # We ignore whether the record is being created or not, and just check and see if in our
+        # local copy we have ever loaded this id before.  If we have then its not new to us.
+        # BUT if we are destroying a record then it can't be treated as new regardless.
+        # This is because we might be just doing a count on a scope and so no actual records will
+        # exist.  Treating a destroyed record as "new" would cause us to first increment the
+        # scope counter and then decrement for the destroy, resulting in a nop instead of a -1 on
+        # the scope count.
+        @is_new = !@backing_record&.id_loaded? && !@destroyed
+
+        # it is possible that we are recieving data on a record for which we are also waiting
+        # on an an inital data load in which case we have not yet set the loaded id, so we
+        # set if now.
+        @backing_record&.loaded_id = params.record[:id]
+
+        # once we have received all the data from all the channels (applies to create and update only)
+        # we yield and process the record
         yield complete! if @channels == @received
       end
     end
@@ -219,7 +233,6 @@ module ReactiveRecord
         end
         [attr, value]
       end.compact.flatten(1)]
-      # TODO: verify - it used to be current_values.merge(br.attributes)
       klass._react_param_conversion(br.attributes.merge(current_values))
     end
   end

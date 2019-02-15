@@ -38,13 +38,14 @@ RSpec::Steps.steps 'ActiveRecord::Base.inspect displays', js: true do
   end
 
   it 'shows the backing record id and actual record id' do
+    evaluate_ruby "TodoItem.new(title: 'foo')"
     backing_record_id = evaluate_ruby(
-      'ReactiveRecord::Operations::Base::FORMAT % TodoItem.find(999).backing_record.object_id'
+      'ReactiveRecord::Operations::Base::FORMAT % TodoItem.find_by_title("foo").backing_record.object_id'
     )
     record_id = evaluate_ruby(
-      'ReactiveRecord::Operations::Base::FORMAT % TodoItem.find(999).object_id'
+      'ReactiveRecord::Operations::Base::FORMAT % TodoItem.find_by_title("foo").object_id'
     )
-    expect_evaluate_ruby('TodoItem.find_by_id(999).inspect')
+    expect_evaluate_ruby('TodoItem.find_by(title: "foo").inspect')
     .to match(/<TodoItem:#{backing_record_id} \(#{record_id}\)/)
   end
 

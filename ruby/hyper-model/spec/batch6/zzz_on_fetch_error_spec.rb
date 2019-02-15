@@ -39,25 +39,33 @@ describe "Hyperstack.on_error (for fetches) ", js: true do
     ApplicationController.acting_user = nil
   end
 
-  it 'call Hyperstack.on_error for access violations' do
+  it 'call Hyperstack.on_error for access violations on find_by' do
     TodoItem.class_eval do
       TodoItem.regulate_relationship(:comments) { acting_user == user }
+      def view_permitted?(_attribute)
+        false
+      end
+    end
+    todo_item = TodoItem.create(user: nil, title: 'secret')
+    expect(Hyperstack).to receive(:on_error).at_least(:once)
+    .with('find_by', kind_of(ActiveRecord::Relation), kind_of(Hash), kind_of(String))
+    expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item.id}) }").to be_nil
+  end
+
+  it 'call Hyperstack.on_error for access violations on other operations' do
+    TodoItem.class_eval do
+      TodoItem.regulate_relationship(:comments) { acting_user == user }
+      # for this test allow the item's attributes to be viewed
+      def view_permitted?(_attribute)
+        true
+      end
     end
     todo_item1 = TodoItem.create(user: ApplicationController.acting_user)
     todo_item2 = TodoItem.create(user: nil)
     Comment.create(todo_item: todo_item1)
     Comment.create(todo_item: todo_item1)
-    # expect(Hyperstack).to receive(:on_error).once.with(
-    #   Hyperstack::AccessViolation,
-    #   :fetch_error,
-    #   'acting_user' => ApplicationController.acting_user,
-    #   'controller' => kind_of(ActionController::Base),
-    #   'pending_fetches' => [['TodoItem', ['find_by', { 'id' => 2 }], 'comments', '*count']],
-    #   'models' => [],
-    #   'associations' => []
-    # )
     expect(Hyperstack).to receive(:on_error).once.with(
-      "ReactiveRecord::Operations::Fetch",
+      'ReactiveRecord::Operations::Fetch',
       instance_of(Hyperstack::AccessViolation),
       instance_of(Hash),
       instance_of(String)

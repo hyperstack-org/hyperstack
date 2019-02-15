@@ -42,7 +42,7 @@ RSpec::Steps.steps "updating scopes", js: true do
   it "destroying records causes a rerender" do
     count = TodoItem.count
     while count > 0
-      expect(page).to have_content("TodoItem.count = #{count}")
+      expect(page).to have_content("TodoItem.count = #{count}", wait: 0.5)
       evaluate_ruby do
         ReactiveRecord.load { TodoItem.last }.then { |todo| todo.destroy }
       end

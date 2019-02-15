@@ -255,20 +255,6 @@ module ActiveRecord
           pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
         end
 
-        # add secure access for find, find_by, and belongs_to and has_one relations.
-        # No explicit security checks are needed here, as the data returned by these objects
-        # will be further processedand checked before returning.  I.e. it is not possible to
-        # simply return `find(1)` but if you try returning `find(1).name` the permission system
-        # will check to see if the name attribute can be legally sent to the current acting user.
-
-        def __secure_remote_access_to_find(_self, _acting_user, *args)
-          find(*args)
-        end
-
-        def __secure_remote_access_to_find_by(_self, _acting_user, *args)
-          find_by(*args)
-        end
-
         %i[belongs_to has_one].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
           define_method(macro) do |name, *aargs, &block|
@@ -330,8 +316,35 @@ module ActiveRecord
         regulate_scope(scope) {}
       end
 
-      finder_method :__hyperstack_internal_scoped_find_by do |hash|
-        find_by(hash)
+      finder_method :__hyperstack_internal_scoped_last do
+        last
+      end
+
+      scope :__hyperstack_internal_scoped_last_n, ->(n) { last(n) }
+
+      # implements find_by inside of scopes.  For security reasons we return nil
+      # if we cannot view at least the id of found record.  Otherwise a hacker
+      # could tell if a record exists depending on whether an access violation
+      # (i.e. it exists) or nil (it doesn't exist is returned.)  Note that
+      # view of id is permitted as long as any attribute of the record is
+      # accessible.
+      finder_method :__hyperstack_internal_scoped_find_by do |attrs|
+        begin
+          found = find_by(attrs)
+          found && found.check_permission_with_acting_user(acting_user, :view_permitted?, :id)
+        rescue Hyperstack::AccessViolation => e
+          message = []
+          message << Pastel.new.red("\n\nHYPERSTACK Access violation during find_by operation.")
+          message << Pastel.new.red("Access to the found record's id is not permitted. nil will be returned")
+          message << "    #{self.name}.find_by("
+          message << attrs.collect do |attr, value|
+            "      #{attr}: '#{value.inspect.truncate(120, separator: '...')}'"
+          end.join(",\n")
+          message << "    )"
+          message << "\n#{e.details}\n"
+          Hyperstack.on_error('find_by', self, attrs, message.join("\n"))
+          nil
+        end
       end
     end
   end

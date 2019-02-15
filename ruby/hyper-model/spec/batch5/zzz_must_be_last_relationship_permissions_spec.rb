@@ -34,7 +34,6 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     stub_const 'TestApplicationPolicy', Class.new
     TestApplicationPolicy.class_eval do
       regulate_class_connection { self }
-      #regulate_all_broadcasts { |policy| policy.send_all }
     end
     ApplicationController.acting_user = nil
     size_window(:small, :portrait)
@@ -433,12 +432,17 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         end
       end
       it 'will control access via relationships' do
+        class TodoItem < ApplicationRecord
+          def view_permitted?(attribute)
+            true
+          end
+        end
+
         todo_item1 = TodoItem.create(user: ApplicationController.acting_user)
         todo_item2 = TodoItem.create(user: nil)
 
         Comment.create(todo_item: todo_item1)
         Comment.create(todo_item: todo_item1)
-
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).comments.count }").to eq(2)
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item2.id}).comments.count }").not_to eq(0)
         expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
@@ -450,6 +454,11 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
         expect_evaluate_ruby('ReactiveRecord::Base.last_log_message').to eq(['Fetch failed', 'error'])
       end
       it 'will allow server_methods to control access' do
+        class TodoItem < ApplicationRecord
+          def view_permitted?(attribute)
+            true
+          end
+        end
         todo_item1 = TodoItem.create(user: ApplicationController.acting_user)
         todo_item2 = TodoItem.create(user: User.create(first_name: 'fred'))
         expect_promise("ReactiveRecord.load { TodoItem.find(#{todo_item1.id}).pow }").to eq('fred')

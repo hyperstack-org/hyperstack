@@ -154,7 +154,7 @@ RSpec::Steps.steps "updating associations", js: true do
     expect_promise do
       Hyperstack::Component::IsomorphicHelpers.load_context
       ReactiveRecord.load do
-        TodoItem.find_by_title("Jon's first todo!").id
+        TodoItem.find_by_title("Jon's first todo!")
       end
     end.to be_nil
   end
@@ -177,9 +177,9 @@ RSpec::Steps.steps "updating associations", js: true do
   it "and can be deleted" do
     expect_promise do
       TodoItem.find_by_title("round to it").destroy.then do
-        TodoItem.find_by_title("round to it").destroyed?
+        TodoItem.find_by_title("round to it")
       end
-    end.to be_truthy
+    end.to be_nil
   end
 
   it "and it will be won't exist the server" do
