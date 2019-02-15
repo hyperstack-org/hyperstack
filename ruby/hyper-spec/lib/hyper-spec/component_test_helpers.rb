@@ -5,6 +5,8 @@ require 'hyper-spec/unparser_patch'
 require 'method_source'
 require_relative '../../lib/hyper-spec/time_cop.rb'
 
+Parser::Builders::Default.emit_procarg0 = true
+
 module HyperSpec
   module ComponentTestHelpers
     TOP_LEVEL_COMPONENT_PATCH =

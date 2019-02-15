@@ -239,21 +239,11 @@ describe "column types on client", js: true do
   end
 
   it 'converts a 0, "false" false and nil to a boolean false, everything else is true' do
-    # there is a bug someplace (unparser probably) that is is treating the empty array as nil
-    # but ONLY if it is the normal ruby block (not a string) AND if you use a normal arg
-    # instead of *args. In other words put that same expression in a string and change
-    # *args/args.first to plain old arg and it works fine.
     expect_evaluate_ruby do
-      [0, 'false', false, nil, 'hi', 17, [], true].collect do |*args|
-        TypeTest.new(boolean: args.first).boolean
-      end
-    end.to eq([false, false, false, false, true, true, true, true])
-
-    expect_evaluate_ruby("
       [0, 'false', false, nil, 'hi', 17, [], true].collect do |val|
         TypeTest.new(boolean: val).boolean
       end
-    ").to eq([false, false, false, false, true, true, true, true])
+    end.to eq([false, false, false, false, true, true, true, true])
     check_errors
   end
 

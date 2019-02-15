@@ -2,6 +2,9 @@
 
 require 'parser/current'
 require 'unparser'
+
+Parser::Builders::Default.emit_procarg0 = true
+
 #require 'pry'
 
 module ComponentTestHelpers
