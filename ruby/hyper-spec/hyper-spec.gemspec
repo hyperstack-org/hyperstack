@@ -36,7 +36,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'selenium-webdriver'
   spec.add_dependency 'timecop', '~> 0.8.1'
   spec.add_dependency 'uglifier'
-  spec.add_dependency 'unparser', '>= 0.2', '< 0.4' # 0.4 is incompatible
+  spec.add_dependency 'unparser', '>= 0.4.2' # 0.4 is incompatible
   spec.add_dependency 'webdrivers'
 
   spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
