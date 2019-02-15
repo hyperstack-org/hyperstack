@@ -25,7 +25,7 @@ _test_gem: &_test_gem
     - sudo rm -f /usr/local/bin/yarn
     - gem install bundler
     - nvm install 10
-    - rvm install $RUBY_VERSION
+    - rvm install 2.5.1
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
   before_script:
     - echo before_script $COMPONENT
