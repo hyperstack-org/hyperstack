@@ -6,10 +6,13 @@
 /pkg/
 /spec/reports/
 /tmp/
-/spec/test_app/Gemfile.lock
 
 # ignore gems
 *.gem
 
 # ignore Idea files
 .idea
+
+# ignore Gemfile.locks https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
+/spec/test_app/Gemfile.lock
+/Gemfile.lock

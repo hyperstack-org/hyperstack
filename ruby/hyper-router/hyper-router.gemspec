@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'sinatra'
   spec.add_development_dependency 'spring-commands-rspec'
-  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   spec.add_development_dependency 'unparser'
   spec.add_development_dependency 'webdrivers'

@@ -41,3 +41,7 @@ spec/test_app/db
 # ignore IDE files
 .idea
 .vscode
+
+# ignore Gemfile.locks https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
+/spec/test_app/Gemfile.lock
+/Gemfile.lock
