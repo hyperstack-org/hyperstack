@@ -1,11 +1,16 @@
-# TodoMVC Tutorial (Rails 5.2.x)
+# TodoMVC Tutorial
+
+*Based on Ruby on Rails 5.2.x*
 
 ### Prerequisites
 
-{ [Ruby On Rails](http://rubyonrails.org/) }  
-{ [Yarn](https://yarnpkg.com/en/docs/install) }
++ Linux or Mac system  
+  (Android, ChromeOS and Windows are not supported)
++ Ruby on Rails must be installed: https://rubyonrails.org/
++ NodeJS must be installed: https://nodejs.org
++ Yarn must be installed: https://yarnpkg.com/en/docs/install
 
-### The Goals of this Tutorial
+### The goals of this tutorial
 
 In this tutorial, you will build the classic [TodoMVC](http://todomvc.com) application using Hyperstack.
 This tutorial will demonstrate several key Hyperstack concepts - client side Components and Isomorphic Models.

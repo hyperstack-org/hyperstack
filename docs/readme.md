@@ -35,8 +35,8 @@ You can be up and running in **less than 5 minutes**. Just follow the simple set
 
 + Setup and Installation: https://hyperstack.org/edge/docs/installation
 
-Beyond the installation we strongly suggest new developers work trough the [ToDo tutorial](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/tutorial/todo.md).
-As it gives a minial understanding of the Hyperstack framework.
+Beyond the installation we strongly suggest new developers work trough the [todo tutorial](https://hyperstack.org/edge/docs/tutorials/todo).
+As it gives a minimal understanding of the Hyperstack framework.
 
 ## Community and support
 
@@ -52,12 +52,13 @@ Please see the [ROADMAP](https://github.com/hyperstack-org/hyperstack/blob/edge/
 
 ## Contributing
 
-We have a [Feature Matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md) that needs to be filled with missing features.
-The idea is that you can check here what the implementation status is of a Ruby (on Rails) feature.
-And if you have the time and skill you're more then encuraged to implement or fix one or two.
-But if you're not in a position to contribute code, just expanding and maintaining this table would be very excellent.
+In general, if you would like to help in any way, please read the [CONTRIBUTING](https://github.com/hyperstack-org/hyperstack/blob/edge/CONTRIBUTING.md) file for suggestions.  
+System setup for the development of Hyperstack itself is documented in this file.
 
-If you would like to help in any other way, please read the [CONTRIBUTING](https://github.com/hyperstack-org/hyperstack/blob/edge/CONTRIBUTING.md) file for suggestions.
+More specifically, we have a [Feature Matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md) that needs to be filled with missing features.
+The idea is that you can check here what the implementation status is of a Ruby (on Rails) feature.
+And if you have the time and skill you're more then encouraged to implement or fix one or two.
+But if you're not in a position to contribute code, just expanding and maintaining this table would be excellent.
 
 ## Links
 
@@ -68,11 +69,12 @@ If you would like to help in any other way, please read the [CONTRIBUTING](https
 
 ## License
 
-Released under the MIT License. See the [LICENSE][https://github.com/hyperstack-org/hyperstack/blob/edge/LICENSE] file for further details.
+Hyperstack is developed and released under the MIT License. See the [LICENSE](https://github.com/hyperstack-org/hyperstack/blob/edge/LICENSE) file for further details.
 
 ## History
 
-Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop). We decided to rename the project to drop the Ruby suffix and also took the opportunity to simplify the repos and project overall.
+Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop). We decided to rename the project to drop the Ruby suffix and also took the opportunity to simplify the repos and project overall.  
+Hyperloop was started by the developers of the reactrb gem.
 
 + Old website: http://ruby-hyperloop.org/
 + Old Github: https://github.com/ruby-hyperloop
