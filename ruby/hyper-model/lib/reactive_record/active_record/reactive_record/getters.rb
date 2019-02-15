@@ -5,7 +5,7 @@ module ReactiveRecord
     def get_belongs_to(assoc, reload = nil)
       getter_common(assoc.attribute, reload) do |has_key, attr|
         return if new?
-        value = Base.fetch_from_db([@model, [:find, id], attr, @model.primary_key]) if id.present?
+        value = fetch_by_id(attr, @model.primary_key) if id.present?
         value = find_association(assoc, value)
         sync_ignore_dummy attr, value, has_key
       end&.cast_to_current_sti_type
@@ -77,8 +77,13 @@ module ReactiveRecord
         elsif on_opal_client?
           sync_ignore_dummy attr, Base.load_from_db(self, *(vector ? vector : [nil]), attr), has_key
         elsif id.present?
-          sync_attribute attr, Base.fetch_from_db([@model, [:find, id], attr])
+          sync_attribute attr, fetch_by_id(attr)
         else
+          # Not sure how to test this branch, it may never execute this line?
+          # If we are on opal_server then we should always be getting an id before getting here
+          # but if we do vector might not be set up properly to fetch the attribute
+          puts "*** Syncing attribute in getters.rb without an id. This may cause problems. ***"
+          puts "*** Report this to hyperstack.org if you see this message: vector =  #{[*vector, attr]}"
           sync_attribute attr, Base.fetch_from_db([*vector, attr])
         end
       end
@@ -128,6 +133,10 @@ module ReactiveRecord
       self.aggregate_owner = parent
       self.aggregate_attribute = attr
       @ar_instance
+    end
+
+    def fetch_by_id(*vector)
+      Base.fetch_from_db([@model, *find_by_vector(@model.primary_key => id), *vector])
     end
   end
 end

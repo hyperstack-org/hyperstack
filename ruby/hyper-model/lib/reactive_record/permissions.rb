@@ -90,7 +90,7 @@ class ActiveRecord::Base
     def belongs_to(attr_name, *args)
       belongs_to_without_reactive_record_add_is_method(attr_name, *args).tap do
         define_method "#{attr_name}_is?".to_sym do |model|
-          self.class.reflections[attr_name.to_s].foreign_key == model.id
+          attributes[self.class.reflections[attr_name.to_s].foreign_key] == model.id
         end
       end
     end

@@ -24,6 +24,8 @@ RSpec::Steps.steps "class inheritance", js: true do
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
 
+    TodoItem # force TodoItem to load
+
     class ActiveRecord::Base
       class << self
         def public_columns_hash

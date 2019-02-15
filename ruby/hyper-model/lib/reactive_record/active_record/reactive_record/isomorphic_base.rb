@@ -47,6 +47,15 @@ module ReactiveRecord
       self.class.instance_variable_get(:@records)
     end
 
+    # constructs vector for find_by
+    def self.find_by_vector(attrs)
+      [:all, [:___hyperstack_internal_scoped_find_by, attrs], '*0']
+    end
+
+    def find_by_vector(attrs)
+      self.class.find_by_vector(attrs)
+    end
+
     # Prerendering db access (returns nil if on client):
     # at end of prerendering dumps all accessed records in the footer
 
@@ -58,7 +67,9 @@ module ReactiveRecord
 
     isomorphic_method(:find_in_db) do |f, klass, attrs|
       f.send_to_server klass.name, attrs if RUBY_ENGINE == 'opal'
-      f.when_on_server { @server_data_cache[klass, ['find_by', attrs], 'id'] }
+      f.when_on_server do
+        @server_data_cache[klass, *find_by_vector(attrs), 'id']
+      end
     end
 
     class << self
@@ -325,8 +336,6 @@ module ReactiveRecord
             elsif method.is_a? Array #__secure_remote_access_to_
               if method[0] == 'new'
                 object.new
-              elsif method[0] == 'find_by'
-                object.send(*method)
               else
                 object.send(:"__secure_remote_access_to_#{method[0]}", object, acting_user, *method[1..-1])
               end
@@ -337,7 +346,11 @@ module ReactiveRecord
             end
           end
           if id and (found.nil? or !(found.class <= model) or (found.id and found.id.to_s != id.to_s))
-            raise "Inconsistent data sent to server - #{model.name}.find(#{id}) != [#{vector}]"
+            # TODO: the one case that this is okay is when we are doing a find(some_id) which
+            # does not exist.  So the above check needs to deal with that if possible,
+            # otherwise we can just skip this check, as it was put in sometime back for
+            # debugging purposes, and is perhaps not necessary anymore
+            #raise "Inconsistent data sent to server - #{model.name}.find(#{id}) != [#{vector}]"
           end
           found
         elsif id
@@ -528,7 +541,7 @@ module ReactiveRecord
 
         promise = Promise.new
 
-        if !data_loading? and (id or vector)
+        if !data_loading? && (id || vector)
           Operations::Destroy.run(model: ar_instance.model_name.to_s, id: id, vector: vector)
           .then do |response|
             Broadcast.to_self ar_instance

@@ -32,13 +32,13 @@ describe "reactive-record edge cases", js: true do
     stub_const 'TestApplicationPolicy', Class.new
     TestApplicationPolicy.class_eval do
       always_allow_connection
-      regulate_all_broadcasts { |policy| policy.send_all }
+      regulate_all_broadcasts { |policy| policy.send_all unless policy.obj.is_a?(Todo) && policy.obj.title == 'secret' }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
     size_window(:small, :portrait)
   end
 
-  it "will load all the policies before the first broadcast" do
+  it "will load all the policies when the system starts" do
     expect(defined? SomeModelPolicy).to be_falsy
     User.create(name: 'Fred')
     expect(defined? SomeModelPolicy).to be_truthy
@@ -124,6 +124,25 @@ describe "reactive-record edge cases", js: true do
     end
   end
 
+  it 'will return nil instead of raising an access violation for finder methods' do
+    FactoryBot.create(:todo, title: 'secret')
+    expect_promise do
+      Hyperstack::Model.load do
+        Todo.find_by_title('secret')
+      end
+    end.to be_nil
+    expect_promise do
+      Hyperstack::Model.load do
+        Todo.find(2)
+      end
+    end.to be_nil
+    expect_promise do
+      Hyperstack::Model.load do
+        Todo.find_by(title: 'secret')
+      end
+    end.to be_nil
+  end
+
   describe 'can use finder methods on scopes' do
     before(:each) do
       isomorphic do
@@ -136,6 +155,7 @@ describe "reactive-record edge cases", js: true do
       FactoryBot.create(:todo, title: 'todo 2', completed: true)
       FactoryBot.create(:todo, title: 'todo 1', completed: false)
       FactoryBot.create(:todo, title: 'todo 2', completed: false)
+      FactoryBot.create(:todo, title: 'secret', completed: true)
     end
     it 'find_by_xxx' do
       expect_promise do
@@ -147,7 +167,7 @@ describe "reactive-record edge cases", js: true do
         Hyperstack::Model.load do
           Todo.completed.find_by_title('todo 3')
         end
-      end.to be_falsy
+      end.to be_nil
     end
     it 'find' do
       expect_promise do
@@ -159,7 +179,7 @@ describe "reactive-record edge cases", js: true do
         Hyperstack::Model.load do
           Todo.completed.find(3)
         end
-      end.to be_falsy
+      end.to be_nil
     end
     it 'find_by' do
       expect_promise do
@@ -171,7 +191,24 @@ describe "reactive-record edge cases", js: true do
         Hyperstack::Model.load do
           Todo.completed.find_by(title: 'todo 3')
         end
-      end.to be_falsy
+      end.to be_nil
+    end
+    it "and will return nil unless access is allowed" do
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find_by_title('secret')
+        end
+      end.to be_nil
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find(5)
+        end
+      end.to be_nil
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find_by(title: 'secret')
+        end
+      end.to be_nil
     end
   end
 end

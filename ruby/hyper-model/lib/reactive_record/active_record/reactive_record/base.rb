@@ -67,30 +67,35 @@ module ReactiveRecord
       load_data { ServerDataCache.load_from_json(json, target) }
     end
 
+    def self.find_locally(model, attrs, new_only: nil)
+      if (id_to_find = attrs[model.primary_key])
+        !new_only && lookup_by_id(model, id_to_find)
+      else
+        @records[model].detect do |r|
+          (r.new? || !new_only) &&
+            !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
+        end
+      end
+    end
+
+    def self.find_by_id(model, id)
+      find(model, model.primary_key => id)
+    end
+
     def self.find(model, attrs)
       # will return the unique record with this attribute-value pair
       # value cannot be an association or aggregation
 
       # add the inheritance column if this is an STI subclass
 
-      inher_col = model.inheritance_column
-      if inher_col && model < model.base_class && !attrs.key?(inher_col)
-        attrs = attrs.merge(inher_col => model.model_name.to_s)
-      end
+      attrs = model.__hyperstack_preprocess_attrs(attrs)
 
       model = model.base_class
       primary_key = model.primary_key
 
       # already have a record with these attribute-value pairs?
 
-      record =
-        if (id_to_find = attrs[primary_key])
-          lookup_by_id(model, id_to_find)
-        else
-          @records[model].detect do |r|
-            !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
-          end
-        end
+      record = find_locally(model, attrs)
 
       unless record
         # if not, and then the record may be loaded, but not have this attribute set yet,
@@ -102,10 +107,8 @@ module ReactiveRecord
           attrs = attrs.merge primary_key => id
         end
         # if we don't have a record then create one
-        # (record = new(model)).vector = [model, [:find_by, attribute => value]] unless record
-        record ||= set_vector_lookup(new(model), [model, [:find_by, attrs]])
-        # and set the values
-        attrs.each { |attr, value| record.sync_attribute(attr, value) }
+        record ||= set_vector_lookup(new(model), [model, *find_by_vector(attrs)])
+        record.sync_attributes(attrs)
       end
       # finally initialize and return the ar_instance
       record.set_ar_instance!
@@ -122,7 +125,6 @@ module ReactiveRecord
       # record = @records[model].detect { |record| record.vector == vector }
       record = lookup_by_vector(vector)
       unless record
-
         record = new model
         set_vector_lookup(record, vector)
       end
@@ -175,6 +177,7 @@ module ReactiveRecord
         @ar_instance.instance_variable_set(:@backing_record, existing_record)
         existing_record.attributes.merge!(attributes) { |key, v1, v2| v1 }
       end
+      @id = value
       value
     end
 
@@ -211,7 +214,7 @@ module ReactiveRecord
 
     def initialize_collections
       if (!vector || vector.empty?) && id && id != ''
-        Base.set_vector_lookup(self, [@model, [:find_by, @model.primary_key => id]])
+        Base.set_vector_lookup(self, [@model, *find_by_vector(@model.primary_key => id)])
       end
       Base.load_data do
         @model.reflect_on_all_associations.each do |assoc|
@@ -251,8 +254,12 @@ module ReactiveRecord
       @synced_with_unscoped = !@synced_with_unscoped
     end
 
-    def sync_attribute(attribute, value)
+    def sync_attributes(attrs)
+      attrs.each { |attr, value| sync_attribute(attr, value) }
+      self
+    end
 
+    def sync_attribute(attribute, value)
       @synced_attributes[attribute] = @attributes[attribute] = value
       Base.set_id_lookup(self) if attribute == primary_key
 
@@ -260,7 +267,7 @@ module ReactiveRecord
 
       if value.is_a? Collection
         @synced_attributes[attribute] = value.dup_for_sync
-      elsif aggregation = model.reflect_on_aggregation(attribute) and (aggregation.klass < ActiveRecord::Base)
+      elsif (aggregation = model.reflect_on_aggregation(attribute)) && (aggregation.klass < ActiveRecord::Base)
         value.backing_record.sync!
       elsif aggregation
         @synced_attributes[attribute] = aggregation.deserialize(aggregation.serialize(value))
@@ -276,6 +283,14 @@ module ReactiveRecord
     # if a record has local changes that are out of sync.
     def self.exists?(model, id)
       Base.lookup_by_id(model, id)
+    end
+
+    def id_loaded?
+      @id
+    end
+
+    def loaded_id=(id)
+      @id = id
     end
 
     def revert

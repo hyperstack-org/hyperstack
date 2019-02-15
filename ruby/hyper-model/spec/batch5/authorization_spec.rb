@@ -115,6 +115,7 @@ describe "authorization integration", js: true do
     model1 = FactoryBot.create(:test_model, test_attribute: "hello")
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})
+    wait_for_ajax
     ApplicationController.acting_user = User.new(name: "fred")
     page.evaluate_ruby('Hyperstack.connect("TestApplication")')
     wait_for_ajax
@@ -152,6 +153,7 @@ describe "authorization integration", js: true do
     model1.update_attribute(:test_attribute, 'george')
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})
+    expect_promise('Hyperstack::Model.load { TestModel.find_by_test_attribute("hello") }').to be_nil
   end
 
   it "will fail on illegal instance connections" do
