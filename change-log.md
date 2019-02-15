@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.4alpha - 2019-02-15
+### Security
++ [#117](https://github.com/hyperstack-org/hyperstack/issues/117) Finder methods will return nil instead of raising access violations.
+
+### Added
++ [#120](https://github.com/hyperstack-org/hyperstack/issues/120) Alias `ActiveRecord::Base#new_record?` to `#new?`.
++ [#112](https://github.com/hyperstack-org/hyperstack/issues/112) Add `:init` param to `INPUT`, `SELECT`, and `TEXTAREA` tags.
+
 ## 1.3alpha - 2019-01-16
 ### Security  
 + [#102](https://github.com/hyperstack-org/hyperstack/issues/102) Security hole in find_record method filled.
