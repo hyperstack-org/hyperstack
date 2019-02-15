@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rails', '>= 4.0.0'
 
 
-  # spec.add_development_dependency 'sqlite3'
+  # spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
   # #spec.add_development_dependency 'chromedriver-helper'
   # spec.add_development_dependency 'geminabox', '>= 0.13.11'
 
@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   #spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'sass-rails', '~> 5.0'
   # Use Uglifier as compressor for JavaScript assets
   spec.add_development_dependency 'uglifier', '>= 1.3.0'
