@@ -10,7 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 + [#120](https://github.com/hyperstack-org/hyperstack/issues/120) Alias `ActiveRecord::Base#new_record?` to `#new?`.
++ [#111](https://github.com/hyperstack-org/hyperstack/issues/111) Add #ref method to Element class
 + [#112](https://github.com/hyperstack-org/hyperstack/issues/112) Add `:init` param to `INPUT`, `SELECT`, and `TEXTAREA` tags.
+
+### Fixed
++ [#128](https://github.com/hyperstack-org/hyperstack/issues/128) Hyperspec improperly parses block parameters
++ [#113](https://github.com/hyperstack-org/hyperstack/issues/113) Can't use finder methods on a scope
++ [#110](https://github.com/hyperstack-org/hyperstack/issues/128) Mutate is executing AFTER render cycle completes causing issues with controlled inputs
+
 
 ## 1.3alpha - 2019-01-16
 ### Security  
