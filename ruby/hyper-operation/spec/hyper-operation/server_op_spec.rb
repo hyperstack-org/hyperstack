@@ -311,11 +311,13 @@ describe "isomorphic operations", js: true do
           step {params.message = 'hello'}
           step {params.counter + 1}
           def self.serialize_params(hash)
-            hash['counter'] += 1
+            # hash['counter'] += 1  # bug in unparser https://github.com/mbj/unparser/issues/117
+            hash['counter'] = hash['counter'] + 1
             hash
           end
           def self.deserialize_params(hash)
-            hash['counter'] += 1
+            # hash['counter'] += 1  # bug in unparser https://github.com/mbj/unparser/issues/117
+            hash['counter'] = hash['counter'] + 1
             hash
           end
           def self.serialize_response(response)
@@ -325,11 +327,13 @@ describe "isomorphic operations", js: true do
             response + 1
           end
           def self.serialize_dispatch(hash)
-            hash[:message] += ' serialized'
+            # hash[:message] += ' serialized' # bug in unparser https://github.com/mbj/unparser/issues/117
+            hash[:message] = hash[:message] + ' serialized'
             hash
           end
           def self.deserialize_dispatch(hash)
-            hash[:message] += ' deserialized'
+            # hash[:message] += ' deserialized' # bug in unparser https://github.com/mbj/unparser/issues/117
+            hash[:message] = hash[:message] + ' deserialized'
             hash
           end
         end
