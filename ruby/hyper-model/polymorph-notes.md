@@ -12,8 +12,8 @@ class Product < ApplicationRecord
 end
 ```
 
-product/employee.pictures -> works almost as normal has_many as far as Hyperstack client is concerned
-imageable is the "alias" of product/employee.   Its as if there is a class Imageable that is the superclass
+product|employee.pictures -> works almost as normal has_many as far as Hyperstack client is concerned
+imageable is the "alias" of product|employee.   Its as if there is a class Imageable that is the superclass
 of Product and Employee.
 
 so has_many :pictures means the usual thing (i.e. there is a belongs_to relationship on Picture) its just that
@@ -89,3 +89,21 @@ end
 its all about the collection inverse.  The inverse class of the has_many is the class containing the polymorphic belongs to.  But the inverse of a polymorphic belongs to depends on the value. If the value is nil or a DummyPolyClass object then there is no inverse.
 
 I think if inverse takes this into account then `<<` and `=` should just "work" (well almost) and probably everything else will to.
+
+### NOTES on the DummyPolyClass...
+
+it needs to respond to reflect_on_all_associations, but just return an empty array.  This way when we search for matching inverse attribute we won't find it.
+
+### Status
+
+added model to inverse, inverse_of, find_inverse
+
+if the relationship is a collection then we will always know the inverse.
+
+The only time we might no know the inverse is if its NOT a collection (i.e. belongs_to)
+
+So only places that are applying inverse to an association that is NOT a collection do we have to pass the model in.
+
+All inverse_of method calls have been checked and updated
+
+that leaves inverse which is only used in SETTERS hurray!

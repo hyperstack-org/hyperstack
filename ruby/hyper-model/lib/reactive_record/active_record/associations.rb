@@ -38,6 +38,7 @@ module ActiveRecord
       attr_reader :macro
       attr_reader :owner_class
       attr_reader :source
+      attr_reader :options
 
       def initialize(owner_class, macro, name, options = {})
         owner_class.reflect_on_all_associations << self
@@ -45,9 +46,11 @@ module ActiveRecord
         @macro =       macro
         @options =     options
         unless options[:polymorphic]
-          @klass_name =  options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
+          @klass_name = options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
         end
-        @association_foreign_key = options[:foreign_key] || (macro == :belongs_to && "#{name}_id") || "#{@owner_class.name.underscore}_id"
+        @association_foreign_key =
+          options[:foreign_key] || (macro == :belongs_to && "#{name}_id") ||
+          (options[:as] && "#{options[:as]}_id") || "#{@owner_class.name.underscore}_id"
         @source = options[:source] || @klass_name.underscore if options[:through]
         @attribute = name
       end
@@ -94,32 +97,41 @@ module ActiveRecord
         found
       end
 
-      def inverse_of(model)
+      def inverse_of(model = nil)
         inverse(model)&.attribute
       end
 
-      def find_inverse(model)
-        the_klass = klass || model.class
+      def find_inverse(model)  # private
+        the_klass = klass || model
         return nil unless the_klass
-        klass.reflect_on_all_associations.each do |association|
+        the_klass.reflect_on_all_associations.each do |association|
           next if association.association_foreign_key != @association_foreign_key
-          next if association.klass != @owner_class
+          next unless target_klass_matches(association)
           next if association.attribute == attribute
-          return association if klass == association.owner_class
+          return association if the_klass == association.owner_class
         end
+        return if options[:polymorphic]  # can't dynamically create the polymorphic has_many
         # instead of raising an error go ahead and create the inverse relationship if it does not exist.
         # https://github.com/hyperstack-org/hyperstack/issues/89
         if macro == :belongs_to
-          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{klass}.has_many :#{@owner_class.name.underscore.pluralize}, foreign_key: #{@association_foreign_key}", :warning
-          klass.has_many @owner_class.name.underscore.pluralize, foreign_key: @association_foreign_key
+          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{the_klass}.has_many :#{@owner_class.name.underscore.pluralize}, foreign_key: #{@association_foreign_key}", :warning
+          the_klass.has_many @owner_class.name.underscore.pluralize, foreign_key: @association_foreign_key
+        elsif options[:as]
+          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{the_klass}.belongs_to :#{options[:as]}, polymorphic: true", :warning
+          the_klass.belongs_to options[:as], polymorphic: true
         else
-          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{klass}.belongs_to :#{@owner_class.name.underscore}, foreign_key: #{@association_foreign_key}", :warning
-          klass.belongs_to @owner_class.name.underscore, foreign_key: @association_foreign_key
+          Hyperstack::Component::IsomorphicHelpers.log "**** warning dynamically adding relationship: #{the_klass}.belongs_to :#{@owner_class.name.underscore}, foreign_key: #{@association_foreign_key}", :warning
+          the_klass.belongs_to @owner_class.name.underscore, foreign_key: @association_foreign_key
         end
       end
 
       def klass
-        @klass ||= Object.const_get(@klass_name)
+        @klass ||= Object.const_get(@klass_name) if @klass_name
+      end
+
+      def target_klass_matches?(inverse_association)
+        return inverse_association.options[:as] if options[:polymorphic]
+        @owner_class == inverse_association.klass
       end
 
       def collection?
