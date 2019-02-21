@@ -133,7 +133,6 @@ module ReactiveRecord
             vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
             final = vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
             next final unless final && final.value.respond_to?(:superclass) && final.value.superclass <= ActiveRecord::Base
-binding.pry
             Hyperstack::InternalPolicy.raise_operation_access_violation(:invalid_vector, "attempt to insecurely access relationship #{vector.last}.")
           end
         end
@@ -496,8 +495,8 @@ keys:
           end
           load_from_json(value, new_target) if new_target
         end
-      #rescue Exception => e
-      #  raise e
+      rescue Exception => e
+       raise e
       end
     end
   end

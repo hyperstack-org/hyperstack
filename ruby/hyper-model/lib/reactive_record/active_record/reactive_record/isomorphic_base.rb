@@ -298,7 +298,6 @@ module ReactiveRecord
               promise.resolve response  # TODO this could be problematic... there was no .json here, so .... what's to do?
 
             rescue Exception => e
-              # debugger
               log("Exception raised while saving - #{e}", :error)
             ensure
               backing_records.each { |_id, record| record.saved! rescue nil } if save

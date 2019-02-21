@@ -128,7 +128,6 @@ module ActiveRecord
           next if association.attribute == attribute
           return association if the_klass == association.owner_class
         end
-        debugger if options[:polymorphic]
         raise "could not find inverse of polymorphic belongs_to: #{model.inspect} #{self.inspect}" if options[:polymorphic]
         # instead of raising an error go ahead and create the inverse relationship if it does not exist.
         # https://github.com/hyperstack-org/hyperstack/issues/89
@@ -147,7 +146,6 @@ module ActiveRecord
       def klass(model = nil)
         @klass ||= Object.const_get(@klass_name) if @klass_name
         raise "model is not correct class" if @klass && model && model.class != @klass
-        debugger unless @klass || model
         raise "no model supplied for polymorphic relationship" unless @klass || model
         @klass || model.class
       end
