@@ -133,6 +133,7 @@ module ReactiveRecord
             vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
             final = vector[1..-1].inject(root) { |cache_item, method| cache_item.apply_method method if cache_item }
             next final unless final && final.value.respond_to?(:superclass) && final.value.superclass <= ActiveRecord::Base
+binding.pry
             Hyperstack::InternalPolicy.raise_operation_access_violation(:invalid_vector, "attempt to insecurely access relationship #{vector.last}.")
           end
         end
@@ -280,6 +281,8 @@ module ReactiveRecord
                   if !cache_item.value || cache_item.value.is_a?(Array)
                     # seeing as we just returning representative, no check is needed (its already checked)
                     representative
+                  elsif method == 'model_name'
+                    cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.model_name }, method, method)
                   else
                     begin
                       secured_method = "__secure_remote_access_to_#{[*method].first}"
@@ -477,10 +480,13 @@ keys:
             # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
             # a better fix might be something like target._internal_attribute_hash[method] =  ...
             target.backing_record.set_attr_value(method, value.first) unless method == :id
-          elsif value.is_a? Hash and value[:id] and value[:id].first and association = target.class.reflect_on_association(method)
+          elsif value.is_a?(Hash) && value[:id] && value[:id].first && (association = target.class.reflect_on_association(method))
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
-            new_target = association.klass.find(value[:id].first)
+            klass = value[:model_name] ? Object.const_get(value[:model_name].first) : association.klass
+            new_target = klass.find(value[:id].first)
+            puts "got a new_target #{new_target.inspect}"
             target.send "#{method}=", new_target
+            puts "and that worked!"
           elsif !(target.class < ActiveRecord::Base)
             new_target = target.send(*method)
             # value is an array if scope returns nil, so we destroy the bogus record
@@ -490,9 +496,8 @@ keys:
           end
           load_from_json(value, new_target) if new_target
         end
-      rescue Exception => e
-        # debugger
-        raise e
+      #rescue Exception => e
+      #  raise e
       end
     end
   end

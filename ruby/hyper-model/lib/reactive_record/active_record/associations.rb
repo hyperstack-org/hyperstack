@@ -38,6 +38,7 @@ module ActiveRecord
       attr_reader :macro
       attr_reader :owner_class
       attr_reader :source
+      attr_reader :source_type
       attr_reader :options
 
       def initialize(owner_class, macro, name, options = {})
@@ -49,10 +50,26 @@ module ActiveRecord
           @klass_name = options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
         end
         @association_foreign_key =
-          options[:foreign_key] || (macro == :belongs_to && "#{name}_id") ||
-          (options[:as] && "#{options[:as]}_id") || "#{@owner_class.name.underscore}_id"
-        @source = options[:source] || @klass_name.underscore if options[:through]
+          options[:foreign_key] ||
+          (macro == :belongs_to && "#{name}_id") ||
+          (options[:as] && "#{options[:as]}_id") ||
+          (options[:polymorphic] && "#{name}_id") ||
+          "#{@owner_class.name.underscore}_id"
+        if options[:through]
+          @source = options[:source] || @klass_name.underscore
+          @source_type = options[:source_type] || @klass_name
+        end
         @attribute = name
+        @through_associations = Hash.new { |_h, k| [] unless k }
+        @source_associations =  Hash.new { |_h, k| [] unless k }
+      end
+
+      def collection?
+        @macro == :has_many
+      end
+
+      def singular?
+        @macro != :has_many
       end
 
       def through_association
@@ -67,21 +84,23 @@ module ActiveRecord
 
       alias through_association? through_association
 
-      def through_associations
+      def through_associations(model)
         # find all associations that use the inverse association as the through association
         # that is find all associations that are using this association in a through relationship
-        @through_associations ||= klass.reflect_on_all_associations.select do |assoc|
-          assoc.through_association && assoc.inverse == self
+        the_klass = klass(model)
+        @through_associations[the_klass] ||= the_klass.reflect_on_all_associations.select do |assoc|
+          assoc.through_association && assoc.inverse(nil) == self
         end
       end
 
-      def source_associations
+      def source_associations(model)
         # find all associations that use this association as the source
-        # that is final all associations that are using this association as the source in a
+        # that is find all associations that are using this association as the source in a
         # through relationship
-        @source_associations ||= owner_class.reflect_on_all_associations.collect do |sibling|
-          sibling.klass.reflect_on_all_associations.select do |assoc|
-            assoc.source == attribute
+        the_klass = klass(model)
+        @source_associations[the_klass] ||= owner_class.reflect_on_all_associations.collect do |sibling|
+          sibling.klass(model).reflect_on_all_associations.select do |assoc|
+            assoc.source == attribute && assoc.source_type == the_klass.name
           end
         end.flatten
       end
@@ -92,25 +111,25 @@ module ActiveRecord
 
       def inverse(model)
         return @inverse if @inverse
-        found = through_association ? through_association.inverse(model) : find_inverse(model)
+        ta = through_association(model)
+        found = ta ? ta.inverse(model) : find_inverse(model)
         @inverse = found unless polymorphic?
         found
       end
 
       def inverse_of(model = nil)
-        inverse(model)&.attribute
+        inverse(model).attribute
       end
 
       def find_inverse(model)  # private
-        the_klass = klass || model
-        return nil unless the_klass
+        the_klass = klass(model)
         the_klass.reflect_on_all_associations.each do |association|
           next if association.association_foreign_key != @association_foreign_key
-          next unless target_klass_matches(association)
           next if association.attribute == attribute
           return association if the_klass == association.owner_class
         end
-        return if options[:polymorphic]  # can't dynamically create the polymorphic has_many
+        debugger if options[:polymorphic]
+        raise "could not find inverse of polymorphic belongs_to: #{model.inspect} #{self.inspect}" if options[:polymorphic]
         # instead of raising an error go ahead and create the inverse relationship if it does not exist.
         # https://github.com/hyperstack-org/hyperstack/issues/89
         if macro == :belongs_to
@@ -125,22 +144,17 @@ module ActiveRecord
         end
       end
 
-      def klass
+      def klass(model = nil)
         @klass ||= Object.const_get(@klass_name) if @klass_name
-      end
-
-      def target_klass_matches?(inverse_association)
-        return inverse_association.options[:as] if options[:polymorphic]
-        @owner_class == inverse_association.klass
+        raise "model is not correct class" if @klass && model && model.class != @klass
+        debugger unless @klass || model
+        raise "no model supplied for polymorphic relationship" unless @klass || model
+        @klass || model.class
       end
 
       def collection?
         [:has_many].include? @macro
       end
-
     end
-
   end
-
-
 end

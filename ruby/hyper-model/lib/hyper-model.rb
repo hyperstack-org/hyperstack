@@ -20,6 +20,7 @@ if RUBY_ENGINE == 'opal'
   require "reactive_record/active_record/reactive_record/isomorphic_base"
   require 'reactive_record/active_record/reactive_record/dummy_value'
   require 'reactive_record/active_record/reactive_record/column_types'
+  require 'reactive_record/active_record/reactive_record/dummy_polymorph'
   require "reactive_record/active_record/aggregations"
   require "reactive_record/active_record/associations"
   require "reactive_record/active_record/reactive_record/backing_record_inspector"

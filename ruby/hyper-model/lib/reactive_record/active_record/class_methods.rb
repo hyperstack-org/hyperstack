@@ -383,10 +383,20 @@ module ActiveRecord
               end
 
               if assoc
-                if value
-                  [assoc.attribute, { id: [value] }]
-                else
+                if !value
                   [assoc.attribute, [nil]]
+                elsif assoc.polymorphic?
+                  model_name = param.detect { |k, *| k == "#{assoc.attribute}_type" }&.last
+                  model_name ||= target.send("#{assoc.attribute}_type")
+                  unless Object.const_defined?(model_name)
+                    raise "Error in #{self.name}._react_param_conversion. \n"\
+                          "Could not determine the type of #{assoc.attribute} of #{target.inspect}.\n"\
+                          "It was not provided in the conversion data, "\
+                          "and it is unknown on the client"
+                  end
+                  [assoc.attribute, { id: [value], model_name: [model_name] }]
+                else
+                  [assoc.attribute, { id: [value]}]
                 end
               else
                 [key, [value]]

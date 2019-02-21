@@ -416,11 +416,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
       backing_record = item.backing_record
       if backing_record && @owner && @association && !@association.through_association? && item.attributes[@association.inverse_of] != @owner
         inverse_of = @association.inverse_of
-        current_association = item.attributes[inverse_of]
+        current_association_value = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
         backing_record.update_belongs_to(inverse_of, @owner)
-        if current_association && current_association.attributes[@association.attribute]
-          current_association.attributes[@association.attribute].delete(item)
+        unless current_association_value.nil?  # might be a dummy value which responds to nil
+          current_association = @association.inverse.inverse(current_association_value)
+          current_association_attribute = current_association.attribute
+          if current_association.collection? && current_association_value.attributes[current_association_attribute]
+            current_association.attributes[current_association_attribute].delete(item)
+          end
         end
         @owner.backing_record.sync_has_many(@association.attribute)
       end
