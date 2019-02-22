@@ -167,9 +167,9 @@ module ReactiveRecord
     def update_has_many_through_associations(assoc, value)
       # note that through and source_associations returns an empty set of
       # the provided ar_instance does not belong to a has_many_through association
-      assoc.through_associations(@ar_instance)
+      assoc.through_associations(value)
            .each { |ta| update_through_association(assoc, ta, value) }
-      assoc.source_associations(@ar_instance)
+      assoc.source_associations(value)
            .each { |sa| update_source_association(assoc, sa, value) }
     end
 

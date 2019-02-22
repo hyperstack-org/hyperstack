@@ -107,3 +107,37 @@ So only places that are applying inverse to an association that is NOT a collect
 All inverse_of method calls have been checked and updated
 
 that leaves inverse which is only used in SETTERS hurray!
+
+
+### Latest thinking
+
+going from `has_many / has_one as: ...` is easy  its essentially setting the association foreign_key using the name supplied to the as:
+
+The problem is going from the polymorphic belongs_to side.  
+
+We don't know the actual type we are loading which presents two problems.
+
+First we just don't know the type.  So if I say `Picture.find(1).imageable.foo.bar` I really can't do anything with foo and bar.  This is solved by having a DummyPolymorph class, which responds to all missing methods with itself, and on creation sets up a vector to pull it the id, and type of the record being fetched.  This will cause a second fetch to actually get `foo.bar` because we don't know what they are yet.  (Its cool beacuse this is like Type inference actually, and I think we could eventually use a type inference system to get rid of the second fetch!!!)
+
+Second we don't know the inverse of the relationship (since we don't know the type)
+
+We can solve this by  aliasing the inverse relationship (the one with the `as: SOMENAME` option)   to be `has_many #{__hyperstack_polymorphic_inverse_of_#{SOMENAME}` and then defining method(s) against the relationship name.  This way regardless of what the polymorphic relationship points to we know the inverse is `__hyperstack_polymorphic_inverse_of_#{SOMENAME}`.  
+
+If the inverse relationship is a has_many then we define
+```ruby
+def #{RELATIONSHIP_NAME}
+  __hyperstack_polymorphic_inverse_of_#{SOMENAME}
+end
+```
+
+If the inverse relationship is a has_one we have to work a bit harder:
+```ruby
+def #{RELATIONSHIP_NAME}
+  __hyperstack_polymorphic_inverse_of_#{SOMENAME}[0]
+end
+def #{RELATIONSHIP_NAME}=(x)
+  __hyperstack_polymorphic_inverse_of_#{SOMENAME}[0] = x # or perhaps we have to replace the array using the internal method in collection for that purpose.
+end
+```
+
+The remaining problem is that the server side will have no such relationships defined so we need to add the `has_many __hyperstack_polymorphic_inverse_of_#{SOMENAME} as: SOMENAME` server side.

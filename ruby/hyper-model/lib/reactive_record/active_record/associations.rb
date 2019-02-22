@@ -99,9 +99,9 @@ module ActiveRecord
         # through relationship
         the_klass = klass(model)
         @source_associations[the_klass] ||= owner_class.reflect_on_all_associations.collect do |sibling|
-          sibling.klass(model).reflect_on_all_associations.select do |assoc|
+          sibling.klass.reflect_on_all_associations.select do |assoc|
             assoc.source == attribute && assoc.source_type == the_klass.name
-          end
+          end unless sibling.polymorphic?
         end.flatten
       end
 
