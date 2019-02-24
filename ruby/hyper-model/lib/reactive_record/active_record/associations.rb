@@ -126,7 +126,7 @@ module ActiveRecord
         # given self is a has_many_through association return the corresponding belongs_to association
         # for the source
         @source_belongs_to_association ||=
-          through_association.inverse.owner_class.detect do |sibling|
+          through_association.inverse.owner_class.reflect_on_all_associations.detect do |sibling|
             sibling.attribute == source
           end
       end
@@ -141,8 +141,6 @@ module ActiveRecord
       end
 
       def inverse(model = nil)
-        raise "internal assertion failure: #{self}.inverse called without a model, "\
-              "and #{self} is not a collection" unless model || collection?
         return @inverse if @inverse
         ta = through_association
         found = ta ? ta.inverse : find_inverse(model)

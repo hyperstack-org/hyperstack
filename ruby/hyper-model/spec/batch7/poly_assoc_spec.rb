@@ -142,7 +142,7 @@ describe "polymorphic relationships", js: true, skip: 'not working yet' do
         end
 
         has_many :memberships
-        has_many :groups, through: :memberships, source: :memerable, source_type: 'Group'
+        has_many :groups,   through: :memberships, source: :memerable, source_type: 'Group'
         has_many :projects, through: :memberships, source: :memerable, source_type: 'Project'
       end
 
