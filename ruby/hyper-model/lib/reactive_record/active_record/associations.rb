@@ -61,7 +61,6 @@ module ActiveRecord
         end
         @attribute = name
         @through_associations = Hash.new { |_h, k| [] unless k }
-        @source_associations =  Hash.new { |_h, k| [] unless k }
       end
 
       def collection?
@@ -84,35 +83,69 @@ module ActiveRecord
 
       alias through_association? through_association
 
+      # class Membership < ActiveRecord::Base
+      #   belongs_to :uzer
+      #   belongs_to :memerable, polymorphic: true
+      # end
+      #
+      # class Project < ActiveRecord::Base
+      #   has_many :memberships, as: :memerable, dependent: :destroy
+      #   has_many :uzers, through: :memberships
+      # end
+      #
+      # class Group < ActiveRecord::Base
+      #   has_many :memberships, as: :memerable, dependent: :destroy
+      #   has_many :uzers, through: :memberships
+      # end
+      #
+      # class Uzer < ActiveRecord::Base
+      #   has_many :memberships
+      #   has_many :groups,   through: :memberships, source: :memerable, source_type: 'Group'
+      #   has_many :projects, through: :memberships, source: :memerable, source_type: 'Project'
+      # end
+
+      # so find the belongs_to relationship whose attribute == ta.source
+      # now find the inverse of that relationship using source_value as the model
+      # now find any has many through relationships that use that relationship as there source.
+      # each of those attributes in the source_value have to be updated.
+
+      # self is the through association
+
+
       def through_associations(model)
+        # given self is a belongs_to association currently pointing to model
         # find all associations that use the inverse association as the through association
         # that is find all associations that are using this association in a through relationship
         the_klass = klass(model)
         @through_associations[the_klass] ||= the_klass.reflect_on_all_associations.select do |assoc|
-          assoc.through_association && assoc.inverse(nil) == self
+          assoc.through_association&.inverse == self
         end
       end
 
+      def source_belongs_to_association  # private
+        # given self is a has_many_through association return the corresponding belongs_to association
+        # for the source
+        @source_belongs_to_association ||=
+          through_association.inverse.owner_class.detect do |sibling|
+            sibling.attribute == source
+          end
+      end
+
       def source_associations(model)
-        # find all associations that use this association as the source
-        # that is find all associations that are using this association as the source in a
-        # through relationship
-        the_klass = klass(model)
-        @source_associations[the_klass] ||= owner_class.reflect_on_all_associations.collect do |sibling|
-          sibling.klass.reflect_on_all_associations.select do |assoc|
-            assoc.source == attribute && assoc.source_type == the_klass.name
-          end unless sibling.polymorphic?
-        end.flatten
+        # given self is a has_many_through association find the source_association for the given model
+        source_belongs_to_association.through_associations(model)
       end
 
       def polymorphic?
         !@klass_name
       end
 
-      def inverse(model)
+      def inverse(model = nil)
+        raise "internal assertion failure: #{self}.inverse called without a model, "\
+              "and #{self} is not a collection" unless model || collection?
         return @inverse if @inverse
-        ta = through_association(model)
-        found = ta ? ta.inverse(model) : find_inverse(model)
+        ta = through_association
+        found = ta ? ta.inverse : find_inverse(model)
         @inverse = found unless polymorphic?
         found
       end

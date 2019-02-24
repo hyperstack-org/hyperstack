@@ -164,43 +164,63 @@ module ReactiveRecord
       @attributes[association.attribute] << ar_instance
     end
 
+    # class Membership < ActiveRecord::Base
+    #   belongs_to :uzer
+    #   belongs_to :memerable, polymorphic: true
+    # end
+    #
+    # class Project < ActiveRecord::Base
+    #   has_many :memberships, as: :memerable, dependent: :destroy
+    #   has_many :uzers, through: :memberships
+    # end
+    #
+    # class Group < ActiveRecord::Base
+    #   has_many :memberships, as: :memerable, dependent: :destroy
+    #   has_many :uzers, through: :memberships
+    # end
+    #
+    # class Uzer < ActiveRecord::Base
+    #   has_many :memberships
+    #   has_many :groups,   through: :memberships, source: :memerable, source_type: 'Group'
+    #   has_many :projects, through: :memberships, source: :memerable, source_type: 'Project'
+    # end
+
+    # membership.uzer = some_new_uzer (i.e. through association is changing)
+    # means membership.some_new_uzer.(groups OR projects) << uzer.memberable (depending on type of memberable)
+    # and we have to remove the current value of the source association (memerable) from the current uzer group or project
+    # and we have to then find any inverse has_many_through association (i.e. group or projects.uzers) and delete the
+    # current value from those collections and push the new value on
+
     def update_has_many_through_associations(assoc, value)
       # note that through and source_associations returns an empty set of
       # the provided ar_instance does not belong to a has_many_through association
-      assoc.through_associations(value)
-           .each { |ta| update_through_association(assoc, ta, value) }
-      assoc.source_associations(value)
-           .each { |sa| update_source_association(assoc, sa, value) }
+      assoc.through_associations(value).each do |ta|
+        source_value = @attributes[ta.source]
+        current_value = @attributes[assoc.attribute]
+        # skip if source value is nil or if type of the association does not match type of source
+        next unless source_value.class.to_s == ta.source_type
+        update_through_association(ta, source_value, current_value, value)
+        ta.source_associations(source_value).each do |sa|
+          update_source_association(sa, source_value, current_value, value)
+        end
+      end
     end
 
-    def update_through_association(assoc, ta, new_belongs_to_value)
-      # appointment.doctor = doctor_new_value (i.e. through association is changing)
-      # means appointment.doctor_new_value.patients << appointment.patient
-      # and we have to appointment.doctor_current_value.patients.delete(appointment.patient)
-      source_value = @attributes[ta.source]
-      current_belongs_to_value = @attributes[assoc.attribute]
-      return unless source_value.class.to_s == ta.source_type
-      unless current_belongs_to_value.nil? || current_belongs_to_value.attributes[ta.attribute].nil?
-        current_belongs_to_value.attributes[ta.attribute].delete(source_value)
+    def update_through_association(ta, source_value, current_value, new_value)
+      unless current_value.nil? || current_value.attributes[ta.attribute].nil?
+        current_value.attributes[ta.attribute].delete(source_value)
       end
-      return unless new_belongs_to_value
-      new_belongs_to_value.attributes[ta.attribute] ||= Collection.new(assoc.owner_class, new_belongs_to_value, ta)
-      new_belongs_to_value.attributes[ta.attribute] << source_value
+      return unless new_value
+      new_value.attributes[ta.attribute] ||= Collection.new(ta.owner_class, new_value, ta)
+      new_value.attributes[ta.attribute] << source_value
     end
 
-    def update_source_association(assoc, sa, new_source_value)
-      # appointment.patient = patient_value (i.e. source is changing)
-      # means appointment.doctor.patients.delete(appointment.patient)
-      # means appointment.doctor.patients << patient_value
-      belongs_to_value = @attributes[assoc.attribute]
-      current_source_value = @attributes[sa.source]
-      return unless belongs_to_value
-      unless belongs_to_value.attributes[sa.attribute].nil? || current_source_value.nil?
-        belongs_to_value.attributes[sa.attribute].delete(current_source_value)
-      end
-      return unless new_source_value
-      belongs_to_value.attributes[sa.attribute] ||= Collection.new(sa.klass(new_source_value), belongs_to_value, sa)
-      belongs_to_value.attributes[sa.attribute] << new_source_value
+    def update_source_association(sa, source_value, current_value, new_value)
+      source_inverse_collection = source_value.attributes[sa.attribute]
+      source_inverse_collection.delete(current_value) if source_inverse_collection
+      return unless new_value
+      source_value.attributes[sa.attribute] ||= Collection.new(sa.owner_class, source_value, sa)
+      source_value.attributes[sa.attribute] << new_value
     end
   end
 end
