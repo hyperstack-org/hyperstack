@@ -7,7 +7,7 @@ module ReactiveRecord
         return if new?
         if id.present?
           value = Base.fetch_from_db([@model, [:find, id], attr, @model.primary_key])
-          klass = Base.fetch_from_db([@model, [:find, id], attr, 'class', 'name'])
+          klass = Base.fetch_from_db([@model, [:find, id], attr, 'model_name'])
           klass &&= Object.const_get(klass)
         end
         value = find_association(assoc, value, klass)
