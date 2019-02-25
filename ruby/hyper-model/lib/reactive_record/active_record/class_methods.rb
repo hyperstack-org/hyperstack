@@ -377,32 +377,53 @@ module ActiveRecord
 
             associations = reflect_on_all_associations
 
+            already_processed_keys = Set.new
+            old_param = param.dup
+
             param = param.collect do |key, value|
-              assoc = associations.detect do |association|
-                association.association_foreign_key == key
+              next if already_processed_keys.include? key
+
+              model_name = model_id = nil
+
+              assoc = associations.detect do |poly_assoc|
+                if key == poly_assoc.polymorphic_type_attribute
+                  model_name = value
+                  already_processed_keys << poly_assoc.association_foreign_key
+                elsif key == poly_assoc.association_foreign_key
+                  model_id = value
+                  already_processed_keys << poly_assoc.polymorphic_type_attribute
+                end
               end
 
               if assoc
                 if !value
                   [assoc.attribute, [nil]]
                 elsif assoc.polymorphic?
-                  model_name = param.detect { |k, *| k == "#{assoc.attribute}_type" }&.last
-                  model_name ||= target.send("#{assoc.attribute}_type")
+                  model_id ||= param.detect { |k, *| k == assoc.association_foreign_key }&.last
+                  model_id ||= target.send(assoc.attribute)&.id
+                  if model_id.nil?
+                    raise "Error in #{self.name}._react_param_conversion. \n"\
+                          "Could not determine the id of #{assoc.attribute} of #{target.inspect}.\n"\
+                          "It was not provided in the conversion data, "\
+                          "and it is unknown on the client"
+                  end
+                  model_name ||= param.detect { |k, *| k == assoc.polymorphic_type_attribute }&.last
+                  model_name ||= target.send(assoc.polymorphic_type_attribute)
                   unless Object.const_defined?(model_name)
                     raise "Error in #{self.name}._react_param_conversion. \n"\
                           "Could not determine the type of #{assoc.attribute} of #{target.inspect}.\n"\
                           "It was not provided in the conversion data, "\
                           "and it is unknown on the client"
                   end
-                  [assoc.attribute, { id: [value], model_name: [model_name] }]
+
+                  [assoc.attribute, { id: [model_id], model_name: [model_name] }]
                 else
                   [assoc.attribute, { id: [value]}]
                 end
               else
                 [key, [value]]
               end
-            end
-            # TODO: verify wrapping with load_data was added so broadcasting works in 1.0.0.lap28
+            end.compact
             ReactiveRecord::Base.load_data do
               ReactiveRecord::ServerDataCache.load_from_json(Hash[param], target)
             end

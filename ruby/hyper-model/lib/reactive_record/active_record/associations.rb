@@ -40,6 +40,7 @@ module ActiveRecord
       attr_reader :source
       attr_reader :source_type
       attr_reader :options
+      attr_reader :polymorphic_type_attribute
 
       def initialize(owner_class, macro, name, options = {})
         owner_class.reflect_on_all_associations << self
@@ -59,6 +60,7 @@ module ActiveRecord
           @source = options[:source] || @klass_name.underscore
           @source_type = options[:source_type] || @klass_name
         end
+        @polymorphic_type_attribute = "#{name}_type" if options[:polymorphic]
         @attribute = name
         @through_associations = Hash.new { |_h, k| [] unless k }
       end
@@ -136,9 +138,7 @@ module ActiveRecord
         source_belongs_to_association.through_associations(model)
       end
 
-      def polymorphic?
-        !@klass_name
-      end
+      alias :polymorphic? polymorphic_type_attribute
 
       def inverse(model = nil)
         return @inverse if @inverse

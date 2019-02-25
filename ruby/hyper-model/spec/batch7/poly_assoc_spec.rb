@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'test_components'
 require 'rspec-steps'
 
-describe "polymorphic relationships", js: true, skip: true do
+describe "polymorphic relationships", js: true do
 
   before(:all) do
     require 'pusher'
@@ -173,12 +173,13 @@ describe "polymorphic relationships", js: true, skip: true do
     def compare_to_server(model, expression, expected_result, load=true)
       server_side = eval("#{model.class}.find(#{model.id}).#{expression}")
       expect(server_side).to eq(expected_result)
+      be_expected_result = expected_result.is_a?(Array) ? contain_exactly(*expected_result) : eq(expected_result)
       if load
         expect_promise("Hyperstack::Model.load { #{model.class}.find(#{model.id}).#{expression} }")
-        .to contain_exactly(*expected_result)
+        .to be_expected_result
       else
         wait_for_ajax
-        expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to contain_exactly(*expected_result)
+        expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to be_expected_result
       end
     end
 
@@ -216,6 +217,7 @@ describe "polymorphic relationships", js: true, skip: true do
     it 'create server side with broadcast update' do
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12']
       Picture.create(name: 'picture15', imageable: @imageable1)
+      wait_for_ajax
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12', 'picture15'], false
     end
 
@@ -234,27 +236,25 @@ describe "polymorphic relationships", js: true, skip: true do
 
     it 'changing belongs to relationship on client' do
       # not working yet
-      # compare_to_server @picture11, 'imageable.name',        'imageable1'
-      # compare_to_server @picture21, 'imageable.name',        'imageable2'
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12']
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22']
-
-      evaluate_ruby do
+      evaluate_promise do
         p = Picture.find(1)
         p.imageable = Product.find(1)
         p.save
       end
-      binding.pry
+      wait_for_ajax
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture12'], false
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture11', 'picture21', 'picture22'], false
     end
 
     it 'changing belongs to relationship on server' do
+      # compare_to_server @picture11, 'imageable.name',        'imageable1'  # here for debug assist
+      # compare_to_server @picture11, 'imageable.ss',          '123'          # here for debug assist
+
       # just debugging here... when id doesn't change we don't realize that data is changing
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12']
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22']
-
-      wait_for_ajax
       p = Picture.find_by_name('picture11')
       p.imageable = @imageable2
       p.save
