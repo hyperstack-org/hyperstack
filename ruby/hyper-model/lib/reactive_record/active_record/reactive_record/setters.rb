@@ -44,9 +44,11 @@ module ReactiveRecord
 
     def set_belongs_to(assoc, raw_value)
       set_common(assoc.attribute, raw_value) do |value, attr|
-        update_has_many_through_associations assoc, value
-        update_current_inverse_attribute     assoc, @attributes[assoc.attribute]
-        update_new_inverse_attribute         assoc, value
+        current_value = @attributes[assoc.attribute]
+        update_has_many_through_associations assoc, current_value, :remove_member
+        update_has_many_through_associations assoc, value, :add_member
+        remove_current_inverse_attribute     assoc, current_value
+        add_new_inverse_attribute            assoc, value
         update_belongs_to                    attr,  value.itself
       end
     end
@@ -134,7 +136,7 @@ module ReactiveRecord
     # change from has_one to has_many.  So we first deal with the current value, then
     # update the new value which uses the push_onto_collection helper
 
-    def update_current_inverse_attribute(association, model)
+    def remove_current_inverse_attribute(association, model)
       return if model.nil?
       inverse_association = association.inverse(model)
       if inverse_association.collection?
@@ -146,7 +148,7 @@ module ReactiveRecord
       end
     end
 
-    def update_new_inverse_attribute(association, model)
+    def add_new_inverse_attribute(association, model)
       return if model.nil?
       inverse_association = association.inverse(model)
       if inverse_association.collection?
@@ -191,36 +193,28 @@ module ReactiveRecord
     # and we have to then find any inverse has_many_through association (i.e. group or projects.uzers) and delete the
     # current value from those collections and push the new value on
 
-    def update_has_many_through_associations(assoc, value)
-      # note that through and source_associations returns an empty set of
-      # the provided ar_instance does not belong to a has_many_through association
+    def update_has_many_through_associations(assoc, value, method)
+      return if value.nil?
       assoc.through_associations(value).each do |ta|
         source_value = @attributes[ta.source]
-        current_value = @attributes[assoc.attribute]
         # skip if source value is nil or if type of the association does not match type of source
         next unless source_value.class.to_s == ta.source_type
-        update_through_association(ta, source_value, current_value, value)
+        ta.send method, source_value, value
         ta.source_associations(source_value).each do |sa|
-          update_source_association(sa, source_value, current_value, value)
+          sa.send method, value, source_value
         end
       end
     end
 
-    def update_through_association(ta, source_value, current_value, new_value)
-      unless current_value.nil? || current_value.attributes[ta.attribute].nil?
-        current_value.attributes[ta.attribute].delete(source_value)
-      end
-      return unless new_value
-      new_value.attributes[ta.attribute] ||= Collection.new(ta.owner_class, new_value, ta)
-      new_value.attributes[ta.attribute] << source_value
-    end
+    # def remove_src_assoc(sa, source_value, current_value)
+    #   source_inverse_collection = source_value.attributes[sa.attribute]
+    #   source_inverse_collection.delete(current_value) if source_inverse_collection
+    # end
+    #
+    # def add_src_assoc(sa, source_value, new_value)
+    #   source_value.attributes[sa.attribute] ||= Collection.new(sa.owner_class, source_value, sa)
+    #   source_value.attributes[sa.attribute] << new_value
+    # end
 
-    def update_source_association(sa, source_value, current_value, new_value)
-      source_inverse_collection = source_value.attributes[sa.attribute]
-      source_inverse_collection.delete(current_value) if source_inverse_collection
-      return unless new_value
-      source_value.attributes[sa.attribute] ||= Collection.new(sa.owner_class, source_value, sa)
-      source_value.attributes[sa.attribute] << new_value
-    end
   end
 end

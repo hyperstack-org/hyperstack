@@ -177,12 +177,24 @@ module ActiveRecord
       def klass(model = nil)
         @klass ||= Object.const_get(@klass_name) if @klass_name
         raise "model is not correct class" if @klass && model && model.class != @klass
+        debugger unless @klass || model
         raise "no model supplied for polymorphic relationship" unless @klass || model
         @klass || model.class
       end
 
       def collection?
         [:has_many].include? @macro
+      end
+
+      def remove_member(member, owner)
+        collection = owner.attributes[attribute]
+        return if collection.nil?
+        collection.delete(member)
+      end
+
+      def add_member(member, owner)
+        owner.attributes[attribute] ||= Collection.new(owner_class, owner, assoc)
+        owner.attributes[attribute] << member
       end
     end
   end

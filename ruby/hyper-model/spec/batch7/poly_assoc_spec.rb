@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'test_components'
 require 'rspec-steps'
 
-describe "polymorphic relationships", js: true, skip: 'not working yet' do
+describe "polymorphic relationships", js: true, skip: 'wip' do
 
   before(:all) do
     require 'pusher'
@@ -18,12 +18,6 @@ describe "polymorphic relationships", js: true, skip: 'not working yet' do
       config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
     end
 
-    class ApplicationPolicy
-      always_allow_connection
-      regulate_all_broadcasts { |policy| policy.send_all }
-      allow_change(to: :all, on: [:create, :update, :destroy]) { true }
-    end
-
     class ActiveRecord::Base
       class << self
         def public_columns_hash
@@ -34,6 +28,17 @@ describe "polymorphic relationships", js: true, skip: 'not working yet' do
   end
 
   before(:each) do
+
+    # spec_helper resets the policy system after each test so we have to setup
+    # before each test
+    stub_const 'TestApplicationPolicy', Class.new
+    TestApplicationPolicy.class_eval do
+      always_allow_connection
+      regulate_all_broadcasts { |policy| policy.send_all }
+      allow_change(to: :all, on: [:create, :update, :destroy]) { true }
+    end
+
+    size_window(:small, :large)
 
     isomorphic do
 
@@ -164,11 +169,6 @@ describe "polymorphic relationships", js: true, skip: 'not working yet' do
       @imageable3 = Product.create(name:  'imageable3', description: 'product2 description')
 
     end
-    #
-    # it 'read has_many' do  # baseline
-    #   expect(@imageable1.pictures.collect(&:name)).to eq ['picture11', 'picture12']
-    #   expect(@imageable2.pictures.collect(&:name)).to eq ['picture21', 'picture22']
-    # end
 
     def compare_to_server(model, expression, expected_result, load=true)
       server_side = eval("#{model.class}.find(#{model.id}).#{expression}")
@@ -181,7 +181,6 @@ describe "polymorphic relationships", js: true, skip: 'not working yet' do
         expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to eq(expected_result)
       end
     end
-
 
     it 'read belongs_to' do
       compare_to_server @picture11, 'imageable.name',        'imageable1'
