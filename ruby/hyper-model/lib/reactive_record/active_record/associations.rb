@@ -177,7 +177,6 @@ module ActiveRecord
       def klass(model = nil)
         @klass ||= Object.const_get(@klass_name) if @klass_name
         raise "model is not correct class" if @klass && model && model.class != @klass
-        debugger unless @klass || model
         raise "no model supplied for polymorphic relationship" unless @klass || model
         @klass || model.class
       end
@@ -193,7 +192,7 @@ module ActiveRecord
       end
 
       def add_member(member, owner)
-        owner.attributes[attribute] ||= Collection.new(owner_class, owner, assoc)
+        owner.attributes[attribute] ||= ReactiveRecord::Collection.new(owner_class, owner, self)
         owner.attributes[attribute] << member
       end
     end
