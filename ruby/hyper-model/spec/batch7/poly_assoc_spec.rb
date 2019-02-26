@@ -273,8 +273,8 @@ describe "polymorphic relationships", js: true do
       @uzer2 = Uzer.create(name: 'uzer2', uzer_data: 'uzer data2')
       @uzer3 = Uzer.create(name: 'uzer3', uzer_data: 'uzer data3')
       @group1 = Group.create(name: 'group1', group_data: 'group data1')
-      @group1 = Group.create(name: 'group2', group_data: 'group data2')
-      @group1 = Group.create(name: 'group3', group_data: 'group data3')
+      @group2 = Group.create(name: 'group2', group_data: 'group data2')
+      @group3 = Group.create(name: 'group3', group_data: 'group data3')
       @project1 = Project.create(name: 'project1', project_data: 'project data1')
       @project2 = Project.create(name: 'project2', project_data: 'project data2')
       @project3 = Project.create(name: 'project3', project_data: 'project data3')
@@ -303,10 +303,13 @@ describe "polymorphic relationships", js: true do
       evaluate_promise do
         uzer = Uzer.find(1)
         group = Group.find(1)
-        uzer.groups << group # client side
-        group.save # needed for client side semantics
+        project = Membership.new(uzer: uzer, memerable: group)
+        #uzer.groups << group # client side
+        #group.save # needed for client side semantics
+        project.save
       end
       binding.pry
+      @group1.reload
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id] # server side
     end
 

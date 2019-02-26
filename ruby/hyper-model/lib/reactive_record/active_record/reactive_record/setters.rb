@@ -45,12 +45,26 @@ module ReactiveRecord
     def set_belongs_to(assoc, raw_value)
       set_common(assoc.attribute, raw_value) do |value, attr|
         current_value = @attributes[assoc.attribute]
-        update_has_many_through_associations assoc, current_value, :remove_member
-        update_has_many_through_associations assoc, value, :add_member
-        remove_current_inverse_attribute     assoc, current_value
-        add_new_inverse_attribute            assoc, value
+        update_has_many_through_associations assoc, nil, current_value, :remove_member
+        update_has_many_through_associations assoc, nil, value, :add_member
+        remove_current_inverse_attribute     assoc, nil, current_value
+        add_new_inverse_attribute            assoc, nil, value
         update_belongs_to                    attr,  value.itself
       end
+    end
+
+    def set_belongs_to_via_has_many(orig, value)
+      puts "set_belongs_to_via_has_many(#{orig.inspect}, #{value.inspect})"
+      assoc = orig.inverse
+      attr = assoc.attribute
+      current_value = @attributes[attr]
+      puts "set_belongs_to_via_has_many(#{orig.attribute}, #{attr}, #{current_value.inspect}, #{value.inspect})"
+
+      update_has_many_through_associations assoc, orig, current_value, :remove_member
+      update_has_many_through_associations assoc, orig, value, :add_member
+      remove_current_inverse_attribute     assoc, orig, current_value
+      add_new_inverse_attribute            assoc, orig, value
+      update_belongs_to                    attr,  value.itself
     end
 
     def sync_has_many(attr)
@@ -136,9 +150,10 @@ module ReactiveRecord
     # change from has_one to has_many.  So we first deal with the current value, then
     # update the new value which uses the push_onto_collection helper
 
-    def remove_current_inverse_attribute(association, model)
+    def remove_current_inverse_attribute(association, orig, model)
       return if model.nil?
       inverse_association = association.inverse(model)
+      return if inverse_association == orig
       if inverse_association.collection?
         # note we don't have to check if the collection exists, since it must
         # exist as at this ar_instance is already part of it.
@@ -148,9 +163,10 @@ module ReactiveRecord
       end
     end
 
-    def add_new_inverse_attribute(association, model)
+    def add_new_inverse_attribute(association, orig, model)
       return if model.nil?
       inverse_association = association.inverse(model)
+      return if inverse_association == orig
       if inverse_association.collection?
         model.backing_record.push_onto_collection(@model, inverse_association, @ar_instance)
       else
@@ -193,9 +209,10 @@ module ReactiveRecord
     # and we have to then find any inverse has_many_through association (i.e. group or projects.uzers) and delete the
     # current value from those collections and push the new value on
 
-    def update_has_many_through_associations(assoc, value, method)
+    def update_has_many_through_associations(assoc, orig, value, method)
       return if value.nil?
       assoc.through_associations(value).each do |ta|
+        next if orig == ta
         source_value = @attributes[ta.source]
         # skip if source value is nil or if type of the association does not match type of source
         next unless source_value.class.to_s == ta.source_type
