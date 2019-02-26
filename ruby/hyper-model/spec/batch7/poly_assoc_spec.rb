@@ -158,6 +158,19 @@ describe "polymorphic relationships", js: true do
 
   end
 
+  def compare_to_server(model, expression, expected_result, load=true)
+    server_side = eval("#{model.class}.find(#{model.id}).#{expression}")
+    expect(server_side).to eq(expected_result)
+    be_expected_result = expected_result.is_a?(Array) ? contain_exactly(*expected_result) : eq(expected_result)
+    if load
+      expect_promise("Hyperstack::Model.load { #{model.class}.find(#{model.id}).#{expression} }")
+      .to be_expected_result
+    else
+      wait_for_ajax
+      expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to be_expected_result
+    end
+  end
+
   context "simple polymorphic relationship" do
     before(:each) do
       @imageable1 = Employee.create(name: 'imageable1', ss: '123')
@@ -170,18 +183,6 @@ describe "polymorphic relationships", js: true do
 
     end
 
-    def compare_to_server(model, expression, expected_result, load=true)
-      server_side = eval("#{model.class}.find(#{model.id}).#{expression}")
-      expect(server_side).to eq(expected_result)
-      be_expected_result = expected_result.is_a?(Array) ? contain_exactly(*expected_result) : eq(expected_result)
-      if load
-        expect_promise("Hyperstack::Model.load { #{model.class}.find(#{model.id}).#{expression} }")
-        .to be_expected_result
-      else
-        wait_for_ajax
-        expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to be_expected_result
-      end
-    end
 
     it 'read belongs_to' do
       compare_to_server @picture11, 'imageable.name',        'imageable1'
@@ -281,30 +282,36 @@ describe "polymorphic relationships", js: true do
 
     it 'loads previously defined data client side' do
       @uzer1.groups << @group1
-      # run this on client after above
-      expect(@group1.uzers.collect(&:id)).to eq [@uzer1.id]
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id]
     end
 
     it 'creates due to a broadcast client side' do
-      expect(@group1.uzers.count).to eq(0)  # client side
+      compare_to_server @group1, 'uzers.collect(&:id)', [] # client side
       @uzer1.groups << @group1 # server side
-      expect(@group1.uzers.collect(&:id)).to eq [@uzer1.id] # client side
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # client side
     end
 
     it 'destroys due to a broadcast client side' do
       @uzer1.groups << @group1 # server side
-      expect(@group1.uzers.collect(&:id)).to eq [@uzer1.id] # client
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id] # client
       Membership.find_by(uzer: @uzer1, memerable: @group1).destroy # server side
-      expect(@group1.uzers.count).to eq(0)  # client side
+      compare_to_server @group1, 'uzers.count', 0  # client side
     end
 
     it 'updates the server when new entries are made on the client' do
-      @uzer1.groups << @group1 # client side
-      @uzer1.save # needed for client side semantics
-      expect(@group1.uzers.collect(&:id)).to eq [@uzer1.id] # server side
+      # Not Working!
+      evaluate_promise do
+        uzer = Uzer.find(1)
+        group = Group.find(1)
+        uzer.groups << group # client side
+        group.save # needed for client side semantics
+      end
+      binding.pry
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id] # server side
     end
 
     it 'updates the server when entries are deleted on the client' do
+      # Not converted to client side execution
       @uzer1.groups << @group1 # server side
       Membership.find_by(uzer: @uzer1, memerable: @group1).destroy # client side
       expect(@group1.uzers.count).to eq(0)  # server side
