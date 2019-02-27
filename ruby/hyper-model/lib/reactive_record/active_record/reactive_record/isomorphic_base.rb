@@ -234,7 +234,7 @@ module ReactiveRecord
               if association.collection?
                 # following line changed from .all to .collection on 10/28
                 [*value.collection, *value.unsaved_children].each do |assoc|
-                  add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of) or assoc.new?
+                  add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of(assoc)) or assoc.new?
                 end
               elsif record.new? || record.changed?(attribute) || (record == record_being_saved && force)
                 if value.nil?
@@ -309,7 +309,6 @@ module ReactiveRecord
               promise.resolve response  # TODO this could be problematic... there was no .json here, so .... what's to do?
 
             rescue Exception => e
-              # debugger
               log("Exception raised while saving - #{e}", :error)
             ensure
               backing_records.each { |_id, record| record.saved! rescue nil } if save
