@@ -92,6 +92,8 @@ describe "polymorphic relationships", js: true do
         has_one :picture, as: :imageable
       end
 
+      class ReactiveRecord::Collection
+      end if RUBY_ENGINE == 'opal'
 
       class Membership < ActiveRecord::Base
         def self.build_tables
@@ -150,8 +152,6 @@ describe "polymorphic relationships", js: true do
         has_many :groups,   through: :memberships, source: :memerable, source_type: 'Group'
         has_many :projects, through: :memberships, source: :memerable, source_type: 'Project'
       end
-
-
     end
 
     [Picture, Employee, Product, Membership, Project, Group, Uzer].each { |klass| klass.build_tables }
@@ -180,9 +180,7 @@ describe "polymorphic relationships", js: true do
       @picture21 =  Picture.create(name:  'picture21',  imageable:   @imageable2)
       @picture22 =  Picture.create(name:  'picture22',  imageable:   @imageable2)
       @imageable3 = Product.create(name:  'imageable3', description: 'product2 description')
-
     end
-
 
     it 'read belongs_to' do
       compare_to_server @picture11, 'imageable.name',        'imageable1'
@@ -278,48 +276,52 @@ describe "polymorphic relationships", js: true do
       @project1 = Project.create(name: 'project1', project_data: 'project data1')
       @project2 = Project.create(name: 'project2', project_data: 'project data2')
       @project3 = Project.create(name: 'project3', project_data: 'project data3')
+      # client scopes have the be 'live' on the display to be automatically updated
+      # so we have this handy component to keep the @group1.uzers scope live.
+      mount 'Testing123' do
+        class Testing123 < HyperComponent
+          render(UL) do
+            Group.find(1).uzers.each { |uzer| LI { uzer.id.to_s }}
+          end
+        end
+      end
     end
 
     it 'loads previously defined data client side' do
       @uzer1.groups << @group1
-      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id]
+      wait_for_ajax
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
     it 'creates due to a broadcast client side' do
-      compare_to_server @group1, 'uzers.collect(&:id)', [] # client side
-      @uzer1.groups << @group1 # server side
-      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # client side
+      @uzer1.groups << @group1
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
     it 'destroys due to a broadcast client side' do
       @uzer1.groups << @group1 # server side
-      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id] # client
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # client
       Membership.find_by(uzer: @uzer1, memerable: @group1).destroy # server side
-      compare_to_server @group1, 'uzers.count', 0  # client side
+      compare_to_server @group1, 'uzers.count', 0, false  # client side
     end
 
     it 'updates the server when new entries are made on the client' do
-      # Not Working!
-      evaluate_promise do
-        uzer = Uzer.find(1)
-        group = Group.find(1)
-        project = Membership.new(uzer: uzer, memerable: group)
-        #uzer.groups << group # client side
-        #group.save # needed for client side semantics
-        project.save
+      evaluate_ruby do
+        Uzer.find(1).groups << Group.find(1) # client side
       end
-      #binding.pry
+      wait_for_ajax
       @group1.reload
-      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id] # server side
+      compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # server side
     end
 
     it 'updates the server when entries are deleted on the client' do
-      # Not converted to client side execution
       @uzer1.groups << @group1 # server side
-      Membership.find_by(uzer: @uzer1, memerable: @group1).destroy # client side
-      expect(@group1.uzers.count).to eq(0)  # server side
+      evaluate_promise do
+        Hyperstack::Model.load do
+          Membership.find_by(uzer_id: 1, memerable_id: 1, memerable_type: 'Group')
+        end.then(&:destroy)
+      end
+      compare_to_server @group1, 'uzers.count', 0, false
     end
-
   end
-
 end

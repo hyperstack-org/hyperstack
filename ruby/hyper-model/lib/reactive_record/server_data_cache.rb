@@ -492,9 +492,7 @@ keys:
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
             klass = value[:model_name] ? Object.const_get(value[:model_name].first) : association.klass
             new_target = ReactiveRecord::Base.find_by_id(klass, value[:id].first)
-            puts "got a new_target #{new_target.inspect}"
             target.send "#{method}=", new_target
-            puts "and that worked!"
           elsif !(target.class < ActiveRecord::Base)
             new_target = target.send(*method)
             # value is an array if scope returns nil, so we destroy the bogus record

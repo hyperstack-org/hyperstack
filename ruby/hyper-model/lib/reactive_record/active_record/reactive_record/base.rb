@@ -253,7 +253,7 @@ module ReactiveRecord
         return if @create_sync
         @create_sync = true
       end
-      model.unscoped << ar_instance
+      model.unscoped._internal_push ar_instance
       @synced_with_unscoped = !@synced_with_unscoped
     end
 

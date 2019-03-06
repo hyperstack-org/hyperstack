@@ -29,7 +29,6 @@ module ReactiveRecord
     end
 
     def set_has_many(assoc, raw_value)
-      puts "********* set_has_many called **********"
       set_common(assoc.attribute, raw_value) do |value, attr|
         # create a new collection to hold value, shove it in, and return the new collection
         # the replace method will take care of updating the inverse belongs_to links as
@@ -54,12 +53,9 @@ module ReactiveRecord
     end
 
     def set_belongs_to_via_has_many(orig, value)
-      puts "set_belongs_to_via_has_many(#{orig.inspect}, #{value.inspect})"
       assoc = orig.inverse
       attr = assoc.attribute
       current_value = @attributes[attr]
-      puts "set_belongs_to_via_has_many(#{orig.attribute}, #{attr}, #{current_value.inspect}, #{value.inspect})"
-
       update_has_many_through_associations assoc, orig, current_value, :remove_member
       update_has_many_through_associations assoc, orig, value, :add_member
       remove_current_inverse_attribute     assoc, orig, current_value
@@ -179,7 +175,7 @@ module ReactiveRecord
 
     def push_onto_collection(model, association, ar_instance)
       @attributes[association.attribute] ||= Collection.new(model, @ar_instance, association)
-      @attributes[association.attribute] << ar_instance
+      @attributes[association.attribute]._internal_push ar_instance
     end
 
     # class Membership < ActiveRecord::Base

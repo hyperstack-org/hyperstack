@@ -77,6 +77,8 @@ module ReactiveRecord
         (@collection.length..index).each do |i|
           new_dummy_record = ReactiveRecord::Base.new_from_vector(@target_klass, nil, *@vector, "*#{i}")
           new_dummy_record.attributes[@association.inverse_of] = @owner if @association && !@association.through_association?
+          # HMT-TODO: the above needs to be looked into... if we are a hmt then don't we need to create a dummy on the joins collection as well?
+          # or maybe this just does not work for HMT?
           @collection << new_dummy_record
         end
       end
@@ -212,7 +214,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       return [] unless attrs[@association.inverse_of] == @owner
       if !@association.through_association
         [record]
-      elsif (source = attrs[@association.source])
+      elsif (source = attrs[@association.source]) && source.is_a?(@target_klass)
         [source]
       else
         []
@@ -233,7 +235,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def in_this_collection(related_records)
-      return related_records unless @association
+      # HMT-TODO: I don't think we can get a set of related records here with a through association unless they are part of the collection
+      return related_records if !@association || @association.through_association?
       related_records.select do |r|
         r.backing_record.attributes[@association.inverse_of] == @owner
       end
@@ -406,7 +409,11 @@ To determine this sync_scopes first asks if the record being changed is in the s
     def set_belongs_to(child)
       if @owner
         # TODO this is major broken...current
-        child.send("#{@association.inverse_of}=", @owner) if @association && !@association.through_association
+        if (through_association = @association.through_association)
+          # HMT-TODO: create a new record with owner and child
+        else
+          child.send("#{@association.inverse_of}=", @owner) if @association && !@association.through_association
+        end
       elsif @parent
         @parent.set_belongs_to(child)
       end
@@ -421,7 +428,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def update_child(item)
       backing_record = item.backing_record
-      if backing_record && @owner && @association && item.attributes[@association.inverse_of] != @owner #&& !@association.through_association?
+      # HMT TODO:  The following && !association.through_association was commented out, causing wrong class items to be added to
+      # associations
+      # Why was it commented out.
+      if backing_record && @owner && @association && item.attributes[@association.inverse_of] != @owner && !@association.through_association?
         inverse_of = @association.inverse_of
         current_association_value = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
@@ -440,6 +450,17 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def push(item)
+      if (through_association = @association&.through_association)
+        through_association.klass.create(@association.inverse_of => @owner, @association.source => item)
+        self
+      else
+        _internal_push(item)
+      end
+    end
+
+    alias << push
+
+    def _internal_push(item)
       item.itself # force get of at least the id
       if collection
         self.force_push item
@@ -454,8 +475,6 @@ To determine this sync_scopes first asks if the record being changed is in the s
       end
       self
     end
-
-    alias << push
 
     def sort!(*args, &block)
       replace(sort(*args, &block))
@@ -529,10 +548,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
       if new_array.is_a? Collection
         @dummy_collection = new_array.dummy_collection
         @dummy_record = new_array.dummy_record
-        new_array.collection.each { |item| self << item } if new_array.collection
+        new_array.collection.each { |item| _internal_push item } if new_array.collection
       else
         @dummy_collection = @dummy_record = nil
-        new_array.each { |item| self << item }
+        new_array.each { |item| _internal_push item }
       end
       notify_of_change new_array
     end
@@ -540,9 +559,9 @@ To determine this sync_scopes first asks if the record being changed is in the s
     def delete(item)
       unsaved_children.delete(item)
       notify_of_change(
-        if @owner && @association && !@association.through_association?
+        if @owner && @association
           inverse_of = @association.inverse_of
-          if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner
+          if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner && !@association.through_association?
             # the if prevents double update if delete is being called from << (see << above)
             backing_record.update_belongs_to(inverse_of, nil)
           end
