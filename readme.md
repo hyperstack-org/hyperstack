@@ -52,6 +52,7 @@ Hyperstack is evolving; we are improving it all the time. As much as we love Rub
 Please see the  [ROADMAP][] file for more information.
 
 [roadmap]: ROADMAP.md
+[current status]: current-status.md
 
 ## Contributing
 

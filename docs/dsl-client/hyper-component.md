@@ -1212,8 +1212,6 @@ Event names:
 
 ## Javascript Components
 
-**TODO - improve this section**
-
 Hyperstack gives you full access to the entire universe of JavaScript libraries and components directly within your Ruby code.
 
 Everything you can do in JavaScript is simple to do in Ruby; this includes passing parameters between Ruby and JavaScript and even passing Ruby methods as JavaScript callbacks. See the JavaScript section for more information.
@@ -1222,9 +1220,9 @@ While it is quite possible to develop large applications purely in Hyperstack Co
 
 Either way you are going to need to import Javascript components into the Hyperstack namespace. Hyperstack provides both manual and automatic mechanisms to do this depending on the level of control you need.
 
-### Importing Components
+### Importing React Components
 
-Lets say you have an existing React Component written in javascript that you would like to access from Hyperstack.  
+Let's say you have an existing React Component written in Javascript that you would like to access from Hyperstack.  
 
 Here is a simple hello world component:
 
@@ -1254,75 +1252,70 @@ end
 
 The `imports` directive takes a string (or a symbol) and will simply evaluate it and check to make sure that the value looks like a React component, and then set the underlying native component to point to the imported component.
 
-### The dom_node method
+### Importing Javascript or React Libraries
 
-Returns the HTML dom_node that this component instance is mounted to.  Typically used in the `after_mount` method to setup linkages to external libraries.
+Importing and using React libraries from inside Hyperstack is very simple and very powerful. Any JavaScript or React based library can be accessible in your Ruby code.
 
-Example:
+Using Webpacker (or Webpack) there are just a few simple steps:
 
-TODO
++ Add the library source to your project using `yarn` or `npm`
++ Import the JavaScript objects you require
++ Package your bundle with `webpack`
++ Use the JavaScript or React component as if it were a Ruby class
 
-### Importing Libraries
+Here is an example of setting up [Material UI](https://material-ui.com/):
 
-Many React components come in libraries.  The `ReactBootstrap` library is one example.  You can import the whole library at once using the `React::NativeLibrary` class.  Assuming that you have initialized `ReactBootstrap` elsewhere, this is how you would bring it into Hyperstack.
+Firstly, you install the library:
+
+```
+// with yarn
+yarn add @material-ui/core
+
+// or with npm
+npm install @material-ui/core
+```
+
+Next you import the objects you plan to us (or you can import the whole library)
 
 ```ruby
-class RBS < React::NativeLibrary
-  imports 'ReactBootstrap'
+# app/javascript/packs/hyperstack.js
+
+# to import the whole library
+import * as Mui from '@material-ui/core';
+global.Mui = Mui;
+
+# or if you just want one component from the library
+import Button from '@material-ui/core/Button';
+global.Button = Button;
+```
+
+The run webpack to build your bundle:
+
+```
+bin/webpack
+```
+
+Now you can use Material UI Components in your Ruby code:
+
+```ruby
+# if you imported the whole library
+Mui.Button(variant: :contained, color: :primary) { "Click me" }.on(:click) do
+  alert 'you clicked the button!'
+end
+
+# if you just imported the Button component
+Button(variant: :contained, color: :primary) { "Click me" }.on(:click) do
+  alert 'you clicked the button!'
 end
 ```
 
-We can now access our bootstrap components as components defined within the RBS scope:
+Libraries used often with Hyperstack projects:
 
-```ruby
-class Show < HyperComponent
++ [Material UI](https://material-ui.com/) Google's Material UI as React components
++ [Semantic UI](https://react.semantic-ui.com/) A React wrapper for the Semantic UI stylesheet
++ [ReactStrap](https://reactstrap.github.io/) Bootstrap 4 React wrapper
 
-  def say_hello(i)
-    alert "Hello from number #{i}"
-  end
-
-  render RBS::Navbar, bsStyle: :inverse do
-    RBS::Nav() do
-      RBS::NavbarBrand() do
-        A(href: '#') { 'Hyperstack Showcase' }
-      end
-      RBS::NavDropdown(eventKey: 1, title: 'Things', id: :drop_down) do
-        (1..5).each do |n|
-          RBS::MenuItem(href: '#', key: n, eventKey: "1.#{n}") do
-            "Number #{n}"
-          end.on(:click) { say_hello(n) }
-        end
-      end
-    end
-  end
-end
-```
-
-Besides the `imports` directive, `React::NativeLibrary` also provides a rename directive that takes pairs in the form `oldname => newname`.  For example:
-
-```ruby
-  rename 'NavDropdown' => 'NavDD', 'Navbar' => 'NavBar', 'NavbarBrand' => 'NavBarBrand'
-```
-
-`React::NativeLibrary` will import components that may be deeply nested in the library.  For example consider a component was defined as `MyLibrary.MySubLibrary.MyComponent`:
-
-```ruby
-class MyLib < React::NativeLibrary
-  imports 'MyLibrary'
-end
-
-class App < React::NativeLibrary
-  render do  
-    ...
-    MyLib::MySubLibrary::MyComponent ...
-    ...
-  end
-end
-```
-
-Note that the `rename` directive can be used to rename both components and sublibraries, giving you full control over the ruby names of the components and libraries.
-
-### Importing Webpack Images
+### Importing Image Assets via Webpack
 
 If you store your images in app/javascript/images directory and want to display them in components, please add the following code to app/javascript/packs/application.js
 
@@ -1354,7 +1347,7 @@ Add the following helper
 
 module ImagesImport
   def img_src(filepath)
-    img_map = Native(`webpackImagesMap`) 
+    img_map = Native(`webpackImagesMap`)
     img_map["./#{filepath}"]
   end
 end
@@ -1377,22 +1370,55 @@ IMG(src: img_src('logo.png'))               # app/javascript/images/logo.png
 IMG(src: img_src('landing/some_image.png')) # app/javascript/images/landing/some_image.png
 ```
 
+### The dom_node method
 
-### Auto Import
+Returns the HTML dom_node that this component instance is mounted to.  Typically used in the `after_mount` method to setup linkages to external libraries.
 
-If you use a lot of libraries and are using a Javascript tool chain with Webpack, having to import the libraries in both Hyperstack and Webpack is redundant and just hard work.
+Example:
 
-Instead you can opt-in for *auto importing* Javascript components into Hyperstack as you need them.  Simply `require hyper-react/auto-import` immediately after you `require hyper-react`.  
+TODO - write example
 
-Now you do not have to use component `imports` directive or `React::NativeLibrary` unless you need to rename a component.
+### The `as_node` and `to_n` methods
 
-In Ruby all module and class names normally begin with an uppercase letter.  However in Javascript this is not always the case, so the auto import will first try the Javascript name that exactly matches the Ruby name, and if that fails it will try the same name with the first character downcased.  For example
+Sometimes you need to create a Component without rendering it so you can pass it as a parameter of a method. This model is used often in the React world.
 
-`MyComponent` will first try `MyComponent` in the Javascript name space, then `myComponent`.
+The example below is taken from Semantic UI, building a [Tab Component](https://react.semantic-ui.com/modules/tab/#types-basic) with multiple tabs:
 
-Likewise MyLib::MyComponent would match any of the following in the Javascript namespace: `MyLib.MyComponent`, `myLib.MyComponent`, `MyLib.myComponent`, `myLib.myComponent`
+Here is the Javascript example:
 
-*How it works:  The first time Ruby hits a native library or component name, the constant value will not be defined.  This will trigger a lookup in the javascript name space for the matching component or library name.  This will generate either a new subclass of HyperComponent or React::NativeLibrary that imports the javascript object, and no further lookups will be needed.*
+```javascript
+import React from 'react'
+import { Tab } from 'semantic-ui-react'
+
+const panes = [
+  { menuItem: 'Tab 1', render: () => <Tab.Pane>Tab 1 Content</Tab.Pane> },
+  { menuItem: 'Tab 2', render: () => <Tab.Pane>Tab 2 Content</Tab.Pane> },
+]
+
+const TabExampleBasic = () => <Tab panes={panes} />
+
+export default TabExampleBasic
+```
+
+And here is the same example converted to Ruby:
+
+```ruby
+# notice we use .as_node to create the Component without rendering it
+tab_1 = Sem.TabPane do
+  P { 'Tab 1 Content' }
+end.as_node
+
+tab_2 = Sem.TabPane do
+  P { 'Tab 2 Content' }
+end.as_node
+
+# notice how we use .to_n to convert the Ruby component to a native JS object
+panes = [ {menuItem: 'Tab 1', render: -> { tab_1.to_n } },
+          {menuItem: 'Tab 2', render: -> { tab_2.to_n } }
+]
+
+Sem.Tab(panes: panes.to_n )
+```
 
 ### Including React Source  
 
@@ -1403,12 +1429,6 @@ However it gets a little tricky if you are using the react-rails gem.  Each vers
 ```bash
 npm install react@15.0.2 react-dom@15.0.2 --save
 ```  
-
-### Using Webpack
-
-Just a word on Webpack: If you a Ruby developer who is new to using Javascript libraries then we recommend using Webpack to manage javascript component dependencies.  Webpack is essentially bundler for Javascript. Please see our Tutorials section for more information.
-
-There are also good tutorials on integrating Webpack with existing rails apps a google search away.
 
 
 ## Elements and Rendering
