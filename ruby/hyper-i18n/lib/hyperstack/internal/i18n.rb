@@ -30,7 +30,7 @@ module Hyperstack
         end
 
         f.when_on_server do
-          @server_data_cache[:t][attribute] = ::I18n.t(attribute, opts.with_indifferent_access)
+          @server_data_cache[:t][attribute] = ::I18n.t(attribute, opts.symbolize_keys)
         end
       end
 
@@ -60,7 +60,7 @@ module Hyperstack
           @server_data_cache[:l][date_or_time.to_s] ||= {}
 
           @server_data_cache[:l][date_or_time.to_s][format] =
-            ::I18n.l(date_or_time, opts.with_indifferent_access.merge(format: format))
+            ::I18n.l(date_or_time, opts.with_indifferent_access.merge(format: format).symbolize_keys)
         end
       end
 

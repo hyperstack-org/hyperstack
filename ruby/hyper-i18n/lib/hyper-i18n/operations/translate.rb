@@ -6,7 +6,7 @@ module HyperI18n
     param :translation, default: nil
 
     def opts
-      params.opts.with_indifferent_access
+      params.opts.symbolize_keys
     end
 
     step do

@@ -8,7 +8,7 @@ module Hyperstack
         param :translation, default: nil
 
         def opts
-          params.opts.with_indifferent_access
+          params.opts.symbolize_keys
         end
 
         step do
