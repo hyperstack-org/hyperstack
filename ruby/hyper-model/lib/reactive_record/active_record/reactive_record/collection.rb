@@ -587,9 +587,14 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @dummy_collection.loading?
     end
 
-    def loaded?
-      false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
-    end
+    # def loading?
+    #   !@collection || (@dummy_collection && @dummy_collection.loading?) || (@owner && !@owner.id && @vector && @vector.length <= 1)
+    # end
+
+    # def loaded?
+    #   @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || !@vector || @vector.length > 1)
+    #   #false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
+    # end
 
     def empty?
       # should be handled by method missing below, but opal-rspec does not deal well
