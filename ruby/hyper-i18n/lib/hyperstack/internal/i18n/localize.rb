@@ -15,7 +15,9 @@ module Hyperstack
         end
 
         def opts
-          @opts ||= params.opts.with_indifferent_access.merge(format: formatted_format(params.format))
+          @opts ||= params.opts.with_indifferent_access
+                          .merge(format: formatted_format(params.format))
+                          .symbolize_keys
         end
 
         step do
