@@ -14,6 +14,10 @@ gem_group :development do
   gem 'foreman'
 end
 
+# ----------------------------------- Ensure Sqlite has a valid version
+
+gsub_file 'Gemfile', /gem\s+'sqlite3'(?!,\s+'.*')\n/, "gem 'sqlite3', '~> 1.3.6'\n"
+
 # ----------------------------------- Create the folders
 
 run 'mkdir app/hyperstack'
