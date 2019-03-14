@@ -77,6 +77,11 @@ module ReactiveRecord
         (@collection.length..index).each do |i|
           new_dummy_record = ReactiveRecord::Base.new_from_vector(@target_klass, nil, *@vector, "*#{i}")
           new_dummy_record.attributes[@association.inverse_of] = @owner if @association && !@association.through_association?
+<<<<<<< Updated upstream
+=======
+          # HMT-TODO: the above needs to be looked into... if we are a hmt then don't we need to create a dummy on the joins collection as well?
+          # or maybe this just does not work for HMT?
+>>>>>>> Stashed changes
           @collection << new_dummy_record
         end
       end
@@ -212,7 +217,11 @@ To determine this sync_scopes first asks if the record being changed is in the s
       return [] unless attrs[@association.inverse_of] == @owner
       if !@association.through_association
         [record]
+<<<<<<< Updated upstream
       elsif (source = attrs[@association.source])
+=======
+      elsif (source = attrs[@association.source]) && source.is_a?(@target_klass)
+>>>>>>> Stashed changes
         [source]
       else
         []
@@ -233,7 +242,12 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def in_this_collection(related_records)
+<<<<<<< Updated upstream
       return related_records unless @association
+=======
+      # HMT-TODO: I don't think we can get a set of related records here with a through association unless they are part of the collection
+      return related_records if !@association || @association.through_association?
+>>>>>>> Stashed changes
       related_records.select do |r|
         r.backing_record.attributes[@association.inverse_of] == @owner
       end
@@ -406,7 +420,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
     def set_belongs_to(child)
       if @owner
         # TODO this is major broken...current
+<<<<<<< Updated upstream
         child.send("#{@association.inverse_of}=", @owner) if @association && !@association.through_association
+=======
+        if (through_association = @association.through_association)
+          # HMT-TODO: create a new record with owner and child
+        else
+          child.send("#{@association.inverse_of}=", @owner) if @association && !@association.through_association
+        end
+>>>>>>> Stashed changes
       elsif @parent
         @parent.set_belongs_to(child)
       end
@@ -421,6 +443,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     def update_child(item)
       backing_record = item.backing_record
+<<<<<<< Updated upstream
       if backing_record && @owner && @association && !@association.through_association? && item.attributes[@association.inverse_of] != @owner
         inverse_of = @association.inverse_of
         current_association = item.attributes[inverse_of]
@@ -429,11 +452,44 @@ To determine this sync_scopes first asks if the record being changed is in the s
         if current_association && current_association.attributes[@association.attribute]
           current_association.attributes[@association.attribute].delete(item)
         end
+=======
+      # HMT TODO:  The following && !association.through_association was commented out, causing wrong class items to be added to
+      # associations
+      # Why was it commented out.
+      if backing_record && @owner && @association && item.attributes[@association.inverse_of] != @owner && !@association.through_association?
+        inverse_of = @association.inverse_of
+        current_association_value = item.attributes[inverse_of]
+        backing_record.virgin = false unless backing_record.data_loading?
+        #backing_record.update_belongs_to(inverse_of, @owner)
+        backing_record.set_belongs_to_via_has_many(@association, @owner)
+        # following is handled by update_belongs_to and is redundant
+        # unless current_association_value.nil?  # might be a dummy value which responds to nil
+        #   current_association = @association.inverse.inverse(current_association_value)
+        #   current_association_attribute = current_association.attribute
+        #   if current_association.collection? && current_association_value.attributes[current_association_attribute]
+        #     current_association.attributes[current_association_attribute].delete(item)
+        #   end
+        # end
+>>>>>>> Stashed changes
         @owner.backing_record.sync_has_many(@association.attribute)
       end
     end
 
     def push(item)
+<<<<<<< Updated upstream
+=======
+      if (through_association = @association&.through_association)
+        through_association.klass.create(@association.inverse_of => @owner, @association.source => item)
+        self
+      else
+        _internal_push(item)
+      end
+    end
+
+    alias << push
+
+    def _internal_push(item)
+>>>>>>> Stashed changes
       item.itself # force get of at least the id
       if collection
         self.force_push item
@@ -449,8 +505,11 @@ To determine this sync_scopes first asks if the record being changed is in the s
       self
     end
 
+<<<<<<< Updated upstream
     alias << push
 
+=======
+>>>>>>> Stashed changes
     def sort!(*args, &block)
       replace(sort(*args, &block))
     end
@@ -523,10 +582,17 @@ To determine this sync_scopes first asks if the record being changed is in the s
       if new_array.is_a? Collection
         @dummy_collection = new_array.dummy_collection
         @dummy_record = new_array.dummy_record
+<<<<<<< Updated upstream
         new_array.collection.each { |item| self << item } if new_array.collection
       else
         @dummy_collection = @dummy_record = nil
         new_array.each { |item| self << item }
+=======
+        new_array.collection.each { |item| _internal_push item } if new_array.collection
+      else
+        @dummy_collection = @dummy_record = nil
+        new_array.each { |item| _internal_push item }
+>>>>>>> Stashed changes
       end
       notify_of_change new_array
     end
@@ -534,9 +600,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
     def delete(item)
       unsaved_children.delete(item)
       notify_of_change(
+<<<<<<< Updated upstream
         if @owner && @association && !@association.through_association?
           inverse_of = @association.inverse_of
           if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner
+=======
+        if @owner && @association
+          inverse_of = @association.inverse_of
+          if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner && !@association.through_association?
+>>>>>>> Stashed changes
             # the if prevents double update if delete is being called from << (see << above)
             backing_record.update_belongs_to(inverse_of, nil)
           end
@@ -562,9 +634,20 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @dummy_collection.loading?
     end
 
+<<<<<<< Updated upstream
     def loaded?
       false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
     end
+=======
+    # def loading?
+    #   !@collection || (@dummy_collection && @dummy_collection.loading?) || (@owner && !@owner.id && @vector && @vector.length <= 1)
+    # end
+
+    # def loaded?
+    #   @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || !@vector || @vector.length > 1)
+    #   #false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
+    # end
+>>>>>>> Stashed changes
 
     def empty?
       # should be handled by method missing below, but opal-rspec does not deal well
