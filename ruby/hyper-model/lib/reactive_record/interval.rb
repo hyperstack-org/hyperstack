@@ -168,12 +168,12 @@ end
 module Kernel
   # (see Browser::Window#after)
   def after(time, &block)
-    `setTimeout(#{block.to_n}, time * 1000)`
+    $window.after(time, &block)
   end
 
   # (see Browser::Window#after!)
   def after!(time, &block)
-    `setTimeout(#{block.to_n}, time * 1000)`
+    $window.after!(time, &block)
   end
 end
 
