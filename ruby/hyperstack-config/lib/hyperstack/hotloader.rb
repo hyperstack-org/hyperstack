@@ -19,19 +19,29 @@ module Hyperstack
       @@callbacks ||= Hash.new { |h, k| h[k] = Array.new }
     end
 
-    STACKDIRS = ['hyperstack/', 'corelib/']
+    STACKDIRS = ['hyperstack', 'corelib']
 
     def self.file_name(frame)
+      return unless frame
       file_name = `#{frame}.fileName`
-      match = %r{^(.+\/assets\/)(.+\/)(.+\/)}.match(file_name)
-      return unless match && match[2] == match[3] && !STACKDIRS.include?(match[2])
-      file_name.gsub(match[1] + match[2], '')
+      match = %r{^(.+\/assets)\/}.match(file_name)
+      return unless match
+      file_name = file_name.gsub(match[0], '').split('/')
+      n = (file_name.length - 1) / 2
+      return unless file_name[0..n - 1] == file_name[n..2 * n - 1]
+      return if STACKDIRS.include?(file_name[0])
+      "#{match[0]}#{file_name[0..n - 1].join('/')}/#{file_name[-1]}"
     end
 
     def self.when_file_updates(&block)
+      return if `Hyperstack.hotloader.ignore_callback_mapping`
       return callbacks[$_hyperstack_reloader_file_name] << block if $_hyperstack_reloader_file_name
       callback = lambda do |frames|
-        frames.collect(&method(:file_name)).each { |name| callbacks[name] << block if name }
+        # StackTrace.get maps the stack frames back to the source maps
+        # we then associate any files in the call stack that match our application file pattern
+        # with the block, which will remove any callbacks defined when those files were executing.
+        # Note that StackTrace.getSync gives us the raw .js file names so it will not work
+        frames.collect(&method(:file_name)).compact.uniq.each { |name| callbacks[name] << block if name }
       end
       error = lambda do |e|
         `console.error(#{"hyperstack hot loader could not find source file for callback: #{e}"})`

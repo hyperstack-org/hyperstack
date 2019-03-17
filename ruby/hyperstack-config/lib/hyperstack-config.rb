@@ -38,6 +38,7 @@ else
   require 'hyperstack/on_error'
   Hyperstack.define_setting :hotloader_port, 25222
   Hyperstack.define_setting :hotloader_ping, nil
+  Hyperstack.define_setting :hotloader_ignore_callback_mapping, false
   Hyperstack.import 'opal', gem: true
   Hyperstack.import 'browser', client_only: true
   Hyperstack.import 'hyperstack-config', gem: true
