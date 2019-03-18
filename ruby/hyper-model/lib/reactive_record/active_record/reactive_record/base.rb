@@ -118,6 +118,9 @@ module ReactiveRecord
       # this is the equivilent of find but for associations and aggregations
       # because we are not fetching a specific attribute yet, there is NO communication with the
       # server.  That only happens during find.
+
+      return DummyPolymorph.new(vector) unless model
+
       model = model.base_class
 
       # do we already have a record with this vector?  If so return it, otherwise make a new one.
@@ -250,7 +253,7 @@ module ReactiveRecord
         return if @create_sync
         @create_sync = true
       end
-      model.unscoped << ar_instance
+      model.unscoped._internal_push ar_instance
       @synced_with_unscoped = !@synced_with_unscoped
     end
 

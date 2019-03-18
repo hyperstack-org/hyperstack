@@ -5,8 +5,12 @@ module ReactiveRecord
     def get_belongs_to(assoc, reload = nil)
       getter_common(assoc.attribute, reload) do |has_key, attr|
         return if new?
-        value = fetch_by_id(attr, @model.primary_key) if id.present?
-        value = find_association(assoc, value)
+        if id.present?
+          value = fetch_by_id(attr, @model.primary_key)
+          klass = fetch_by_id(attr, 'model_name')
+          klass &&= Object.const_get(klass)
+        end
+        value = find_association(assoc, value, klass)
         sync_ignore_dummy attr, value, has_key
       end&.cast_to_current_sti_type
     end
@@ -107,15 +111,23 @@ module ReactiveRecord
       end.tap { |value| Hyperstack::Internal::State::Variable.get(self, attribute) unless data_loading? }
     end
 
-    def find_association(association, id)
-      inverse_of = association.inverse_of
+    def find_association(association, id, klass)
       instance = if id
-        find(association.klass, association.klass.primary_key => id)
+        find(klass, klass.primary_key => id)
+      elsif association.polymorphic?
+        new_from_vector(nil, nil, *vector, association.attribute)
       else
         new_from_vector(association.klass, nil, *vector, association.attribute)
       end
+      return instance if instance.is_a? DummyPolymorph
+      inverse_of = association.inverse_of(instance)
       instance_backing_record_attributes = instance.attributes
       inverse_association = association.klass.reflect_on_association(inverse_of)
+      # HMT-TODO: don't we need to do something with the through association case.
+      # perhaps we never hit this point...
+      if association.through_association?
+        IsomorphicHelpers.log "*********** called #{ar_instance}.find_association(#{association.attribute}) which is has many through!!!!!!!", :error
+      end
       if inverse_association.collection?
         instance_backing_record_attributes[inverse_of] = if id and id != ""
           Collection.new(@model, instance, inverse_association, association.klass, ["find", id], inverse_of)

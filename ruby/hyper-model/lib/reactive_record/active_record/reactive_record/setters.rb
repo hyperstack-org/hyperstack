@@ -43,15 +43,24 @@ module ReactiveRecord
 
     def set_belongs_to(assoc, raw_value)
       set_common(assoc.attribute, raw_value) do |value, attr|
-        if assoc.inverse.collection?
-          update_has_many_through_associations assoc, value
-          update_inverse_collections assoc, value
-        else
-          update_inverse_attribute assoc, value
-        end
-        # itself will just reactively read the value (a model instance)  by doing a .id
-        update_belongs_to attr, value.itself
+        current_value = @attributes[assoc.attribute]
+        update_has_many_through_associations assoc, nil, current_value, :remove_member
+        update_has_many_through_associations assoc, nil, value, :add_member
+        remove_current_inverse_attribute     assoc, nil, current_value
+        add_new_inverse_attribute            assoc, nil, value
+        update_belongs_to                    attr,  value.itself
       end
+    end
+
+    def set_belongs_to_via_has_many(orig, value)
+      assoc = orig.inverse
+      attr = assoc.attribute
+      current_value = @attributes[attr]
+      update_has_many_through_associations assoc, orig, current_value, :remove_member
+      update_has_many_through_associations assoc, orig, value, :add_member
+      remove_current_inverse_attribute     assoc, orig, current_value
+      add_new_inverse_attribute            assoc, orig, value
+      update_belongs_to                    attr,  value.itself
     end
 
     def sync_has_many(attr)
@@ -125,70 +134,100 @@ module ReactiveRecord
       )
     end
 
-    def update_inverse_attribute(association, value)
-      # when updating the inverse attribute of a belongs_to that is itself a belongs_to
-      # (i.e. 1-1 relationship) we clear the existing inverse value and then
-      # write the current record to the new value
-      current_value = @attributes[association.attribute]
-      inverse_attr = association.inverse.attribute
-      current_value.attributes[inverse_attr] = nil unless current_value.nil?
-      return if value.nil?
-      value.attributes[inverse_attr] = @ar_instance
-      return if data_loading?
-      Hyperstack::Internal::State::Variable.set(value.backing_record, inverse_attr, @ar_instance)
+    # when updating the inverse attribute of a belongs_to that is itself a belongs_to
+    # (i.e. 1-1 relationship) we clear the existing inverse value and then
+    # write the current record to the new value
+
+    # when updating an inverse attribute of a belongs_to that is a has_many (i.e. a collection)
+    # we need to first remove the current associated value (if non-nil), then add the new
+    # value to the collection.  If the inverse collection is not yet initialized we do it here.
+
+    # the above is split into three methods, because the  inverse of apolymorphic belongs to may
+    # change from has_one to has_many.  So we first deal with the current value, then
+    # update the new value which uses the push_onto_collection helper
+
+    def remove_current_inverse_attribute(association, orig, model)
+      return if model.nil?
+      inverse_association = association.inverse(model)
+      return if inverse_association == orig
+      if inverse_association.collection?
+        # note we don't have to check if the collection exists, since it must
+        # exist as at this ar_instance is already part of it.
+        model.attributes[inverse_association.attribute].delete(@ar_instance)
+      else
+        model.attributes[inverse_association.attribute] = nil
+      end
     end
 
-    def update_inverse_collections(association, value)
-      # when updating an inverse attribute of a belongs_to that is a has_many (i.e. a collection)
-      # we need to first remove the current associated value (if non-nil), then add the new
-      # value to the collection.  If the inverse collection is not yet initialized we do it here.
-      current_value = @attributes[association.attribute]
-      inverse_attr = association.inverse.attribute
-      if value.nil?
-        current_value.attributes[inverse_attr].delete(@ar_instance) unless current_value.nil?
+    def add_new_inverse_attribute(association, orig, model)
+      return if model.nil?
+      inverse_association = association.inverse(model)
+      return if inverse_association == orig
+      if inverse_association.collection?
+        model.backing_record.push_onto_collection(@model, inverse_association, @ar_instance)
       else
-        value.backing_record.push_onto_collection(@model, association.inverse, @ar_instance)
+        inverse_attr = inverse_association.attribute
+        value.attributes[inverse_attr] = @ar_instance
+        return if data_loading?
+        Hyperstack::Internal::State::Variable.set(model.backing_record, inverse_attr, @ar_instance)
       end
     end
 
     def push_onto_collection(model, association, ar_instance)
       @attributes[association.attribute] ||= Collection.new(model, @ar_instance, association)
-      @attributes[association.attribute] << ar_instance
+      @attributes[association.attribute]._internal_push ar_instance
     end
 
-    def update_has_many_through_associations(association, value)
-      association.through_associations.each { |ta| update_through_association(ta, value) }
-      association.source_associations.each { |sa| update_source_association(sa, value) }
-    end
+    # class Membership < ActiveRecord::Base
+    #   belongs_to :uzer
+    #   belongs_to :memerable, polymorphic: true
+    # end
+    #
+    # class Project < ActiveRecord::Base
+    #   has_many :memberships, as: :memerable, dependent: :destroy
+    #   has_many :uzers, through: :memberships
+    # end
+    #
+    # class Group < ActiveRecord::Base
+    #   has_many :memberships, as: :memerable, dependent: :destroy
+    #   has_many :uzers, through: :memberships
+    # end
+    #
+    # class Uzer < ActiveRecord::Base
+    #   has_many :memberships
+    #   has_many :groups,   through: :memberships, source: :memerable, source_type: 'Group'
+    #   has_many :projects, through: :memberships, source: :memerable, source_type: 'Project'
+    # end
 
-    def update_through_association(ta, new_belongs_to_value)
-      # appointment.doctor = doctor_new_value (i.e. through association is changing)
-      # means appointment.doctor_new_value.patients << appointment.patient
-      # and we have to appointment.doctor_current_value.patients.delete(appointment.patient)
-      source_value = @attributes[ta.source]
-      current_belongs_to_value = @attributes[ta.inverse.attribute]
-      return unless source_value
-      unless current_belongs_to_value.nil? || current_belongs_to_value.attributes[ta.attribute].nil?
-        current_belongs_to_value.attributes[ta.attribute].delete(source_value)
+    # membership.uzer = some_new_uzer (i.e. through association is changing)
+    # means membership.some_new_uzer.(groups OR projects) << uzer.memberable (depending on type of memberable)
+    # and we have to remove the current value of the source association (memerable) from the current uzer group or project
+    # and we have to then find any inverse has_many_through association (i.e. group or projects.uzers) and delete the
+    # current value from those collections and push the new value on
+
+    def update_has_many_through_associations(assoc, orig, value, method)
+      return if value.nil?
+      assoc.through_associations(value).each do |ta|
+        next if orig == ta
+        source_value = @attributes[ta.source]
+        # skip if source value is nil or if type of the association does not match type of source
+        next unless source_value.class.to_s == ta.source_type
+        ta.send method, source_value, value
+        ta.source_associations(source_value).each do |sa|
+          sa.send method, value, source_value
+        end
       end
-      return unless new_belongs_to_value
-      new_belongs_to_value.attributes[ta.attribute] ||= Collection.new(ta.klass, new_belongs_to_value, ta)
-      new_belongs_to_value.attributes[ta.attribute] << source_value
     end
 
-    def update_source_association(sa, new_source_value)
-      # appointment.patient = patient_value (i.e. source is changing)
-      # means appointment.doctor.patients.delete(appointment.patient)
-      # means appointment.doctor.patients << patient_value
-      belongs_to_value = @attributes[sa.inverse.attribute]
-      current_source_value = @attributes[sa.source]
-      return unless belongs_to_value
-      unless belongs_to_value.attributes[sa.attribute].nil? || current_source_value.nil?
-        belongs_to_value.attributes[sa.attribute].delete(current_source_value)
-      end
-      return unless new_source_value
-      belongs_to_value.attributes[sa.attribute] ||= Collection.new(sa.klass, belongs_to_value, sa)
-      belongs_to_value.attributes[sa.attribute] << new_source_value
-    end
+    # def remove_src_assoc(sa, source_value, current_value)
+    #   source_inverse_collection = source_value.attributes[sa.attribute]
+    #   source_inverse_collection.delete(current_value) if source_inverse_collection
+    # end
+    #
+    # def add_src_assoc(sa, source_value, new_value)
+    #   source_value.attributes[sa.attribute] ||= Collection.new(sa.owner_class, source_value, sa)
+    #   source_value.attributes[sa.attribute] << new_value
+    # end
+
   end
 end
