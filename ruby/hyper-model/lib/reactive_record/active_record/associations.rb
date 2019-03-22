@@ -50,6 +50,12 @@ module ActiveRecord
         unless options[:polymorphic]
           @klass_name = options[:class_name] || (collection? && name.camelize.singularize) || name.camelize
         end
+
+        if @klass_name < ActiveRecord::Base
+          @klass = @klass_name
+          @klass_name = @klass_name.name
+        end rescue nil
+
         @association_foreign_key =
           options[:foreign_key] ||
           (macro == :belongs_to && "#{name}_id") ||
@@ -176,8 +182,10 @@ module ActiveRecord
 
       def klass(model = nil)
         @klass ||= Object.const_get(@klass_name) if @klass_name
-        raise "model is not correct class" if @klass && model && model.class != @klass
-        raise "no model supplied for polymorphic relationship" unless @klass || model
+        if @klass && model && !(model.class <= @klass)
+          raise "internal error: provided model #{model} is not subclass of #{@klass}"
+        end
+        raise 'no model supplied for polymorphic relationship' unless @klass || model
         @klass || model.class
       end
 

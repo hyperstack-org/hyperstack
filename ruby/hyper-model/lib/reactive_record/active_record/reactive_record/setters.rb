@@ -167,7 +167,7 @@ module ReactiveRecord
         model.backing_record.push_onto_collection(@model, inverse_association, @ar_instance)
       else
         inverse_attr = inverse_association.attribute
-        value.attributes[inverse_attr] = @ar_instance
+        model.attributes[inverse_attr] = @ar_instance
         return if data_loading?
         Hyperstack::Internal::State::Variable.set(model.backing_record, inverse_attr, @ar_instance)
       end

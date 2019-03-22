@@ -92,9 +92,6 @@ describe "polymorphic relationships", js: true do
         has_one :picture, as: :imageable
       end
 
-      class ReactiveRecord::Collection
-      end if RUBY_ENGINE == 'opal'
-
       class Membership < ActiveRecord::Base
         def self.build_tables
           connection.create_table :memberships, force: true do |t|
