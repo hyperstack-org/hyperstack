@@ -21,7 +21,7 @@ In Hyperstack we are using Rails templates to create new applications.
 + Follow these instructions: https://github.com/hyperstack-org/hyperstack/tree/edge/install
 + See the template for an understanding of the installation steps: https://github.com/hyperstack-org/hyperstack/blob/edge/install/rails-webpacker.rb
 
-**If you aee not upgrading an existing Hyoperloop application you do not need to follow the rest of these instructions.**
+**If you are not upgrading an existing Hyoperloop application, you do not need to follow the rest of these instructions.**
 
 ## Hyperstack gem
 
@@ -64,9 +64,9 @@ The simplest way to implement this change is a global search and replace in your
 
 ## There is a new concept of a base `HyperComponent` and `HyperStore` base class
 
-In Hyperloop, all Components and Stores inherited from a base `Hyperloop::Component` class. In HyperStack (following the new Rails convention), we do not provide the base class but encourage you to create.  your own. This is very useful for containing methods that all your Components share.
+In Hyperloop, all Components and Stores inherited from a base `Hyperloop::Component` class. In HyperStack (following the new Rails convention), we do not provide the base class but encourage you to create your own. This is very useful for containing methods that all your Components share.
 
-To implement this change, you need to create your own HyperComponent class:
+To implement this change, you need to create your HyperComponent class:
 
 ```ruby
 class HyperComponent
@@ -107,9 +107,9 @@ end
 
 **The same is true for `Hyperloop::Store` to `HyperStore`**.
 
-ou will need to create a `HyperStore` class and make the same changes as above.
+You will need to create a `HyperStore` class and make the same changes as above.
 
-Note that in Hyperstack, any ruby class can be a store simply by including the `include Hyperstack::State::Observable` mixin.
+Note that in Hyperstack, any ruby class can be a store by merely including the `include Hyperstack::State::Observable` mixin.
 
 For example:
 
@@ -155,7 +155,7 @@ There are several advantages to this new approach:
 
 + It is significantly faster (ask Mitch)
 + It feels more natural to think about state variables as normal instance variables
-+ You only use the `mutate` method when you want React to re-render based ont eh change to state. This gives you more control.
++ You only use the `mutate` method when you want React to re-render based on the change to state. This gives you more control.
 + You can string mutations together. For example:
 
 ```ruby
@@ -202,7 +202,7 @@ A Hyperstack router looks like this:
 
 ```ruby
 class MainFrame < HyperComponent
-  include Hyperstack::Router # note the inclusing of the Router mixin
+  include Hyperstack::Router # note the inclusion of the Router mixin
 
   render(DIV) do # note the render method
     Switch do
