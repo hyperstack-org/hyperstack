@@ -5,7 +5,7 @@ describe 'mutation client integration', js: true do
       class UserSignup < Mutations::Command
 
         def self.sample_run
-          run email: "doit@hyperloop.com", name: "Hyperloop", newsletter_subscribe: true
+          run email: "doit@hyperstack.com", name: "Hyperstack", newsletter_subscribe: true
         end
         required do
           string :email

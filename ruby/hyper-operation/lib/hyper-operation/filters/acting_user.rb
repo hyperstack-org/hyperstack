@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class ActingUser
     @default_options = {
       :nils => false   # true allows an explicit nil to be valid. Overrides any other options

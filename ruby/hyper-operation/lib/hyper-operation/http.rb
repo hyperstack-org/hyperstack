@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   # {HTTP} is used to perform a `XMLHttpRequest` in ruby. It is a simple wrapper
   # around `XMLHttpRequest`
   #
@@ -161,7 +161,7 @@ module Hyperloop
       @active_requests ||= 0
       @active_requests -= 1
       if @active_requests < 0
-        `console.log("Ooops, Hyperloop::HTTP active_requests out of sync!")`
+        `console.log("Ooops, Hyperstack::HTTP active_requests out of sync!")`
         @active_requests = 0
       end
     end

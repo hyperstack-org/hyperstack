@@ -1,4 +1,4 @@
-# Hyperstack 1.0 ALPHA Rails Template
+# Hyperstack
 
 # ----------------------------------- Commit so we have good history of these changes
 
@@ -9,44 +9,105 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'opal-sprockets', '~> 0.4.2.0.11.0.3.1' # to ensure we have the latest
-gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
-gem 'hyperloop', git: 'https://github.com/ruby-hyperloop/hyperloop', branch: 'edge'
-gem 'hyper-react', git: 'https://github.com/ruby-hyperloop/hyper-react', branch: 'edge'
-gem 'hyper-component', git: 'https://github.com/ruby-hyperloop/hyper-component', branch: 'edge'
-gem 'hyper-router', git: 'https://github.com/ruby-hyperloop/hyper-router', branch: 'edge'
-gem 'hyper-store', git: 'https://github.com/ruby-hyperloop/hyper-store', branch: 'edge'
-gem 'hyperloop-config', git: 'https://github.com/ruby-hyperloop/hyperloop-config', branch: 'edge'
-gem 'opal_hot_reloader', git: 'https://github.com/fkchang/opal-hot-reloader.git'
-
+gem 'rails-hyperstack', '~> 1.0.alpha'
 gem_group :development do
   gem 'foreman'
 end
 
+# ----------------------------------- Ensure Sqlite has a valid version
+
+gsub_file 'Gemfile', /gem\s+'sqlite3'(?!,\s+'.*')\n/, "gem 'sqlite3', '~> 1.3.6'\n"
+
 # ----------------------------------- Create the folders
 
-run 'mkdir app/hyperloop'
-run 'mkdir app/hyperloop/components'
-run 'mkdir app/hyperloop/stores'
-run 'mkdir app/hyperloop/models'
-run 'mkdir app/hyperloop/operations'
+run 'mkdir app/hyperstack'
+run 'mkdir app/hyperstack/components'
+run 'mkdir app/hyperstack/stores'
+run 'mkdir app/hyperstack/models'
+run 'mkdir app/hyperstack/operations'
+run 'mkdir app/policies'
 
 # ----------------------------------- Add .keep files
 
-run 'touch app/hyperloop/components/.keep'
-run 'touch app/hyperloop/stores/.keep'
-run 'touch app/hyperloop/models/.keep'
-run 'touch app/hyperloop/operations/.keep'
+run 'touch app/hyperstack/stores/.keep'
+run 'touch app/hyperstack/models/.keep'
+run 'touch app/hyperstack/operations/.keep'
 
-# ----------------------------------- Create the Hyperloop config
+# ----------------------------------- Create the HyperCompnent base class
 
-file 'config/initializers/hyperloop.rb', <<-CODE
-Hyperloop.configuration do |config|
-  # config.transport = :action_cable
-  config.import 'reactrb/auto-import'
-  config.import 'opal_hot_reloader'
-  config.cancel_import 'react/react-source-browser' # bring your own React and ReactRouter via Yarn/Webpacker
+file 'app/hyperstack/components/hyper_component.rb', <<-CODE
+class HyperComponent
+  include Hyperstack::Component
+  include Hyperstack::State::Observable
 end
+CODE
+
+# ----------------------------------- Create the public ApplicationRecord base class
+
+file 'app/hyperstack/models/application_record.rb', <<-CODE
+class ApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
+  regulate_scope all: true
+end
+CODE
+
+# ----------------------------------- reference the public application_record.rb file
+
+file 'app/models/application_record.rb', <<-CODE, force: true
+# app/models/application_record.rb
+# the presence of this file prevents rails migrations from recreating application_record.rb
+# see https://github.com/rails/rails/issues/29407
+
+require 'models/application_record.rb'
+CODE
+
+# ----------------------------------- Create the Hyperstack config
+
+file 'config/initializers/hyperstack.rb', <<-CODE
+# config/initializers/hyperstack.rb
+# If you are not using ActionCable, see http://hyperstack.orgs/docs/models/configuring-transport/
+Hyperstack.configuration do |config|
+  config.transport = :action_cable
+  config.prerendering = :off # or :on
+  config.cancel_import 'react/react-source-browser' # bring your own React and ReactRouter via Yarn/Webpacker
+  config.import 'hyperstack/component/jquery', client_only: true # remove this line if you don't need jquery
+  config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?
+end
+
+# useful for debugging
+module Hyperstack
+  def self.on_error(operation, err, params, formatted_error_message)
+    ::Rails.logger.debug(
+      "\#{formatted_error_message}\\n\\n" +
+      Pastel.new.red(
+        'To further investigate you may want to add a debugging '\\
+        'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+      )
+    )
+  end
+end if Rails.env.development?
+CODE
+
+# ----------------------------------- Add a default policy
+
+file 'app/policies/application_policy.rb', <<-CODE
+# Policies regulate access to your public models
+# The following policy will open up full access (but only in development)
+# The policy system is very flexible and powerful.  See the documentation
+# for complete details.
+class Hyperstack::ApplicationPolicy
+  # Allow any session to connect:
+  always_allow_connection
+  # Send all attributes from all public models
+  regulate_all_broadcasts { |policy| policy.send_all }
+  # Allow all changes to public models
+  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
+  # allow remote access to all scopes - i.e. you can count or get a list of ids
+  # for any scope or relationship
+  ApplicationRecord.regulate_scope :all
+end unless Rails.env.production?
+# don't forget to provide a policy before production...
+raise "You need to define a Hyperstack policy for production" if Rails.env.production?
 CODE
 
 # ----------------------------------- Add NPM modules
@@ -55,14 +116,14 @@ run 'yarn add react'
 run 'yarn add react-dom'
 run 'yarn add react-router'
 
-# ----------------------------------- Create thyperstack.js
+# ----------------------------------- Create hyperstack.js
 
 file 'app/javascript/packs/hyperstack.js', <<-CODE
 // Import all the modules
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// for opal/hyperloop modules to find React and others they must explicitly be saved
+// for opal/hyperstack modules to find React and others they must explicitly be saved
 // to the global space, otherwise webpack will encapsulate them locally here
 global.React = React;
 global.ReactDOM = ReactDOM;
@@ -82,37 +143,52 @@ inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require
 <<-CODE
 //= require jquery
 //= require jquery_ujs
-//= require hyperloop-loader
+//= require hyperstack-loader
 CODE
 end
 
 # ----------------------------------- Procfile
 
 file 'Procfile', <<-CODE
-web: bundle exec puma
-hot: opal-hot-reloader -p 25222 -d app/hyperloop/
+web: bundle exec rails s -b 0.0.0.0
+hot: hyperstack-hotloader -p 25222 -d app/hyperstack/
 CODE
 
-# ----------------------------------- OpalHotReloader client
+# ----------------------------------- App
 
-file 'app/hyperloop/components/hot_loader.rb', <<-CODE
-require 'opal_hot_reloader'
-OpalHotReloader.listen(25222, false)
-CODE
+# must be inserted BEFORE the engine mount so it ends up after in the route file!
+route "get '/(*other)', to: 'hyperstack#app'"
 
-# ----------------------------------- Hello World
+file 'app/hyperstack/components/app.rb', <<-CODE
+# app/hyperstack/component/app.rb
 
-route "root 'hyperloop#HelloWorld'"
+# This is your top level component, the rails router will
+# direct all requests to mount this component.  You may
+# then use the Route psuedo component to mount specific
+# subcomponents depending on the URL.
 
-file 'app/hyperloop/components/hello_world.rb', <<-CODE
-class HelloWorld < Hyperloop::Component
+class App < HyperComponent
+  include Hyperstack::Router
+
+  # define routes using the Route psuedo component.  Examples:
+  # Route('/foo', mounts: Foo)                : match the path beginning with /foo and mount component Foo here
+  # Route('/foo') { Foo(...) }                : display the contents of the block
+  # Route('/', exact: true, mounts: Home)     : match the exact path / and mount the Home component
+  # Route('/user/:id/name', mounts: UserName) : path segments beginning with a colon will be captured in the match param
+  # see the hyper-router gem documentation for more details
+
   render do
     H1 { "Hello world from Hyperstack!" }
   end
 end
 CODE
 
-# ----------------------------------- Commit Hyperloop setup
+# ----------------------------------- Engine mount point
+
+# must be inserted AFTER route get ... so it ends up before in the route file!
+route "mount Hyperstack::Engine => '/hyperstack'"
+
+# ----------------------------------- Commit Hyperstack setup
 
 after_bundle do
   run 'bundle exec rails webpacker:install'

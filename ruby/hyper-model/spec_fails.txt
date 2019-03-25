@@ -1,0 +1,3 @@
+rspec ./spec/batch5/save_while_loading_spec.rb:28 # save while loading with push
+rspec ./spec/batch4/default_value_spec.rb:40 # defaultValue special handling will not use the defaultValue param until data is loaded - unit test
+rspec ./spec/batch3/revert_spec.rb:39 # reverting records adds the todo to adam's todos and expects adam to change

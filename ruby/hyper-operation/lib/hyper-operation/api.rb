@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Operation
 
     def add_error(key, kind, message = nil)
@@ -137,7 +137,7 @@ module Hyperloop
         end
 
         child.singleton_class.define_singleton_method(:_Railway) do
-          Hyperloop::Context.set_var(self, :@_railway) do
+          Hyperstack::Context.set_var(self, :@_railway) do
             # overcomes a bug in Opal 0.9 which returns nil for singleton superclass
             my_super = superclass || `self.$$singleton_of`.superclass.singleton_class
             if my_super == Operation.singleton_class

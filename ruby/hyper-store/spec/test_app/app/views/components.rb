@@ -1,6 +1,6 @@
 require 'opal'
-require 'hyper-react'
-if React::IsomorphicHelpers.on_opal_client?
+require 'hyper-component'
+if Hyperstack::Component::IsomorphicHelpers.on_opal_client?
   require 'browser'
   require 'browser/delay'
 end

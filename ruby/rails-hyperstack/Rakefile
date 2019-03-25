@@ -1,0 +1,25 @@
+require "bundler/gem_tasks"
+require "rspec/core/rake_task"
+
+RSpec::Core::RakeTask.new(:spec)
+
+namespace :spec do
+  task :prepare do
+    Dir.chdir('spec') do
+      sh('rm -rf test_app')
+      sh('bundle exec rails new test_app')
+      Dir.chdir('test_app') do
+        sh('bundle exec rails g hyperstack:install')
+        sh('mv Gemfile _Gemfile_')
+        sh('bundle exec rails generate model Sample name:string description:text')
+        sh('mv app/models/sample.rb app/hyperstack/models/sample.rb')
+        sh('bundle exec rake db:migrate')
+        sh('bundle exec rails dev:cache')
+      end
+    end
+  end
+end
+
+task :default do
+  
+end

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe 'Hyperloop::Operation execution (server side)' do
+describe 'Hyperstack::Operation execution (server side)' do
 
   before(:each) do
-    stub_const 'MyOperation', Class.new(Hyperloop::Operation)
+    stub_const 'MyOperation', Class.new(Hyperstack::Operation)
   end
 
   it "will execute some steps" do
@@ -143,7 +143,7 @@ describe 'Hyperloop::Operation execution (server side)' do
   end
 
   it "can define the step, async and failed callbacks many ways" do
-    stub_const 'SayHelloOp', Class.new(Hyperloop::Operation)
+    stub_const 'SayHelloOp', Class.new(Hyperstack::Operation)
     SayHelloOp.class_eval do
       param :xxx
       step { MyOperation.say_hello if params.xxx == 123 }
@@ -211,7 +211,7 @@ describe 'Hyperloop::Operation execution (server side)' do
   end
 end
 
-RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
+RSpec::Steps.steps 'Hyperstack::Operation execution (client side)', js: true do
 
   before(:step) do
     on_client do
@@ -240,7 +240,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "will execute some steps" do
     expect_evaluate_ruby do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         param :i
         step { params.i + 1 }
         step { |r| r + params.i }
@@ -250,7 +250,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "will chain promises" do
     expect_promise do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         param :i
         step { get_round_tuit(2) }
         step { |n| params.i + n }
@@ -261,7 +261,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "will interrupt the promise chain with async" do
     expect_promise do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         param :i
         step { get_round_tuit(2) }
         step { |n| params.i + n }
@@ -273,7 +273,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "will continue running after the async" do
     expect_promise do
-      Class.new(Hyperloop::Operation) do
+      Class.new(Hyperstack::Operation) do
         param :i
         step { get_round_tuit(2) }
         step { |n| params.i + n }
@@ -286,7 +286,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "will switch to the failure track on an error" do
     expect_promise do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend DontCallMe
         param :i
         step { get_round_tuit('x') }
@@ -301,7 +301,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "will begin on the failure track if there are validation errors" do
     expect_promise do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend DontCallMe
         param :i
         step   { self.class.dont_call_me }
@@ -316,7 +316,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "succeed! will skip to the end" do
     expect_promise do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend DontCallMe
         step { succeed! "I succeeded at last!"}
         step { MyOperation.dont_call_me }
@@ -328,7 +328,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "succeed! will skip to the end and succeed even on the failure track" do
     expect_evaluate_ruby do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend DontCallMe
         step { fail }
         failed { succeed! "I still can succeed!"}
@@ -342,7 +342,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "abort! will skip to the end with a failure" do
     expect_evaluate_ruby do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend DontCallMe
         step { abort! "Pride cometh before the fall!"}
         step { self.class.dont_call_me }
@@ -355,7 +355,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "if abort! is given an exception it will return that exception" do
     expect_evaluate_ruby do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend DontCallMe
         step { abort! Exception.new("okay okay okay")}
         step { MyOperation.dont_call_me }
@@ -370,9 +370,9 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
   it "can define the step, async and failed callbacks many ways" do
     expect_evaluate_ruby do
 
-      TestOperation = Class.new(Hyperloop::Operation)
+      TestOperation = Class.new(Hyperstack::Operation)
 
-      class SayHelloOp < Hyperloop::Operation
+      class SayHelloOp < Hyperstack::Operation
         param :xxx
         step { TestOperation.say_hello if params.xxx == 123 }
       end
@@ -408,7 +408,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it "can define class level callbacks" do
     expect_evaluate_ruby do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend HelloCounter
         step(:class) { say_hello }
         step   class: :say_hello
@@ -431,7 +431,7 @@ RSpec::Steps.steps 'Hyperloop::Operation execution (client side)', js: true do
 
   it 'can provide options different ways' do
     expect_evaluate_ruby do
-      operation = Class.new(Hyperloop::Operation) do
+      operation = Class.new(Hyperstack::Operation) do
         extend HelloCounter
         def say_instance_hello()
           self.class.say_hello

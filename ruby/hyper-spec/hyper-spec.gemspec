@@ -25,8 +25,10 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.require_paths = ['lib']
 
   spec.add_dependency 'capybara'
-  spec.add_dependency 'chromedriver-helper'
+  spec.add_dependency 'chromedriver-helper', '1.2.0'
+  spec.add_dependency 'libv8'
   spec.add_dependency 'method_source'
+  spec.add_dependency 'mini_racer', '~> 0.2.4'
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'parser', '>= 2.3.3.1'
   spec.add_dependency 'pry'
@@ -34,20 +36,17 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'selenium-webdriver'
   spec.add_dependency 'timecop', '~> 0.8.1'
   spec.add_dependency 'uglifier'
-  spec.add_dependency 'unparser'
+  spec.add_dependency 'unparser', '>= 0.4.2' # 0.4 is incompatible
   spec.add_dependency 'webdrivers'
-  spec.add_dependency 'mini_racer', '~> 0.1.15'
-  # https://github.com/discourse/mini_racer/issues/92
-  spec.add_dependency 'libv8', '~> 6.3.0'
 
-  spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'hyper-react', HyperSpec::VERSION
+  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
+  spec.add_development_dependency 'hyper-component', HyperSpec::VERSION
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '~> 0.9.4'
+  spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'rspec-expectations'

@@ -1,7 +1,7 @@
 require 'hyper-operation/version'
-require 'hyperloop-config'
+require 'hyperstack-config'
 
-Hyperloop.import 'hyper-operation'
+Hyperstack.import 'hyper-operation'
 
 if RUBY_ENGINE == 'opal'
   require 'active_support/core_ext/string'
@@ -29,7 +29,8 @@ if RUBY_ENGINE == 'opal'
   require 'hyper-operation/server_op'
   require 'hyper-operation/boot'
 else
-  require 'hyperloop-config'
+  require 'tty-table'
+  require 'hyperstack-config'
   require 'mutations'
   Mutations::HashFilter.register_additional_filter(Mutations::DuckFilter, :duck)
   require 'hyper-operation/filters/outbound_filter'
@@ -38,8 +39,9 @@ else
   require 'hyper-operation/transport/active_record'
   require 'hyper-operation/engine'
   require 'hyper-operation/transport/connection'
-  require 'hyper-operation/transport/hyperloop'
+  require 'hyper-operation/transport/hyperstack'
   require 'hyper-operation/transport/policy'
+  require 'hyper-operation/transport/policy_diagnostics'
   require 'hyper-operation/transport/client_drivers'
   require 'hyper-operation/transport/acting_user'
   require 'opal-activesupport'
@@ -52,8 +54,9 @@ else
   require 'hyper-operation/railway/params_wrapper'
   require 'hyper-operation/railway/run.rb'
   require 'hyper-operation/railway/validations'
-  require 'hyper-operation/transport/hyperloop_controller'
+  require 'hyper-operation/transport/hyperstack_controller'
   require 'hyper-operation/server_op'
+  require 'hyper-operation/boot'
   Opal.use_gem 'mutations', false
   Opal.append_path File.expand_path('../sources/', __FILE__).untaint
   Opal.append_path File.expand_path('../', __FILE__).untaint

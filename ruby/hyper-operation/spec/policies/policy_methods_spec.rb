@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe "including Hyperloop::PolicyMethods" do
+describe "including Hyperstack::PolicyMethods" do
 
   before(:each) do
     stub_const "TestClass", Class.new
     TestClass.class_eval do
-      include Hyperloop::PolicyMethods
+      include Hyperstack::PolicyMethods
     end
   end
 
@@ -31,28 +31,28 @@ describe "including Hyperloop::PolicyMethods" do
   end
 
   it "sets the correct regulated class" do
-    expect(TestClass.hyperloop_internal_policy_object.instance_variable_get("@regulated_klass")).to eq("TestClass")
+    expect(TestClass.hyperstack_internal_policy_object.instance_variable_get("@regulated_klass")).to eq("TestClass")
   end
 
   it "exposes the underlying regulate_class_connection method" do
-    expect(TestClass.hyperloop_internal_policy_object).to respond_to(:regulate_class_connection)
+    expect(TestClass.hyperstack_internal_policy_object).to respond_to(:regulate_class_connection)
   end
 
 
   it "exposes the underlying regulate_instance_connections method" do
-    expect(TestClass.hyperloop_internal_policy_object).to respond_to(:regulate_instance_connections)
+    expect(TestClass.hyperstack_internal_policy_object).to respond_to(:regulate_instance_connections)
   end
 
   it "exposes the underlying always_allow_connection method" do
-    expect(TestClass.hyperloop_internal_policy_object).to respond_to(:always_allow_connection)
+    expect(TestClass.hyperstack_internal_policy_object).to respond_to(:always_allow_connection)
   end
 
   it "exposes the underlying regulate_all_broadcasts method" do
-    expect(TestClass.hyperloop_internal_policy_object).to respond_to(:regulate_all_broadcasts)
+    expect(TestClass.hyperstack_internal_policy_object).to respond_to(:regulate_all_broadcasts)
   end
 
   it "exposes the underlying regulate_broadcast method" do
-    expect(TestClass.hyperloop_internal_policy_object).to respond_to(:regulate_broadcast)
+    expect(TestClass.hyperstack_internal_policy_object).to respond_to(:regulate_broadcast)
   end
 
   it "defines the send_all instance method" do
@@ -77,7 +77,7 @@ describe "including Hyperloop::PolicyMethods" do
     ApplicationPolicy.class_eval do
       regulate_class_connection { true }
     end
-    Hyperloop.configuration {}
+    Hyperstack.configuration {}
     expect(Application).to be_a(Class)
   end
 

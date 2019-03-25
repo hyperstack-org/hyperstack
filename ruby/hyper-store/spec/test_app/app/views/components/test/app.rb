@@ -1,5 +1,6 @@
 module Test
-  class App < React::Component::Base
+  class App
+    include Hyperstack::Component
     before_mount do
       @store = Store.new
     end

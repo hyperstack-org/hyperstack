@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Operation
 
   end

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stock Tickers Example</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <link
+  rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"
+  crossorigin="anonymous"
+>
+    <%# <script src="https://unpkg.com/@material-ui/core@1.1.0/umd/material-ui.development.js" crossorigin="anonymous"></script>
+    <!-- <script src="https://unpkg.com/@material-ui/core/umd/material-ui.production.min.js" crossorigin="anonymous"></script> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <script>
+      window.MUI = window['material-ui']
+      const theme = MUI.createMuiTheme({
+        palette: {
+          primary: {
+            light: MUI.colors.purple[300],
+            main: MUI.colors.purple[500],
+            dark: MUI.colors.purple[700],
+          },
+          secondary: {
+            light: MUI.colors.green[300],
+            main: MUI.colors.green[500],
+            dark: MUI.colors.green[700],
+          },
+        },
+        typography: {
+          useNextVariants: true,
+        },
+      });
+      const styles = theme => ({
+        root: {
+          textAlign: 'center',
+          paddingTop: theme.spacing.unit * 20,
+        },
+        icon: {
+          marginRight: theme.spacing.unit,
+        },
+      });
+  </script> %>
+
+  </head>
+
+  <body>
+    <%= yield %>
+    <script src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.js" crossorigin></script>
+
+
+  </body>
+</html>

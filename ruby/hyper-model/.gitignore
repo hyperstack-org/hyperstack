@@ -1,50 +1,39 @@
-*.rbc
-capybara-*.html
-.rspec
-/log
-/tmp
-/db/*.sqlite3
-/db/*.sqlite3-journal
-/public/system
+/.bundle/
+/.yardoc
+/_yardoc/
+/.byebug_history
 /coverage/
-/spec/tmp
-**.orig
-rerun.txt
-pickle-email-*.html
+/doc/
+/pkg/
+/spec/reports/
+tmp/
+spec/test_app/tmp/
+spec/test_app/db/test.sqlite3
+spec/test_app/log/test.log
+spec/test_app/log/development.log
+/synchromesh-simple-poller-store
+/synchromesh-pusher-channel-store
+/examples/action-cable/rails_cache_dir/
+rails_cache_dir/
+react_prerendering_src.js
 
-# TODO Comment out these rules if you are OK with secrets being uploaded to the repo
-config/initializers/secret_token.rb
-config/secrets.yml
+.bundle/
+log/*.log
+pkg/
+reactive_record_test_app/db/*.sqlite3
+reactive_record_test_app/log/
+reactive_record_test_app/tmp/
+reactive_record_test_app/.sass-cache
+.DS_Store
+public/assets/*
 
-# dotenv
-# TODO Comment out this rule if environment variables can be committed
-.env
-
-## Environment normalization:
-/.bundle
-/vendor/bundle
-
-# these should all be checked in to normalize the environment:
-# Gemfile.lock, .ruby-version, .ruby-gemset
-
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
-.rvmrc
-
-# if using bower-rails ignore default bower_components path bower.json files
-/vendor/assets/bower_components
-*.bowerrc
-bower.json
-
-# Ignore pow environment settings
-.powenv
-
-# Ignore Byebug command history file.
-.byebug_history
-
-# ingore gems
+# ignore gems
 *.gem
 
-# ignore Idea
+# ingore Idea
 .idea
 .vscode
-Gemfile.lock
+
+# ignore Gemfile.locks https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
+/spec/test_app/Gemfile.lock
+/Gemfile.lock

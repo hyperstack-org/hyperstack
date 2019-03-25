@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   module AutoCreate
     def table_exists?
       # works with both rails 4 and 5 without deprecation warnings
@@ -10,7 +10,7 @@ module Hyperloop
     end
 
     def needs_init?
-      Hyperloop.transport != :none && Hyperloop.on_server? && !table_exists?
+      Hyperstack.transport != :none && Hyperstack.on_server? && !table_exists?
     end
 
     def create_table(*args, &block)
@@ -23,18 +23,18 @@ module Hyperloop
 
       extend AutoCreate
 
-      self.table_name = 'hyperloop_queued_messages'
+      self.table_name = 'hyperstack_queued_messages'
 
       do_not_synchronize
 
       serialize :data
 
-      belongs_to :hyperloop_connection,
-                 class_name: 'Hyperloop::Connection',
+      belongs_to :hyperstack_connection,
+                 class_name: 'Hyperstack::Connection',
                  foreign_key: 'connection_id'
 
       scope :for_session,
-            ->(session) { joins(:hyperloop_connection).where('session = ?', session) }
+            ->(session) { joins(:hyperstack_connection).where('session = ?', session) }
 
       # For simplicity we use QueuedMessage with connection_id 0
       # to store the current path which is used by consoles to
@@ -69,11 +69,11 @@ module Hyperloop
 
     do_not_synchronize
 
-    self.table_name = 'hyperloop_connections'
+    self.table_name = 'hyperstack_connections'
 
     has_many :messages,
              foreign_key: 'connection_id',
-             class_name: 'Hyperloop::Connection::QueuedMessage',
+             class_name: 'Hyperstack::Connection::QueuedMessage',
              dependent: :destroy
     scope :expired,
           -> { where('expires_at IS NOT NULL AND expires_at < ?', Time.zone.now) }
@@ -106,7 +106,7 @@ module Hyperloop
         # a migration or from a console before the server has ever started
         # in these cases there are no channels so we return nothing
         return [] unless table_exists?
-        if Hyperloop.on_server?
+        if Hyperstack.on_server?
           expired.delete_all
           refresh_connections if needs_refresh?
         end
@@ -120,7 +120,7 @@ module Hyperloop
 
       def send_to_channel(channel, data)
         pending_for(channel).each do |connection|
-          QueuedMessage.create(data: data, hyperloop_connection: connection)
+          QueuedMessage.create(data: data, hyperstack_connection: connection)
         end
         transport.send_data(channel, data) if exists?(channel: channel, session: nil)
       end

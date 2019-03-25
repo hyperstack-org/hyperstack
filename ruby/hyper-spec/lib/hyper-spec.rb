@@ -17,11 +17,11 @@ RSpec.configure do |config|
   config.add_setting :debugger_width, default: nil
 
   config.before(:each) do
-    Hyperloop.class_eval do
+    Hyperstack.class_eval do
       def self.on_server?
         true
       end
-    end if defined?(Hyperloop)
+    end if defined?(Hyperstack)
     # for compatibility with HyperMesh
     HyperMesh.class_eval do
       def self.on_server?
@@ -62,6 +62,14 @@ RSpec.configure do |_config|
     Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
   end
 
+  Capybara.register_driver :chrome_headless_docker_travis do |app|
+    options = ::Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    Capybara::Selenium::Driver.new(app, browser: :chrome, :driver_path => "/usr/lib/chromium-browser/chromedriver", options: options)
+  end
+
   Capybara.register_driver :firefox do |app|
     Capybara::Selenium::Driver.new(app, browser: :firefox)
   end
@@ -92,6 +100,7 @@ RSpec.configure do |_config|
     when 'firefox' then :firefox
     when 'headless' then :selenium_chrome_headless
     when 'safari' then :safari
+    when 'travis' then :chrome_headless_docker_travis
     else :selenium_chrome_headless
     end
 

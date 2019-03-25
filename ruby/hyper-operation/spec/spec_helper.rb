@@ -29,7 +29,7 @@ RSpec.configure do |config|
     unless example.exception
       #Object.send(:remove_const, :Application) rescue nil
       ObjectSpace.each_object(Class).each do |klass|
-        if klass < Hyperloop::Regulation || klass < Hyperloop::Operation
+        if klass < Hyperstack::Regulation || klass < Hyperstack::Operation
           klass.instance_variables.each { |v| klass.instance_variable_set(v, nil) }
         end
       end
@@ -62,48 +62,48 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods if defined? FactoryBot
 
-  config.use_transactional_fixtures = false
+  config.use_transactional_fixtures = true # -sfc george false
 
   Capybara.default_max_wait_time = 10.seconds
 
   config.before(:suite) do
-    #Hyperloop.define_setting :connect_session, false
-    DatabaseCleaner.clean_with(:truncation)
+    #Hyperstack.define_setting :connect_session, false
+    # -sfc george DatabaseCleaner.clean_with(:truncation)
   end
 
-  config.before(:each) do
-    DatabaseCleaner.strategy = :transaction
-  end
+  # config.before(:each) do
+  #   DatabaseCleaner.strategy = :transaction
+  # end
 
   config.before(:each) do |x|
-    Hyperloop.class_eval do
+    Hyperstack.class_eval do
       def self.on_server?
         true
       end
     end
-    # Hyperloop.configuration do |config|
+    # Hyperstack.configuration do |config|
     #   config.connect_session = false
     # end
   end
 
   config.before(:each, :js => true) do
-    DatabaseCleaner.strategy = :truncation
+    # -sfc george DatabaseCleaner.strategy = :truncation
   end
 
   config.before(:each, :js => true) do
     size_window
   end
 
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
+  # config.before(:each) do
+  #   DatabaseCleaner.start
+  # end
 
   config.after(:each) do |example|
     unless example.exception
       # Clear session data
       Capybara.reset_sessions!
       # Rollback transaction
-      DatabaseCleaner.clean
+      # -sfc george DatabaseCleaner.clean
     end
   end
 

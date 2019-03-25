@@ -1,26 +1,30 @@
 require 'net/http' unless RUBY_ENGINE == 'opal'
 
-module Hyperloop
+module Hyperstack
   class ServerOp < Operation
 
     class << self
-      include React::IsomorphicHelpers
+      include Hyperstack::Component::IsomorphicHelpers
 
       if RUBY_ENGINE == 'opal'
         if on_opal_client?
           def run(*args)
             hash = _Railway.params_wrapper.combine_arg_array(args)
             hash = serialize_params(hash)
-            Hyperloop::HTTP.post(
-              "#{`window.HyperloopEnginePath`}/execute_remote",
+            Hyperstack::HTTP.post(
+              "#{`window.HyperstackEnginePath`}/execute_remote",
               payload: {json: {operation: name, params: hash}.to_json},
-              headers: {'X-CSRF-Token' => Hyperloop::ClientDrivers.opts[:form_authenticity_token] }
+              headers: {'X-CSRF-Token' => Hyperstack::ClientDrivers.opts[:form_authenticity_token] }
               )
             .then do |response|
               deserialize_response response.json[:response]
             end
             .fail do |response|
-              Exception.new response.json[:error]
+              begin
+                const_get(response.json[:error_class]).new(response.json[:error])
+              rescue
+                Exception.new response.json[:error]
+              end
             end
           end
         elsif on_opal_server?
@@ -40,20 +44,20 @@ module Hyperloop
       isomorphic_method(:internal_iso_run) do |f, klass_name, op_params|
         f.send_to_server(klass_name, op_params)
         f.when_on_server {
-          Hyperloop::ServerOp.run_from_client(:acting_user, controller, klass_name, *op_params)
+          Hyperstack::ServerOp.run_from_client(:acting_user, controller, klass_name, *op_params)
         }
       end
 
       def descendants_map_cache
         # calling descendants alone may take 10ms in a complex app, so better cache it
-        @cached_descendants ||= Hyperloop::ServerOp.descendants.map(&:to_s)
+        @cached_descendants ||= Hyperstack::ServerOp.descendants.map(&:to_s)
       end
 
       def run_from_client(security_param, controller, operation, params)
         if Rails.env.production?
           # in production everything is eager loaded so ServerOp.descendants is filled and can be used to guard the .constantize
-          unless Hyperloop::ServerOp.descendants_map_cache.include?(operation)
-            Hyperloop::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (in production)")
+          unless Hyperstack::ServerOp.descendants_map_cache.include?(operation)
+            Hyperstack::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (in production)")
           end
           # however ...
         else
@@ -64,17 +68,17 @@ module Hyperloop
           begin
             const = Object.const_get(operation)
           rescue NameError
-            Hyperloop::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (const not found)")
+            Hyperstack::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (const not found)")
           end
-          unless const < Hyperloop::ServerOp
-            Hyperloop::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (not a ServerOp subclass)")
+          unless const < Hyperstack::ServerOp
+            Hyperstack::InternalPolicy.raise_operation_access_violation(:illegal_remote_op_call, "Operation: #{operation} (not a ServerOp subclass)")
           end
         end
         operation.constantize.class_eval do
           if _Railway.params_wrapper.method_defined?(:controller)
             params[:controller] = controller
           elsif !_Railway.params_wrapper.method_defined?(security_param)
-            raise AccessViolation
+            raise AccessViolation.new(:remote_access_not_allowed)
           end
           run(deserialize_params(params))
           .then { |r| return { json: { response: serialize_response(r) } } }
@@ -84,13 +88,27 @@ module Hyperloop
         handle_exception(e, operation, params)
       end
 
-      def handle_exception(e, operation, params)
-        if defined? ::Rails
-          params.delete(:controller)
-          ::Rails.logger.debug "\033[0;31;1mERROR: Hyperloop::ServerOp exception caught when running "\
-                               "#{operation} with params \"#{params}\": #{e}\033[0;30;21m"
+      def status(e)
+        if e.is_a? AccessViolation
+          403
+        elsif e.is_a? Operation::ValidationException
+          400
+        else
+          500
         end
-        { json: { error: e }, status: 500 }
+      end
+
+      def handle_exception(e, operation, params)
+        if e.respond_to? :__hyperstack_on_error
+          params = params.to_h
+          message = []
+          message << Pastel.new.red("HYPERSTACK ERROR during #{operation} #{e.inspect}")
+          params.each { |param, value| message << "  #{param} => #{value.inspect.truncate(120, separator: '...')}" }
+          message << "\n#{e.details}" if e.respond_to? :details
+          e.__hyperstack_on_error(operation, params, message.join("\n"))
+        end
+
+        { json: { error_class: e.class.to_s, error: e}, status: status(e) }
       end
 
 
@@ -104,7 +122,7 @@ module Hyperloop
         end
         request.body = {
           operation: name,
-          params: Hyperloop::Operation::ParamsWrapper.combine_arg_array(args)
+          params: Hyperstack::Operation::ParamsWrapper.combine_arg_array(args)
         }.to_json
         promise.resolve http.request(request)
       rescue Exception => e
@@ -152,7 +170,7 @@ module Hyperloop
           [operation.instance_exec(*context, &regulation)].flatten.compact.uniq.each do |channel|
             unless operation.instance_variable_get(:@_dispatched_channels).include?(channel)
               operation.instance_variable_set(:@_dispatched_channels, operation.instance_variable_get(:@_dispatched_channels) << channel)
-              Hyperloop.dispatch(channel: Hyperloop::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
+              Hyperstack.dispatch(channel: Hyperstack::InternalPolicy.channel_to_string(channel), operation: operation.class.name, params: serialized_params)
             end
           end
         end

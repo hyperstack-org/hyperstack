@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Operation
     class Railway
 
@@ -9,12 +9,16 @@ module Hyperloop
       class << self
         def receivers
           # use the force: true option so that system code needing to receive
-          # boot will NOT be erased on the next Hyperloop::Context.reset!
-          Hyperloop::Context.set_var(self, :@receivers, force: true) { [] }
+          # boot will NOT be erased on the next Hyperstack::Context.reset!
+          Hyperstack::Context.set_var(self, :@receivers, force: true) { [] }
         end
 
         def add_receiver(&block)
-          receivers << block
+          cloned_block = ->(*args, &b) { block.call(*args, &b) }
+          operation = self
+          cloned_block.define_singleton_method(:unmount) { operation.receivers.delete(cloned_block) }
+          receivers << cloned_block
+          cloned_block
         end
       end
 

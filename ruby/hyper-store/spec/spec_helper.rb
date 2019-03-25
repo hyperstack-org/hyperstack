@@ -8,7 +8,7 @@ require 'rspec/rails'
 require 'rspec-steps'
 require 'timecop'
 require 'hyper-spec'
-require 'hyper-react'
+require 'hyper-component'
 require 'hyper-store'
 
 
@@ -18,25 +18,29 @@ RSpec.configure do |config|
 end
 
 # Stubbing the React calls so we can test outside of Opal
-module React
-  class State
-    class << self
-      def reset!
-        @states = nil
-      end
+module Hyperstack
+  module Internal
+    module State
+      module Variable
+        class << self
+          def reset!
+            @legacy_map = nil
+          end
 
-      def get_state(from, key)
-        states[from] ||= {}
-        states[from][key.to_s]
-      end
-
-      def set_state(from, key, value)
-        states[from] ||= {}
-        states[from][key.to_s] = value
-      end
-
-      def states
-        @states ||= {}
+          # def get_state(from, key)
+          #   states[from] ||= {}
+          #   states[from][key.to_s]
+          # end
+          #
+          # def set_state(from, key, value)
+          #   states[from] ||= {}
+          #   states[from][key.to_s] = value
+          # end
+          #
+          # def states
+          #   @states ||= {}
+          # end
+        end
       end
     end
   end

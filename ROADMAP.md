@@ -12,27 +12,17 @@
 + A professional, well structured code base, complete test coverage, and automatic continuous integration.
 + Implementation should be as efficient both in speed and space as practical given the above.
 
-## Goals of this release
-
-+ First Hyperstack release based on last Hyperloop
-+ Change class names from Hyperloop to Hyperstack convention
-+ All gems building from one repo with an automated test, build, deploy process
-+ 10x speed improvement in hyper-spec
-+ Opal-webpack-loader based build process
-+ New webesite and updated docs and tutorials
-+ Use rails templates for installation and setup
-+ Depreciation of changes and documented upgrade path
-
 ## Roadmap
 
-### Hyperloop (!!) version 0.99
+### Hyperloop (!!) version 0.99 - final Hyperloop version
 
 #### mission:  release the functionality of current hyperloop edge branch
 
-+ move current gem set to one repo under hyperstack (done - tx Barry)
-+ get specs to pass with current names
-+ release under old hyperloop gem names version 0.99
-+ publish to hyperloop-legacy branch *(not master)* with tag 0.99
++ ~~move current gem set to one repo under hyperstack (done - tx Barry)~~
++ ~~get specs to pass with current names (done - tx Mitch and Johan)~~
++ ~~release under old hyperloop gem names version 0.99~~
++ ~~publish to hyperloop-legacy branch *(not master)* with tag 0.99~~
++ update old website
 
 ------
 
@@ -45,6 +35,8 @@
 + document upgrade path
 + release under new gem names with version 0.1
 + tag as master version  0.1
++ release new website with updated docs
++ clearly document (in hyperloop repo and old website) that we have moved
 
 ### version 0.2
 

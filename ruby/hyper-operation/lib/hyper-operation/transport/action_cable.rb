@@ -3,7 +3,7 @@ module ApplicationCable
   class Connection < ActionCable::Connection::Base; end
 end
 
-module Hyperloop
+module Hyperstack
   class ActionCableChannel < ApplicationCable::Channel
     class << self
       def subscriptions
@@ -12,28 +12,28 @@ module Hyperloop
     end
 
     def inc_subscription
-      self.class.subscriptions[params[:hyperloop_channel]] =
-        self.class.subscriptions[params[:hyperloop_channel]] + 1
+      self.class.subscriptions[params[:hyperstack_channel]] =
+        self.class.subscriptions[params[:hyperstack_channel]] + 1
     end
 
     def dec_subscription
-      self.class.subscriptions[params[:hyperloop_channel]] =
-        self.class.subscriptions[params[:hyperloop_channel]] - 1
+      self.class.subscriptions[params[:hyperstack_channel]] =
+        self.class.subscriptions[params[:hyperstack_channel]] - 1
     end
 
     def subscribed
       session_id = params["client_id"]
-      authorization = Hyperloop.authorization(params["salt"], params["hyperloop_channel"], session_id)
+      authorization = Hyperstack.authorization(params["salt"], params["hyperstack_channel"], session_id)
       if params["authorization"] == authorization
         inc_subscription
-        stream_from "hyperloop-#{params[:hyperloop_channel]}"
+        stream_from "hyperstack-#{params[:hyperstack_channel]}"
       else
         reject
       end
     end
 
     def unsubscribed
-      Hyperloop::Connection.disconnect(params[:hyperloop_channel]) if dec_subscription == 0
+      Hyperstack::Connection.disconnect(params[:hyperstack_channel]) if dec_subscription == 0
     end
   end
 end

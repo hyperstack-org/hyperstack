@@ -1,0 +1,7 @@
+{
+  "name": "smoke-test",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.4.0"
+  }
+}

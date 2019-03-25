@@ -7,7 +7,7 @@ describe 'rails autoloader' do
   # we define two different class policy pairs...
 
   before(:all) do
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.connect_session = false
     end
   end
@@ -16,7 +16,7 @@ describe 'rails autoloader' do
 
     it 'will find the policy class file if available' do
       stub_const "AutoLoaderTestClassa", Class.new
-      expect(Hyperloop::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassa"])
+      expect(Hyperstack::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassa"])
     end
 
     it 'will raise a load error if file does not define the class' do
@@ -29,7 +29,7 @@ describe 'rails autoloader' do
     it 'will find the policy class if available' do
       class AutoLoaderTestClassb
       end
-      expect(Hyperloop::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassb"])
+      expect(Hyperstack::AutoConnect.channels(0, nil)).to eq(["AutoLoaderTestClassb"])
     end
 
     it 'will raise a load error if file does not define the class' do

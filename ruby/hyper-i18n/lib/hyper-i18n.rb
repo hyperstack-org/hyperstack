@@ -1,26 +1,24 @@
-require 'hyperloop-config'
-Hyperloop.import 'hyper-i18n'
+require 'hyperstack-config'
+Hyperstack.import 'hyper-i18n'
 
 require 'hyper-component'
 require 'hyper-operation'
+require 'hyper-state'
 
-require 'hyper-i18n/helper_methods'
-require 'hyper-i18n/operations/localize'
-require 'hyper-i18n/operations/translate'
-require 'hyper-i18n/i18n'
+require 'hyperstack/internal/i18n/helper_methods'
+require 'hyperstack/internal/i18n/localize'
+require 'hyperstack/internal/i18n/translate'
+require 'hyperstack/internal/i18n'
+require 'hyperstack/i18n/version'
 
 if RUBY_ENGINE == 'opal'
-  require 'hyper-store'
-
-  require 'hyper-i18n/active_model/name'
-  require 'hyper-i18n/active_record/class_methods'
-  require 'hyper-i18n/hyperloop/component/mixin'
-
-  require 'hyper-i18n/stores/i18n_store'
+  require 'hyperstack/ext/i18n/active_model/name'
+  require 'hyperstack/ext/i18n/active_record/class_methods'
+  require 'hyperstack/internal/i18n/store'
+  require 'hyperstack/i18n'
+  require 'hyperstack/i18n/i18n'
 else
   require 'opal'
-
-  require 'hyper-i18n/version'
 
   Opal.append_path File.expand_path('../', __FILE__).untaint
 end

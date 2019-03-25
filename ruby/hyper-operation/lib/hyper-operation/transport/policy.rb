@@ -1,8 +1,18 @@
-module Hyperloop
+module Hyperstack
 
   class InternalClassPolicy
 
     def initialize(regulated_klass)
+      unless regulated_klass.is_a?(Class)
+        # attempt to constantize the class in case eager_loading in production
+        # has loaded the policy before the class.  THis will insure that if
+        # there is a class being regulated, it is loaded first.
+        begin
+          regulated_klass.constantize
+        rescue NameError
+          nil
+        end
+      end
       @regulated_klass = regulated_klass
     end
 
@@ -11,7 +21,7 @@ module Hyperloop
     EXPOSED_METHODS = [
       :regulate_class_connection, :always_allow_connection, :regulate_instance_connections,
       :regulate_all_broadcasts, :regulate_broadcast,
-      :dispatch_to, :regulate_dispatches_from, :always_dispatch_from,
+      :regulate_dispatches_from, :always_dispatch_from,
       :allow_change, :allow_create, :allow_read, :allow_update, :allow_destroy
     ]
 
@@ -48,21 +58,6 @@ module Hyperloop
       regulate_dispatches_from(*args) { true }
     end
 
-    def dispatch_to(*args, &regulation)
-      actual_klass = if regulated_klass.is_a?(Class)
-                       regulated_klass
-                     else
-                       begin
-                         regulated_klass.constantize
-                       rescue NameError
-                         nil
-                       end
-                     end
-      raise 'you can only dispatch_to Operation classes' unless actual_klass.respond_to? :dispatch_to
-      actual_klass.dispatch_to(actual_klass)
-      actual_klass.dispatch_to(*args, &regulation)
-    end
-
     CHANGE_POLICIES = [:create, :update, :destroy]
 
     def self.allow_policy(policy, method)
@@ -95,7 +90,7 @@ module Hyperloop
     def get_ar_model(str)
       if str.is_a?(Class)
         unless str <= ActiveRecord::Base
-          Hyperloop::InternalPolicy.raise_operation_access_violation(:non_ar_class, "#{str} is not a subclass of ActiveRecord::Base")
+          Hyperstack::InternalPolicy.raise_operation_access_violation(:non_ar_class, "#{str} is not a subclass of ActiveRecord::Base")
         end
         str
       else
@@ -104,12 +99,12 @@ module Hyperloop
         # def self.ar_base_descendants_map_cache
         #   @ar_base_descendants_map_cache ||= ActiveRecord::Base.descendants.map(&:name)
         # end
-        # if Rails.env.production? && !Hyperloop::InternalClassPolicy.ar_base_descendants_map_cache.include?(str)
+        # if Rails.env.production? && !Hyperstack::InternalClassPolicy.ar_base_descendants_map_cache.include?(str)
         if Rails.application.config.eager_load && !ActiveRecord::Base.descendants.map(&:name).include?(str)
           # AR::Base.descendants is eager loaded in production -> this guard works.
           # In development it may be empty or partially filled -> this guard may fail.
           # Thus guarded here only in production.
-          Hyperloop::InternalPolicy.raise_operation_access_violation(:non_ar_class, "#{str} is either not defined or is not a subclass of ActiveRecord::Base")
+          Hyperstack::InternalPolicy.raise_operation_access_violation(:non_ar_class, "#{str} is either not defined or is not a subclass of ActiveRecord::Base")
         end
         Object.const_get(str)
       end
@@ -192,7 +187,7 @@ module Hyperloop
           raise "Could not determine the class when regulating.  This is probably caused by doing something like &:send_all"
         end
         wrapped_policy = policy_klass.new(nil, nil)
-        wrapped_policy.hyperloop_internal_policy_object = policy
+        wrapped_policy.hyperstack_internal_policy_object = policy
         wrapped_policy
       end
 
@@ -343,7 +338,7 @@ module Hyperloop
     def self.channels(session, acting_user)
       channels = ClassConnectionRegulation.connections_for(acting_user, true) +
         InstanceConnectionRegulation.connections_for(acting_user, true)
-      channels << "Hyperloop::Session-#{session.split('-').last}" if Hyperloop.connect_session && session
+      channels << "Hyperstack::Session-#{session.split('-').last}" if Hyperstack.connect_session && session
       channels.uniq.each { |channel| Connection.open(channel, session) }
     end
   end
@@ -369,16 +364,15 @@ module Hyperloop
     end
 
     def self.raise_operation_access_violation(message, details)
-      Hyperloop.on_error(Hyperloop::AccessViolation, message, details)
-      raise Hyperloop::AccessViolation
+      raise Hyperstack::AccessViolation.new(message, details)
     end
 
     def self.regulate_connection(acting_user, channel_string)
       channel = channel_string.split("-")
       if channel.length > 1
         id = channel[1..-1].join("-")
-        unless Hyperloop::InternalClassPolicy.regulated_klasses.include?(channel[0])
-          Hyperloop::InternalPolicy.raise_operation_access_violation(:not_a_channel, "#{channel[0]} is not regulated channel class")
+        unless Hyperstack::InternalClassPolicy.regulated_klasses.include?(channel[0])
+          Hyperstack::InternalPolicy.raise_operation_access_violation(:not_a_channel, "#{channel[0]} is not regulated channel class")
         end
         object = Object.const_get(channel[0]).find(id)
         InstanceConnectionRegulation.connect(object, acting_user)
@@ -396,16 +390,17 @@ module Hyperloop
       internal_policy.broadcast &block
     end
 
-    def initialize(obj, attribute_names, available_channels)
+    def initialize(obj, attribute_names, available_channels = :all)
       @obj = obj
-      attribute_names = attribute_names.map(&:to_sym).to_set
+      @attribute_names = attribute_names.map(&:to_sym).to_set
       @unassigned_send_sets = []
-      @channel_sets = Hash.new { |hash, key| hash[key] = attribute_names }
+      @channel_sets = Hash.new { |hash, key| hash[key] = @attribute_names }
       @available_channels = available_channels
     end
 
     def channel_available?(channel)
-      channel && @available_channels.include?(channel_to_string(channel))
+      return false unless channel
+      @available_channels == :all || @available_channels.include?(channel_to_string(channel))
     end
 
     def id
@@ -513,12 +508,12 @@ module Hyperloop
   end
 
   module ClassPolicyMethods
-    def hyperloop_internal_policy_object
-      @hyperloop_internal_policy_object ||= InternalClassPolicy.new(name || self)
+    def hyperstack_internal_policy_object
+      @hyperstack_internal_policy_object ||= InternalClassPolicy.new(name || self)
     end
     InternalClassPolicy::EXPOSED_METHODS.each do |policy_method|
       define_method policy_method do |*klasses, &block|
-        hyperloop_internal_policy_object.send policy_method, *klasses, &block
+        hyperstack_internal_policy_object.send policy_method, *klasses, &block
       end unless respond_to? policy_method
     end
   end
@@ -529,10 +524,10 @@ module Hyperloop
         extend ClassPolicyMethods
       end
     end
-    attr_accessor :hyperloop_internal_policy_object
+    attr_accessor :hyperstack_internal_policy_object
     InternalPolicy::EXPOSED_METHODS.each do |method|
       define_method method do |*args, &block|
-        hyperloop_internal_policy_object.send method, *args, &block
+        hyperstack_internal_policy_object.send method, *args, &block
       end unless respond_to? method
     end
     define_method :initialize do |*args|
@@ -549,34 +544,34 @@ module Hyperloop
 end
 
 class Module
-  alias pre_hyperloop_const_set const_set
+  alias pre_hyperstack_const_set const_set
 
   def const_set(name, value)
-    pre_hyperloop_const_set(name, value).tap do
-      Hyperloop::PolicyAutoLoader.load(name, value)
+    pre_hyperstack_const_set(name, value).tap do
+      Hyperstack::PolicyAutoLoader.load(name, value)
     end
   end
 end
 
 class Class
 
-  alias pre_hyperloop_inherited inherited
+  alias pre_hyperstack_inherited inherited
 
   def inherited(child_class)
-    pre_hyperloop_inherited(child_class).tap do
-      Hyperloop::PolicyAutoLoader.load(child_class.name, child_class)
+    pre_hyperstack_inherited(child_class).tap do
+      Hyperstack::PolicyAutoLoader.load(child_class.name, child_class)
     end
   end
 
-  Hyperloop::ClassPolicyMethods.instance_methods.each do |method|
+  Hyperstack::ClassPolicyMethods.instance_methods.each do |method|
     define_method method do |*args, &block|
       if name.end_with?("Policy".freeze)
-        @hyperloop_internal_policy_object = Hyperloop::InternalClassPolicy.new(name.sub(/Policy$/,""))
-        include Hyperloop::PolicyMethods
+        @hyperstack_internal_policy_object = Hyperstack::InternalClassPolicy.new(name.sub(/Policy$/,""))
+        include Hyperstack::PolicyMethods
         send method, *args, &block
       else
         class << self
-          Hyperloop::ClassPolicyMethods.instance_methods.each do |method|
+          Hyperstack::ClassPolicyMethods.instance_methods.each do |method|
             undef_method method
           end
         end

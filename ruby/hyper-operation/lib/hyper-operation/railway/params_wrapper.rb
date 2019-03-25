@@ -1,4 +1,4 @@
-module Hyperloop
+module Hyperstack
   class Operation
     class ParamsWrapper
 
@@ -119,7 +119,7 @@ module Hyperloop
       end
 
       def self.params_wrapper
-        Hyperloop::Context.set_var(self, :@params_wrapper) do
+        Hyperstack::Context.set_var(self, :@params_wrapper) do
           if Railway == superclass
             Class.new(ParamsWrapper)
           else

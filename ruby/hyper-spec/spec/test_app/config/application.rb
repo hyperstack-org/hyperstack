@@ -16,7 +16,7 @@ require File.expand_path('../boot', __FILE__)
 Bundler.require(*Rails.groups(assets: %w(development test)))
 
 require 'opal-rails'
-require 'hyper-react'
+require 'hyper-component'
 
 module TestApp
   class Application < Rails::Application
@@ -31,7 +31,7 @@ module TestApp
     config.opal.dynamic_require_severity = :ignore
     config.opal.enable_specs = true
     config.opal.spec_location = 'spec-opal'
-    config.hyperloop.auto_config = false
+    config.hyperstack.auto_config = false
 
     config.assets.cache_store = :null_store
 

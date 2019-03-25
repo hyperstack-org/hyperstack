@@ -1,8 +1,10 @@
 # Debugging
 
+**Work in progress - ALPHA (docs and code)**
+
 ## Debugging tips
 
-Tips, good practice will help you debugging your Hyperloop application.
+Tips, good practice will help you debugging your Hyperstack application.
 
 ### JavaScript Console
 
@@ -21,7 +23,7 @@ Here are some tips: https://dev.mikamai.com/2014/11/19/3-tricks-to-debug-opal-co
 Anywhere in your HyperReact code you can simply puts any_value which will display the contents of the value in the browser console. This can help you understand React program flow as well as how data changes over time.
 
 ```ruby
-class Thing < Hyperloop::Component
+class Thing < Hyperstack::Component
   param initial_mode: 12
 
   before_mount do

@@ -1,12 +1,43 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 
-RSpec::Core::RakeTask.new(:spec)
+def run_batches(batches)
+  failed = false
+  batches.each do |batch|
+    begin
+      Rake::Task["spec:batch#{batch}"].invoke
+    rescue SystemExit
+      failed = true
+    end
+  end
+  exit 1 if failed
+end
+
+
+task :part1 do
+  run_batches(1..2)
+end
+
+task :part2 do
+  run_batches(3..4)
+end
+
+task :part3 do
+  run_batches(5..7)
+end
+
+task :spec do
+  run_batches(1..7)
+end
 
 namespace :spec do
   task :prepare do
-    sh %{bundle update}
-    sh %{cd spec/test_app; bundle update ;bundle exec rails db:setup}
+    sh %(cd spec/test_app; bundle exec rails db:setup)
+  end
+  (1..7).each do |batch|
+    RSpec::Core::RakeTask.new(:"batch#{batch}") do |t|
+      t.pattern = "spec/batch#{batch}/**/*_spec.rb"
+    end
   end
 end
 

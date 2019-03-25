@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160129182544) do
+ActiveRecord::Schema.define(version: 20160731182106) do
 
   create_table "addresses", force: :cascade do |t|
     t.string   "street"
@@ -21,15 +21,22 @@ ActiveRecord::Schema.define(version: 20160129182544) do
     t.datetime "updated_at"
   end
 
-  create_table "comments", force: :cascade do |t|
-    t.integer  "user_id"
-    t.integer  "todo_item_id"
-    t.string   "comment"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "child_models", force: :cascade do |t|
+    t.string  "child_attribute"
+    t.integer "test_model_id"
   end
 
-  create_table "hyperloop_connections", force: :cascade do |t|
+  create_table "comments", force: :cascade do |t|
+    t.text     "comment"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "todo_id"
+    t.integer  "author_id"
+    t.integer  "user_id"
+    t.integer  "todo_item_id"
+  end
+
+  create_table "hyperstack_connections", force: :cascade do |t|
     t.string   "channel"
     t.string   "session"
     t.datetime "created_at"
@@ -37,9 +44,16 @@ ActiveRecord::Schema.define(version: 20160129182544) do
     t.datetime "refresh_at"
   end
 
-  create_table "hyperloop_queued_messages", force: :cascade do |t|
+  create_table "hyperstack_queued_messages", force: :cascade do |t|
     t.text    "data"
     t.integer "connection_id"
+  end
+
+  create_table "test_models", force: :cascade do |t|
+    t.string   "test_attribute"
+    t.boolean  "completed"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
   create_table "todo_items", force: :cascade do |t|
@@ -52,7 +66,19 @@ ActiveRecord::Schema.define(version: 20160129182544) do
     t.integer  "comment_id"
   end
 
+  create_table "todos", force: :cascade do |t|
+    t.string   "title"
+    t.text     "description"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.boolean  "completed",     default: false, null: false
+    t.integer  "created_by_id"
+    t.integer  "owner_id"
+  end
+
   create_table "users", force: :cascade do |t|
+    t.string   "role"
+    t.integer  "manager_id"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email"

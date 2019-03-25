@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe "controller operations", js: true do
   before(:each) do
-    Hyperloop::HyperloopController.class_eval do
+    Hyperstack::HyperstackController.class_eval do
       def a_controller_method
         12
       end
     end
-    stub_const "MyControllerOp", Class.new(Hyperloop::ControllerOp)
+    stub_const "MyControllerOp", Class.new(Hyperstack::ControllerOp)
     isomorphic do
-      class MyControllerOp < Hyperloop::ControllerOp
+      class MyControllerOp < Hyperstack::ControllerOp
         param :data
         step { a_controller_method if params.data }
       end
@@ -21,13 +21,15 @@ describe "controller operations", js: true do
     end.to eq(12)
   end
   it "connects globally and broadcasts to the session channel" do
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.connect_session = true
     end
     mount 'SessionApp' do
-      class SessionApp < Hyperloop::Component
-        after_mount { MyControllerOp.on_dispatch { |params| mutate.message params.data } }
-        render { state.message }
+      class SessionApp
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
+        after_mount { receives(MyControllerOp) { |params| mutate @message = params.data } }
+        render { @message }
       end
     end
     MyControllerOp.dispatch_to { session_channel }
@@ -37,14 +39,16 @@ describe "controller operations", js: true do
     expect(page).to have_content('hello')
   end
   it "connects locally and broadcasts to the session channel" do
-    Hyperloop.configuration do |config|
+    Hyperstack.configuration do |config|
       config.connect_session = false
     end
     mount 'SessionApp' do
-      class SessionApp < Hyperloop::Component
-        after_mount { Hyperloop.connect_session }
-        after_mount { MyControllerOp.on_dispatch { |params| mutate.message params.data } }
-        render { state.message }
+      class SessionApp
+        include Hyperstack::Component
+        include Hyperstack::State::Observable
+        after_mount { Hyperstack.connect_session }
+        after_mount { receives(MyControllerOp) { |params| mutate @message = params.data } }
+        render { @message }
       end
     end
     MyControllerOp.dispatch_to { session_channel }
@@ -67,7 +71,7 @@ end
 #
 #     it "pass validation failures back" do
 #       ServerFacts.param :acting_user, nils: true
-#       class ServerFacts < Hyperloop::ServerOp
+#       class ServerFacts < Hyperstack::ServerOp
 #         validate { false }
 #       end
 #       expect_promise do
@@ -78,7 +82,7 @@ end
 #     it "will reject uplinks that don't accept acting_user" do
 #       expect_promise do
 #         ServerFacts.run(n: 5).fail { |exception| Promise.new.resolve(exception) }
-#       end.to include('Hyperloop::AccessViolation')
+#       end.to include('Hyperstack::AccessViolation')
 #     end
 #   end
 #
@@ -92,7 +96,7 @@ end
 #       Pusher.secret = "MY_TEST_SECRET"
 #       require "pusher-fake/support/base"
 #
-#       Hyperloop.configuration do |config|
+#       Hyperstack.configuration do |config|
 #         config.transport = :pusher
 #         config.channel_prefix = "synchromesh"
 #         config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
@@ -100,7 +104,7 @@ end
 #     end
 #
 #     before(:each) do
-#       stub_const "Operation", Class.new(Hyperloop::ServerOp)
+#       stub_const "Operation", Class.new(Hyperstack::ServerOp)
 #       on_client do
 #         class Test < React::Component::Base
 #           before_mount do
@@ -122,7 +126,7 @@ end
 #
 #     it 'will dispatch to the client' do
 #       isomorphic do
-#         class Operation < Hyperloop::ServerOp
+#         class Operation < Hyperstack::ServerOp
 #           param :message
 #           param :password
 #         end
@@ -137,7 +141,7 @@ end
 #
 #     it 'will evaluate channels dynamically' do
 #       isomorphic do
-#         class Operation < Hyperloop::ServerOp
+#         class Operation < Hyperstack::ServerOp
 #           param :message
 #           param :channels
 #           dispatch_to { params.channels }
@@ -153,7 +157,7 @@ end
 #
 #     it 'will attach the channel with the regulate_connection' do
 #       isomorphic do
-#         class Operation < Hyperloop::ServerOp
+#         class Operation < Hyperstack::ServerOp
 #           param :message
 #         end
 #       end
@@ -167,7 +171,7 @@ end
 #
 #     it 'can regulate dispatches with the regulate_dispatches_from' do
 #       isomorphic do
-#         class Operation < Hyperloop::ServerOp
+#         class Operation < Hyperstack::ServerOp
 #           param :message
 #           param :broadcast, default: false
 #         end
@@ -186,7 +190,7 @@ end
 #
 #     it 'can regulate dispatches with the regulate_dispatch applied to a policy' do
 #       isomorphic do
-#         class Operation < Hyperloop::ServerOp
+#         class Operation < Hyperstack::ServerOp
 #           param :message
 #           param :broadcast, default: false
 #         end
@@ -206,7 +210,7 @@ end
 #
 #     it 'will regulate with the always_dispatch_from regulation' do
 #       isomorphic do
-#         class Operation < Hyperloop::ServerOp
+#         class Operation < Hyperstack::ServerOp
 #           param :message
 #         end
 #       end

@@ -1,12 +1,12 @@
 module HyperI18n
-  class Translate < Hyperloop::ServerOp
+  class Translate < Hyperstack::ServerOp
     param :acting_user, nils: true
     param :attribute
     param :opts
     param :translation, default: nil
 
     def opts
-      params.opts.with_indifferent_access
+      params.opts.symbolize_keys
     end
 
     step do

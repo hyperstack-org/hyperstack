@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require "hyperstack/hotloader/server"
+
+options = {:port => 25222, :directories => []}
+OptionParser.new do |opts|
+  opts.banner = "Usage: opal-hot-reloader [options]"
+
+  opts.on("-p", '--port [INTEGER]', Integer, 'port to run on, defaults to 25222') do |v|
+    options[:port] = v
+  end
+
+  opts.on("-d", '--directories x,y,z', Array, "comma separated directories to watch. Ex. to add 2 directories '-d app/assets/js,app/client/components'. Directoriess automatically included if they exist are:\n\t\t* app/assets/javascripts\n\t\t* app/views/components") do |v|
+    options[:directories] = v
+  end
+
+end.parse!
+
+server = Hyperstack::Hotloader::Server.new(options)
+puts "Listening on port #{options[:port]}, watching for changes in #{options[:directories].join(', ')}"
+server.loop

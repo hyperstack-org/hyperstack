@@ -1,3 +1,0 @@
-[dciy.commands]
-prepare = ["rake spec:prepare"]
-cibuild = ["bundle exec rake"]

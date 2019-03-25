@@ -8,7 +8,8 @@ describe 'hyper-spec', js: true do
 
   it "can the mount a component defined in mounts code block" do
     mount 'ShowOff' do
-      class ShowOff < React::Component::Base
+      class ShowOff
+        include Hyperstack::Component
         render(DIV) { 'Now how cool is that???' }
       end
     end
@@ -34,7 +35,8 @@ describe 'hyper-spec', js: true do
     it "can use an alternative style sheet" do
       client_option style_sheet: 'test'
       mount 'StyledDiv' do # see test_app/spec/assets/stylesheets
-        class StyledDiv < React::Component::Base
+        class StyledDiv
+          include Hyperstack::Component
           render(DIV, id: 'hello', class: 'application-style') do
             'Hello!'
           end
@@ -103,20 +105,22 @@ describe 'hyper-spec', js: true do
 
     before(:each) do
       mount 'CallBackOnEveryThirdClick' do
-        class CallBackOnEveryThirdClick < React::Component::Base
+        class CallBackOnEveryThirdClick
+          include Hyperstack::Component
+          include Hyperstack::State::Observable
           param :click3, type: Proc
-          param :_onClick3, type: Proc
-          define_state clicks: 0
+          triggers :click3
+          before_mount { @clicks = 0 }
           def increment_click
-            state.clicks! (state.clicks + 1)
-            if state.clicks % 3 == 0
-              params.click3(state.clicks)
-              params._onClick3(state.clicks)
+            mutate @clicks += 1
+            if @clicks % 3 == 0
+              @Click3.call(@clicks)
+              click3!(@clicks)
             end
           end
           render do
             DIV do
-              SPAN { "I have been clicked #{state.clicks} times" }
+              SPAN { "I have been clicked #{@clicks} times" }
               BUTTON(class: :tp_clicker) { "click me again" }
               .on(:click) { increment_click }
             end
@@ -152,7 +156,8 @@ describe 'hyper-spec', js: true do
   it "can add classes during testing" do
     add_class :some_class, borderStyle: :solid
     mount 'StyledDiv' do
-      class StyledDiv < React::Component::Base
+      class StyledDiv
+        include Hyperstack::Component
         render(DIV, id: 'hello', class: 'some_class') do
           'Hello!'
         end

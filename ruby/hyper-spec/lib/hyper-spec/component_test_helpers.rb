@@ -1,13 +1,16 @@
 # see component_test_helpers_spec.rb for examples
 require 'parser/current'
 require 'unparser'
+require 'hyper-spec/unparser_patch'
 require 'method_source'
 require_relative '../../lib/hyper-spec/time_cop.rb'
+
+Parser::Builders::Default.emit_procarg0 = true
 
 module HyperSpec
   module ComponentTestHelpers
     TOP_LEVEL_COMPONENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../react/top_level_rails_component.rb', __FILE__)))
+      Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
     TIME_COP_CLIENT_PATCH =
       Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
       "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
@@ -24,11 +27,11 @@ module HyperSpec
 
     def build_test_url_for(controller)
       unless controller
-        unless defined?(::ReactTestController)
-          Object.const_set('ReactTestController', Class.new(::ActionController::Base))
+        unless defined?(::HyperstackTestController)
+          Object.const_set('HyperstackTestController', Class.new(::ActionController::Base))
         end
 
-        controller = ::ReactTestController
+        controller = ::HyperstackTestController
       end
 
       route_root = controller.name.gsub(/Controller$/, '').underscore
@@ -216,8 +219,9 @@ module HyperSpec
               }
             end
           end
-          class React::Component::HyperTestDummy < React::Component::Base
-                def render; end
+          class Hyperstack::Internal::Component::TestDummy
+            include Hyperstack::Component
+                render {}
           end
           #{@client_code}
           #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
@@ -225,7 +229,7 @@ module HyperSpec
         opts[:code] = Opal.compile(block_with_helpers)
       end
 
-      component_name ||= 'React::Component::HyperTestDummy'
+      component_name ||= 'Hyperstack::Internal::Component::TestDummy'
       ::Rails.cache.write(test_url, [component_name, params, opts])
       test_code_key = "hyper_spec_prerender_test_code.js"
       @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
@@ -249,7 +253,7 @@ module HyperSpec
     [:callback_history_for, :last_callback_for, :clear_callback_history_for,
      :event_history_for, :last_event_for, :clear_event_history_for].each do |method|
       define_method(method) do |event_name|
-        evaluate_ruby("React::TopLevelRailsComponent.#{method}('#{event_name}')")
+        evaluate_ruby("Hyperstack::Internal::Component::TopLevelRailsComponent.#{method}('#{event_name}')")
       end
     end
 

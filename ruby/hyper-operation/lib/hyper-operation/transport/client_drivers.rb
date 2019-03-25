@@ -1,13 +1,17 @@
 #### this is going to need some refactoring so that HyperMesh can add its methods in here...
 
-module Hyperloop
+module Hyperstack
   # Client side handling of synchronization messages
   # When a synchronization message comes in, the client will sync_dispatch
   # We use ERB to determine the configuration and implement the appropriate
   # client interface to sync_change or sync_destroy
 
+  def self.anti_csrf_token
+    ClientDrivers.opts[:form_authenticity_token]
+  end
+
   class Application
-    extend React::IsomorphicHelpers::ClassMethods
+    extend Component::IsomorphicHelpers::ClassMethods
 
     if on_opal_client?
       def self.acting_user_id
@@ -46,7 +50,7 @@ module Hyperloop
     end
 
     def self.connect_session
-      connect(['Hyperloop::Session', ClientDrivers.opts[:id].split('-').last])
+      connect(['Hyperstack::Session', ClientDrivers.opts[:id].split('-').last])
     end
 
     def self.action_cable_consumer
@@ -76,14 +80,14 @@ module Hyperloop
           }
         elsif ClientDrivers.opts[:transport] == :action_cable
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
-          Hyperloop::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|
+          Hyperstack::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|
             %x{
               var fix_opal_0110 = 'return';
-              #{Hyperloop.action_cable_consumer}.subscriptions.create(
+              #{Hyperstack.action_cable_consumer}.subscriptions.create(
                 {
-                  channel: "Hyperloop::ActionCableChannel",
+                  channel: "Hyperstack::ActionCableChannel",
                   client_id: #{ClientDrivers.opts[:id]},
-                  hyperloop_channel: #{channel_string},
+                  hyperstack_channel: #{channel_string},
                   authorization: #{response.json[:authorization]},
                   salt: #{response.json[:salt]}
                 },
@@ -101,14 +105,14 @@ module Hyperloop
             }
           end
         else
-          Hyperloop::HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
+          Hyperstack::HTTP.get(ClientDrivers.polling_path(:subscribe, channel_string))
         end
       end
     end
   end
 
   class ClientDrivers
-    include React::IsomorphicHelpers
+    include Hyperstack::Component::IsomorphicHelpers
 
     def self.sync_dispatch(data)
       # TODO old synchromesh double checked at this point to make sure that this client
@@ -116,7 +120,7 @@ module Hyperloop
       data[:operation].constantize.dispatch_from_server(data[:params])
     end
 
-    # save the configuration info needed in window.HyperloopOpts
+    # save the configuration info needed in window.HyperstackOpts
 
     # we keep a list of all channels by session with connections in progress
     # for each broadcast we check the list, and add the message to a queue for that
@@ -125,44 +129,45 @@ module Hyperloop
     # will remove the session from the list.
 
     prerender_footer do |controller|
-      next if Hyperloop.transport == :none
-      if defined?(PusherFake)
-        path = ::Rails.application.routes.routes.detect do |route|
-          route.app == Hyperloop::Engine ||
-            (route.app.respond_to?(:app) && route.app.app == Hyperloop::Engine)
-        end.path.spec
-        pusher_fake_js = PusherFake.javascript(
-          auth: { headers: { 'X-CSRF-Token' => controller.send(:form_authenticity_token) } },
-          authEndpoint: "#{path}/hyperloop-pusher-auth"
-        )
+      unless Hyperstack.transport == :none
+        if defined?(PusherFake)
+          path = ::Rails.application.routes.routes.detect do |route|
+            route.app == Hyperstack::Engine ||
+              (route.app.respond_to?(:app) && route.app.app == Hyperstack::Engine)
+          end.path.spec
+          pusher_fake_js = PusherFake.javascript(
+            auth: { headers: { 'X-CSRF-Token' => controller.send(:form_authenticity_token) } },
+            authEndpoint: "#{path}/hyperstack-pusher-auth"
+          )
+        end
+        controller.session.delete 'hyperstack-dummy-init' unless controller.session.id
+        id = "#{SecureRandom.uuid}-#{controller.session.id}"
+        auto_connections = Hyperstack::AutoConnect.channels(id, controller.acting_user) rescue []
       end
-      controller.session.delete 'hyperloop-dummy-init' unless controller.session.id
-      id = "#{SecureRandom.uuid}-#{controller.session.id}"
-      auto_connections = Hyperloop::AutoConnect.channels(id, controller.acting_user)
       config_hash = {
-        transport: Hyperloop.transport,
+        transport: Hyperstack.transport,
         id: id,
         acting_user_id: (controller.acting_user && controller.acting_user.id),
         env: ::Rails.env,
-        client_logging: Hyperloop.client_logging,
+        client_logging: Hyperstack.client_logging,
         pusher_fake_js: pusher_fake_js,
-        key: Hyperloop.key,
-        cluster: Hyperloop.cluster,
-        encrypted: Hyperloop.encrypted,
-        channel: Hyperloop.channel,
+        key: Hyperstack.key,
+        cluster: Hyperstack.cluster,
+        encrypted: Hyperstack.encrypted,
+        channel: Hyperstack.channel,
         form_authenticity_token: controller.send(:form_authenticity_token),
-        seconds_between_poll: Hyperloop.seconds_between_poll,
+        seconds_between_poll: Hyperstack.seconds_between_poll,
         auto_connect:  auto_connections
       }
       path = ::Rails.application.routes.routes.detect do |route|
         # not sure why the second check is needed.  It happens in the test app
-        route.app == Hyperloop::Engine or (route.app.respond_to?(:app) and route.app.app == Hyperloop::Engine)
+        route.app == Hyperstack::Engine or (route.app.respond_to?(:app) and route.app.app == Hyperstack::Engine)
       end
-      raise 'Hyperloop::Engine mount point not found.  Check your config/routes.rb file' unless path
+      raise 'Hyperstack::Engine mount point not found.  Check your config/routes.rb file' unless path
       path = path.path.spec
       "<script type='text/javascript'>\n"\
-        "window.HyperloopEnginePath = '#{path}';\n"\
-        "window.HyperloopOpts = #{config_hash.to_json}\n"\
+        "window.HyperstackEnginePath = '#{path}';\n"\
+        "window.HyperstackOpts = #{config_hash.to_json}\n"\
       "</script>\n"
     end if RUBY_ENGINE != 'opal'
 
@@ -188,7 +193,7 @@ module Hyperloop
     end
 
     def self.get_queued_data(operation, channel = nil, opts = {})
-      Hyperloop::HTTP.get(polling_path(operation, channel), opts).then do |response|
+      Hyperstack::HTTP.get(polling_path(operation, channel), opts).then do |response|
         response.json.each do |data|
           `console.log("simple_poller received: ", data)` if ClientDrivers.env == 'development'
           sync_dispatch(data[1])
@@ -200,11 +205,11 @@ module Hyperloop
 
       if @initialized
         # 1) skip initialization if already initialized
-        if on_opal_client? && Hyperloop.action_cable_consumer
+        if on_opal_client? && Hyperstack.action_cable_consumer
           # 2) if running action_cable make sure connection is up after pinging the server_up
           #    action cable closes the connection if files change on the server
-          Hyperloop::HTTP.get("#{`window.HyperloopEnginePath`}/server_up") do
-            `#{Hyperloop.action_cable_consumer}.connection.open()` if `#{Hyperloop.action_cable_consumer}.connection.disconnected`
+          Hyperstack::HTTP.get("#{`window.HyperstackEnginePath`}/server_up") do
+            `#{Hyperstack.action_cable_consumer}.connection.open()` if `#{Hyperstack.action_cable_consumer}.connection.disconnected`
           end
         end
         return
@@ -215,7 +220,7 @@ module Hyperloop
 
       if on_opal_client?
 
-        @opts = Hash.new(`window.HyperloopOpts`)
+        @opts = Hash.new(`window.HyperstackOpts`)
 
 
         if opts[:transport] == :pusher
@@ -236,18 +241,18 @@ module Hyperloop
               h = {
                 encrypted: #{opts[:encrypted]},
                 cluster: #{opts[:cluster]},
-                authEndpoint: window.HyperloopEnginePath+'/hyperloop-pusher-auth',
+                authEndpoint: window.HyperstackEnginePath+'/hyperstack-pusher-auth',
                 auth: {headers: {'X-CSRF-Token': #{opts[:form_authenticity_token]}}}
               };
               pusher_api = new Pusher(#{opts[:key]}, h)
             }
             opts[:pusher_api] = pusher_api
           end
-          Hyperloop.connect(*opts[:auto_connect])
+          Hyperstack.connect(*opts[:auto_connect])
         elsif opts[:transport] == :action_cable
           opts[:action_cable_consumer] =
             `ActionCable.createConsumer.apply(ActionCable, #{[*opts[:action_cable_consumer_url]]})`
-          Hyperloop.connect(*opts[:auto_connect])
+          Hyperstack.connect(*opts[:auto_connect])
         elsif opts[:transport] == :simple_poller
           opts[:auto_connect].each { |channel| IncomingBroadcast.add_connection(*channel) }
           every(opts[:seconds_between_poll]) do
@@ -258,7 +263,7 @@ module Hyperloop
     end
 
     def self.polling_path(to, id = nil)
-      s = "#{`window.HyperloopEnginePath`}/hyperloop-#{to}/#{opts[:id]}"
+      s = "#{`window.HyperstackEnginePath`}/hyperstack-#{to}/#{opts[:id]}"
       s = "#{s}/#{id}" if id
       s
     end
