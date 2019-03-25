@@ -62,7 +62,7 @@ Hyperstack::Application.acting_user_id
 
 The simplest way to implement this change is a global search and replace in your project.
 
-## There is a new concept of a base `HyperComponent` and `HyperStore` base class
+## There is a new concept of a base HyperComponent and HyperStore base class
 
 In Hyperloop, all Components and Stores inherited from a base `Hyperloop::Component` class. In HyperStack (following the new Rails convention), we do not provide the base class but encourage you to create your own. This is very useful for containing methods that all your Components share.
 
