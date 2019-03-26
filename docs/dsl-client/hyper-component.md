@@ -1463,7 +1463,8 @@ class UserIndex < HyperComponent
       TableRow do
         TableCell { "#{user.first_name} #{user.last_name}" }
         TableCell { user.is_female ? 'Female' : 'Male' }
-	# below note the use of key so React knows which Component is which else the erong params can be passed
+        # note the use of key so React knows which Component this refers to
+        # this is very important for performance and to ensure the component is used
         TableCell { UserDialog(user: user, key: user.id) } # this will render as an edit button
       end
     end
