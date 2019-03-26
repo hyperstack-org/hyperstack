@@ -1434,11 +1434,11 @@ npm install react@15.0.2 react-dom@15.0.2 --save
 
 Rails famously used scaffolding for Model CRUD (Create, Read, Update and Delete). There is no scaffolding in Hyperstack today, so here is an example which demonstrates how those simple Rails pages would work in Hyperstack.
 
-This examples uses components from the [Material UI](https://material-ui.com/) framework but the principals would be similar for any framework (or just HTML elements).
+This example uses components from the [Material UI](https://material-ui.com/) framework, but the principals would be similar for any framework (or just HTML elements).
 
-In this example, we will have a table of users and the ability to add new users or edit a user from the list.
-
+In this example, we will have a table of users and the ability to add new users or edit a user from the list. As the user edits the values in the UserDialog, they will appear in the underlying table. You can avoid this behaviour if you choose by copying the values in the `before_mount` of the UserDialog, so you are not interacting with the model directly.
 Firstly the table of users:
+
 
 ```ruby
 class UserIndex < HyperComponent
@@ -1463,7 +1463,8 @@ class UserIndex < HyperComponent
       TableRow do
         TableCell { "#{user.first_name} #{user.last_name}" }
         TableCell { user.is_female ? 'Female' : 'Male' }
-        TableCell { UserDialog(user: user) } # this will render as an edit button
+	# below note the use of key so React knows which Component is which else the erong params can be passed
+        TableCell { UserDialog(user: user, key: user.id) } # this will render as an edit button
       end
     end
   end
@@ -1478,18 +1479,9 @@ class UserDialog < HyperComponent
 
   before_mount do
     @open = false
-    # we care copying the model instance variables to local instance variables
-    # because we do not want updates made to the model to be reflected in the
-    # underlying table as the user types. If you did want this, you would not
-    # need to do this - just use the model itself
-    @first_name = @User.first_name
-    @last_name = @User.last_name
-    @is_female = @User.is_female
   end
 
   render do
-    # notice that the same component renders in three different ways
-    # as an Add button, and Edit button or a Dialog
     if @open
       render_dialog
     else
@@ -1522,11 +1514,12 @@ class UserDialog < HyperComponent
 
   def content
     FormGroup(row: true) do
-      TextField(label: 'First Name', value: @first_name.to_s).on(:change) do |e|
-        mutate @first_name = e.target.value
+      # note .to_s to specifically cast to a String
+      TextField(label: 'First Name', value: @User.first_name.to_s).on(:change) do |e|
+        @User.first_name = e.target.value
       end
-      TextField(label: 'Last Name', value: @last_name.to_s).on(:change) do |e|
-        mutate @last_name = e.target.value
+      TextField(label: 'Last Name', value: @User.last_name.to_s).on(:change) do |e|
+        @User.last_name = e.target.value
       end
     end
 
@@ -1535,31 +1528,37 @@ class UserDialog < HyperComponent
     FormLabel(component: 'legend') { 'Gender' }
     RadioGroup(row: true) do
       FormControlLabel(label: 'Male',
-                       control: Radio(value: false, checked: !@is_female).as_node.to_n)
+                       control: Radio(value: false, checked: !is_checked(@User.is_female)).as_node.to_n)
       FormControlLabel(label: 'Female',
-                       control: Radio(value: true, checked: @is_female).as_node.to_n)
+                       control: Radio(value: true, checked: is_checked(@User.is_female)).as_node.to_n)
     end.on(:change) do |e|
-      # for some unknown reason Radio() returns a String
-      mutate @is_female = e.target.value == 'true' ? true : false
+      @User.is_female = e.target.value
     end
+  end
+
+  def is_checked value
+    # we need a true or false and not an object
+    value ? true : false
   end
 
   def actions
     Button { 'Cancel' }.on(:click) { cancel }
 
-    return unless ready_to_save?
-    Button(color: :primary, variant: :contained, disabled: (@User.saving? ? true : false)) do
-      'Save'
-    end.on(:click) { save }
+    if @User.changed? && validate_content
+      Button(color: :primary, variant: :contained, disabled: (@User.saving? ? true : false)) do
+        'Save'
+      end.on(:click) { save }
+    end
   end
 
   def save
-    @User.update(first_name: @first_name, last_name: @last_name, is_female: @is_female).then do |result|
+    @User.save(validate: true).then do |result|
       mutate @open = false if result[:success]
     end
   end
 
   def cancel
+    @User.revert
     mutate @open = false
   end
 
@@ -1569,13 +1568,12 @@ class UserDialog < HyperComponent
     end
   end
 
-  def ready_to_save?
-    return false if @first_name.to_s.empty?
-    return false if @last_name.to_s.empty?
-    return false if @is_female.nil?
-    return true if @first_name != @User.first_name
-    return true if @last_name != @User.last_name
-    return true if @is_female != @User.is_female
+  def validate_content
+    return false if @User.first_name.to_s.empty?
+    return false if @User.last_name.to_s.empty?
+    return false if @User.is_female.nil?
+
+    true
   end
 end
 ```
