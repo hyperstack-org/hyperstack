@@ -14,7 +14,7 @@ Hyperstack is a Ruby-based DSL and modern web toolkit for building spectacular, 
 All that means you can write simple front-end code like this:
 
 ```ruby
-class GoodBooksToRead < Hyperstack::Component
+class GoodBooksToRead < HyperComponent
   render(UL) do
     Book.good_books.each do |book|
       LI { "Read #{book.name}" }.on(:click) { display book } if book.available?
