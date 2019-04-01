@@ -435,8 +435,9 @@ To determine this sync_scopes first asks if the record being changed is in the s
         inverse_of = @association.inverse_of
         current_association_value = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
-        #backing_record.update_belongs_to(inverse_of, @owner)
-        backing_record.set_belongs_to_via_has_many(@association, @owner)
+        # next line was commented out and following line was active.
+        backing_record.update_belongs_to(inverse_of, @owner)
+        #backing_record.set_belongs_to_via_has_many(@association, @owner)
         # following is handled by update_belongs_to and is redundant
         # unless current_association_value.nil?  # might be a dummy value which responds to nil
         #   current_association = @association.inverse.inverse(current_association_value)
@@ -542,8 +543,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
           r.id = new_array[i].id if array[i] and array[i].id and !r.new? and r.backing_record.vector.last =~ /^\*[0-9]+$/
         end
       end
-
-      @collection.dup.each { |item| delete(item) } if @collection  # this line is a big nop I think
+      # the following makes sure that the existing elements are properly removed from the collection
+      @collection.dup.each { |item| delete(item) } if @collection
       @collection = []
       if new_array.is_a? Collection
         @dummy_collection = new_array.dummy_collection

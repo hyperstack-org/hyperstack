@@ -163,7 +163,7 @@ module ActiveRecord
         the_klass.reflect_on_all_associations.each do |association|
           next if association.association_foreign_key != @association_foreign_key
           next if association.attribute == attribute
-          return association if the_klass == association.owner_class
+          return association if association.polymorphic? || association.klass == owner_class
         end
         raise "could not find inverse of polymorphic belongs_to: #{model.inspect} #{self.inspect}" if options[:polymorphic]
         # instead of raising an error go ahead and create the inverse relationship if it does not exist.

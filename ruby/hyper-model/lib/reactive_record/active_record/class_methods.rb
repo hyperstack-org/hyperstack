@@ -172,7 +172,7 @@ module ActiveRecord
       :full_table_name_prefix, :full_table_name_suffix, :reset_sequence_name, :sequence_name=, :next_sequence_value, :column_defaults, :content_columns,
       :readonly_attributes, :attr_readonly, :create, :create!, :instantiate, :find, :type_caster, :arel_table, :find_by, :find_by!, :initialize_find_by_cache,
       :generated_association_methods, :arel_engine, :arel_attribute, :predicate_builder, :collection_cache_key, :relation_delegate_class,
-      :initialize_relation_delegate_cache, :enum, :collecting_queries_for_explain, :exec_explain, :i18n_scope, :lookup_ancestors, :human_attribute_name,
+      :initialize_relation_delegate_cache, :enum, :collecting_queries_for_explain, :exec_explain, :i18n_scope, :lookup_ancestors,
       :references, :uniq, :maximum, :none, :exists?, :second, :limit, :order, :eager_load, :update, :delete_all, :destroy, :ids, :many?, :pluck, :third,
       :delete, :fourth, :fifth, :forty_two, :second_to_last, :third_to_last, :preload, :sum, :take!, :first!, :last!, :second!, :offset, :select, :fourth!,
       :third!, :third_to_last!, :fifth!, :where, :first_or_create, :second_to_last!, :forty_two!, :first, :having, :any?, :one?, :none?, :find_or_create_by,
@@ -334,6 +334,10 @@ module ActiveRecord
         vector = args.count.zero? ? name : [[name] + args]
         @backing_record.get_server_method(vector, true)
       end
+    end
+
+    def human_attribute_name(attribute, opts = {})
+      opts[:default] || attribute
     end
 
     def define_attribute_methods

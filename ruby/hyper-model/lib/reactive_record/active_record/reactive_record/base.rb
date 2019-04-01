@@ -207,7 +207,7 @@ module ReactiveRecord
     end
 
     def errors
-      @errors ||= ActiveModel::Errors.new(self)
+      @errors ||= ActiveModel::Errors.new(ar_instance)
     end
 
     # called when we have a newly created record, to initialize

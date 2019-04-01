@@ -42,6 +42,14 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     end.to eq("last_name"=>["no swear words allowed"])
   end
 
+  it "can validate and use the full_messages method" do
+    expect_promise do
+      User.new(last_name: 'f**k').validate.then do |new_user|
+        new_user.errors.full_messages
+      end
+    end.to eq(["Last name no swear words allowed"])
+  end
+
   it "the valid? method will return true if the model has no errors" do
     mount "Validator" do
       class Validator < HyperComponent
@@ -62,8 +70,9 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
   it "the valid? method will return false if the model has errors" do
     expect_promise do
       user = User.new(last_name: 'f**k')
-      user.save.then { user.valid? }
+      user.save(validate: true).then { |result| user.valid?}
     end.to be_falsy
+
   end
 
   it "the valid? method reacts to the model being saved" do
