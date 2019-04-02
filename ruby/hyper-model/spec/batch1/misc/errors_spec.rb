@@ -22,11 +22,11 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
         #   send(attr)
         # end
 
-        class << self
-          def human_attribute_name(attr, options = {})
-            attr
-          end
-        end
+        # class << self
+        #   def human_attribute_name(attr, options = {})
+        #     attr
+        #   end
+        # end
 
         # def self.lookup_ancestors
         #   [self]
@@ -174,7 +174,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
       person = Person.new
       person.validate!
       person.errors.full_messages
-    end.to eq ['name cannot be nil']
+    end.to eq ['Name cannot be nil']
 
     expect_evaluate_ruby do
       person = Person.new
@@ -312,7 +312,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
       person.errors.add(:name, 'cannot be blank')
       person.errors.add(:name, 'cannot be nil')
       person.errors.to_a
-    end.to eq ['name cannot be blank', 'name cannot be nil']
+    end.to eq ['Name cannot be blank', 'Name cannot be nil']
   end
 
   it 'to_hash returns the error messages hash' do
@@ -343,7 +343,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
       person.errors.add(:name, 'cannot be blank')
       person.errors.add(:name, 'cannot be nil')
       person.errors.full_messages
-    end.to eq ['name cannot be blank', 'name cannot be nil']
+    end.to eq ['Name cannot be blank', 'Name cannot be nil']
   end
 
   it 'full_messages_for contains all the error messages for the given attribute indifferent' do
@@ -352,7 +352,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
       person.errors.add(:name, 'cannot be blank')
       person.errors.add(:name, 'cannot be nil')
       person.errors.full_messages_for(:name)
-    end.to eq ['name cannot be blank', 'name cannot be nil']
+    end.to eq ['Name cannot be blank', 'Name cannot be nil']
   end
 
   it 'full_messages_for does not contain error messages from other attributes' do
@@ -361,7 +361,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
       person.errors.add(:name, 'cannot be blank')
       person.errors.add(:email, 'cannot be blank')
       person.errors.full_messages_for(:name)
-    end.to eq ['name cannot be blank']
+    end.to eq ['Name cannot be blank']
   end
 
   it 'full_messages_for returns an empty list in case there are no errors for the given attribute' do
@@ -383,7 +383,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
     expect_evaluate_ruby do
       person = Person.new
       person.errors.full_message(:name_test, 'cannot be blank')
-    end.to eq 'name_test cannot be blank'
+    end.to eq 'Name test cannot be blank'
   end
 
   it 'as_json creates a json formatted representation of the errors hash' do
@@ -399,7 +399,7 @@ RSpec::Steps.steps ActiveModel::Errors, js: true do
       person = Person.new
       person.validate!
       person.errors.as_json(full_messages: true)
-    end.to eq('name' => ['name cannot be nil'])
+    end.to eq('name' => ['Name cannot be nil'])
   end
 
   it 'generate_message works without i18n_scope', skip: true do

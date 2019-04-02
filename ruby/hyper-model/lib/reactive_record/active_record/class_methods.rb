@@ -185,7 +185,10 @@ module ActiveRecord
     ]
 
     def method_missing(name, *args, &block)
-      if args.count == 1 && name.start_with?("find_by_") && !block
+      if name == 'human_attribute_name'
+        opts = args[1] || {}
+        opts[:default] || args[0]
+      elsif args.count == 1 && name.start_with?("find_by_") && !block
         find_by(name.sub(/^find_by_/, '') => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
@@ -334,10 +337,6 @@ module ActiveRecord
         vector = args.count.zero? ? name : [[name] + args]
         @backing_record.get_server_method(vector, true)
       end
-    end
-
-    def human_attribute_name(attribute, opts = {})
-      opts[:default] || attribute
     end
 
     def define_attribute_methods
