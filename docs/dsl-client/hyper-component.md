@@ -1430,6 +1430,154 @@ However it gets a little tricky if you are using the react-rails gem.  Each vers
 npm install react@15.0.2 react-dom@15.0.2 --save
 ```  
 
+## Single Page Application CRUD example
+
+Rails famously used scaffolding for Model CRUD (Create, Read, Update and Delete). There is no scaffolding in Hyperstack today, so here is an example which demonstrates how those simple Rails pages would work in Hyperstack.
+
+This example uses components from the [Material UI](https://material-ui.com/) framework, but the principals would be similar for any framework (or just HTML elements).
+
+In this example, we will have a table of users and the ability to add new users or edit a user from the list. As the user edits the values in the UserDialog, they will appear in the underlying table. You can avoid this behaviour if you choose by copying the values in the `before_mount` of the UserDialog, so you are not interacting with the model directly.
+Firstly the table of users:
+
+
+```ruby
+class UserIndex < HyperComponent
+  render(DIV, class: 'mo-page') do
+    UserDialog(user: User.new) # this will render as a button to add users
+    Table do
+      TableHead do
+        TableRow do
+          TableCell { 'Name' }
+          TableCell { 'Gender' }
+          TableCell { 'Edit' }
+        end
+      end
+      TableBody do
+        user_rows
+      end
+    end
+  end
+
+  def user_rows
+    User.each do |user| # note User is a Hyperstack model (see later in the Isomorphic section)
+      TableRow do
+        TableCell { "#{user.first_name} #{user.last_name}" }
+        TableCell { user.is_female ? 'Female' : 'Male' }
+        # note the use of key so React knows which Component this refers to
+        # this is very important for performance and to ensure the component is used
+        TableCell { UserDialog(user: user, key: user.id) } # this will render as an edit button
+      end
+    end
+  end
+end
+```
+
+Then we need the actual Dialog (Modal) component:
+
+```ruby
+class UserDialog < HyperComponent
+  param :user
+
+  before_mount do
+    @open = false
+  end
+
+  render do
+    if @open
+      render_dialog
+    else
+      edit_or_new_button.on(:click) { mutate @open = true }
+    end
+  end
+
+  def render_dialog
+    Dialog(open: @open, fullWidth: false) do
+      DialogTitle do
+        'User'
+      end
+      DialogContent do
+        content
+        error_messages if @User.errors.any?
+      end
+      DialogActions do
+        actions
+      end
+    end
+  end
+
+  def edit_or_new_button
+    if @User.new?
+      Fab(size: :small, color: :primary) { Icon { 'add' } }
+    else
+      Fab(size: :small, color: :secondary) { Icon { 'settings' } }
+    end
+  end
+
+  def content
+    FormGroup(row: true) do
+      # note .to_s to specifically cast to a String
+      TextField(label: 'First Name', value: @User.first_name.to_s).on(:change) do |e|
+        @User.first_name = e.target.value
+      end
+      TextField(label: 'Last Name', value: @User.last_name.to_s).on(:change) do |e|
+        @User.last_name = e.target.value
+      end
+    end
+
+    BR()
+
+    FormLabel(component: 'legend') { 'Gender' }
+    RadioGroup(row: true) do
+      FormControlLabel(label: 'Male',
+                       control: Radio(value: false, checked: !is_checked(@User.is_female)).as_node.to_n)
+      FormControlLabel(label: 'Female',
+                       control: Radio(value: true, checked: is_checked(@User.is_female)).as_node.to_n)
+    end.on(:change) do |e|
+      @User.is_female = e.target.value
+    end
+  end
+
+  def is_checked value
+    # we need a true or false and not an object
+    value ? true : false
+  end
+
+  def actions
+    Button { 'Cancel' }.on(:click) { cancel }
+
+    if @User.changed? && validate_content
+      Button(color: :primary, variant: :contained, disabled: (@User.saving? ? true : false)) do
+        'Save'
+      end.on(:click) { save }
+    end
+  end
+
+  def save
+    @User.save(validate: true).then do |result|
+      mutate @open = false if result[:success]
+    end
+  end
+
+  def cancel
+    @User.revert
+    mutate @open = false
+  end
+
+  def error_messages
+    @User.errors.full_messages.each do |message|
+      Typography(variant: :h6, color: :secondary) { message }
+    end
+  end
+
+  def validate_content
+    return false if @User.first_name.to_s.empty?
+    return false if @User.last_name.to_s.empty?
+    return false if @User.is_female.nil?
+
+    true
+  end
+end
+```
 
 ## Elements and Rendering
 
