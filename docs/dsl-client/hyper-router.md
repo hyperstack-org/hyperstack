@@ -350,7 +350,7 @@ Now, going to `/goodbye` would match the `Goodbye` route first and only render t
 
 ### Links
 
-Links are provided by both the `Hyperstack::Router` and `Hyperstack::Router::Helper` modules.
+Links are provided by both the `Hyperstack::Router` and `Hyperstack::Router::Helpers` modules.
 
 The `Link` method takes a url path, and these options:
 + `search: String` adds the specified string to the search query
