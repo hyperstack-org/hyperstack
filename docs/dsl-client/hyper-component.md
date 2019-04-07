@@ -426,7 +426,7 @@ If no value is provided for `:an_optional_param` it will be given the value `"he
 
 ### Params of type Proc
 
-A Ruby `Proc` can be passed to a component like any other object.  A param of type proc (i.e. `param :update, type: Proc`) gets special treatment that will directly call the proc when the param is accessed.
+A Ruby `Proc` can be passed to a component like any other object. 
 
 ```ruby
 param :all_done, type: Proc
