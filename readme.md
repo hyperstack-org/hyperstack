@@ -43,7 +43,15 @@ You can be up and running in **less than 5 minutes**. Just follow the simple set
 
 Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, please reach out and say hello.
 
-+ Reach us at: [Gitter chat](https://gitter.im/ruby-hyperloop/chat)
++ [Join](https://hyperstack.org/slack-invite) our new Slack group
++ After you have joined there is a shortcut at https://hyperstack.org/slack
+
+### StackOverflow Questions
+
+Please ask technical questions on StackOverflow as the answers help people in the future. We use the `hyperstack` tag, but also add `ruby-on-rails`, `ruby` and `react-js` tags to get this project exposed to a broader community.
+
++ Please ask questions here: https://hyperstack.org/question
++ All the `hyperstack` tagged questions are here: https://hyperstack.org/questions
 
 ## Roadmap
 

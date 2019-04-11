@@ -25,6 +25,10 @@ Some recent blogs:
 
 + [The Exact Same App in Hyperstack part II — Hold on to your socks!)](https://medium.com/@mitch_23203/the-exact-same-app-in-hyperstack-part-ii-5b062074ec20) - Persistance and push notifications in two lines of code!
 
+## Videos
+
++ [Hyperstack approaching 1.0](https://www.youtube.com/watch?v=GEe7hHIhyUs) - a great overview of all the new functionality in 1.0 by @catmando
+
 ## Questions and Answers
 
 Please use [Stack Overflow](https://stackoverflow.com/questions/ask?tags=hyperstack+ruby-on-rails+reactjs+ruby+isomorphic) to post any questions. We monitor the `hyperstack` tag carefully so you should get a reply quickly, but please also post the URL of your question to the [Gitter chat](https://gitter.im/ruby-hyperloop/chat) to get our attention quicker.  
