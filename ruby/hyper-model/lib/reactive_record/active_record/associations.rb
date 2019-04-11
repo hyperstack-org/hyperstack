@@ -182,7 +182,8 @@ module ActiveRecord
 
       def klass(model = nil)
         @klass ||= Object.const_get(@klass_name) if @klass_name
-        if @klass && model && !(model.class <= @klass)
+        if @klass && model && !(model.class <= @klass || @klass <= model.class)
+          # TODO: added || @klass <= model.class can both cases really happen I guess so
           raise "internal error: provided model #{model} is not subclass of #{@klass}"
         end
         raise 'no model supplied for polymorphic relationship' unless @klass || model

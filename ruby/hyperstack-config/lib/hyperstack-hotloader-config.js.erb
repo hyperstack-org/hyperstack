@@ -3,5 +3,5 @@ if ((typeof(window) !== 'undefined') && (window.Hyperstack==undefined || window.
 }
 //if (typeof(Hyperstack) === 'undefined') { Hyperstack = {} }
 Hyperstack.hotloader.port = <%= Hyperstack.hotloader_port %>
-Hyperstack.hotloader.ping = <%= !!Hyperstack.hotloader_ping %>
+Hyperstack.hotloader.ping = <%= Hyperstack.hotloader_ping ? Hyperstack.hotloader_ping : false %>
 Hyperstack.hotloader.ignore_callback_mapping = <%= !(!Hyperstack.hotloader_ignore_callback_mapping && Rails.configuration.assets.debug) %>
