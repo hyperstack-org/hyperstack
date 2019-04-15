@@ -35,16 +35,35 @@ module Hyperstack
 
 
   if RUBY_ENGINE == 'opal'
+    # Patch in a dummy copy of Model.load in case we are not using models
+    # this will be defined properly by hyper-model
+    module Model
+      def self.load
+        Promise.new.tap { |promise| promise.resolve(yield) }
+      end unless respond_to?(:load)
+    end
+
     def self.connect(*channels)
       channels.each do |channel|
         if channel.is_a? Class
           IncomingBroadcast.connect_to(channel.name)
         elsif channel.is_a?(String) || channel.is_a?(Array)
           IncomingBroadcast.connect_to(*channel)
-        elsif channel.id
-          IncomingBroadcast.connect_to(channel.class.name, channel.id)
+        elsif channel.respond_to?(:id)
+          Hyperstack::Model.load do
+            channel.id
+          end.then do |id|
+            raise "Hyperstack.connect cannot connect to #{channel.inspect}.  "\
+                  "The id is nil. This can be caused by connecting to a model "\
+                  "that is not saved, or that does not exist." unless id
+            IncomingBroadcast.connect_to(channel.class.name, id)
+          end
         else
-          raise "cannot connect to model before it has been saved"
+          raise "Hyperstack.connect cannot connect to #{channel.inspect}.\n"\
+                "Channels must be either a class, or a class name,\n"\
+                "a string in the form 'ClassName-id',\n"\
+                "an array in the form [class, id] or [class-name, id],\n"\
+                "or an object that responds to the id method with a non-nil value"
         end
       end
     end
