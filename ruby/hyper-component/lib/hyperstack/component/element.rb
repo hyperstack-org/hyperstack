@@ -39,18 +39,25 @@ module Hyperstack
       end
 
       def ref
-        @ref || raise("#{self} has not been mounted yet")
+        return @ref if @ref
+        raise("The instance of #{self.type} has not been mounted yet") if properties[:ref]
+        raise("Attempt to get a ref on #{self.type} which is a static component.")
       end
 
       def dom_node
-        @type.is_a?(String) ? ref : ref.dom_node
+        `typeof #{ref}.$dom_node == 'function'` ? ref.dom_node : ref
       end
 
-      # Attach event handlers.
+      # Attach event handlers. skip false, nil and blank event names
 
       def on(*event_names, &block)
-        event_names.each { |event_name| merge_event_prop!(event_name, &block) }
-        @native = `React.cloneElement(#{@native}, #{@properties.shallow_to_n})`
+        any_found = false
+        event_names.each do |event_name|
+          next unless event_name && event_name.strip != ''
+          merge_event_prop!(event_name, &block)
+          any_found = true
+        end
+        @native = `React.cloneElement(#{@native}, #{@properties.shallow_to_n})` if any_found
         self
       end
 

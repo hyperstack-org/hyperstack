@@ -451,6 +451,13 @@ keys:
             loaded_collection[0].backing_record.sync_attributes(attrs)
           end
           target.replace loaded_collection
+          # we need to notify any observers of the collection.  collection#replace
+          # will not notify if we are data_loading (which we are) so we will do it
+          # here.  BUT we want the notification to occur after the current event
+          # completes so we wrap it a bulk_update
+          Hyperstack::Internal::State::Mapper.bulk_update do
+            Hyperstack::Internal::State::Variable.set(target, :collection, target.collection)
+          end
         end
 
         if id_value = tree["id"] and id_value.is_a? Array
