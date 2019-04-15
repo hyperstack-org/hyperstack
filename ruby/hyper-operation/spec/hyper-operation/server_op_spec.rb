@@ -347,5 +347,29 @@ describe "isomorphic operations", js: true do
       end.to eq(6)
       expect(page).to have_content("The server says 'hello serialized deserialized'!")
     end
+
+    it 'can attach custom headers' do
+      isomorphic do
+        class Operation < Hyperstack::ControllerOp
+
+          def self.headers # this runs on the client and adds custom headers
+            { Authorization: '1234' }
+          end
+
+          # return the value of the Authorization header
+          # rails automatically upcases all the keys
+
+          step { request.headers['AUTHORIZATION'] }
+        end
+      end
+      stub_const "OperationPolicy", Class.new
+      OperationPolicy.always_allow_connection
+      mount 'Test'
+
+      expect_promise do
+        Operation.run
+      end.to eq('1234')
+    end
+
   end
 end

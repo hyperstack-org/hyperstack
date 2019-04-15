@@ -14,7 +14,7 @@ module Hyperstack
             Hyperstack::HTTP.post(
               "#{`window.HyperstackEnginePath`}/execute_remote",
               payload: {json: {operation: name, params: hash}.to_json},
-              headers: {'X-CSRF-Token' => Hyperstack::ClientDrivers.opts[:form_authenticity_token] }
+              headers: headers.merge('X-CSRF-Token' => Hyperstack::ClientDrivers.opts[:form_authenticity_token])
               )
             .then do |response|
               deserialize_response response.json[:response]
@@ -127,6 +127,10 @@ module Hyperstack
         promise.resolve http.request(request)
       rescue Exception => e
         promise.reject e
+      end
+
+      def headers
+        {}
       end
 
       def serialize_params(hash)
