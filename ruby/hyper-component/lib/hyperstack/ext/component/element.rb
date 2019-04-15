@@ -1,16 +1,8 @@
 Element.instance_eval do
   def self.find(selector)
-    # the following rescue should no longer be needed,
-    # and it prevents bubbling up necessary error messages
-    # for improper use of refs.
-
-    # selector = begin
-    #   selector.dom_node
-    # rescue
-    #   selector
-    # end if `#{selector}.$dom_node !== undefined`
-
-    selector = selector.dom_node if `#{selector}.$dom_node !== undefined`
+    if `typeof #{selector}['$respond_to?'] == 'function'` && selector.respond_to?(:dom_node)
+      selector = selector.dom_node
+    end
     `$(#{selector})`
   end
 
