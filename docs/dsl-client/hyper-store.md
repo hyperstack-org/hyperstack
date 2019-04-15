@@ -112,7 +112,8 @@ end
 You can keep the logic around initialization in your Store. Remember that in Ruby your class instance variables can be initialized as the class is defined:
 
 ```ruby
-class CardStatusStore < HyperStore
+class CardStore
+  include Hyperstack::State::Observable
 
   @show_card_status = true
   @show_card_details = false
