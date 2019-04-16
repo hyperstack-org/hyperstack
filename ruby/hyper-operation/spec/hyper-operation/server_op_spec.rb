@@ -350,7 +350,7 @@ describe "isomorphic operations", js: true do
 
     it 'can attach custom headers' do
       isomorphic do
-        class Operation < Hyperstack::ControllerOp
+        class ControllerOperation < Hyperstack::ControllerOp
 
           def self.headers # this runs on the client and adds custom headers
             { Authorization: '1234' }
@@ -362,12 +362,12 @@ describe "isomorphic operations", js: true do
           step { request.headers['AUTHORIZATION'] }
         end
       end
-      stub_const "OperationPolicy", Class.new
-      OperationPolicy.always_allow_connection
+      # stub_const "ControllerOperationPolicy", Class.new
+      # ControllerOperationPolicy.always_allow_connection
       mount 'Test'
 
       expect_promise do
-        Operation.run
+        ControllerOperation.run
       end.to eq('1234')
     end
 
