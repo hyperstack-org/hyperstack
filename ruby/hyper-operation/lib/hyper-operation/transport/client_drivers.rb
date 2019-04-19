@@ -84,20 +84,19 @@ module Hyperstack
 
       def self.add_connection(channel_name, id = nil)
         channel_string = "#{channel_name}#{'-'+id.to_s if id}"
+        return if open_channels.include? channel_string
         open_channels << channel_string
         channel_string
       end
 
       def self.connect_to(channel_name, id = nil)
         channel_string = add_connection(channel_name, id)
+        return unless channel_string # already connected!
         if ClientDrivers.opts[:transport] == :pusher
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
             var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel.gsub('::', '==')});
-            if (#{!@pusher_dispatcher_registered}) {
-              console.log('registering dispatch for pusher')
-              channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
-            }
+            channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
             channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }
           @pusher_dispatcher_registered = true
