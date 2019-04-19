@@ -214,7 +214,6 @@ module ReactiveRecord
         backing_records = Hash[*records_to_process.collect { |record| [record.object_id, record] }.flatten(1)]
 
         add_new_association = lambda do |record, attribute, assoc_record|
-          puts "adding new association(#{record.inspect}, #{attribute}, #{assoc_record})"
           unless backing_records[assoc_record.object_id]
             records_to_process << assoc_record
             backing_records[assoc_record.object_id] = assoc_record
