@@ -198,6 +198,7 @@ module ReactiveRecord
     if RUBY_ENGINE == 'opal'
 
       def self.gather_records(records_to_process, force, record_being_saved)
+        puts "gather_records(#{records_to_process.count}, #{force}, #{record_being_saved.inspect})"
         # we want to pass not just the model data to save, but also enough information so that on return from the server
         # we can update the models on the client
 
@@ -213,6 +214,7 @@ module ReactiveRecord
         backing_records = Hash[*records_to_process.collect { |record| [record.object_id, record] }.flatten(1)]
 
         add_new_association = lambda do |record, attribute, assoc_record|
+          puts "adding new association(#{record.inspect}, #{attribute}, #{assoc_record})"
           unless backing_records[assoc_record.object_id]
             records_to_process << assoc_record
             backing_records[assoc_record.object_id] = assoc_record

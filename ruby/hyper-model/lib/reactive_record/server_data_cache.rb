@@ -510,7 +510,7 @@ keys:
           load_from_json(value, new_target) if new_target
         end
       rescue Exception => e
-       raise e
+        raise e
       end
     end
   end

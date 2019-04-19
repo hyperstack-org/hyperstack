@@ -94,9 +94,13 @@ module Hyperstack
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
             var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel.gsub('::', '==')});
-            channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
+            if (#{!@pusher_dispatcher_registered}) {
+              console.log('registering dispatch for pusher')
+              channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
+            }
             channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }
+          @pusher_dispatcher_registered = true
         elsif ClientDrivers.opts[:transport] == :action_cable
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           Hyperstack::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|

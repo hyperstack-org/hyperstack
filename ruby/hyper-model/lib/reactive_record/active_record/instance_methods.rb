@@ -81,7 +81,11 @@ module ActiveRecord
     end
 
     def ==(ar_instance)
-      @backing_record == ar_instance.instance_eval { @backing_record }
+      return true  if @backing_record == ar_instance.instance_eval { @backing_record }
+      return false unless ar_instance.is_a?(ActiveRecord::Base)
+      return false if ar_instance.new_record?
+      return false unless self.class.base_class == ar_instance.class.base_class
+      id == ar_instance.id
     end
 
     def [](attr)
