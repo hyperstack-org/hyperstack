@@ -198,7 +198,6 @@ module ReactiveRecord
     if RUBY_ENGINE == 'opal'
 
       def self.gather_records(records_to_process, force, record_being_saved)
-        puts "gather_records(#{records_to_process.count}, #{force}, #{record_being_saved.inspect})"
         # we want to pass not just the model data to save, but also enough information so that on return from the server
         # we can update the models on the client
 
@@ -454,6 +453,9 @@ module ReactiveRecord
             elsif parent.class.reflect_on_association(association[:attribute].to_sym).collection?
               #puts ">>>>>>>>>> #{parent.class.name}.send('#{association[:attribute]}') << #{reactive_records[association[:child_id]]})"
               dont_save_list.delete(parent)
+              if reactive_records[association[:child_id]]&.new_record?
+                dont_save_list << reactive_records[association[:child_id]]
+              end
               #if false and parent.new?
                 #parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]]
                 # puts "updated"
@@ -463,8 +465,11 @@ module ReactiveRecord
             else
               #puts ">>>>ASSOCIATION>>>> #{parent.class.name}.send('#{association[:attribute]}=', #{reactive_records[association[:child_id]]})"
               parent.send("#{association[:attribute]}=", reactive_records[association[:child_id]])
+
               dont_save_list.delete(parent)
-              #puts "updated"
+              if reactive_records[association[:child_id]]&.new_record? && parent.class.reflect_on_association(association[:attribute].to_sym).macro == :has_one
+                dont_save_list << reactive_records[association[:child_id]]
+              end
             end
           end if associations
 
@@ -497,6 +502,7 @@ module ReactiveRecord
             messages = model.errors.messages if validate && !model.valid?
             all_messages << [model, messages] if save && messages
             attributes = model.__hyperstack_secure_attributes(acting_user)
+            attributes[model.class.primary_key] = model[model.class.primary_key]
             [reactive_record_id, model.class.name, attributes, messages]
           end
 

@@ -89,7 +89,7 @@ module ActiveModel
     #   person.errors.values   # => [["cannot be nil", "must be specified"]]
     def values
       messages.select do |key, value|
-        !value.empty?
+        !value&.empty?
       end.values
     end
 
