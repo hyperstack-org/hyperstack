@@ -177,7 +177,12 @@ module ReactiveRecord
 
         # once we have received all the data from all the channels (applies to create and update only)
         # we yield and process the record
-        yield complete! if @channels == @received
+
+        # pusher fake can send duplicate records which will result in a nil broadcast
+        # so we also check that before yielding
+        if @channels == @received && (broadcast = complete!)
+          yield broadcast
+        end
       end
     end
 

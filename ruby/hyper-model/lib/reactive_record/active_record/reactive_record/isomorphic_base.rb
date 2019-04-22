@@ -464,9 +464,9 @@ module ReactiveRecord
               dont_save_list.delete(parent)
 
 
-              if reactive_records[association[:child_id]]&.new_record?
-                dont_save_list << reactive_records[association[:child_id]]
-              end
+              # if reactive_records[association[:child_id]]&.new_record?
+              #   dont_save_list << reactive_records[association[:child_id]]
+              # end
               #if false and parent.new?
                 #parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]]
                 # puts "updated"
@@ -478,10 +478,10 @@ module ReactiveRecord
               parent.send("#{association[:attribute]}=", reactive_records[association[:child_id]])
               dont_save_list.delete(parent)
 
-              if parent.class.reflect_on_association(association[:attribute].to_sym).macro == :has_one &&
-                 reactive_records[association[:child_id]]&.new_record?
-                dont_save_list << reactive_records[association[:child_id]]
-              end
+              # if parent.class.reflect_on_association(association[:attribute].to_sym).macro == :has_one &&
+              #    reactive_records[association[:child_id]]&.new_record?
+              #   dont_save_list << reactive_records[association[:child_id]]
+              # end
             end
           end if associations
           # get rid of any records that don't require further processing, as a side effect
@@ -493,7 +493,8 @@ module ReactiveRecord
             next true  if dont_save_list.include?(record) # skip if the record is on the don't save list
             next true  if record.changed.include?(record.class.primary_key)  # happens on an aggregate
             #next true  if record.persisted? # record may be have been saved as result of has_one assignment
-            next record.persisted? if record.id && !record.changed? # throw out any existing records with no changes
+            # next false if record.id && !record.changed? # throw out any existing records with no changes
+            next record.persisted? if record.id && !record.changed?
             # if we get to here save the record and return true to keep it
             op = new_models.include?(record) ? :create_permitted? : :update_permitted?
             record.check_permission_with_acting_user(acting_user, op).save(validate: false) || true
