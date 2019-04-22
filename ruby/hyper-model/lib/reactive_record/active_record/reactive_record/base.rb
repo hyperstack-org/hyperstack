@@ -310,7 +310,8 @@ module ReactiveRecord
       @saving = true
     end
 
-    def errors!(hash)
+    def errors!(hash, saving)
+      @errors_at_last_sync = hash if saving
       notify_waiting_for_save
       errors.clear && return unless hash
       hash.each do |attribute, messages|
@@ -318,6 +319,11 @@ module ReactiveRecord
           errors.add(attribute, message)
         end
       end
+    end
+
+    def revert_errors!
+      puts "#{inspect}.revert_errors!  @errors_at_last_sync: #{@errors_at_last_sync}"
+      errors!(@errors_at_last_sync)
     end
 
     def saved!(save_only = nil) # sets saving to false AND notifies

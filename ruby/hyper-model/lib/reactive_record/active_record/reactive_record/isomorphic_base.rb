@@ -264,8 +264,17 @@ module ReactiveRecord
           HyperMesh.load do
             ReactiveRecord.loads_pending! unless self.class.pending_fetches.empty?
           end.then { send_save_to_server(save, validate, force, &block) }
-          #save_to_server(validate, force, &block)
         else
+          if validate
+            # Handles the case where a model is valid, then some attribute is
+            # updated, and model.validate is called updating the error data.
+            # Now lets say the attribute changes back to the last synced value.  In
+            # this case we need to revert the error records.
+            models, _, backing_records = self.class.gather_records([self], true, self)
+            models.each do |item|
+              backing_records[item[:id]].revert_errors!
+            end
+          end
           promise = Promise.new
           yield true, nil, [] if block
           promise.resolve({success: true})
@@ -302,7 +311,7 @@ module ReactiveRecord
 
               response[:saved_models].each do | item |
                 backing_records[item[0]].sync_unscoped_collection! if save
-                backing_records[item[0]].errors! item[3]
+                backing_records[item[0]].errors! item[3], save
               end
 
               yield response[:success], response[:message], response[:models]  if block

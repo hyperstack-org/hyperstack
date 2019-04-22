@@ -120,9 +120,8 @@ module ReactiveRecord
       # || data_loading? added so that model.new can be wrapped in a ReactiveRecord.load_data
       if !changed || data_loading?
         changed_attributes.delete(attr)
-      else
-        changed_attributes << attr if !changed_attributes.include?(attr)
-        synced_attributes.delete(attr)
+      elsif !changed_attributes.include?(attr)
+        changed_attributes << attr
       end
       yield @attributes.key?(attr), @attributes[attr]
       return unless empty_before != changed_attributes.empty?
