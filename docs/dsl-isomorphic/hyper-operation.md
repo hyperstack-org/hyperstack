@@ -2,9 +2,32 @@
 
 **Work in progress - ALPHA (docs and code)**
 
-Operations are the engine rooms of Hyperstack; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
+Operations are Hyperstack's implementation of Service Object which is...  
 
-Operations receive parameters and execute a series of steps. They have a simple structure which is not dissimilar to a Component:
+> "A class that performs an action"   [A simple explanation of Service Objects for Ruby on Rails](https://medium.freecodecamp.org/service-objects-explained-simply-for-ruby-on-rails-5-a8cc42a5441f)
+
+Why do we need Service Objects?  Because in any real world system you have logic that does belong in models or stores because it effects multiple models or stores, and it does not belong in components because the logic of the task is independent of the specific user interface design.
+
+There are also those boundary areas between gathering and processing external data and getting into or out of our stores and models.  You don't want that kind of logic in your model or store, so where does it go?  Into an operation.
+
+Simply put an operation is like a large standalone method that has no internal state of its own.  You run an operation, it does it thing, and it returns an answer.
+
+Any state that an operation needs to retrieve or save is stored somewhere else: in a model, a store, or even in a remote API.  Once the operation completes, it has no memory of its own.  
+
+
+Because this an operation's full time mission the Hyperstack Operation base class is structured to make writing this kind of code easy.
+
+An Operation may take parameters (params) just like any other method.  
+An Operation may validate the parameters
+An Operation then executes a number of steps
+The value of the final step is returned
+
+Hyperstack Operations often involve asynchronous methods such as HTTP requests, and so Operations always return promises
+
+
+; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
+
+Operations receive parameters, va and execute a series of steps They have a simple structure which is not dissimilar to a Component:
 
 ```ruby
 class SimpleOperation < Hyperstack::Operation

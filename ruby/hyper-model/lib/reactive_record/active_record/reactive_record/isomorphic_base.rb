@@ -243,7 +243,7 @@ module ReactiveRecord
                   add_new_association.call record, attribute, value.backing_record
                 end
               end
-            elsif aggregation = record.model.reflect_on_aggregation(attribute) and (aggregation.klass < ActiveRecord::Base)
+            elsif (aggregation = record.model.reflect_on_aggregation(attribute)) && (aggregation.klass < ActiveRecord::Base)
               add_new_association.call record, attribute, value.backing_record unless value.nil?
             elsif aggregation
               new_value = aggregation.serialize(value)
@@ -483,8 +483,8 @@ module ReactiveRecord
             next true  if record.frozen?  # skip (but process later) frozen records
             next true  if dont_save_list.include?(record) # skip if the record is on the don't save list
             next true  if record.changed.include?(record.class.primary_key)  # happens on an aggregate
-            next true  if record.persisted? # record may be have been saved as result of has_one assignment
-            next false if record.id && !record.changed? # throw out any existing records with no changes
+            #next true  if record.persisted? # record may be have been saved as result of has_one assignment
+            next record.persisted? if record.id && !record.changed? # throw out any existing records with no changes
             # if we get to here save the record and return true to keep it
             op = new_models.include?(record) ? :create_permitted? : :update_permitted?
             record.check_permission_with_acting_user(acting_user, op).save(validate: false) || true
@@ -500,6 +500,7 @@ module ReactiveRecord
           # the all the error messages during a save so we can dump them to the server log.
 
           all_messages = []
+          attributes = nil
 
           saved_models = reactive_records.collect do |reactive_record_id, model|
             messages = model.errors.messages if validate && !model.valid?
@@ -522,7 +523,6 @@ module ReactiveRecord
             end
             raise 'HyperModel saving records failed!'
           end
-
         end
 
         { success: true, saved_models: saved_models }

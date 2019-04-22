@@ -10,15 +10,22 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     # before each test
     stub_const 'TestApplication', Class.new
     stub_const 'TestApplicationPolicy', Class.new
+    User.do_not_synchronize
+    TestModel.do_not_synchronize
     TestApplicationPolicy.class_eval do
-      #always_allow_connection  TURN OFF BROADCAST SO TESTS DON"T EFFECT EACH OTHER
+      always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-    #size_window(:large, :landscape)
     User.validates :last_name, exclusion: { in: %w[f**k], message: 'no swear words allowed' }
     TestModel.validates_presence_of :child_models
-    client_option raise_on_js_errors: :off
+    client_option raise_on_js_errors: :off # TURN OFF BROADCAST SO TESTS DON"T EFFECT EACH OTHER
+  end
+  
+  after(:step) do
+    # Turn broadcasting back on
+    TestModel.instance_variable_set :@do_not_synchronize, false
+    User.instance_variable_set :@do_not_synchronize, false
   end
 
   it "can validate the presence of an association" do
@@ -72,7 +79,6 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
       user = User.new(last_name: 'f**k')
       user.save(validate: true).then { |result| user.valid?}
     end.to be_falsy
-
   end
 
   it "the valid? method reacts to the model being saved" do
