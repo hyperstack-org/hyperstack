@@ -17,11 +17,13 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-    User.validates :last_name, exclusion: { in: %w[f**k], message: 'no swear words allowed' }
+    %i[last_name first_name].each do |attr|
+      User.validates attr, exclusion: { in: %w[f**k], message: 'no swear words allowed' }
+    end
     TestModel.validates_presence_of :child_models
     client_option raise_on_js_errors: :off # TURN OFF BROADCAST SO TESTS DON"T EFFECT EACH OTHER
   end
-  
+
   after(:step) do
     # Turn broadcasting back on
     TestModel.instance_variable_set :@do_not_synchronize, false
@@ -121,6 +123,19 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
       Validator.model.errors.clear
     end
     expect(page).to have_content('.valid? true')
+  end
+
+  it "previous errors are cleared on each validation" do
+    expect_promise do
+      user = User.new(last_name: 'f**k')
+      user.validate.then do
+        user.last_name = 'doggie'
+        user.first_name = 'f**k'
+        user.validate.then do |new_user|
+          new_user.errors.full_messages
+        end
+      end
+    end.to eq(["First name no swear words allowed"])
   end
 
 end
