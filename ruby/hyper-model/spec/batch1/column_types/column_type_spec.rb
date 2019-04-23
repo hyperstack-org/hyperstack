@@ -323,4 +323,19 @@ describe "column types on client", js: true do
     end.to eq(r.text)
   end
 
+  it 'allows for attribute methods to be overwritten and use super' do
+    isomorphic do
+      class TypeTest < ActiveRecord::Base
+        def string
+          super.reverse
+        end
+      end
+    end
+    r = TypeTest.create(string: 'reverse')
+    expect_promise do
+      ReactiveRecord.load { TypeTest.find(1).string }
+    end.to eq(r.string)
+    expect(r.string).to eq(r[:string].reverse)
+  end
+
 end
