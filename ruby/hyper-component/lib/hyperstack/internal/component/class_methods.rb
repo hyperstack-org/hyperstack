@@ -292,7 +292,7 @@ module Hyperstack
         end
 
         def to_n
-          ReactWrapper.class_eval('@@component_classes')[self]
+          Hyperstack::Internal::Component::ReactWrapper.create_native_react_class(self)
         end
       end
     end
