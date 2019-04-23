@@ -20,13 +20,18 @@ module ReactiveRecord
       salt = SecureRandom.hex
       authorization = Hyperstack.authorization(salt, data[:channel], data[:broadcast_id])
       raise 'no server running' unless Hyperstack::Connection.root_path
-      SendPacket.remote(
-        Hyperstack::Connection.root_path,
-        data,
-        operation: operation,
-        salt: salt,
-        authorization: authorization
-      ).tap { |p| raise p.error if p.rejected? }
+      Timeout::timeout(Hyperstack.send_to_server_timeout) do
+        SendPacket.remote(
+          Hyperstack::Connection.root_path,
+          data,
+          operation: operation,
+          salt: salt,
+          authorization: authorization
+        ).tap { |p| raise p.error if p.rejected? }
+      end
+    rescue Timeout::Error
+      puts "\n********* FAILED TO RECEIVE RESPONSE FROM SERVER WITHIN #{Hyperstack.send_to_server_timeout} SECONDS. CHANGES WILL NOT BE SYNCED ************\n"
+      raise 'no server running'
     end unless RUBY_ENGINE == 'opal'
 
     class SendPacket < Hyperstack::ServerOp

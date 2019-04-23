@@ -59,6 +59,8 @@ module Hyperstack
     end
   end
 
+  define_setting(:send_to_server_timeout, 10)
+
   define_setting :opts, {}
   define_setting :channel_prefix, 'synchromesh'
   define_setting :client_logging, true
@@ -163,7 +165,10 @@ module Hyperstack
     request.body = {
       channel: channel, data: data, salt: salt, authorization: authorization
     }.to_json
-    http.request(request)
+    Timeout::timeout(Hyperstack.send_to_server_timeout) { http.request(request) }
+  rescue Timeout::Error
+    puts "\n********* FAILED TO RECEIVE RESPONSE FROM SERVER WITHIN #{Hyperstack.send_to_server_timeout} SECONDS. CHANGES WILL NOT BE SYNCED ************\n"
+    raise 'no server running'
   end
 
   def self.dispatch(data)

@@ -2,9 +2,9 @@ module ActiveRecord
   module InstanceMethods
 
     def method_missing(missing, *args, &block)
-      if (column = self.class.columns_hash.detect { |name, _c| missing =~ /^#{name}/ })
+      column = self.class.columns_hash.detect { |name, *| missing =~ /^#{name}/ }
+      if column
         name = column[0]
-
         case missing
         when /\!\z/ then @backing_record.get_attr_value(name, true)
         when /\=\z/ then @backing_record.set_attr_value(name, *args)
