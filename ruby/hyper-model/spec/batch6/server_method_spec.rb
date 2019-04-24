@@ -53,6 +53,7 @@ RSpec::Steps.steps 'server_method', js: true do
       end
     end
     expect(page).to have_content('test = 1')
+    binding.pry
   end
 
   it "can update the server method" do

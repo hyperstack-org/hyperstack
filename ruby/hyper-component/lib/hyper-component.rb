@@ -28,6 +28,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/component/react_api'
   require 'hyperstack/internal/component/top_level_rails_component'
   require 'hyperstack/component/while_loading'
+  require 'hyperstack/component/free_render'
   require 'hyperstack/internal/component/rescue_wrapper'
   require 'hyperstack/internal/component/while_loading_wrapper'
 
