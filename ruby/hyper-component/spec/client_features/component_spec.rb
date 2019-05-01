@@ -496,6 +496,11 @@ describe 'React::Component', js: true do
 
         Hyperstack::Component::ReactTestUtils.render_component_into_document(foo)
       end
+      puts "*************************"
+      puts page.driver.browser.manage.logs.get(:browser)
+        .reject { |entry| entry.to_s.include?("Deprecated feature") }
+        .map { |m| m.message.gsub(/\\n/, "\n") }.to_a[0..10].join("\n")
+      puts "*************************"
       expect(page.driver.browser.manage.logs.get(:browser)
         .reject { |entry| entry.to_s.include?("Deprecated feature") }
         .map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n").size)
