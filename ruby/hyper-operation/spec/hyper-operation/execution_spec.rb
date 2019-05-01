@@ -85,6 +85,7 @@ describe 'Hyperstack::Operation execution (server side)' do
       step { MyOperation.dont_call_me }
       failed { |s| "#{s} failure!" }
     end
+    "I is required! Looks like i am still a! Looks like i am still a failure!"
     expect(MyOperation).not_to receive(:dont_call_me)
     expect(MyOperation.run.tap { MyOperation.promise.resolve('x') }.error.to_s).to eq 'I is required! Looks like i am still a failure!'
   end
