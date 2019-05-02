@@ -89,7 +89,7 @@ And if you just added webpacker make sure to run `bundle exec rails webpacker:in
 
 ### Update the `application.js` file
 
-The `hyperstack-loader` is a dynamically generated asset manifest that will load all your client side Ruby code. Make sure it is the last require in `app/assets/javascripts/application.js` file.
+The `hyperstack-loader` is a dynamically generated asset manifest that will load all your client side Ruby code. Make sure it is the last require in `app/assets/javascripts/application.js` file.  That is it should be just before the final `require_tree` directive
 
 `jQuery` is very nicely integrated with Hyperstack, and provides a well
 documented uniform interface to the DOM.  To use it require it and its Rails
@@ -99,6 +99,7 @@ counter part in `application.js` before the `hyperstack-loader`
 //= require jquery
 //= require jquery_ujs
 //= require hyperstack-loader
+//= require_tree .
 ```
 > Note check to make sure jquery is not already being required.
 

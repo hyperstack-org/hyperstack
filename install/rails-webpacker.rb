@@ -1,4 +1,5 @@
 # Hyperstack
+WITH_PRERENDERING = true
 
 # ----------------------------------- Commit so we have good history of these changes
 
@@ -9,7 +10,7 @@ git commit: "-m 'Initial commit: Rails base'"
 # ----------------------------------- Add the gems
 
 gem 'webpacker'
-gem 'rails-hyperstack', '~> 1.0.alpha'
+gem 'rails-hyperstack', '~> 1.0.alpha1.0'
 gem_group :development do
   gem 'foreman'
 end
@@ -116,36 +117,86 @@ CODE
 run 'yarn add react'
 run 'yarn add react-dom'
 run 'yarn add react-router'
-
-# ----------------------------------- Create hyperstack.js
-
-file 'app/javascript/packs/hyperstack.js', <<-CODE
-// Import all the modules
-import React from 'react';
-import ReactDOM from 'react-dom';
-
-// for opal/hyperstack modules to find React and others they must explicitly be saved
-// to the global space, otherwise webpack will encapsulate them locally here
-global.React = React;
-global.ReactDOM = ReactDOM;
-CODE
-
-# ----------------------------------- View template
-
-inject_into_file 'app/views/layouts/application.html.erb', before: %r{<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>} do
-<<-CODE
-<%= javascript_pack_tag 'hyperstack' %>
-CODE
+if WITH_PRERENDERING
+run 'yarn add react-router-dom'
+run 'yarn add history'
+run 'yarn add react_ujs'
+run 'yarn add jquery'
 end
 
-# ----------------------------------- application.js
+if !WITH_PRERENDERING
+  # ----------------------------------- Create hyperstack.js
 
-inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
+  file 'app/javascript/packs/hyperstack.js', <<-CODE
+  // Import all the modules
+  import React from 'react';
+  import ReactDOM from 'react-dom';
+
+  // for opal/hyperstack modules to find React and others they must explicitly be saved
+  // to the global space, otherwise webpack will encapsulate them locally here
+  global.React = React;
+  global.ReactDOM = ReactDOM;
+  CODE
+
+  # ----------------------------------- View template
+
+  inject_into_file 'app/views/layouts/application.html.erb', before: %r{<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>} do
+  <<-CODE
+  <%= javascript_pack_tag 'hyperstack' %>
+  CODE
+  end
+
+  # ----------------------------------- application.js
+
+  inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
 <<-CODE
 //= require jquery
 //= require jquery_ujs
 //= require hyperstack-loader
 CODE
+  end
+else
+  # ----------------------------------- Create client_and_server.js
+
+  file 'app/javascript/packs/client_and_server.js', <<-CODE
+//app/javascript/packs/client_and_server.js
+// these packages will be loaded both during prerendering and on the client
+React = require('react');                      // react-js library
+History = require('history');                  // react-router history library
+ReactRouter = require('react-router');         // react-router js library
+ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
+ReactRailsUJS = require('react_ujs');          // interface to react-rails
+// to add additional NPM packages call run yarn package-name@version
+// then add the require here.
+CODE
+
+  # ----------------------------------- Create client_only.js
+
+  file 'app/javascript/packs/client_only.js', <<-CODE
+//app/javascript/packs/client_only.js
+// add any requires for packages that will run client side only
+ReactDOM = require('react-dom');               // react-js client side code
+jQuery = require('jquery');
+// to add additional NPM packages call run yarn package-name@version
+// then add the require here.
+CODE
+
+  # ----------------------------------- add asset paths
+
+  # note before this was just public/packs now its public/paths/js.  WHY???
+  append_file 'config/initializers/assets.rb' do
+    <<-RUBY
+Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js').to_s
+    RUBY
+  end
+
+  # ----------------------------------- application.js
+
+  inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
+<<-CODE
+//= require hyperstack-loader
+CODE
+  end
 end
 
 # ----------------------------------- Procfile
