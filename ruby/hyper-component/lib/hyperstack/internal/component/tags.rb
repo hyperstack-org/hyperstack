@@ -88,8 +88,8 @@ module Hyperstack
           scopes = self.class.name.to_s.split('::').inject([Module]) do |nesting, next_const|
             nesting + [nesting.last.const_get(next_const)]
           end.reverse
-          scope = scopes.detect { |s| s.const_defined?(name) }
-          scope.const_get(name) if scope
+          scope = scopes.detect { |s| s.const_defined?(name, false) }
+          scope.const_get(name, false) if scope
         end
       end
     end

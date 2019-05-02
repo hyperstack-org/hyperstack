@@ -16,17 +16,18 @@ Simply put an Operation is like a large standalone method that has no internal s
 
 Any state that an operation needs to retrieve or save is stored somewhere else: in a model, a store, or even in a remote API.  Once the operation completes, it has no memory of its own.  
 
-Because this an Operation's full time mission the Hyperstack `Operation` base class is structured to make writing this kind of code easy.
+Being a stand-alone, glue and business logic method is an Operation's full time mission. The Hyperstack `Operation` base class is therefor structured to make writing this kind of code easy.
 
-+ An Operation may take parameters (params) just like any other method.  
-+ An Operation may validate the parameters
-+ An Operation then executes a number of *steps*
-+ The steps can be part of a success track or a failure track
-+ The value of the final step is returned
++ An Operation may take parameters (params) just like any other method;  
++ An Operation may validate the parameters;
++ An Operation then executes a number of *steps*;
++ The steps can be part of a success track or a failure track;
++ The value of the final step is returned to the caller;
++ And the results can be *broadcast* to any interested parties.
 
-Hyperstack's Operations often involve asynchronous methods such as HTTP requests and so Operations always return promises.  Likewise each of the steps of an Operation can itself be an asynchronous action, and the Operation class will take care of chaining the promises together for you.  
+Hyperstack's Operations often involve asynchronous methods such as HTTP requests and so Operations always return *Promises*.  Likewise each of the steps of an Operation can itself be an asynchronous action, and the Operation class will take care of chaining the promises together for you.  
 
-A final key feature of Operations is that because they are stateless they can make a perfect RPC (Remote Procedure Call) mechanism.  So an Operation can be started on the client, but will run on the server, and then return the results to the client.  Thus Operations form the underlying data *transport* mechanism between the server and client.
+Another key feature of Operations is that because they are stateless they make a perfect RPC (Remote Procedure Call) mechanism.  So an Operation can be called on the client, but will run on the server, and then return or broadcast the results to the clients.  Thus Operations form the underlying data *transport* mechanism between the server and clients.
 
 That is a lot to digest, and truly Operations are the swiss-army knife of Hyperstack.  So let's dive into some examples.
 
@@ -59,7 +60,7 @@ class GetIPAddress
 end
 ```
 
-Notice a couple of things that are typical of service objects:  Its stateless and because it has no state it is simply a class method.  We then use our service object like this:
+Notice that the object is stateless and because it has no state it is simply a class method.  We then use our service object like this:
 
 ```ruby
 class App < HyperComponent
@@ -73,28 +74,33 @@ class App < HyperComponent
 end
 ```
 
-Now we will redefine our service object using the Hyperstack::Operation class.  The interface to our service object will remain exactly the same.
+If we were to change how we get the IP address, the Component now doesn't have to change.
 
-
+Now we will redefine our service object using the Hyperstack::Operation class.
 ```ruby
 class GetIPAddress < Hyperstack::Operation
   step { HTTP.get('https://api.ipify.org?format=json') }
   step { |response| response.json[:ip] }
 end
 ```
+You invoke Operations using the run method, so our Component does not have to change at all.
 
 The advantage is that the Operation syntax takes care of a lot of clutter, allows our
 promise to be chained neatly, and makes our intention clear to the reader.  
 
 We will see how these advantages multiply as our example becomes more complex.
 
-However, before moving on lets understand the basics of Operations.
+Before moving on lets understand the basics of Operations.
 
 + Every Operation has as its external API a single `run` method.
 + The work of the Operation is defined by a series of *steps*.
 + When the run method is called, the code associated with each step is executed.
 + If a step returns a promise the next step will wait till the promise is resolved.
 + The result of the final step is wrapped in a promise and is the result of the operation.
+
+The final point means that regardless of the Operation's internal implementation, the Operation always returns a promise,
+so its API is consistent.  As operations always return promises you can simply apply the `then` and `fail` promise methods
+directly to the Operation rather than saying `Op.run.then`.
 
 Let's say that rather than a simple ip address what we want is a full set of geo-location data.  We can use another
 third party API to do the job.  This API requires we supply our IP address, so we will reuse our IPAddress Op.
@@ -123,8 +129,8 @@ class GetGeoData
 end
 ```
 
-Again its the same logic, but the body of our service object is over twice the number of lines, and logic
-is obscured by promise handlers.
+Again its the same logic, but the body of our service object is over twice the number of lines and logic
+is obscured by the promise handlers.
 
 It would be nice if we could include a flag icon to go with the country in the response data.  Lets do that:
 
@@ -166,9 +172,17 @@ Operations have two *tracks* of execution.  The normal success track which is de
 *failure track* which is defined by a series of `failed` methods.
 
 Execution begins with the first step, and continues with each step until an exception is raised, or a promise fails. When that happens execution jumps *to the next* `failed` step, and the continues executing `failed` steps.  The result of the
-Operation will be value of the last failed step, and the Operation's promise will be be rejected.
+Operation will be value of the last failed step, and the Operation's promise will be be rejected (i.e. will be in the fail state.)
 
+Parameters
 
+Operations can take a series of named parameters defined by the `param` method.  Parameters can have type information, defaults, and can be validated.  This helps Operations act like a firewall between various parts of the system, making debugging and error handling easier.  For now we are just going to use a simple case of a parameter that takes a default value.
+
+The `abort!` and `succeed!` methods
+
+These provide an early exit like `return`, `break` and next statements.  Calling `abort!` and `succeed!` immediately exits the Operation by the appropriate track.
+
+Putting it together:
 
 ```ruby
 class GetGeoData < Hyperstack::Operation

@@ -16,19 +16,35 @@ module Hyperstack
       end
     end
 
+    APPJS = 'app/assets/javascripts/application.js'
+
     def inject_react_file_js
-      append_file 'app/assets/javascripts/application.js' do
-        <<-'JS'
+      code = ""
+      unless File.foreach(APPJS).any?{ |l| l['//= require jquery'] }
+        code +=
+        <<-CODE
+//= require jquery
+//= require jquery_ujs
+        CODE
+      end
+      unless File.foreach(APPJS).any?{ |l| l['//= require hyperstack-loader'] }
+        code +=
+        <<-CODE
 //= require hyperstack-loader
-        JS
+        CODE
+      end
+      return if code == ""
+      inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
+        code
       end
     end
 
-    def create_hyperstack_directories
+    def create_hyperstack_files_and_directories
       create_file 'app/hyperstack/components/hyper_component.rb', <<-RUBY
   class HyperComponent
     include Hyperstack::Component
     include Hyperstack::State::Observer
+    param_accessor_style :accessors
   end
         RUBY
       create_file 'app/hyperstack/operations/.keep', ''
@@ -72,8 +88,33 @@ end unless Rails.env.production?
 
     def add_router
       generate "hyper:router", "App"
+      route "get '/(*other)', to: 'hyperstack#app'"
     end
 
+    def add_webpackin
+      run 'yarn add react'
+      run 'yarn add react-dom'
+      run 'yarn add react-router'
+      create_file 'app/javascript/packs/hyperstack.js', <<-CODE
+        // Import all the modules
+        import React from 'react';
+        import ReactDOM from 'react-dom';
+
+        // for opal/hyperstack modules to find React and others they must explicitly be saved
+        // to the global space, otherwise webpack will encapsulate them locally here
+        global.React = React;
+        global.ReactDOM = ReactDOM;
+        CODE
+      inject_into_file 'app/views/layouts/application.html.erb', before: %r{<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>} do
+<<-CODE
+<%= javascript_pack_tag 'hyperstack' %>
+CODE
+      end
+      gem 'webpacker'
+    end
+
+
+if false
     def add_webpacker_manifests
       return if skip_webpack?
       create_file 'app/javascript/packs/client_and_server.js', <<-JAVASCRIPT
@@ -122,22 +163,35 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs').to_s
     def build_webpack
       system('bin/webpack')
     end
-
+end
     # all generators should be run before the initializer due to the opal-rails opal-jquery
     # conflict
 
     def create_initializer
-      create_file 'config/initializers/hyperstack.rb', <<-RUBY
-# config/initializers/hyperstack.rb
-# If you are not using ActionCable, see http://hyperstack.orgs/docs/models/configuring-transport/
-Hyperstack.configuration do |config|
-  config.transport = :action_cable # or :pusher or :simpler_poller or :none
-  config.prerendering = :off # or :on
-#{"  config.import 'jquery', client_only: true  # remove this line if you don't need jquery" if skip_webpack?}
-  config.import 'hyperstack/component/jquery', client_only: true # remove this line if you don't need jquery
-#{"  config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?" unless options['skip-hot-reloader']}
-end
-        RUBY
+      create_file 'config/initializers/hyperstack.rb', <<-CODE
+      # config/initializers/hyperstack.rb
+      # If you are not using ActionCable, see http://hyperstack.orgs/docs/models/configuring-transport/
+      Hyperstack.configuration do |config|
+        config.transport = :action_cable
+        config.prerendering = :off # or :on
+        config.cancel_import 'react/react-source-browser' # bring your own React and ReactRouter via Yarn/Webpacker
+        config.import 'hyperstack/component/jquery', client_only: true # remove this line if you don't need jquery
+        config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?
+      end
+
+      # useful for debugging
+      module Hyperstack
+        def self.on_error(operation, err, params, formatted_error_message)
+          ::Rails.logger.debug(
+            "\#{formatted_error_message}\\n\\n" +
+            Pastel.new.red(
+              'To further investigate you may want to add a debugging '\\
+              'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+            )
+          )
+        end
+      end if Rails.env.development?
+      CODE
     end
 
     def inject_engine_to_routes
@@ -149,7 +203,7 @@ end
       return if options['skip-hot-reloader']
       create_file 'Procfile', <<-TEXT
 web:        bundle exec rails s -b 0.0.0.0
-hot-loader: bundle exec hyperstack-hotloader -d app/hyperstack
+hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
       TEXT
       gem_group :development do
         gem 'foreman'
@@ -157,17 +211,13 @@ hot-loader: bundle exec hyperstack-hotloader -d app/hyperstack
     end
 
     def add_gems
-      # gem 'hyper-model', Hyperstack::VERSION
-      # gem 'hyper-router', Hyperstack::ROUTERVERSION
-      # gem 'opal-rails', '~> 0.9.4'
-      # gem 'opal-jquery'
-      # gem "opal-jquery", git: "https://github.com/opal/opal-jquery.git", branch: "master"
     end
 
     def install
       Bundler.with_clean_env do
         run "bundle install"
       end
+      run 'bundle exec rails webpacker:install'
     end
 
     private

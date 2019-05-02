@@ -48,6 +48,34 @@ describe 'React Integration', js: true do
     expect(input.value).to eq('123hello4567890')
   end
 
+  it 'Looks up components in nested namespaces correctly' do
+    mount 'Foo::Bar::Zoom' do
+      module Foo
+        module Bar
+          class Zoom < HyperComponent
+            render do
+              Wham()
+            end
+          end
+        end
+      end
+
+      module Wham
+      end
+
+      module Foo
+        module Bar
+          class Wham < HyperComponent
+            render(DIV) do
+              "found me!"
+            end
+          end
+        end
+      end
+    end
+    expect(page).to have_content('found me!')
+  end
+
   # it "and it can still use the deprecated mutate syntax" do
   #   mount "TestComp" do
   #     class TestComp < Hyperloop::Component

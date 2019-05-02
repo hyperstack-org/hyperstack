@@ -1,6 +1,6 @@
 <%- @modules.each do |module_name| %><%= "  "* @indent %>module <%= module_name.camelize %><%- @indent += 1 %>
 <%- end %><%="  "* @indent %>class <%= @file_name %> < HyperComponent
-<%="  "* @indent %>  include Hyperstack::State::Observer
+<%="  "* @indent %>  include Hyperstack::Router
 <%="  "* @indent %>  render do
 <%="  "* @indent %>    DIV do
 <%="  "* @indent %>      '<%= (@modules+[@file_name]).join('::') %>'

@@ -6,7 +6,8 @@
 <%="  "* @indent %>  # param :param_with_default2, default: "default value" # alternative syntax
 <%="  "* @indent %>  # param :param_with_type, type: Hash
 <%="  "* @indent %>  # param :array_of_hashes, type: [Hash]
-<%="  "* @indent %>  # collect_other_params_as :attributes  # collects all other params into a hash
+<%="  "* @indent %>  # other :attributes  # collects all other params into a hash
+<%="  "* @indent %>  # fires :callback  # creates a callback param
 
 <%="  "* @indent %>  # The following are the most common lifecycle call backs,
 <%="  "* @indent %>  # the following are the most common lifecycle call backs# delete any that you are not using.

@@ -39,6 +39,7 @@ file 'app/hyperstack/components/hyper_component.rb', <<-CODE
 class HyperComponent
   include Hyperstack::Component
   include Hyperstack::State::Observable
+  param_accessor_style :accessors
 end
 CODE
 
