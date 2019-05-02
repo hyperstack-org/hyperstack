@@ -156,7 +156,6 @@ describe "polymorphic relationships", js: true do
   end
 
   def compare_to_server(model, expression, expected_result, load=true)
-    wait_for_ajax
     server_side = eval("#{model.class}.find(#{model.id}).#{expression}")
     expect(server_side).to eq(expected_result)
     be_expected_result = expected_result.is_a?(Array) ? contain_exactly(*expected_result) : eq(expected_result)
@@ -293,11 +292,13 @@ describe "polymorphic relationships", js: true do
 
     it 'creates due to a broadcast client side' do
       @uzer1.groups << @group1
+      wait_for_ajax
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
     it 'destroys due to a broadcast client side' do
       @uzer1.groups << @group1 # server side
+      wait_for_ajax
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # client
       Membership.find_by(uzer: @uzer1, memerable: @group1).destroy # server side
       compare_to_server @group1, 'uzers.count', 0, false  # client side

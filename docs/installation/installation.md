@@ -5,6 +5,10 @@ You can install hyperstack either
 + using a Rails generator - best for existing Rails apps;
 + or manually walking through the detailed installation instructions.
 
+Even if you use the template or generator, later reading through the 
+detailed installation instructions can be helpful to understand how the
+system fits together.
+
 ## Pre-Requisites
 
 + Rails 5.x
@@ -14,7 +18,7 @@ You can install hyperstack either
 
 This template will create a new Rails app with Webpacker from Hyperstack edge branch
 
-### Usage
+### Run the template
 
 Simply run the command below to create a new Rails app with Hyperstack all configured:
 
@@ -50,11 +54,13 @@ These are the various parts of the system that must be updated for Hyperstack:
 + Add the `hyperstack` directories
 + Add the `HyperComponent` base class
 + Replicate the `application_record.rb` file
-+ Add the `policy` directory and a base `application_policy.rb` file
++ Add a basic `application_policy.rb` file
 + Add the `hyperstack.rb` initializer file
 + Integrate with webpacker
 + Add the Hyperstack engine to the routes file
 + Add/Update the Procfile
+
+There are quite a few steps, but each has a specific, and understandable purpose.
 
 ### Insure `yarn` is loaded
 
@@ -126,4 +132,111 @@ class HyperComponent
 end
 ```
 
-> Note that this is only convention.  The Hyperstack system assumes nothing about HyperComponent or how you define components.  Any class that includes the `Hyperstack::Component` module will be a component.  
+> Note that this is only convention.  The Hyperstack system assumes nothing about HyperComponent or how you define components.  Any class that includes the `Hyperstack::Component` module will be a component.
+
+### Replicate the `application_record.rb` file
+
+Model files typically inherit from the `ApplicationModel` class, so you must move the
+`app/models/application_record.rb` to `app/hyperstack/models/application_record.rb` so
+that it is accessible both on the client and server.
+
+However Rails will automatically generate a new `application_record.rb` file if it does
+not find one in the `app/models` directory.  To prevent create a new `app/models/application_record.rb` that looks like this:
+
+```ruby
+# app/models/application_record.rb
+# the presence of this file prevents rails migrations from recreating application_record.rb see https://github.com/rails/rails/issues/29407
+
+# this will grab the real file from the hyperstack directory
+require 'models/application_record.rb'
+```
+
+### Add a basic `application_policy.rb` file
+
+Your server side model data is protected by *Policies* defined in Policy classes stored in the `app/policy` directory.  The following file creates basic a *"wide open"* set of
+policies, for development mode.  You will then need to add specific Policies to protect
+your data in production model.
+
+```ruby
+# app/policies/application_policy.rb
+
+# Policies regulate access to your public models
+# The following policy will open up full access (but only in development)
+# The policy system is very flexible and powerful.  See the documentation
+# for complete details.
+class Hyperstack::ApplicationPolicy
+  # Allow any session to connect:
+  always_allow_connection
+
+  # Send all attributes from all public models
+  regulate_all_broadcasts { |policy| policy.send_all }
+
+  # Allow all changes to models
+  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
+
+  # Allow remote access to all scopes - i.e. you can count or get a list of ids
+  # for any scope or relationship
+  # You can also add the line `regulate_scope :all` directly to your
+  # ApplicationRecord class.
+  ApplicationRecord.regulate_scope :all
+end unless Rails.env.production?
+```
+
+> Note that regardless of whether models are public (i.e stored in the hyperstack/models
+directory) or private, they are ultimately protected by the Policy system.  
+
+### Add the `hyperstack.rb` initializer file
+
+Add the following file to the `config/initializers/` directory:
+
+```ruby
+# config/initializers/hyperstack.rb
+Hyperstack.configuration do |config|
+  # If you are not using ActionCable,
+  # see http://hyperstack.orgs/docs/models/configuring-transport/
+  config.transport = :action_cable # or :pusher or :simple_poller
+
+  # typically you will want to develop with prerendering off, and
+  # once the system is working, turn it on for final debug and test.
+  config.prerendering = :off # or :on
+
+  # We bring in React and ReactRouter via Yarn/Webpacker
+  config.cancel_import 'react/react-source-browser'
+
+  # remove the following line if you don't need jquery (see notes in application.js)
+  config.import 'hyperstack/component/jquery', client_only: true
+
+  # remove this line if you don't want to use the hotloader
+  config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?
+end
+
+# useful for debugging
+module Hyperstack
+  def self.on_error(operation, err, params, formatted_error_message)
+    ::Rails.logger.debug(
+      "\#{formatted_error_message}\\n\\n" +
+      Pastel.new.red(
+        'To further investigate you may want to add a debugging '\\
+        'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+      )
+    )
+  end
+end if Rails.env.development?
+```
+
+The first section configures Hyperstack and the assets that will be included (or not
+included) in the asset manifest.
+
+The on_error method defines what you want to do when errors occur.  In production
+you will may want to direct the output to a dedicated log file for example.
+
+### Integrate with webpacker
+
+@barriehadfield - HELP!
+
+### Add the Hyperstack engine to the routes file
+
+At the beginning of `config/routes.rb` file mount the Hyperstack engine:
+
+```ruby
+```

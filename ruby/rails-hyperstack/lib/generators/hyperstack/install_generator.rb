@@ -66,7 +66,7 @@ require 'models/application_record.rb'
 
     def create_policies_directory
       create_file 'app/policies/application_policy.rb', <<-RUBY
-# app/policies/application_policy
+# app/policies/application_policy.rb
 
 # Policies regulate access to your public models
 # The following policy will open up full access (but only in development)
@@ -77,7 +77,7 @@ class Hyperstack::ApplicationPolicy
   always_allow_connection
   # Send all attributes from all public models
   regulate_all_broadcasts { |policy| policy.send_all }
-  # Allow all changes to public models
+  # Allow all changes to models
   allow_change(to: :all, on: [:create, :update, :destroy]) { true }
   # allow remote access to all scopes - i.e. you can count or get a list of ids
   # for any scope or relationship
