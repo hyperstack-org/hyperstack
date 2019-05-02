@@ -308,7 +308,7 @@ describe "polymorphic relationships", js: true do
       evaluate_ruby do
         Uzer.find(1).groups << Group.find(1) # client side
       end
-      # was wait_for_ajax
+      wait_for_ajax
       @group1.reload
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # server side
     end
