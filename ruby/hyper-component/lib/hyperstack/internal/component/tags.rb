@@ -85,7 +85,7 @@ module Hyperstack
 
         def lookup_const(name)
           return nil unless name =~ /^[A-Z]/
-          scopes = self.class.name.to_s.split('::').inject([Module]) do |nesting, next_const|
+          scopes = self.class.name.to_s.split('::').inject([Object]) do |nesting, next_const|
             nesting + [nesting.last.const_get(next_const)]
           end.reverse
           scope = scopes.detect { |s| s.const_defined?(name, false) }
