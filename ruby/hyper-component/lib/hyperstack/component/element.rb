@@ -121,7 +121,7 @@ module Hyperstack
           prop_name => %x{
             function(){
               var react_event = arguments[0];
-              if (arguments.length == 0 || react_event.constructor.name != 'SyntheticEvent') {
+              if (arguments.length == 0 || !react_event.nativeEvent) {
                 return #{yield(*Array(`arguments`))}
               }
               var all_args;

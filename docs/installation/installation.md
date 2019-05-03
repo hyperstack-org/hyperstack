@@ -260,16 +260,16 @@ you will may want to direct the output to a dedicated log file for example.
 
 The Rails webpacker gem will bundle up all your javascript assets including those used by Hyperstack such as React, and React-Router.
 
-You can also easily add other NPM (node package manager) assets to the webpacker *pack files*.
+You can easily add other NPM (node package manager) assets to the webpacker *pack files*.
 
-Hyperstack will look for two webpacker pack files: one for packages that *only* run on the client side, and packages that can run on *both* the client, and during server prerendering.
+Hyperstack will look for two pack files: one for packages that *only* run on the client side, and the other for packages that can run on *both* the client and during server prerendering.
 > Prerendering builds the initial page view server side, and then delivers it to the client as a normal static HTML page.  Attached to the HTML are flags that React will use update the page as components are re-rendered after the initial page load.
 >
 > This means that page load time is comparable to any other Rails view.
 >
-> But to make this work packages that rely on the `browser` object, cannot be used during prerendering.  Well structured packages that depend on the `browser` object will have a way to run in the prerendering environment.  
+> But to make this work packages that rely on the `browser` object cannot be used during prerendering.  Well structured packages that depend on the `browser` object will have a way to run in the prerendering environment.  
 
-You will also need to fetch the packages, plus any of their dependencies and bring them into your build environment.  
+Once you have the pack files setup you will also need to fetch the packages, plus any of their dependencies and bring them into your build environment.  
 
 > Coming from Ruby this can be confusing as we are used to simply adding a dependency into the `Gemfile`, and then using bundler to both fetch dependencies, and produce the `Gemfile.lock` file.
 >
@@ -309,12 +309,19 @@ First you need make sure you have `yarn` installed:
 Once yarn is installed you need to add the following packages which Hyperstack depends on:
 
 ```text
-yarn add react@16 react-dom@16 \
-         react-router@^5.0.0 react-router-dom@^5.0.0 \
-         react_ujs@^2.5.0 jquery@^3.4.1
+yarn add react@16
+yarn add react-dom@16
+yarn add react-router@^5.0.0
+yarn add react-router-dom@^5.0.0
+yarn add react_ujs@^2.5.0
+yarn add jquery@^3.4.1
 ```
 
-And now you are good to go.  In the future if you want to add a new
+And now you are good to go.  In the future if you want to add a new package like [react-datepicker](https://reactdatepicker.com/), you would run
+
+`yarn add react-datepicker`
+
+
 
 ### Add the Hyperstack engine to the routes file
 
