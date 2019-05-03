@@ -76,6 +76,24 @@ describe 'React Integration', js: true do
     expect(page).to have_content('found me!')
   end
 
+  it "allows application components to raise built in events" do
+    mount 'RaiseMeAnEvent' do
+      class RaiseMeAnEvent < HyperComponent
+        render(DIV) do
+          SPAN { @value ||= "not set yet!" }
+          EventRaiser()
+          .on(:change) { |new_value| mutate @value = new_value }
+        end
+      end
+      class EventRaiser < HyperComponent
+        fires :change
+        before_mount { after(0) { change!('you have been set') }}
+        render(SPAN) { '' }
+      end
+    end
+    expect(page).to have_content('you have been set')
+  end
+
   # it "and it can still use the deprecated mutate syntax" do
   #   mount "TestComp" do
   #     class TestComp < Hyperloop::Component

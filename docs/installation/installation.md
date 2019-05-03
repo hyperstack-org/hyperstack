@@ -74,13 +74,13 @@ These are the steps to manually install Hyperstack in an existing Rails app:
 
 There are quite a few steps, but each has a specific, and understandable purpose.
 
-### Insure `yarn` is loaded
+### 1. Insure `yarn` is loaded
 
 Yarn is used to load and manage NPM (Javascript) assets.  
 
 See https://yarnpkg.com/en/docs/install for details
 
-### Add the gems
+### 2. Add the gems
 
 Add  
 ```ruby
@@ -95,21 +95,26 @@ Then `bundle install`.
 
 And if you just added webpacker make sure to run `bundle exec rails webpacker:install`
 
-### Update the `application.js` file
+>Note: if you want to use the unreleased edge branch your rails-hyperstack gem specification will be:  
+```ruby
+gem 'rails-hyperstack',
+     git: 'git://github.com/hyperstack-org/hyperstack.git',
+     branch: 'edge',
+     glob: 'ruby/*/*.gemspec'
+```
 
-The `hyperstack-loader` is a dynamically generated asset manifest that will load all your client side Ruby code. Make sure it is the last require in `app/assets/javascripts/application.js` file.  That is it should be just before the final `require_tree` directive
+### 3. Update the `application.js` file
 
-`jQuery` is very nicely integrated with Hyperstack, and provides a well
-documented uniform interface to the DOM.  To use it require it and its Rails
-counter part in `application.js` before the `hyperstack-loader`
+The `hyperstack-loader` is a dynamically generated asset manifest that will load all your client side Ruby code. Make sure it is the last require in `app/assets/javascripts/application.js` file.  That is it should be just *before* the final `require_tree` directive
 
 ```javascript
+// assets/javascripts/application.js
+...
 //= require hyperstack-loader
 //= require_tree .
 ```
-> Note check to make sure jquery is not already being required.
 
-### Add the `hyperstack` directories
+### 4. Add the `hyperstack` directories
 
 Hyperstack will load code out of the `app/hyperstack` directory.  Within this directory there are typically the following subdirectories:
 
@@ -124,11 +129,11 @@ These directories are all optional.  The `models`, `operations`, and `shared` su
 
 Any other subdirectories will be treated as client only.  The names listed above such as `components`, `stores` and `lib` are just conventions.  For example you may prefer `client_lib`.
 
-> Note that you will still have a `app/models` directory, which can be used to keep server-only models.  This is useful for models that will never be accessed from the client to reduce payload size.  You can also add an `app/operations` directory if you wish to have Operations that only run on the server.
+> Note that you will still have the standard Rails `app/models` directory, which can be used to keep server-only models.  This is useful for models that will never be accessed from the client to reduce payload size.  You can also add an `app/operations` directory if you wish to have Operations that only run on the server.
 >
-> For security see the policy setup below.
+> This does **not** effect security. See the section 7 for how Policies are setup.
 
-### Add the HyperComponent base class
+### 5. Add the HyperComponent base class
 
 The Hyperstack convention is for each application to define a `HyperComponent` base class from which all of your other components will inherit.  This follows the modern Rails convention used with Models and Controllers.
 
@@ -139,8 +144,8 @@ The typical `HyperComponent` class definition looks like this:
 class HyperComponent
   # All component classes must include Hyperstack::Component
   include Hyperstack::Component
-  # The Observer module adds state handling
-  include Hyperstack::State::Observer
+  # The Observable module adds state handling
+  include Hyperstack::State::Observable
   # The following turns on the new style param accessor
   # i.e. param :foo is accessed by the foo method
   param_accessor_style :accessors
@@ -151,9 +156,9 @@ end
 base class `ApplicationComponent` more closely following the
 rails convention.  
 
-### Replicate the `application_record.rb` file
+### 6. Replicate the `application_record.rb` file
 
-Model files typically inherit from the `ApplicationModel` class, so you must move the
+Rails models files normally inherit from the `ApplicationModel` class, so you must move the
 `app/models/application_record.rb` to `app/hyperstack/models/application_record.rb` so
 that it is accessible both on the client and server.
 
@@ -171,9 +176,9 @@ require 'models/application_record.rb'
 > Note that the above is *not* a typo.  Rails paths begin with
 the *subdirectory* name.  So `'models/application_record.rb'` means to search all directories for a file name `application_record.rb` in the `models` *subdirectory*
 
-### Add a basic `application_policy.rb` file
+### 7. Add a basic `application_policy.rb` file
 
-Your server side model data is protected by *Policies* defined in Policy classes stored in the `app/policy` directory.  The following file creates basic a *"wide open"* set of
+Your server side model data is protected by *Policies* defined in Policy classes stored in the `app/policy` directory.  The following file creates a basic *"wide open"* set of
 policies for development mode.  You will then need to add specific Policies to protect
 your data in production mode.
 
@@ -205,15 +210,16 @@ end unless Rails.env.production?
 > Note that regardless of whether models are public (i.e stored in the hyperstack/models
 directory) or private, they are ultimately protected by the Policy system.  
 
-### Add the `hyperstack.rb` initializer file
+### 8. Add the `hyperstack.rb` initializer file
 
 Add the following file to the `config/initializers/` directory:
 
 ```ruby
 # config/initializers/hyperstack.rb
 Hyperstack.configuration do |config|
-  # If you are not using ActionCable,
+  # If you do not want to use ActionCable,
   # see http://hyperstack.orgs/docs/models/configuring-transport/
+  # for setting up other options.
   config.transport = :action_cable # or :pusher or :simple_poller
 
   # typically you will want to develop with prerendering off, and
@@ -252,7 +258,63 @@ you will may want to direct the output to a dedicated log file for example.
 
 ### Integrate with webpacker
 
-@barriehadfield - HELP!
+The Rails webpacker gem will bundle up all your javascript assets including those used by Hyperstack such as React, and React-Router.
+
+You can also easily add other NPM (node package manager) assets to the webpacker *pack files*.
+
+Hyperstack will look for two webpacker pack files: one for packages that *only* run on the client side, and packages that can run on *both* the client, and during server prerendering.
+> Prerendering builds the initial page view server side, and then delivers it to the client as a normal static HTML page.  Attached to the HTML are flags that React will use update the page as components are re-rendered after the initial page load.
+>
+> This means that page load time is comparable to any other Rails view.
+>
+> But to make this work packages that rely on the `browser` object, cannot be used during prerendering.  Well structured packages that depend on the `browser` object will have a way to run in the prerendering environment.  
+
+You will also need to fetch the packages, plus any of their dependencies and bring them into your build environment.  
+
+> Coming from Ruby this can be confusing as we are used to simply adding a dependency into the `Gemfile`, and then using bundler to both fetch dependencies, and produce the `Gemfile.lock` file.
+>
+> In the JS world its a two part process.  Yarn fetches packages and their dependents, and maintains a `yarn.lock` file.  The pack files specify how to package up the JS code, making it ready for delivery to the client.
+
+#### Add the `client_and_server.js` pack file
+
+* Note that this goes in a new directory: `app/javascripts/packs` *
+
+```javascript
+//app/javascript/packs/client_and_server.js
+// these packages will be loaded both during prerendering and on the client
+React = require('react');                      // react-js library
+History = require('history');                  // react-router history library
+ReactRouter = require('react-router');         // react-router js library
+ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
+ReactRailsUJS = require('react_ujs');          // interface to react-rails
+// to add additional NPM packages run add yarn package-name@version
+// then add the require here.
+```
+#### Add the `client_only.js` pack file
+
+```javascript
+//app/javascript/packs/client_only.js
+// add any requires for packages that will run client side only
+ReactDOM = require('react-dom');               // react-js client side code
+jQuery = require('jquery');
+// to add additional NPM packages call run add yarn package-name@version
+// then add the require here.
+```
+
+#### Add the packages using `yarn`
+
+First you need make sure you have `yarn` installed:  
+[Yarn install for any system](https://yarnpkg.com/en/docs/install)
+
+Once yarn is installed you need to add the following packages which Hyperstack depends on:
+
+```text
+yarn add react@16 react-dom@16 \
+         react-router@^5.0.0 react-router-dom@^5.0.0 \
+         react_ujs@^2.5.0 jquery@^3.4.1
+```
+
+And now you are good to go.  In the future if you want to add a new
 
 ### Add the Hyperstack engine to the routes file
 
@@ -270,15 +332,12 @@ end
 
 You can mount the engine under any name you please.  All of internal Hyperstack requests will be prefixed with that mount point.
 
-> Note: You can also directly ask Hyperstack to mount your top level components
-via the routes file.  For example
-
+>Note: You can also directly ask Hyperstack to mount your top level components
+via the routes file.  For example  
 ```ruby
 Rails.application.routes.draw do
-  # this route should be first in the routes file so it always matches
-  mount Hyperstack::Engine => '/hyperstack'
+  mount Hyperstack::Engine => '/hyperstack' # this must be the first route
   get '/(*other)', to: 'hyperstack#app'
-...
 ```
 > will pass all requests (i.e. `/(*other)`) to the hyperstack engine, and find
 and mount a component named `App`.  Whatever ever you name the engine

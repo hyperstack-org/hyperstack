@@ -38,6 +38,29 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
     end
   end
 
+  describe "component defined in an es6 module" do
+    it "is detected as native React.js component by `native_react_component?`" do
+      expect_evaluate_ruby do
+        Hyperstack::Internal::Component::ReactWrapper.native_react_component?(
+          JS.call(:eval,
+            "dummy = { default: function () { return null; }, __esModule: true }"
+          )
+        )
+      end.to be_truthy
+    end
+
+    it "is imported" do
+      mount 'Foo', name: "There" do
+        JS.call(:eval, 'window.NativeModule = { __esModule: true, default: function HelloMessage(props){
+          return React.createElement("div", null, "Hello ", props.name); }}')
+        class Foo < Hyperloop::Component
+          imports "NativeModule"
+        end
+      end
+      expect(page.body[-60..-19]).to include('<div>Hello There</div>')
+    end
+  end
+
   it "can use native_react_component? to detect a native React.js component" do
     evaluate_ruby do
       "this makes sure React is loaded for this test, before js is run"

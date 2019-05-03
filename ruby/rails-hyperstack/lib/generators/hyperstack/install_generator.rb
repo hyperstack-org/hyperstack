@@ -30,7 +30,7 @@ module Hyperstack
       create_file 'app/hyperstack/components/hyper_component.rb', <<-RUBY
   class HyperComponent
     include Hyperstack::Component
-    include Hyperstack::State::Observer
+    include Hyperstack::State::Observable
     param_accessor_style :accessors
   end
         RUBY
@@ -112,7 +112,7 @@ History = require('history');                  // react-router history library
 ReactRouter = require('react-router');         // react-router js library
 ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
 ReactRailsUJS = require('react_ujs');          // interface to react-rails
-// to add additional NPM packages call run yarn package-name@version
+// to add additional NPM packages call run yarn add package-name@version
 // then add the require here.
       JAVASCRIPT
       create_file 'app/javascript/packs/client_only.js', <<-JAVASCRIPT
@@ -120,7 +120,7 @@ ReactRailsUJS = require('react_ujs');          // interface to react-rails
 // add any requires for packages that will run client side only
 ReactDOM = require('react-dom');               // react-js client side code
 jQuery = require('jquery');
-// to add additional NPM packages call run yarn package-name@version
+// to add additional NPM packages call run yarn add package-name@version
 // then add the require here.
       JAVASCRIPT
       append_file 'config/initializers/assets.rb' do
@@ -142,11 +142,11 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       return if skip_webpack?
       yarn 'react', '16'
       yarn 'react-dom', '16'
-      yarn 'react-router'#, '4.2'
-      yarn 'react-router-dom'#, '4.2'
-      yarn 'history'#, '4.2'
-      yarn 'react_ujs'
-      yarn 'jquery'
+      yarn 'react-router', '^5.0.0'
+      yarn 'react-router-dom', '^5.0.0'
+      # yarn 'history'#, '4.2' this will be brought in by react-router
+      yarn 'react_ujs', '^2.5.0'
+      yarn 'jquery', '^3.4.1'
     end
 
     def add_webpacker_gem

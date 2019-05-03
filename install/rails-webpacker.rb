@@ -114,14 +114,14 @@ CODE
 
 # ----------------------------------- Add NPM modules
 
-run 'yarn add react'
-run 'yarn add react-dom'
-run 'yarn add react-router'
+run 'yarn add react@16'
+run 'yarn add react-dom@16'
+run 'yarn add react-router@^5.0.0'
 if WITH_PRERENDERING
-run 'yarn add react-router-dom'
-run 'yarn add history'
-run 'yarn add react_ujs'
-run 'yarn add jquery'
+run 'yarn add react-router-dom@^5.0.0'
+# run 'yarn add history' # this will be brought in by react-router
+run 'yarn add react_ujs@^2.5.0'
+run 'yarn add jquery@^3.4.1'
 end
 
 if !WITH_PRERENDERING
@@ -166,7 +166,7 @@ History = require('history');                  // react-router history library
 ReactRouter = require('react-router');         // react-router js library
 ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
 ReactRailsUJS = require('react_ujs');          // interface to react-rails
-// to add additional NPM packages call run yarn package-name@version
+// to add additional NPM packages call run add yarn package-name@version
 // then add the require here.
 CODE
 
@@ -177,7 +177,7 @@ CODE
 // add any requires for packages that will run client side only
 ReactDOM = require('react-dom');               // react-js client side code
 jQuery = require('jquery');
-// to add additional NPM packages call run yarn package-name@version
+// to add additional NPM packages call run add yarn package-name@version
 // then add the require here.
 CODE
 
@@ -189,11 +189,12 @@ CODE
 Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js').to_s
     RUBY
   end
-  append_file 'config/environments/test.rb' do
+  inject_into_file 'config/environments/test.rb', before: /^end/ do
     <<-RUBY
+
+# added by hyperstack installer
 config.assets.paths << Rails.root.join('public', 'packs-test', 'js').to_s
     RUBY
-  end
 
 
   # ----------------------------------- application.js
