@@ -163,8 +163,18 @@ describe "polymorphic relationships", js: true do
       expect_promise("Hyperstack::Model.load { #{model.class}.find(#{model.id}).#{expression} }")
       .to be_expected_result
     else
-      wait_for_ajax
-      expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to be_expected_result
+      3.times do |i|
+        begin
+          wait_for_ajax
+          expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}")
+          .to be_expected_result
+          break
+        rescue RSpec::Expectations::ExpectationNotMetError => e
+          raise e if i == 2
+          puts "client data not yet synced will retry in 500MS"
+          sleep 0.5
+        end
+      end
     end
   end
 

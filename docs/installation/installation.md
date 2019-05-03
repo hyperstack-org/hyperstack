@@ -23,8 +23,9 @@ This template will create a **new** Rails app with Webpacker from Hyperstack edg
 Simply run the command below to create a new Rails app with Hyperstack all configured:
 
 ```
-rails new MyApp -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+rails new MyApp -T -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
 ```
+> Note: The -T flag will not install minitest directories, leaving room for Rspec and HyperSpec see the HyperSpec readme under "Tools" for more info.
 
 ### Start the Rails app
 
@@ -37,14 +38,21 @@ If you have an existing Rails app, you can use the built in generator to install
 
 + add `gem 'rails-hyperstack', "~> 1.0.alpha1.0"` to your gem file
 + run `bundle install`
-+ run `rails g hyperstack:install`
++ run `bundle exec rails g hyperstack:install`
 
+> Note: if you want to use the unreleased edge branch your gem specification will be:  
+```ruby
+gem 'rails-hyperstack',
+     git: 'git://github.com/hyperstack-org/hyperstack.git',
+     branch: 'edge',
+     glob: 'ruby/*/*.gemspec'
+```
 ### Start the Rails app
 
-+ `foreman start` to start Rails and the Hotloader
++ `bundle exec foreman start` to start Rails and the Hotloader
 + Navigate to `http://localhost:5000/`
 
-> Note that the generator will add a wild card route to the beginning of your routes file.  This will let you immediately test Hyperstack, but will also mean that all of your existing routes are now unreachable.  So after getting Hyperstack up, you will want to adjust things to your needs.  See that last steps in the detailed installation for more info.
+> Note that the generator will add a wild card route to the beginning of your routes file.  This will let you immediately test Hyperstack, but will also mean that all of your existing routes are now unreachable.  So after getting Hyperstack up, you will want to adjust things to your needs.  See that last steps in the **Manual Installation** section for more info.
 
 ## Manual Installation
 
@@ -96,8 +104,6 @@ documented uniform interface to the DOM.  To use it require it and its Rails
 counter part in `application.js` before the `hyperstack-loader`
 
 ```javascript
-//= require jquery
-//= require jquery_ujs
 //= require hyperstack-loader
 //= require_tree .
 ```

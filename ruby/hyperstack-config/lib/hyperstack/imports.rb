@@ -90,8 +90,8 @@ module Hyperstack
       Dir.glob(Rails.root.join('app', path, '**', '*')).sort.collect do |fname|
         fname = fname.gsub(/^#{base_name}/, '')
         fname = fname.gsub(/\.erb$/, '')
-        if fname =~ /(\.js$)|(\.rb$)/
-          fname = fname.gsub(/(\.js$)|(\.rb$)/, '')
+        if fname =~ /(\.js$)|(\.rb$)|(\.jsx$)/
+          fname = fname.gsub(/(\.js$)|(\.rb$)|(\.jsx$)/, '')
           r = "require '#{fname}' #{client_guard(render_on_server, render_on_client)}"
           puts "    #{r}"
           "puts \"#{r}\"; #{r}"

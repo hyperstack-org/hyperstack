@@ -18,24 +18,11 @@ module Hyperstack
 
     APPJS = 'app/assets/javascripts/application.js'
 
-    def inject_react_file_js
-      code = ""
-      unless File.foreach(APPJS).any?{ |l| l['//= require jquery'] }
-        code +=
-        <<-CODE
-//= require jquery
-//= require jquery_ujs
-        CODE
-      end
+    def inject_hyperstack_loader_js
       unless File.foreach(APPJS).any?{ |l| l['//= require hyperstack-loader'] }
-        code +=
-        <<-CODE
-//= require hyperstack-loader
-        CODE
-      end
-      return if code == ""
-      inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
-        code
+        inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
+          "//= require hyperstack-loader\n"
+        end
       end
     end
 
@@ -90,7 +77,7 @@ end unless Rails.env.production?
       generate "hyper:router", "App"
       route "get '/(*other)', to: 'hyperstack#app'"
     end
-
+if false
     def add_webpackin
       run 'yarn add react'
       run 'yarn add react-dom'
@@ -114,7 +101,7 @@ CODE
     end
 
 
-if false
+else
     def add_webpacker_manifests
       return if skip_webpack?
       create_file 'app/javascript/packs/client_and_server.js', <<-JAVASCRIPT
@@ -138,20 +125,32 @@ jQuery = require('jquery');
       JAVASCRIPT
       append_file 'config/initializers/assets.rb' do
         <<-RUBY
-Rails.application.config.assets.paths << Rails.root.join('public', 'packs').to_s
+Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js').to_s
         RUBY
       end
+      inject_into_file 'config/environments/test.rb', before: /^end/ do
+        <<-RUBY
+
+  # added by hyperstack installer
+  config.assets.paths << Rails.root.join('public', 'packs-test', 'js').to_s
+        RUBY
+      end
+
     end
 
     def add_webpacks
       return if skip_webpack?
       yarn 'react', '16'
       yarn 'react-dom', '16'
-      yarn 'react-router', '4.2'
-      yarn 'react-router-dom', '4.2'
-      yarn 'history', '4.2'
+      yarn 'react-router'#, '4.2'
+      yarn 'react-router-dom'#, '4.2'
+      yarn 'history'#, '4.2'
       yarn 'react_ujs'
       yarn 'jquery'
+    end
+
+    def add_webpacker_gem
+      gem 'webpacker'
     end
 
     def add_framework
@@ -160,9 +159,9 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs').to_s
       generate "hyperstack:install_#{framework}", "--no-build"
     end
 
-    def build_webpack
-      system('bin/webpack')
-    end
+    # def build_webpack
+    #   system('bin/webpack')
+    # end
 end
     # all generators should be run before the initializer due to the opal-rails opal-jquery
     # conflict
@@ -211,6 +210,7 @@ hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
     end
 
     def add_gems
+
     end
 
     def install
@@ -223,7 +223,7 @@ hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
     private
 
     def skip_webpack?
-      options['skip-webpack'] || !defined?(Webpacker)
+      options['skip-webpack'] #|| !defined?(Webpacker)
     end
   end
 end

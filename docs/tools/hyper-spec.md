@@ -1,16 +1,14 @@
 # HyperSpec
 
-**Work in progress - ALPHA (docs and code)**
-
-With HyperSpec you can run *isomorphic* specs for all your Hyperloop code using RSpec.  Everything runs as standard RSpec test specs.  
+With HyperSpec you can run *isomorphic* specs for all your Hyperstack code using RSpec.  Everything runs as standard RSpec test specs.  
 
 For example if you have a component like this:
 
 ```ruby
-class SayHello < React::Component::Base
+class SayHello < HyperComponent
   param :name
   render(DIV) do
-    "Hello there #{params.name}"
+    "Hello there #{name}"
   end
 end
 ```
@@ -30,13 +28,13 @@ The `mount` method will setup a blank client window, and *mount* the named compo
 
 Notice that the spec will need a client environment so we must set `js: true`.
 
-The `mount` method can also take a block which will be recompiled and set to the client before mounting the component.  You can place any client side code in the mount block including the definition of components.
+The `mount` method can also take a block which will be recompiled and sent to the client before mounting the component.  You can place any client side code in the mount block including the definition of components.
 
 ```ruby
 describe "the mount's code block", js: true do
   it 'will be recompiled on the client' do
     mount 'ShowOff' do
-      class ShowOff < React::Component::Base
+      class ShowOff < HyperComponent
         render(DIV) { 'Now how cool is that???' }
       end
     end
@@ -47,39 +45,106 @@ end
 
 ## Why?
 
-Hyperloop wants to make the server-client divide as transparent to the developer as practical.  Given this, it makes sense that the testing should also be done with as little concern for client versus server.  
+Hyperstack wants to make the server-client divide as transparent to the developer as practical.  Given this, it makes sense that the testing should also be done with as little concern for client versus server.  
 
-HyperSpec allows you to directly use tools like FactoryBot (or Hyperloop Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code.
-
+HyperSpec allows you to directly use tools like FactoryBot (or Hyperstack Operations) to setup some test data, then run a spec to make sure that a component correctly displays, or modifies that data.  You can use Timecop to manipulate time and keep in sync between the server and client.  This makes testing easier and more realistic without writing a lot of redundant code.
 
 ## Installation
 
-Add this line to your application's Gemfile in the test section:
+These instructions are assuming you are using Rails as the backend.  However the `hyper-spec` gem itself does not require Rails, so you can adapt these instructions as needed.
 
+### Add the gems
+
+In your `Gemfile` add
 ```ruby
-gem 'hyper-spec'
+group :test do
+  gem 'hyper-spec', path: '../hyperstack/ruby/hyper-spec'
+  gem 'database_cleaner' # optional but we find it works best due to the concurrency of hyperstack
+end
 ```
+and `bundle install`
 
-Execute:
+### Install RSpec files
 
-    $ bundle install
+`bundle exec rails g rspec:install`
 
-and then in your spec_helper.rb file
+> Skip this step if rspec is already installed.
+
+### Configure HyperSpec
+
+Update your `spec/rails_helper.rb` so it looks like this:
 
 ```ruby
+# This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'spec_helper'
+ENV['RAILS_ENV'] ||= 'test'
+require File.expand_path('../../config/environment', __FILE__)
+# Prevent database truncation if the environment is production
+abort("The Rails environment is running in production mode!") if Rails.env.production?
+require 'rspec/rails'
+# Add additional requires below this line. Rails is not loaded until this point!
+
+# THESE ARE LINES WE ARE ADDING
+# JUST MAKE SURE THEY ARE AFTER `require 'rspec/rails'`
+
+# pull in the hyper-spec code.
 require 'hyper-spec'
+
+# If you are using DatabaseCleaner here is where
+# you set the mode. We recommend truncation.
+DatabaseCleaner.strategy = :truncation
+
+# Now we setup Rspec details
+RSpec.configure do |config|
+
+  # This is only needed if you are using DatabaseCleaner
+  config.before(:each) do
+    DatabaseCleaner.clean
+  end
+
+  # If you are NOT using webpacker remove this block
+  config.before(:suite) do # compile front-end
+    Webpacker.compile
+  end
+end
+...
 ```
+### Create an install smoke test
 
-You will also need to install selenium, poltergeist and firefox version **46.0.1** (ff latest still does not play well with selenium).
+Make sure your installation is working by creating a simple smoke test like this:
+```ruby
+# spec/hyperspec_smoke_test.rb
+require 'rails_helper'
 
-Sadly at this time the selenium chrome driver does not play nicely with Opal, so you can't use Chrome.  We are working on getting rid of the whole selenium business.  Stay tuned.
+describe 'Hyperspec', js: true do
+  it 'can mount and test a component' do
+    mount "HyperSpecTest" do
+      class HyperSpecTest < HyperComponent
+        render(DIV) do
+          "It's Alive!"
+        end
+      end
+    end
+    expect(page).to have_content("It's Alive!")
+  end
+  it 'can evaluate and test expressions on the client' do
+    expect_evaluate_ruby do
+      [1, 2, 3].reverse
+    end.to eq [3, 2, 1]
+  end
+end
+```
+To run it do a  
+`bundle exec rspec spec/hyperspec_smoke_test.rb`
+
+> Note that because the test does not end in `_spec.rb` it will not be run with the rest of your specs.
 
 ## Environment Variables
 
-You can set `DRIVER` to `ff` to run the client in Firefox and see what is going on.  By default tests will run in poltergeist which is quicker, but harder to debug problems.
+You can set `DRIVER` to `chrome` to run the client in chrome and see what is going on.  By default tests will run in chrome headless mode which is quicker, but harder to debug problems.
 
 ```
-DRIVER=ff bundle exec rspec
+DRIVER=chrome bundle exec rspec
 ```
 
 ## Spec Helpers
@@ -109,9 +174,9 @@ mounted may be actually defined in the block, which is useful for setting up top
 
 ```ruby
 mount 'Display', test: 123 do
-  class Display < React::Component::Base
+  class Display < HyperComponent
     param :test
-    render(DIV) { params.test.to_s }
+    render(DIV) { test.to_s }
   end
 end
 ```
@@ -222,12 +287,12 @@ HyperReact components can *generate* events and perform callbacks.  HyperSpec pr
 
 ```ruby
 mount 'CallBackOnEveryThirdClick' do
-  class CallBackOnEveryThirdClick < React::Component::Base
-    param :click3, type: Proc
+  class CallBackOnEveryThirdClick < HyperComponent
+    fires :click3
     def increment_click
       @clicks ||= 0
       @clicks = (@clicks + 1)
-      params.click3(@clicks) if @clicks % 3 == 0
+      click3!(@clicks) if @clicks % 3 == 0
     end
     render do
       DIV(class: :tp_clicker) { "click me" }
@@ -240,8 +305,6 @@ end
 expect(callback_history_for(:click3)).to eq([[3], [6]])
 ```
 
-Note that for things to work, the param must be declared as a `type: Proc`.
-
 + `callback_history_for`: the entire history given as an array of arrays
 + `last_callback_for`: same as `callback_history_for(xxx).last`
 + `clear_callback_history_for`: clears the array (userful for repeating test variations without remounting)
@@ -249,7 +312,7 @@ Note that for things to work, the param must be declared as a `type: Proc`.
 
 #### The `pause` Method
 
-For debugging.  Everything stops, until you type `go()` in the client console.  Running binding.pry also has this effect, and is often sufficient, however it will also block the server from responding unless you have a multithreaded server.
+For debugging.  Everything stops, until you type `go()` in the client console.  Running `binding.pry` also has this effect, and is often sufficient, however it will also block the server from responding unless you have a multithreaded server.
 
 #### The `attributes_on_client` Method
 
@@ -263,7 +326,7 @@ In other words the method `attributes_on_client` is added to all ActiveRecord mo
 expect(some_record_on_server.attributes_on_client(page)[:fred]).to eq(12)
 ```
 
-Note that after persisting a record the client and server will be synced so this is mainly useful for debug or in rare cases where it is important to interrogate the value on the client before its persisted.
+> Note that after persisting a record the client and server will be synced so this is mainly useful for debug or in rare cases where it is important to interrogate the value on the client before its persisted.
 
 #### The `size_window` Method
 
@@ -300,7 +363,7 @@ The `add_class` method takes a class name (as a symbol or string), and hash repr
 it "can add classes during testing" do
   add_class :some_class, borderStyle: :solid
   mount 'StyledDiv' do
-    class StyledDiv < React::Component::Base
+    class StyledDiv < HyperComponent
       render(DIV, id: 'hello', class: 'some_class') do
         'Hello!'
       end
@@ -318,7 +381,7 @@ The rspec-steps gem will run each test without reloading the window, which is us
 
 Checkout the rspec-steps example in the `hyper_spec.rb` file for an example.
 
-*Note that hopefully in the near future we are going to build a custom capybara driver that will just directly talk to Hyperloop on the client side.  Once this is in place these troubles should go away! - Volunteers welcome to help!*
+> Note that hopefully in the near future we are going to build a custom capybara driver that will just directly talk to Hyperstack on the client side.  Once this is in place these troubles should go away! - Volunteers welcome to help!*
 
 ## Timecop Integration
 
@@ -350,31 +413,4 @@ end
 
 See the Timecop [README](https://github.com/travisjeffery/timecop/blob/master/README.markdown) for more details.
 
-There is one confusing thing to note:  On the server if you `sleep` then you will sleep for the specified number of seconds when viewed *outside* of the test.  However inside the test environment if you look at Time.now, you will see it advancing according to the scale factor.  Likewise if you have a `after` or `every` block on the client, you will wait according to *simulated* time.
-
-## Common Problems
-
-If you are getting failures on Poltergeist but not Firefox, make sure you are not requiring `browser` in your components.rb.
-Requiring `browser/interval` or `browser/delay` is okay.
-
-## Development
-
-After checking out the repo, run bundle install and you should be good to go.
-
-Tests are run either by running `rake` or for more control:
-
-```
-DRIVER=ff bundle exec rspec spec/hyper_spec.rb
-```
-
-where DRIVER can be either `ff` (firefox) or `pg` (poltergeist - default).
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/hyper-spec. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+> There is one confusing thing to note:  On the server if you `sleep` then you will sleep for the specified number of seconds when viewed *outside* of the test.  However inside the test environment if you look at Time.now, you will see it advancing according to the scale factor.  Likewise if you have a `after` or `every` block on the client, you will wait according to *simulated* time.

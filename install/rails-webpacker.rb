@@ -189,6 +189,12 @@ CODE
 Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js').to_s
     RUBY
   end
+  append_file 'config/environments/test.rb' do
+    <<-RUBY
+config.assets.paths << Rails.root.join('public', 'packs-test', 'js').to_s
+    RUBY
+  end
+
 
   # ----------------------------------- application.js
 
