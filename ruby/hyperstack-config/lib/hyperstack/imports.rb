@@ -6,11 +6,15 @@ module Hyperstack
     end
 
     def import(value, gem: nil, cancelled: nil, client_only: nil, server_only: nil, tree: nil, js_import: nil, at_head: nil)
-      return if import_list.detect { |current_value, *_rest| value == current_value }
+      return if imported? value
       new_element = [
         value, cancelled, !client_only, !server_only, (tree ? :tree : :gem), js_import
       ]
       import_list.send(at_head ? :unshift : :push, new_element)
+    end
+
+    def imported?(value)
+      import_list.detect { |current_value, *| value == current_value }
     end
 
     alias imports import

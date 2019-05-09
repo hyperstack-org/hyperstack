@@ -185,12 +185,17 @@ module Hyperstack
         # not sure why the second check is needed.  It happens in the test app
         route.app == Hyperstack::Engine or (route.app.respond_to?(:app) and route.app.app == Hyperstack::Engine)
       end
-      raise 'Hyperstack::Engine mount point not found.  Check your config/routes.rb file' unless path
-      path = path.path.spec
-      "<script type='text/javascript'>\n"\
-        "window.HyperstackEnginePath = '#{path}';\n"\
-        "window.HyperstackOpts = #{config_hash.to_json}\n"\
-      "</script>\n"
+      if path
+        path = path.path.spec
+        "<script type='text/javascript'>\n"\
+          "window.HyperstackEnginePath = '#{path}';\n"\
+          "window.HyperstackOpts = #{config_hash.to_json}\n"\
+        "</script>\n"
+      else
+        "<script type='text/javascript'>\n"\
+          "window.HyperstackOpts = #{config_hash.to_json}\n"\
+        "</script>\n"
+      end
     end if RUBY_ENGINE != 'opal'
 
     class << self
@@ -244,6 +249,9 @@ module Hyperstack
 
         @opts = Hash.new(`window.HyperstackOpts`)
 
+        if opts[:transport] != :none && `typeof(window.HyperstackEnginePath) == 'undefined'`
+          raise "No hyperstack mount point found!\nCheck your Rails routes.rb file";
+        end
 
         if opts[:transport] == :pusher
 

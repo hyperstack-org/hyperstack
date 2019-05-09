@@ -58,7 +58,7 @@ gem 'rails-hyperstack',
 
 These are the steps to manually install Hyperstack in an existing Rails app:
 
-+ Insure yarn is loaded
+1. Insure yarn is loaded
 + Add the gems
 + Update the `application.js` file
 + Add the `hyperstack` directories
@@ -256,7 +256,7 @@ included) in the asset manifest.
 The `on_error` method defines what you want to do when errors occur.  In production
 you will may want to direct the output to a dedicated log file for example.
 
-### Integrate with webpacker
+### 9. Integrate with webpacker
 
 The Rails webpacker gem will bundle up all your javascript assets including those used by Hyperstack such as React, and React-Router.
 
@@ -275,7 +275,7 @@ Once you have the pack files setup you will also need to fetch the packages, plu
 >
 > In the JS world its a two part process.  Yarn fetches packages and their dependents, and maintains a `yarn.lock` file.  The pack files specify how to package up the JS code, making it ready for delivery to the client.
 
-#### Add the `client_and_server.js` pack file
+##### Add the `client_and_server.js` pack file
 
 * Note that this goes in a new directory: `app/javascripts/packs` *
 
@@ -290,7 +290,7 @@ ReactRailsUJS = require('react_ujs');          // interface to react-rails
 // to add additional NPM packages run add yarn package-name@version
 // then add the require here.
 ```
-#### Add the `client_only.js` pack file
+##### Add the `client_only.js` pack file
 
 ```javascript
 //app/javascript/packs/client_only.js
@@ -301,7 +301,7 @@ jQuery = require('jquery');
 // then add the require here.
 ```
 
-#### Add the packages using `yarn`
+##### Add the packages using `yarn`
 
 First you need make sure you have `yarn` installed:  
 [Yarn install for any system](https://yarnpkg.com/en/docs/install)
@@ -317,13 +317,25 @@ yarn add react_ujs@^2.5.0
 yarn add jquery@^3.4.1
 ```
 
-And now you are good to go.  In the future if you want to add a new package like [react-datepicker](https://reactdatepicker.com/), you would run
+And now you are good to go.  
 
-`yarn add react-datepicker`
+>One of the great things about Hyperstack is that while you can code in Ruby, you have access to the thousands of predefined react component libraries.
+>
+>For example if you want to add a new package like [react-datepicker](https://reactdatepicker.com/), you would run  
+```text
+yarn add react-datepicker
+```
+> and then add  
+```javascript
+DatePicker = require('jquery'); // bring in the component
+require("react-datepicker/dist/react-datepicker.css"); // bring in the styles
+```
+> to the `client_only.js` pack file.  *Note that DatePicker can only be sensibly run on the client, as time on the client will be different from the server.*
+>
+>Finally you will have to run `bin/webpack` to rebuild everything
 
 
-
-### Add the Hyperstack engine to the routes file
+### 10. Add the Hyperstack engine to the routes file
 
 At the beginning of the `config/routes.rb` file mount the Hyperstack engine:
 
@@ -337,7 +349,7 @@ Rails.application.routes.draw do
 end
 ```
 
-You can mount the engine under any name you please.  All of internal Hyperstack requests will be prefixed with that mount point.
+You can mount the engine under any name you please.  All of internal Hyperstack requests will be prefixed with whatever name you use.
 
 >Note: You can also directly ask Hyperstack to mount your top level components
 via the routes file.  For example  
@@ -347,13 +359,17 @@ Rails.application.routes.draw do
   get '/(*other)', to: 'hyperstack#app'
 ```
 > will pass all requests (i.e. `/(*other)`) to the hyperstack engine, and find
-and mount a component named `App`.  Whatever ever you name the engine
+and mount a component named `App`.  Whatever you name the engine
 mount point (i.e. `hyperstack` in this case) is what you direct the requests to.
 >
 > Likewise `get /price-quote/(*other), to: hyperstack#price_quote` would mount
-a component named `PriceQuote` when the url begins with `price-quote`.  
+a component named `PriceQuote` when the url begins with `price-quote`.
+>
+> Remember though that the first route that matches will be used, so if you had both examples in your routes, the price-quote route would be before the wildcard route.
+>
+> This the way you have have 2 or more single page apps served by the same Rails backend.
 
-### Add/Update the Procfile
+### 11. Add/Update the Procfile
 
 If you are using the Hotloader, then you will also want to use the `foreman` gem.
 The Hotloader runs in its own application process, and foreman will start and stop both Rails and the Hotloader together.
@@ -373,7 +389,7 @@ To run foreman simply execute `bundle exec foreman start`, and CTRL-C to quit.
 
 > Note when running foreman with the above Procfile your port will be 5000 instead of the usual 3000.
 
-### Using generators
+### 12. Using generators
 
 No matter which way you installed Hyperstack you can use the included generators to add new components.
 
@@ -382,7 +398,7 @@ skeleton top level (router) component named App.
 
 `bundle exec rails g hyper:component Index` will create a skeleton component named Index.
 
-### Adding a test component
+### 13. Adding a test component
 
 Once you have installed Hyperstack you have a couple of options to see how things work.  
 
@@ -398,7 +414,7 @@ and then route everything to this component from your routes file:
 
 ##### Mounting a component from an existing page
 
-Another approach is to add a regular component again using the generator:
+Another approach is to add a simple component using the component generator:
 
 `bundle exec rails g hyper:component HyperTest`
 

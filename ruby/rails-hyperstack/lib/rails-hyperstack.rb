@@ -26,3 +26,9 @@ require 'react-rails'
 require 'opal-browser'
 require 'mini_racer'
 require 'hyperstack/version'
+
+class RailsHyperstack < Rails::Railtie
+  rake_tasks do
+    Dir[File.join(File.dirname(__FILE__),'tasks/hyperstack/*.rake')].each { |f| puts "loading #{f}"; load f }
+  end
+end
