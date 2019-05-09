@@ -913,7 +913,7 @@ Event Handlers are attached to tags and components using the `on` method.
 SELECT ... do
   ...
 end.on(:change) do |e|
-  mutate.mode(e.target.value.to_i)
+  mutate mode = e.target.value.to_i
 end
 ```
 
@@ -960,7 +960,7 @@ class YouSaid < HyperComponent
       alert "You said: #{state.value}" if e.key_code == 13
     end.
     on(:change) do |e|
-      mutate.value e.target.value
+      mutate value = e.target.value
     end
   end
 end
