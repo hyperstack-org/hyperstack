@@ -147,6 +147,10 @@ require 'models/application_record.rb'
       end
     end
 
+    def add_engine_route
+      return if skip_hyper_model?
+      
+
     def report
       say "\n\n"
       unless skip_adding_component?

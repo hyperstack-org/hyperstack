@@ -18,6 +18,19 @@ Gem::Specification.new do |spec|
   # }
   spec.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(tasks)/}) }
   spec.require_paths = ['lib']
+  spec.post_install_message = %q{
+Welcome to Hyperstack!
+
+For a complete install run
+
+bundle exec rails hyperstack:install
+
+Other options:
+
+bundle exec rails generate hyper:component CompName --add-route=/test/(*others)
+# Add a new component named CompName and route to it with /test/...
+}
+
 
   spec.add_dependency 'hyper-model', Hyperstack::VERSION
   spec.add_dependency 'hyper-router', Hyperstack::ROUTERVERSION
