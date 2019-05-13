@@ -89,7 +89,7 @@ else
             "    <%= javascript_include_tag 'action_cable' %>\n"\
             "  </head>\n"\
             "  <body>\n"\
-            "    <%= react_component '::DebugConsole', #{console_params}, { prerender: false } %>\n"\
+            "    <%= react_component 'Hyperloop::Console::DebugConsole', #{console_params}, { prerender: false } %>\n"\
             "  </body>\n"\
             "</html>\n"
         end
