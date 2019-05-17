@@ -19,18 +19,41 @@ Gem::Specification.new do |spec|
   spec.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(tasks)/}) }
   spec.require_paths = ['lib']
   spec.post_install_message = %q{
+*******************************************************************************
+
 Welcome to Hyperstack!
 
 For a complete install run
 
 bundle exec rails hyperstack:install
 
-Other options:
+You can also add components directly using generators:
 
 bundle exec rails generate hyper:component CompName --add-route=/test/(*others)
-# Add a new component named CompName and route to it with /test/...
-}
+# Add a new component named CompName and route to it with /test/
 
+bundle exec rails generate hyper:router CompName --add-route=/test/(*others)
+# Add a top level router named CompName
+bundle exec rails
+
+The generators will insure you have the minimal additions to your system for the
+new component to run.  And note: --add-route is optional.
+
+The hyperstack:install task also has options to control how much of the `Stack
+gets installed:
+
+--skip-hotloader   # don't add the hotloader
+--skip-webpack     # don't add webpack
+--skip-hyper-model # don't add hyper-model and default policy files
+
+You can always install these pieces later using these options:
+
+--hotloader-only   # just add the hotloader
+--webpack-only     # just add webpack
+--hyper-model-only # just add hyper-model, and default policy files
+
+*******************************************************************************
+}
 
   spec.add_dependency 'hyper-model', Hyperstack::VERSION
   spec.add_dependency 'hyper-router', Hyperstack::ROUTERVERSION

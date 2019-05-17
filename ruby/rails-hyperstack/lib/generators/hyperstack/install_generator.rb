@@ -10,7 +10,14 @@ module Hyperstack
     class_option 'hyper-model-only', type: :boolean
 
     def add_component
-      generate 'hyper:component App -add-router' unless skip_adding_component?
+      if skip_adding_component?
+        # normally this is handled by the hyper:component
+        # generator, but if we are skipping it we will check it
+        # now.
+        insure_hyperstack_loader_installed
+      else
+        generate 'hyper:router App --add-route'
+      end
     end
 
     def add_hotloader
@@ -149,27 +156,29 @@ require 'models/application_record.rb'
 
     def add_engine_route
       return if skip_hyper_model?
-      
+      route 'mount Hyperstack::Engine => \'/hyperstack\'  # this route should be first in the routes file so it always matches'
+    end
 
     def report
       say "\n\n"
       unless skip_adding_component?
         say "🎢 Top Level App Component successfully installed at app/hyperstack/components/app.rb 🎢", :green
       end
-      unless skip_hotloader?
-        say "🚒 Hyperstack Hotloader installed - use bundle exec foreman start and visit localhost:5000 🚒", :green
-      end
       unless skip_webpack?
-        say "🚀 Webpack integrated with Hyperstack.  "\
-            "Add javascript assets to app/javascript/packs/client_only.js and /client_and_server.js 🚀", :green
+        say "📦 Webpack integrated with Hyperstack.  "\
+            "Add javascript assets to app/javascript/packs/client_only.js and /client_and_server.js 📦", :green
       end
       unless skip_hyper_model?
         say "👩‍✈️ Basic development policy defined.  See app/policies/application_policy.rb 👨🏽‍✈️", :green
-        say "💽 Move any Active Record models to the app/hyperstack/models to access them from the client 📀", :green
+        say "💽 HyperModel installed. Move any Active Record models to the app/hyperstack/models to access them from the client 📀", :green
       end
       if File.exists?(init = File.join('config', 'initializers', 'hyperstack.rb'))
         say "☑️  Check #{init} for other configuration options. ☑️", :green
       end
+      unless skip_hotloader?
+        say "🚒 Hyperstack Hotloader installed - use bundle exec foreman start and visit localhost:5000 🚒", :green
+      end
+
       say "\n\n"
     end
 
@@ -198,9 +207,27 @@ require 'models/application_record.rb'
       else
         create_file file_name, <<-RUBY
 #{s}
+# set the component base class
+
+Hyperstack.component_base_class = 'HyperComponent' # i.e. 'ApplicationComponent'
+
+# prerendering is default :off, you should wait until your
+# application is relatively well debugged before turning on.
+
 Hyperstack.prerendering = :off # or :on
+
+# transport controls how push (websocket) communications are
+# implemented.  The default is :action_cable.
+# Other possibilities are :pusher (see www.pusher.com) or
+# :simple_poller which is sometimes handy during system debug.
+
+Hyperstack.transport = :action_cable # or :none, :pusher,  :simple_poller
+
 # add this line if you need jQuery AND ARE NOT USING WEBPACK
 # Hyperstack.import 'hyperstack/component/jquery', client_only: true
+
+# change definition of on_error to control how errors such as validation
+# exceptions are reported on the server
 module Hyperstack
   def self.on_error(operation, err, params, formatted_error_message)
     ::Rails.logger.debug(

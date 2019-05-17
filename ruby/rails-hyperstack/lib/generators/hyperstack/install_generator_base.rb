@@ -6,6 +6,25 @@ module Rails
 
       protected
 
+      def create_component_file(template)
+        clear_cache
+        insure_hyperstack_loader_installed
+        insure_base_component_class_exists
+        @no_help = options.key?('no-help')
+        self.components.each do |component|
+          component_array = component.split('::')
+          @modules = component_array[0..-2]
+          @file_name = component_array.last
+          @indent = 0
+          template template,
+                   File.join('app', 'hyperstack', 'components',
+                             *@modules.map(&:downcase),
+                             "#{@file_name.underscore}.rb")
+        end
+        add_route
+      end
+
+
       def clear_cache
         run 'rm -rf tmp/cache' unless Dir.exists?(File.join('app', 'hyperstack'))
       end
@@ -37,7 +56,7 @@ module Rails
 
 
       def insure_base_component_class_exists
-        @component_base_class = options['base-class']
+        @component_base_class = options['base-class'] || Hyperstack.component_base_class
         file_name = File.join(
           'app', 'hyperstack', 'components', "#{@component_base_class.underscore}.rb"
         )
@@ -63,9 +82,14 @@ module Rails
         end
         action_name = (@modules+[@file_name.underscore]).join('__')
         path = options['add-route'] == 'add-route' ? '/(*others)' : options['add-route']
-        route "get '#{path}', to: 'hyperstack##{action_name}'"
+        routing_code = "get '#{path}', to: 'hyperstack##{action_name}'"
+        log :route, routing_code
+        [/mount\s+Hyperstack::Engine[^\n]+\n/m, /\.routes\.draw do\s*\n/m].each do |sentinel|
+          in_root do
+            x = inject_into_file "config/routes.rb", optimize_indentation(routing_code, 2), after: sentinel, verbose: false, force: false
+          end
+        end
       end
-
 
       def yarn(package, version = nil)
         return if system("yarn add #{package}#{'@' + version if version}")
