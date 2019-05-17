@@ -178,7 +178,7 @@ module React
       def send_to_server(*args)
         if IsomorphicHelpers.on_opal_server?
           method_string = "ServerSideIsomorphicMethod." + @name + "(" + args.to_json + ")"
-          @result = [JSON.parse(`eval(method_string)`)]
+          @result = [JSON.parse(`eval(#{method_string})`)]
         end
       end
 
