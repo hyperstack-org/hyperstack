@@ -92,7 +92,7 @@ rails g hyper:router CompName        # adds a router component
 # Note --add-route switch will not work if multiple components are generated.
 
 # Note you can override the component base class for the entire application
-# by setting the `component_base_class` option.  See config options in the
+# by setting the Hyperstack `component_base_class` config option.  See config options in the
 # last section.
 
 # Note that hyperstack:install is the same as running:
