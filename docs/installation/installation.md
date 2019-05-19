@@ -291,7 +291,7 @@ Using the Rails `webpacker` gem you can easily add other NPM (node package manag
 For details on how to import and use NPM packages in your application see [Importing React Components](https://hyperstack.org/edge/docs/dsl-client/components#javascript-components)
 
 To integrate webpacker with an existing Hyperstack application - for example if you just added a couple of components and now
-want to try webpacker - use the hyperstack:webpack task:
+want to try webpacker - use the hyperstack:install:webpack task:
 ```
 bundle exec rails hyperstack:install:webpack
 ```
