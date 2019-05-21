@@ -29,11 +29,11 @@ module ReactiveRecord
         column_type = Base.column_type(@column_hash) || 'nil'
         default_value_method = "build_default_value_for_#{column_type}"
         @object = __send__ default_value_method
-      rescue ::Exception
+      rescue ::Exception => e
       end
 
       def build_default_value_for_nil
-        @column_hash[:default] || nil
+        @column_hash.key?(:default) ? @column_hash[:default] :  nil
       end
 
       def build_default_value_for_datetime
@@ -56,23 +56,23 @@ module ReactiveRecord
       end
 
       def build_default_value_for_boolean
-        @column_hash[:default] || false
+        @column_hash.key?(:default) ? @column_hash[:default] :  false
       end
 
       def build_default_value_for_float
-        @column_hash[:default] || Float(0.0)
+        @column_hash.key?(:default) ? @column_hash[:default] :  Float(0.0)
       end
 
       alias build_default_value_for_decimal build_default_value_for_float
 
       def build_default_value_for_integer
-        @column_hash[:default] || Integer(0)
+        @column_hash.key?(:default) ? @column_hash[:default] :  Integer(0)
       end
 
       alias build_default_value_for_bigint build_default_value_for_integer
 
       def build_default_value_for_string
-        @column_hash[:default] || ''
+        @column_hash.key?(:default) ? @column_hash[:default] :  ''
       end
 
       alias build_default_value_for_text build_default_value_for_string
