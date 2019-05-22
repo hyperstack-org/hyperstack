@@ -342,6 +342,7 @@ module ActiveRecord
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
         next if name == primary_key
+        column_hash[:serialized?] = ReactiveRecord::Base.serialized?[self][name]
         define_method(name) { @backing_record.get_attr_value(name, nil) }
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
         define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }
