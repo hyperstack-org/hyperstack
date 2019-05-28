@@ -1,3 +1,15 @@
+# Caution.  For now Hyperstack maintains its own copy of the Promise class.
+# Eventually the diff between hyperstacks version and the official Opal version
+# should be put into a PR.
+
+# A key feature add is the Fail Exception class which is simply there to allow
+# a `always` block to reject without raising an error.  To use this see the run.rb
+# module.
+
+# Also see exception! method for the part of the code that detects the Fail exception.
+
+# See https://github.com/opal/opal/issues/1967 for details.
+
 class Promise
   def self.value(value)
     new.resolve(value)
@@ -9,6 +21,13 @@ class Promise
 
   def self.when(*promises)
     When.new(promises)
+  end
+
+  class Fail < StandardError
+    attr_reader :result
+    def initialize(result)
+      @result = result
+    end
   end
 
   attr_reader :error, :prev, :next
@@ -164,8 +183,15 @@ class Promise
   end
 
   def exception!(error)
-    @exception = true
-
+    # If the error is a Promise::Fail, then
+    # the error becomes the error.result value
+    # this allows code to raise an error on an
+    # object that is not an error.
+    if error.is_a? Promise::Fail
+      error = error.result
+    else
+      @exception = true
+    end
     reject!(error)
   end
 

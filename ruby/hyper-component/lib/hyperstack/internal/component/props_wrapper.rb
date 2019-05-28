@@ -48,21 +48,23 @@ module Hyperstack
           end
 
           def define_param(name, param_type, aka = nil)
-            meth_name = aka || name
-            var_name = fix_suffix(aka) || instance_var_name_for(name)
-            param_definitions[name] = lambda do |props|
-              @component.instance_variable_set :"@#{var_name}", val = fetch_from_cache(name, param_type, props)
-              next unless param_accessor_style == :accessors
-              `#{@component}[#{"$#{meth_name}"}] = function() { return #{val} }`
-              # @component.define_singleton_method(name) { val } if param_accessor_style == :accessors
+            if param_accessor_style != :legacy || aka
+              meth_name = aka || name
+              var_name = fix_suffix(aka) || instance_var_name_for(name)
+              param_definitions[name] = lambda do |props|
+                @component.instance_variable_set :"@#{var_name}", val = fetch_from_cache(name, param_type, props)
+                next unless param_accessor_style == :accessors
+                `#{@component}[#{"$#{meth_name}"}] = function() { return #{val} }`
+                # @component.define_singleton_method(name) { val } if param_accessor_style == :accessors
+              end
+              return if %i[hyperstack accessors].include? param_accessor_style
             end
-            return if %i[hyperstack accessors].include? param_accessor_style
             if param_type == Proc
-              define_method(meth_name.to_sym) do |*args, &block|
+              define_method(name.to_sym) do |*args, &block|
                 props[name].call(*args, &block) if props[name]
               end
             else
-              define_method(meth_name.to_sym) do
+              define_method(name.to_sym) do
                 fetch_from_cache(name, param_type, props)
               end
             end
@@ -88,7 +90,7 @@ module Hyperstack
 
         def initialize(component, incoming = nil)
           @component = component
-          return if param_accessor_style == :legacy
+          #return if param_accessor_style == :legacy
           self.class.param_definitions.each_value do |initializer|
             instance_exec(incoming || props, &initializer)
           end

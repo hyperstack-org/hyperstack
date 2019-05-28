@@ -25,7 +25,8 @@ module Hyperstack
       # @context.
       if @context
         @context.each do |ctx, vars|
-          vars.each { |var, init| ctx.instance_variable_set(var, init.dup) }
+          # be careful:  You can't dup nil, hence `init && init.dup`
+          vars.each { |var, init| ctx.instance_variable_set(var, init && init.dup) }
         end
         Hyperstack::Application::Boot.run if reboot
       else

@@ -72,6 +72,7 @@ module ReactiveRecord
       alias build_default_value_for_bigint build_default_value_for_integer
 
       def build_default_value_for_string
+        return @column_hash[:default] if @column_hash[:serialized?]
         @column_hash[:default] || ''
       end
 

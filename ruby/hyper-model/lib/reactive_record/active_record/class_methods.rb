@@ -342,6 +342,10 @@ module ActiveRecord
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
         next if name == primary_key
+        # only add serialized key if its serialized.  This just makes testing a bit
+        # easier by keeping the columns_hash the same if there are no seralized strings
+        # see rspec ./spec/batch1/column_types/column_type_spec.rb:100
+        column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
         define_method(name) { @backing_record.get_attr_value(name, nil) }
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
         define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }

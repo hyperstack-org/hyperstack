@@ -163,8 +163,18 @@ describe "polymorphic relationships", js: true do
       expect_promise("Hyperstack::Model.load { #{model.class}.find(#{model.id}).#{expression} }")
       .to be_expected_result
     else
-      wait_for_ajax
-      expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}").to be_expected_result
+      3.times do |i|
+        begin
+          wait_for_ajax
+          expect_evaluate_ruby("#{model.class}.find(#{model.id}).#{expression}")
+          .to be_expected_result
+          break
+        rescue RSpec::Expectations::ExpectationNotMetError => e
+          raise e if i == 2
+          puts "client data not yet synced will retry in 500MS"
+          sleep 0.5
+        end
+      end
     end
   end
 
@@ -239,7 +249,7 @@ describe "polymorphic relationships", js: true do
         p.imageable = Product.find(1)
         p.save
       end
-      wait_for_ajax
+      # was wait_for_ajax
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture12'], false
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture11', 'picture21', 'picture22'], false
     end
@@ -254,7 +264,7 @@ describe "polymorphic relationships", js: true do
       p = Picture.find_by_name('picture11')
       p.imageable = @imageable2
       p.save
-      wait_for_ajax
+      # was wait_for_ajax
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture12']
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture11', 'picture21', 'picture22']
     end
@@ -286,17 +296,19 @@ describe "polymorphic relationships", js: true do
 
     it 'loads previously defined data client side' do
       @uzer1.groups << @group1
-      wait_for_ajax
+      # was wait_for_ajax
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
     it 'creates due to a broadcast client side' do
       @uzer1.groups << @group1
+      # was wait_for_ajax
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
     it 'destroys due to a broadcast client side' do
       @uzer1.groups << @group1 # server side
+      # was wait_for_ajax
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # client
       Membership.find_by(uzer: @uzer1, memerable: @group1).destroy # server side
       compare_to_server @group1, 'uzers.count', 0, false  # client side
@@ -306,7 +318,7 @@ describe "polymorphic relationships", js: true do
       evaluate_ruby do
         Uzer.find(1).groups << Group.find(1) # client side
       end
-      wait_for_ajax
+      wait_for_ajax # this is required
       @group1.reload
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false # server side
     end

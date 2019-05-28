@@ -135,7 +135,6 @@ module ReactiveRecord
       model.columns_hash[method_name] || model.server_methods[method_name]
     end
 
-
     class << self
 
       attr_reader :pending_fetches

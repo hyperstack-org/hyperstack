@@ -12,8 +12,9 @@ module Hyperstack
           end
           config.after_initialize do
             class ::HyperstackController < ::ApplicationController
-              def action_missing(_name)
-                render_component
+              def action_missing(*)
+                parts = params[:action].split('__')
+                render_component (parts[0..-2]+[parts.last.camelize]).join('::')
               end
             end
           end

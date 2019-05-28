@@ -1,20 +1,7 @@
-require 'rails/generators'
 module Hyper
-  class Component < Rails::Generators::Base
-    source_root File.expand_path('../templates', __FILE__)
-
-    argument :components, type: :array
-    def create_component_file
-      self.components.each do |component|
-        component_array = component.split('::')
-        @modules = component_array[0..-2]
-        @file_name = component_array.last
-        @indent = 0
-        template 'component_template.rb',
-                 File.join('app/hyperstack/components',
-                           @modules.map(&:downcase).join('/'),
-                           "#{@file_name.underscore}.rb")
-      end
+  class Component < GeneratorBase
+    def add_component
+      create_component_file 'component_template.rb'
     end
   end
 end

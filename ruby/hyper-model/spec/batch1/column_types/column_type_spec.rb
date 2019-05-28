@@ -145,6 +145,16 @@ describe "column types on client", js: true do
     check_errors
   end
 
+  it 'will not override a default of nil if the attribute is serialized' do
+    isomorphic do
+      TypeTest.serialize :string
+      TypeTest.serialize :text
+    end
+    [:string, :text].each do |attr|
+      expect_evaluate_ruby("TypeTest.find(1).#{attr}.class").to eq('NilClass')
+    end
+  end
+
   it 'while loading the dummy value delegates the correct type with operators etc' do
     t = Time.parse('1/2/2003')
     TypeTest.create(
@@ -293,6 +303,15 @@ describe "column types on client", js: true do
     check_errors
   end
 
+  it 'uses the default value if even if the attribute is serialized' do
+    isomorphic do
+      DefaultTest.serialize :string
+    end
+    expect_evaluate_ruby do
+      DefaultTest.find(1).string
+    end.to eq("I'm a string!")
+  end
+
   it 'uses the default value if specified when initializing a new record' do
     expect_evaluate_ruby do
       DefaultTest.new.string
@@ -321,6 +340,21 @@ describe "column types on client", js: true do
     expect_promise do
       ReactiveRecord.load { TypeTest.find(1).text }
     end.to eq(r.text)
+  end
+
+  it 'allows for attribute methods to be overwritten and use super' do
+    isomorphic do
+      class TypeTest < ActiveRecord::Base
+        def string
+          super.reverse
+        end
+      end
+    end
+    r = TypeTest.create(string: 'reverse')
+    expect_promise do
+      ReactiveRecord.load { TypeTest.find(1).string }
+    end.to eq(r.string)
+    expect(r.string).to eq(r[:string].reverse)
   end
 
 end

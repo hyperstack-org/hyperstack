@@ -24,6 +24,8 @@ module ActiveModel
       @messages.clear
     end
 
+    alias non_reactive_clear clear
+
     def add(attribute, message = :invalid, _options = {})
       @messages[attribute] << message unless @messages[attribute].include? message
     end

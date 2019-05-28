@@ -2,36 +2,24 @@ module Hyperstack
   module Router
     module Helpers
       def match
-        if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
-          params.match
-        else
-          @Match
-        end
+        @_match_param
       end
 
       def location
-        if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
-          params.location
-        else
-          @Location
-        end
+        @_location_param
       end
 
       def history
-        if @__hyperstack_component_params_wrapper.param_accessor_style != :hyperstack
-          params.history
-        else
-          @History
-        end
+        @_history_param
       end
 
       def self.included(base)
         base.include(Hyperstack::Internal::Router::Helpers)
 
         base.class_eval do
-          param :match, default: nil
-          param :location, default: nil
-          param :history, default: nil
+          param :match,    default: nil, alias: :_match_param
+          param :location, default: nil, alias: :_location_param
+          param :history,  default: nil, alias: :_history_param
         end
       end
     end

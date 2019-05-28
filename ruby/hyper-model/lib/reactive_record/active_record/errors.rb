@@ -219,8 +219,12 @@ module ActiveModel
     #   person.errors.clear
     #   person.errors.full_messages # => []
     def clear
+      non_reactive_clear.tap { reactive_empty! true }
+    end
+
+    def non_reactive_clear
       messages.clear
-      details.clear.tap { reactive_empty! true }
+      details.clear
     end
 
     # Merges the errors from <tt>other</tt>.

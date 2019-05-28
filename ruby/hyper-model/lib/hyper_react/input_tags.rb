@@ -42,7 +42,8 @@ module Hyperstack
               Hyperstack::Internal::Component::RenderingContext.render(tag, opts) { children.each(&:render) }
             end
           end
-          const_set component, klass
+
+          Object.const_set component, klass
         end
       end
     end

@@ -314,6 +314,7 @@ module ReactiveRecord
       @errors_at_last_sync = hash if saving
       notify_waiting_for_save
       errors.clear && return unless hash
+      errors.non_reactive_clear
       hash.each do |attribute, messages|
         messages.each do |message|
           errors.add(attribute, message)
