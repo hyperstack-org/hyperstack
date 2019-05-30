@@ -306,7 +306,7 @@ module ComponentTestHelpers
   def evaluate_ruby(str="", opts={}, &block)
     insure_mount
     str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
-    js = Opal.compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
+    js = Opal.compile(str).gsub("// Prepare super implicit arguments\n", "").gsub("\n","").gsub("(Opal);","(Opal)")
     JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
   end
 
