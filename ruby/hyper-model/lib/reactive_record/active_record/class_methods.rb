@@ -339,6 +339,21 @@ module ActiveRecord
       end
     end
 
+    # def define_attribute_methods
+    #   columns_hash.each do |name, column_hash|
+    #     next if name == primary_key
+    #     column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
+    #
+    #     define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
+    #     define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
+    #     define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
+    #     define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
+    #     define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
+    #   end
+    #   self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
+    # end
+
+
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
         next if name == primary_key
@@ -346,11 +361,12 @@ module ActiveRecord
         # easier by keeping the columns_hash the same if there are no seralized strings
         # see rspec ./spec/batch1/column_types/column_type_spec.rb:100
         column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
-        define_method(name) { @backing_record.get_attr_value(name, nil) }
-        define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
-        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }
-        define_method("#{name}_changed?") { @backing_record.changed?(name) }
-        define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? }
+        
+        define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
+        define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
+        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
+        define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
+        define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
       end
       self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
     end
