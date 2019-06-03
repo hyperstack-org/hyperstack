@@ -32,7 +32,7 @@ Add the rails-hyperstack gem to your Gemfile, and then bundle install.  This can
 bundle add 'rails-hyperstack', --version "~> 1.0.alpha1.0"
 ```
 
-> If you want to use the unreleased edge branch your gem specification will be:  
+> If you want to use the unreleased edge branch your gem specification will be:
 ```ruby
 gem 'rails-hyperstack',
      git: 'git://github.com/hyperstack-org/hyperstack.git',
@@ -113,9 +113,9 @@ The following subdirectories are standard:
 app/
   ...
   hyperstack/
-    components/  
-    models/      
-    operations/   
+    components/
+    models/
+    operations/
     stores/
     shared/
     lib/
@@ -158,8 +158,8 @@ class HyperComponent
   param_accessor_style :accessors
 end
 ```
-> Note: You can override the base class name using the `--base-class` switch:  
-> For example if you prefer ApplicationComponent rather than HyperComponent  
+> Note: You can override the base class name using the `--base-class` switch:
+> For example if you prefer ApplicationComponent rather than HyperComponent
 ```bash
 bundle exec rails g hyper:component Test --base-class=ApplicationComponent
 ```
@@ -200,7 +200,7 @@ and override the default layout
 
 For example
 ```erb
-   <% render_component 'Dashboard', user: @user %>
+   <%= react_component 'Dashboard', user: @user %>
 ```
 > Note that you may have several component trees mounted in a single page using the `render_component` helper.  While this is not typical for a clean sheet Hyperstack design, it is useful when mixing Hyperstack with legacy applications.
 
@@ -253,7 +253,7 @@ various routing methods.
 
 > Note that in a large app you may have several single page apps working together,
 along with some legacy routes.
-In such an application the router structure might look like this:  
+In such an application the router structure might look like this:
 ```ruby
 Rails.application.routes.draw do
   ... # legacy routes
@@ -332,7 +332,7 @@ Webpacker uses manifests to determine how to package up assets.  Hyperstack depe
 >
 > This means that page load time is comparable to any other Rails view, and that Rails can cache the pages like any other view.
 >
-> But to make this work packages that rely on the `browser` object cannot be used during prerendering.  Well structured packages that depend on the `browser` object will have a way to run in the prerendering environment.  
+> But to make this work packages that rely on the `browser` object cannot be used during prerendering.  Well structured packages that depend on the `browser` object will have a way to run in the prerendering environment.
 
 These two files look like this and are placed in the `app/javascript/packs` directory:
 ```javascript
@@ -464,7 +464,7 @@ policies for legacy parts of your system.
 
 #### Moving the `application_record.rb` File.
 
-Once you have a basic Policy defined the client can access your Rails models.  For your ActiveRecord model class definitions to be visible on the client you need to move them to the `app/hyperstack/models` directory.  This directory (along with `app/hyperstack/operations` and `app/hyperstack/shared`) are *isomorphic* directories.  The code in these directories will be accessible on both the client and the server.  
+Once you have a basic Policy defined the client can access your Rails models.  For your ActiveRecord model class definitions to be visible on the client you need to move them to the `app/hyperstack/models` directory.  This directory (along with `app/hyperstack/operations` and `app/hyperstack/shared`) are *isomorphic* directories.  The code in these directories will be accessible on both the client and the server.
 > Moving the files is necessary both because of the way Rails is structured, but its also very useful when evolving legacy systems to Hyperstack.  Until a class
 definition is moved to the `hyperstack/models` directory it will be ignored by Hyperstack.
 
@@ -537,14 +537,14 @@ bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
 This will tell the Hotloader to use port 25222, and to scan the
 `app/hyperstack` directory.
 
-> If for some reason you cannot use port 25222 you can change it, but you need to also configure this in the Hyperstack initializer file:  
+> If for some reason you cannot use port 25222 you can change it, but you need to also configure this in the Hyperstack initializer file:
 ```ruby
   ...
   config.hotloader_port = 12345 # override default of 25222
   ...
 ```
 
-Now that the Hotloader is running, you can start your Rails server the normal way, and refresh your browser page.  
+Now that the Hotloader is running, you can start your Rails server the normal way, and refresh your browser page.
 You should now see `require 'hyperstack/hotloader' # CLIENT ONLY` added to the manifest,
 and you will also see a message indicating that your browser has connected to the Hotloader.
 
@@ -629,7 +629,7 @@ Hyperstack.configuration do |config|
   config.import 'path/to/file', client_only: true # but only in the client manifest
   config.import 'path/to/file', server_only: true # but only on the server_only manifest
 
-  # The cancel_import directive removes an import.  This is used when we replace  
+  # The cancel_import directive removes an import.  This is used when we replace
   # assets from the rails side with those loaded by webpacker
   config.cancel_import 'path/to/file'
 end

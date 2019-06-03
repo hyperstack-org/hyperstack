@@ -113,9 +113,9 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
 
     def create_policies_directory
       return if skip_hyper_model?
-      policy_file = File.join('app', 'hyperstack', 'models', 'application_record.rb')
+      policy_file = File.join('app', 'policies', 'application_policy.rb')
       unless File.exists? policy_file
-        create_file 'policy_file', <<-RUBY
+        create_file policy_file, <<-RUBY
   # #{policy_file}
 
   # Policies regulate access to your public models
