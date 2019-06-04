@@ -49,7 +49,7 @@ gets installed:
 You can always install these pieces later using these options:
 
 --hotloader-only   # just add the hotloader
---webpack-only     # just add webpack
+--webpack          # just add webpack
 --hyper-model-only # just add hyper-model, and default policy files
 
 *******************************************************************************

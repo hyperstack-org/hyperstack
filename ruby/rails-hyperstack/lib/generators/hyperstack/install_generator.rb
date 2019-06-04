@@ -185,11 +185,11 @@ require 'models/application_record.rb'
     private
 
     def skip_adding_component?
-      options['hotloader-only'] || options['webpack-only'] || options['hyper-model-only']
+      options['hotloader-only'] || options['webpack'] || options['hyper-model-only']
     end
 
     def skip_hotloader?
-      options['skip-hotloader'] || options['webpack-only'] || options['hyper-model-only']
+      options['skip-hotloader'] || options['webpack'] || options['hyper-model-only']
     end
 
     def skip_webpack?
@@ -197,7 +197,7 @@ require 'models/application_record.rb'
     end
 
     def skip_hyper_model?
-      options['hotloader-only'] || options['webpack-only'] || options['skip-hyper-model']
+      options['hotloader-only'] || options['webpack'] || options['skip-hyper-model']
     end
 
     def inject_into_initializer(s)

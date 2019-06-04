@@ -13,7 +13,7 @@ namespace :hyperstack do
     task "hotloader-only" do
       exec "#{RbConfig.ruby} #{bin_path}/rails g hyperstack:install --hotloader-only"
     end
-    task "webpack-only" do
+    task "webpack" do
       exec "#{RbConfig.ruby} #{bin_path}/rails g hyperstack:install --webpack-only"
     end
     task "hyper-model-only" do
