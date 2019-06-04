@@ -82,11 +82,11 @@ module Rails
         end
         action_name = (@modules+[@file_name.underscore]).join('__')
         path = options['add-route'] == 'add-route' ? '/(*others)' : options['add-route']
-        routing_code = "get '#{path}', to: 'hyperstack##{action_name}'"
+        routing_code = "get '#{path}', to: 'hyperstack##{action_name}'\n"
         log :route, routing_code
         [/mount\s+Hyperstack::Engine[^\n]+\n/m, /\.routes\.draw do\s*\n/m].each do |sentinel|
           in_root do
-            x = inject_into_file "config/routes.rb", optimize_indentation(routing_code, 2), after: sentinel, verbose: false, force: false
+            inject_into_file 'config/routes.rb', routing_code.indent(2), after: sentinel, verbose: false, force: false
           end
         end
       end
