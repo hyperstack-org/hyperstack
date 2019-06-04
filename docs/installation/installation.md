@@ -389,9 +389,9 @@ To add the packages using yarn run these commands:
 ```bash
 yarn add react@16
 yarn add react-dom@16
-yarn react-router@5.0.0
-yarn react-router-dom@5.0.0
-yarn react_ujs@5.0
+yarn add react-router@5.0.0
+yarn add react-router-dom@5.0.0
+yarn add react_ujs@5.0
 ```
 
 And then add a `cancel_import` directive to the `hyperstack.rb` initializer in your the Rails `config/initializers` directory:
