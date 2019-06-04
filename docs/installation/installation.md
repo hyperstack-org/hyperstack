@@ -64,7 +64,7 @@ bundle exec ... # for best results always use bundle exec!
 rails hyperstack:install                  # full system install
 rails hyperstack:install:webpack          # just add webpack
 rails hyperstack:install:skip-webpack     # all but webpack
-rails hyperstack:install:hyper-model-only # just add hyper-model
+rails hyperstack:install:hyper-model      # just add hyper-model
 rails hyperstack:install:skip-hyper-model # all but hyper-model
 rails hyperstack:install:hotloader-only   # just add the hotloader
 rails hyperstack:install:skip-hotloader   # skip the hotloader
@@ -99,7 +99,7 @@ rails g hyper:router CompName        # adds a router component
 
 rails g hyper:component App --add-route
 rails hyperstack:install:webpack
-rails hyperstack:install:hyper-model-only
+rails hyperstack:install:hyper-model
 rails hyperstack:install:hotloader-only
 ```
 

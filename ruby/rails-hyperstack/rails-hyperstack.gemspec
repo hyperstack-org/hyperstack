@@ -50,7 +50,7 @@ You can always install these pieces later using these options:
 
 --hotloader-only   # just add the hotloader
 --webpack          # just add webpack
---hyper-model-only # just add hyper-model, and default policy files
+--hyper-model      # just add hyper-model, and default policy files
 
 *******************************************************************************
 }
