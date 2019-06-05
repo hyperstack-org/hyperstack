@@ -185,7 +185,7 @@ require 'models/application_record.rb'
     private
 
     def skip_adding_component?
-      @skip_adding_component ||= options['hotloader-only'] || options['webpack-only'] || options['hyper-model-only'] || existing_rails_app?
+      options['hotloader-only'] || options['webpack-only'] || options['hyper-model-only'] || !new_rails_app?
     end
 
     def skip_hotloader?
@@ -200,21 +200,19 @@ require 'models/application_record.rb'
       options['hotloader-only'] || options['webpack-only'] || options['skip-hyper-model']
     end
 
-    def existing_rails_app?
-      #check to see if there are any routes set up
-      route_file = File.join('config', 'routes.rb')
-puts "***********************************exisiting_rails_app"
-      count = File.foreach(route_file).inject(0) do | c, line |
-        line = line.strip
-
-        if line.empty? || line.start_with?('#') || line.start_with?('mount')
-          c
-        else
+    def new_rails_app?
+      # check to see if there are any routes set up and remember it, cause we might add a route in the process
+      @new_rails_app ||= begin
+        route_file = File.join('config', 'routes.rb')
+        count = File.foreach(route_file).inject(0) do | c, line |
+          line = line.strip
+          next c if line.empty?
+          next c if line.start_with?('#')
+          next c if line.start_with?('mount')
           c + 1
         end
+        count <= 2
       end
-
-      count >= 3
     end
 
     def inject_into_initializer(s)
