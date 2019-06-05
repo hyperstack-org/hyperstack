@@ -185,7 +185,7 @@ require 'models/application_record.rb'
     private
 
     def skip_adding_component?
-      options['hotloader-only'] || options['webpack-only'] || options['hyper-model-only'] || existing_rails_app?
+      @skip_adding_component ||= options['hotloader-only'] || options['webpack-only'] || options['hyper-model-only'] || existing_rails_app?
     end
 
     def skip_hotloader?
@@ -203,7 +203,7 @@ require 'models/application_record.rb'
     def existing_rails_app?
       #check to see if there are any routes set up
       route_file = File.join('config', 'routes.rb')
-
+puts "***********************************exisiting_rails_app"
       count = File.foreach(route_file).inject(0) do | c, line |
         line = line.strip
 
