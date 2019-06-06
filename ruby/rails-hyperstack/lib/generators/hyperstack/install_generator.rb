@@ -25,7 +25,7 @@ module Hyperstack
       unless Hyperstack.imported? 'hyperstack/hotloader'
         inject_into_initializer(
           "Hyperstack.import 'hyperstack/hotloader', "\
-          "client_only: true if Rails.env.development?"
+          'client_only: true if Rails.env.development?'
         )
       end
       create_file 'Procfile', <<-TEXT
@@ -80,7 +80,6 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
   config.assets.paths << Rails.root.join('public', 'packs-test', 'js').to_s
         RUBY
       end
-
     end
 
     def add_webpacks
@@ -98,7 +97,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       return if skip_webpack?
       inject_into_initializer(
         "Hyperstack.cancel_import 'react/react-source-browser' "\
-        "# bring your own React and ReactRouter via Yarn/Webpacker"
+        '# bring your own React and ReactRouter via Yarn/Webpacker'
       )
     end
 
@@ -106,7 +105,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       return if skip_webpack?
       gem 'webpacker'
       Bundler.with_clean_env do
-        run "bundle install"
+        run 'bundle install'
       end
       run 'bundle exec rails webpacker:install'
     end
@@ -114,7 +113,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
     def create_policies_directory
       return if skip_hyper_model?
       policy_file = File.join('app', 'policies', 'application_policy.rb')
-      unless File.exists? policy_file
+      unless File.exist? policy_file
         create_file policy_file, <<-RUBY
   # #{policy_file}
 
@@ -141,7 +140,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       return if skip_hyper_model?
       rails_app_record_file = File.join('app', 'models', 'application_record.rb')
       hyper_app_record_file = File.join('app', 'hyperstack', 'models', 'application_record.rb')
-      unless File.exists? hyper_app_record_file
+      unless File.exist? hyper_app_record_file
         empty_directory File.join('app', 'hyperstack', 'models')
         `mv #{rails_app_record_file} #{hyper_app_record_file}`
         create_file rails_app_record_file, <<-RUBY
@@ -162,24 +161,24 @@ require 'models/application_record.rb'
     def report
       say "\n\n"
       unless skip_adding_component?
-        say "🎢 Top Level App Component successfully installed at app/hyperstack/components/app.rb 🎢", :green
+        say '🎢 Top Level App Component successfully installed at app/hyperstack/components/app.rb 🎢', :green
       end
       if !new_rails_app?
-        say "🎢 Top Level App Component skipped, you can manually generate it later 🎢", :green
+        say '🎢 Top Level App Component skipped, you can manually generate it later 🎢', :green
       end
       unless skip_webpack?
-        say "📦 Webpack integrated with Hyperstack.  "\
-            "Add javascript assets to app/javascript/packs/client_only.js and /client_and_server.js 📦", :green
+        say '📦 Webpack integrated with Hyperstack.  '\
+            'Add javascript assets to app/javascript/packs/client_only.js and /client_and_server.js 📦', :green
       end
       unless skip_hyper_model?
-        say "👩‍✈️ Basic development policy defined.  See app/policies/application_policy.rb 👨🏽‍✈️", :green
-        say "💽 HyperModel installed. Move any Active Record models to the app/hyperstack/models to access them from the client 📀", :green
+        say '👩‍✈️ Basic development policy defined.  See app/policies/application_policy.rb 👨🏽‍✈️', :green
+        say '💽 HyperModel installed. Move any Active Record models to the app/hyperstack/models to access them from the client 📀', :green
       end
-      if File.exists?(init = File.join('config', 'initializers', 'hyperstack.rb'))
+      if File.exist?(init = File.join('config', 'initializers', 'hyperstack.rb'))
         say "☑️  Check #{init} for other configuration options. ☑️", :green
       end
       unless skip_hotloader?
-        say "🚒 Hyperstack Hotloader installed - use bundle exec foreman start and visit localhost:5000 🚒", :green
+        say '🚒 Hyperstack Hotloader installed - use bundle exec foreman start and visit localhost:5000 🚒', :green
       end
 
       say "\n\n"
@@ -220,7 +219,7 @@ require 'models/application_record.rb'
 
     def inject_into_initializer(s)
       file_name = File.join('config', 'initializers', 'hyperstack.rb')
-      if File.exists?(file_name)
+      if File.exist?(file_name)
         prepend_to_file(file_name) { "#{s}\n" }
       else
         create_file file_name, <<-RUBY

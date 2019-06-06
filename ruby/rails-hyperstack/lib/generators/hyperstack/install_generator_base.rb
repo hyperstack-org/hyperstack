@@ -26,7 +26,7 @@ module Rails
 
 
       def clear_cache
-        run 'rm -rf tmp/cache' unless Dir.exists?(File.join('app', 'hyperstack'))
+        run 'rm -rf tmp/cache' unless Dir.exist?(File.join('app', 'hyperstack'))
       end
 
       def insure_hyperstack_loader_installed
@@ -54,17 +54,16 @@ module Rails
         end
       end
 
-
       def insure_base_component_class_exists
         @component_base_class = options['base-class'] || Hyperstack.component_base_class
         file_name = File.join(
           'app', 'hyperstack', 'components', "#{@component_base_class.underscore}.rb"
         )
-        template 'hyper_component_template.rb', file_name unless File.exists? file_name
+        template 'hyper_component_template.rb', file_name unless File.exist? file_name
       end
 
       def add_to_manifest(manifest, &block)
-        if File.exists? "app/javascript/packs/#{manifest}"
+        if File.exist? "app/javascript/packs/#{manifest}"
           append_file "app/javascript/packs/#{manifest}", &block
         else
           create_file "app/javascript/packs/#{manifest}", &block
