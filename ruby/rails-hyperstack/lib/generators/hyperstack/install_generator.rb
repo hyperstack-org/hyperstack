@@ -164,6 +164,9 @@ require 'models/application_record.rb'
       unless skip_adding_component?
         say "🎢 Top Level App Component successfully installed at app/hyperstack/components/app.rb 🎢", :green
       end
+      if !new_rails_app?
+        say "🎢 Top Level App Component skipped, you can manually generate it later 🎢", :green
+      end
       unless skip_webpack?
         say "📦 Webpack integrated with Hyperstack.  "\
             "Add javascript assets to app/javascript/packs/client_only.js and /client_and_server.js 📦", :green
@@ -204,7 +207,7 @@ require 'models/application_record.rb'
       # check to see if there are any routes set up and remember it, cause we might add a route in the process
       @new_rails_app ||= begin
         route_file = File.join('config', 'routes.rb')
-        count = File.foreach(route_file).inject(0) do | c, line |
+        count = File.foreach(route_file).inject(0) do |c, line|
           line = line.strip
           next c if line.empty?
           next c if line.start_with?('#')

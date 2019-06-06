@@ -57,6 +57,16 @@ Each of these pieces can be skipped or installed independently either using
 built in installers and generators, or manually as explained in the
 following sections.
 
+At this point, you're fully installed.
+
+If you're installing into a new rails app, you can run bundle exec foreman start
+to start the server, and "app" will display on the top left hand side of the page.
+
+If you're installing into an existing Rails apps, you can run bundle exec foreman start
+to start the server, and your app should funcion exactly as it always has. From here, you'll need to
+[add a Hypercomponent](#<user-content-adding-a-single-component-to-your-application>)
+to have Hyperstack funcionality.
+
 ## Summary of Installers and Generators
 
 ```
