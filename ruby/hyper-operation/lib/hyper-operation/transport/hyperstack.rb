@@ -16,7 +16,7 @@ module Hyperstack
       # config.eager_load_paths += %W(#{config.root}/app/hyperstack/models)
       # config.autoload_paths += %W(#{config.root}/app/hyperstack/models)
       # config.assets.paths << ::Rails.root.join('app', 'hyperstack').to_s
-      config.after_initialize { Connection.build_tables }
+      config.after_initialize { Connection.build_tables if Connection.build_tables? }
     end
     Object.send(:remove_const, :Application) if @fake_application_defined
     @fake_application_defined = false
@@ -65,6 +65,14 @@ module Hyperstack
   define_setting :channel_prefix, 'synchromesh'
   define_setting :client_logging, true
   define_setting :connect_session, true
+
+  define_setting(:connection, { adapter: :active_record }) do |connection|
+    if connection[:adapter] == :redis
+      require 'redis'
+
+      connection[:redis_url] ||= 'redis://127.0.0.1:6379/hyperstack'
+    end
+  end
 
   def self.app_id
     opts[:app_id] || Pusher.app_id if transport == :pusher
