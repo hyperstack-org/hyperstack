@@ -72,7 +72,7 @@ module ReactiveRecord
 
     def self.to_self(record, data = {})
       # simulate incoming packet after a local save
-      operation = if record.new?
+      operation = if record.new_record?
                     :create
                   elsif record.destroyed?
                     :destroy
