@@ -23,34 +23,36 @@ Gem::Specification.new do |spec|
 
 Welcome to Hyperstack!
 
-For a complete install run
+For a quick start simply add a component using one of the generators:
 
-bundle exec rails hyperstack:install
+  >> bundle exec rails generate hyper:component CompName --add-route=/test/(*others)
+     # Add a new component named CompName and route to it with /test/
 
-You can also add components directly using generators:
-
-bundle exec rails generate hyper:component CompName --add-route=/test/(*others)
-# Add a new component named CompName and route to it with /test/
-
-bundle exec rails generate hyper:router CompName --add-route=/test/(*others)
-# Add a top level router named CompName
-bundle exec rails
+  >> bundle exec rails generate hyper:router CompName --add-route=/test/(*others)
+     # Add a top level router named CompName
 
 The generators will insure you have the minimal additions to your system for the
 new component to run.  And note: --add-route is optional.
 
-The hyperstack:install task also has options to control how much of the `Stack
-gets installed:
+For a complete install run the hyperstack install task:
 
---skip-hotloader   # don't add the hotloader
---skip-webpack     # don't add webpack
---skip-hyper-model # don't add hyper-model and default policy files
+  >> bundle exec rails hyperstack:install
+
+This will add everything you need including the hotloader, webpack integration,
+hyper-model (active record model client synchronization) and a top level
+component to get you started.
+
+You can control how much of the stack gets installed using these options:
+
+  --skip-hotloader   # don't add the hotloader
+  --skip-webpack     # don't add webpack
+  --skip-hyper-model # don't add hyper-model and default policy files
 
 You can always install these pieces later using these options:
 
---hotloader-only   # just add the hotloader
---webpack-only     # just add webpack
---hyper-model-only # just add hyper-model, and default policy files
+  --hotloader-only   # just add the hotloader
+  --webpack-only     # just add webpack
+  --hyper-model-only # just add hyper-model, and default policy files
 
 *******************************************************************************
 }

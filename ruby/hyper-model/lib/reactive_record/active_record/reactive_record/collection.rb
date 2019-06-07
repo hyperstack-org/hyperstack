@@ -540,7 +540,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
         @dummy_collection.notify
         array = new_array.is_a?(Collection) ? new_array.collection : new_array
         @collection.each_with_index do |r, i|
-          r.id = new_array[i].id if array[i] and array[i].id and !r.new? and r.backing_record.vector.last =~ /^\*[0-9]+$/
+          r.id = new_array[i].id if array[i] and array[i].id and !r.new_record? and r.backing_record.vector.last =~ /^\*[0-9]+$/
         end
       end
       # the following makes sure that the existing elements are properly removed from the collection
