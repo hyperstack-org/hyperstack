@@ -233,7 +233,7 @@ module ReactiveRecord
               if association.collection?
                 # following line changed from .all to .collection on 10/28
                 [*value.collection, *value.unsaved_children].each do |assoc|
-                  add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of(assoc)) or assoc.new?
+                  add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of(assoc)) or assoc.new_record?
                 end
               elsif record.new? || record.changed?(attribute) || (record == record_being_saved && force)
                 if value.nil?
