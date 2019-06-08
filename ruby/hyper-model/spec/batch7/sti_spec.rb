@@ -130,6 +130,22 @@ RSpec::Steps.steps "class inheritance", js: true do
 
   end
 
+  it "Finders will work regardless of type" do
+    Sti::SubClass1.create(data: 'changeme')
+    expect_promise do
+      Hyperstack::Model.load do
+        Sti::Base.all.last
+      end.then do |from_base|
+        Hyperstack::Model.load do
+          Sti::SubClass1.find(from_base.id)
+        end.then do |from_subclass|
+          from_subclass.data = 'changed'
+          from_base.data
+        end
+      end
+    end.to eq('changed')
+  end
+
   it "will use the subclass name to set the type" do
     evaluate_ruby('Sti::SubClass1.create(data: "record 1")')
     expect_promise('Sti::Base.last.load(:type)').to eq('Sti::SubClass1')
