@@ -7,6 +7,7 @@ RSpec::Steps.steps "updating associations", js: true do
 
   before(:all) do
     seed_database
+    Hyperstack.transport = :none
   end
 
   before(:step) do
