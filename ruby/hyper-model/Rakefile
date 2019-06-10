@@ -23,7 +23,7 @@ task :part2 do
 end
 
 task :part3 do
-  run_batches(6..6)
+  run_batches(5..6)
 end
 
 task :spec do
