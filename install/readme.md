@@ -17,7 +17,7 @@ Simply run the command below to create a new Rails app with Hyperstack all confi
 ```shell
 rails new MyAppName --template=https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
 ```
-Alternativly, if you like you can also download [the template file](https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb) (the part after `--template=`) and read the contents,
+Alternatively, if you like, you can also download [the template file](https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb) (the part after `--template=`) and read the contents,
 it shows how a Hyperstack Rails project differs from a plain Rails project.
 The downloaded file can then be referenced from the local filesystem.
 ```shell
