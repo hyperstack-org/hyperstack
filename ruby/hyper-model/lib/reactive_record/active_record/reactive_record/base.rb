@@ -428,6 +428,7 @@ module ReactiveRecord
 
     def destroy_associations
       @destroyed = false
+      @being_destroyed = true
       model.reflect_on_all_associations.each do |association|
         if association.collection?
           @attributes[association.attribute].replace([]) if @attributes[association.attribute]
