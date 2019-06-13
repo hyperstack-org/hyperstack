@@ -64,7 +64,7 @@ following sections.
 
 At this point you're fully installed.
 
-> ** Note the first time you run you app it will take 1-2 minutes to compile all the system libraries.**
+> **Note the first time you run you app it will take 1-2 minutes to compile all the system libraries.**
 
 If you installed into a new rails app, you can run bundle exec foreman start
 to start the server, and **App** will display on the top left hand side of the page.  You will find the `App` component in the `app/hyperstack/components/app.rb` file.  If you edit this file and save you should see the changes reflected in the browser.
