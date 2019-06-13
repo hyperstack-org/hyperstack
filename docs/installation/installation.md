@@ -27,7 +27,7 @@ rails new MyApp -T
 
 which will create a new directory called `MyApp`.  *Be sure to cd into the new directory when done.*
 
-> The -T option prevents Rails from installing the minitest directories.  Hyperstack uses the alternate rspec test framework for testing.
+> The -T option prevents Rails from installing the minitest directories.  Hyperstack uses the alternate rspec test framework for testing.  If you are installing in an existing Rails app and already using mini-test that's okay.
 
 ## Adding the Hyperstack gem
 
@@ -71,16 +71,18 @@ At this point you're fully installed.
 
 > **Note the first time you run you app it will take 1-2 minutes to compile all the system libraries.**
 
-If you installed into a new rails app, you can run bundle exec foreman start
-to start the server, and **App** will display on the top left hand side of the page.  You will find the `App` component in the `app/hyperstack/components/app.rb` file.  If you edit this file and save you should see the changes reflected in the browser.
+If you installed into a new rails app, you can run
 
-If you installed into an existing Rails apps, you can run bundle exec foreman start
-to start the server, and your app should function exactly as it always has. From here, you'll need to start adding components and
-and mounting them from either a view or a controller. See [How to add components](#adding-a-single-component-to-your-application) and [mount them](#mounting-components) for details.
+`bundle exec foreman start`
+
+to start the server, and **App** will display on the top left hand side of the page.  You will find the `App` component in the `app/hyperstack/components/app.rb` file.  If you edit this file and save it you will see the changes reflected immediately in the browser.
+
+If you installed into an existing Rails app, your app should function exactly as it always has. You can also use `bundle exec foreman start` to start the server and the hotloader. From here, you'll need to start adding components and
+and using them from either a view or a controller. See [How to add components](#adding-a-single-component-to-your-application) and [mount them](#mounting-components) for details.
 
 ## Summary of Installers and Generators
 
-The following sections details the installers and generators you can use for for full control of the installation process.  Details are also given on exactly what each installer and generator does if you want to manually apply the step or modify it to your needs.
+The following sections details the installers and generators you can use for full control of the installation process.  Details are also given on exactly what each installer and generator does if you want to manually apply the step or modify it to your needs.
 
 ```
 bundle exec ... # for best results always use bundle exec!
@@ -92,10 +94,10 @@ rails hyperstack:install:skip-hyper-model # all but hyper-model
 rails hyperstack:install:hotloader        # just add the hotloader
 rails hyperstack:install:skip-hotloader   # skip the hotloader
 
-# rails g is short for rails generate
-
 rails g hyper:component CompName     # adds a component named CompName
 rails g hyper:router CompName        # adds a router component
+
+# Note: rails g ... is short for rails generate
 
 # Both generators can take a list of components.  Component names can be
 # any legal Ruby class name.  For example Module1::ComponentA will work.
@@ -112,18 +114,18 @@ rails g hyper:router CompName        # adds a router component
                                          # HyperComponent as the base class
 # --no-help                              # don't add helper comments
 
-# Note --add-route switch will not work if multiple components are generated.
+# Note: the --add-route switch will not work if multiple components are generated.
 
-# Note you can override the component base class for the entire application
+# Note: you can override the component base class for the entire application
 # by setting the Hyperstack `component_base_class` config option.  See config options in the
 # last section.
 
-# Note that hyperstack:install is the same as running:
+# Note: that hyperstack:install is the same as running:
 
 rails g hyper:component App --add-route
 rails hyperstack:install:webpack
 rails hyperstack:install:hyper-model
-rails hyperstack:install:hotloader-only
+rails hyperstack:install:hotloader
 ```
 
 ## The `app/hyperstack` Directory
@@ -136,16 +138,17 @@ The following subdirectories are standard:
 app/
   ...
   hyperstack/
-    components/
-    models/
-    operations/
-    stores/
-    shared/
-    lib/
+    components/   <- runs on client/prerendering
+    models/       <- isomorphic
+    operations/   <- isomorphic
+    stores/       <- runs on client/prerendering
+    shared/       <- isomorphic
+    lib/          <- runs on client/prerendering
+                  <- others are client/prerendering
 ```
 
 The `models`, `operations`, and `shared` directories are *isomorphic*. That is the code will
-be run on both the Rails server and on the client.  All other directories (regardless of the name)
+be run on both the Rails server, on the client and during prerendering.  All other directories (regardless of the name)
 will only be visible on the client and during prerendering.
 
 These directories will be created as required by the installers and generators, or you can create them yourself as needed.
@@ -193,7 +196,7 @@ bundle exec rails g hyper:component Test --base-class=ApplicationComponent
 
 Components render (or *mount*) other components in a tree-like fashion. You can mount the top level component of  the tree in three different ways:
 + Render it from a controller using the `render_component` method
-+ Mount it from within a view using the `react_component` view helper
++ Mount it from within a view using the `mount_component` view helper
 + Route to it from the Rails router
 
 #### Rendering from a Controller Action
@@ -324,12 +327,12 @@ want to try webpacker - use the `hyperstack:install:webpack` task:
 bundle exec rails hyperstack:install:webpack
 ```
 This will do the following:
-+ Insure yarn is installed
++ Insure node and yarn are installed
 + Install the Webpacker gem
 + Add the Hyperstack Webpacker manifests
 + Manage the Hyperstack dependencies with yarn
 
-These steps are explained in detailed below.
+You can manually perform the above steps following the instructions below.
 
 #### Yarn and Node
 
@@ -342,9 +345,9 @@ Node can be installed following these instructions: [Node Install Instructions](
 #### The Webpacker Gem
 
 The Webpacker Gem uses a node package called Webpack to manage NPM assets instead of sprockets.  So once you have webpacker installed you will want to bring in any javascript
-libraries using Yarn, and let webpacker manage them instead of the including them as wrapped Ruby gems, or as files in the rails assets directory.
+libraries using Yarn, and let webpacker manage them instead of including them as wrapped Ruby gems or as files in the rails assets directory.
 
-To install webpacker manually add the `webpacker` gem to you gem file and run `bundle install` or simply run
+To install webpacker manually add the `webpacker` gem to your gem file and run `bundle install` or simply run
 ```
 bundle add webpacker
 ```
@@ -491,7 +494,7 @@ As your application develops you can begin defining more restrictive policies (o
 > Note: The policy mechanism does not depend on [Pundit](https://github.com/varvet/pundit) but is compatible with it.  You can add pundit style
 policies for legacy parts of your system.  
 >  
-> For details on creating policies see the [policy documentation](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-isomorphic/hyper-policy.md).
+> For details on creating policies see the [policy documentation](https://hyperstack.org/edge/docs/dsl-isomorphic/policies).
 
 #### Moving the `application_record.rb` File.
 
