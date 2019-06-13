@@ -14,7 +14,7 @@ And for a full system that includes Webpack for managing javascript assets you w
 
 ## Creating a Test Rails App
 
-You can install Hyperstack in an existing Rails apps, or you can create a new Rails app using the Rails `new` command.  For example to create a new app called `MyApp` you would run
+You can install Hyperstack in existing Rails apps, or you can create a new Rails app using the Rails `new` command.  For example to create a new app called `MyApp` you would run
 
 ```
 rails new MyApp -T
@@ -26,7 +26,7 @@ which will create a new directory called `MyApp`.  *Be sure to cd into the new d
 
 ## Adding the Hyperstack gem
 
-Add the rails-hyperstack gem to your Gemfile, and then bundle install.  This can be done in one step by running:
+Once you have a new (or existing) Rails app, add the rails-hyperstack gem to your Gemfile, and then bundle install.  This can be done in one step by running:
 
 ```
 bundle add 'rails-hyperstack', --version "~> 1.0.alpha1.0"
@@ -47,27 +47,31 @@ After the Hyperstack gem is installed you can do a full install by running:
 bundle exec rails hyperstack:install
 ```
 This will install the following pieces:
-+ A skeleton top level router component named `App`
-+ A Rails route that will send all requests to that component
++ A skeleton top level router component named `App` *(only on new apps)*
++ A Rails route that will send all requests to that component *(only on new apps)*
 + The webpacker gem and associated files to integrate Hyperstack with webpack
 + HyperModel to give your client components access to your Rails models
 + The Hotloader which will update the client when you make changes to code
 
-Each of these pieces can be skipped or installed independently either using
+Each of the above pieces can be skipped or installed independently either using
 built in installers and generators, or manually as explained in the
 following sections.
 
-At this point, you're fully installed.
+> The top level component, and route is only installed if a new Rails app is detected.  Otherwise you will have to choose how you want to mount your components, depending on the needs of your application.  See [How to add components](#<user-content-adding-a-single-component-to-your-application>) and [mount them](#<mounting-components>) for details.
 
-If you're installing into a new rails app, you can run bundle exec foreman start
-to start the server, and "app" will display on the top left hand side of the page.
 
-If you're installing into an existing Rails apps, you can run bundle exec foreman start
-to start the server, and your app should funcion exactly as it always has. From here, you'll need to
-[add a Hypercomponent](#<user-content-adding-a-single-component-to-your-application>)
-to have Hyperstack funcionality.
+At this point you're fully installed.
+
+If you installed into a new rails app, you can run bundle exec foreman start
+to start the server, and **App** will display on the top left hand side of the page.  You will find the `App` component in the `app/hyperstack/components/app.rb` file.  If you edit this file and save you should see the changes reflected in the browser.
+
+If you installed into an existing Rails apps, you can run bundle exec foreman start
+to start the server, and your app should function exactly as it always has. From here, you'll need to start adding components and
+and mounting them from either a view or a controller. See [How to add components](#<user-content-adding-a-single-component-to-your-application>) and [mount them](#<mounting-components>) for details.
 
 ## Summary of Installers and Generators
+
+The following sections details the installers and generators you can use for for full control of the installation process.  Details are also given on exactly what each installer and generator does if you want to manually apply the step or modify it to your needs.
 
 ```
 bundle exec ... # for best results always use bundle exec!
@@ -135,7 +139,7 @@ The `models`, `operations`, and `shared` directories are *isomorphic*. That is t
 be run on both the Rails server and on the client.  All other directories (regardless of the name)
 will only be visible on the client and during prerendering.
 
-These directories will be created as needed by the installers and generators, or you can create them yourself as needed.
+These directories will be created as required by the installers and generators, or you can create them yourself as needed.
 
 ## Adding a Single Component to Your Application
 
@@ -174,13 +178,13 @@ end
 bundle exec rails g hyper:component Test --base-class=ApplicationComponent
 ```
 > You can also override the base class for the entire application by setting
-> the `component_base_class` config setting.  See the last section for details.
+> the `component_base_class` config setting.  See [Summary of Hyperstack Configuration Switches](#<summary-of-hyperstack-configuration-switches>) for details.
 
 ## Mounting Components
 
 Components render (or *mount*) other components in a tree-like fashion. You can mount the top level component of  the tree in three different ways:
 + Render it from a controller using the `render_component` method
-+ Mount it from within a view using the `render_component` view helper
++ Mount it from within a view using the `react_component` view helper
 + Route to it from the Rails router
 
 #### Rendering from a Controller Action
@@ -205,14 +209,17 @@ and override the default layout
 ```ruby
   render_component 'Dashboard', {user: @user}, layout: :none
 ```
+> Notice how `render_component` works very much like the standard Rails `render` method, except a component is rendered instead of a view.
 
-#### Mounting from Within a View
+#### Mounting from Within a View or Layout
 
 For example
 ```erb
-   <%= react_component 'Dashboard', user: @user %>
+   <%= mount_component 'Dashboard', user: @user %>
 ```
-> Note that you may have several component trees mounted in a single page using the `render_component` helper.  While this is not typical for a clean sheet Hyperstack design, it is useful when mixing Hyperstack with legacy applications.
+will display the `Dashboard` component at this position in the
+code, very similar to displaying a view or partial.
+> Note that you may have several component trees mounted in a single page using the `mount_component` helper.  While this is not typical for a clean sheet Hyperstack design, it is useful when mixing Hyperstack with legacy applications.
 
 
 #### Directly Routing to a Component
@@ -301,7 +308,7 @@ Using the Rails `webpacker` gem you can easily add other NPM (node package manag
 For details on how to import and use NPM packages in your application see [Importing React Components](https://hyperstack.org/edge/docs/dsl-client/components#javascript-components)
 
 To integrate webpacker with an existing Hyperstack application - for example if you just added a couple of components and now
-want to try webpacker - use the hyperstack:install:webpack task:
+want to try webpacker - use the `hyperstack:install:webpack` task:
 ```
 bundle exec rails hyperstack:install:webpack
 ```
@@ -338,7 +345,7 @@ bundle exec rails webpacker:install
 
 Webpacker uses manifests to determine how to package up assets.  Hyperstack depends on two manifests: One that builds assets that are loaded both during prerendering **and** on the client, and a second that is **only** loaded on the client.
 
-> Prerendering builds the initial page view server side, and then delivers it to the client as a normal static HTML page.  Attached to the HTML are flags that React will use update the page as components are re-rendered after the initial page load.
+> Prerendering builds the initial page view server side, and then delivers it to the client as a normal static HTML page.  Attached to the HTML are flags that React will use to update the page as components are re-rendered after the initial page load.
 >
 > This means that page load time is comparable to any other Rails view, and that Rails can cache the pages like any other view.
 >
@@ -470,7 +477,9 @@ This policy specifies the following:
 As your application develops you can begin defining more restrictive policies (only allowing Users to see their own data for example)
 
 > Note: The policy mechanism does not depend on [Pundit](https://github.com/varvet/pundit) but is compatible with it.  You can add pundit style
-policies for legacy parts of your system.
+policies for legacy parts of your system.  
+>  
+> For details on creating policies see the [policy documentation](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-isomorphic/hyper-policy.md).
 
 #### Moving the `application_record.rb` File.
 
@@ -498,7 +507,7 @@ So to prevent that you need to add this file to `app/models`
 require 'models/application_record.rb'
 ```
 > Note that the last line is *not* a typo.  Rails paths begin with
-the *subdirectory* name.  So `'models/application_record.rb'` means to search all directories for a file name `application_record.rb` in the `models` *subdirectory*
+a *subdirectory* name.  So `'models/application_record.rb'` means to search all app directories for a file name `application_record.rb` in a `models` *subdirectory*
 
 Thus Rails will find `app/models/application_record.rb` where it expects it, but that file simply requires the real `application_record.rb` file from the `app/hyperstack/models` directory so everybody is happy.
 
@@ -521,7 +530,6 @@ You can manually perform these steps following these instructions.
 
 By default the Hotloader is **not** included in the hyperstack manifest so the first step is to import it using `config/initializers/hyperstack.rb` initializer file:
 
-Note that
 ```ruby
 # config/initializers/hyperstack.rb
 Hyperstack.configuration do |config|
@@ -563,7 +571,7 @@ Now go into your editor and make a change to a component.  You should see the br
 #### Adding the Foreman Gem and Procfile
 
 Having to start (and stop) two separate shells is painful so you can add the `foreman` gem which will manage all that for you.  Add
-the `foreman` to the development section of your gem file and bundle install.  You can do this in one step by running:
+the `foreman` gem to the development section of your Gemfile and bundle install.  You can do this in one step by running:
 ```ruby
   bundle add foreman --group development
 ```
@@ -592,7 +600,7 @@ Hyperstack.configuration do |config|
   # set the component base class
   config.component_base_class = 'HyperComponent' # i.e. 'ApplicationComponent'
 
-  # prerendering is default :off, you should wait until your
+  # prerendering is by default :off. You should wait until your
   # application is relatively well debugged before turning on.
   config.prerendering = :off # or :on
 
@@ -606,7 +614,6 @@ Hyperstack.configuration do |config|
   # non-server process, Hyperstack needs to forward the change notification
   # to the server for push broadcasting.  This value controls how long
   # Hyperstack will wait to hear back from the server.
-
   config.send_to_server_timeout = 10 # seconds or nil for no timeout
 
   # pusher specific setting.  If you are already using pusher you
@@ -617,14 +624,14 @@ Hyperstack.configuration do |config|
   # you may want to switch this like this:  = Rails.env.debug?
   config.client_logging = true
 
-  # Don't setup a session channel.  This is mainly useful in test specs
+  # Setup a session channel.  Turning this off is mainly useful in test specs
   config.connect_session = true
 
   # if you need to change the hotloader port
   config.hotloader_port = 25222 # note also update your proc file as well
 
   # turn pinging on if your hotloader connection keeps dropping
-  config.hotloader_ping = nil
+  config.hotloader_ping = nil # 10 seconds for example
 
   # callback mapping allows the hotloader to reprogram callbacks
   # however it adds additional overhead on first load.  On large systems
@@ -646,7 +653,7 @@ end
 
 # Hyperstack provides a hook to aid in debugging communication problems.  The following
 # code block adds a useful server side log message.  You may want to change this to
-# a specific logging location, or on occassion add a debug break point instead of logging
+# a specific logging location, or on occasion add a debug break point instead of logging
 
 module Hyperstack
   def self.on_error(operation, err, params, formatted_error_message)
