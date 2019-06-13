@@ -59,17 +59,19 @@ Each of the above pieces can be skipped or installed independently either using
 built in installers and generators, or manually as explained in the
 following sections.
 
-> The top level component, and route is only installed if a new Rails app is detected.  Otherwise you will have to choose how you want to mount your components, depending on the needs of your application.  See [How to add components](#<user-content-adding-a-single-component-to-your-application>) and [mount them](#<mounting-components>) for details.
+> The top level component, and route is only installed if a new Rails app is detected.  Otherwise you will have to choose how you want to mount your components, depending on the needs of your application.  See [How to add components](#user-content-adding-a-single-component-to-your-application) and [mount them](#mounting-components) for details.
 
 
 At this point you're fully installed.
+
+> ** Note the first time you run you app it will take 1-2 minutes to compile all the system libraries.**
 
 If you installed into a new rails app, you can run bundle exec foreman start
 to start the server, and **App** will display on the top left hand side of the page.  You will find the `App` component in the `app/hyperstack/components/app.rb` file.  If you edit this file and save you should see the changes reflected in the browser.
 
 If you installed into an existing Rails apps, you can run bundle exec foreman start
 to start the server, and your app should function exactly as it always has. From here, you'll need to start adding components and
-and mounting them from either a view or a controller. See [How to add components](#<user-content-adding-a-single-component-to-your-application>) and [mount them](#<mounting-components>) for details.
+and mounting them from either a view or a controller. See [How to add components](#adding-a-single-component-to-your-application) and [mount them](#mounting-components) for details.
 
 ## Summary of Installers and Generators
 
@@ -180,7 +182,7 @@ end
 bundle exec rails g hyper:component Test --base-class=ApplicationComponent
 ```
 > You can also override the base class for the entire application by setting
-> the `component_base_class` config setting.  See [Summary of Hyperstack Configuration Switches](#<summary-of-hyperstack-configuration-switches>) for details.
+> the `component_base_class` config setting.  See [Summary of Hyperstack Configuration Switches](#summary-of-hyperstack-configuration-switches) for details.
 
 ## Mounting Components
 
