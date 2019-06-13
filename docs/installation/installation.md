@@ -28,6 +28,8 @@ which will create a new directory called `MyApp`.  *Be sure to cd into the new d
 
 Once you have a new (or existing) Rails app, add the rails-hyperstack gem to your Gemfile, and then bundle install.  This can be done in one step by running:
 
+> **Be sure you cd into the new directory if you just created a new Rails app**
+
 ```
 bundle add 'rails-hyperstack', --version "~> 1.0.alpha1.0"
 ```
