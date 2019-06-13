@@ -25,11 +25,11 @@ Welcome to Hyperstack!
 
 For a quick start simply add a component using one of the generators:
 
-  >> bundle exec rails generate hyper:component CompName --add-route=/test/(*others)
+  >> bundle exec rails generate hyper:component CompName --add-route="/test/(*others)"
      # Add a new component named CompName and route to it with /test/
 
-  >> bundle exec rails generate hyper:router CompName --add-route=/test/(*others)
-     # Add a top level router named CompName
+  >> bundle exec rails generate hyper:router CompName --add-route="/test/(*others)"
+     # Add a top level router named CompName and route to it
 
 The generators will insure you have the minimal additions to your system for the
 new component to run.  And note: --add-route is optional.

@@ -43,7 +43,7 @@ hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
         yarn_version = `yarn --version`
         raise Errno::ENOENT if yarn_version.blank?
       rescue Errno::ENOENT
-        raise Thor::Error.new("please insure the yarn command is available if using webpacker")
+        raise Thor::Error.new("please insure nodejs is installed and the yarn command is available if using webpacker")
       end
     end
 

@@ -8,9 +8,14 @@ For any setup you need
 
 #### - Rails 5.x ([Install Instructions](http://railsinstaller.org/en))
 
+> if anybody can confirm or deny that NodeJS is actually needed for a basic install just to
+display a component, please let us know by either chatting, tweeting #hyperstack, or raising an issue.
+
 And for a full system that includes Webpack for managing javascript assets you will need
 
-#### - Yarn ([Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable))
+#### - Yarn ([Install Instructions](https://yarnpkg.com/en/docs/install))
+#### - NodeJS: ([Install Instructions](https://nodejs.org))
+
 
 ## Creating a Test Rails App
 
@@ -305,7 +310,9 @@ work the same, but just generate different skeleton components.
 
 Using the Rails `webpacker` gem you can easily add other NPM (node package manager) assets to your Hyperstack application.  This allows your Hyperstack components to use any of the thousands of existing React component libraries, as well as packages like jQuery.
 
-> Note that you will need to have yarn installed: [Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable)
+> Note that you will need to have yarn and nodejs installed:  
+> [Yarn Install Instructions](https://yarnpkg.com/en/docs/install)  
+> [Node Install Instructions](https://nodejs.org)
 
 For details on how to import and use NPM packages in your application see [Importing React Components](https://hyperstack.org/edge/docs/dsl-client/components#javascript-components)
 
@@ -322,12 +329,13 @@ This will do the following:
 
 These steps are explained in detailed below.
 
-#### Yarn
+#### Yarn and Node
 
 Yarn is an NPM package manager.  Its role is similar to bundler in the Ruby world.  Like bundler it uses a `.lock` file to track the current set of dependencies.  Unlike
-bundler there is no equivilent of the `Gem` file.  Instead you add packages directly into the yarn data base by running `yarn add` commands.
+bundler there is no equivilent of the `Gem` file.  Instead you add packages directly into the yarn data base by running `yarn add` commands.  Yarn also depends on NodeJS so you will need to install that if you have not already.
 
-Yarn can be installed following these instructions: [Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable)
+Yarn can be installed following these instructions: [Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable)  
+Node can be installed following these instructions: [Node Install Instructions](https://nodejs.org)
 
 #### The Webpacker Gem
 

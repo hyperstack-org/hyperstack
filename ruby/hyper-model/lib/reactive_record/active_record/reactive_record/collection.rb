@@ -588,25 +588,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @dummy_collection.loading?
     end
 
-    # def loading?
-    #   !@collection || (@dummy_collection && @dummy_collection.loading?) || (@owner && !@owner.id && @vector && @vector.length <= 1)
-    # end
-
-    # def loaded?
-    #   @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || !@vector || @vector.length > 1)
-    #   #false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
-    # end
-
-    def empty?
-      # should be handled by method missing below, but opal-rspec does not deal well
-      # with method missing, so to test...
-      all.empty?
-    end
-
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
-      # r = @collection&.detect { |lr| lr.new_record? && !attrs.detect { |k, v| lr.attributes[k] != v } }
-      # return r if r
       (r = __hyperstack_internal_scoped_find_by(attrs)) || return
       r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
@@ -625,6 +608,16 @@ To determine this sync_scopes first asks if the record being changed is in the s
       return first unless found
       @collection = [found]
       found
+    end
+
+    # to avoid fetching the entire collection array we check empty and any against the count
+
+    def empty?
+      count.zero?
+    end
+
+    def any?
+      !count.zero?
     end
 
     def method_missing(method, *args, &block)
