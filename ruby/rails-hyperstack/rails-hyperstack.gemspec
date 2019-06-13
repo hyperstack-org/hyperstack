@@ -42,17 +42,14 @@ This will add everything you need including the hotloader, webpack integration,
 hyper-model (active record model client synchronization) and a top level
 component to get you started.
 
-You can control how much of the stack gets installed using these options:
+You can control how much of the stack gets installed as well:
 
-  --skip-hotloader   # don't add the hotloader
-  --skip-webpack     # don't add webpack
-  --skip-hyper-model # don't add hyper-model and default policy files
-
-You can always install these pieces later using these options:
-
-  --hotloader-only   # just add the hotloader
-  --webpack-only     # just add webpack
-  --hyper-model-only # just add hyper-model, and default policy files
+  >> bundle exec rails hyperstack:install:webpack          # just add webpack
+  >> bundle exec rails hyperstack:install:skip-webpack     # all but webpack
+  >> bundle exec rails hyperstack:install:hyper-model      # just add hyper-model
+  >> bundle exec rails hyperstack:install:skip-hyper-model # all but hyper-model
+  >> bundle exec rails hyperstack:install:hotloader        # just add the hotloader
+  >> bundle exec rails hyperstack:install:skip-hotloader   # skip the hotloader
 
 *******************************************************************************
 }

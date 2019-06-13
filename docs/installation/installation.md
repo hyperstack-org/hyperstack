@@ -80,7 +80,7 @@ rails hyperstack:install:webpack          # just add webpack
 rails hyperstack:install:skip-webpack     # all but webpack
 rails hyperstack:install:hyper-model      # just add hyper-model
 rails hyperstack:install:skip-hyper-model # all but hyper-model
-rails hyperstack:install:hotloader-only   # just add the hotloader
+rails hyperstack:install:hotloader        # just add the hotloader
 rails hyperstack:install:skip-hotloader   # skip the hotloader
 
 # rails g is short for rails generate
