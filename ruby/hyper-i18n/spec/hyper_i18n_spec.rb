@@ -26,8 +26,8 @@ describe 'I18n client methods', js: true do
       mount 'Components::TestComponent', {}, render_on: flag
       expect(find('#tp1')).to have_content('I am a key')
       expect(find('#tp2')).to have_content('Hello world')
-      expect(find('#tp3')).to have_content('Mon, 01 Jan 2018 12:45:00')
-      expect(find('#tp4')).to have_content('January 01, 2018 at 12:45 pm')
+      expect(find('#tp3')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45')))
+      expect(find('#tp4')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45'), format: '%B %d, %Y at %l:%M %P'))
       expect(find('#tp5')).to have_content('My Model')
       expect(find('#tp6')).to have_content('The Attribute')
     end

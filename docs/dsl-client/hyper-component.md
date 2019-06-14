@@ -222,7 +222,7 @@ Parent { Child() }
 param :items
 render do
   # notice how the items param is accessed in CamelCase (to indicate that it is read-only)
-  @Items.each do |item|
+  items.each do |item|
     PARA do
       item[:text]
     end
@@ -241,7 +241,7 @@ The situation gets more complicated when the children are shuffled around (as in
   param :results, type: [Hash] # each result is a hash of the form {id: ..., text: ....}
   render do
     OL do
-      @Results.each do |result|
+      results.each do |result|
         LI(key: result[:id]) { result[:text] }
       end
     end
@@ -257,7 +257,7 @@ The `key` should *always* be supplied directly to the components in the array, n
 class ListItemWrapper < HyperComponent
   param :data
   render do
-    LI(key: @Data[:id]) { @Data[:text] }
+    LI(key: data[:id]) { data[:text] }
   end
 end  
 
@@ -265,7 +265,7 @@ class MyComponent < HyperComponent
   param :results
   render do
     UL do
-      @Result.each do |result|
+      result.each do |result|
         ListItemWrapper data: result
       end
     end
@@ -278,7 +278,7 @@ end
 class ListItemWrapper < HyperComponent
   param :data
   render do
-    LI { @Data[:text] }
+    LI { data[:text] }
   end
 end
 
@@ -286,7 +286,7 @@ class MyComponent < HyperComponent
   param :results
   render do
     UL do
-      @Result.each do |result|
+      results.each do |result|
         ListItemWrapper key: result[:id], data: result
       end
     end
@@ -316,7 +316,7 @@ class IndentEachLine < HyperComponent
 
   render(DIV) do
     children.each_with_index do |child, i|
-      child.render(style: {"margin-left" => @By*i})
+      child.render(style: {"margin-left" => by*i})
     end
   end
 end
@@ -336,10 +336,9 @@ When designing interfaces, break down the common design elements (buttons, form 
 
 ## Params
 
-The `param` method gives *read-only* access to each of the scalar params passed to the Component. The params are accessed as instance variables converted to CamelCase.
+The `param` method gives *read-only* access to each of the scalar params passed to the Component. Params are accessed as instance methods on the Component.
 
-Within a React Component the `param` method is used to define the parameter signature of the component.  You can think of params as
-the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is re-rendered.  
+Within a React Component the `param` method is used to define the parameter signature of the component.  You can think of params as the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is re-rendered.  
 
 Note that the default value can be supplied either as the hash value of the symbol, or explicitly using the `:default_value` key.
 
@@ -358,7 +357,7 @@ param foo: [], type: [String]       # foo must be an array of strings, and has a
 
 #### Accessing param values
 
-> Params are accessible in the Component class as instance variables in **CamelCase**. The CamelCase syntax is used to indicate that params are immutable.
+Params are accessible in the Component class as instance methods.
 
 For example:
 
@@ -368,7 +367,7 @@ class Hello < HyperComponent
   param visitor: "World", type: String
 
   render do
-    "Hello #{@Visitor}" # notice how you CamelCase for immutable params
+    "Hello #{visitor}"
   end
 end
 ```
@@ -389,8 +388,8 @@ class Likes < HyperComponent
   param :book # book is an instance of the Book model
 
   render(DIV) do
-    P { "#{@Book.likes.count} likes" }
-    BUTTON { "Like" }.on(:click) { @Book.likes += 1}
+    P { "#{book.likes.count} likes" }
+    BUTTON { "Like" }.on(:click) { book.likes += 1}
   end
 end
 ```
@@ -427,13 +426,13 @@ If no value is provided for `:an_optional_param` it will be given the value `"he
 
 ### Params of type Proc
 
-A Ruby `Proc` can be passed to a component like any other object.  A param of type proc (i.e. `param :update, type: Proc`) gets special treatment that will directly call the proc when the param is accessed.
+A Ruby `Proc` can be passed to a component like any other object. 
 
 ```ruby
 param :all_done, type: Proc
 ...
   # typically in an event handler
-params.all_done(data) # instead of params.all_done.call(data)
+all_done(data).call
 ```
 
 Proc params can be optional, using the `default: nil` and `allow_nil: true` options.  Invoking a nil proc param will do nothing.  This is handy for allowing optional callbacks.
@@ -445,8 +444,8 @@ class Alarm < HyperComponent
 
   after_mount do
     @clock = every(1) do
-      if Time.now > @At
-        @Notify
+      if Time.now > at
+        notify.call
         @clock.stop
       end
       force_update!
@@ -475,7 +474,7 @@ class ButtonBar < HyperComponent
   param :button
 
   render do
-    @Button.render
+    button.render
   end
 end
 ```
@@ -491,10 +490,10 @@ class Test < HyperComponent
   render do
     DIV do
       children.each do |child|
-        @Node.render
+        node.render
         child.render
       end
-      @Node.render
+      node.render
     end
   end
 end
@@ -511,7 +510,7 @@ class CheckLink < HyperComponent
   collect_other_params_as :attributes
   render do
     # we just pass along any incoming attributes
-    a(@Attributes) { '√ '.span; children.each &:render }
+    a(attributes) { '√ '.span; children.each &:render }
   end
 end
 # CheckLink(href: "/checked.html")
@@ -656,7 +655,7 @@ class UsingState < HyperComponent
 
   def output
     # rerender whenever input_value changes
-	P { "#{@input_value}" }
+	  P { "#{@input_value}" }
   end
 
   def easter_egg
@@ -914,7 +913,7 @@ Event Handlers are attached to tags and components using the `on` method.
 SELECT ... do
   ...
 end.on(:change) do |e|
-  mutate.mode(e.target.value.to_i)
+  mutate mode = e.target.value.to_i
 end
 ```
 
@@ -961,7 +960,7 @@ class YouSaid < HyperComponent
       alert "You said: #{state.value}" if e.key_code == 13
     end.
     on(:change) do |e|
-      mutate.value e.target.value
+      mutate value = e.target.value
     end
   end
 end
@@ -1430,6 +1429,154 @@ However it gets a little tricky if you are using the react-rails gem.  Each vers
 npm install react@15.0.2 react-dom@15.0.2 --save
 ```  
 
+## Single Page Application CRUD example
+
+Rails famously used scaffolding for Model CRUD (Create, Read, Update and Delete). There is no scaffolding in Hyperstack today, so here is an example which demonstrates how those simple Rails pages would work in Hyperstack.
+
+This example uses components from the [Material UI](https://material-ui.com/) framework, but the principals would be similar for any framework (or just HTML elements).
+
+In this example, we will have a table of users and the ability to add new users or edit a user from the list. As the user edits the values in the UserDialog, they will appear in the underlying table. You can avoid this behaviour if you choose by copying the values in the `before_mount` of the UserDialog, so you are not interacting with the model directly.
+Firstly the table of users:
+
+
+```ruby
+class UserIndex < HyperComponent
+  render(DIV, class: 'mo-page') do
+    UserDialog(user: User.new) # this will render as a button to add users
+    Table do
+      TableHead do
+        TableRow do
+          TableCell { 'Name' }
+          TableCell { 'Gender' }
+          TableCell { 'Edit' }
+        end
+      end
+      TableBody do
+        user_rows
+      end
+    end
+  end
+
+  def user_rows
+    User.each do |user| # note User is a Hyperstack model (see later in the Isomorphic section)
+      TableRow do
+        TableCell { "#{user.first_name} #{user.last_name}" }
+        TableCell { user.is_female ? 'Female' : 'Male' }
+        # note the use of key so React knows which Component this refers to
+        # this is very important for performance and to ensure the component is used
+        TableCell { UserDialog(user: user, key: user.id) } # this will render as an edit button
+      end
+    end
+  end
+end
+```
+
+Then we need the actual Dialog (Modal) component:
+
+```ruby
+class UserDialog < HyperComponent
+  param :user
+
+  before_mount do
+    @open = false
+  end
+
+  render do
+    if @open
+      render_dialog
+    else
+      edit_or_new_button.on(:click) { mutate @open = true }
+    end
+  end
+
+  def render_dialog
+    Dialog(open: @open, fullWidth: false) do
+      DialogTitle do
+        'User'
+      end
+      DialogContent do
+        content
+        error_messages if user.errors.any?
+      end
+      DialogActions do
+        actions
+      end
+    end
+  end
+
+  def edit_or_new_button
+    if user.new?
+      Fab(size: :small, color: :primary) { Icon { 'add' } }
+    else
+      Fab(size: :small, color: :secondary) { Icon { 'settings' } }
+    end
+  end
+
+  def content
+    FormGroup(row: true) do
+      # note .to_s to specifically cast to a String
+      TextField(label: 'First Name', value: user.first_name.to_s).on(:change) do |e|
+        user.first_name = e.target.value
+      end
+      TextField(label: 'Last Name', value: user.last_name.to_s).on(:change) do |e|
+        user.last_name = e.target.value
+      end
+    end
+
+    BR()
+
+    FormLabel(component: 'legend') { 'Gender' }
+    RadioGroup(row: true) do
+      FormControlLabel(label: 'Male',
+                       control: Radio(value: false, checked: !is_checked(user.is_female)).as_node.to_n)
+      FormControlLabel(label: 'Female',
+                       control: Radio(value: true, checked: is_checked(user.is_female)).as_node.to_n)
+    end.on(:change) do |e|
+      user.is_female = e.target.value
+    end
+  end
+
+  def is_checked value
+    # we need a true or false and not an object
+    value ? true : false
+  end
+
+  def actions
+    Button { 'Cancel' }.on(:click) { cancel }
+
+    if user.changed? && validate_content
+      Button(color: :primary, variant: :contained, disabled: (user.saving? ? true : false)) do
+        'Save'
+      end.on(:click) { save }
+    end
+  end
+
+  def save
+    user.save(validate: true).then do |result|
+      mutate @open = false if result[:success]
+    end
+  end
+
+  def cancel
+    user.revert
+    mutate @open = false
+  end
+
+  def error_messages
+    user.errors.full_messages.each do |message|
+      Typography(variant: :h6, color: :secondary) { message }
+    end
+  end
+
+  def validate_content
+    return false if user.first_name.to_s.empty?
+    return false if user.last_name.to_s.empty?
+    return false if user.is_female.nil?
+
+    true
+  end
+end
+```
 
 ## Elements and Rendering
 

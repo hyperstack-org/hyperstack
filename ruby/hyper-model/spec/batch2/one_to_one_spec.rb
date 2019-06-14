@@ -85,6 +85,8 @@ describe "one to one relationships", js: true do
   end
 
   before(:each) do
+    Parent.delete_all
+    Child.delete_all
     @parent1 = Parent.create(name: 'parent1')
     @child1 = Child.create(name: 'child1', parent: @parent1)
   end
@@ -95,5 +97,13 @@ describe "one to one relationships", js: true do
 
   it 'will load the child' do
     compare_to_server @parent1, 'child.name', 'child1'
+  end
+
+  it 'saving parent and child from client' do
+    expect_promise do
+      Parent.new(name: 'parent', child: Child.new(name: 'child')).save.then do |response|
+        response[:saved_models].collect { |m| m[1] }
+      end
+    end.to contain_exactly('Parent', 'Child')
   end
 end

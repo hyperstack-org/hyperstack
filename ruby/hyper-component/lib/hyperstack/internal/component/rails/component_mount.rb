@@ -50,3 +50,12 @@ module Hyperstack
     end
   end
 end
+
+
+module React
+  module Rails
+    module ViewHelper
+      alias mount_component react_component
+    end
+  end
+end

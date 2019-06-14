@@ -35,16 +35,35 @@ module Hyperstack
 
 
   if RUBY_ENGINE == 'opal'
+    # Patch in a dummy copy of Model.load in case we are not using models
+    # this will be defined properly by hyper-model
+    module Model
+      def self.load
+        Promise.new.tap { |promise| promise.resolve(yield) }
+      end unless respond_to?(:load)
+    end
+
     def self.connect(*channels)
       channels.each do |channel|
         if channel.is_a? Class
           IncomingBroadcast.connect_to(channel.name)
         elsif channel.is_a?(String) || channel.is_a?(Array)
           IncomingBroadcast.connect_to(*channel)
-        elsif channel.id
-          IncomingBroadcast.connect_to(channel.class.name, channel.id)
+        elsif channel.respond_to?(:id)
+          Hyperstack::Model.load do
+            channel.id
+          end.then do |id|
+            raise "Hyperstack.connect cannot connect to #{channel.inspect}.  "\
+                  "The id is nil. This can be caused by connecting to a model "\
+                  "that is not saved, or that does not exist." unless id
+            IncomingBroadcast.connect_to(channel.class.name, id)
+          end
         else
-          raise "cannot connect to model before it has been saved"
+          raise "Hyperstack.connect cannot connect to #{channel.inspect}.\n"\
+                "Channels must be either a class, or a class name,\n"\
+                "a string in the form 'ClassName-id',\n"\
+                "an array in the form [class, id] or [class-name, id],\n"\
+                "or an object that responds to the id method with a non-nil value"
         end
       end
     end
@@ -65,12 +84,14 @@ module Hyperstack
 
       def self.add_connection(channel_name, id = nil)
         channel_string = "#{channel_name}#{'-'+id.to_s if id}"
+        return if open_channels.include? channel_string
         open_channels << channel_string
         channel_string
       end
 
       def self.connect_to(channel_name, id = nil)
         channel_string = add_connection(channel_name, id)
+        return unless channel_string # already connected!
         if ClientDrivers.opts[:transport] == :pusher
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           %x{
@@ -78,6 +99,7 @@ module Hyperstack
             channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
             channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }
+          @pusher_dispatcher_registered = true
         elsif ClientDrivers.opts[:transport] == :action_cable
           channel = "#{ClientDrivers.opts[:channel]}-#{channel_string}"
           Hyperstack::HTTP.post(ClientDrivers.polling_path('action-cable-auth', channel), headers: { 'X-CSRF-Token' => ClientDrivers.opts[:form_authenticity_token] }).then do |response|
@@ -163,12 +185,17 @@ module Hyperstack
         # not sure why the second check is needed.  It happens in the test app
         route.app == Hyperstack::Engine or (route.app.respond_to?(:app) and route.app.app == Hyperstack::Engine)
       end
-      raise 'Hyperstack::Engine mount point not found.  Check your config/routes.rb file' unless path
-      path = path.path.spec
-      "<script type='text/javascript'>\n"\
-        "window.HyperstackEnginePath = '#{path}';\n"\
-        "window.HyperstackOpts = #{config_hash.to_json}\n"\
-      "</script>\n"
+      if path
+        path = path.path.spec
+        "<script type='text/javascript'>\n"\
+          "window.HyperstackEnginePath = '#{path}';\n"\
+          "window.HyperstackOpts = #{config_hash.to_json}\n"\
+        "</script>\n"
+      else
+        "<script type='text/javascript'>\n"\
+          "window.HyperstackOpts = #{config_hash.to_json}\n"\
+        "</script>\n"
+      end
     end if RUBY_ENGINE != 'opal'
 
     class << self
@@ -222,6 +249,9 @@ module Hyperstack
 
         @opts = Hash.new(`window.HyperstackOpts`)
 
+        if opts[:transport] != :none && `typeof(window.HyperstackEnginePath) == 'undefined'`
+          raise "No hyperstack mount point found!\nCheck your Rails routes.rb file";
+        end
 
         if opts[:transport] == :pusher
 

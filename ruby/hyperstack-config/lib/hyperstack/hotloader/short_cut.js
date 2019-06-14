@@ -4,6 +4,6 @@ if (typeof window !== 'undefined') {
       Opal.Hyperstack.$const_get('Hotloader').$listen(port || 25222, ping || Opal.nil)
     }
   }
-} else {
+} /* else {
   throw 'Attempt to run hotloader during prerendering - make sure you import with the `client_only: true` option'
-}
+} */

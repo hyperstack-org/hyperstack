@@ -135,7 +135,6 @@ module ReactiveRecord
       model.columns_hash[method_name] || model.server_methods[method_name]
     end
 
-
     class << self
 
       attr_reader :pending_fetches
@@ -234,7 +233,7 @@ module ReactiveRecord
               if association.collection?
                 # following line changed from .all to .collection on 10/28
                 [*value.collection, *value.unsaved_children].each do |assoc|
-                  add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of(assoc)) or assoc.new?
+                  add_new_association.call(record, attribute, assoc.backing_record) if assoc.changed?(association.inverse_of(assoc)) or assoc.new_record?
                 end
               elsif record.new? || record.changed?(attribute) || (record == record_being_saved && force)
                 if value.nil?
@@ -243,7 +242,7 @@ module ReactiveRecord
                   add_new_association.call record, attribute, value.backing_record
                 end
               end
-            elsif aggregation = record.model.reflect_on_aggregation(attribute) and (aggregation.klass < ActiveRecord::Base)
+            elsif (aggregation = record.model.reflect_on_aggregation(attribute)) && (aggregation.klass < ActiveRecord::Base)
               add_new_association.call record, attribute, value.backing_record unless value.nil?
             elsif aggregation
               new_value = aggregation.serialize(value)
@@ -264,8 +263,17 @@ module ReactiveRecord
           HyperMesh.load do
             ReactiveRecord.loads_pending! unless self.class.pending_fetches.empty?
           end.then { send_save_to_server(save, validate, force, &block) }
-          #save_to_server(validate, force, &block)
         else
+          if validate
+            # Handles the case where a model is valid, then some attribute is
+            # updated, and model.validate is called updating the error data.
+            # Now lets say the attribute changes back to the last synced value.  In
+            # this case we need to revert the error records.
+            models, _, backing_records = self.class.gather_records([self], true, self)
+            models.each do |item|
+              backing_records[item[:id]].revert_errors!
+            end
+          end
           promise = Promise.new
           yield true, nil, [] if block
           promise.resolve({success: true})
@@ -302,7 +310,7 @@ module ReactiveRecord
 
               response[:saved_models].each do | item |
                 backing_records[item[0]].sync_unscoped_collection! if save
-                backing_records[item[0]].errors! item[3]
+                backing_records[item[0]].errors! item[3], save
               end
 
               yield response[:success], response[:message], response[:models]  if block
@@ -453,6 +461,11 @@ module ReactiveRecord
             elsif parent.class.reflect_on_association(association[:attribute].to_sym).collection?
               #puts ">>>>>>>>>> #{parent.class.name}.send('#{association[:attribute]}') << #{reactive_records[association[:child_id]]})"
               dont_save_list.delete(parent)
+
+
+              # if reactive_records[association[:child_id]]&.new_record?
+              #   dont_save_list << reactive_records[association[:child_id]]
+              # end
               #if false and parent.new?
                 #parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]]
                 # puts "updated"
@@ -463,10 +476,13 @@ module ReactiveRecord
               #puts ">>>>ASSOCIATION>>>> #{parent.class.name}.send('#{association[:attribute]}=', #{reactive_records[association[:child_id]]})"
               parent.send("#{association[:attribute]}=", reactive_records[association[:child_id]])
               dont_save_list.delete(parent)
-              #puts "updated"
+
+              # if parent.class.reflect_on_association(association[:attribute].to_sym).macro == :has_one &&
+              #    reactive_records[association[:child_id]]&.new_record?
+              #   dont_save_list << reactive_records[association[:child_id]]
+              # end
             end
           end if associations
-
           # get rid of any records that don't require further processing, as a side effect
           # we also save any records that need to be saved (these may be rolled back later.)
 
@@ -475,7 +491,9 @@ module ReactiveRecord
             next true  if record.frozen?  # skip (but process later) frozen records
             next true  if dont_save_list.include?(record) # skip if the record is on the don't save list
             next true  if record.changed.include?(record.class.primary_key)  # happens on an aggregate
-            next false if record.id && !record.changed? # throw out any existing records with no changes
+            #next true  if record.persisted? # record may be have been saved as result of has_one assignment
+            # next false if record.id && !record.changed? # throw out any existing records with no changes
+            next record.persisted? if record.id && !record.changed?
             # if we get to here save the record and return true to keep it
             op = new_models.include?(record) ? :create_permitted? : :update_permitted?
             record.check_permission_with_acting_user(acting_user, op).save(validate: false) || true
@@ -491,14 +509,15 @@ module ReactiveRecord
           # the all the error messages during a save so we can dump them to the server log.
 
           all_messages = []
+          attributes = nil
 
           saved_models = reactive_records.collect do |reactive_record_id, model|
             messages = model.errors.messages if validate && !model.valid?
             all_messages << [model, messages] if save && messages
             attributes = model.__hyperstack_secure_attributes(acting_user)
+            attributes[model.class.primary_key] = model[model.class.primary_key]
             [reactive_record_id, model.class.name, attributes, messages]
           end
-
           # if we are not saving (i.e. just validating) then we rollback the transaction
 
           raise ActiveRecord::Rollback, 'This Rollback is intentional!' unless save
@@ -513,7 +532,6 @@ module ReactiveRecord
             end
             raise 'HyperModel saving records failed!'
           end
-
         end
 
         { success: true, saved_models: saved_models }

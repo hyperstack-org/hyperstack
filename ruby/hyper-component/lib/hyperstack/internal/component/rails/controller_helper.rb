@@ -22,7 +22,7 @@ module ActionController
       @render_params = args.shift || {}
       options = args[0] || {}
       return if performed?
-      render inline: '<%= react_component @component_name, @render_params %>',
+      render inline: '<%= mount_component @component_name, @render_params %>',
              layout: options.key?(:layout) ? options[:layout].to_s : :default
     rescue Exception => e
       m = /^RuntimeError: Hyperstack::Internal::Component::Redirect (.+) status: (.+)$/.match(e.message)

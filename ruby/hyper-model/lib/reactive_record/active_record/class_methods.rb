@@ -172,7 +172,7 @@ module ActiveRecord
       :full_table_name_prefix, :full_table_name_suffix, :reset_sequence_name, :sequence_name=, :next_sequence_value, :column_defaults, :content_columns,
       :readonly_attributes, :attr_readonly, :create, :create!, :instantiate, :find, :type_caster, :arel_table, :find_by, :find_by!, :initialize_find_by_cache,
       :generated_association_methods, :arel_engine, :arel_attribute, :predicate_builder, :collection_cache_key, :relation_delegate_class,
-      :initialize_relation_delegate_cache, :enum, :collecting_queries_for_explain, :exec_explain, :i18n_scope, :lookup_ancestors, :human_attribute_name,
+      :initialize_relation_delegate_cache, :enum, :collecting_queries_for_explain, :exec_explain, :i18n_scope, :lookup_ancestors,
       :references, :uniq, :maximum, :none, :exists?, :second, :limit, :order, :eager_load, :update, :delete_all, :destroy, :ids, :many?, :pluck, :third,
       :delete, :fourth, :fifth, :forty_two, :second_to_last, :third_to_last, :preload, :sum, :take!, :first!, :last!, :second!, :offset, :select, :fourth!,
       :third!, :third_to_last!, :fifth!, :where, :first_or_create, :second_to_last!, :forty_two!, :first, :having, :any?, :one?, :none?, :find_or_create_by,
@@ -185,7 +185,10 @@ module ActiveRecord
     ]
 
     def method_missing(name, *args, &block)
-      if args.count == 1 && name.start_with?("find_by_") && !block
+      if name == 'human_attribute_name'
+        opts = args[1] || {}
+        opts[:default] || args[0]
+      elsif args.count == 1 && name.start_with?("find_by_") && !block
         find_by(name.sub(/^find_by_/, '') => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
@@ -336,14 +339,34 @@ module ActiveRecord
       end
     end
 
+    # def define_attribute_methods
+    #   columns_hash.each do |name, column_hash|
+    #     next if name == primary_key
+    #     column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
+    #
+    #     define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
+    #     define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
+    #     define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
+    #     define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
+    #     define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
+    #   end
+    #   self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
+    # end
+
+
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
         next if name == primary_key
-        define_method(name) { @backing_record.get_attr_value(name, nil) }
-        define_method("#{name}!") { @backing_record.get_attr_value(name, true) }
-        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) }
-        define_method("#{name}_changed?") { @backing_record.changed?(name) }
-        define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? }
+        # only add serialized key if its serialized.  This just makes testing a bit
+        # easier by keeping the columns_hash the same if there are no seralized strings
+        # see rspec ./spec/batch1/column_types/column_type_spec.rb:100
+        column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
+        
+        define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
+        define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
+        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
+        define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
+        define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
       end
       self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
     end

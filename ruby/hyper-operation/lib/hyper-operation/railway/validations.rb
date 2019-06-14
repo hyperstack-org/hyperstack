@@ -28,6 +28,8 @@ module Hyperstack
             rescue Exit => e
               raise e unless e.state == :failed
               add_error(param, symbol, message)
+              # use a bogus exit state which will skip adding
+              # a validation error (see catch block in process_validations method)
               raise Exit.new(:abort_from_add_error, e.result)
             end
           end
@@ -47,16 +49,21 @@ module Hyperstack
             when :failed
               add_validation_error(i, "param validation #{i+1} aborted")
             end
-            @state = :failed
+            @state = :abort
             return # break does not work in Opal
           rescue AccessViolation => e
             add_validation_error(i, e)
-            @state = :failed
+            @state = :abort
             @last_result = e
             return # break does not work in Opal
           rescue Exception => e
             add_validation_error(i, e)
           end
+        end
+      ensure
+        if @operation.has_errors?
+          @last_result ||= ValidationException.new(@operation.instance_variable_get('@errors'))
+          @state ||= :failed
         end
       end
     end

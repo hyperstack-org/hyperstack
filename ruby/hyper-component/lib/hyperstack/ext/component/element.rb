@@ -1,11 +1,9 @@
 Element.instance_eval do
   def self.find(selector)
-    selector = begin
-      selector.dom_node
-    rescue
-      selector
-    end if `#{selector}.$dom_node !== undefined`
-    `$(#{selector})`
+    if `typeof #{selector}['$respond_to?'] == 'function'` && selector.respond_to?(:dom_node)
+      selector = selector.dom_node
+    end
+    `jQuery(#{selector})`
   end
 
   def self.[](selector)
@@ -37,7 +35,7 @@ Element.instance_eval do
   # see react-rails documentation for more details
 
   %x{
-    $.fn.mount_components = function() {
+    jQuery.fn.mount_components = function() {
       this.each(function(e) { ReactRailsUJS.mountComponents(e[0]) })
       return this;
     }

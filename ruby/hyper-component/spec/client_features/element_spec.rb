@@ -18,13 +18,13 @@ describe 'Hyperstack::Component::Element', js: true do
   end
 
   describe "Event Subscription" do
-    it "keeps the original params" do
+    it "keeps the original params, and ignores false, nil, and blank event names" do
       client_option render_on: :both
       mount 'Foo' do
         class Foo
           include Hyperstack::Component
           render do
-            INPUT(value: nil, type: 'text').on(:change) {}
+            INPUT(value: nil, type: 'text').on(:change, false, nil, " ") {}
           end
         end
       end

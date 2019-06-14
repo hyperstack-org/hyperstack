@@ -1,5 +1,22 @@
 module ActiveRecord
   module InstanceMethods
+
+    def method_missing(missing, *args, &block)
+      column = self.class.columns_hash.detect { |name, *| missing =~ /^#{name}/ }
+      if column
+        name = column[0]
+        case missing
+        when /\!\z/ then @backing_record.get_attr_value(name, true)
+        when /\=\z/ then @backing_record.set_attr_value(name, *args)
+        when /\_changed\?\z/ then @backing_record.changed?(name)
+        when /\?/ then @backing_record.get_attr_value(name, nil).present?
+        else @backing_record.get_attr_value(name, nil)
+        end
+      else
+        super
+      end
+    end
+
     def inspect
       "<#{model_name}:#{ReactiveRecord::Operations::Base::FORMAT % to_key} "\
       "(#{ReactiveRecord::Operations::Base::FORMAT % object_id}) "\
@@ -81,7 +98,11 @@ module ActiveRecord
     end
 
     def ==(ar_instance)
-      @backing_record == ar_instance.instance_eval { @backing_record }
+      return true  if @backing_record == ar_instance.instance_eval { @backing_record }
+      return false unless ar_instance.is_a?(ActiveRecord::Base)
+      return false if ar_instance.new_record?
+      return false unless self.class.base_class == ar_instance.class.base_class
+      id == ar_instance.id
     end
 
     def [](attr)

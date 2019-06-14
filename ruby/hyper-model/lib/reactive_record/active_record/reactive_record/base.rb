@@ -71,7 +71,7 @@ module ReactiveRecord
       if (id_to_find = attrs[model.primary_key])
         !new_only && lookup_by_id(model, id_to_find)
       else
-        @records[model].detect do |r|
+        @records[model.base_class].detect do |r|
           (r.new? || !new_only) &&
             !attrs.detect { |attr, value| r.synced_attributes[attr] != value }
         end
@@ -150,7 +150,7 @@ module ReactiveRecord
       @attributes = {}
       @changed_attributes = []
       @virgin = true
-      records[model] << self
+      records[model.base_class] << self
       Base.set_object_id_lookup(self)
     end
 
@@ -207,7 +207,7 @@ module ReactiveRecord
     end
 
     def errors
-      @errors ||= ActiveModel::Errors.new(self)
+      @errors ||= ActiveModel::Errors.new(ar_instance)
     end
 
     # called when we have a newly created record, to initialize
@@ -310,14 +310,21 @@ module ReactiveRecord
       @saving = true
     end
 
-    def errors!(hash)
+    def errors!(hash, saving)
+      @errors_at_last_sync = hash if saving
       notify_waiting_for_save
       errors.clear && return unless hash
+      errors.non_reactive_clear
       hash.each do |attribute, messages|
         messages.each do |message|
           errors.add(attribute, message)
         end
       end
+    end
+
+    def revert_errors!
+      puts "#{inspect}.revert_errors!  @errors_at_last_sync: #{@errors_at_last_sync}"
+      errors!(@errors_at_last_sync)
     end
 
     def saved!(save_only = nil) # sets saving to false AND notifies
@@ -421,6 +428,7 @@ module ReactiveRecord
 
     def destroy_associations
       @destroyed = false
+      @being_destroyed = true
       model.reflect_on_all_associations.each do |association|
         if association.collection?
           @attributes[association.attribute].replace([]) if @attributes[association.attribute]

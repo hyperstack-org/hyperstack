@@ -325,6 +325,12 @@ if RUBY_ENGINE != 'opal'
 
     config.after(:each, js: true) do |spec|
       logs = page.driver.browser.manage.logs.get(:browser)
+      if spec.exception
+        all_messages = logs.select { |e| e.message.present? }
+                           .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+        puts "Javascript client console messages:\n\n" +
+             all_messages.join("\n\n") if all_messages.present?
+      end
       errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
                   .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
       if client_options[:deprecation_warnings] == :on
@@ -362,12 +368,30 @@ if RUBY_ENGINE != 'opal'
     end
 
     Capybara.register_driver :chrome_headless_docker_travis do |app|
+      caps = Selenium::WebDriver::Remote::Capabilities.chrome(loggingPrefs:{browser: 'ALL'})
       options = ::Selenium::WebDriver::Chrome::Options.new
       options.add_argument('--headless')
       options.add_argument('--no-sandbox')
       options.add_argument('--disable-dev-shm-usage')
-      Capybara::Selenium::Driver.new(app, browser: :chrome, :driver_path => "/usr/lib/chromium-browser/chromedriver", options: options)
+      Capybara::Selenium::Driver.new(app, browser: :chrome, :driver_path => "/usr/lib/chromium-browser/chromedriver", options: options, desired_capabilities: caps)
     end
+
+    Capybara.register_driver :selenium_chrome_headless_with_logs do |app|
+      caps = Selenium::WebDriver::Remote::Capabilities.chrome(loggingPrefs:{browser: 'ALL'})
+      browser_options = ::Selenium::WebDriver::Chrome::Options.new()
+      # browser_options.args << '--some_option' # add whatever browser args and other options you need (--headless, etc)
+      browser_options.add_argument('--headless')
+      Capybara::Selenium::Driver.new(app, browser: :chrome, options: browser_options, desired_capabilities: caps)
+      #
+      #
+      #
+      # options = ::Selenium::WebDriver::Chrome::Options.new
+      # options.add_argument('--headless')
+      # options.add_argument('--no-sandbox')
+      # options.add_argument('--disable-dev-shm-usage')
+      # Capybara::Selenium::Driver.new(app, browser: :chrome, :driver_path => "/usr/lib/chromium-browser/chromedriver", options: options)
+    end
+
 
     class Selenium::WebDriver::Firefox::Profile
 
@@ -436,11 +460,11 @@ if RUBY_ENGINE != 'opal'
     elsif ENV['DRIVER'] == 'chrome'
       Capybara.javascript_driver = :chromez
     elsif ENV['DRIVER'] == 'headless'
-      Capybara.javascript_driver = :selenium_chrome_headless
+      Capybara.javascript_driver = :selenium_chrome_headless_with_logs #:selenium_chrome_headless
     elsif ENV['DRIVER'] == 'travis'
       Capybara.javascript_driver = :chrome_headless_docker_travis
     else
-      Capybara.javascript_driver = :selenium_chrome_headless
+      Capybara.javascript_driver = :selenium_chrome_headless_with_logs #:selenium_chrome_headless
     end
 
     include ComponentTestHelpers

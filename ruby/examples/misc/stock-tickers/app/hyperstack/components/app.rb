@@ -8,9 +8,9 @@ class App < HyperComponent
 
   before_mount { @symbols = Set.new }
 
-  def add_symbol
-    mutate @symbols << @_symbol_input.value.upcase
-    @_symbol_input.value = ''
+  mutator :add_symbol do
+    @symbols << jQ[@symbol_input].value.upcase
+    jQ[@symbol_input].value = ''
   end
 
   render do
@@ -22,7 +22,7 @@ class App < HyperComponent
       BS::Row(style: { marginTop: 20 }) do
         BS::Col(sm: 4) do
           BS::InputGroup(class: 'mb-3') do
-            BS::FormControl(ref: set_jq(:_symbol_input), placeholder: 'New Stock Market Symbol')
+            @symbol_input = BS::FormControl(placeholder: 'New Stock Market Symbol')
             .on(:enter) { add_symbol }
             BS::InputGroup::Append() { BS::Button() { 'Add' } }
             .on(:click) { add_symbol }

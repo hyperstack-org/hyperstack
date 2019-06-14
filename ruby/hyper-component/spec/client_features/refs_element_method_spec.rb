@@ -34,13 +34,39 @@ describe 'getting ref from an Element', js: true do
         render(DIV) { "another component"}
       end
       class TestComponent < HyperComponent
-        after_mount { raise "Failed" unless jQ[@another_component].html == 'another component' }
+        after_mount { raise 'Failure' unless jQ[@another_component].html == 'another component' }
         render do
           @another_component = AnotherComponent()
         end
       end
     end
     expect(page).to have_content('another component')
+  end
+
+  it "the ref method has a dom_node method that works with native react components" do
+    mount 'TestComponent' do
+      JS.call(:eval,
+        <<-JSCODE
+          window.NativeComponent = class extends React.Component {
+            constructor(props) {
+              super(props);
+              this.displayName = "aNativeComponent";
+            }
+            render() { return React.createElement("div", null, "a native component"); }
+          }
+        JSCODE
+      )
+      class AnotherComponent < Hyperloop::Component
+        imports "NativeComponent"
+      end
+      class TestComponent < HyperComponent
+        after_mount { raise 'Failure' unless jQ[@another_component].html == 'a native component' }
+        render do
+          @another_component = AnotherComponent()
+        end
+      end
+    end
+    expect(page).to have_content('a native component')
   end
 
   it 'the ref method has a dom_node method that works with application components' do
@@ -50,7 +76,7 @@ describe 'getting ref from an Element', js: true do
         render(DIV) { "another component named #{@Others[:foo]}"}
       end
       class TestComponent < HyperComponent
-        after_mount { raise "Failed" unless @ref_1.ref == @ref_2.ref }
+        after_mount { debugger unless @ref_1.ref == @ref_2.ref; nil }
         render do
           @ref_1 = AnotherComponent().as_node
           @ref_2 = @ref_1.render(foo: :bar)

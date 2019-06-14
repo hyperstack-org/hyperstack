@@ -89,7 +89,7 @@ module ActiveModel
     #   person.errors.values   # => [["cannot be nil", "must be specified"]]
     def values
       messages.select do |key, value|
-        !value.empty?
+        !value&.empty?
       end.values
     end
 
@@ -105,9 +105,9 @@ module ActiveModel
       attr_name =
         attribute.to_s.tr('.', '_').tr('_', ' ').gsub(/_id$/, '').capitalize
       # attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
-      # if @base.class.respond_to?(:human_attribute_name)
+      if @base.class.respond_to?(:human_attribute_name)
         attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
-      # end
+      end
       # I18n.t(:"errors.format",
       #   default:  "%{attribute} %{message}",
       #   attribute: attr_name,
@@ -219,8 +219,12 @@ module ActiveModel
     #   person.errors.clear
     #   person.errors.full_messages # => []
     def clear
+      non_reactive_clear.tap { reactive_empty! true }
+    end
+
+    def non_reactive_clear
       messages.clear
-      details.clear.tap { reactive_empty! true }
+      details.clear
     end
 
     # Merges the errors from <tt>other</tt>.

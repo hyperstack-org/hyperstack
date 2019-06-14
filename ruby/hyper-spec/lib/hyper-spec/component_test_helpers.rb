@@ -111,7 +111,8 @@ module HyperSpec
       if block
         str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}"
       end
-      js = Opal.compile(str).delete("\n").gsub('(Opal);', '(Opal)')
+      js = Opal.compile(str).gsub("// Prepare super implicit arguments\n", "")
+               .delete("\n").gsub('(Opal);', '(Opal)')
       # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
       # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
       JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
@@ -281,11 +282,11 @@ module HyperSpec
     def pause(message = nil)
       if message
         puts message
-        page.evaluate_ruby "puts #{message.inspect}.to_s + ' (type go() to continue)'"
+        page.evaluate_script "console.log('#{message} (type go() to continue)')"
       end
 
       page.evaluate_script('window.hyper_spec_waiting_for_go = true')
-
+      page.evaluate_script('go = function() {window.hyper_spec_waiting_for_go = false}')
       loop do
         sleep 0.25
         break unless page.evaluate_script('window.hyper_spec_waiting_for_go')

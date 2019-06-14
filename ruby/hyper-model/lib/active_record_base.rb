@@ -255,7 +255,7 @@ module ActiveRecord
           pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
         end
 
-        %i[belongs_to has_one].each do |macro|
+        %i[belongs_to has_one composed_of].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
           define_method(macro) do |name, *aargs, &block|
             define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|

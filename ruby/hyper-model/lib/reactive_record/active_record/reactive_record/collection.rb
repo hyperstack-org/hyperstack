@@ -435,8 +435,9 @@ To determine this sync_scopes first asks if the record being changed is in the s
         inverse_of = @association.inverse_of
         current_association_value = item.attributes[inverse_of]
         backing_record.virgin = false unless backing_record.data_loading?
-        #backing_record.update_belongs_to(inverse_of, @owner)
-        backing_record.set_belongs_to_via_has_many(@association, @owner)
+        # next line was commented out and following line was active.
+        backing_record.update_belongs_to(inverse_of, @owner)
+        #backing_record.set_belongs_to_via_has_many(@association, @owner)
         # following is handled by update_belongs_to and is redundant
         # unless current_association_value.nil?  # might be a dummy value which responds to nil
         #   current_association = @association.inverse.inverse(current_association_value)
@@ -539,11 +540,11 @@ To determine this sync_scopes first asks if the record being changed is in the s
         @dummy_collection.notify
         array = new_array.is_a?(Collection) ? new_array.collection : new_array
         @collection.each_with_index do |r, i|
-          r.id = new_array[i].id if array[i] and array[i].id and !r.new? and r.backing_record.vector.last =~ /^\*[0-9]+$/
+          r.id = new_array[i].id if array[i] and array[i].id and !r.new_record? and r.backing_record.vector.last =~ /^\*[0-9]+$/
         end
       end
-
-      @collection.dup.each { |item| delete(item) } if @collection  # this line is a big nop I think
+      # the following makes sure that the existing elements are properly removed from the collection
+      @collection.dup.each { |item| delete(item) } if @collection
       @collection = []
       if new_array.is_a? Collection
         @dummy_collection = new_array.dummy_collection
@@ -587,25 +588,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @dummy_collection.loading?
     end
 
-    # def loading?
-    #   !@collection || (@dummy_collection && @dummy_collection.loading?) || (@owner && !@owner.id && @vector && @vector.length <= 1)
-    # end
-
-    # def loaded?
-    #   @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || !@vector || @vector.length > 1)
-    #   #false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
-    # end
-
-    def empty?
-      # should be handled by method missing below, but opal-rspec does not deal well
-      # with method missing, so to test...
-      all.empty?
-    end
-
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
-      # r = @collection&.detect { |lr| lr.new_record? && !attrs.detect { |k, v| lr.attributes[k] != v } }
-      # return r if r
       (r = __hyperstack_internal_scoped_find_by(attrs)) || return
       r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
@@ -624,6 +608,16 @@ To determine this sync_scopes first asks if the record being changed is in the s
       return first unless found
       @collection = [found]
       found
+    end
+
+    # to avoid fetching the entire collection array we check empty and any against the count
+
+    def empty?
+      count.zero?
+    end
+
+    def any?
+      !count.zero?
     end
 
     def method_missing(method, *args, &block)

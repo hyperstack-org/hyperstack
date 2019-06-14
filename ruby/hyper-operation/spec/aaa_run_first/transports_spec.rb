@@ -346,5 +346,74 @@ describe "Transport Tests", js: true do
     it 'has a anti_csrf_token' do
       expect_evaluate_ruby('Hyperstack.anti_csrf_token').to be_present
     end
+
+    it 'wait for an instance channel to be loaded before connecting' do
+      # Make a pretend mini model, and allow it to be accessed by user-123
+      stub_const "UserModelPolicy", Class.new
+      stub_const "UserModel", Class.new
+      UserModel.class_eval do
+        def initialize(id)
+          @id = id
+        end
+        def ==(other)
+          id == other.id
+        end
+        def self.find(id)
+          new(id)
+        end
+        def id
+          @id.to_s
+        end
+      end
+      UserModelPolicy.class_eval do
+        regulate_instance_connections { UserModel.new(123) }
+      end
+
+      # During checkin we will run this op.  The spec will make sure it runs
+      isomorphic do
+        class CheckIn < Hyperstack::ControllerOp
+          param :id
+          validate { params.id == '123' }
+          step { params.id }
+        end
+      end
+
+
+      on_client do
+        # Stub the user model on the client
+        class UserModel
+          def initialize(id)
+            @id = id
+          end
+          def id
+            @id.to_s
+          end
+        end
+        # stub the normal Hyperstack::Model.load to call checkin
+        # note that load returns a promise and so does checkin!  Lovely
+        module Hyperstack
+          module Model
+            def self.load
+              CheckIn.run(id: yield)
+            end
+          end
+        end
+      end
+
+      # use action cable
+      Hyperstack.configuration do |config|
+        config.connect_session = false
+        config.transport = :action_cable
+        config.channel_prefix = "synchromesh"
+      end
+
+      expect(CheckIn).to receive(:run).and_call_original
+      evaluate_ruby "Hyperstack.connect(UserModel.new(123))"
+      # the suite previously redefined connect so we have to call this to initiate
+      # the connection
+      evaluate_ruby "Hyperstack.go_ahead_and_connect"
+      wait(10.seconds).for { Hyperstack::Connection.active }.to eq(['UserModel-123'])
+    end
+
   end
 end

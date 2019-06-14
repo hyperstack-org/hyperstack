@@ -14,6 +14,7 @@ Hyperstack.import 'hyper-model'
 Hyperstack.import 'hyper-state'
 
 require 'generators/hyperstack/install_generator'
+require 'generators/hyper/generator_base'
 require 'generators/hyper/component_generator'
 require 'generators/hyper/router_generator'
 begin
@@ -26,3 +27,11 @@ require 'react-rails'
 require 'opal-browser'
 require 'mini_racer'
 require 'hyperstack/version'
+
+class RailsHyperstack < Rails::Railtie
+  rake_tasks do
+    Dir[File.join(File.dirname(__FILE__),'tasks/hyperstack/*.rake')].each { |f| puts "loading #{f}"; load f }
+  end
+end
+
+Hyperstack.define_setting :component_base_class, 'HyperComponent'

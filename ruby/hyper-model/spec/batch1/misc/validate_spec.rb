@@ -10,15 +10,24 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     # before each test
     stub_const 'TestApplication', Class.new
     stub_const 'TestApplicationPolicy', Class.new
+    User.do_not_synchronize
+    TestModel.do_not_synchronize
     TestApplicationPolicy.class_eval do
-      #always_allow_connection  TURN OFF BROADCAST SO TESTS DON"T EFFECT EACH OTHER
+      always_allow_connection
       regulate_all_broadcasts { |policy| policy.send_all }
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
     end
-    #size_window(:large, :landscape)
-    User.validates :last_name, exclusion: { in: %w[f**k], message: 'no swear words allowed' }
+    %i[last_name first_name].each do |attr|
+      User.validates attr, exclusion: { in: %w[f**k], message: 'no swear words allowed' }
+    end
     TestModel.validates_presence_of :child_models
-    client_option raise_on_js_errors: :off
+    client_option raise_on_js_errors: :off # TURN OFF BROADCAST SO TESTS DON"T EFFECT EACH OTHER
+  end
+
+  after(:step) do
+    # Turn broadcasting back on
+    TestModel.instance_variable_set :@do_not_synchronize, false
+    User.instance_variable_set :@do_not_synchronize, false
   end
 
   it "can validate the presence of an association" do
@@ -42,6 +51,14 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     end.to eq("last_name"=>["no swear words allowed"])
   end
 
+  it "can validate and use the full_messages method" do
+    expect_promise do
+      User.new(last_name: 'f**k').validate.then do |new_user|
+        new_user.errors.full_messages
+      end
+    end.to eq(["Last name no swear words allowed"])
+  end
+
   it "the valid? method will return true if the model has no errors" do
     mount "Validator" do
       class Validator < HyperComponent
@@ -62,7 +79,7 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
   it "the valid? method will return false if the model has errors" do
     expect_promise do
       user = User.new(last_name: 'f**k')
-      user.save.then { user.valid? }
+      user.save(validate: true).then { |result| user.valid?}
     end.to be_falsy
   end
 
@@ -106,6 +123,19 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
       Validator.model.errors.clear
     end
     expect(page).to have_content('.valid? true')
+  end
+
+  it "previous errors are cleared on each validation" do
+    expect_promise do
+      user = User.new(last_name: 'f**k')
+      user.validate.then do
+        user.last_name = 'doggie'
+        user.first_name = 'f**k'
+        user.validate.then do |new_user|
+          new_user.errors.full_messages
+        end
+      end
+    end.to eq(["First name no swear words allowed"])
   end
 
 end

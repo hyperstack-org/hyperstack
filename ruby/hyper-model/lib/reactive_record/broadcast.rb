@@ -20,13 +20,18 @@ module ReactiveRecord
       salt = SecureRandom.hex
       authorization = Hyperstack.authorization(salt, data[:channel], data[:broadcast_id])
       raise 'no server running' unless Hyperstack::Connection.root_path
-      SendPacket.remote(
-        Hyperstack::Connection.root_path,
-        data,
-        operation: operation,
-        salt: salt,
-        authorization: authorization
-      ).tap { |p| raise p.error if p.rejected? }
+      Timeout::timeout(Hyperstack.send_to_server_timeout) do
+        SendPacket.remote(
+          Hyperstack::Connection.root_path,
+          data,
+          operation: operation,
+          salt: salt,
+          authorization: authorization
+        ).tap { |p| raise p.error if p.rejected? }
+      end
+    rescue Timeout::Error
+      puts "\n********* FAILED TO RECEIVE RESPONSE FROM SERVER WITHIN #{Hyperstack.send_to_server_timeout} SECONDS. CHANGES WILL NOT BE SYNCED ************\n"
+      raise 'no server running'
     end unless RUBY_ENGINE == 'opal'
 
     class SendPacket < Hyperstack::ServerOp
@@ -67,7 +72,7 @@ module ReactiveRecord
 
     def self.to_self(record, data = {})
       # simulate incoming packet after a local save
-      operation = if record.new?
+      operation = if record.new_record?
                     :create
                   elsif record.destroyed?
                     :destroy
@@ -177,7 +182,12 @@ module ReactiveRecord
 
         # once we have received all the data from all the channels (applies to create and update only)
         # we yield and process the record
-        yield complete! if @channels == @received
+
+        # pusher fake can send duplicate records which will result in a nil broadcast
+        # so we also check that before yielding
+        if @channels == @received && (broadcast = complete!)
+          yield broadcast
+        end
       end
     end
 

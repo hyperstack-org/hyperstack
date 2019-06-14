@@ -271,7 +271,8 @@ module Hyperstack
           ReactWrapper.import_native_component(
             self, ReactWrapper.eval_native_react_component(component_name)
           )
-          define_method(:render) {} # define a dummy render method - will never be called...
+          render {}
+          #define_method(:render) {} # define a dummy render method - will never be called...
         rescue Exception => e # rubocop:disable Lint/RescueException : we need to catch everything!
           raise "#{self} cannot import '#{component_name}': #{e.message}."
           # rubocop:enable Lint/RescueException
@@ -291,7 +292,7 @@ module Hyperstack
         end
 
         def to_n
-          ReactWrapper.class_eval('@@component_classes')[self]
+          Hyperstack::Internal::Component::ReactWrapper.create_native_react_class(self)
         end
       end
     end

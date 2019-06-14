@@ -14,15 +14,15 @@ module ReactiveRecord
     end
 
     def waiting_for_save(model)
-      @waiting_for_save[model]
+      @waiting_for_save[model.base_class]
     end
 
     def wait_for_save(model, &block)
-      @waiting_for_save[model] << block
+      @waiting_for_save[model.base_class] << block
     end
 
     def clear_waiting_for_save(model)
-      @waiting_for_save[model] = []
+      @waiting_for_save[model.base_class] = []
     end
 
     def lookup_by_object_id(object_id)
@@ -33,8 +33,8 @@ module ReactiveRecord
       `#{@records_by_object_id}[#{record.object_id}] = #{record}`
     end
 
-    def lookup_by_id(*args) # model and id
-      `#{@records_by_id}[#{args}]` || nil
+    def lookup_by_id(model, id) # model and id
+      `#{@records_by_id}[#{[model.base_class, id]}]` || nil
     end
 
     def set_id_lookup(record)

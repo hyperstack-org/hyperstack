@@ -21,7 +21,7 @@ module Hyperstack
           @tracks ||= []
         end
 
-        def to_opts(tie, args, block)
+        def build_tie(tie, args, block)
           if args.count.zero?
             { run: block }
           elsif args[0].is_a?(Hash)
@@ -41,7 +41,7 @@ module Hyperstack
 
         [:step, :failed, :async].each do |tie|
           define_method :"add_#{tie}" do |*args, &block|
-            tracks << to_opts(tie, args, block)
+            tracks << build_tie(tie, args, block)
           end
         end
 
@@ -55,44 +55,33 @@ module Hyperstack
       end
 
       def step(opts)
-        if @last_result.is_a? Promise
-          @last_result = @last_result.then do |*result|
-            @last_result = result
-            apply(opts, :in_promise)
-          end
-        elsif @state == :success
-          apply(opts)
-        end
+        @promise_chain = @promise_chain
+          .then { |result| apply(result, :success, opts) }
       end
 
       def failed(opts)
-        if @last_result.is_a? Promise
-          @last_result = @last_result.fail do |e|
-            @last_result = e
-            apply(opts, :in_promise)
-            raise @last_result if @last_result.is_a? Exception
-            raise e
-          end
-        elsif @state == :failed
-          apply(opts)
-        end
+        @promise_chain = @promise_chain
+          .always { |result| apply(result, :failed, opts) }
       end
 
       def async(opts)
-        apply(opts) if @state != :failed
+        @promise_chain = @promise_chain_start = Promise.new
+        @promise_chain.resolve(@last_async_result)
+        step(opts)
       end
 
-      def apply(opts, in_promise = nil)
+      def apply(result, state, opts)
+        return result unless @state == state
         if opts[:scope] == :class
-          args = [@operation, *@last_result]
+          args = [@operation, *result]
           instance = @operation.class
         else
-          args = @last_result
+          args = result
           instance = @operation
         end
         block = opts[:run]
         block = instance.method(block) if block.is_a? Symbol
-        @last_result =
+        last_result =
           if block.arity.zero?
             instance.instance_exec(&block)
           elsif args.is_a?(Array) && block.arity == args.count
@@ -100,40 +89,54 @@ module Hyperstack
           else
             instance.instance_exec(args, &block)
           end
-        return @last_result unless @last_result.is_a? Promise
-        raise @last_result.error if @last_result.rejected?
-        @last_result = @last_result.value if @last_result.resolved?
-        @last_result
+        @last_async_result = last_result unless last_result.is_a? Promise
+        last_result
       rescue Exit => e
-        @state = e.state
-        @last_result = (e.state != :failed || e.result.is_a?(Exception)) ? e.result : e
-        raise e
+        # the promise chain ends with an always block which will process
+        # any immediate exits by checking the value of @state.   All other
+        # step/failed/async blocks will be skipped because state will not equal
+        # :succeed or :failed
+        if e.state == :failed
+          @state = :abort
+          # exit via the final always block with the exception
+          raise e.result.is_a?(Exception) ? e.result : e
+        else
+          @state = :succeed
+          # exit via the final then block with the success value
+          e.result
+        end
       rescue Exception => e
         @state = :failed
-        @last_result = e
-        raise e if in_promise
+        raise e
       end
 
       def run
-        if @operation.has_errors? || @state
-          @last_result ||= ValidationException.new(@operation.instance_variable_get('@errors'))
-          return if @state  # handles abort out of validation
-          @state = :failed
-        else
-          @state = :success
-        end
-        tracks.each { |opts| opts[:tie].bind(self).call(opts) }
-      rescue Exit
+        # if @operation.has_errors? || @state
+        #   @last_result ||= ValidationException.new(@operation.instance_variable_get('@errors'))
+        #   # following handles abort out of validation.  if state is already set then we are aborting
+        #   # otherwise if state is not set but we have errors then we are failed
+        #   @state ||= :failed
+        # else
+        #   @state = :success
+        # end
+        @state ||= :success
+        @promise_chain_start = @promise_chain = Promise.new
+        @promise_chain_start.resolve(@last_result)
+        tracks.each { |opts| opts[:tie].bind(self).call(opts) } unless @state == :abort
       end
 
       def result
-        return @last_result if @last_result.is_a? Promise
-        @last_result =
-          if @state == :success
-            Promise.new.resolve(@last_result)
+        @result ||= @promise_chain.always do |e|
+          if %i[abort failed].include? @state
+            if e.is_a? Exception
+              raise e
+            else
+              raise Promise::Fail.new(e)
+            end
           else
-            Promise.new.reject(@last_result)
+            e
           end
+        end
       end
     end
   end

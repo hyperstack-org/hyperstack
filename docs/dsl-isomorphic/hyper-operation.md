@@ -2,9 +2,218 @@
 
 **Work in progress - ALPHA (docs and code)**
 
-Operations are the engine rooms of Hyperstack; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
+Operations are Hyperstack's implementation of Service Object which is...  
 
-Operations receive parameters and execute a series of steps. They have a simple structure which is not dissimilar to a Component:
+> "A class that performs an action"   [A simple explanation of Service Objects for Ruby on Rails](https://medium.freecodecamp.org/service-objects-explained-simply-for-ruby-on-rails-5-a8cc42a5441f)
+
+Why do we need Service Objects?  Because in any real world system you have logic that does not belong in models (or stores) because it effects multiple models or stores, and it does not belong in components because the logic of the task is independent of the specific user interface design.  In MVC frameworks this kind of logic is often shoved in the controller, but it doesn't belong there either.
+
+There are also those boundary areas between gathering and processing external data and getting data into or out of our stores and models.  You don't want that kind of logic in your model or store, so where does it go?  It belongs in a service object or *Operation* in Hyperstack terminology.  
+
+> The term Operation, the key concepts of the Operation, and a lot of the implementation was taken from [Trailblazer](http://trailblazer.to/guides/trailblazer/2.0/01-operation-basics.html)
+
+Simply put an Operation is like a large standalone method that has no internal state of its own.  You run an operation, it does it thing, and it returns an answer.
+
+Any state that an operation needs to retrieve or save is stored somewhere else: in a model, a store, or even in a remote API.  Once the operation completes, it has no memory of its own.  
+
+Being a stand-alone, glue and business logic method is an Operation's full time mission. The Hyperstack `Operation` base class is therefor structured to make writing this kind of code easy.
+
++ An Operation may take parameters (params) just like any other method;  
++ An Operation may validate the parameters;
++ An Operation then executes a number of *steps*;
++ The steps can be part of a success track or a failure track;
++ The value of the final step is returned to the caller;
++ And the results can be *broadcast* to any interested parties.
+
+Hyperstack's Operations often involve asynchronous methods such as HTTP requests and so Operations always return *Promises*.  Likewise each of the steps of an Operation can itself be an asynchronous action, and the Operation class will take care of chaining the promises together for you.  
+
+Another key feature of Operations is that because they are stateless they make a perfect RPC (Remote Procedure Call) mechanism.  So an Operation can be called on the client, but will run on the server, and then return or broadcast the results to the clients.  Thus Operations form the underlying data *transport* mechanism between the server and clients.
+
+That is a lot to digest, and truly Operations are the swiss-army knife of Hyperstack.  So let's dive into some examples.
+
+In this simple example we are going to use a third-party API to determine our browser's IP address.  First without Operations:
+
+```ruby
+class App < HyperComponent
+  before_mount do
+    HTTP.get('https://api.ipify.org?format=json').then do |response|
+      mutate @ip_address = response.json[:ip]
+    end
+  end
+
+  render do
+    H1 { "Hello world from Hyperstack your ip address: #{@ip_address}" }
+  end
+end
+```
+
+Nice and simple.  Our App mounts, does a HTTP get from our API, and when it returns it updates the state.  The problem is
+our view logic is cluttered up with low level specifics of how to get the address.  Lets fix that by moving that logic to a separate service object:
+
+```ruby
+class GetIPAddress
+  def self.run
+    HTTP.get('https://api.ipify.org?format=json').then do |response|
+      response.json[:ip]
+    end
+  end
+end
+```
+
+Notice that the object is stateless and because it has no state it is simply a class method.  We then use our service object like this:
+
+```ruby
+class App < HyperComponent
+  before_mount do
+    GetIPAddress.run.then { |ip_address| mutate @ip_address = ip_address}
+  end
+
+  render do
+    H1 { "Hello world from Hyperstack.  Your ip address is #{@ip_address}" }
+  end
+end
+```
+
+If we were to change how we get the IP address, the Component now doesn't have to change.
+
+Now we will redefine our service object using the Hyperstack::Operation class.
+```ruby
+class GetIPAddress < Hyperstack::Operation
+  step { HTTP.get('https://api.ipify.org?format=json') }
+  step { |response| response.json[:ip] }
+end
+```
+You invoke Operations using the run method, so our Component does not have to change at all.
+
+The advantage is that the Operation syntax takes care of a lot of clutter, allows our
+promise to be chained neatly, and makes our intention clear to the reader.  
+
+We will see how these advantages multiply as our example becomes more complex.
+
+Before moving on lets understand the basics of Operations.
+
++ Every Operation has as its external API a single `run` method.
++ The work of the Operation is defined by a series of *steps*.
++ When the run method is called, the code associated with each step is executed.
++ If a step returns a promise the next step will wait till the promise is resolved.
++ The result of the final step is wrapped in a promise and is the result of the operation.
+
+The final point means that regardless of the Operation's internal implementation, the Operation always returns a promise,
+so its API is consistent.  As operations always return promises you can simply apply the `then` and `fail` promise methods
+directly to the Operation rather than saying `Op.run.then`.
+
+Let's say that rather than a simple ip address what we want is a full set of geo-location data.  We can use another
+third party API to do the job.  This API requires we supply our IP address, so we will reuse our IPAddress Op.
+
+```ruby
+class GetGeoData < Hyperstack::Operation
+  step GetIPAddress
+  step { |ip_address| HTTP.get("https://ipapi.co/#{ip_address}/json/") }
+  step { |response| response.json }
+end
+```
+
+Here we can see one of the different ways to define a step:  We simply delegate the first step to our already defined `GetIPAddress` operation.
+
+Again lets compare to a traditional ServiceObject:
+
+```ruby
+class GetGeoData
+  def self.run
+    IPAddress.run.then do |ip_address|
+      HTTP.get("https://ipapi.co/#{ip_address}/json/")
+    end.then do |response|
+      response.json
+    end
+  end
+end
+```
+
+Again its the same logic, but the body of our service object is over twice the number of lines and logic
+is obscured by the promise handlers.
+
+It would be nice if we could include a flag icon to go with the country in the response data.  Lets do that:
+
+```ruby
+class GetGeoData < Hyperstack::Operation
+  step IPAddress
+  step { |ip_address| HTTP.get("https://ipapi.co/#{ip_address}/json/") }
+  step { |response| response.json }
+  step { |json| json.merge flag_url: "https://www.countryflags.io/#{json['country']}/shiny/64.png" }
+end
+```
+
+Of course its just *Ruby*, so we can further clean up our code by defining some helper methods:
+
+```ruby
+class GetGeoData < Hyperstack::Operation
+  step IPAddress
+  step { |ip_address| HTTP.get(geo_data_url_for(ip_address)) }
+  step { |response|   response.json }
+  step { |json|       json.merge flag_url: flag_url_for(json['country']) }
+
+  def geo_data_url_for(ip_address)
+    "https://ipapi.co/#{ip_address}/json/"
+  end
+
+  def flag_url_for(country_code)
+    "https://www.countryflags.io/#{country_code}/shiny/64.png"
+  end
+end
+```
+
+Our `GetGeoData` uses two remote third party operations, which may occasionally fail so we add a retry
+mechanism.  This will introduce four new features of Operation:  The *failure track*, *parameters*, and the
+`abort!` and `succeed!` methods.
+
+Tracks
+
+Operations have two *tracks* of execution.  The normal success track which is defined by the `step` method, and a
+*failure track* which is defined by a series of `failed` methods.
+
+Execution begins with the first step, and continues with each step until an exception is raised, or a promise fails. When that happens execution jumps *to the next* `failed` step, and the continues executing `failed` steps.  The result of the
+Operation will be value of the last failed step, and the Operation's promise will be be rejected (i.e. will be in the fail state.)
+
+Parameters
+
+Operations can take a series of named parameters defined by the `param` method.  Parameters can have type information, defaults, and can be validated.  This helps Operations act like a firewall between various parts of the system, making debugging and error handling easier.  For now we are just going to use a simple case of a parameter that takes a default value.
+
+The `abort!` and `succeed!` methods
+
+These provide an early exit like `return`, `break` and next statements.  Calling `abort!` and `succeed!` immediately exits the Operation by the appropriate track.
+
+Putting it together:
+
+```ruby
+class GetGeoData < Hyperstack::Operation
+  param  attempts: 0
+
+  step   IPAddress
+  step   { |ip_address| HTTP.get(geo_data_url_for(ip_address)) }
+  step   { |response|   response.json }
+  step   { |json|       json.merge flag_url: flag_url_for(json['country']) }
+
+  failed { abort! if params.attempts > 3 }
+  failed { sleep 1.second }
+  failed { GeoData.run(attempts: params.attempts+1).then(&:succeed!) }
+
+  def geo_data_url_for(ip_address)
+    "https://ipapi.co/#{ip_address}/json/"
+  end
+
+  def flag_url_for(country_code)
+    "https://www.countryflags.io/#{country_code}/shiny/64.png"
+  end
+end
+```
+
+
+
+
+
+; they orchestrate the interactions between Components, external services, Models, and Stores. Operations provide a tidy place to keep your business logic.
+
+Operations receive parameters, va and execute a series of steps They have a simple structure which is not dissimilar to a Component:
 
 ```ruby
 class SimpleOperation < Hyperstack::Operation
