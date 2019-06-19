@@ -1,4 +1,4 @@
-# Installation and Setup
+# Installation and Setup (~> 1.0.alpha1.5)
 
 You can install a single `HyperComponent` or the complete 'Stack  in your Rails app using the built in generators and Rake tasks, with as little as two commands.  You can also manually install the pieces following the detailed guide below.
 
