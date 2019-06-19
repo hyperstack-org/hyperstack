@@ -300,8 +300,14 @@ describe "synchronizing relationships", js: true do
             end
           end
         end
-        before_mount { TestComponent4.child_model = ChildModel.new(child_attribute: 'hello') }
-        render { DIV { TestComponent4.child_model.test_model&.test_attribute } }
+        before_mount do
+          TestComponent4.child_model = ChildModel.new(child_attribute: 'hello')
+        end
+        render do
+          DIV do
+            TestComponent4.child_model.test_model&.test_attribute
+          end
+        end
       end
     end
     evaluate_ruby do
