@@ -305,7 +305,7 @@ describe "synchronizing relationships", js: true do
         end
         render do
           DIV do
-            TestComponent4.child_model.test_model&.test_attribute
+            TestComponent4.child_model.test_model.try(:test_attribute)
           end
         end
       end
