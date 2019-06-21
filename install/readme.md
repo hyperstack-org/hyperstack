@@ -31,7 +31,7 @@ Once you have a new (or existing) Rails app, add the rails-hyperstack gem to you
 > **Be sure you cd into the new directory if you just created a new Rails app**
 
 ```
-bundle add 'rails-hyperstack', --version "~> 1.0.alpha1.0"
+bundle add 'rails-hyperstack' --version "~> 1.0.alpha1.0"
 ```
 
 > If you want to use the unreleased edge branch your gem specification will be:
