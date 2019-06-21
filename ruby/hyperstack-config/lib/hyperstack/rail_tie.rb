@@ -17,6 +17,9 @@ module Hyperstack
       def auto_config=(on)
         Rails.configuration.tap do |config|
           if [:on, 'on', true].include?(on)
+            
+            config.filter_parameters << :hyperstack_secured_json
+
             config.eager_load_paths += %W(#{config.root}/app/hyperstack/models)
             config.eager_load_paths += %W(#{config.root}/app/hyperstack/models/concerns)
             config.eager_load_paths += %W(#{config.root}/app/hyperstack/operations)

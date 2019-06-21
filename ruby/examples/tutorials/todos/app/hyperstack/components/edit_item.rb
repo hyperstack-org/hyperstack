@@ -1,15 +1,15 @@
 # app/hyperstack/components/edit_item.rb
 class EditItem < HyperComponent
   param :todo
-  fires :save
+  fires :saved
   fires :cancel
   other :etc
   after_mount { jQ[dom_node].focus }
   render do
-    INPUT(@Etc, placeholder: 'What is left to do today?',
-                defaultValue: @Todo.title, key: @Todo)
+    INPUT(etc, placeholder: 'What is left to do today?',
+                defaultValue: todo.title, key: todo)
     .on(:enter) do |evt|
-      @Todo.update(title: evt.target.value)
+      todo.update(title: evt.target.value)
       saved!
     end
     .on(:blur) { cancel! }
