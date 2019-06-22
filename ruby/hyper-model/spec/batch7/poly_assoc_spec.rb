@@ -301,9 +301,8 @@ describe "polymorphic relationships", js: true do
     end
 
     it 'creates due to a broadcast client side' do
-      @uzer1.groups << @group1
       wait_for_ajax # so pusher can initialize
-      sleep 2
+      @uzer1.groups << @group1
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
