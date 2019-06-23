@@ -100,6 +100,7 @@ module Hyperstack
 
     class << self
       attr_accessor :transport
+      attr_accessor :show_diagnostics
 
       def active
         # if table doesn't exist then we are either calling from within
@@ -114,8 +115,9 @@ module Hyperstack
       end
 
       def open(channel, session = nil, root_path = nil)
+        puts "open(#{channel}, #{session}, #{root_path})" if show_diagnostics
         self.root_path = root_path
-        find_or_create_by(channel: channel, session: session)
+        find_or_create_by(channel: channel, session: session).tap { |c| puts " - open returning #{c}" if show_diagnostics}
       end
 
       def send_to_channel(channel, data)
@@ -133,6 +135,7 @@ module Hyperstack
       end
 
       def connect_to_transport(channel, session, root_path)
+        puts "connect_to_transport(#{channel}, #{session}, #{root_path})" if show_diagnostics
         self.root_path = root_path
         if (connection = find_by(channel: channel, session: session))
           messages = connection.messages.pluck(:data)

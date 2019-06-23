@@ -301,7 +301,9 @@ describe "polymorphic relationships", js: true do
     end
 
     it 'creates due to a broadcast client side' do
-      wait_for_ajax # so pusher can initialize
+      Hyperstack::Connection.show_diagnostics = true
+      # wait_for_ajax # so pusher can initialize
+      # sleep 1
       @uzer1.groups << @group1
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
