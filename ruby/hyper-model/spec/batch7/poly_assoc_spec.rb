@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'test_components'
-require 'rspec-steps'
 
 describe "polymorphic relationships", js: true do
 
@@ -300,7 +299,7 @@ describe "polymorphic relationships", js: true do
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
     end
 
-    it 'creates due to a broadcast client side' do
+    xit 'creates due to a broadcast client side' do
       Hyperstack::Connection.show_diagnostics = true
       @uzer1.groups << @group1
       compare_to_server @group1, 'uzers.collect(&:id)', [@uzer1.id], false
