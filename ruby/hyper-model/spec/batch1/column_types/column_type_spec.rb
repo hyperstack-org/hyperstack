@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'test_components'
-require 'rspec-steps'
 
 describe "column types on client", js: true do
 
