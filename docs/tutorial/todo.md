@@ -1,4 +1,4 @@
-# TodoMVC Tutorial
+todo# TodoMVC Tutorial
 
 *Based on Ruby on Rails 5.2.x*
 
@@ -30,25 +30,44 @@ You will write less than 100 lines of code, and the tutorial should take about 1
 
 Basic knowledge of Ruby is needed, knowledge of Ruby on Rails is helpful.
 
-
 ### Chapter 1: Setting Things Up
 
 First you need to create a new project for this tutorial.
 ```shell
-rails new todo-demo --skip-test --template=https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+rails new todo-demo --skip-test
 ```
-This command will create a new Rails project and run the template file to set up Hyperstack within this project.
+This command will create a new Rails project.
 
 **Caution:** *you can name the app anything you want, we recommend todo-demo, but whatever you do DON'T call it todo,
 as this name will be needed later!*
 
-**Note:** *if you like you can read the contents of the template file by pasting the
-[url](https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb) (the part after `--template=`) in a browser.
-It shows how a Hyperstack Rails project differs from a plain Rails project.*
+Now
 ```shell
 cd todo-demo
 ```
-Will change the working directory to your new todo rails project.
+which will change the working directory to your new todo rails project.
+
+Now run
+```shell
+bundle add 'rails-hyperstack' --version "~> 1.0.alpha1.0"
+```
+
+which will install the `rails-hyperstack` 'gem' into the system.
+
+Once the gem is installed run
+```shell
+bundle exec rails hyperstack:install
+```
+
+to complete the hyperstack installation.
+
+Finally find the `config/initializers/hyperstack.rb` file, and make sure that this line is **not** commented out:
+
+```ruby
+Hyperstack.import 'hyperstack/component/jquery', client_only: true
+```
+
+> Ignore any comments saying that it should be commented out, this is a typo in the current installer
 
 #### Start the Rails app
 
@@ -67,7 +86,7 @@ Hyperstack will need a moment to start and pre-compile with the first request.
 #### Make a Simple Change
 
 Bring up your favorite editor on the `todo-demo` directory.  You will see folders like `app`, `bin`, `config` and `db`.
-These have all been preinitialized by Rails and the Hyperstack template you used to build the app.
+These have all been preinitialized by Rails and Hyperstack gems.
 
 Now find the `app/hyperstack/components/app.rb` file.  It looks like this:
 
@@ -143,7 +162,7 @@ t.boolean :completed, null: false, default: false
 ...
 ```
 For details on 'why' see [this blog post.](https://robots.thoughtbot.com/avoid-the-threestate-boolean-problem)
-Basically this insures `completed` is treated as a true boolean, and will avoid having to check between `false` and `null` later on.
+Basically this insures `completed` is treated as a real boolean, and will avoid having to check between `false` and `null` later on.
 
 Now run:
 ```shell
@@ -222,7 +241,7 @@ After saving you will see the following error displayed:
 in App (created by Hyperstack::Internal::Component::TopLevelRailsComponent)
 in Hyperstack::Internal::Component::TopLevelRailsComponent**
 
-because have not defined the three subcomponents.  Lets define them now:
+because we have not defined the three subcomponents.  Lets define them now:
 
 Add three new ruby files to the `app/hyperstack/components` folder:
 
@@ -281,7 +300,7 @@ To display each Todo we will create a TodoItem component that takes a parameter:
 class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    @Todo.title
+    todo.title
   end
 end
 ```
@@ -318,8 +337,7 @@ As you can see components can take parameters (or props in react.js terminology.
 >*Rails uses the terminology params (short for parameters) which have a similar purpose to React props,
 so to make the transition more natural for Rails programmers Hyperstack uses params, rather than props.*
 
-Params are declared using the `param` macro and are accessed via Ruby *instance variables*.
-Notice that the instance variable name is *CamelCased* so that it is easily distinguished from other instance variables.
+Params are declared using the `param` macro which creates an *accessor* method of the same name within the component.
 
 Our `Index` component *mounts* a new `TodoItem` with each `Todo` record and passes the `Todo` to the `TodoItem` component as the parameter.
 
@@ -344,8 +362,8 @@ First add an `INPUT` html tag to your TodoItem component like this:
 class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    INPUT(type: :checkbox, checked: @Todo.completed)
-    @Todo.title
+    INPUT(type: :checkbox, checked: todo.completed)
+    todo.title
   end
 end
 ```
@@ -365,9 +383,9 @@ To make our checkbox input change its own state, we will add an `event handler` 
 class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    INPUT(type: :checkbox, checked: @Todo.completed)
-    .on(:change) { @Todo.update(completed: !@Todo.completed) }
-    @Todo.title
+    INPUT(type: :checkbox, checked: todo.completed)
+    .on(:change) { todo.update(completed: !todo.completed) }
+    todo.title
   end
 end
 ```
@@ -386,10 +404,10 @@ We will finish up by adding a *delete* link at the end of the Todo item:
 class TodoItem < HyperComponent
   param :todo
   render(LI) do
-    INPUT(type: :checkbox, checked: @Todo.completed)
-    .on(:change) { @Todo.update(completed: !@Todo.completed) }
-    SPAN { @Todo.title } # See note below...
-    A { ' -X-' }.on(:click) { @Todo.destroy }
+    INPUT(type: :checkbox, checked: todo.completed)
+    .on(:change) { todo.update(completed: !todo.completed) }
+    SPAN { todo.title } # See note below...
+    A { ' -X-' }.on(:click) { todo.destroy }
   end
 end
 ```
@@ -574,9 +592,9 @@ Add a new component like this:
 class EditItem < HyperComponent
   param :todo
   render do
-    INPUT(defaultValue: @Todo.title)
+    INPUT(defaultValue: todo.title)
     .on(:enter) do |evt|
-      @Todo.update(title: evt.target.value)
+      todo.update(title: evt.target.value)
     end
   end
 end
@@ -584,17 +602,17 @@ end
 Before we use this component let's understand how it works.
 + It receives a `todo` param which will be edited by the user;
 + The `title` of the todo is displayed as the initial value of the input;
-+ When the user types the enter key the `@Todo` is updated.
++ When the user types the enter key the `todo` is updated.
 
 Now update the `TodoItem` component replacing
 
 ```ruby
-SPAN { @Todo.title }
+SPAN { todo.title }
 ```
 with
 
 ```ruby
-EditItem(todo: @Todo)
+EditItem(todo: todo)
 ```
 Try it out by changing the text of some our your Todos followed by the enter key.  Then refresh the page to see that the Todos have changed.
 
@@ -624,9 +642,9 @@ class EditItem < HyperComponent
   after_mount { jQ[dom_node].focus }         # add
 
   render do
-    INPUT(defaultValue: @Todo.title)
+    INPUT(defaultValue: todo.title)
     .on(:enter) do |evt|
-      @Todo.update(title: evt.target.value)
+      todo.update(title: evt.target.value)
       saved!                                 # add
     end
     .on(:blur) { cancel! }                   # add
@@ -653,15 +671,15 @@ class TodoItem < HyperComponent
   param :todo
   render(LI) do
     if @editing
-      EditItem(todo: @Todo)
+      EditItem(todo: todo)
       .on(:saved, :cancel) { mutate @editing = false }
     else
-      INPUT(type: :checkbox, checked: @Todo.completed)
-      .on(:change) { @Todo.update(completed: !@Todo.completed) }
-      LABEL { @Todo.title }
+      INPUT(type: :checkbox, checked: todo.completed)
+      .on(:change) { todo.update(completed: !todo.completed) }
+      LABEL { todo.title }
       .on(:double_click) { mutate @editing = true }
       A { ' -X-' }
-      .on(:click) { @Todo.destroy }
+      .on(:click) { todo.destroy }
     end
   end
 end
@@ -724,12 +742,12 @@ new Todo records, but even though they are changing React *does not* update the 
 React has a special param called `key`.  React uses this to uniquely identify mounted components.  It's used to keep track of lists of components,
 in this case it can also be used to indicate that the component needs to be remounted when the value of `key` is changed.
 
-All objects in Hyperstack respond to the `to_key` method which will return a suitable unique key id, so all we have to do is pass `@Todo` as the key param,
-this will insure that as `@Todo` changes, we will re-initialize the `INPUT` tag.
+All objects in Hyperstack respond to the `to_key` method which will return a suitable unique key id, so all we have to do is pass `todo` as the key param,
+this will insure that as `todo` changes, we will re-initialize the `INPUT` tag.
 
 ```ruby
 ...
-INPUT(defaultValue: @Todo.title, key: @Todo) # add the special key param
+INPUT(defaultValue: todo.title, key: todo) # add the special key param
 ...
 ```
 
@@ -809,9 +827,9 @@ class EditItem < HyperComponent
   other :etc  # can be named anything you want
   after_mount { jQ[dom_node].focus }
   render do
-    INPUT(@Etc, defaultValue: @Todo.title, key: @Todo)
+    INPUT(etc, defaultValue: todo.title, key: todo)
     .on(:enter) do |evt|
-      @Todo.update(title: evt.target.value)
+      todo.update(title: evt.target.value)
       saved!
     end
     .on(:blur) { cancel! }
@@ -826,15 +844,15 @@ class TodoItem < HyperComponent
   param :todo
   render(LI, class: 'todo-item') do # add the todo-item class
     if @editing
-      EditItem(class: :edit, todo: @Todo)  # add the edit class
+      EditItem(class: :edit, todo: todo)  # add the edit class
       .on(:saved, :cancel) { mutate @editing = false }
     else
-      INPUT(type: :checkbox, class: :toggle, checked: @Todo.completed) # add the toggle class
-      .on(:change) { @Todo.update(completed: !@Todo.completed) }
-      LABEL { @Todo.title }
+      INPUT(type: :checkbox, class: :toggle, checked: todo.completed) # add the toggle class
+      .on(:change) { todo.update(completed: !todo.completed) }
+      LABEL { todo.title }
       .on(:double_click) { mutate @editing = true }
       A(class: :destroy) # add the destroy class and remove the -X- placeholder
-      .on(:click) { @Todo.destroy }
+      .on(:click) { todo.destroy }
     end
   end
 end
@@ -877,8 +895,8 @@ render(DIV, class: :footer) do
 
 ```ruby
 ...
-INPUT(@Etc, placeholder: 'What is left to do today?',
-            defaultValue: @Todo.title, key: @Todo)
+INPUT(etc, placeholder: 'What is left to do today?',
+            defaultValue: todo.title, key: todo)
 .on(:enter) do |evt|
 ...
 ```
@@ -971,15 +989,15 @@ class TodoItem < HyperComponent
   param :todo
   render(LI, class: 'todo-item') do
     if @editing
-      EditItem(class: :edit, todo: @Todo)
+      EditItem(class: :edit, todo: todo)
       .on(:saved, :cancel) { mutate @editing = false }
     else
-      INPUT(type: :checkbox, class: :toggle, checked: @Todo.completed)
-      .on(:change) { @Todo.update(completed: !@Todo.completed) }
-      LABEL { @Todo.title }
+      INPUT(type: :checkbox, class: :toggle, checked: todo.completed)
+      .on(:change) { todo.update(completed: !todo.completed) }
+      LABEL { todo.title }
       .on(:double_click) { mutate @editing = true }
       A(class: :destroy)
-      .on(:click) { @Todo.destroy }
+      .on(:click) { todo.destroy }
     end
   end
 end
@@ -992,10 +1010,10 @@ class EditItem < HyperComponent
   other :etc
   after_mount { jQ[dom_node].focus }
   render do
-    INPUT(@Etc, placeholder: 'What is left to do today?',
-                defaultValue: @Todo.title, key: @Todo)
+    INPUT(etc, placeholder: 'What is left to do today?',
+                defaultValue: todo.title, key: todo)
     .on(:enter) do |evt|
-      @Todo.update(title: evt.target.value)
+      todo.update(title: evt.target.value)
       saved!
     end
     .on(:blur) { cancel! }
