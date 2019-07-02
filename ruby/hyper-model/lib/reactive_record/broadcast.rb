@@ -6,6 +6,8 @@ module ReactiveRecord
       # before the first broadcast.
       @public_columns_hash ||= ActiveRecord::Base.public_columns_hash
       Hyperstack::InternalPolicy.regulate_broadcast(model) do |data|
+        puts "Broadcast aftercommit hook: #{data}" if Hyperstack::Connection.show_diagnostics
+
         if !Hyperstack.on_server? && Hyperstack::Connection.root_path
           send_to_server(operation, data) rescue nil # fails if server no longer running so ignore
         else

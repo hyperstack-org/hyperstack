@@ -1,13 +1,13 @@
 class DisplayTicker < HyperComponent
 
-  param :symbol  # hyperstack will copy the param to @Symbol when it changes
+  param :symbol  # access the current value through the symbol method
   fires :cancel  # this is an outgoing event.  You fire it by calling cancel!
 
   # when the component mounts (is created) we create a corresponding ticker
   # from our StockTicker store.  We will never within the component change the
   # value of @_ticker so it begins with an underscore
 
-  before_mount { @_ticker = StockTicker.new(@Symbol, 10.seconds) }
+  before_mount { @_ticker = StockTicker.new(symbol, 10.seconds) }
 
   # The status helper method renders some bootstrap columns depending on
   # the state of the ticker status.  Internal to each StockTicker state
@@ -32,7 +32,7 @@ class DisplayTicker < HyperComponent
 
   render do
     BS::Row() do
-      BS::Col(sm: 1) { @Symbol.upcase }
+      BS::Col(sm: 1) { symbol.upcase }
       status
       BS::Col(sm: 1) do
         BS::Button(class: :close) { "\u00D7" }

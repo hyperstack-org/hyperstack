@@ -25,7 +25,7 @@ class StockTicker
   # be marked with a call to mutate.
   # Finally we make our first fetch of the symbols stock data.
 
-  def initialize(symbol, update_interval = 5.seconds)
+  def initialize(symbol, update_interval = 5.minutes)
     @symbol = symbol
     @update_interval = update_interval
     @status = :loading
@@ -34,7 +34,7 @@ class StockTicker
 
   # Each fetch sets up a call to get the symbols delayed quote data.
   # when the fetch returns we record the status, the price,
-  # and the time of the quote.
+  # and the time of the quote. <--- api changed so we no longer get the time!
 
   # prefixing the state changes with mutate will signal any observers
   # that the state of this ticker has changed.
@@ -46,10 +46,10 @@ class StockTicker
   # need to reattempt the fetch, but otherwise we will keep trying.
 
   def fetch
-    HTTP.get("https://api.iextrading.com/1.0/stock/#{@symbol}/delayed-quote")
+    HTTP.get("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=#{@symbol}&apikey=NH1E83T56P88YY0U")
         .then do |resp|
-          mutate @status = :success, @price = resp.json[:delayedPrice],
-                 @time = Time.at(resp.json[:delayedPriceTime] / 1000)
+          mutate @status = :success, @price = resp.json["Global Quote"]["05. price"]
+                 @time = Time.now # Time.at(resp.json[:delayedPriceTime] / 1000) No longer provides time
           after(@update_interval) { fetch }
         end
         .fail do |resp|

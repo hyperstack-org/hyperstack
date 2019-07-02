@@ -141,7 +141,7 @@ module Hyperstack
       end
 
       def execute_remote
-        parsed_params = JSON.parse(params[:json]).symbolize_keys
+        parsed_params = JSON.parse(params[:hyperstack_secured_json]).symbolize_keys
         render ServerOp.run_from_client(
           :acting_user,
           self,

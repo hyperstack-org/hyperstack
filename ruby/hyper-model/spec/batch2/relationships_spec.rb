@@ -286,6 +286,36 @@ describe "synchronizing relationships", js: true do
 
   end
 
+  it "causes a rerender when an association is updated" do
+    FactoryBot.create(:test_model, test_attribute: 'hello')
+    mount "TestComponent4" do
+      class TestComponent4 < HyperComponent
+        class << self
+          attr_accessor :child_model
+          def update_relationship
+            Hyperstack::Model.load do
+              TestModel.first
+            end.then do |test_model|
+              child_model.test_model = test_model
+            end
+          end
+        end
+        before_mount do
+          TestComponent4.child_model = ChildModel.new(child_attribute: 'hello')
+        end
+        render do
+          DIV do
+            TestComponent4.child_model.test_model.try(:test_attribute)
+          end
+        end
+      end
+    end
+    evaluate_ruby do
+      TestComponent4.update_relationship
+    end
+    page.should have_content(TestModel.first.test_attribute)
+  end
+
   it "composed_of"
 
 end

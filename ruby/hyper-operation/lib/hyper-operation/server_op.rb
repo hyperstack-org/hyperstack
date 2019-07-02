@@ -13,7 +13,7 @@ module Hyperstack
             hash = serialize_params(hash)
             Hyperstack::HTTP.post(
               "#{`window.HyperstackEnginePath`}/execute_remote",
-              payload: {json: {operation: name, params: hash}.to_json},
+              payload: {hyperstack_secured_json: {operation: name, params: hash}.to_json},
               headers: headers.merge('X-CSRF-Token' => Hyperstack::ClientDrivers.opts[:form_authenticity_token])
               )
             .then do |response|
