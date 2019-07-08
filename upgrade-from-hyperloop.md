@@ -164,10 +164,19 @@ You will also need to add this to your Gemfile:
 gem 'hyper-store`, '~> 1.0.alpha1.5'
 ```
 
+### xx. Change hyperloop to hyperstack in your routes file.
+
+`mount Hyperstack::Engine => '/hyperstack'`
+
+### xx. Hyperstack::ApplicationPolicy
+
 ### 10. Change name of Hyperloop::... to Hyperstack::
 
 Hyperloop::Operation -> Hyperstack::Operation
 Hyperloop::Store -> 
+
+
+
 
 If at this point you have other classes and methods under the `Hyperloop` namespace, you will have to find
 the equivilent class or method under Hyperstack.  Its going to be a case by case basis.  Let us know if you need help, and we can 
