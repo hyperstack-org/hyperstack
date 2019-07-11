@@ -11,7 +11,7 @@ if RUBY_ENGINE == 'opal'
 else
   require "hyperstack/internal/component"
   require "react/rails/asset_variant"
-  variant = Hyperstack.env.production? ? 'production' : 'development'
-  react_directory = React::Rails::AssetVariant.new({environment: variant}).react_directory
+  variant = Hyperstack.env.production? ? :production : :development
+  react_directory = React::Rails::AssetVariant.new({variant: variant}).react_directory
   Opal.append_path react_directory.untaint
 end
