@@ -146,7 +146,7 @@ module ReactiveRecord
       @destroyed = operation == :destroy
       @is_new = operation == :create
       @klass = record.class.name
-      @record = data
+      @record = destroyed? ? {} : record.attributes.dup
       record.backing_record.destroyed = false
       @record[:id] = record.id if record.id
       record.backing_record.destroyed = @destroyed

@@ -49,6 +49,15 @@ if RUBY_ENGINE == 'opal'
 else
   require 'opal'
   require 'hyper-operation'
+  # insure show_diagnostics is acccessible - this is a cludge as we are changing the
+  # APIs across gems, but we don't want to have to make a major alpha release just for
+  # this.
+  Hyperstack::Connection.class_eval do
+    class << self
+      attr_accessor :show_diagnostics
+    end 
+  end
+
   require "reactive_record/permissions"
   require "reactive_record/server_data_cache"
   require "reactive_record/active_record/reactive_record/operations"
