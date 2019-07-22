@@ -616,8 +616,13 @@ To determine this sync_scopes first asks if the record being changed is in the s
       count.zero?
     end
 
-    def any?
-      !count.zero?
+    def any?(*args, &block)
+      # If are doing anything other than just checking if there is an object in the collection,
+      # proceed to the normal behavior
+      return super if args&.length&.positive? || block.present?
+
+      # Otherwise just check the count for efficiency
+      count.positive?
     end
 
     def method_missing(method, *args, &block)

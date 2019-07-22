@@ -50,4 +50,40 @@ RSpec::Steps.steps "collection aggregate methods", js: true do
     ).to eq(TestModel.all.send(method))
     end
   end
+
+  it 'will retrieve the entire collection when using any? if an arg is passed in' do
+    FactoryBot.create(:test_model)
+
+    expect_promise(
+      <<~RUBY
+        Hyperstack::Model.load do
+          TestModel.any?(TestModel)
+        end.then do |val|
+          if TestModel.all.instance_variable_get('@collection')
+            'necessary fetch of all'
+          else
+            val
+          end
+        end
+      RUBY
+    ).to eq('necessary fetch of all')
+  end
+
+  it 'will retrieve the entire collection when using any? if a block is passed in' do
+    FactoryBot.create(:test_model)
+
+    expect_promise(
+      <<~RUBY
+        Hyperstack::Model.load do
+          TestModel.any? { |test_model| test_model }
+        end.then do |val|
+          if TestModel.all.instance_variable_get('@collection')
+            'necessary fetch of all'
+          else
+            val
+          end
+        end
+      RUBY
+    ).to eq('necessary fetch of all')
+  end
 end
