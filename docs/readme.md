@@ -42,7 +42,7 @@ As it gives a minimal understanding of the Hyperstack framework.
 
 Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, please reach out and say hello.
 
-+ Reach us at: [Gitter chat](https://gitter.im/ruby-hyperloop/chat)
++ Reach us at: [Slack chat](https://hyperstack.org/slack-invite)
 
 ## Roadmap
 
