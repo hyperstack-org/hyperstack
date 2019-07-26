@@ -16,7 +16,7 @@ module Hyperstack
       if Hyperstack::Component::IsomorphicHelpers.on_opal_client?
         %x{
           function onError(event) {
-            if (event.message.startsWith('Uncaught NotQuiet: ')) event.preventDefault();
+            if (event.message.match(/^Uncaught NotQuiet: /)) event.preventDefault();
           }
 
           window.addEventListener('error', onError);
