@@ -109,7 +109,7 @@ module Hyperstack
                     this.__opalInstanceSyncSetState = false;
                   }
                 },
-                shouldComponentUpdate(next_props, next_state) {
+                shouldComponentUpdate: function(next_props, next_state) {
                   if (#{type.method_defined? :should_component_update?}) {
                     this.__opalInstanceSyncSetState = false;
                     return this.__opalInstance["$should_component_update?"](Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
