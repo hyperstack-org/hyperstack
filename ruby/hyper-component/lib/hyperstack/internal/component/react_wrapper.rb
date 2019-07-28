@@ -64,93 +64,81 @@ module Hyperstack
         end
 
         def self.create_native_react_class(type)
+          raise "createReactClass is undefined. Add the 'react-create-class' npm module, and import it as 'createReactClass'" if `typeof(createReactClass)=='undefined'`
           raise "Provided class should define `render` method"  if !(type.method_defined? :render)
           render_fn = (type.method_defined? :_render_wrapper) ? :_render_wrapper : :render
           # this was hashing type.to_s, not sure why but .to_s does not work as it Foo::Bar::View.to_s just returns "View"
 
           @@component_classes[type] ||= begin
             comp = %x{
-              class extends React.Component {
-                constructor(props) {
-                  super(props);
+              createReactClass({
+                getInitialState: function() {
                   this.mixins = #{type.respond_to?(:native_mixins) ? type.native_mixins : `[]`};
                   this.statics = #{type.respond_to?(:static_call_backs) ? type.static_call_backs.to_n : `{}`};
-                  this.state = {};
                   this.__opalInstanceInitializedState = false;
                   this.__opalInstanceSyncSetState = true;
                   this.__opalInstance = #{type.new(`this`)};
                   this.__opalInstanceInitializedState = true;
                   this.__opalInstanceSyncSetState = false;
                   this.__name = #{type.name};
-                }
-                static get displayName() {
-                  if (typeof this.__name != "undefined") {
-                    return this.__name;
-                  } else {
-                    return #{type.name};
-                  }
-                }
-                static set displayName(name) {
-                  this.__name = name;
-                }
-                static get defaultProps() {
+                  return {}
+                },
+                displayName: #{type.name},
+                getDefaultProps: function() {
                   return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
-                }
-                static get propTypes() {
-                  return  #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`};
-                }
-                componentWillMount() {
+                },
+                propTypes: #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`},
+                componentWillMount: function() {
                   if (#{type.method_defined? :component_will_mount}) {
                     this.__opalInstanceSyncSetState = true;
                     this.__opalInstance.$component_will_mount();
                     this.__opalInstanceSyncSetState = false;
                   }
-                }
-                componentDidMount() {
+                },
+                componentDidMount: function() {
                   this.__opalInstance.__hyperstack_component_is_mounted = true
                   if (#{type.method_defined? :component_did_mount}) {
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_did_mount();
                   }
-                }
-                componentWillReceiveProps(next_props) {
+                },
+                componentWillReceiveProps: function(next_props) {
                   if (#{type.method_defined? :component_will_receive_props}) {
                     this.__opalInstanceSyncSetState = true;
                     this.__opalInstance.$component_will_receive_props(Opal.Hash.$new(next_props));
                     this.__opalInstanceSyncSetState = false;
                   }
-                }
-                shouldComponentUpdate(next_props, next_state) {
+                },
+                shouldComponentUpdate: function(next_props, next_state) {
                   if (#{type.method_defined? :should_component_update?}) {
                     this.__opalInstanceSyncSetState = false;
                     return this.__opalInstance["$should_component_update?"](Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
                   } else { return true; }
-                }
-                componentWillUpdate(next_props, next_state) {
+                },
+                componentWillUpdate: function(next_props, next_state) {
                   if (#{type.method_defined? :component_will_update}) {
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_will_update(Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
                   }
-                }
-                componentDidUpdate(prev_props, prev_state) {
+                },
+                componentDidUpdate: function(prev_props, prev_state) {
                   if (#{type.method_defined? :component_did_update}) {
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_did_update(Opal.Hash.$new(prev_props), Opal.Hash.$new(prev_state));
                   }
-                }
-                componentWillUnmount() {
+                },
+                componentWillUnmount: function() {
                   if (#{type.method_defined? :component_will_unmount}) {
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_will_unmount();
                   }
                   this.__opalInstance.__hyperstack_component_is_mounted = false;
-                }
-
-                render() {
+                },
+                render: function() {
                   this.__opalInstanceSyncSetState = false;
                   return this.__opalInstance.$send(render_fn).$to_n();
                 }
-              }
+              })
             }
             # check to see if there is an after_error callback.  If there is add a
             # componentDidCatch handler. Because legacy behavior is to allow any object
