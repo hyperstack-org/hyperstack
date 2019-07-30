@@ -5,7 +5,7 @@ If you're new to Hyperstack but have experience with Ruby (and Rails) and would 
 that way you understand the basic capabilities and lingo of Hyperstack.
 
 Next would be to start an experimental project that's based on the *edge* Hyperstack codebase.  
-If you just want to build a website with Hyperstack without contributing to Hyperstack itself you're better of sticking to released versions of Hyperstack.
+If you just want to build a project with Hyperstack without contributing to Hyperstack itself you're better of sticking to released versions of Hyperstack.
 But presuming you do want to contribute you can change you `Gemfile` in the following way to get your project on *edge*.
 
 ```ruby
@@ -27,9 +27,17 @@ The *edge* branch is the latest work in progress, where specs (automated tests) 
 The difference between *edge* and *master*, is that *master* guarantees that all specs across all gems pass, plus *master* is the branch from which new versions are released.  
 
 With this configuration you can track development of Hyperstack itself and discuss changes with the other developers.  
-It's the basic starting point from which you can make different types of contributions listed below under the separate headings.
 
-## If you would like to contribute code to Hyperstack
+In the following sections we explain how to make different types of contributions.
+ - Contributing code to Hyperstack
+   - Running tests for your code
+   - Adding your own tests
+ - Improving the Hyperstack documentation
+ - If you think you can improve the website
+ - When you find a possible bug
+ - Fixing a bug
+
+## Contributing code to Hyperstack
 
 With the `Gemfile` configuration above you can track Hyperstack development. But you can't contribute code.
 
@@ -37,12 +45,27 @@ For that you need to `git clone https://github.com/hyperstack-org/hyperstack.git
 Cd into the directory `cd hyperstack`  
 And change to the *edge* branch: `git checkout edge` (*edge* is the default branch but just to be sure).
 
-Now you're free to fix bugs and create new features.  
-Reconfigure the `Gemfile` of your website project with a [filesystem path](https://bundler.io/gemfile.html) to create a local development environment.  
+This gives you a local copy of the Hyperstack codebase on your system.  
+You will have to reconfigure the `Gemfile` of your own website project with a [filesystem path](https://bundler.io/gemfile.html) so it uses this local Hyperstack copy.  
+
 ```
-TODO: Actually provide an example Gemfile..
+gem 'rails-hyperstack',  path: '~/path/to/hyperstack/ruby/rails-hyperstack'
+gem 'hyper-component',   path: '~/path/to/hyperstack/ruby/hyper-component'
+gem 'hyper-i18n',        path: '~/path/to/hyperstack/ruby/hyper-i18n'
+gem 'hyper-model',       path: '~/path/to/hyperstack/ruby/hyper-model'
+gem 'hyper-operation',   path: '~/path/to/hyperstack/ruby/hyper-operation'
+gem 'hyper-router',      path: '~/path/to/hyperstack/ruby/hyper-router'
+gem 'hyper-state',       path: '~/path/to/hyperstack/ruby/hyper-state'
+gem 'hyperstack-config', path: '~/path/to/hyperstack/ruby/hyperstack-config'
+gem 'hyper-trace',       path: '~/path/to/hyperstack/ruby/hyper-trace', group: :development
+#gem 'hyper-store',       path: '~/path/to/hyperstack/ruby/hyper-store' # Extra (legacy?)
 ```
-And if your improvements could be interesting to others then push it to Github and create a pull request.
+
+Or use `bundle config local.GEM_NAME /path/to/hyperstack` as described [here](https://rossta.net/blog/how-to-specify-local-ruby-gems-in-your-gemfile.html). But I would recommend the Gemfile with a local path approach.  
+Use `bundle config --delete local.GEM_NAME` to remove a `bundle config local` configuration.
+
+This setup provides a local Hyperstack development environment. You're now able to fix bugs and create new features within the Hyperstack code itself.  
+If your improvements could be interesting to others then push it to Github and create a pull request.
 Then keep reminding the existing developers that you would like your code pulled into the Hyperstack repository.
 When they find the time to look at it and like your code they will kindly ask you to also write some specs before your code is merged. That's a good thing, your code is considered valuable, but does require those tests.
 Please understand that your code can also be rejected because it has security issues, is slow, hard to maintain or buggy (among other things).
@@ -54,7 +77,37 @@ But Hyperstack and Opal are quite happily pushing boundaries, so we might like y
 
 Hyperstack's [license is MIT](https://github.com/hyperstack-org/hyperstack/blob/edge/LICENSE). All code contributions must be under this license. If code is submitted under a different open source license then this must be explicitly stated. Preferably with an explanation why it can't be MIT.
 
-## If you would like to improve the Hyperstack documentation
+### Running tests for your code
+
+Hyperstack has a comprehensive automated test system. Changes to code must be accompanied with the necessary tests.  
+This is how you setup the test environment on your local development system:
+
+ - You do the `git clone https://github.com/hyperstack-org/hyperstack.git` as before.  
+ - Now you enter the gem you would like to run the tests for. Lets say you change directory to the hyper-model gem `cd ~/path/to/hyperstack/ruby/hyper-model`
+ - Optionally but recommended: Create a RVM environment by adding the `.ruby-gemset` and `.ruby-version` files, run `cd .` to reload RVM.
+ - Install bundler `gem install bundler` then run `bundle install` to pull in the gems needed for testing.
+ - Then you have to setup the test environment by running `rake spec:prepare`, this creates the test database and tables.
+
+After this call `rspec spec` to run the tests.
+
+If all test pass you know your changes to the Hyperstack code did not break any existing functionality.  
+Please understand that tests can sometimes be flaky, re-run tests if needed. Sometimes it's just the phase of the moon.
+
+### Adding your own tests
+
+Cleaning up and improving the existing tests is a great and "safe" way to contribute and get experience with the Hyperstack codebase.  
+
+**TODO:** Pointers about directory structure.
+
+ - Test one thing at a time, don't write one large test.
+ - Check the before state, call the code you want to test, check if the before state has changed to the expected state.
+ - Test the interface, the internals of the implementation should keep some flexibility.
+ - Watch out with testing things that use Date/Time, you don't want your test to fail when it's run on the 29th of February or when run in a different timezone.
+ - Don't check if `string1.include?(string2)` if string2 can be an empty string, like "". As that would pass.
+ - Tests are a development tool, flaky or slow tests that don't cover enough have a negative value.
+ - Test your feature with different types of input (nil, empty string, empty array, false, zero, negative dates). Don't test with every day of the year if it exesersizes the same codepath as with the other dates.
+ 
+## Improving the Hyperstack documentation
 
 Each page on [the website](https://hyperstack.org) has an ***Improve this page*** button which will allow you to edit the underlying markdown file on Github and create a ***pull request***. This is to make it as easy as possible to contribute to the documentation.
 And make small fixes quickly.
@@ -69,19 +122,19 @@ The website's code can be found in [this repository](https://github.com/hypersta
 By running `git clone https://github.com/hyperstack-org/website.git` you can check out your own copy.  
 Please note that this repository does not contain the documentation. The website pulls the most recent markdown files from the *edge* hyperstack repository.
 
-Before you write code to change the website, please create an issue describing your plans and reach out to us in the Gitter chat. Our goal for this site is that it acts as a showcase for all that Hyperstack can do, so your creativity is very welcome.
+Before you write code to change the website, please create an issue describing your plans and reach out to us in Slack chat. Our goal for this site is that it acts as a showcase for all that Hyperstack can do, so your creativity is very welcome.
 
-## If you found a possible bug
+## When you find a possible bug
 
-You can ask on [gitter chat](https://gitter.im/ruby-hyperloop/chat) if you're making a mistake or actually found a bug.  
-Also check the GitHub issue list and if you don't find it mentioned there, please create an issue.  
+You can ask on [Slack chat](https://hyperstack-org.slack.com) if you're making a mistake or actually found a bug. (get a account via the "Join Slack" button on the [homepage](https://hyperstack.org))  
+Also check the [GitHub issue list](https://github.com/hyperstack-org/hyperstack/issues) and if you don't find it mentioned there, please create an issue.  
 If you can reproduce the problem in a branch you push to GitHub we will love you even more.
 
 We also have a [feature matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md), which is an attempt to list known issues and the current status.
 Having people expanding and maintaining this table would be excellent.
 
-## If you would like to fix a bug
+## Fixing a bug
 
-Please ask in [gitter chat](https://gitter.im/ruby-hyperloop/chat) if you need pointers. There is always tons to do so we would appreciate the help.  
+Please ask in [Slack chat](https://hyperstack-org.slack.com) if you need pointers. There is always tons to do so we would appreciate the help.  
 You can see the list of GitHub issues labelled '[Help Wanted](https://github.com/hyperstack-org/hyperstack/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)'
 or look at the [feature matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md) for things that have the status 'bugged'.
