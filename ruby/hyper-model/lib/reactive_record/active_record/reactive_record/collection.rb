@@ -594,8 +594,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
       r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
 
-    def find(id)
-      find_by @target_klass.primary_key => id
+    def find(*args)
+      args = args[0] if args[0].is_a? Array
+      return args.collect { |id| find(id) } if args.count > 1
+      find_by(@target_klass.primary_key => args[0])
     end
 
     def _find_by_initializer(scope, attrs)

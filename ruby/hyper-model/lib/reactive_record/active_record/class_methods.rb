@@ -59,8 +59,10 @@ module ActiveRecord
       attrs.each { |attr, value| dealiased_attrs[_dealias_attribute(attr)] = value }
     end
 
-    def find(id)
-      find_by(primary_key => id)
+    def find(*args)
+      args = args[0] if args[0].is_a? Array
+      return args.collect { |id| find(id) } if args.count > 1
+      find_by(primary_key => args[0])
     end
 
     def find_by(attrs = {})
