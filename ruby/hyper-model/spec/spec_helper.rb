@@ -133,6 +133,17 @@ if RUBY_ENGINE != 'opal'
   require 'support/component_helpers'
   require 'selenium-webdriver'
 
+  def policy_allows_all
+    stub_const 'TestApplication', Class.new
+    stub_const 'TestApplicationPolicy', Class.new
+    TestApplicationPolicy.class_eval do
+      always_allow_connection
+      regulate_all_broadcasts { |policy| policy.send_all }
+      allow_change(to: :all, on: [:create, :update, :destroy]) { true }
+    end
+  end
+
+
   module React
     module IsomorphicHelpers
       def self.xxxload_context(ctx, controller, name = nil)
