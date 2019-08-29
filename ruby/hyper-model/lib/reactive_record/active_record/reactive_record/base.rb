@@ -64,7 +64,11 @@ module ReactiveRecord
     end
 
     def self.load_from_json(json, target = nil)
-      load_data { ServerDataCache.load_from_json(json, target) }
+      load_data {
+        start_time = Time.now.to_f
+        ServerDataCache.load_from_json(json, target)
+        puts "Base.load_from_json took #{Time.now.to_f - start_time}s"
+      }
     end
 
     def self.find_locally(model, attrs, new_only: nil)
