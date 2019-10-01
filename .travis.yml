@@ -14,8 +14,8 @@ _test_gem: &_test_gem
         - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
           key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
       packages:
-        - chromium-chromedriver=74.0.3729.169-0ubuntu0.16.04.1
-        - chromium-browser=74.0.3729.169-0ubuntu0.16.04.1
+        - chromium-chromedriver
+        - google-chrome-stable
         - yarn
     mariadb: '10.3'
   before_install:
@@ -32,8 +32,8 @@ _test_gem: &_test_gem
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - bundle exec rake spec:prepare
-    - chromium-browser --version
-    - which chromium-browser
+    - google-chrome --version
+    - which google-chrome
     - yarn install
   script:
     - echo running script $COMPONENT
