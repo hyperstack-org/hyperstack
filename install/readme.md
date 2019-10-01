@@ -11,8 +11,15 @@ And for a full system that includes Webpack for managing javascript assets you w
 #### - Yarn ([Install Instructions](https://yarnpkg.com/en/docs/install))
 #### - NodeJS: ([Install Instructions](https://nodejs.org))
 
+## Createing a new app with a Rails template
 
-## Creating a Test Rails App
+This template will create a new app with Webpacker, Hyperstack and Postgres and will deploy to Heroku
+
+```shell
+rails new MyApp --database=postgresql --template=https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+```
+
+## Creating a Test Rails App (without using the template)
 
 You can install Hyperstack in existing Rails apps, or you can create a new Rails app using the Rails `new` command.  For example to create a new app called `MyApp` you would run
 
