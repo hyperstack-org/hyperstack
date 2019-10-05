@@ -12,6 +12,7 @@ gem 'webpacker'
 gem 'rails-hyperstack', '~> 1.0.alpha1.0'
 gem_group :development do
   gem 'foreman'
+  gem 'rubocop'
 end
 
 # ----------------------------------- Ensure Sqlite has a valid version
@@ -77,18 +78,20 @@ Hyperstack.configuration do |config|
   config.import 'hyperstack/hotloader', client_only: true if Rails.env.development?
 end
 
-# useful for debugging
-module Hyperstack
-  def self.on_error(operation, err, params, formatted_error_message)
-    ::Rails.logger.debug(
-      "\#{formatted_error_message}\\n\\n" +
-      Pastel.new.red(
-        'To further investigate you may want to add a debugging '\\
-        'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+if Rails.env.development?
+  # useful for debugging
+  module Hyperstack
+    def self.on_error(operation, err, params, formatted_error_message)
+      ::Rails.logger.debug(
+        "\#{formatted_error_message}\\n\\n" +
+        Pastel.new.red(
+          'To further investigate you may want to add a debugging '\\
+          'breakpoint to the on_error method in config/initializers/hyperstack.rb'
+        )
       )
-    )
+    end
   end
-end if Rails.env.development?
+end
 CODE
 
 # ----------------------------------- Create thyperstack.js
@@ -118,19 +121,25 @@ file 'app/policies/application_policy.rb', <<-CODE
 # The following policy will open up full access (but only in development)
 # The policy system is very flexible and powerful.  See the documentation
 # for complete details.
-class Hyperstack::ApplicationPolicy
-  # Allow any session to connect:
-  always_allow_connection
-  # Send all attributes from all public models
-  regulate_all_broadcasts { |policy| policy.send_all }
-  # Allow all changes to public models
-  allow_change(to: :all, on: [:create, :update, :destroy]) { true }
-  # allow remote access to all scopes - i.e. you can count or get a list of ids
-  # for any scope or relationship
-  ApplicationRecord.regulate_scope :all
-end unless Rails.env.production?
-# don't forget to provide a policy before production...
-::Rails.logger.debug("WARNING: You need to define a Hyperstack policy for production") if Rails.env.production?
+if Rails.env.production?
+  ::Rails.logger.warn("WARNING: You need to define a Hyperstack policy for production")
+else
+  class Hyperstack::ApplicationPolicy
+    # Allow any session to connect
+    always_allow_connection
+
+    # Send all attributes from all public models
+    regulate_all_broadcasts { |policy| policy.send_all }
+
+    # Allow all changes to public models
+    allow_change(to: :all, on: %i[create update destroy]) { true }
+
+    # Allow remote access to all scopes - i.e. you can count or get a list of ids
+    # for any scope or relationship
+    ApplicationRecord.regulate_scope :all
+  end
+end
+
 CODE
 
 # ----------------------------------- Add NPM modules
@@ -164,6 +173,124 @@ web: bundle exec rails s -b 0.0.0.0
 hot: hyperstack-hotloader -p 25222 -d app/hyperstack/
 CODE
 
+# ----------------------------------- .rubocop.yml
+
+file '.rubocop.yml', <<-'CODE'
+# Prevent rubocop from prefixing unused arguments
+# with an underscore. We might be using the argument
+# in a syntax (e.g. `javascript`) that Rubocop
+# doesn't understand.
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+# Increase allowed method/class/block/etc.
+# length and complexity. These values are
+# completely arbitrary. Feel free to adjust
+# as you see fit.
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/BlockLength:
+  Max: 80
+
+Metrics/ClassLength:
+  Max: 240
+
+Metrics/MethodLength:
+  Max: 12
+
+Metrics/LineLength:
+  Max: 180
+
+# Allow to use { } for multi-line blocks
+Style/BlockDelimiters:
+  Enabled: false
+
+# Allow compact class/module style; Foo::Bar
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# Allow: assert_match /foo bar regex/, err.message
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+# Allow comment after keyword, like:
+# def foo
+#   ..long method..
+# end # /foo
+Style/CommentedKeyword:
+  Enabled: false
+
+# Don't nag about missing comments
+Style/Documentation:
+  Enabled: false
+
+# Allow top-level 'include' in scripts
+Style/MixinUsage:
+  Exclude:
+    - 'bin/*'
+
+# Allow chained blocks (javascript-style)
+Style/MultilineBlockChain:
+  Enabled: false
+
+# Allow 'foo == 0' instead of 'foo.zero?'
+Style/NumericPredicate:
+  Enabled: false
+
+# Sometimes humans feel better with an explicit begin.
+Style/RedundantBegin:
+  Enabled: false
+
+# Sometimes humans feel better with an explicit return.
+Style/RedundantReturn:
+  Enabled: false
+
+# Sometimes humans want to write ; things ; in a ; condensed ; fashion
+Style/Semicolon:
+  Enabled: false
+
+# Sometimes humans disagree with rubocop.
+Style/GuardClause:
+  Enabled: false
+
+# Allow double-quotes ("foo") even when there is no interpolation.
+# There is no performance difference and therefore no reason
+# to be a pain in the ass about it.
+Style/StringLiterals:
+  Enabled: false
+
+# Allow blocks that call `send_all`.
+# *** DO NOT REMOVE THIS RULE! ***
+# Hyperstack frequently requires this syntax.
+# Your code will break if you let rubocop change it.
+Style/SymbolProc:
+  Enabled: false
+
+# Allow "#{foo}".
+# *** DO NOT REMOVE THIS RULE! ***
+# Hyperstack frequently requires this syntax.
+# Your code will break if you let rubocop change it.
+Style/UnneededInterpolation:
+  Enabled: false
+
+# If you don't understand what this does then
+# best leave it disabled. Re-enabling it will
+# _likely_ not break anything. But you may get
+# cryptic warnings that are exceedingly unlikely
+# to help improve your code.
+Lint/Void:
+  Enabled: false
+
+# Don't nag about missing magic comment '# frozen_string_literal: true'.
+# Neither Rails nor Hyperstack seem to endorse the practice of having it.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+CODE
+
 # ----------------------------------- App
 
 # must be inserted BEFORE the engine mount so it ends up after in the route file!
@@ -174,7 +301,7 @@ file 'app/hyperstack/components/app.rb', <<-CODE
 
 # This is your top level component, the rails router will
 # direct all requests to mount this component.  You may
-# then use the Route psuedo component to mount specific
+# then use the Route pseudo component to mount specific
 # subcomponents depending on the URL.
 
 class App < HyperComponent
@@ -189,7 +316,7 @@ class App < HyperComponent
 
   render(DIV) do
     H1 { "Hello world from Hyperstack!" }
-    BUTTON {"Click me"}.on(:click) do
+    BUTTON { "Click me" }.on(:click) do
       alert("All working!")
     end
   end
@@ -206,6 +333,12 @@ route "mount Hyperstack::Engine => '/hyperstack'"
 
 after_bundle do
   run 'bundle exec rails webpacker:install'
+
+  # We let rubocop fix all linter problems
+  # that are auto-fixable. This normally leads
+  # to a lint-clean installation.
+  run 'rubocop -a'
+
   git add:    "."
   git commit: "-m 'Hyperstack config complete'"
   run 'rake db:create'
