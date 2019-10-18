@@ -43,7 +43,7 @@ You can be up and running in **less than 5 minutes**. Just follow the simple set
 
 Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, please reach out and say hello.
 
-+ [Join](https://hyperstack.org/slack-invite)(needs updating, the link has expired) our new Slack group
++ [Join](https://join.slack.com/t/hyperstack-org/shared_invite/enQtNTg4NTI5NzQyNTYyLWQ4YTZlMGU0OGIxMDQzZGIxMjNlOGY5MjRhOTdlMWUzZWYyMTMzYWJkNTZmZDRhMDEzODA0NWRkMDM4MjdmNDE) our Slack group
 + After you have joined there is a shortcut at https://hyperstack.org/slack
 
 ### StackOverflow Questions
