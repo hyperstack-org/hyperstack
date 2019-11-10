@@ -363,7 +363,7 @@ module ActiveRecord
         # easier by keeping the columns_hash the same if there are no seralized strings
         # see rspec ./spec/batch1/column_types/column_type_spec.rb:100
         column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
-        
+
         define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
         define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
@@ -410,7 +410,7 @@ module ActiveRecord
                 if key == poly_assoc.polymorphic_type_attribute
                   model_name = value
                   already_processed_keys << poly_assoc.association_foreign_key
-                elsif key == poly_assoc.association_foreign_key
+                elsif key == poly_assoc.association_foreign_key && poly_assoc.polymorphic_type_attribute
                   model_id = value
                   already_processed_keys << poly_assoc.polymorphic_type_attribute
                 end
