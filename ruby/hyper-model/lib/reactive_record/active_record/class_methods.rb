@@ -399,18 +399,23 @@ module ActiveRecord
             associations = reflect_on_all_associations
 
             already_processed_keys = Set.new
-            old_param = param.dup
 
             param = param.collect do |key, value|
               next if already_processed_keys.include? key
 
               model_name = model_id = nil
 
+              # polymorphic association is where the belongs_to side holds the
+              # id, and the type of the model the id points to
+
+              # belongs_to :duplicate_of, class_name: 'Report', required: false
+              # has_many :duplicates, class_name: 'Report', foreign_key: 'duplicate_of_id'
+
               assoc = associations.detect do |poly_assoc|
                 if key == poly_assoc.polymorphic_type_attribute
                   model_name = value
                   already_processed_keys << poly_assoc.association_foreign_key
-                elsif key == poly_assoc.association_foreign_key && poly_assoc.polymorphic_type_attribute
+                elsif key == poly_assoc.association_foreign_key # && poly_assoc.polymorphic_type_attribute #poly_assoc.macro != :has_many
                   model_id = value
                   already_processed_keys << poly_assoc.polymorphic_type_attribute
                 end
