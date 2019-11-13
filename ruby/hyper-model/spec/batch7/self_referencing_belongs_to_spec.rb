@@ -65,10 +65,10 @@ describe "self referencing belongs_to", js: true do
       class SelfRefModelIndex < HyperComponent
         render(UL) do
           SelfRefModel.first.tap do |m|
-            if m.parent&.id
+            if m.parent && m.parent.id
               LI { "name: #{m.name}, parent id: #{m.parent.id}." }
             elsif !m.children.empty?
-              LI { "name: #{m.name}, children: [#{m.children.collect(&:id)}]"}
+              LI { "name: #{m.name}, children: [#{m.children.collect(&:id)}]" }
             else
               LI { "name: #{m.name}." }
             end
