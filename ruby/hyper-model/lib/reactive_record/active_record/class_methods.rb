@@ -384,6 +384,7 @@ module ActiveRecord
             klass = ReactiveRecord::Base.infer_type_from_hash(self, param)
             klass == self || klass < self
           else
+            #debugger if param[:duplicate_of_id]
             # TODO: investigate saving .changes here and then replacing the
             # TODO: changes after the load is complete.  In other words preserve the
             # TODO: changed values as changes while just updating the synced values.
@@ -415,7 +416,7 @@ module ActiveRecord
                 if key == poly_assoc.polymorphic_type_attribute
                   model_name = value
                   already_processed_keys << poly_assoc.association_foreign_key
-                elsif key == poly_assoc.association_foreign_key # && poly_assoc.polymorphic_type_attribute #poly_assoc.macro != :has_many
+                elsif key == poly_assoc.association_foreign_key && (poly_assoc.polymorphic_type_attribute || poly_assoc.macro == :belongs_to)
                   model_id = value
                   already_processed_keys << poly_assoc.polymorphic_type_attribute
                 end

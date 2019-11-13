@@ -558,8 +558,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def delete(item)
-      unsaved_children.delete(item)
-      notify_of_change(
+      Hyperstack::Internal::State::Mapper.bulk_update do
+        unsaved_children.delete(item)
         if @owner && @association
           inverse_of = @association.inverse_of
           if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner && !@association.through_association?
@@ -569,8 +569,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
           delete_internal(item) { @owner.backing_record.sync_has_many(@association.attribute) }
         else
           delete_internal(item)
-        end
-      )
+        end.tap { Hyperstack::Internal::State::Variable.set(self, :collection, collection) }
+      end
     end
 
     def delete_internal(item)

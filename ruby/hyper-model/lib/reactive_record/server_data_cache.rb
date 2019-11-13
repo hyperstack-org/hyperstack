@@ -492,9 +492,15 @@ keys:
 
             target.send "#{method}=", value.first
           elsif value.is_a? Array
-            # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
-            # a better fix might be something like target._internal_attribute_hash[method] =  ...
-            target.backing_record.set_attr_value(method, value.first) unless method == :id
+            unless method == :id
+              # we cannot always use target.send "#{method}=" here because it might be a server method, which does not have a setter
+              # a better fix might be something like target._internal_attribute_hash[method] =  ...
+              if target.respond_to?("#{method}=")
+                target.send("#{method}=", value.first)
+              else
+                target.backing_record.set_attr_value(method, value.first) unless method == :id
+              end
+            end
           elsif value.is_a?(Hash) && value[:id] && value[:id].first && (association = target.class.reflect_on_association(method))
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
             klass = value[:model_name] ? Object.const_get(value[:model_name].first) : association.klass
