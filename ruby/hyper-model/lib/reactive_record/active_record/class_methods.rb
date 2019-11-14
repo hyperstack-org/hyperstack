@@ -347,20 +347,11 @@ module ActiveRecord
       end
     end
 
-    # def define_attribute_methods
-    #   columns_hash.each do |name, column_hash|
-    #     next if name == primary_key
-    #     column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
-    #
-    #     define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
-    #     define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
-    #     define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
-    #     define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
-    #     define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
-    #   end
-    #   self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
-    # end
-
+    # define all the methods for each column.  To allow overriding the methods they will NOT
+    # be defined if already defined (i.e. by the model)  See the instance_methods module for how
+    # super calls are handled in this case.   The _hyperstack_internal_setter_... methods
+    # are used by the load_from_json method when bringing in data from the server, and so therefore
+    # does not want to be overriden.
 
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
