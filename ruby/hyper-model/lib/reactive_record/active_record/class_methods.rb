@@ -57,6 +57,7 @@ module ActiveRecord
       end
       dealiased_attrs = {}
       attrs.each { |attr, value| dealiased_attrs[_dealias_attribute(attr)] = value }
+      dealiased_attrs
     end
 
     def find(*args)
@@ -297,11 +298,12 @@ module ActiveRecord
         assoc = Associations::AssociationReflection.new(self, macro, name, opts)
         if macro == :has_many
           define_method(name) { @backing_record.get_has_many(assoc, nil) }
-          define_method("#{name}=") { |val| @backing_record.set_has_many(assoc, val) }
+          define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_has_many(assoc, val) }
         else
           define_method(name) { @backing_record.get_belongs_to(assoc, nil) }
-          define_method("#{name}=") { |val| @backing_record.set_belongs_to(assoc, val) }
+          define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_belongs_to(assoc, val) }
         end
+        alias_method "#{name}=", "_hyperstack_internal_setter_#{name}"
         assoc
       end
     end
@@ -310,11 +312,12 @@ module ActiveRecord
       reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
       if reflection.klass < ActiveRecord::Base
         define_method(name) { @backing_record.get_ar_aggregate(reflection, nil) }
-        define_method("#{name}=") { |val| @backing_record.set_ar_aggregate(reflection, val) }
+        define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_ar_aggregate(reflection, val) }
       else
         define_method(name) { @backing_record.get_non_ar_aggregate(name, nil) }
-        define_method("#{name}=") { |val| @backing_record.set_non_ar_aggregate(reflection, val) }
+        define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_non_ar_aggregate(reflection, val) }
       end
+      alias_method "#{name}=", "_hyperstack_internal_setter_#{name}"
     end
 
     def column_names
@@ -338,6 +341,9 @@ module ActiveRecord
       define_method("#{name}!") do |*args|
         vector = args.count.zero? ? name : [[name] + args]
         @backing_record.get_server_method(vector, true)
+      end
+      define_method("_hyperstack_internal_setter_#{name}") do |val|
+        backing_record.set_attr_value(name, val)
       end
     end
 
@@ -366,7 +372,8 @@ module ActiveRecord
 
         define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
-        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
+        define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_attr_value(name, val) }
+        alias_method "#{name}=", "_hyperstack_internal_setter_#{name}" unless method_defined?("#{name}=")
         define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
         define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
       end
@@ -384,7 +391,6 @@ module ActiveRecord
             klass = ReactiveRecord::Base.infer_type_from_hash(self, param)
             klass == self || klass < self
           else
-            #debugger if param[:duplicate_of_id]
             # TODO: investigate saving .changes here and then replacing the
             # TODO: changes after the load is complete.  In other words preserve the
             # TODO: changed values as changes while just updating the synced values.

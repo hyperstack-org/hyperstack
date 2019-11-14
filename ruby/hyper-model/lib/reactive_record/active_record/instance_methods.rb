@@ -17,6 +17,9 @@ module ActiveRecord
       end
     end
 
+    # ignore load_from_json when it calls _hyperstack_internal_setter_id
+    def _hyperstack_internal_setter_id(*); end
+
     def inspect
       "<#{model_name}:#{ReactiveRecord::Operations::Base::FORMAT % to_key} "\
       "(#{ReactiveRecord::Operations::Base::FORMAT % object_id}) "\
