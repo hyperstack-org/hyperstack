@@ -32,58 +32,61 @@ RSpec::Steps.steps "collection aggregate methods", js: true do
     size_window(:small, :portrait)
   end
 
-  [:count, :empty?, :any?].each do |method|
+  %i[count empty? any? none?].each do |method|
     it "will not retrieve the entire collection when using #{method}" do
       FactoryBot.create(:test_model)
 
-      expect_promise(<<-RUBY
-        Hyperstack::Model
-        .load { TestModel.#{method} }
-        .then do |val|
-          if TestModel.all.instance_variable_get('@collection')
-            "unnecessary fetch of all"
-          else
-            val
+      expect_promise(
+        <<~RUBY
+          Hyperstack::Model
+          .load { TestModel.#{method} }
+          .then do |val|
+            if TestModel.all.instance_variable_get('@collection')
+              "unnecessary fetch of all"
+            else
+              val
+            end
           end
-        end
-      RUBY
-    ).to eq(TestModel.all.send(method))
+        RUBY
+      ).to eq(TestModel.all.send(method))
     end
   end
 
-  it 'will retrieve the entire collection when using any? if an arg is passed in' do
-    FactoryBot.create(:test_model)
+  %i[any? none?].each do |method|
+    it 'will retrieve the entire collection when using any? if an arg is passed in' do
+      FactoryBot.create(:test_model)
 
-    expect_promise(
-      <<~RUBY
-        Hyperstack::Model.load do
-          TestModel.any?(TestModel)
-        end.then do |val|
-          if TestModel.all.instance_variable_get('@collection')
-            'necessary fetch of all'
-          else
-            val
+      expect_promise(
+        <<~RUBY
+          Hyperstack::Model.load do
+            TestModel.#{method}(TestModel)
+          end.then do |val|
+            if TestModel.all.instance_variable_get('@collection')
+              'necessary fetch of all'
+            else
+              val
+            end
           end
-        end
-      RUBY
-    ).to eq('necessary fetch of all')
-  end
+        RUBY
+      ).to eq('necessary fetch of all')
+    end
 
-  it 'will retrieve the entire collection when using any? if a block is passed in' do
-    FactoryBot.create(:test_model)
+    it 'will retrieve the entire collection when using any? if a block is passed in' do
+      FactoryBot.create(:test_model)
 
-    expect_promise(
-      <<~RUBY
-        Hyperstack::Model.load do
-          TestModel.any? { |test_model| test_model }
-        end.then do |val|
-          if TestModel.all.instance_variable_get('@collection')
-            'necessary fetch of all'
-          else
-            val
+      expect_promise(
+        <<~RUBY
+          Hyperstack::Model.load do
+            TestModel.#{method} { |test_model| test_model }
+          end.then do |val|
+            if TestModel.all.instance_variable_get('@collection')
+              'necessary fetch of all'
+            else
+              val
+            end
           end
-        end
-      RUBY
-    ).to eq('necessary fetch of all')
+        RUBY
+      ).to eq('necessary fetch of all')
+    end
   end
 end
