@@ -3,7 +3,7 @@ module ActiveRecord
   class Base
 
     def self.reflect_on_all_associations
-      @associations ||= superclass.instance_eval { (@associations && @associations.dup) || [] }
+      @associations ||= superclass.instance_eval { @associations&.dup || [] }
     end
 
     def self.reflect_on_association(attr)

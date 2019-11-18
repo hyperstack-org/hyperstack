@@ -1,4 +1,4 @@
-class CreateTestModels < ActiveRecord::Migration
+class CreateTestModels < ActiveRecord::Migration[5.2]
   def change
     create_table :test_models do |t|
       t.string :test_attribute
@@ -70,6 +70,18 @@ class CreateTestModels < ActiveRecord::Migration
       t.datetime "updated_at"
       t.integer  "user_id"
       t.integer  "comment_id"
+    end
+
+    create_table :pets do |t|
+      t.integer :owner_id
+    end
+
+    create_table :bones do |t|
+      t.integer :dog_id
+    end
+
+    create_table :scratching_posts do |t|
+      t.integer :cat_id
     end
   end
 end
