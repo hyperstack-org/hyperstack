@@ -462,16 +462,13 @@ module ReactiveRecord
               #puts ">>>>>>>>>> #{parent.class.name}.send('#{association[:attribute]}') << #{reactive_records[association[:child_id]]})"
               dont_save_list.delete(parent)
 
-
               # if reactive_records[association[:child_id]]&.new_record?
               #   dont_save_list << reactive_records[association[:child_id]]
               # end
-              #if false and parent.new?
-                #parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]]
-                # puts "updated"
-              #else
-                #puts "skipped"
-              #end
+
+              if parent.new_record?
+                parent.send("#{association[:attribute]}") << reactive_records[association[:child_id]]
+              end
             else
               #puts ">>>>ASSOCIATION>>>> #{parent.class.name}.send('#{association[:attribute]}=', #{reactive_records[association[:child_id]]})"
               parent.send("#{association[:attribute]}=", reactive_records[association[:child_id]])
@@ -496,7 +493,8 @@ module ReactiveRecord
             next record.persisted? if record.id && !record.changed?
             # if we get to here save the record and return true to keep it
             op = new_models.include?(record) ? :create_permitted? : :update_permitted?
-            record.check_permission_with_acting_user(acting_user, op).save(validate: false) || true
+
+            record.check_permission_with_acting_user(acting_user, op).save(validate: validate) || true
           end
 
           # if called from ServerDataCache then save and validate are both false, and we just return the

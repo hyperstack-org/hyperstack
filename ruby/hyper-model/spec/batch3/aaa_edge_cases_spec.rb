@@ -144,6 +144,7 @@ describe "reactive-record edge cases", js: true do
   end
 
   describe 'can use finder methods on scopes' do
+
     before(:each) do
       isomorphic do
         Todo.finder_method :with_title do |title|
@@ -157,6 +158,7 @@ describe "reactive-record edge cases", js: true do
       FactoryBot.create(:todo, title: 'todo 2', completed: false)
       FactoryBot.create(:todo, title: 'secret', completed: true)
     end
+
     it 'find_by_xxx' do
       expect_promise do
         Hyperstack::Model.load do
@@ -169,6 +171,7 @@ describe "reactive-record edge cases", js: true do
         end
       end.to be_nil
     end
+
     it 'find' do
       expect_promise do
         Hyperstack::Model.load do
@@ -181,6 +184,23 @@ describe "reactive-record edge cases", js: true do
         end
       end.to be_nil
     end
+
+    it 'find with id array' do
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find(1,2).map(&:id)
+        end
+      end.to eq(Todo.completed.find(1,2).map(&:id))
+    end
+
+    it 'find with id array returns nil values' do
+      expect_promise do
+        Hyperstack::Model.load do
+          Todo.completed.find(2,3,4,5,6).map {|todo| todo.is_a?(Todo) ? todo.id : todo}
+        end
+      end.to eq([2,nil,nil,nil,nil])
+    end
+
     it 'find_by' do
       expect_promise do
         Hyperstack::Model.load do
@@ -193,6 +213,7 @@ describe "reactive-record edge cases", js: true do
         end
       end.to be_nil
     end
+
     it "and will return nil unless access is allowed" do
       expect_promise do
         Hyperstack::Model.load do

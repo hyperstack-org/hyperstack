@@ -30,7 +30,7 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     User.instance_variable_set :@do_not_synchronize, false
   end
 
-  it "can validate the presence of an association" do
+  it "can validate the presence of an association on a new record" do
     expect_promise do
       @test_model = TestModel.new
       @test_model.validate.then { |test_model| test_model.errors.messages }
@@ -41,6 +41,26 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     end.to be_empty
     expect(TestModel.count).to be_zero
     expect(ChildModel.count).to be_zero
+  end
+
+  it "can validate the presence of an association on a saved record" do
+    expect(TestModel.count).to be_zero
+    expect(ChildModel.count).to be_zero
+
+    expect_promise do
+      @child = ChildModel.new
+      @test_model = TestModel.new(child_models: [@child])
+      @test_model.save.then { |r| @test_model.errors.messages }
+    end.to be_empty
+
+    expect_promise do
+      @child.destroy.then do |d|
+        @test_model = TestModel.find_by_id(@test_model.id)
+        @test_model.validate(force: true).then do |test_model| # why force is needed ?
+          test_model.errors.messages
+        end
+      end
+    end.to_not be_empty
   end
 
   it "can validate only using the validate method" do
@@ -80,6 +100,13 @@ RSpec::Steps.steps "validate and valid? methods", js: true do
     expect_promise do
       user = User.new(last_name: 'f**k')
       user.save(validate: true).then { |result| user.valid?}
+    end.to be_falsy
+  end
+
+  it "save without validate should save invalid record" do
+    expect_promise do
+      user = User.new(last_name: 'f**k')
+      user.save(validate: false).then { |result| user.new_record?}
     end.to be_falsy
   end
 

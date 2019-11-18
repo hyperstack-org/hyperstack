@@ -28,7 +28,12 @@ describe 'Hyperstack::Component::Element', js: true do
           end
         end
       end
-      expect(page.body[-285..-233]).to match(/<input (type="text" value=""|value="" type="text").*\/>/)
+      # these checks are really not doing anything except making sure a proper
+      # input tag is created as expected.  However if false, nil, or a blank event
+      # name was not filtered errors would be raised during rendering which will
+      # throw errors.
+      expect(find('input')['type']).to eq('text')
+      expect(find('input')['value']).to eq('')
     end
   end
 

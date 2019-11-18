@@ -65,7 +65,8 @@ describe 'the React DSL', js: true do
         end
       end
     end
-    expect(page.body).to match(/<input data-foo="12" data-reactroot="" \/>/)
+    expect(find('input')['data-reactroot']).to eq('')
+    expect(find('input')['data-foo']).to eq('12')
   end
 
   it "will turn the last string in a block into a element" do
@@ -287,11 +288,11 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         render do
-          DIV(title: { bar: :foo })
+          DIV(id: :div, title: { bar: :foo }) { 'the div' }
         end
       end
     end
-    expect(page.body[-80..-19]).to include('<div title="{&quot;bar&quot;=&gt;&quot;foo&quot;}"></div>')
+    expect(find('#div')['title']).to eq('{"bar"=>"foo"}')
   end
 
   it "will remove all elements passed as params from the rendering buffer" do

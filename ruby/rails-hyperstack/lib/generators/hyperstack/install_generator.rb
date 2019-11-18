@@ -52,11 +52,12 @@ hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
       create_file 'app/javascript/packs/client_and_server.js', <<-JAVASCRIPT
 //app/javascript/packs/client_and_server.js
 // these packages will be loaded both during prerendering and on the client
-React = require('react');                      // react-js library
-History = require('history');                  // react-router history library
-ReactRouter = require('react-router');         // react-router js library
-ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
-ReactRailsUJS = require('react_ujs');          // interface to react-rails
+React = require('react');                         // react-js library
+createReactClass = require('create-react-class'); // backwards compatibility with ECMA5
+History = require('history');                     // react-router history library
+ReactRouter = require('react-router');            // react-router js library
+ReactRouterDOM = require('react-router-dom');     // react-router DOM interface
+ReactRailsUJS = require('react_ujs');             // interface to react-rails
 // to add additional NPM packages run `yarn add package-name@version`
 // then add the require here.
       JAVASCRIPT
@@ -88,9 +89,9 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       yarn 'react-dom', '16'
       yarn 'react-router', '^5.0.0'
       yarn 'react-router-dom', '^5.0.0'
-      # yarn 'history'#, '4.2' this will be brought in by react-router
       yarn 'react_ujs', '^2.5.0'
       yarn 'jquery', '^3.4.1'
+      yarn 'create-react-class'
     end
 
     def cancel_react_source_import
