@@ -64,7 +64,7 @@ For complete examples with *push* updates, see any of the apps in the `examples`
 
 Depending on the architecture of your application, you may decide that some of your models should be Isomorphic and some should remain server-only. The consideration will be that your Isomorphic models will be compiled by Opal to JavaScript and accessible on he client (without the need for a boilerplate API) - Hyperstack takes care of the communication between your server-side models and their client-side compiled versions and you can use Policy to govern access to the models.
 
-In order for Hyperstack to see your Models (and his make them Isomorphic) you need to move them to the `hyperstack/models` folder. Only models in this folder will be seen by Hyperstack and compiled to Javascript. Once a Model is on this folder it ill be accessable to both your client and server code.
+In order for Hyperstack to see your Models (and make them Isomorphic) you need to move them to the `hyperstack/models` folder. Only models in this folder will be seen by Hyperstack and compiled to Javascript. Once a Model is on this folder it ill be accessable to both your client and server code.
 
 | **Location of Models**        | **Scope**           |
 | ------------------------- |---------------|
