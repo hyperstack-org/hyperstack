@@ -618,8 +618,22 @@ To determine this sync_scopes first asks if the record being changed is in the s
       count.zero?
     end
 
-    def any?
-      !count.zero?
+    def any?(*args, &block)
+      # If there are any args passed in, then the collection is being used in the condition
+      #   and we must load it all into memory.
+      return all.any?(*args, &block) if args&.length&.positive? || block.present?
+
+      # Otherwise we can just check the count for efficiency
+      !empty?
+    end
+
+    def none?(*args, &block)
+      # If there are any args passed in, then the collection is being used in the condition
+      #   and we must load it all into memory.
+      return all.none?(*args, &block) if args&.length&.positive? || block.present?
+
+      # Otherwise we can just check the count for efficiency
+      empty?
     end
 
     def method_missing(method, *args, &block)
