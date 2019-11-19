@@ -61,8 +61,8 @@ You can control how much of the stack gets installed as well:
 
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
-  spec.add_dependency 'mini_racer', '~> 0.2.4'
-  spec.add_dependency 'libv8', '~> 6.7.0'
+  spec.add_dependency 'mini_racer', '~> 0.2.6'
+  spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'rails', '>= 4.0.0'
 
 
