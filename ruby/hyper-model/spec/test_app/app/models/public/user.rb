@@ -86,3 +86,7 @@ class User < ActiveRecord::Base
   end
 
 end unless RUBY_ENGINE == 'opal'
+
+class User < ActiveRecord::Base
+  has_many :pets, inverse_of: :owner
+end
