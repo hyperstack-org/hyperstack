@@ -260,54 +260,68 @@ module ReactiveRecord
           def apply_method_to_cache(method)
             @db_cache.cache.inject(nil) do |representative, cache_item|
               if cache_item.vector == vector
-                if method == "*"
-                  # apply_star does the security check if value is present
-                  cache_item.apply_star || representative
-                elsif method == "*all"
-                  # if we secure the collection then we assume its okay to read the ids
-                  secured_value = cache_item.value.__secure_collection_check(cache_item)
-                  cache_item.build_new_cache_item(timing(:active_record) { secured_value.collect { |record| record.id } }, method, method)
-                elsif method == "*count"
-                  secured_value = cache_item.value.__secure_collection_check(cache_item)
-                  cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.__secure_collection_check(cache_item).count }, method, method)
-                elsif preloaded_value = @preloaded_records[cache_item.absolute_vector + [method]]
-                  # no security check needed since we already evaluated this
-                  cache_item.build_new_cache_item(preloaded_value, method, method)
-                elsif aggregation = cache_item.aggregation?(method)
-                  # aggregations are not protected
-                  cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
-                else
-                  if !cache_item.value || cache_item.value.is_a?(Array)
-                    # seeing as we just returning representative, no check is needed (its already checked)
-                    representative
-                  elsif method == 'model_name'
-                    cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.model_name }, method, method)
+                begin
+                  # error_recovery_method holds the current method that we are attempting to apply
+                  # in case we throw an exception, and need to give the developer a meaningful message.
+                  if method == "*"
+                    # apply_star does the security check if value is present
+                    cache_item.apply_star || representative
+                  elsif method == "*all"
+                    # if we secure the collection then we assume its okay to read the ids
+                    error_recovery_method = [:all]
+                    secured_value = cache_item.value.__secure_collection_check(cache_item)
+                    cache_item.build_new_cache_item(timing(:active_record) { secured_value.collect { |record| record.id } }, method, method)
+                  elsif method == "*count"
+                    error_recovery_method = [:count]
+                    secured_value = cache_item.value.__secure_collection_check(cache_item)
+                    cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.__secure_collection_check(cache_item).count }, method, method)
+                  elsif preloaded_value = @preloaded_records[cache_item.absolute_vector + [method]]
+                    # no security check needed since we already evaluated this
+                    cache_item.build_new_cache_item(preloaded_value, method, method)
+                  elsif aggregation = cache_item.aggregation?(method)
+                    # aggregations are not protected
+                    error_recovery_method = [method, :mapping, :all]
+                    cache_item.build_new_cache_item(aggregation.mapping.collect { |attribute, accessor| cache_item.value[attribute] }, method, method)
                   else
-                    begin
-                      secured_method = "__secure_remote_access_to_#{[*method].first}"
-
-                      # order is important.  This check must be first since scopes can have same name as attributes!
-                      if cache_item.value.respond_to? secured_method
-                        cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(secured_method, cache_item.value, @acting_user, *([*method][1..-1])) }, method, method)
-                      elsif (cache_item.value.class < ActiveRecord::Base) && cache_item.value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
-                        cache_item.value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
-                        cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(*method) }, method, method)
-                      else
-                        raise "Method missing while fetching data: \`#{cache_item.value}##{[*method].first}\` "\
-                        'should either be an attribute or a method defined using the server_method of finder_method macros.'
+                    if !cache_item.value || cache_item.value.is_a?(Array)
+                      # seeing as we just returning representative, no check is needed (its already checked)
+                      representative
+                    elsif method == 'model_name'
+                      error_recovery_method = [:model_name]
+                      cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.model_name }, method, method)
+                    else
+                      begin
+                        secured_method = "__secure_remote_access_to_#{[*method].first}"
+                        error_recovery_method = [*method]
+                        # order is important.  This check must be first since scopes can have same name as attributes!
+                        if cache_item.value.respond_to? secured_method
+                          cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(secured_method, cache_item.value, @acting_user, *([*method][1..-1])) }, method, method)
+                        elsif (cache_item.value.class < ActiveRecord::Base) && cache_item.value.attributes.has_key?(method) # TODO: second check is not needed, its built into  check_permmissions,  check should be does class respond to check_permissions...
+                          cache_item.value.check_permission_with_acting_user(@acting_user, :view_permitted?, method)
+                          cache_item.build_new_cache_item(timing(:active_record) { cache_item.value.send(*method) }, method, method)
+                        else
+                          raise "Method missing while fetching data: \`#{[*method].first}\` "\
+                          'was expected to be an attribute or a method defined using the server_method of finder_method macros.'
+                        end
                       end
-                    # rescue Exception => e # this check may no longer be needed as we are quite explicit now on which methods we apply
-                    #   binding.pry
-                    #   # ReactiveRecord::Pry::rescued(e)
-                    #   #::Rails.logger.debug "\033[0;31;1mERROR: HyperModel exception caught when applying #{method} to db object #{cache_item.value}: #{e}\033[0;30;21m"
-                    #   raise e, "HyperModel fetching records failed, exception caught when applying #{method} to db object #{cache_item.value}: #{e}", e.backtrace
                     end
                   end
+                rescue StandardError => e
+                  raise e.class, form_error_message(e, cache_item.vector + error_recovery_method), e.backtrace
                 end
               else
                 representative
               end
             end
+          end
+
+          def form_error_message(original_error, vector)
+            expression = vector.collect do |exp|
+              next exp unless exp.is_a? Array
+              next exp.first if exp.length == 1
+              "#{exp.first}(#{exp[1..-1].join(', ')})"
+            end.join('.')
+            "raised when evaluating #{expression}\n#{original_error}"
           end
 
           def aggregation?(method)
@@ -492,9 +506,7 @@ keys:
 
             target.send "#{method}=", value.first
           elsif value.is_a? Array
-            # we cannot use target.send "#{method}=" here because it might be a server method, which does not have a setter
-            # a better fix might be something like target._internal_attribute_hash[method] =  ...
-            target.backing_record.set_attr_value(method, value.first) unless method == :id
+            target.send("_hyperstack_internal_setter_#{method}", value.first)
           elsif value.is_a?(Hash) && value[:id] && value[:id].first && (association = target.class.reflect_on_association(method))
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
             klass = value[:model_name] ? Object.const_get(value[:model_name].first) : association.klass
