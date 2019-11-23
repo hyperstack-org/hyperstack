@@ -1,6 +1,6 @@
 # HTML and Component DSL
 
-A key design goal of the DSL (Domain Specific Language) is to make it work seamlessly with the rest of Ruby and easy to work with HTML elements and Components. Additionally, the DSL provides an abstraction layer between your code and the underlying (fast moving) technology stack. Hyperstack always uses the very latest versions of React and React Router yet our DSL does not change often. We believe that a stable DSL abstraction is an advantage.
+A key design goal of the DSL \(Domain Specific Language\) is to make it work seamlessly with the rest of Ruby and easy to work with HTML elements and Components. Additionally, the DSL provides an abstraction layer between your code and the underlying \(fast moving\) technology stack. Hyperstack always uses the very latest versions of React and React Router yet our DSL does not change often. We believe that a stable DSL abstraction is an advantage.
 
 ## HTML DSL
 
@@ -14,7 +14,7 @@ UL do
 end
 ```
 
-> **Notice that the HTML elements (BUTTON, DIV, etc.) are in CAPS**. We know this is bending the standard Ruby style rules, but we think it reads better this way.
+> **Notice that the HTML elements \(BUTTON, DIV, etc.\) are in CAPS**. We know this is bending the standard Ruby style rules, but we think it reads better this way.
 
 For example, to render a `<div>`:
 
@@ -24,7 +24,7 @@ DIV(class: 'green-text') { "Let's gets started!" }
 
 Would create the following HTML:
 
-```html
+```markup
 <div class="green-text">Let's gets started!</div>
 ```
 
@@ -51,13 +51,13 @@ end
 
 The following HTML elements are available:
 
-```html
+```markup
 A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO B BASE BDI BDO BIG BLOCKQUOTE BODY BR BUTTON CANVAS CAPTION CITE CODE COL COLGROUP DATA DATALIST DD DEL DETAILS DFN DIALOG DIV DL DT EM EMBED FIELDSET FIGCAPTION FIGURE FOOTER FORM H1 H2 H3 H4 H5 H6 HEAD HEADER HR HTML I IFRAME IMG INPUT INS KBD KEYGEN LABEL LEGEND LI LINK MAIN MAP MARK MENU MENUITEM META METER NAV NOSCRIPT OBJECT OL OPTGROUP OPTION OUTPUT P PARAM PICTURE PRE PROGRESS Q RP RT RUBY S SAMP SCRIPT SECTION SELECT SMALL SOURCE SPAN STRONG STYLE SUB SUMMARY SUP TABLE TBODY TD TEXTAREA TFOOT TH THEAD TIME TITLE TR TRACK U UL VAR VIDEO WBR
 ```
 
 And also the SVG elements:
 
-```html
+```markup
 CIRCLE CLIPPATH DEFS ELLIPSE G LINE LINEARGRADIENT MASK PATH PATTERN POLYGON POLYLINE RADIALGRADIENT RECT STOP SVG TEXT TSPAN
 ```
 
@@ -69,6 +69,7 @@ You can pass any expected parameter to a HTML element:
 A(href: '/') { 'Click me' } # <a href="/">Click me</a>
 IMG(src: '/logo.png')  # <img src="/logo.png">
 ```
+
 Each key-value pair in the parameter block is passed down as an attribute to the tag as you would expect.
 
 ### CSS
@@ -93,18 +94,18 @@ PARA(style: { display: item[:some_property] == "some state" ? :block : :none })
 
 Hyperstack Component DSL is a set of class and instance methods that are used to describe React components and render the user-interface.
 
-The DSL has the following major areas:  
+The DSL has the following major areas:
 
-+ The `Hyperstack::Component` mixin or your own `HyperComponent` class
-+ HTML DSL elements
-+ Component Lifecycle Methods (`before_mount`, `render`, `after_mount`, `after_update`, `after_error`)
-+ The `param` and `render` methods
-+ Event handlers
-+ Miscellaneous methods
+* The `Hyperstack::Component` mixin or your own `HyperComponent` class
+* HTML DSL elements
+* Component Lifecycle Methods \(`before_mount`, `render`, `after_mount`, `after_update`, `after_error`\)
+* The `param` and `render` methods
+* Event handlers
+* Miscellaneous methods
 
 ## HyperComponent
 
-Hyperstack Components classes include the `Hyperstack::Component` mixin or (for ease of use) are a subclass of a `HyperComponent` class which includes the mixin:
+Hyperstack Components classes include the `Hyperstack::Component` mixin or \(for ease of use\) are a subclass of a `HyperComponent` class which includes the mixin:
 
 ```ruby
 class HyperComponent
@@ -135,7 +136,7 @@ class Component < HyperComponent
 end
 ```
 
-To render a component, you reference its class name in the DSL as a method call.  This creates a new instance, passes any parameters proceeds with the component lifecycle.  
+To render a component, you reference its class name in the DSL as a method call. This creates a new instance, passes any parameters proceeds with the component lifecycle.
 
 ```ruby
 class FirstComponent < HyperComponent
@@ -145,11 +146,11 @@ class FirstComponent < HyperComponent
 end
 ```
 
-Note that you should never redefine the `new` or `initialize` methods, or call them directly.  The equivalent of `initialize` is the `before_mount` method.  
+Note that you should never redefine the `new` or `initialize` methods, or call them directly. The equivalent of `initialize` is the `before_mount` method.
 
 ### Invoking Components
 
-> Note: when invoking a component **you must have** a (possibly empty) parameter list or (possibly empty) block.
+> Note: when invoking a component **you must have** a \(possibly empty\) parameter list or \(possibly empty\) block.
 
 ```ruby
 MyCustomComponent()  # ok
@@ -163,7 +164,7 @@ So far, we've looked at how to write a single component to display data. Next le
 
 ### Motivation: Separation of Concerns
 
-By building modular components that reuse other components with well-defined interfaces, you get much of the same benefits that you get by using functions or classes. Specifically you can *separate the different concerns* of your app however you please simply by building new components. By building a custom component library for your application, you are expressing your UI in a way that best fits your domain.
+By building modular components that reuse other components with well-defined interfaces, you get much of the same benefits that you get by using functions or classes. Specifically you can _separate the different concerns_ of your app however you please simply by building new components. By building a custom component library for your application, you are expressing your UI in a way that best fits your domain.
 
 ### Composition Example
 
@@ -200,9 +201,9 @@ end
 
 ### Ownership
 
-In the above example, instances of `Avatar` *own* instances of `ProfilePic` and `ProfileLink`. In React, **an owner is the component that sets the `params` of other components**. More formally, if a component `X` is created in component `Y`'s `render` method, it is said that `X` is *owned by* `Y`. As discussed earlier, a component cannot mutate its `params` — they are always consistent with what its owner sets them to. This fundamental invariant leads to UIs that are guaranteed to be consistent.
+In the above example, instances of `Avatar` _own_ instances of `ProfilePic` and `ProfileLink`. In React, **an owner is the component that sets the `params` of other components**. More formally, if a component `X` is created in component `Y`'s `render` method, it is said that `X` is _owned by_ `Y`. As discussed earlier, a component cannot mutate its `params` — they are always consistent with what its owner sets them to. This fundamental invariant leads to UIs that are guaranteed to be consistent.
 
-It's important to draw a distinction between the owner-ownee relationship and the parent-child relationship. The owner-ownee relationship is specific to React, while the parent-child relationship is simply the one you know and love from the DOM. In the example above, `Avatar` owns the `div`, `ProfilePic` and `ProfileLink` instances, and `div` is the **parent** (but not owner) of the `ProfilePic` and `ProfileLink` instances.
+It's important to draw a distinction between the owner-ownee relationship and the parent-child relationship. The owner-ownee relationship is specific to React, while the parent-child relationship is simply the one you know and love from the DOM. In the example above, `Avatar` owns the `div`, `ProfilePic` and `ProfileLink` instances, and `div` is the **parent** \(but not owner\) of the `ProfilePic` and `ProfileLink` instances.
 
 ### Children
 
@@ -216,7 +217,7 @@ Parent { Child() }
 
 ### Child Reconciliation
 
-**Reconciliation is the process by which React updates the DOM with each new render pass.** In general, children are reconciled according to the order in which they are rendered. For example, suppose we have the following render method displaying a list of items.  On each pass the items will be completely re-rendered:
+**Reconciliation is the process by which React updates the DOM with each new render pass.** In general, children are reconciled according to the order in which they are rendered. For example, suppose we have the following render method displaying a list of items. On each pass the items will be completely re-rendered:
 
 ```ruby
 param :items
@@ -230,12 +231,11 @@ render do
 end
 ```
 
-What if the first time items was `[{text: "foo"}, {text: "bar"}]`, and the second time items was `[{text: "bar"}]`?
-Intuitively, the paragraph `<p>foo</p>` was removed. Instead, React will reconcile the DOM by changing the text content of the first child and destroying the last child. React reconciles according to the *order* of the children.
+What if the first time items was `[{text: "foo"}, {text: "bar"}]`, and the second time items was `[{text: "bar"}]`? Intuitively, the paragraph `<p>foo</p>` was removed. Instead, React will reconcile the DOM by changing the text content of the first child and destroying the last child. React reconciles according to the _order_ of the children.
 
 ### Dynamic Children
 
-The situation gets more complicated when the children are shuffled around (as in search results) or if new components are added onto the front of the list (as in streams). In these cases where the identity and state of each child must be maintained across render passes, you can uniquely identify each child by assigning it a `key`:
+The situation gets more complicated when the children are shuffled around \(as in search results\) or if new components are added onto the front of the list \(as in streams\). In these cases where the identity and state of each child must be maintained across render passes, you can uniquely identify each child by assigning it a `key`:
 
 ```ruby
   param :results, type: [Hash] # each result is a hash of the form {id: ..., text: ....}
@@ -248,9 +248,9 @@ The situation gets more complicated when the children are shuffled around (as in
   end
 ```
 
-When React reconciles the keyed children, it will ensure that any child with `key` will be reordered (instead of clobbered) or destroyed (instead of reused).
+When React reconciles the keyed children, it will ensure that any child with `key` will be reordered \(instead of clobbered\) or destroyed \(instead of reused\).
 
-The `key` should *always* be supplied directly to the components in the array, not to the container HTML child of each component in the array:
+The `key` should _always_ be supplied directly to the components in the array, not to the container HTML child of each component in the array:
 
 ```ruby
 # WRONG!
@@ -328,17 +328,17 @@ In React, data flows from owner to owned component through the params as discuss
 
 ### Stores
 
-Managing state between components is best done using Stores as many Components can access one store. This saves passing data btween Components. Please see the [Store documentation](/docs/dsl-client/hyper-store) for details.
+Managing state between components is best done using Stores as many Components can access one store. This saves passing data btween Components. Please see the [Store documentation](https://github.com/hyperstack-org/hyperstack/tree/a530e3955296c5bd837c648fd452617e0a67a6ed/docs/dsl-client/hyper-store/README.md) for details.
 
 ### Reusable Components
 
-When designing interfaces, break down the common design elements (buttons, form fields, layout components, etc.) into reusable components with well-defined interfaces. That way, the next time you need to build some UI, you can write much less code. This means faster development time, fewer bugs, and fewer bytes down the wire.
+When designing interfaces, break down the common design elements \(buttons, form fields, layout components, etc.\) into reusable components with well-defined interfaces. That way, the next time you need to build some UI, you can write much less code. This means faster development time, fewer bugs, and fewer bytes down the wire.
 
 ## Params
 
-The `param` method gives *read-only* access to each of the scalar params passed to the Component. Params are accessed as instance methods on the Component.
+The `param` method gives _read-only_ access to each of the scalar params passed to the Component. Params are accessed as instance methods on the Component.
 
-Within a React Component the `param` method is used to define the parameter signature of the component.  You can think of params as the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is re-rendered.  
+Within a React Component the `param` method is used to define the parameter signature of the component. You can think of params as the values that would normally be sent to the instance's `initialize` method, but with the difference that a React Component gets new parameters when it is re-rendered.
 
 Note that the default value can be supplied either as the hash value of the symbol, or explicitly using the `:default_value` key.
 
@@ -374,14 +374,14 @@ end
 
 ### Immutable params
 
-A core design concept taken from React is that data flows down to child Components via params and params (called props in React) are immutable.
+A core design concept taken from React is that data flows down to child Components via params and params \(called props in React\) are immutable.
 
 In Hyperstack, there are **two exceptions** to this rule:
 
-+ An instance of a **Store** (passed as a param) is mutable and changes to the state of the Store will cause a re-render
-+ An instance of a **Model** (discussed in the Isomorphic section of these docs) will also case a re-render when changed
+* An instance of a **Store** \(passed as a param\) is mutable and changes to the state of the Store will cause a re-render
+* An instance of a **Model** \(discussed in the Isomorphic section of these docs\) will also case a re-render when changed
 
-In the example below, clicking on the button will cause the Component to re-render (even though `book` is a `param`) because `book` is a Model. If `book` were not a Model (or Store) then the Component would not re-render.
+In the example below, clicking on the button will cause the Component to re-render \(even though `book` is a `param`\) because `book` is a Model. If `book` were not a Model \(or Store\) then the Component would not re-render.
 
 ```ruby
 class Likes < HyperComponent
@@ -394,7 +394,7 @@ class Likes < HyperComponent
 end
 ```
 
->Note: Non-scalar params (objects) which are mutable through their methods are not read only. Care should be taken here as changes made to these objects will **not** cause a re-render of the Component. Specifically, if you pass a non-scalar param into a Component, and modify the internal data of that param, Hyperstack will not be notified to re-render the Component (as it does not know about the internal structure of your object). To achieve a re-render in this circumstance you will need to ensure that the parts of your object which are mutable are declared as state in a higher-order parent Component so that data can flow down from the parent to the child as per the React pattern.
+> Note: Non-scalar params \(objects\) which are mutable through their methods are not read only. Care should be taken here as changes made to these objects will **not** cause a re-render of the Component. Specifically, if you pass a non-scalar param into a Component, and modify the internal data of that param, Hyperstack will not be notified to re-render the Component \(as it does not know about the internal structure of your object\). To achieve a re-render in this circumstance you will need to ensure that the parts of your object which are mutable are declared as state in a higher-order parent Component so that data can flow down from the parent to the child as per the React pattern.
 
 ### Param Validation
 
@@ -426,7 +426,7 @@ If no value is provided for `:an_optional_param` it will be given the value `"he
 
 ### Params of type Proc
 
-A Ruby `Proc` can be passed to a component like any other object. 
+A Ruby `Proc` can be passed to a component like any other object.
 
 ```ruby
 param :all_done, type: Proc
@@ -435,7 +435,7 @@ param :all_done, type: Proc
 all_done(data).call
 ```
 
-Proc params can be optional, using the `default: nil` and `allow_nil: true` options.  Invoking a nil proc param will do nothing.  This is handy for allowing optional callbacks.
+Proc params can be optional, using the `default: nil` and `allow_nil: true` options. Invoking a nil proc param will do nothing. This is handy for allowing optional callbacks.
 
 ```ruby
 class Alarm < HyperComponent
@@ -460,7 +460,6 @@ end
 
 If for whatever reason you need to get the actual proc instead of calling it use `params.method(*symbol name of method*)`
 
-
 ### Components as Params
 
 You can pass a Component as a `param` and then render it in the receiving Component. To create a Component without rendering it you use `.as_node`. This technique is used extensively in JavaScript libraries.
@@ -479,7 +478,7 @@ class ButtonBar < HyperComponent
 end
 ```
 
-`as_node` can be attached to a component or tag, and removes the element from the rendering buffer and returns it.   This is useful when you need store an element in some data structure, or passing to a native JS component.  When passing an element to another Hyperstack Component `.as_node` will be automatically applied so you normally don't need it.  
+`as_node` can be attached to a component or tag, and removes the element from the rendering buffer and returns it. This is useful when you need store an element in some data structure, or passing to a native JS component. When passing an element to another Hyperstack Component `.as_node` will be automatically applied so you normally don't need it.
 
 `render` can be applied to the objects returned by `as_node` and `children` to actually render the node.
 
@@ -520,14 +519,14 @@ Note: `collect_other_params_as` builds a hash, so you can merge other data in or
 
 ## State
 
-In React (and Hyperstack) state is mutable. Changes (mutations) to state variables cause Components to re-render. Where state is passed into a child Component as a `param`, it will cause a re-rendering of that child Component. Change flows from a parent to a child - change does not flow upward and this is why params are not mutable.
+In React \(and Hyperstack\) state is mutable. Changes \(mutations\) to state variables cause Components to re-render. Where state is passed into a child Component as a `param`, it will cause a re-rendering of that child Component. Change flows from a parent to a child - change does not flow upward and this is why params are not mutable.
 
-State variables are normal instance variables or objects. When a state variable changes, we use the `mutate` method to get React's attention and cause a re-render. Like normal instance variables, state variables are created when they are first accessed, so there is no explicit declaration.  
+State variables are normal instance variables or objects. When a state variable changes, we use the `mutate` method to get React's attention and cause a re-render. Like normal instance variables, state variables are created when they are first accessed, so there is no explicit declaration.
 
 The syntax of `mutate` is simple - its `mutate` and any other number of parameters and/or a block. Normal evaluation means the parameters are going to be evaluated first, and then `mutate` gets called.
 
-+ `mutate @foo = 12, @bar[:zap] = 777` executes the two assignments first, then calls mutate
-+ or you can say `mutate { @foo = 12; @bar[:zap] = 777 }` which is more explicit, and does the same thing
+* `mutate @foo = 12, @bar[:zap] = 777` executes the two assignments first, then calls mutate
+* or you can say `mutate { @foo = 12; @bar[:zap] = 777 }` which is more explicit, and does the same thing
 
 Here are some examples:
 
@@ -542,7 +541,7 @@ class Counter < HyperComponent
     BUTTON { "+" }.on(:click) { mutate @count += 1) }
     P { @count.to_s }
   end
-end  
+end
 ```
 
 ```ruby
@@ -571,7 +570,7 @@ Most of your components should simply take some params and render based on their
 
 A common pattern is to create several stateless components that just render data, and have a stateful component above them in the hierarchy that passes its state to its children via `param`s. The stateful component encapsulates all of the interaction logic, while the stateless components take care of rendering data in a declarative way.
 
-State can be held in any object (not just a Component). For example:
+State can be held in any object \(not just a Component\). For example:
 
 ```ruby
 class TestIt
@@ -596,23 +595,22 @@ end
 
 In the example above, the singleton class `TestIt` holds its own internal state which is changed through a `swap_state` class method. The `TestResults` Component has no knowledge of the internal workings of the `TestIt` class.
 
-When the BUTTON is pressed, we call `mutate`, passing the object which is being mutated. The actual mutated value is not important, it is the fact that the *observed* object (our `TestIt` class) is being mutated that will cause a re-render of the *observing* `TestResults` Component. Think about `mutate` as a way of telling React that the Component needs to be re-rendered as the state has changed.
+When the BUTTON is pressed, we call `mutate`, passing the object which is being mutated. The actual mutated value is not important, it is the fact that the _observed_ object \(our `TestIt` class\) is being mutated that will cause a re-render of the _observing_ `TestResults` Component. Think about `mutate` as a way of telling React that the Component needs to be re-rendered as the state has changed.
 
-In the example above, we could also move the *observing* and *mutating* behaviour out of the Component completely and manage it in the `TestIt` class - in this case, we would call it a Store. Stores are covered in the Hyper-Store documentation later.
+In the example above, we could also move the _observing_ and _mutating_ behaviour out of the Component completely and manage it in the `TestIt` class - in this case, we would call it a Store. Stores are covered in the Hyper-Store documentation later.
 
 ### What Should Go in State?
 
 **State should contain data that a component's instance variables, event handlers, timers, or http requests may change and trigger a UI update.**
 
-When building a stateful component, think about the minimal possible representation of its state, and only store those properties in `state`.  Add to your class methods to compute higher level values from your state variables.  Avoid adding redundant or computed values as state variables as these values must then be kept in sync whenever state changes.
+When building a stateful component, think about the minimal possible representation of its state, and only store those properties in `state`. Add to your class methods to compute higher level values from your state variables. Avoid adding redundant or computed values as state variables as these values must then be kept in sync whenever state changes.
 
 ### What Shouldn't Go in State?
 
 State should contain the minimal amount of data needed to represent your UI's state. As such, it should not contain:
 
-+ **Computed data:** Don't worry about precomputing values based on state — it's easier to ensure that your UI is consistent if you do all computation during rendering.  For example, if you have an array of list items in state and you want to render the count as a string, simply render `"#{@list_items.length} list items'` in your `render` method rather than storing the count as another state.
-
-+ **Data that does not effect rendering:** Changing an instance variable (or any object) that does not affect rendering does not need to be mutated (i.e you do not need to call `mutate`).
+* **Computed data:** Don't worry about precomputing values based on state — it's easier to ensure that your UI is consistent if you do all computation during rendering. For example, if you have an array of list items in state and you want to render the count as a string, simply render `"#{@list_items.length} list items'` in your `render` method rather than storing the count as another state.
+* **Data that does not effect rendering:** Changing an instance variable \(or any object\) that does not affect rendering does not need to be mutated \(i.e you do not need to call `mutate`\).
 
 The rule is simple: anytime you are updating a state variable use `mutate` and your UI will be re-rendered appropriately.
 
@@ -655,7 +653,7 @@ class UsingState < HyperComponent
 
   def output
     # rerender whenever input_value changes
-	  P { "#{@input_value}" }
+      P { "#{@input_value}" }
   end
 
   def easter_egg
@@ -666,7 +664,7 @@ end
 
 ### State and HTTP responses
 
-Often your UI will re-render based on the response to a HTTP request to a remote service. Hyperstack does not need to understand the internals of the HTTP response JSON, but does need to *observe* the object holding that response so we call `mutate` when updating our response object in the block which executes when the HTTP.get promise resolves.
+Often your UI will re-render based on the response to a HTTP request to a remote service. Hyperstack does not need to understand the internals of the HTTP response JSON, but does need to _observe_ the object holding that response so we call `mutate` when updating our response object in the block which executes when the HTTP.get promise resolves.
 
 ```ruby
 class FaaS < HyperComponent
@@ -695,7 +693,7 @@ end
 
 ### State and updating interval
 
-One common use case is a component wanting to update itself on a time interval. It's easy to use the kernel method `every`, but it's important to cancel your interval when you don't need it anymore to save memory. Hyperstack provides Lifecycle Methods (covered in the next section) that let you know when a component is about to be created or destroyed. Let's create a simple mixin that uses these methods to provide a React friendly `every` function that will automatically get cleaned up when your component is destroyed.
+One common use case is a component wanting to update itself on a time interval. It's easy to use the kernel method `every`, but it's important to cancel your interval when you don't need it anymore to save memory. Hyperstack provides Lifecycle Methods \(covered in the next section\) that let you know when a component is about to be created or destroyed. Let's create a simple mixin that uses these methods to provide a React friendly `every` function that will automatically get cleaned up when your component is destroyed.
 
 ```ruby
 module ReactInterval
@@ -746,7 +744,7 @@ A component may define lifecycle methods for each phase of the components lifecy
 * `after_update`
 * `before_unmount`
 
->Note: At a minimum, one `render` method must be defined and must return just one HTML element.
+> Note: At a minimum, one `render` method must be defined and must return just one HTML element.
 
 All the Component Lifecycle methods may take a block or the name of an instance method to be called.
 
@@ -773,7 +771,7 @@ A component class may define lifecycle methods for specific points in a componen
 
 ### Rendering
 
-The lifecycle revolves around rendering the component.  As the state or parameters of a component changes, its render method will be called to generate the new HTML.
+The lifecycle revolves around rendering the component. As the state or parameters of a component changes, its render method will be called to generate the new HTML.
 
 ```ruby
 render do ....
@@ -798,9 +796,9 @@ render do
 end
 ```
 
-The purpose of the render method is syntactic.  Many components consist of a static outer container with possibly some parameters, and most component's render method by necessity will be longer than the normal *10 line* ruby style guideline.  The render method solves both these problems by allowing the outer container to be specified as part of the method parameter (which reads very nicely) and because the render code is now specified as a block you avoid the 10 line limitation, while encouraging the rest of your methods to adhere to normal ruby style guides
+The purpose of the render method is syntactic. Many components consist of a static outer container with possibly some parameters, and most component's render method by necessity will be longer than the normal _10 line_ ruby style guideline. The render method solves both these problems by allowing the outer container to be specified as part of the method parameter \(which reads very nicely\) and because the render code is now specified as a block you avoid the 10 line limitation, while encouraging the rest of your methods to adhere to normal ruby style guides
 
-### Before Mounting (first render)
+### Before Mounting \(first render\)
 
 ```ruby
 before_mount do ...
@@ -811,17 +809,16 @@ Invoked once when the component is first instantiated, immediately before the in
 
 This is the only life cycle method that is called during `render_to_string` used in server side pre-rendering.
 
-### After Mounting (first render)
+### After Mounting \(first render\)
 
 ```ruby
 after_mount do ...
 end
 ```
 
-Invoked once, only on the client (not on the server), immediately after the initial rendering occurs. At this point in the lifecycle, you can access any refs to your children (e.g., to access the underlying DOM representation). The `after_mount` methods of children components are invoked before that of parent components.
+Invoked once, only on the client \(not on the server\), immediately after the initial rendering occurs. At this point in the lifecycle, you can access any refs to your children \(e.g., to access the underlying DOM representation\). The `after_mount` methods of children components are invoked before that of parent components.
 
-If you want to integrate with other JavaScript frameworks, set timers using the `after` or `every` methods, or send AJAX requests, perform those operations in this method.  Attempting to perform such operations in before_mount will cause errors during prerendering because none of these operations are available in the server environment.
-
+If you want to integrate with other JavaScript frameworks, set timers using the `after` or `every` methods, or send AJAX requests, perform those operations in this method. Attempting to perform such operations in before\_mount will cause errors during prerendering because none of these operations are available in the server environment.
 
 ### Before Receiving New Params
 
@@ -829,10 +826,10 @@ If you want to integrate with other JavaScript frameworks, set timers using the 
 before_receive_props do |new_params_hash| ...
 end
 ```
-Invoked when a component is receiving *new* params (React.js props). This method is not called for the initial render.
 
-Use this as an opportunity to react to a prop transition before `render` is called by updating any instance or state variables. The
-new_props block parameter contains a hash of the new values.
+Invoked when a component is receiving _new_ params \(React.js props\). This method is not called for the initial render.
+
+Use this as an opportunity to react to a prop transition before `render` is called by updating any instance or state variables. The new\_props block parameter contains a hash of the new values.
 
 ```ruby
 before_receive_props do |next_props|
@@ -840,15 +837,13 @@ before_receive_props do |next_props|
 end
 ```
 
-> Note:
-> There is no analogous method `before_receive_state`. An incoming param may cause a state change, but the opposite is not true. If you need to perform operations in response to a state change, use `before_update`.
+> Note: There is no analogous method `before_receive_state`. An incoming param may cause a state change, but the opposite is not true. If you need to perform operations in response to a state change, use `before_update`.
 
 TODO: The above needs to be checked and a better example provided. PR very welcome.
 
 ### Controlling Updates
 
-Normally Hyperstack will only update a component if some state variable or param has changed.  To override this behavior you can redefine the `should_component_update?` instance method.  For example, assume that we have a state called `funky` that for whatever reason, we
-cannot update using the normal `state.funky!` update method.  So what we can do is override `should_component_update?` call `super`, and then double check if the `funky` has changed by doing an explicit comparison.
+Normally Hyperstack will only update a component if some state variable or param has changed. To override this behavior you can redefine the `should_component_update?` instance method. For example, assume that we have a state called `funky` that for whatever reason, we cannot update using the normal `state.funky!` update method. So what we can do is override `should_component_update?` call `super`, and then double check if the `funky` has changed by doing an explicit comparison.
 
 ```ruby
 class RerenderMore < HyperComponent
@@ -858,26 +853,22 @@ class RerenderMore < HyperComponent
 end
 ```
 
-Why would this happen?  Most likely there is integration between new Hyperstack Components and other data structures being maintained outside of Hyperstack, and so we have to do some explicit comparisons to detect the state change.
+Why would this happen? Most likely there is integration between new Hyperstack Components and other data structures being maintained outside of Hyperstack, and so we have to do some explicit comparisons to detect the state change.
 
 Note that `should_component_update?` is not called for the initial render or when `force_update!` is used.
 
-> Note to react.js readers.  Essentially Hyperstack assumes components are "well behaved" in the sense that all state changes
-> will be explicitly declared using the state update ("!") method when changing state.  This gives similar behavior to a
-> "pure" component without the possible performance penalties.
-> To achieve the standard react.js behavior add this line to your class `def should_component_update?; true; end`
+> Note to react.js readers. Essentially Hyperstack assumes components are "well behaved" in the sense that all state changes will be explicitly declared using the state update \("!"\) method when changing state. This gives similar behavior to a "pure" component without the possible performance penalties. To achieve the standard react.js behavior add this line to your class `def should_component_update?; true; end`
 
-### Before Updating (re-rendering)
+### Before Updating \(re-rendering\)
 
 ```ruby
 before_update do ...
 end
 ```
 
-Invoked immediately before rendering when new params or state are being received.  
+Invoked immediately before rendering when new params or state are being received.
 
-
-### After Updating (re-rendering)
+### After Updating \(re-rendering\)
 
 ```ruby
 after_update do ...
@@ -899,11 +890,11 @@ Invoked immediately before a component is unmounted from the DOM.
 
 Perform any necessary cleanup in this method, such as invalidating timers or cleaning up any DOM elements that were created in the `after_mount` method.
 
-### The force_update! method
+### The force\_update! method
 
-`force_update!` is a component instance method that causes the component to re-rerender. This method is seldom (if ever) needed.
+`force_update!` is a component instance method that causes the component to re-rerender. This method is seldom \(if ever\) needed.
 
-The `force_update!` instance method causes the component to re-render.  Usually this is not necessary as rendering will occur when state variables change, or new params are passed.  
+The `force_update!` instance method causes the component to re-render. Usually this is not necessary as rendering will occur when state variables change, or new params are passed.
 
 ## Event Handlers
 
@@ -917,7 +908,7 @@ end.on(:change) do |e|
 end
 ```
 
-The `on` method takes the event name symbol (note that `onClick` becomes `:click`) and the block is passed the React.js event object.
+The `on` method takes the event name symbol \(note that `onClick` becomes `:click`\) and the block is passed the React.js event object.
 
 ```ruby
 BUTTON { 'Press me' }.on(:click) { do_something }
@@ -966,10 +957,9 @@ class YouSaid < HyperComponent
 end
 ```
 
-If you find that you need the underlying browser event for some reason use the `native_event`.  
+If you find that you need the underlying browser event for some reason use the `native_event`.
 
-In the following responses shown as (native ...) indicate the value returned is a native object with an Opal wrapper.  In some cases there will be opal methods available (i.e. for native DOMNode values) and in other cases you will have to convert to the native value
-with `.to_n` and then use javascript directly.
+In the following responses shown as \(native ...\) indicate the value returned is a native object with an Opal wrapper. In some cases there will be opal methods available \(i.e. for native DOMNode values\) and in other cases you will have to convert to the native value with `.to_n` and then use javascript directly.
 
 Every `React::Event` has the following methods:
 
@@ -996,9 +986,7 @@ The underlying React `SyntheticEvent` is pooled. This means that the `SyntheticE
 
 ### Supported Events
 
-React normalizes events so that they have consistent properties across
-different browsers.
-
+React normalizes events so that they have consistent properties across different browsers.
 
 ### Clipboard Events
 
@@ -1014,7 +1002,7 @@ Available Methods:
 clipboard_data -> (native DOMDataTransfer)
 ```
 
-### Composition Events (not tested)
+### Composition Events \(not tested\)
 
 Event names:
 
@@ -1052,7 +1040,6 @@ repeat                  -> Boolean
 shift_key               -> Boolean
 which                   -> Integer
 ```
-
 
 ### Focus Events
 
@@ -1136,7 +1123,6 @@ Event names:
 onSelect
 ```
 
-
 ### Touch events
 
 Event names:
@@ -1172,7 +1158,6 @@ Available Methods:
 detail -> Integer
 view   -> (Native DOMAbstractView)
 ```
-
 
 ### Wheel Events
 
@@ -1215,13 +1200,13 @@ Hyperstack gives you full access to the entire universe of JavaScript libraries 
 
 Everything you can do in JavaScript is simple to do in Ruby; this includes passing parameters between Ruby and JavaScript and even passing Ruby methods as JavaScript callbacks. See the JavaScript section for more information.
 
-While it is quite possible to develop large applications purely in Hyperstack Components with a ruby back end like rails, you may eventually find you want to use some pre-existing React Javascript library.   Or you may be working with an existing React-JS application, and want to just start adding some Hyperstack Components.
+While it is quite possible to develop large applications purely in Hyperstack Components with a ruby back end like rails, you may eventually find you want to use some pre-existing React Javascript library. Or you may be working with an existing React-JS application, and want to just start adding some Hyperstack Components.
 
 Either way you are going to need to import Javascript components into the Hyperstack namespace. Hyperstack provides both manual and automatic mechanisms to do this depending on the level of control you need.
 
 ### Importing React Components
 
-Let's say you have an existing React Component written in Javascript that you would like to access from Hyperstack.  
+Let's say you have an existing React Component written in Javascript that you would like to access from Hyperstack.
 
 Here is a simple hello world component:
 
@@ -1249,24 +1234,24 @@ class MyBigApp < HyperComponent
 end
 ```
 
-The `imports` directive takes a string (or a symbol) and will simply evaluate it and check to make sure that the value looks like a React component, and then set the underlying native component to point to the imported component.
+The `imports` directive takes a string \(or a symbol\) and will simply evaluate it and check to make sure that the value looks like a React component, and then set the underlying native component to point to the imported component.
 
 ### Importing Javascript or React Libraries
 
 Importing and using React libraries from inside Hyperstack is very simple and very powerful. Any JavaScript or React based library can be accessible in your Ruby code.
 
-Using Webpacker (or Webpack) there are just a few simple steps:
+Using Webpacker \(or Webpack\) there are just a few simple steps:
 
-+ Add the library source to your project using `yarn` or `npm`
-+ Import the JavaScript objects you require
-+ Package your bundle with `webpack`
-+ Use the JavaScript or React component as if it were a Ruby class
+* Add the library source to your project using `yarn` or `npm`
+* Import the JavaScript objects you require
+* Package your bundle with `webpack`
+* Use the JavaScript or React component as if it were a Ruby class
 
 Here is an example of setting up [Material UI](https://material-ui.com/):
 
 Firstly, you install the library:
 
-```
+```text
 // with yarn
 yarn add @material-ui/core
 
@@ -1274,7 +1259,7 @@ yarn add @material-ui/core
 npm install @material-ui/core
 ```
 
-Next you import the objects you plan to us (or you can import the whole library)
+Next you import the objects you plan to us \(or you can import the whole library\)
 
 ```ruby
 # app/javascript/packs/hyperstack.js
@@ -1290,7 +1275,7 @@ global.Button = Button;
 
 The run webpack to build your bundle:
 
-```
+```text
 bin/webpack
 ```
 
@@ -1310,9 +1295,9 @@ end
 
 Libraries used often with Hyperstack projects:
 
-+ [Material UI](https://material-ui.com/) Google's Material UI as React components
-+ [Semantic UI](https://react.semantic-ui.com/) A React wrapper for the Semantic UI stylesheet
-+ [ReactStrap](https://reactstrap.github.io/) Bootstrap 4 React wrapper
+* [Material UI](https://material-ui.com/) Google's Material UI as React components
+* [Semantic UI](https://react.semantic-ui.com/) A React wrapper for the Semantic UI stylesheet
+* [ReactStrap](https://reactstrap.github.io/) Bootstrap 4 React wrapper
 
 ### Importing Image Assets via Webpack
 
@@ -1339,6 +1324,7 @@ The above code creates an images map and stores it in webpackImagesMap variable.
      ...
 }
 ```
+
 Add the following helper
 
 ```ruby
@@ -1369,9 +1355,9 @@ IMG(src: img_src('logo.png'))               # app/javascript/images/logo.png
 IMG(src: img_src('landing/some_image.png')) # app/javascript/images/landing/some_image.png
 ```
 
-### The dom_node method
+### The dom\_node method
 
-Returns the HTML dom_node that this component instance is mounted to.  Typically used in the `after_mount` method to setup linkages to external libraries.
+Returns the HTML dom\_node that this component instance is mounted to. Typically used in the `after_mount` method to setup linkages to external libraries.
 
 Example:
 
@@ -1419,25 +1405,23 @@ panes = [ {menuItem: 'Tab 1', render: -> { tab_1.to_n } },
 Sem.Tab(panes: panes.to_n )
 ```
 
-### Including React Source  
+### Including React Source
 
-If you are in the business of importing components with a tool like Webpack, then you will need to let Webpack (or whatever dependency manager you are using) take care of including the React source code.  Just make sure that you are *not* including it on the ruby side of things. Hyperstack is currently tested with React versions 13, 14, and 15, so its not sensitive to the version you use.
+If you are in the business of importing components with a tool like Webpack, then you will need to let Webpack \(or whatever dependency manager you are using\) take care of including the React source code. Just make sure that you are _not_ including it on the ruby side of things. Hyperstack is currently tested with React versions 13, 14, and 15, so its not sensitive to the version you use.
 
-However it gets a little tricky if you are using the react-rails gem.  Each version of this gem depends on a specific version of React, and so you will need to manually declare this dependency in your Javascript dependency manager.  Consult this [table](https://github.com/reactjs/react-rails/blob/master/VERSIONS.md) to determine which version of React you need. For example assuming you are using `npm` to install modules and you are using version 1.7.2 of react-rails you would say something like this:
+However it gets a little tricky if you are using the react-rails gem. Each version of this gem depends on a specific version of React, and so you will need to manually declare this dependency in your Javascript dependency manager. Consult this [table](https://github.com/reactjs/react-rails/blob/master/VERSIONS.md) to determine which version of React you need. For example assuming you are using `npm` to install modules and you are using version 1.7.2 of react-rails you would say something like this:
 
 ```bash
 npm install react@15.0.2 react-dom@15.0.2 --save
-```  
+```
 
 ## Single Page Application CRUD example
 
-Rails famously used scaffolding for Model CRUD (Create, Read, Update and Delete). There is no scaffolding in Hyperstack today, so here is an example which demonstrates how those simple Rails pages would work in Hyperstack.
+Rails famously used scaffolding for Model CRUD \(Create, Read, Update and Delete\). There is no scaffolding in Hyperstack today, so here is an example which demonstrates how those simple Rails pages would work in Hyperstack.
 
-This example uses components from the [Material UI](https://material-ui.com/) framework, but the principals would be similar for any framework (or just HTML elements).
+This example uses components from the [Material UI](https://material-ui.com/) framework, but the principals would be similar for any framework \(or just HTML elements\).
 
-In this example, we will have a table of users and the ability to add new users or edit a user from the list. As the user edits the values in the UserDialog, they will appear in the underlying table. You can avoid this behaviour if you choose by copying the values in the `before_mount` of the UserDialog, so you are not interacting with the model directly.
-Firstly the table of users:
-
+In this example, we will have a table of users and the ability to add new users or edit a user from the list. As the user edits the values in the UserDialog, they will appear in the underlying table. You can avoid this behaviour if you choose by copying the values in the `before_mount` of the UserDialog, so you are not interacting with the model directly. Firstly the table of users:
 
 ```ruby
 class UserIndex < HyperComponent
@@ -1471,7 +1455,7 @@ class UserIndex < HyperComponent
 end
 ```
 
-Then we need the actual Dialog (Modal) component:
+Then we need the actual Dialog \(Modal\) component:
 
 ```ruby
 class UserDialog < HyperComponent
@@ -1580,13 +1564,13 @@ end
 
 ## Elements and Rendering
 
-### React.create_element
+### React.create\_element
 
 **Note: You almost never need to directly call `create_element`, the DSL, Rails, and jQuery interfaces take care of this for you.**
 
-A React Element is a component class, a set of parameters, and a group of children.  When an element is rendered the parameters and used to initialize a new instance of the component.
+A React Element is a component class, a set of parameters, and a group of children. When an element is rendered the parameters and used to initialize a new instance of the component.
 
-`React.create_element` creates a new element.  It takes either the component class, or a string (representing a built in tag such as div, or span), the parameters (properties) to be passed to the element, and optionally a block that will be evaluated to build the enclosed children elements
+`React.create_element` creates a new element. It takes either the component class, or a string \(representing a built in tag such as div, or span\), the parameters \(properties\) to be passed to the element, and optionally a block that will be evaluated to build the enclosed children elements
 
 ```ruby
 React.create_element("div", prop1: "foo", prop2: 12) { para { "hello" }; para { "goodby" } )
@@ -1607,7 +1591,7 @@ render_component("MyComponent", ...params...)
 react_component("MyComponent", ...)
 
 # from jQuery (Note Element is the Opal jQuery wrapper, not be confused with React::Element)
-Element['#container'].render { MyComponent(...params...) { ...optional children... } }  
+Element['#container'].render { MyComponent(...params...) { ...optional children... } }
 ```
 
 ### React.is\_valid\_element?
@@ -1616,8 +1600,7 @@ Element['#container'].render { MyComponent(...params...) { ...optional children.
 is_valid_element?(object)
 ```
 
-Verifies `object` is a valid react element.  Note that `React::Element` wraps the React.js native class,
-`React.is_valid_element?` returns true for both classes unlike `object.is_a? React::Element`
+Verifies `object` is a valid react element. Note that `React::Element` wraps the React.js native class, `React.is_valid_element?` returns true for both classes unlike `object.is_a? React::Element`
 
 ### React.render
 
@@ -1625,9 +1608,9 @@ Verifies `object` is a valid react element.  Note that `React::Element` wraps th
 React.render(element, container) { puts "element rendered" }
 ```
 
-Render an `element` into the DOM in the supplied `container` and return a [reference](/docs/more-about-refs.html) to the component.
+Render an `element` into the DOM in the supplied `container` and return a [reference](https://github.com/hyperstack-org/hyperstack/tree/a530e3955296c5bd837c648fd452617e0a67a6ed/docs/more-about-refs.html) to the component.
 
-The container can either be a DOM node or a jQuery selector (i.e. Element['#container']) in which case the first element is the container.
+The container can either be a DOM node or a jQuery selector \(i.e. Element\['\#container'\]\) in which case the first element is the container.
 
 If the element was previously rendered into `container`, this will perform an update on it and only mutate the DOM as necessary to reflect the latest React component.
 
@@ -1637,8 +1620,7 @@ If the optional block is provided, it will be executed after the component is re
 >
 > `React.render()` controls the contents of the container node you pass in. Any existing DOM elements inside are replaced when first called. Later calls use React’s DOM diffing algorithm for efficient updates.
 >
-> `React.render()` does not modify the container node (only modifies the children of the container). In the future, it may be possible to insert a component to an existing DOM node without overwriting the existing children.
-
+> `React.render()` does not modify the container node \(only modifies the children of the container\). In the future, it may be possible to insert a component to an existing DOM node without overwriting the existing children.
 
 ### React.unmount\_component\_at\_node
 
@@ -1658,8 +1640,7 @@ Render an element to its initial HTML. This is should only be used on the server
 
 If you call `React.render` on a node that already has this server-rendered markup, React will preserve it and only attach event handlers, allowing you to have a very performant first-load experience.
 
-If you are using rails, then the prerendering functions are automatically performed.  Otherwise you can use `render_to_string` to build your own prerendering system.
-
+If you are using rails, then the prerendering functions are automatically performed. Otherwise you can use `render_to_string` to build your own prerendering system.
 
 ### React.render\_to\_static\_markup
 
@@ -1671,35 +1652,35 @@ Similar to `render_to_string`, except this doesn't create extra DOM attributes s
 
 ## Prerendering
 
-Prerendering will render your page on the server before sending it to the client. There are some limitations as there is no browser context and no JQuery available. Prerendering is very useful for static sites with complex HTML pages (like this website).
+Prerendering will render your page on the server before sending it to the client. There are some limitations as there is no browser context and no JQuery available. Prerendering is very useful for static sites with complex HTML pages \(like this website\).
 
 **Prerendering is controllable at three levels:**
 
-+ In the rails Hyperstack initializer you can say:
+* In the rails Hyperstack initializer you can say:
 
- ```ruby
- Hyperstack.configuration do |config|
+  ```ruby
+  Hyperstack.configuration do |config|
    config.prerendering = :on # :off by default
- end
- ```
+  end
+  ```
 
-+ In a route you can override the config setting by setting a default for Hyperstack_prerendering:
+* In a route you can override the config setting by setting a default for Hyperstack\_prerendering:
 
 ```ruby
 get '/some_page', to: 'Hyperstack#some_page', defaults: {Hyperstack_prerendering: :off} # or :on
 ```
 
-This allows you to override the prerendering option for specific pages. For example the application may have prererendering off by default (via the config setting) but you can still turn it on for a specific page.
+This allows you to override the prerendering option for specific pages. For example the application may have prererendering off by default \(via the config setting\) but you can still turn it on for a specific page.
 
-+ You can override the route, and config setting using the Hyperstack-prerendering query param:
+* You can override the route, and config setting using the Hyperstack-prerendering query param:
 
-```html
+```markup
 http://localhost:3000/my_hyper_app/some_page?Hyperstack-prerendering=off
 ```
 
 This is useful for development and testing.
 
->Note: in the route you say Hyperstack_prererendering but in the query string its Hyperstack-prerendering (underscore vs. dash). This is because of rails security protection when using defaults.
+> Note: in the route you say Hyperstack\_prererendering but in the query string its Hyperstack-prerendering \(underscore vs. dash\). This is because of rails security protection when using defaults.
 
 ## DSL Gotchas
 
@@ -1707,10 +1688,10 @@ There are few gotchas with the DSL you should be aware of:
 
 React has implemented a browser-independent events and DOM system for performance and cross-browser compatibility reasons. We took the opportunity to clean up a few rough edges in browser DOM implementations.
 
-* All DOM properties and attributes (including event handlers) should be snake_cased to be consistent with standard Ruby style. We intentionally break with the spec here since the spec is inconsistent. **However**, `data-*` and `aria-*` attributes [conform to the specs](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes#data-*) and should be lower-cased only.
+* All DOM properties and attributes \(including event handlers\) should be snake\_cased to be consistent with standard Ruby style. We intentionally break with the spec here since the spec is inconsistent. **However**, `data-*` and `aria-*` attributes [conform to the specs](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes#data-*) and should be lower-cased only.
 * The `style` attribute accepts a Hash with camelCased properties rather than a CSS string. This  is more efficient, and prevents XSS security holes.
-* All event objects conform to the W3C spec, and all events (including submit) bubble correctly per the W3C spec. See [Event System](#event-handling-and-synthetic-events) for more details.
-* The `onChange` event (`on(:change)`) behaves as you would expect it to: whenever a form field is changed this event is fired rather than inconsistently on blur. We intentionally break from existing browser behavior because `onChange` is a misnomer for its behavior and React relies on this event to react to user input in real time.
+* All event objects conform to the W3C spec, and all events \(including submit\) bubble correctly per the W3C spec. See [Event System](hyper-component.md#event-handling-and-synthetic-events) for more details.
+* The `onChange` event \(`on(:change)`\) behaves as you would expect it to: whenever a form field is changed this event is fired rather than inconsistently on blur. We intentionally break from existing browser behavior because `onChange` is a misnomer for its behavior and React relies on this event to react to user input in real time.
 * Form input attributes such as `value` and `checked`, as well as `textarea`.
 
 ### HTML Entities
@@ -1748,14 +1729,15 @@ DIV("aria-hidden" => true)
 
 To master Hyperstack you do need a solid understanding of the underlying philosophy of React and its component based architecture. The 'Thinking in React' tutorial below is an excellent place to start. Most searches for help on Google will take you to examples written in JSX or ES6 JavaScript but you will learn over time to translate this to Hyperstack easily.
 
-+ [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html)
-+ [React](https://facebook.github.io/react/docs/getting-started.html)
-+ [React Router](https://github.com/reactjs/react-router)
+* [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html)
+* [React](https://facebook.github.io/react/docs/getting-started.html)
+* [React Router](https://github.com/reactjs/react-router)
 
 ### Opal
 
 Hyperstack uses Opal to generate JavaScript from Ruby code. It is well worth reading the Opal guides and the Opal JQuery docs.
 
-+ [Opal](https://opalrb.com/)
-+ [Opal JQuery Docs](https://www.rubydoc.info/github/opal/opal-jquery/Element)
-+ [Awesome Opal](https://github.com/fazibear/awesome-opal)
+* [Opal](https://opalrb.com/)
+* [Opal JQuery Docs](https://www.rubydoc.info/github/opal/opal-jquery/Element)
+* [Awesome Opal](https://github.com/fazibear/awesome-opal)
+

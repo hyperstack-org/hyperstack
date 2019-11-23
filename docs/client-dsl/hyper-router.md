@@ -1,6 +1,6 @@
 # Client-side Routing
 
-**Work in progress - ALPHA (docs and code)**
+**Work in progress - ALPHA \(docs and code\)**
 
 ## Usage
 
@@ -205,8 +205,7 @@ end
 
 ### Rendering a Router
 
-Use the `render` macro as normal.  Note you cannot redefine the `render` instance method
-in a Router componenent
+Use the `render` macro as normal. Note you cannot redefine the `render` instance method in a Router componenent
 
 ```ruby
 class MyRouter
@@ -218,11 +217,9 @@ class MyRouter
 end
 ```
 
-
 ### Routes
 
-Routes are defined with special pseudo components you call inside the router/components.
-The router determines which of the routes to actually mount based on the current URL.
+Routes are defined with special pseudo components you call inside the router/components. The router determines which of the routes to actually mount based on the current URL.
 
 ```ruby
 class MyRouter
@@ -241,9 +238,10 @@ end
 ```
 
 The `Route` method takes a url path, and these options:
-- `mounts: Component` The component you want to mount when routed to
-- `exact: Boolean` When true, the path must match the location exactly
-- `strict: Boolean` When true, the path will only match if the location and path **both** have/don't have a trailing slash
+
+* `mounts: Component` The component you want to mount when routed to
+* `exact: Boolean` When true, the path must match the location exactly
+* `strict: Boolean` When true, the path will only match if the location and path **both** have/don't have a trailing slash
 
 The `Route` method can also take a block instead of the `mounts` option.
 
@@ -274,12 +272,16 @@ class MyRouter
 end
 ```
 
-+ The `Hyperstack::Router::Helpers` is useful for components mounted by the router.
-+ This automatically sets the `match`, `location`, and `history` params,
-and also gives you instance methods with those names.
-+ You can use either `params.match` or just `match`.
-and gives you access to the `Route` method and more.
-+ This allows you to create inner routes as you need them.
+* The `Hyperstack::Router::Helpers` is useful for components mounted by the router.
+* This automatically sets the `match`, `location`, and `history` params,
+
+  and also gives you instance methods with those names.
+
+* You can use either `params.match` or just `match`.
+
+  and gives you access to the `Route` method and more.
+
+* This allows you to create inner routes as you need them.
 
 ```ruby
 class MyRouter
@@ -353,9 +355,11 @@ Now, going to `/goodbye` would match the `Goodbye` route first and only render t
 Links are provided by both the `Hyperstack::Router` and `Hyperstack::Router::Helper` modules.
 
 The `Link` method takes a url path, and these options:
-+ `search: String` adds the specified string to the search query
-+ `hash: String` adds the specified string to the hash location
-it can also take a block of children to render inside it.
+
+* `search: String` adds the specified string to the search query
+* `hash: String` adds the specified string to the hash location
+
+  it can also take a block of children to render inside it.
 
 ```ruby
 class MyRouter
@@ -375,9 +379,10 @@ end
 ### NavLinks
 
 NavLinks are the same as Links, but will add styling attributes when it matches the current url
-- `active_class: String` adds the class to the link when the url matches
-- `active_style: String` adds the style to the link when the url matches
-- `active: Proc` A proc that will add extra logic to determine if the link is active
+
+* `active_class: String` adds the class to the link when the url matches
+* `active_style: String` adds the style to the link when the url matches
+* `active: Proc` A proc that will add extra logic to determine if the link is active
 
 ```ruby
 class MyRouter
@@ -407,9 +412,9 @@ Pre-rendering is automatically taken care for you under the hood.
 
 To setup HyperRouter:
 
-+ Install the gem
-+ Your page should render your router as its top-level-component (first component to be rendered on the page) - in the example below this would be `AppRouter`
-+ You will need to configure your server to route all unknown routes to the client-side router (Rails example below)
+* Install the gem
+* Your page should render your router as its top-level-component \(first component to be rendered on the page\) - in the example below this would be `AppRouter`
+* You will need to configure your server to route all unknown routes to the client-side router \(Rails example below\)
 
 ### With Rails
 
@@ -423,3 +428,4 @@ match '*all', to: 'Hyperstack#AppRouter', via: [:get] # this should be the last 
 Note:
 
 `root 'Hyperstack#AppRouter'` is shorthand which will automagically create a Controller, View and launch `AppRouter` as the top-level Component. If you are rendering your Component via your own COntroller or View then ignore this line.
+
