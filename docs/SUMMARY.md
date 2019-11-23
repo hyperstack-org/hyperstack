@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Hyperstack](README.md)
+* [Welcome](README.md)
 * [Installation](installation/README.md)
   * [Installation](installation/man-installation.md)
   * [Configuration](installation/config.md)
