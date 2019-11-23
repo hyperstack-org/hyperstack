@@ -1,7 +1,7 @@
 # Installation
 
 You can install Hyperstack either
-+ using a template - best for new applications;
++ using a template - best for new applications (not working for Rails 6) yet;
 + using a Rails generator - best for existing Rails apps;
 + or manually walking through the detailed installation instructions below.
 
