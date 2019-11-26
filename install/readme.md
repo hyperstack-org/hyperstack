@@ -11,7 +11,7 @@ And for a full system that includes Webpack for managing javascript assets you w
 #### - Yarn ([Install Instructions](https://yarnpkg.com/en/docs/install))
 #### - NodeJS: ([Install Instructions](https://nodejs.org))
 
-## Createing a new app with a Rails template
+## Creating a new app with a Rails template
 
 This template will create a new app with Webpacker, Hyperstack and Postgres and will deploy to Heroku
 
