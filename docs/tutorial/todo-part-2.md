@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-{ [Familarity with the TodoMVC tutorial Part I](https://hyperstack.org/edge/docs/tutorials/todo) }
+{ [Familarity with the TodoMVC tutorial Part I](https://docs.hyperstack.org/tutorial/todo) }
 
 ## The Goals of this Tutorial
 

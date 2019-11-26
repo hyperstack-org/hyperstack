@@ -1,7 +1,7 @@
 # Contributing to Hyperstack
 
 We welcome and encourage contribution and would be delighted if you participated in this project.  
-If you're new to Hyperstack but have experience with Ruby (and Rails) and would like to contribute then start with the [ToDo tutorial](https://hyperstack.org/edge/docs/tutorials/todo)
+If you're new to Hyperstack but have experience with Ruby (and Rails) and would like to contribute then start with the [ToDo tutorial](https://docs.hyperstack.org/tutorial)
 that way you understand the basic capabilities and lingo of Hyperstack.
 
 Next would be to start an experimental project that's based on the *edge* Hyperstack codebase.  

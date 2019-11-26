@@ -33,9 +33,9 @@ Our website serves as a Hyperstack example application. All the doc content is l
 
 You can be up and running in **less than 5 minutes**. Just follow the simple setup guide for a new Rails application all correctly configured and ready to go with Hyperstack.
 
-* Setup and Installation: [https://hyperstack.org/edge/docs/installation](https://hyperstack.org/edge/docs/installation)
+* Setup and Installation: https://docs.hyperstack.org/installation/man-installation
 
-Beyond the installation we strongly suggest new developers work trough the [todo tutorial](https://hyperstack.org/edge/docs/tutorials/todo). As it gives a minimal understanding of the Hyperstack framework.
+Beyond the installation we strongly suggest new developers work trough the [todo tutorial](https://docs.hyperstack.org/tutorial). As it gives a minimal understanding of the Hyperstack framework.
 
 ## Community and support
 

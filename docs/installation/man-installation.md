@@ -331,7 +331,7 @@ bundle exec rails g hyperstack:webpack
 
 > Note that you also need to have yarn installed [Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable)
 
-For details on how to import and use NPM packages in your application see [Importing React Components](https://hyperstack.org/edge/docs/dsl-client/components#javascript-components)
+For details on how to import and use NPM packages in your application see [Importing React Components](https://docs.hyperstack.org/client-dsl/javascript-components)
 
 To manually install webpacker follow these steps:
 

@@ -321,7 +321,7 @@ Using the Rails `webpacker` gem you can easily add other NPM (node package manag
 > [Yarn Install Instructions](https://yarnpkg.com/en/docs/install)  
 > [Node Install Instructions](https://nodejs.org)
 
-For details on how to import and use NPM packages in your application see [Importing React Components](https://hyperstack.org/edge/docs/dsl-client/components#javascript-components)
+For details on how to import and use NPM packages in your application see [Importing React Components](https://docs.hyperstack.org/client-dsl/javascript-components#importing-javascript-or-react-libraries)
 
 To integrate webpacker with an existing Hyperstack application - for example if you just added a couple of components and now
 want to try webpacker - use the `hyperstack:install:webpack` task:
@@ -498,7 +498,7 @@ As your application develops you can begin defining more restrictive policies (o
 > Note: The policy mechanism does not depend on [Pundit](https://github.com/varvet/pundit) but is compatible with it.  You can add pundit style
 policies for legacy parts of your system.  
 >  
-> For details on creating policies see the [policy documentation](https://hyperstack.org/edge/docs/dsl-isomorphic/policies).
+> For details on creating policies see the [policy documentation](https://docs.hyperstack.org/isomorphic-dsl/hyper-policy).
 
 #### Moving the `application_record.rb` File.
 
