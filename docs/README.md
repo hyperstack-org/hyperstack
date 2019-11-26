@@ -41,7 +41,7 @@ Beyond the installation we strongly suggest new developers work trough the [todo
 
 Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, please reach out and say hello.
 
-* Reach us at: [Slack chat](https://hyperstack.org/slack-invite)
+* Reach us at: [Slack chat](https://join.slack.com/t/hyperstack-org/shared_invite/enQtNTg4NTI5NzQyNTYyLWQ4YTZlMGU0OGIxMDQzZGIxMjNlOGY5MjRhOTdlMWUzZWYyMTMzYWJkNTZmZDRhMDEzODA0NWRkMDM4MjdmNDE)
 
 ## Roadmap
 
