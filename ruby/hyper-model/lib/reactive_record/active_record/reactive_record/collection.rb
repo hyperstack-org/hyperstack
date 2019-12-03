@@ -540,7 +540,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
         @dummy_collection.notify
         array = new_array.is_a?(Collection) ? new_array.collection : new_array
         @collection.each_with_index do |r, i|
-          r.id = new_array[i].id if array[i] and array[i].id and !r.new? and r.backing_record.vector.last =~ /^\*[0-9]+$/
+          r.id = new_array[i].id if array[i] and array[i].id and !r.new_record? and r.backing_record.vector.last =~ /^\*[0-9]+$/
         end
       end
       # the following makes sure that the existing elements are properly removed from the collection
@@ -558,8 +558,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def delete(item)
-      unsaved_children.delete(item)
-      notify_of_change(
+      Hyperstack::Internal::State::Mapper.bulk_update do
+        unsaved_children.delete(item)
         if @owner && @association
           inverse_of = @association.inverse_of
           if (backing_record = item.backing_record) && item.attributes[inverse_of] == @owner && !@association.through_association?
@@ -569,8 +569,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
           delete_internal(item) { @owner.backing_record.sync_has_many(@association.attribute) }
         else
           delete_internal(item)
-        end
-      )
+        end.tap { Hyperstack::Internal::State::Variable.set(self, :collection, collection) }
+      end
     end
 
     def delete_internal(item)
@@ -588,31 +588,16 @@ To determine this sync_scopes first asks if the record being changed is in the s
       @dummy_collection.loading?
     end
 
-    # def loading?
-    #   !@collection || (@dummy_collection && @dummy_collection.loading?) || (@owner && !@owner.id && @vector && @vector.length <= 1)
-    # end
-
-    # def loaded?
-    #   @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || !@vector || @vector.length > 1)
-    #   #false && @collection && (!@dummy_collection || !@dummy_collection.loading?) && (!@owner || @owner.id || @vector.length > 1)
-    # end
-
-    def empty?
-      # should be handled by method missing below, but opal-rspec does not deal well
-      # with method missing, so to test...
-      all.empty?
-    end
-
     def find_by(attrs)
       attrs = @target_klass.__hyperstack_preprocess_attrs(attrs)
-      # r = @collection&.detect { |lr| lr.new_record? && !attrs.detect { |k, v| lr.attributes[k] != v } }
-      # return r if r
       (r = __hyperstack_internal_scoped_find_by(attrs)) || return
       r.backing_record.sync_attributes(attrs).set_ar_instance!
     end
 
-    def find(id)
-      find_by @target_klass.primary_key => id
+    def find(*args)
+      args = args[0] if args[0].is_a? Array
+      return args.collect { |id| find(id) } if args.count > 1
+      find_by(@target_klass.primary_key => args[0])
     end
 
     def _find_by_initializer(scope, attrs)
@@ -625,6 +610,30 @@ To determine this sync_scopes first asks if the record being changed is in the s
       return first unless found
       @collection = [found]
       found
+    end
+
+    # to avoid fetching the entire collection array we check empty and any against the count
+
+    def empty?
+      count.zero?
+    end
+
+    def any?(*args, &block)
+      # If there are any args passed in, then the collection is being used in the condition
+      #   and we must load it all into memory.
+      return all.any?(*args, &block) if args&.length&.positive? || block.present?
+
+      # Otherwise we can just check the count for efficiency
+      !empty?
+    end
+
+    def none?(*args, &block)
+      # If there are any args passed in, then the collection is being used in the condition
+      #   and we must load it all into memory.
+      return all.none?(*args, &block) if args&.length&.positive? || block.present?
+
+      # Otherwise we can just check the count for efficiency
+      empty?
     end
 
     def method_missing(method, *args, &block)

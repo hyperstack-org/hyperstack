@@ -23,34 +23,33 @@ Gem::Specification.new do |spec|
 
 Welcome to Hyperstack!
 
-For a complete install run
+For a quick start simply add a component using one of the generators:
 
-bundle exec rails hyperstack:install
+  >> bundle exec rails generate hyper:component CompName --add-route="/test/(*others)"
+     # Add a new component named CompName and route to it with /test/
 
-You can also add components directly using generators:
-
-bundle exec rails generate hyper:component CompName --add-route=/test/(*others)
-# Add a new component named CompName and route to it with /test/
-
-bundle exec rails generate hyper:router CompName --add-route=/test/(*others)
-# Add a top level router named CompName
-bundle exec rails
+  >> bundle exec rails generate hyper:router CompName --add-route="/test/(*others)"
+     # Add a top level router named CompName and route to it
 
 The generators will insure you have the minimal additions to your system for the
 new component to run.  And note: --add-route is optional.
 
-The hyperstack:install task also has options to control how much of the `Stack
-gets installed:
+For a complete install run the hyperstack install task:
 
---skip-hotloader   # don't add the hotloader
---skip-webpack     # don't add webpack
---skip-hyper-model # don't add hyper-model and default policy files
+  >> bundle exec rails hyperstack:install
 
-You can always install these pieces later using these options:
+This will add everything you need including the hotloader, webpack integration,
+hyper-model (active record model client synchronization) and a top level
+component to get you started.
 
---hotloader-only   # just add the hotloader
---webpack-only     # just add webpack
---hyper-model-only # just add hyper-model, and default policy files
+You can control how much of the stack gets installed as well:
+
+  >> bundle exec rails hyperstack:install:webpack          # just add webpack
+  >> bundle exec rails hyperstack:install:skip-webpack     # all but webpack
+  >> bundle exec rails hyperstack:install:hyper-model      # just add hyper-model
+  >> bundle exec rails hyperstack:install:skip-hyper-model # all but hyper-model
+  >> bundle exec rails hyperstack:install:hotloader        # just add the hotloader
+  >> bundle exec rails hyperstack:install:skip-hotloader   # skip the hotloader
 
 *******************************************************************************
 }
@@ -62,8 +61,8 @@ You can always install these pieces later using these options:
 
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
-  spec.add_dependency 'mini_racer', '~> 0.2.4'
-  spec.add_dependency 'libv8', '~> 6.7.0'
+  spec.add_dependency 'mini_racer', '~> 0.2.6'
+  spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'rails', '>= 4.0.0'
 
 

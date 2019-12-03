@@ -291,6 +291,7 @@ module ActiveRecord
       after_commit :synchromesh_after_destroy, on: [:destroy]
 
       def synchromesh_after_create
+        puts "#{self}.synchromesh_after_create: #{do_not_synchronize?} channels: #{Hyperstack::Connection.active}" if Hyperstack::Connection.show_diagnostics
         return if do_not_synchronize?
         ReactiveRecord::Broadcast.after_commit :create, self
       end

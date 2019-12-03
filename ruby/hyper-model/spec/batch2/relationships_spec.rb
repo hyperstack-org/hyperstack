@@ -120,7 +120,7 @@ describe "synchronizing relationships", js: true do
     evaluate_ruby("TestComponent2.add_child")
     page.should have_content("parent has 3 children")
   end
-  
+
   it "preserves the order of children" do
     isomorphic do
       ChildModel.class_eval do
@@ -211,7 +211,7 @@ describe "synchronizing relationships", js: true do
       ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       page.should have_content('child id = 2')
       ChildModel.find(1).destroy
-      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      sleep 0.1 # necessary for chrome driver to work with pusher faker
       page.should_not have_content('child id = 1', wait: 2)
     end
 
@@ -228,7 +228,7 @@ describe "synchronizing relationships", js: true do
       evaluate_ruby do
         ChildModel.find(1).destroy
       end
-      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      sleep 0.1 # necessary for chrome driver to work with pusher faker
       page.should_not have_content('child id = 1', wait: 2)
     end
 
@@ -242,10 +242,14 @@ describe "synchronizing relationships", js: true do
       FactoryBot.create(:child_model, test_model: m)
 
       mount "TestComponent3" do
+        class InnerComponent < HyperComponent
+          param :child
+          render { LI { "child id = #{@Child.id} #{@Child.test_model.test_attribute}"} }
+        end
         class TestComponent3 < HyperComponent
           render(OL) do
             TestModel.all[0].child_models.each do |child|
-              LI { "child id = #{child.id} "}
+              InnerComponent(child: child)
             end
           end
         end
@@ -257,8 +261,9 @@ describe "synchronizing relationships", js: true do
       ChildModel.create(child_attribute: :foo, test_model: TestModel.find(1))
       page.should have_content('child id = 2')
       ChildModel.find(1).destroy
-      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      sleep 0.1 # necessary for chrome driver to work with pusher faker
       page.should_not have_content('child id = 1', wait: 2)
+      page.should have_content('child id = 2')
     end
 
     it "will update when sent from the client" do
@@ -275,10 +280,40 @@ describe "synchronizing relationships", js: true do
 
         ChildModel.find(1).destroy
       end
-      sleep 0.1 # necessary for poltergeist to work with pusher faker
+      sleep 0.1 # necessary for chrome driver to work with pusher faker
       page.should_not have_content('child id = 1', wait: 2)
     end
 
+  end
+
+  it "causes a rerender when an association is updated" do
+    FactoryBot.create(:test_model, test_attribute: 'hello')
+    mount "TestComponent4" do
+      class TestComponent4 < HyperComponent
+        class << self
+          attr_accessor :child_model
+          def update_relationship
+            Hyperstack::Model.load do
+              TestModel.first
+            end.then do |test_model|
+              child_model.test_model = test_model
+            end
+          end
+        end
+        before_mount do
+          TestComponent4.child_model = ChildModel.new(child_attribute: 'hello')
+        end
+        render do
+          DIV do
+            TestComponent4.child_model.test_model.try(:test_attribute)
+          end
+        end
+      end
+    end
+    evaluate_ruby do
+      TestComponent4.update_relationship
+    end
+    page.should have_content(TestModel.first.test_attribute)
   end
 
   it "composed_of"

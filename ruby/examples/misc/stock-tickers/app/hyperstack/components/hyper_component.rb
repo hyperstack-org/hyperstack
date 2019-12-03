@@ -9,4 +9,5 @@
 class HyperComponent
   include Hyperstack::Component
   include Hyperstack::State::Observable
-end.hypertrace instrument: :all
+  param_accessor_style :accessors
+end#.hypertrace instrument: :all

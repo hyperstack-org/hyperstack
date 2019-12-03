@@ -35,20 +35,9 @@ gem 'jbuilder', '~> 2.5'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
-#https://github.com/hyperstack-org/hyperstack/blob/edge/ruby/hyper-component/hyper-component.gemspec
-# gem 'hyper-component',   github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
-# gem 'hyper-state',       github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
-# gem 'hyperstack-config', github: 'hyperstack-org/hyperstack', branch: 'edge', glob: 'ruby/*/*.gemspec'
-gem 'hyper-component',   path: '../../../hyper-component'
-gem 'hyper-state',       path: '../../../hyper-state'
-gem 'hyperstack-config', path: '../../../hyperstack-config'
-gem 'hyper-spec',        path: '../../../hyper-spec'
-gem 'hyper-trace',       path: '../../../hyper-trace'
-# gem 'hyperloop'
-#gem 'hyper-operation'
-gem 'opal-rails' #, '~> 0.9.4'
-gem 'opal-activesupport'
 
+gem 'rails-hyperstack', path: '../../../..', glob: 'ruby/*/*.gemspec'
+gem 'hyper-trace', path: '../../../../ruby/hyper-trace'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -4,7 +4,7 @@ module ReactiveRecord
   module Getters
     def get_belongs_to(assoc, reload = nil)
       getter_common(assoc.attribute, reload) do |has_key, attr|
-        return if new?
+        next if new?
         if id.present?
           value = fetch_by_id(attr, @model.primary_key)
           klass = fetch_by_id(attr, 'model_name')

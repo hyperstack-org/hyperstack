@@ -3,7 +3,7 @@
 module Hyperstack
   class Connection
     class << self
-      attr_accessor :transport, :connection_adapter
+      attr_accessor :transport, :connection_adapter, :show_diagnostics
 
       def adapter
         adapter_name = Hyperstack.connection[:adapter].to_s
@@ -39,7 +39,11 @@ module Hyperstack
       end
 
       def open(channel, session = nil, root_path = nil)
-        adapter.open(channel, session, root_path)
+        puts "open(#{channel}, #{session}, #{root_path})" if show_diagnostics
+
+        adapter.open(channel, session, root_path).tap do |c|
+          puts " - open returning #{c}" if show_diagnostics
+        end
       end
 
       def send_to_channel(channel, data)
@@ -51,6 +55,8 @@ module Hyperstack
       end
 
       def connect_to_transport(channel, session, root_path)
+        puts "connect_to_transport(#{channel}, #{session}, #{root_path})" if show_diagnostics
+
         adapter.connect_to_transport(channel, session, root_path)
       end
 

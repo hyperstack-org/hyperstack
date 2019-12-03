@@ -4,6 +4,10 @@ require 'rspec-steps'
 
 RSpec::Steps.steps  "overriding attribute methods", js: true do
 
+  before(:all) do
+    TypeTest.build_tables
+  end
+
   it 'can override the getter' do
     expect_evaluate_ruby do
       TypeTest.class_eval do
