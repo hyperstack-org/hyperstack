@@ -18,23 +18,23 @@ module Hyperstack
                 dependent: :destroy
 
         scope :expired,
-              -> { where('expires_at IS NOT NULL AND expires_at < ?', Time.zone.now) }
+              -> { where('expires_at IS NOT NULL AND expires_at < ?', Time.current) }
         scope :pending_for,
               ->(channel) { where(channel: channel).where('session IS NOT NULL') }
         scope :inactive,
-              -> { where('session IS NULL AND refresh_at < ?', Time.zone.now) }
+              -> { where('session IS NULL AND refresh_at < ?', Time.current) }
 
         before_create do
           if session
-            self.expires_at = Time.now + transport.expire_new_connection_in
+            self.expires_at = Time.current + transport.expire_new_connection_in
           elsif transport.refresh_channels_every != :never
-            self.refresh_at = Time.now + transport.refresh_channels_every
+            self.refresh_at = Time.current + transport.refresh_channels_every
           end
         end
 
         class << self
           def needs_refresh?
-            exists?(['refresh_at IS NOT NULL AND refresh_at < ?', Time.zone.now])
+            exists?(['refresh_at IS NOT NULL AND refresh_at < ?', Time.current])
           end
         end
 

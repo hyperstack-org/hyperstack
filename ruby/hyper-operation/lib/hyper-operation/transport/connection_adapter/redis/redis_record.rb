@@ -35,14 +35,14 @@ module Hyperstack
             def find(id)
               return unless client.smembers(table_name).include?(id)
 
-              client.hget("#{table_name}:#{id}")
+              new(client.hgetall("#{table_name}:#{id}"))
             end
 
             def find_by(opts)
               found = nil
 
               client.smembers(table_name).each do |id|
-                unless opts.map { |k, v| client.hget("#{table_name}:#{id}", k) == v }.include?(false)
+                unless opts.map { |k, v| client.hget("#{table_name}:#{id}", k) == v.to_s }.include?(false)
                   found = new(client.hgetall("#{table_name}:#{id}"))
                   break
                 end
@@ -61,7 +61,7 @@ module Hyperstack
 
             def where(opts = {})
               scope do |id|
-                unless opts.map { |k, v| client.hget("#{table_name}:#{id}", k) == v }.include?(false)
+                unless opts.map { |k, v| client.hget("#{table_name}:#{id}", k) == v.to_s }.include?(false)
                   new(client.hgetall("#{table_name}:#{id}"))
                 end
               end
@@ -69,12 +69,22 @@ module Hyperstack
 
             def exists?(opts = {})
               !!client.smembers(table_name).detect do |uuid|
-                !opts.map { |k, v| client.hget("#{table_name}:#{uuid}", k) == v }.include?(false)
+                !opts.map { |k, v| client.hget("#{table_name}:#{uuid}", k) == v.to_s }.include?(false)
               end
+            end
+
+            def create(opts = {})
+              record = new({ id: SecureRandom.uuid }.merge(opts))
+
+              record.save
+
+              record
             end
 
             def destroy_all
               all.each(&:destroy)
+
+              true
             end
           end
 
@@ -84,6 +94,12 @@ module Hyperstack
 
           def save
             self.class.client.hmset("#{table_name}:#{id}", *attributes)
+
+            unless self.class.client.smembers(table_name).include?(id)
+              self.class.client.sadd(table_name, id)
+            end
+
+            true
           end
 
           def update(opts = {})
@@ -95,10 +111,14 @@ module Hyperstack
             self.class.client.srem(table_name, id)
 
             self.class.client.hdel("#{table_name}:#{id}", attributes.keys)
+
+            true
           end
 
           def attributes
-            self.class.client.hgetall("#{table_name}:#{id}")
+            self.class.column_names.map do |column_name|
+              [column_name, instance_variable_get("@#{column_name}")]
+            end.to_h
           end
 
           def table_name

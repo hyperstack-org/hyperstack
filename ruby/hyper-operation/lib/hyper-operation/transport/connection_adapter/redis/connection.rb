@@ -21,24 +21,17 @@ module Hyperstack
           end
 
           def create(opts = {})
-            id = SecureRandom.uuid
-
             opts.tap do |hash|
-              hash[:id] = id
-
               if opts[:session]
-                hash[:expires_at] = Time.now + transport.expire_new_connection_in
+                hash[:expires_at] = (Time.current + transport.expire_new_connection_in)
               else
-                hash[:refresh_at] = Time.now + transport.refresh_channels_every
+                hash[:refresh_at] = (Time.current + transport.refresh_channels_every)
               end
 
-              hash[:created_at] = Time.now
+              hash[:created_at] = Time.current
             end.to_a.flatten
 
-            client.hmset("#{table_name}:#{id}", *opts)
-            client.sadd(table_name, id)
-
-            new(client.hgetall("#{table_name}:#{id}"))
+            super(opts)
           end
 
           def inactive
@@ -47,8 +40,8 @@ module Hyperstack
 
           def inactive?(id)
             client.hget("#{table_name}:#{id}", :session).blank? &&
-              client.hexists("h#{table_name}:#{id}", :refresh_at) &&
-              Time.parse(client.hget("#{table_name}:#{id}", :refresh_at)) < Time.zone.now
+              client.hget("#{table_name}:#{id}", :refresh_at).present? &&
+              Time.zone.parse(client.hget("#{table_name}:#{id}", :refresh_at)) < Time.current
           end
 
           def expired
@@ -56,8 +49,8 @@ module Hyperstack
           end
 
           def expired?(id)
-            client.hexists("#{table_name}:#{id}", :expires_at) &&
-              Time.parse(client.hget("#{table_name}:#{id}", :expires_at)) < Time.zone.now
+            client.hget("#{table_name}:#{id}", :expires_at).present? &&
+              Time.zone.parse(client.hget("#{table_name}:#{id}", :expires_at)) < Time.current
           end
 
           def pending_for(channel)
@@ -65,17 +58,17 @@ module Hyperstack
           end
 
           def pending_for?(id, channel)
-            !client.hget("#{table_name}:#{id}", :session).blank? &&
+            client.hget("#{table_name}:#{id}", :session).present? &&
               client.hget("#{table_name}:#{id}", :channel) == channel
           end
 
           def needs_refresh?
-            scope { |id| new(client.hgetall("#{table_name}:#{id}")) if needs_refresh(id) }
+            scope { |id| new(client.hgetall("#{table_name}:#{id}")) if needs_refresh(id) }.any?
           end
 
           def needs_refresh(id)
-            client.hexists("#{table_name}:#{id}", :refresh_at) &&
-              Time.parse(client.hget("#{table_name}:#{id}", :refresh_at)) < Time.zone.now
+            client.hget("#{table_name}:#{id}", :refresh_at).present? &&
+              Time.zone.parse(client.hget("#{table_name}:#{id}", :refresh_at)) < Time.current
           end
         end
       end

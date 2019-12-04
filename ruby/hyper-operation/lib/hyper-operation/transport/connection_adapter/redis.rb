@@ -38,7 +38,7 @@ module Hyperstack
           self.root_path = root_path
 
           Connection.where(session: session).each do |connection|
-            connection.update(expires_at: Time.now + transport.expire_polled_connection_in)
+            connection.update(expires_at: Time.current + transport.expire_polled_connection_in)
           end
 
           messages = QueuedMessage.for_session(session)
@@ -77,7 +77,7 @@ module Hyperstack
         end
 
         def refresh_connections
-          refresh_started_at = Time.zone.now
+          refresh_started_at = Time.current
           channels = transport.refresh_channels
           next_refresh = refresh_started_at + transport.refresh_channels_every
 

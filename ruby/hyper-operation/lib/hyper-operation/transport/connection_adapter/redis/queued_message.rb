@@ -12,15 +12,6 @@ module Hyperstack
         attr_accessor(*column_names.map(&:to_sym))
 
         class << self
-          def create(opts = {})
-            id = SecureRandom.uuid
-
-            client.hmset("#{table_name}:#{id}", *opts.merge(id: id))
-            client.sadd(table_name, id)
-
-            new(client.hgetall("#{table_name}:#{id}"))
-          end
-
           def for_session(session)
             Connection.where(session: session).map(&:messages).flatten
           end
