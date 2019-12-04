@@ -17,6 +17,7 @@ _test_gem: &_test_gem
         - chromium-chromedriver
         - google-chrome-stable
         - yarn
+        - redis-server
     mariadb: '10.3'
   before_install:
     - echo installing $COMPONENT
