@@ -1,8 +1,6 @@
 require 'spec_helper'
 
-%w[active_record redis].each do |adapter|
-  require adapter
-
+%w[redis active_record].each do |adapter|
   describe Hyperstack::Connection do
     if adapter == 'active_record'
       if ActiveRecord::Base.connection.respond_to? :data_sources
@@ -25,6 +23,8 @@ require 'spec_helper'
     end
 
     before(:all) do
+      require adapter
+
       Hyperstack.configuration do |config|
         config.connection = { adapter: adapter }
       end
