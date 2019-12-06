@@ -86,6 +86,12 @@ RSpec.configure do |config|
     # end
   end
 
+  config.before(:each) do
+    if Hyperstack.connection[:adapter] == :redis
+      Hyperstack::Connection.adapter::RedisRecord::Base.client.flushdb
+    end
+  end
+
   config.before(:each, :js => true) do
     # -sfc george DatabaseCleaner.strategy = :truncation
   end

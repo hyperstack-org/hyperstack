@@ -47,10 +47,14 @@ module Hyperstack
       end
 
       def send_to_channel(channel, data)
+        puts "send_to_channel(#{channel}, #{data})" if show_diagnostics
+
         adapter.send_to_channel(channel, data)
       end
 
       def read(session, root_path)
+        puts "read(#{session}, #{root_path})" if show_diagnostics
+
         adapter.read(session, root_path)
       end
 

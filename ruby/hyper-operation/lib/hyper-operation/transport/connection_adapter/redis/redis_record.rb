@@ -13,37 +13,41 @@ module Hyperstack
             end
 
             def scope(&block)
-              client.smembers(table_name).map(&block).compact
+              ids = client.smembers(table_name)
+
+              ids = ids.map(&block) if block
+
+              ids.compact.map { |id| instantiate(id) }
             end
 
             def all
-              scope { |id| new(client.hgetall("#{table_name}:#{id}")) }
+              scope
             end
 
             def first
               id = client.smembers(table_name).first
 
-              new(client.hgetall("#{table_name}:#{id}"))
+              instantiate(id)
             end
 
             def last
               id = client.smembers(table_name).last
 
-              new(client.hgetall("#{table_name}:#{id}"))
+              instantiate(id)
             end
 
             def find(id)
               return unless client.smembers(table_name).include?(id)
 
-              new(client.hgetall("#{table_name}:#{id}"))
+              instantiate(id)
             end
 
             def find_by(opts)
               found = nil
 
               client.smembers(table_name).each do |id|
-                unless opts.map { |k, v| client.hget("#{table_name}:#{id}", k) == v.to_s }.include?(false)
-                  found = new(client.hgetall("#{table_name}:#{id}"))
+                unless opts.map { |k, v| get_dejsonized_attribute(id, k) == v }.include?(false)
+                  found = instantiate(id)
                   break
                 end
               end
@@ -61,15 +65,15 @@ module Hyperstack
 
             def where(opts = {})
               scope do |id|
-                unless opts.map { |k, v| client.hget("#{table_name}:#{id}", k) == v.to_s }.include?(false)
-                  new(client.hgetall("#{table_name}:#{id}"))
+                unless opts.map { |k, v| get_dejsonized_attribute(id, k) == v }.include?(false)
+                  id
                 end
               end
             end
 
             def exists?(opts = {})
-              !!client.smembers(table_name).detect do |uuid|
-                !opts.map { |k, v| client.hget("#{table_name}:#{uuid}", k) == v.to_s }.include?(false)
+              !!client.smembers(table_name).detect do |id|
+                !opts.map { |k, v| get_dejsonized_attribute(id, k) == v }.include?(false)
               end
             end
 
@@ -86,6 +90,28 @@ module Hyperstack
 
               true
             end
+
+            def jsonize_attributes(attrs)
+              attrs.map do |attr, value|
+                [attr, value.to_json]
+              end.to_h
+            end
+
+            def dejsonize_attributes(attrs)
+              attrs.map do |attr, value|
+                [attr, JSON.parse(value)]
+              end.to_h
+            end
+
+            protected
+
+            def instantiate(id)
+              new(dejsonize_attributes(client.hgetall("#{table_name}:#{id}")))
+            end
+
+            def get_dejsonized_attribute(id, attr)
+              JSON.parse(client.hget("#{table_name}:#{id}", attr))
+            end
           end
 
           def initialize(opts = {})
@@ -93,7 +119,7 @@ module Hyperstack
           end
 
           def save
-            self.class.client.hmset("#{table_name}:#{id}", *attributes)
+            self.class.client.hmset("#{table_name}:#{id}", *self.class.jsonize_attributes(attributes))
 
             unless self.class.client.smembers(table_name).include?(id)
               self.class.client.sadd(table_name, id)

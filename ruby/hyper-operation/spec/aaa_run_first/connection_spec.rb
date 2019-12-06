@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-%w[redis active_record].each do |adapter|
+%i[redis active_record].each do |adapter|
   describe Hyperstack::Connection do
-    if adapter == 'active_record'
+    if adapter == :active_record
       if ActiveRecord::Base.connection.respond_to? :data_sources
         it 'creates the tables (rails 5.x)' do
           ActiveRecord::Base.connection.data_sources.should include('hyperstack_connections')
@@ -23,8 +23,6 @@ require 'spec_helper'
     end
 
     before(:all) do
-      require adapter
-
       Hyperstack.configuration do |config|
         config.connection = { adapter: adapter }
       end
@@ -32,9 +30,6 @@ require 'spec_helper'
 
     before(:each) do
       Timecop.return
-
-      described_class.adapter::Connection.destroy_all
-      described_class.adapter::QueuedMessage.destroy_all
     end
 
     it 'creates the messages queue' do

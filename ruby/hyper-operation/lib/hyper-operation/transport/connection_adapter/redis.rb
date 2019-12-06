@@ -31,7 +31,7 @@ module Hyperstack
             QueuedMessage.create(connection_id: connection.id, data: data)
           end
 
-          transport.send_data(channel, data) if Connection.exists?(channel: channel, session: '')
+          transport.send_data(channel, data) if Connection.exists?(channel: channel, session: nil)
         end
 
         def read(session, root_path)
@@ -63,7 +63,7 @@ module Hyperstack
         end
 
         def disconnect(channel)
-          Connection.find_by(channel: channel, session: '').each(&:destroy)
+          Connection.find_by(channel: channel, session: nil).each(&:destroy)
         end
 
         def root_path=(path)
@@ -82,7 +82,7 @@ module Hyperstack
           next_refresh = refresh_started_at + transport.refresh_channels_every
 
           channels.each do |channel|
-            connection = Connection.find_by(channel: channel, session: '')
+            connection = Connection.find_by(channel: channel, session: nil)
             connection.update(refresh_at: next_refresh) if connection
           end
 
