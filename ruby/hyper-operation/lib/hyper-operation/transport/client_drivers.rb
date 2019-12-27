@@ -229,6 +229,8 @@ module Hyperstack
     end
 
     def self.initialize_client_drivers_on_boot
+      # If we are using hyperstack-js then there is no backend
+      return if Hyperstack.env == 'express'
 
       if @initialized
         # 1) skip initialization if already initialized
