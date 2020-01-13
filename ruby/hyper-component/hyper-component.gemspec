@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mini_racer', '~> 0.2.4'
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
-  spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
+  spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.7.0'
 
   spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
   spec.add_development_dependency 'chromedriver-helper'
