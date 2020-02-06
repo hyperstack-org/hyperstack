@@ -126,7 +126,7 @@ module ReactiveRecord
       # HMT-TODO: don't we need to do something with the through association case.
       # perhaps we never hit this point...
       if association.through_association?
-        IsomorphicHelpers.log "*********** called #{ar_instance}.find_association(#{association.attribute}) which is has many through!!!!!!!", :error
+        Hyperstack::Component::IsomorphicHelpers.log "*********** called #{ar_instance}.find_association(#{association.attribute}) which is has many through!!!!!!!", :error
       end
       if inverse_association.collection?
         instance_backing_record_attributes[inverse_of] = if id and id != ""
