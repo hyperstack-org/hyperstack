@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-component', HyperRouter::VERSION
   spec.add_dependency 'hyper-state', HyperRouter::VERSION
   spec.add_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
+  spec.add_development_dependency 'bundler' #, ['>= 1.17.3', '< 2.1']
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
