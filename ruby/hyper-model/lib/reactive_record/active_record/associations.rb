@@ -202,7 +202,7 @@ module ActiveRecord
       end
 
       def add_member(member, owner)
-        owner.attributes[attribute] ||= ReactiveRecord::Collection.new(owner_class, owner, self)
+        owner.attributes[attribute] ||= ReactiveRecord::Collection.new(klass, owner, self)
         owner.attributes[attribute]._internal_push member
       end
     end
