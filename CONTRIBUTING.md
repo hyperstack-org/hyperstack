@@ -1,7 +1,7 @@
 # Contributing to Hyperstack
 
 We welcome and encourage contribution and would be delighted if you participated in this project.  
-If you're new to Hyperstack but have experience with Ruby (and Rails) and would like to contribute then start with the [ToDo tutorial](https://hyperstack.org/edge/docs/tutorials/todo)
+If you're new to Hyperstack but have experience with Ruby (and Rails) and would like to contribute then start with the [ToDo tutorial](https://docs.hyperstack.org/tutorial)
 that way you understand the basic capabilities and lingo of Hyperstack.
 
 Next would be to start an experimental project that's based on the *edge* Hyperstack codebase.  
@@ -122,11 +122,11 @@ The website's code can be found in [this repository](https://github.com/hypersta
 By running `git clone https://github.com/hyperstack-org/website.git` you can check out your own copy.  
 Please note that this repository does not contain the documentation. The website pulls the most recent markdown files from the *edge* hyperstack repository.
 
-Before you write code to change the website, please create an issue describing your plans and reach out to us in Slack chat. Our goal for this site is that it acts as a showcase for all that Hyperstack can do, so your creativity is very welcome.
+Before you write code to change the website, please create an issue describing your plans and reach out to us in [Slack](https://join.slack.com/t/hyperstack-org/shared_invite/enQtNTg4NTI5NzQyNTYyLWQ4YTZlMGU0OGIxMDQzZGIxMjNlOGY5MjRhOTdlMWUzZWYyMTMzYWJkNTZmZDRhMDEzODA0NWRkMDM4MjdmNDE) chat. Our goal for this site is that it acts as a showcase for all that Hyperstack can do, so your creativity is very welcome.
 
 ## When you find a possible bug
 
-You can ask on [Slack chat](https://hyperstack-org.slack.com) if you're making a mistake or actually found a bug. (get a account via the "Join Slack" button on the [homepage](https://hyperstack.org))  
+You can ask on [Slack chat](https://join.slack.com/t/hyperstack-org/shared_invite/enQtNTg4NTI5NzQyNTYyLWQ4YTZlMGU0OGIxMDQzZGIxMjNlOGY5MjRhOTdlMWUzZWYyMTMzYWJkNTZmZDRhMDEzODA0NWRkMDM4MjdmNDE) if you're making a mistake or actually found a bug. (get a account via the "Join Slack" button on the [homepage](https://hyperstack.org))  
 Also check the [GitHub issue list](https://github.com/hyperstack-org/hyperstack/issues) and if you don't find it mentioned there, please create an issue.  
 If you can reproduce the problem in a branch you push to GitHub we will love you even more.
 
@@ -135,6 +135,6 @@ Having people expanding and maintaining this table would be excellent.
 
 ## Fixing a bug
 
-Please ask in [Slack chat](https://hyperstack-org.slack.com) if you need pointers. There is always tons to do so we would appreciate the help.  
+Please ask in [Slack chat](https://join.slack.com/t/hyperstack-org/shared_invite/enQtNTg4NTI5NzQyNTYyLWQ4YTZlMGU0OGIxMDQzZGIxMjNlOGY5MjRhOTdlMWUzZWYyMTMzYWJkNTZmZDRhMDEzODA0NWRkMDM4MjdmNDE) if you need pointers. There is always tons to do so we would appreciate the help.  
 You can see the list of GitHub issues labelled '[Help Wanted](https://github.com/hyperstack-org/hyperstack/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)'
 or look at the [feature matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md) for things that have the status 'bugged'.

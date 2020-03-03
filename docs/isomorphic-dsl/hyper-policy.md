@@ -4,19 +4,19 @@
 
 ## Authorization
 
-Access to your Isomorphic Models is controlled by *Policies* that describe how the current *acting_user* and *channels* may access your Models.
+Access to your Isomorphic Models is controlled by _Policies_ that describe how the current _acting\_user_ and _channels_ may access your Models.
 
-Each browser session has an *acting_user* (which may be nil) and you will define `create`, `update`, and `destroy` policies giving (or denying) the `acting_user` the ability to do these operations.
+Each browser session has an _acting\_user_ \(which may be nil\) and you will define `create`, `update`, and `destroy` policies giving \(or denying\) the `acting_user` the ability to do these operations.
 
-Read and *broadcast* access is defined based on *channels* which are connected based again on the current `acting_user`.  Read access is initiated when a specific browser tries to read a record attribute, and broadcasts are initiated whenever a model changes.
+Read and _broadcast_ access is defined based on _channels_ which are connected based again on the current `acting_user`. Read access is initiated when a specific browser tries to read a record attribute, and broadcasts are initiated whenever a model changes.
 
 An application can have several channels and each channel and each active record model can have different policies to determine which attributes are sent when a record changes.
 
-For example a Todo application might have an *instance* of a channel for each currently logged in user; an instance of a channel for each team if that team has one or more logged in users; and a general `AdminUser` channel shared by all administrators that are logged in.
+For example a Todo application might have an _instance_ of a channel for each currently logged in user; an instance of a channel for each team if that team has one or more logged in users; and a general `AdminUser` channel shared by all administrators that are logged in.
 
-Lets say a specific `Todo` changes, which is part of team id 123's Todo list, and users 7 and 8 who are members of that team are currently logged in as well as two of the `AdminUsers`.  
+Lets say a specific `Todo` changes, which is part of team id 123's Todo list, and users 7 and 8 who are members of that team are currently logged in as well as two of the `AdminUsers`.
 
-When the `Todo` changes we want all the attributes of the `Todo` broadcast on team 123's channel, as well on the `AdminUser`'s channel.  Now lets say User 7 sends User 8 a private message, adding a new record to the `Message` model.  This update should only be sent to user 7 and user 8's private channels, as well as to the AdminUser channel.
+When the `Todo` changes we want all the attributes of the `Todo` broadcast on team 123's channel, as well on the `AdminUser`'s channel. Now lets say User 7 sends User 8 a private message, adding a new record to the `Message` model. This update should only be sent to user 7 and user 8's private channels, as well as to the AdminUser channel.
 
 We can define all these policies by creating the following classes:
 
@@ -97,35 +97,36 @@ end
 
 Note that `acting_user` is also used by ReactiveRecord's permission system.
 
-Our entire set of policies is defined in 29 lines of code of which 8 actually execute the policies.  Our existing classes form the foundation, and we simply add Hyperloop specific policy directives.  Pretty sweet huh?
+Our entire set of policies is defined in 29 lines of code of which 8 actually execute the policies. Our existing classes form the foundation, and we simply add Hyperloop specific policy directives. Pretty sweet huh?
 
 ### Details
 
-Hyperloop uses *Policies* to *regulate* what *connections* are opened between clients and the server and what data is distributed over those connections.
+Hyperloop uses _Policies_ to _regulate_ what _connections_ are opened between clients and the server and what data is distributed over those connections.
 
-Connections are made on *channels* of data flowing between the server and a number of clients.  Each channel is associated with either a class or an instance of a class.  Typically the channel class represents an entity (or is associated with an entity) that can be authenticated like a `User`, an  `AdminUser`, or a `Team` of users.  A channel associated with the class itself broadcasts data that is received by any member of that class.  A channel associated with an instance is for data that is available only to that specific instance.   
+Connections are made on _channels_ of data flowing between the server and a number of clients. Each channel is associated with either a class or an instance of a class. Typically the channel class represents an entity \(or is associated with an entity\) that can be authenticated like a `User`, an `AdminUser`, or a `Team` of users. A channel associated with the class itself broadcasts data that is received by any member of that class. A channel associated with an instance is for data that is available only to that specific instance.
 
-As Models on the server change (i.e. created, updated, or destroyed) the changes are broadcast over open channels.  What specific attributes are sent (if any) is determined by broadcast policies.
+As Models on the server change \(i.e. created, updated, or destroyed\) the changes are broadcast over open channels. What specific attributes are sent \(if any\) is determined by broadcast policies.
 
-Broadcast policies can be associated with Models.  As the Model changes the broadcast policy will regulate what attributes of the changed model will be sent over which channels.  
+Broadcast policies can be associated with Models. As the Model changes the broadcast policy will regulate what attributes of the changed model will be sent over which channels.
 
-Broadcast policies can also be associated with a channel and will regulate *all* model changes over specific channels.  In other words this is just a convenient way to associate a common policy with *all* Models.
+Broadcast policies can also be associated with a channel and will regulate _all_ model changes over specific channels. In other words this is just a convenient way to associate a common policy with _all_ Models.
 
 Note that Models that are associated with channels can also broadcast their changes on the same or different channels.
 
 #### Defining Policies and Policy Classes
 
-The best way to define policies is to use a *Policy Class*.  A policy class has the same class name as the class it is regulating, with `Policy` added to the end.  Policy classes are compatible with `Pundit`, and you can add regular pundit policies as well.
+The best way to define policies is to use a _Policy Class_. A policy class has the same class name as the class it is regulating, with `Policy` added to the end. Policy classes are compatible with `Pundit`, and you can add regular pundit policies as well.
 
 Policies are defined using four methods:
-+ `regulate_class_connection` controls connections to the class channels,
-+ `regulate_instance_connections` controls connections to instance channels,
-+ `regulate_broadcast` controls what data will be sent when a model or object changes and,
-+ `regulate_all_broadcasts` controls what data will be sent of some channels when any model changes.
+
+* `regulate_class_connection` controls connections to the class channels,
+* `regulate_instance_connections` controls connections to instance channels,
+* `regulate_broadcast` controls what data will be sent when a model or object changes and,
+* `regulate_all_broadcasts` controls what data will be sent of some channels when any model changes.
 
 In addition `always_allow_connection` is short hand for `regulate_class_connection { true }`
 
-A policy class can be defined for which there is no regulated class.  This is useful for application wide connections, which are typically open even if no one is logged in:
+A policy class can be defined for which there is no regulated class. This is useful for application wide connections, which are typically open even if no one is logged in:
 
 ```ruby
 #app/policies/application.rb
@@ -134,9 +135,9 @@ class ApplicationPolicy
 end
 ```
 
-Note that by default policy classes go in the `app/policies` directory.  Hyperloop will require all the files in this directory.
+Note that by default policy classes go in the `app/policies` directory. Hyperloop will require all the files in this directory.
 
-If you wish, you can also add policies directly in your Models by including the `Hyperloop::PolicyMethods` module in your model.  You can then use the `regulate_class_connection`, `regulate_instance_connections`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
+If you wish, you can also add policies directly in your Models by including the `Hyperloop::PolicyMethods` module in your model. You can then use the `regulate_class_connection`, `regulate_instance_connections`, `regulate_all_broadcasts` and `regulate_broadcast` methods directly in the model.
 
 ```ruby
 class User < ActiveRecord::Base
@@ -148,7 +149,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-Normally the policy methods are regulating the class with the prefix as the policy, but you can override this by providing specific class names to the policy method.  This allows you to group several different class policies together, and to reuse policies:
+Normally the policy methods are regulating the class with the prefix as the policy, but you can override this by providing specific class names to the policy method. This allows you to group several different class policies together, and to reuse policies:
 
 ```ruby
 class ApplicationPolicy
@@ -167,25 +168,25 @@ end
 
 Any ruby class that has a connection policy is a Hyperloop channel. The fully scoped name of the class becomes the root of the channel name.
 
-The purpose of having channels is to restrict what gets broadcast when models change, therefore typically channels represent *connections* to
+The purpose of having channels is to restrict what gets broadcast when models change, therefore typically channels represent _connections_ to
 
-+ the application, or some function within the application
-+ or some class which is *authenticated* like a User or Administrator,
-+ instances of those classes,
-+ or instances of related classes.
+* the application, or some function within the application
+* or some class which is _authenticated_ like a User or Administrator,
+* instances of those classes,
+* or instances of related classes.
 
 So a channel that is connected to the User class would get information readable by any logged-in user, while a channel that is connected to a specific User instance would get information readable by that specific user.
 
-The `regulate_class_connection` takes a block that will execute in the context of the current acting_user (which may be nil), and if the block returns any truthy value, the connection will be made.
+The `regulate_class_connection` takes a block that will execute in the context of the current acting\_user \(which may be nil\), and if the block returns any truthy value, the connection will be made.
 
-The `regulate_instance_connections` likewise takes a block that is executed in the context of the current acting_user.  The block may do one of following:
+The `regulate_instance_connections` likewise takes a block that is executed in the context of the current acting\_user. The block may do one of following:
 
-+ raise an error meaning the connection cannot be made
-+ return a falsy value also meaning the connection cannot be made
-+ return a single object meaning the connection can be made to that object
-+ return a enumerable of objects meaning the connection can made to any member of the enumerable
+* raise an error meaning the connection cannot be made
+* return a falsy value also meaning the connection cannot be made
+* return a single object meaning the connection can be made to that object
+* return a enumerable of objects meaning the connection can made to any member of the enumerable
 
-Note that the object (or objects) returned are expected to be of the same class as the regulated policy.  
+Note that the object \(or objects\) returned are expected to be of the same class as the regulated policy.
 
 ```ruby
 # Create a class connection only if the acting_user is non-nil (i.e. logged in:)
@@ -227,7 +228,7 @@ end
 
 #### Automatic Connection
 
-Connections to channels available to the current `acting_user` are automatically made on the initial page load.  This behavior can be turned off with the `auto_connect` option.
+Connections to channels available to the current `acting_user` are automatically made on the initial page load. This behavior can be turned off with the `auto_connect` option.
 
 ```ruby
 class TeamPolicy
@@ -237,15 +238,13 @@ class TeamPolicy
 end
 ```
 
-Its important to consider turning off automatic connections for cases like the above where the user is likely to be a member of many teams.  Typically the client application will want to dynamically determine which specific teams to connect to given the current state of the application.
+Its important to consider turning off automatic connections for cases like the above where the user is likely to be a member of many teams. Typically the client application will want to dynamically determine which specific teams to connect to given the current state of the application.
 
 ### Manually Connecting to Channels
 
-Normally the client will automatically connect to the available channels when a page loads, but you can also
-manually connect on the client in response to some user action like logging in, or the user deciding to
-display a specific team status on their dashboard.
+Normally the client will automatically connect to the available channels when a page loads, but you can also manually connect on the client in response to some user action like logging in, or the user deciding to display a specific team status on their dashboard.
 
-To manually connect a client use the `Hyperloop.connect` method.  
+To manually connect a client use the `Hyperloop.connect` method.
 
 The `connect` method takes any number of arguments each of which is either a class, an object, a String or Array.
 
@@ -282,6 +281,7 @@ Hyperloop.connect(['User', current_user.id])
 ```
 
 You can make several connections at once as well:
+
 ```ruby
 Hyperloop.connect(AdminUser, current_user)
 ```
@@ -322,17 +322,17 @@ Calling `Hyperloop.disconnect(channel)` or `channel.disconnect!` will disconnect
 
 ## Broadcasting and Broadcast Policies
 
-Broadcast policies can be defined for channels using the `regulate_all_broadcasts` method, and for individual objects (typically ActiveRecord models) using the `regulate_broadcast` method.  A `regulate_all_broadcasts` policy is essentially a `regulate_broadcast` that will be run for every record that changes in the system.
+Broadcast policies can be defined for channels using the `regulate_all_broadcasts` method, and for individual objects \(typically ActiveRecord models\) using the `regulate_broadcast` method. A `regulate_all_broadcasts` policy is essentially a `regulate_broadcast` that will be run for every record that changes in the system.
 
-After an ActiveRecord Model change is committed, all active class channels run their channel broadcast policies, and then the instance broadcast policy associated with the changing Model is run.  So for any change there may be multiple channel broadcast policies involved, but only one (at most) regulate_broadcast.  
+After an ActiveRecord Model change is committed, all active class channels run their channel broadcast policies, and then the instance broadcast policy associated with the changing Model is run. So for any change there may be multiple channel broadcast policies involved, but only one \(at most\) regulate\_broadcast.
 
 The result is that each channel may get a filtered copy of the record which is broadcast on that channel.
 
-The purpose of the policies then is to determine which channel sees what.  Each broadcast policy receives the instance of the policy which responds to the following methods
+The purpose of the policies then is to determine which channel sees what. Each broadcast policy receives the instance of the policy which responds to the following methods
 
-+ `send_all`: send all the attributes of the record.
-+ `send_only`: send only the listed attributes of the record.
-+ `send_all_but`: send all the attributes except the ones listed.
+* `send_all`: send all the attributes of the record.
+* `send_only`: send only the listed attributes of the record.
+* `send_all_but`: send all the attributes except the ones listed.
 
 The result of the `send...` method is then directed to the set of channels using the `to` method:
 
@@ -352,13 +352,13 @@ end
 
 The `to` method can take any number of arguments:
 
-+ a class naming a channel,
-+ an object that is instance channel,
-+ an ActiveRecord collection,
-+ any falsy value which will be ignored,
-+ or an array that will be flattened and merged with the other arguments.
+* a class naming a channel,
+* an object that is instance channel,
+* an ActiveRecord collection,
+* any falsy value which will be ignored,
+* or an array that will be flattened and merged with the other arguments.
 
-The broadcast policy executes in the context of the model that has just changed, so the policy can use all the methods of that model, especially relationships.  For example:
+The broadcast policy executes in the context of the model that has just changed, so the policy can use all the methods of that model, especially relationships. For example:
 
 ```ruby
 class Message < ActiveRecord::Base
@@ -376,7 +376,7 @@ class MessagePolicy
 end
 ```
 
-It is possible that the same channel may be sent a record from different policies, in this case the minimum set of attributes will be sent regardless of the order of the send operations.  For example:
+It is possible that the same channel may be sent a record from different policies, in this case the minimum set of attributes will be sent regardless of the order of the send operations. For example:
 
 ```ruby
 policy.send_all_but(:password).to(MyChannel)
@@ -413,7 +413,7 @@ end
 
 To allow code in the browser to create, update or destroy a model, there must be a change access policy defined for that operation.
 
-Each change access policy executes a block in the context of the record that will be accessed.  The current value of `acting_user` is also defined for the life of the block.
+Each change access policy executes a block in the context of the record that will be accessed. The current value of `acting_user` is also defined for the life of the block.
 
 If the block returns a truthy value access will be allowed, otherwise if the block returns a falsy value or raises an exception, access will be denied.
 
@@ -459,23 +459,24 @@ class ApplicationPolicy
 end
 ```
 
-Note that there is no `allow_read` method.  Read access is granted if this browser would have the attribute broadcast to it.  
+Note that there is no `allow_read` method. Read access is granted if this browser would have the attribute broadcast to it.
 
 ## Method Summary and Name Space Conflicts
 
-Policy classes (and the Hyperloop::PolicyMethods module) define the following class methods:
+Policy classes \(and the Hyperloop::PolicyMethods module\) define the following class methods:
 
-+ `regulate_connection`
-+ `regulate_all_broadcasts`
-+ `regulate_broadcast`
+* `regulate_connection`
+* `regulate_all_broadcasts`
+* `regulate_broadcast`
 
 As well as the following instance methods:
-+ `send_all`
-+ `send_all_but`
-+ `send_only`
-+ `obj`
 
-To avoid name space conflicts with your classes, Hyperloop policy classes (and the Hyperloop::PolicyMethods module) maintain class and instance `attr_accessor`s named `synchromesh_internal_policy_object`.   The above methods call methods of the same name in the appropriate internal policy object.
+* `send_all`
+* `send_all_but`
+* `send_only`
+* `obj`
+
+To avoid name space conflicts with your classes, Hyperloop policy classes \(and the Hyperloop::PolicyMethods module\) maintain class and instance `attr_accessor`s named `synchromesh_internal_policy_object`. The above methods call methods of the same name in the appropriate internal policy object.
 
 You may thus freely redefine of the class and instance methods if you have name space conflicts
 
@@ -488,26 +489,17 @@ class ProductionCenterPolicy < MyPolicyClass
   end
   ...
 end
-```  
+```
 
----------------------------
 TODO: rewrite the following:
 
-First as you say to explicitly send stuff to all applicants. Policies work "backwards" to how you might think in a controller. In a controller you might check something like acting_user.chatrooms.include?(message.chatroom) whereas Hyperloop starts from the other end, it'll effectively do something like this message.chatroom.participants.include?(acting_user). Your job in a policy is to start with the actual record, then traverse the relationships to return the user or users it belongs to. Think in terms of "I have a thing, who are all the people who are allowed to see it?".
-Now that may or may not work in your case. If you have anonymous accounts for applicants but they all still have user records and thus IDs then it will work — job_posting.hiring_manager.applicants. But if applicants didn't have any record then you couldn't use this style of "instance channel policy". Instance == ids == non-public. So if something is public you can use a class channel. send_all.to(Applicant).
-Finally you can have many channels or just a few. In our app I've gone with a user instance channel, and a user class channel. That's just what works for my mental model. But you could have other instance and class channels to make dividing things up easier, your scope chains shorter, etc.
-Hopefully you can look at the docs now and see instance, class, channel, broadcast, etc. and come up with a way that works for you. Mitch's snippet looks good, I just tried to give some surrounding color.
+First as you say to explicitly send stuff to all applicants. Policies work "backwards" to how you might think in a controller. In a controller you might check something like acting\_user.chatrooms.include?\(message.chatroom\) whereas Hyperloop starts from the other end, it'll effectively do something like this message.chatroom.participants.include?\(acting\_user\). Your job in a policy is to start with the actual record, then traverse the relationships to return the user or users it belongs to. Think in terms of "I have a thing, who are all the people who are allowed to see it?". Now that may or may not work in your case. If you have anonymous accounts for applicants but they all still have user records and thus IDs then it will work — job\_posting.hiring\_manager.applicants. But if applicants didn't have any record then you couldn't use this style of "instance channel policy". Instance == ids == non-public. So if something is public you can use a class channel. send\_all.to\(Applicant\). Finally you can have many channels or just a few. In our app I've gone with a user instance channel, and a user class channel. That's just what works for my mental model. But you could have other instance and class channels to make dividing things up easier, your scope chains shorter, etc. Hopefully you can look at the docs now and see instance, class, channel, broadcast, etc. and come up with a way that works for you. Mitch's snippet looks good, I just tried to give some surrounding color.
 
-The policy send all bit is about once you've got a record/records, are you allowed to see it and what attributes are you allowed to see (in that case all, but you can permit a subset).
-The regulate bit is about what relations are you allowed to access. It may seem redundant as without regulations event if you loaded the relation you still wouldn't be able see any of the record attributes without a policy. So even without regulations there's no risk of exposing private information. BUT what would leak is lists IDs and counts. A count doesn't instantiate any records so there's nothing to run a policy on. Leaking counts and IDs is metadata that may or may not be sensitive, aka you wouldn't want an insurance company to be able to do patient.diseases.count. And if you're using UUIDs so you don't sequentially leak all of your public pages, again you'd want a regulation to protect that. They can also prevent denial of service attacks loading big expensive relations.
-So, broadcast policies are about who can see the attributes of an individual record (or collection but it's still run on each record individually). Regulations are about preventing business data leakage.
-
-------------
+The policy send all bit is about once you've got a record/records, are you allowed to see it and what attributes are you allowed to see \(in that case all, but you can permit a subset\). The regulate bit is about what relations are you allowed to access. It may seem redundant as without regulations event if you loaded the relation you still wouldn't be able see any of the record attributes without a policy. So even without regulations there's no risk of exposing private information. BUT what would leak is lists IDs and counts. A count doesn't instantiate any records so there's nothing to run a policy on. Leaking counts and IDs is metadata that may or may not be sensitive, aka you wouldn't want an insurance company to be able to do patient.diseases.count. And if you're using UUIDs so you don't sequentially leak all of your public pages, again you'd want a regulation to protect that. They can also prevent denial of service attacks loading big expensive relations. So, broadcast policies are about who can see the attributes of an individual record \(or collection but it's still run on each record individually\). Regulations are about preventing business data leakage.
 
 from Mitch...
 
-These work very similar to pundit, and by design you can even mix pundit and hyperloop policies.
-Here is an example pundit policy from the pundit tutorial:
+These work very similar to pundit, and by design you can even mix pundit and hyperloop policies. Here is an example pundit policy from the pundit tutorial:
 
 ```ruby
 # app/policies/article_policy.rb
@@ -535,7 +527,7 @@ class ArticlePolicy < ApplicationPolicy
     end
 end
 ```
---------------
+
 ```ruby
 class ArticlePolicy < ApplicationPolicy
   # def index?
@@ -588,7 +580,7 @@ end
 
 without comments....
 
-```
+```text
 class ArticlePolicy < ApplicationPolicy
   regulate_broadcast { |policy| policy.send_all.to Application }
 
@@ -598,5 +590,5 @@ class ArticlePolicy < ApplicationPolicy
 end
 ```
 
-BTW what if you want to restrict what data is broadcast? In Hyperloop you just update the regulation. In pundit you may have to edit both the index controller method and
-Policy class.
+BTW what if you want to restrict what data is broadcast? In Hyperloop you just update the regulation. In pundit you may have to edit both the index controller method and Policy class.
+

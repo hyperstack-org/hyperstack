@@ -35,9 +35,9 @@ Hyperstack.configuration do |config|
 end
 ```
 
-The listed gem will be automatically added to the `hyperstack-loader` manifest.   This means all you do is add a gem to Rails, and it will get sent on to the client (plus any other dependencies you care to require.)
+The listed gem will be automatically added to the `hyperstack-loader` manifest. This means all you do is add a gem to Rails, and it will get sent on to the client \(plus any other dependencies you care to require.\)
 
-The require method can be used in the Hyperstack initializer as well to add code to the manifest (i.e. add a gem to that is not using Hyperstack.import)
+The require method can be used in the Hyperstack initializer as well to add code to the manifest \(i.e. add a gem to that is not using Hyperstack.import\)
 
 To define an initializer:
 
@@ -58,3 +58,4 @@ module Hyperstack
     # you do what you want here...
   end
 ```
+

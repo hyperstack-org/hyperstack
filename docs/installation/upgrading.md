@@ -4,37 +4,37 @@ This guide sets out to provide the steps necessary to move an existing project f
 
 ## Summary of changes
 
-+ Creating a new Hyperstack Rails application
-+ Adding Hyperstack to an existing Rails application
-+ New Hyperstack gems
-+ Renamed folders
-+ Hyperstack configuration
-+ Changes to the application.js file
-+ Hotloader
-+ Hyperloop classes have been renamed Hyperstack
-+ There is a new concept of a base `HyperComponent` and `HyperStore` base class
-+ State syntax has changed
-+ Param syntax has changed
-+ The Router DSL has changed slightly
+* Creating a new Hyperstack Rails application
+* Adding Hyperstack to an existing Rails application
+* New Hyperstack gems
+* Renamed folders
+* Hyperstack configuration
+* Changes to the application.js file
+* Hotloader
+* Hyperloop classes have been renamed Hyperstack
+* There is a new concept of a base `HyperComponent` and `HyperStore` base class
+* State syntax has changed
+* Param syntax has changed
+* The Router DSL has changed slightly
 
 ## Creating a new Hyperstack Rails application
 
 In Hyperstack we are using Rails templates to create new applications.
 
-+ Follow these instructions: https://github.com/hyperstack-org/hyperstack/tree/edge/install
-+ See the template for an understanding of the installation steps: https://github.com/hyperstack-org/hyperstack/blob/edge/install/rails-webpacker.rb
+* Follow these instructions: [https://github.com/hyperstack-org/hyperstack/tree/edge/install](https://github.com/hyperstack-org/hyperstack/tree/edge/install)
+* See the template for an understanding of the installation steps: [https://github.com/hyperstack-org/hyperstack/blob/edge/install/rails-webpacker.rb](https://github.com/hyperstack-org/hyperstack/blob/edge/install/rails-webpacker.rb)
 
 ## Adding Hyperstack to an existing Rails application
 
-+ add `gem 'rails-hyperstack', "~> 1.0.alpha1"` to your gem file
-+ run `bundle install`
-+ run `rails g hyperstack:install`
+* add `gem 'rails-hyperstack', "~> 1.0.alpha1"` to your gem file
+* run `bundle install`
+* run `rails g hyperstack:install`
 
 **If you are not upgrading an existing Hyoperloop application, you do not need to follow the rest of these instructions.**
 
 ## Hyperstack gem
 
-Hyperstack (with Rails) requires just one Gem:
+Hyperstack \(with Rails\) requires just one Gem:
 
 ```ruby
 # gem 'webpacker' # if you are using webpacker
@@ -45,14 +45,14 @@ Delete all Hyperloop gems from your gemfile and do a `bundle update`.
 
 ## Renamed folders
 
-+ `app/hyperloop` has become `app/hyperstack`
-+ The sub-folder structure has not changed (components, models, stores, etc)
+* `app/hyperloop` has become `app/hyperstack`
+* The sub-folder structure has not changed \(components, models, stores, etc\)
 
 ## Hyperstack configuration
 
-+ `config/initializers/hyperloop.rb` has been renamed `config/initializers/hyperstack.rb`
+* `config/initializers/hyperloop.rb` has been renamed `config/initializers/hyperstack.rb`
 
-The configuration initialiser has changed a little. Please see this page for details: https://github.com/hyperstack-org/hyperstack/blob/edge/docs/installation/config.md
+The configuration initialiser has changed a little. Please see this page for details: [https://github.com/hyperstack-org/hyperstack/blob/edge/docs/installation/config.md](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/installation/config.md)
 
 ## Changes to the application.js file
 
@@ -67,8 +67,7 @@ The end of the application.js file now looks like this:
 
 ## Hotloader
 
-The Hotloader is now directly included in the gem set, but is optionally loaded via
-the `hyperstack.rb` initializer:
+The Hotloader is now directly included in the gem set, but is optionally loaded via the `hyperstack.rb` initializer:
 
 ```ruby
 Hyperstack.configuration do |config|
@@ -94,6 +93,7 @@ In Hyperloop:
 ```ruby
 Hyperloop::Application.acting_user_id
 ```
+
 In Hyperstack becomes:
 
 ```ruby
@@ -104,7 +104,7 @@ The simplest way to implement this change is a global search and replace in your
 
 ## There is a new concept of a base HyperComponent and HyperStore base class
 
-In Hyperloop, all Components and Stores inherited from a base `Hyperloop::Component` class. In HyperStack (following the new Rails convention), we do not provide the base class but encourage you to create your own. This is very useful for containing methods that all your Components share.
+In Hyperloop, all Components and Stores inherited from a base `Hyperloop::Component` class. In HyperStack \(following the new Rails convention\), we do not provide the base class but encourage you to create your own. This is very useful for containing methods that all your Components share.
 
 To implement this change, you need to create your HyperComponent class:
 
@@ -143,8 +143,7 @@ class MyComp < HyperComponent
 end
 ```
 
-`HyperComponent` is explained here: https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md#hypercomponent
-
+`HyperComponent` is explained here: [https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md\#hypercomponent](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md#hypercomponent)
 
 **The same is true for `Hyperloop::Store` to `HyperStore`**.
 
@@ -194,16 +193,16 @@ H1 { 'Yay' } if @something
 
 There are several advantages to this new approach:
 
-+ It is significantly faster
-+ It feels more natural to think about state variables as normal instance variables
-+ You only use the `mutate` method when you want React to re-render based on the change to state. This gives you more control.
-+ You can string mutations together. For example:
+* It is significantly faster
+* It feels more natural to think about state variables as normal instance variables
+* You only use the `mutate` method when you want React to re-render based on the change to state. This gives you more control.
+* You can string mutations together. For example:
 
 ```ruby
 mutate @something[12] = true, @amount = 100, @living = :good
 ```
 
-You can read more about state here: https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md#state
+You can read more about state here: [https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md\#state](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md#state)
 
 ## Param syntax has changed
 
@@ -231,7 +230,7 @@ class SayHello < HyperComponent
   end
 ```
 
-You can read more about this here: https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md#params
+You can read more about this here: [https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md\#params](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/dsl-client/hyper-component.md#params)
 
 ## The Router DSL has changed slightly
 
@@ -251,3 +250,4 @@ class MainFrame < HyperComponent
   end
 end
 ```
+

@@ -31,4 +31,4 @@ rails new MyAppName --template=rails-webpacker.rb
 
 ### Tutorial
 
-If you are new to developing an application based on Hyperstack we suggest you follow the [todo tutorial](https://hyperstack.org/edge/docs/tutorials/todo).
+If you are new to developing an application based on Hyperstack we suggest you follow the [todo tutorial](https://docs.hyperstack.org/tutorial).

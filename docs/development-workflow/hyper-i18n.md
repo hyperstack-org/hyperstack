@@ -2,7 +2,7 @@
 
 ## HyperI18n
 
-**Work in progress - ALPHA (docs and code)**
+**Work in progress - ALPHA \(docs and code\)**
 
 HyperI18n seamlessly brings Rails I18n into your Hyperstack application.
 
@@ -16,13 +16,11 @@ HyperI18n seamlessly brings Rails I18n into your Hyperstack application.
 
 ## Note!
 
-This gem is in it's very early stages, and only a handful of the API has been implemented.
-Contributions are very welcome!
+This gem is in it's very early stages, and only a handful of the API has been implemented. Contributions are very welcome!
 
 ### Usage
 
 Hyper-I18n brings in the standard ActiveSupport API.
-
 
 #### ActiveRecord Models
 
@@ -37,6 +35,7 @@ en:
     attributes:
       name: 'Name'
 ```
+
 ```ruby
 User.model_name.human
 # 'Customer'
@@ -47,9 +46,7 @@ User.human_attribute_name(:name)
 
 #### Views
 
-Hyper-I18n makes available the method `t` to components, just as ActiveSupport does for views.
-It also implements the same lazy-loading pattern,
-so if you name space your locale file the same as your components, it will just work:
+Hyper-I18n makes available the method `t` to components, just as ActiveSupport does for views. It also implements the same lazy-loading pattern, so if you name space your locale file the same as your components, it will just work:
 
 ```yaml
 # config/locales/views/en.yml
@@ -58,6 +55,7 @@ en:
     show:
       title: 'Customer View'
 ```
+
 ```ruby
 module Users
   class Show < Hyperstack::Component
@@ -72,5 +70,5 @@ end
 
 ### Server Rendering
 
-HyperI18n is fully compatible with server rendering!
-All translations are also sent to the client, so as to bypass fetching/rendering again on the client.
+HyperI18n is fully compatible with server rendering! All translations are also sent to the client, so as to bypass fetching/rendering again on the client.
+

@@ -27,17 +27,16 @@ In the code above, if the `good_books` scope changed (even on the server), the U
 
 ## Website and documentation
 
-Please see the website for full documentation, or find the same content in the [/docs](/docs) folder in this repo if you prefer.
+Please see the documentation site for full documentation, or find the same content in the [/docs](/docs) folder in this repo if you prefer.
 
 + Website: [hyperstack.org](https://hyperstack.org)
-
-Our website serves as a Hyperstack example application. All the doc content is loaded dynamically from this repo and converted to HTML on the fly. It uses React Semantic UI and a client-side JavaScript full-text search engine. Its a Rails app hosted on Heroku.
++ Docs: [docs.hyperstack.org](https://docs.hyperstack.org/)
 
 ## Setup and installation
 
 You can be up and running in **less than 5 minutes**. Just follow the simple setup guide for a new Rails application all correctly configured and ready to go with Hyperstack.
 
-+ Setup and Installation: [/install](/install)
++ [Setup and Installation docs](https://docs.hyperstack.org/installation/man-installation)
 
 ## Community and support
 
