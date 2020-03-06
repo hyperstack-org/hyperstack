@@ -70,7 +70,8 @@ module Hyperstack
         elsif kind == :gem
           r = "require '#{value}' #{client_guard(render_on_server, render_on_client)}"
           puts "    #{r}"
-          "puts \"#{r}\"; #{r}"
+          "# puts \"#{r}\"; #{r}"
+          r
         else
           generate_directive(:require, value, file, render_on_server, render_on_client)
         end
@@ -86,7 +87,8 @@ module Hyperstack
       end
       r = "#{directive} '#{(['.'] + ['..'] * gem_path.length + comp_path).join('/')}' #{client_guard(render_on_server, render_on_client)}"
       puts "    #{r}"
-      "puts \"#{r}\"; #{r}"
+      "# puts \"#{r}\"; #{r}"
+      r
     end
 
     def generate_require_tree(path, render_on_server, render_on_client)
@@ -98,7 +100,8 @@ module Hyperstack
           fname = fname.gsub(/(\.js$)|(\.rb$)|(\.jsx$)/, '')
           r = "require '#{fname}' #{client_guard(render_on_server, render_on_client)}"
           puts "    #{r}"
-          "puts \"#{r}\"; #{r}"
+          "# puts \"#{r}\"; #{r}"
+          r
         end
       end.compact.join("\n")
     end

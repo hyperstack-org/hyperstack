@@ -57,7 +57,7 @@ You can control how much of the stack gets installed as well:
   spec.add_dependency 'hyper-model', Hyperstack::VERSION
   spec.add_dependency 'hyper-router', Hyperstack::ROUTERVERSION
   spec.add_dependency 'hyperstack-config', Hyperstack::VERSION
-  spec.add_dependency 'opal-rails', '~> 0.9.4'
+  spec.add_dependency 'opal-rails'#, '~> 1.0'
 
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
@@ -80,7 +80,7 @@ You can control how much of the stack gets installed as well:
   #spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3', '~> 1.4' # was 1.3.6 -- see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'sass-rails', '~> 5.0'
   # Use Uglifier as compressor for JavaScript assets
   spec.add_development_dependency 'uglifier', '>= 1.3.0'
@@ -88,7 +88,7 @@ You can control how much of the stack gets installed as well:
   # gem 'mini_racer', platforms: :ruby
 
   # Use CoffeeScript for .coffee assets and views
-  spec.add_development_dependency 'coffee-rails', '~> 4.2'
+  #spec.add_development_dependency 'coffee-rails', '~> 4.2'
   # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
   spec.add_development_dependency 'turbolinks', '~> 5'
   # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
