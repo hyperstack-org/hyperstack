@@ -9,6 +9,13 @@ module Hyperstack
     class_option 'webpack-only', type: :boolean
     class_option 'hyper-model-only', type: :boolean
 
+    def add_clexer
+      gem 'c_lexer'
+      Bundler.with_clean_env do
+        run 'bundle update'
+      end
+    end
+
     def add_component
       if skip_adding_component?
         # normally this is handled by the hyper:component
@@ -113,7 +120,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
 
     def create_policies_directory
       return if skip_hyper_model?
-      policy_file = File.join('app', 'policies', 'application_policy.rb')
+      policy_file = File.join('app', 'policies', 'hyperstack', 'application_policy.rb')
       unless File.exist? policy_file
         create_file policy_file, <<-RUBY
   # #{policy_file}
@@ -122,17 +129,19 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
   # The following policy will open up full access (but only in development)
   # The policy system is very flexible and powerful.  See the documentation
   # for complete details.
-  class Hyperstack::ApplicationPolicy
-    # Allow any session to connect:
-    always_allow_connection
-    # Send all attributes from all public models
-    regulate_all_broadcasts { |policy| policy.send_all }
-    # Allow all changes to models
-    allow_change(to: :all, on: [:create, :update, :destroy]) { true }
-    # allow remote access to all scopes - i.e. you can count or get a list of ids
-    # for any scope or relationship
-    ApplicationRecord.regulate_scope :all
-  end unless Rails.env.production?
+  module Hyperstack
+    class ApplicationPolicy
+      # Allow any session to connect:
+      always_allow_connection
+      # Send all attributes from all public models
+      regulate_all_broadcasts { |policy| policy.send_all }
+      # Allow all changes to models
+      allow_change(to: :all, on: [:create, :update, :destroy]) { true }
+      # allow remote access to all scopes - i.e. you can count or get a list of ids
+      # for any scope or relationship
+      ApplicationRecord.regulate_scope :all
+    end unless Rails.env.production?
+  end
         RUBY
       end
     end
@@ -183,6 +192,8 @@ require 'models/application_record.rb'
       end
 
       say "\n\n"
+
+      warnings.each { |warning| say "#{warning}", :yellow }
     end
 
     private

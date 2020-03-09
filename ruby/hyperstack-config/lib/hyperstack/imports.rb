@@ -58,10 +58,18 @@ module Hyperstack
       []
     end
 
+    def add_opal(sys)
+      return [] unless sys
+
+      puts "    require 'opal'"
+      ["require 'opal'; puts \"require 'opal'\""]
+    end
+
     def generate_requires(mode, sys, file)
       handle_webpack
-      (import_list.collect do |value, cancelled, render_on_server, render_on_client, kind|
+      (add_opal(sys) + import_list.collect do |value, cancelled, render_on_server, render_on_client, kind|
         next if cancelled
+        next if value == 'opal'
         next if (sys && kind == :tree) || (!sys && kind != :tree)
         next if mode == :client && !render_on_client
         next if mode == :server && !render_on_server
@@ -70,8 +78,7 @@ module Hyperstack
         elsif kind == :gem
           r = "require '#{value}' #{client_guard(render_on_server, render_on_client)}"
           puts "    #{r}"
-          "# puts \"#{r}\"; #{r}"
-          r
+          "puts \"#{r}\"; #{r}"
         else
           generate_directive(:require, value, file, render_on_server, render_on_client)
         end
@@ -87,8 +94,7 @@ module Hyperstack
       end
       r = "#{directive} '#{(['.'] + ['..'] * gem_path.length + comp_path).join('/')}' #{client_guard(render_on_server, render_on_client)}"
       puts "    #{r}"
-      "# puts \"#{r}\"; #{r}"
-      r
+      "puts \"#{r}\"; #{r}"
     end
 
     def generate_require_tree(path, render_on_server, render_on_client)
@@ -100,8 +106,7 @@ module Hyperstack
           fname = fname.gsub(/(\.js$)|(\.rb$)|(\.jsx$)/, '')
           r = "require '#{fname}' #{client_guard(render_on_server, render_on_client)}"
           puts "    #{r}"
-          "# puts \"#{r}\"; #{r}"
-          r
+          "puts \"#{r}\"; #{r}"
         end
       end.compact.join("\n")
     end

@@ -1,7 +1,7 @@
 module React
   class Router
     class History
-      include Native
+      include Native::Wrapper
 
       def self.current
         new(`History`)

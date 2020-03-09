@@ -7,14 +7,21 @@ namespace :spec do
   task :prepare do
     Dir.chdir('spec') do
       sh('rm -rf test_app')
-      sh('bundle exec rails new test_app')
-      Dir.chdir('test_app') do
-        sh('bundle exec rails g hyperstack:install')
-        sh('mv Gemfile _Gemfile_')
-        sh('bundle exec rails generate model Sample name:string description:text')
-        sh('mv app/models/sample.rb app/hyperstack/models/sample.rb')
-        sh('bundle exec rake db:migrate')
-        sh('bundle exec rails dev:cache')
+      Bundler.with_clean_env do
+        sh('rails -v')
+        sh('rails _6.0.2.1_ new test_app -T')
+      end
+      Bundler.with_clean_env do
+        Dir.chdir('test_app') do
+          sh('cat ../gems.rb >> Gemfile')
+          sh('bundle update')
+          sh('spring stop')
+          sh('bundle exec rails g hyperstack:install')
+          sh('bundle exec rails generate model Sample name:string description:text')
+          sh('mv app/models/sample.rb app/hyperstack/models/sample.rb')
+          sh('bundle exec rake db:migrate')
+          sh('bundle exec rails dev:cache') # not tested yet...
+        end
       end
     end
   end
