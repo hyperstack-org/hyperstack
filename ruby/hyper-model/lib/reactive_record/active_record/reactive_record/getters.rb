@@ -95,7 +95,7 @@ module ReactiveRecord
 
     def getter_common(attribute, reload)
       @virgin = false unless data_loading?
-      return if @destroyed
+      return @attributes[attribute] if @destroyed
       if @attributes.key? attribute
         current_value = @attributes[attribute]
         current_value.notify if current_value.is_a? Base::DummyValue
