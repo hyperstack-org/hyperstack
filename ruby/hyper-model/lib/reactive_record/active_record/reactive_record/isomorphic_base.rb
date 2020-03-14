@@ -230,6 +230,7 @@ module ReactiveRecord
           models << {id: record.object_id, model: record.model.model_name.to_s, attributes: output_attributes, vector: vector}
           record.attributes.each do |attribute, value|
             if association = record.model.reflect_on_association(attribute)
+              next if association.macro == :belongs_to
               if association.collection?
                 # following line changed from .all to .collection on 10/28
                 [*value.collection, *value.unsaved_children].each do |assoc|
