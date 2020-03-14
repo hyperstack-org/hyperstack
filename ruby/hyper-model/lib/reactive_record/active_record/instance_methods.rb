@@ -128,7 +128,8 @@ module ActiveRecord
       return false unless ar_instance.is_a?(ActiveRecord::Base)
       return false if ar_instance.new_record?
       return false unless self.class.base_class == ar_instance.class.base_class
-      id == ar_instance.id
+      return id == ar_instance.id unless id.nil?
+      attributes == ar_instance.attributes
     end
 
     def [](attr)
