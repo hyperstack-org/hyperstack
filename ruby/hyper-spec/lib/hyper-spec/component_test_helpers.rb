@@ -5,7 +5,8 @@ require 'hyper-spec/unparser_patch'
 require 'method_source'
 require_relative '../../lib/hyper-spec/time_cop.rb'
 
-Parser::Builders::Default.emit_procarg0 = true
+# Parser::Builders::Default.emit_procarg0 = true
+# Parser::Builders::Default.emit_arg_inside_procarg0 = true
 
 module HyperSpec
   module ComponentTestHelpers
@@ -333,9 +334,9 @@ module HyperSpec
       end
 
       width, height = [height, width] if portrait
-
       unless RSpec.configuration.debugger_width
         Capybara.current_session.current_window.resize_to(1000, 500)
+        sleep RSpec.configuration.wait_for_initialization_time
         wait_for_size(1000, 500)
         inner_width = evaluate_script('window.innerWidth')
         RSpec.configuration.debugger_width = 1000 - inner_width

@@ -47,11 +47,12 @@ RSpec.configure do |config|
 end
 
 # Capybara config
-RSpec.configure do |_config|
+RSpec.configure do |config|
+  config.add_setting :wait_for_initialization_time
+  config.wait_for_initialization_time = 3
   Capybara.default_max_wait_time = 10
 
   Capybara.register_driver :chrome do |app|
-    binding.pry
     options = {}
     options.merge!(
       args: %w[auto-open-devtools-for-tabs]) #,

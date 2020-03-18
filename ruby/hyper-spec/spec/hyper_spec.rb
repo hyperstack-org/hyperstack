@@ -1,12 +1,16 @@
 require 'spec_helper'
 
 describe 'hyper-spec', js: true do
+  it 'can visit a page' do
+    visit 'test'
+  end
+
   it 'will mount a component' do
     mount "SayHello", name: 'Fred'
     expect(page).to have_content('Hello there Fred')
   end
 
-  it "can the mount a component defined in mounts code block" do
+  it "can mount a component defined in mounts code block" do
     mount 'ShowOff' do
       class ShowOff
         include Hyperstack::Component
@@ -18,7 +22,7 @@ describe 'hyper-spec', js: true do
 
   context "the client_option method" do
 
-    it "can rendered server side only" do
+    it "can render server side only" do
       client_option render_on: :server_only
       mount 'SayHello', name: 'George'
       expect(page).to have_content('Hello there George')
