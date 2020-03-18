@@ -32,13 +32,13 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
   spec.add_development_dependency 'chromedriver-helper'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
+  spec.add_development_dependency 'opal-rails'#, '~> 0.9.4'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rails', '>= 4.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec', '~> 3.7.0'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3'#, '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'timecop', '~> 0.8.1'
 end
