@@ -1,9 +1,11 @@
 module Mutations
-  class ErrorArray
+  class ErrorHash
     def self.new_from_error_hash(errors)
-      new(errors.collect do |key, values|
-        ErrorAtom.new(key, values[:symbol], values)
-      end)
+			new.tap do |hash|
+				errors.each do |key, values|
+					hash[key] = ErrorAtom.new(key, values[:symbol], values)
+				end
+			end
     end
   end
 end
@@ -30,7 +32,7 @@ module Hyperstack
 
       def initialize(errors)
         unless errors.is_a? Mutations::ErrorHash
-          errors = Mutations::ErrorArray.new_from_error_hash(errors)
+          errors = Mutations::ErrorHash.new_from_error_hash(errors)
         end
         super(errors)
       end
