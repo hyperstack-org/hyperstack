@@ -22,24 +22,34 @@ module Hyperstack
           `typeof #{ncc} === 'function' && !(#{ncc}.prototype && #{ncc}.prototype.isReactComponent)`
         end
 
+        def self.component_is_class?(component)
+          `#{component}.prototype !== undefined` &&
+            (`!!#{component}.prototype.isReactComponent` || `!!#{component}.prototype.render`)
+        end
+
         def self.import_native_component(opal_class, native_class)
           opal_class.instance_variable_set("@native_import", true)
           @@component_classes[opal_class] = native_class
         end
 
+        # rubocop:disable Lint/LiteralAsCondition
         def self.eval_native_react_component(name)
           component = `eval(name)`
+
           raise "#{name} is not defined" if `#{component} === undefined`
-          component = `component.default` if `component.__esModule`
-          is_component_class = `#{component}.prototype !== undefined` &&
-                                (`!!#{component}.prototype.isReactComponent` ||
-                                 `!!#{component}.prototype.render`)
+
+          # We can't assume that there is a default export for components that are ES6 modules,
+          #   but if there is we should go ahead and use it.
+          component         = `component.default` if `component.__esModule && component.default`
           has_render_method = `typeof #{component}.render === "function"`
-          unless is_component_class || stateless?(component) || has_render_method
+
+          unless component_is_class?(component) || stateless?(component) || has_render_method
             raise 'does not appear to be a native react component'
           end
+
           component
         end
+        # rubocop:enable Lint/LiteralAsCondition
 
         def self.native_react_component?(name = nil)
           return false unless name
