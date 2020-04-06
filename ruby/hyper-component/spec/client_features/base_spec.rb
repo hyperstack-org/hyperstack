@@ -18,6 +18,7 @@ describe 'Hyperloop::Component', js: true do
   it 'can create a simple component class' do
     mount 'Foo'
     expect(page.body[-50..-19]).to match(/<span>working<\/span>/)
+    binding.pry
   end
 
   it 'can create a simple component class that can be inherited to create another component class' do

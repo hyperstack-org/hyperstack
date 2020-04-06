@@ -1,7 +1,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
-require 'opal-rspec'
+#require 'opal-rspec'
 require 'opal-jquery'
 
 begin

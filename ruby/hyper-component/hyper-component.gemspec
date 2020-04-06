@@ -37,8 +37,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
   spec.add_development_dependency 'opal-jquery'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
-  spec.add_development_dependency 'opal-rspec'
+  spec.add_development_dependency 'opal-rails'#, '~> 0.9.4'
+  #spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'puma'
@@ -47,6 +47,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3'#, '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'timecop', '~> 0.8.1'
 end
