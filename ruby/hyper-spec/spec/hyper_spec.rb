@@ -153,7 +153,7 @@ describe 'hyper-spec', js: true do
 
   end
 
-  it "can add classes during testing" do
+  it "can add style classes during testing" do
     add_class :some_class, borderStyle: :solid
     mount 'StyledDiv' do
       class StyledDiv
@@ -222,6 +222,55 @@ describe 'hyper-spec', js: true do
       end
       expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(1).of(Time.now.to_i+@sync_gap)
     end
+  end
+
+  context "new style rspec expressions" do
+
+    before(:each) do
+      @str = 'hello'
+    end
+
+    let(:another_string) { 'a man a plan a canal panama' }
+
+    it 'can evaluate expressions on the client using the on_client_to method' do
+      expect { 12 + 12 }.on_client_to eq 24
+    end
+
+    it 'with the on_client_to on a new line' do
+      expect do
+        12 + 12
+      end
+        .on_client_to eq 24
+    end
+
+    it 'can evaluate expressions on the client using the on_client_not_to method' do
+      expect { 12 + 12 }.on_client_not_to eq 25
+    end
+
+    it 'can use the to_then method to evaluate promises on the client' do
+      expect do
+        Promise.new.tap { |p| after(1) { p.resolve('done') } }
+      end.to_then eq('done')
+    end
+
+    it 'will copy local vars to the client' do
+      str = 'hello'
+      expect { str.reverse }.on_client_to eq str.reverse
+    end
+
+    it 'will copy instance vars to the client' do
+      expect { @str.reverse }.on_client_to eq @str.reverse
+    end
+
+    it 'will copy memoized values to the client' do
+      expect { another_string.gsub(/\W/, '') }.on_client_to eq another_string.gsub(/\W/, '')
+    end
+
+    it 'aliases evaluate_ruby as on_client and c?' do
+      expect(on_client { 12 % 5 }).to eq(2)
+      expect(c? { 12 % 5 }).to eq(2)
+    end
+
   end
 end
 

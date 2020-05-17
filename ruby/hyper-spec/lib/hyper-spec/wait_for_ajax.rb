@@ -29,7 +29,7 @@ module HyperSpec
         }
       })();
       CODE
-      page.evaluate_script(jscode)
+      Capybara.page.evaluate_script(jscode)
     rescue Exception => e
       puts "wait_for_ajax failed while testing state of ajax requests: #{e}"
     end
