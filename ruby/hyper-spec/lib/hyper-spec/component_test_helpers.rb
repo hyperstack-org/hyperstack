@@ -7,6 +7,7 @@ require 'pry'
 require_relative '../../lib/hyper-spec/time_cop.rb'
 
 Parser::Builders::Default.emit_procarg0 = true # not present in original version of refactored hyperspec
+
 module MethodSource
   class << self
     alias original_lines_for_before_hyper_spec lines_for
@@ -41,20 +42,26 @@ class Time
   end
 end
 
+class NilClass
+  def to_opal_expression
+    self.inspect
+  end
+end
+
 module HyperSpec
 
-  class << self
-    attr_accessor :current_pry_code_block
-    Pry.hooks.add_hook(:before_eval, "hyper_spec_code_capture") do |code|
-      HyperSpec.current_pry_code_block = code
+  # add a before eval hook to pry so we can capture the source
+
+  if defined? Pry
+    class << self
+      attr_accessor :current_pry_code_block
+      Pry.hooks.add_hook(:before_eval, "hyper_spec_code_capture") do |code|
+        HyperSpec.current_pry_code_block = code
+      end
     end
-    Pry.hooks.add_hook(:after_eval, "hyper_spec_code_capture") do
-      # @current_pry_code_block = nil
-    end
-  end if defined? Pry
+  end
 
   module ComponentTestHelpers
-
     def self.opal_compile(s)
       Opal.compile(s)
     rescue Exception => e
@@ -77,8 +84,8 @@ module HyperSpec
       attr_accessor :description_displayed
 
       def test_id
-        @test_id ||= 0
-        @test_id += 1
+        @_hyperspec_private_test_id ||= 0
+        @_hyperspec_private_test_id += 1
       end
 
       def display_example_description
@@ -174,13 +181,12 @@ module HyperSpec
       if ping
         "/#{route_root}/ping"
       else
-        @test_id = ComponentTestHelpers.test_id
-        "/#{route_root}/#{@test_id}"
+        "/#{route_root}/#{ComponentTestHelpers.test_id}"
       end
     end
 
     def insert_html(str)
-      @html_block = "#{@html_block}\n#{str}"
+      @_hyperspec_private_html_block = "#{@_hyperspec_private_html_block}\n#{str}"
     end
 
     def isomorphic(&block)
@@ -212,12 +218,7 @@ module HyperSpec
       args.each do |name, value|
         str = "#{name} = #{value.to_opal_expression}\n#{str}"
       end
-      #if block
-      #return evaluate_ruby(add_opal_block(str, block), opts) if block
       str = add_opal_block(str, block) if block
-        #binding.pry
-        #str = "#{add_locals(str, block)}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}"
-      #end
       js = opal_compile(str).delete("\n").gsub('(Opal);', '(Opal)')
       # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
       # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
@@ -250,9 +251,9 @@ module HyperSpec
       expect(evaluate_ruby(add_opal_block(str, block), opts, {}))
     end
 
-    PREDEFINED_VARIABLES = %i[
-      @__inspect_output @__memoized @example @client_code @html_block @fixture_cache
-      @fixture_connections @connection_subscriber @loaded_fixtures @client_options @test_id
+    PRIVATE_VARIABLES = %i[
+      @__inspect_output @__memoized @example @_hyperspec_private_client_code @_hyperspec_private_html_block @fixture_cache
+      @fixture_connections @connection_subscriber @loaded_fixtures @_hyperspec_private_client_options
       b __ _ _ex_ pry_instance _out_ _in_ _dir_ _file_
     ]
 
@@ -265,28 +266,22 @@ module HyperSpec
       end if memoized
 
       in_str = b.local_variables.inject(in_str) do |str, var|
-        next str if PREDEFINED_VARIABLES.include? var
+        next str if PRIVATE_VARIABLES.include? var
 
         "#{str}\n#{var} = #{b.local_variable_get(var).to_opal_expression}"
       end
 
       in_str = b.eval('instance_variables').inject(in_str) do |str, var|
-        next str if PREDEFINED_VARIABLES.include? var
+        next str if PRIVATE_VARIABLES.include? var
 
         "#{str}\n#{var} = #{b.eval("instance_variable_get('#{var}')").to_opal_expression}"
       end
       in_str
     end
 
-    def the_node_you_are_looking_for?(node)
-      node.type == :block &&
-        node.children.first.class == Parser::AST::Node &&
-        node.children.first.type == :send #&&
-        #respond_to?(node.children.first.children[1]) &&
-        #method(node.children.first.children[1]) == method(:evaluate_ruby)
-    end
-
     def find_block(node)
+      # find a block with the ast tree.
+
       return false unless node.class == Parser::AST::Node
       return node if the_node_you_are_looking_for?(node)
 
@@ -297,29 +292,33 @@ module HyperSpec
       false
     end
 
+    def the_node_you_are_looking_for?(node)
+      node.type == :block &&
+        node.children.first.class == Parser::AST::Node &&
+        node.children.first.type == :send
+        # we could also check that the block is going to the right method
+        #   respond_to?(node.children.first.children[1]) &&
+        #   method(node.children.first.children[1]) == method(:evaluate_ruby)
+        # however that does not work for expect { ... }.on_client_to ...
+        # because now the block is being sent to expect... so we could
+        # check the above OR node.children.first.children[1] == :expect
+        # but what if there are two blocks?  on and on...
+    end
+
     def add_opal_block(str, block)
-      # we need to find the block within the source ast.  This code works for
-      # both the case where the following `.to` method is on a new line after the
-      # block (ast.type == :block) in which case the block code is the third child
-      # otherwise the expression begins begins with a send, so we get the block from
-      # within the expression
       return str unless block
 
       source = block.source
       ast = Parser::CurrentRuby.parse(source)
-      # while ast.type == :send
-      #   ast = ast.children.first
-      # end
       ast = find_block(ast)
-      raise "could not find block within source: #{block.source}" unless ast #.type == :block
+      raise "could not find block within source: #{block.source}" unless ast
 
-      "#{add_locals(str, block)}\n"\
-      "#{Unparser.unparse ast.children.last}"
+      "#{add_locals(str, block)}\n#{Unparser.unparse ast.children.last}"
     end
 
     def evaluate_promise(str = '', opts = {}, _dummy = nil, &block)
       insure_page_loaded
-      str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}" if block
+      str = add_opal_block(str, block)
       str = "(#{str}).then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
       js = opal_compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
       page.evaluate_script("window.hyper_spec_promise_result = false")
@@ -345,8 +344,8 @@ module HyperSpec
     end
 
     def before_mount(&block) # was called on_client
-      @client_code =
-        "#{@client_code}#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}\n"
+      @_hyperspec_private_client_code =
+        "#{@_hyperspec_private_client_code}#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}\n"
     end
 
     # to get legacy on_client behavior you can alias on_client before_mount
@@ -359,7 +358,7 @@ module HyperSpec
     end
 
     def insure_page_loaded(only_if_code_or_html_exists = nil)
-      return if only_if_code_or_html_exists && !@client_code && !@html_block
+      return if only_if_code_or_html_exists && !@_hyperspec_private_client_code && !@_hyperspec_private_html_block
       # if we are not resetting between examples, or think its mounted
       # then look for Opal, but if we can't find it, then ping to clear and try again
       if !HyperSpec.reset_between_examples? || page.instance_variable_get('@hyper_spec_mounted')
@@ -371,8 +370,8 @@ module HyperSpec
     end
 
     def client_option(opts = {})
-      @client_options ||= {}
-      @client_options.merge! opts
+      @_hyperspec_private_client_options ||= {}
+      @_hyperspec_private_client_options.merge! opts
     end
 
     alias client_options client_option
@@ -385,7 +384,7 @@ module HyperSpec
 
       opts = client_options opts
       test_url = build_test_url_for(opts.delete(:controller))
-      if block || @client_code || component_name.nil?
+      if block || @_hyperspec_private_client_code || component_name.nil?
         block_with_helpers = <<-code
           module ComponentHelpers
             def self.js_eval(s)
@@ -419,16 +418,16 @@ module HyperSpec
           # class React::Component::HyperTestDummy < React::Component::Base
           #       def render; end
           # end
-          #{@client_code}
+          #{@_hyperspec_private_client_code}
           #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
         code
         opts[:code] = opal_compile(block_with_helpers)
       end
-      @client_code = nil
+      @_hyperspec_private_client_code = nil
       #component_name ||= 'React::Component::HyperTestDummy'
-      value = [component_name, params, @html_block, opts]
+      value = [component_name, params, @_hyperspec_private_html_block, opts]
       ::Rails.cache.write(test_url, value)
-      @html_block = nil
+      @_hyperspec_private_html_block = nil
       test_code_key = "hyper_spec_prerender_test_code.js"
       if defined? ::Hyperstack::Component # was ::React in old hyperloop version
         @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
@@ -470,7 +469,7 @@ module HyperSpec
     end
 
     def add_class(class_name, style)
-      @client_code = "#{@client_code}ComponentHelpers.add_class('#{class_name}', #{style})\n"
+      @_hyperspec_private_client_code = "#{@_hyperspec_private_client_code}ComponentHelpers.add_class('#{class_name}', #{style})\n"
     end
 
     def open_in_chrome

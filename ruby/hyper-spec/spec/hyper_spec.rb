@@ -6,7 +6,7 @@ describe 'hyper-spec', js: true do
     expect(page).to have_content('Hello there Fred')
   end
 
-  it "can the mount a component defined in mounts code block" do
+  it "can the mount a component defined in the mounts code block" do
     mount 'ShowOff' do
       class ShowOff
         include Hyperstack::Component
@@ -18,7 +18,7 @@ describe 'hyper-spec', js: true do
 
   context "the client_option method" do
 
-    it "can rendered server side only" do
+    it "can render server side only" do
       client_option render_on: :server_only
       mount 'SayHello', name: 'George'
       expect(page).to have_content('Hello there George')
@@ -84,8 +84,7 @@ describe 'hyper-spec', js: true do
 
     it 'evaluate_promise will wait for the promise to resolve' do
       start = Time.now
-      answer =
-      evaluate_promise do
+      answer = evaluate_promise do
         wait(DELAY)
       end
       expect(answer).to eq(DELAY)
@@ -269,6 +268,10 @@ describe 'hyper-spec', js: true do
     it 'aliases evaluate_ruby as on_client and c?' do
       expect(on_client { 12 % 5 }).to eq(2)
       expect(c? { 12 % 5 }).to eq(2)
+    end
+
+    it 'allows local variables on the client to be set using the with method' do
+      expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
 
   end
