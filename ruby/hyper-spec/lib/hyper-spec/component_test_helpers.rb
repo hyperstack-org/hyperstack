@@ -76,8 +76,9 @@ module HyperSpec
     TOP_LEVEL_COMPONENT_PATCH =
       opal_compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
     TIME_COP_CLIENT_PATCH =
-      opal_compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
-      "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
+      "#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}\n" +
+      opal_compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__)))
+
 
     class << self
       attr_accessor :current_example
