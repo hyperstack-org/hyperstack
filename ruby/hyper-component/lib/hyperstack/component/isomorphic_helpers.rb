@@ -18,16 +18,22 @@ module Hyperstack
         def self.load_context(unique_id = nil, name = nil)
           # can be called on the client to force re-initialization for testing purposes
           if !unique_id || !@context || @context.unique_id != unique_id
-            if on_opal_server?
-              `console.history = []` rescue nil
-              message = "************************ React Prerendering Context Initialized #{name} ***********************"
-            else
-              message = "************************ React Browser Context Initialized ****************************"
-            end
+            message =
+              if on_opal_server?
+                `console.history = []` rescue nil
+                "************************ React Prerendering Context Initialized #{name} ***********************"
+              else
+                '************************ React Browser Context Initialized ****************************'
+              end
+
             log(message)
+
             @context = Context.new(unique_id)
           end
-          @context
+
+          # True is returned here because this method is evaluated by MiniRacer,
+          #   and can cause TypeError: Converting circular structure to JSON to raise
+          true
         end
       end
 

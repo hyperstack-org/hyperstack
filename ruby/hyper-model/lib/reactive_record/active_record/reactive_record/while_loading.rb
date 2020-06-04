@@ -478,6 +478,27 @@ if RUBY_ENGINE == 'opal'
         reactive_record_link_set_while_loading_container_class
       end
 
+      # This is required to support legacy browsers (Internet Explorer 9+)
+      # https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+      `
+      if (typeof(Element) != 'undefined' && !Element.prototype.matches) {
+        Element.prototype.matches = Element.prototype.msMatchesSelector ||
+                                    Element.prototype.webkitMatchesSelector;
+      }
+
+      if (typeof(Element) != 'undefined' && !Element.prototype.closest) {
+        Element.prototype.closest = function(s) {
+          var el = this;
+
+          do {
+            if (el.matches(s)) return el;
+            el = el.parentElement || el.parentNode;
+          } while (el !== null && el.nodeType === 1);
+          return null;
+        };
+      }
+      `
+
       def reactive_record_link_to_enclosing_while_loading_container
         # Call after any component mounts - attaches the containers loading id to this component
         # Fyi, the while_loading container is responsible for setting its own link to itself

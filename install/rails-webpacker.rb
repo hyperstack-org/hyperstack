@@ -1,5 +1,4 @@
 # Hyperstack
-WITH_PRERENDERING = true
 
 # ----------------------------------- Commit so we have good history of these changes
 
@@ -17,7 +16,8 @@ end
 
 # ----------------------------------- Ensure Sqlite has a valid version
 
-gsub_file 'Gemfile', /gem\s+'sqlite3'(?!,\s+'.*')\n/, "gem 'sqlite3', '~> 1.3.6'\n"
+# gsub_file 'Gemfile', /gem\s+'sqlite3'(?!,\s+'.*')\n/, "gem 'sqlite3', '~> 1.3.6'\n"
+# gsub_file 'Gemfile', /gem\s+'sqlite3'(?!,\s+'.*')\n/, "gem 'pg'"
 
 # ----------------------------------- Create the folders
 
@@ -60,7 +60,8 @@ file 'app/models/application_record.rb', <<-CODE, force: true
 # the presence of this file prevents rails migrations from recreating application_record.rb
 # see https://github.com/rails/rails/issues/29407
 
-require 'models/application_record.rb'
+# BH - I am not sure this is right
+# require 'models/application_record.rb'
 CODE
 
 # ----------------------------------- Create the Hyperstack config
@@ -90,6 +91,26 @@ module Hyperstack
 end if Rails.env.development?
 CODE
 
+# ----------------------------------- Create thyperstack.js
+
+file 'app/javascript/packs/hyperstack.js', <<-CODE
+// Import all the modules
+import React from 'react';
+import ReactDOM from 'react-dom';
+ // for opal/hyperloop modules to find React and others they must explicitly be saved
+// to the global space, otherwise webpack will encapsulate them locally here
+global.React = React;
+global.ReactDOM = ReactDOM;
+CODE
+
+# ----------------------------------- View template
+
+inject_into_file 'app/views/layouts/application.html.erb', before: %r{<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>} do
+  <<-CODE
+  <%= javascript_pack_tag 'hyperstack' %>
+  CODE
+  end
+
 # ----------------------------------- Add a default policy
 
 file 'app/policies/application_policy.rb', <<-CODE
@@ -109,7 +130,7 @@ class Hyperstack::ApplicationPolicy
   ApplicationRecord.regulate_scope :all
 end unless Rails.env.production?
 # don't forget to provide a policy before production...
-raise "You need to define a Hyperstack policy for production" if Rails.env.production?
+::Rails.logger.debug("WARNING: You need to define a Hyperstack policy for production") if Rails.env.production?
 CODE
 
 # ----------------------------------- Add NPM modules
@@ -117,94 +138,24 @@ CODE
 run 'yarn add react@16'
 run 'yarn add react-dom@16'
 run 'yarn add react-router@^5.0.0'
-if WITH_PRERENDERING
 run 'yarn add react-router-dom@^5.0.0'
 # run 'yarn add history' # this will be brought in by react-router
 run 'yarn add react_ujs@^2.5.0'
 run 'yarn add jquery@^3.4.1'
-end
-
-if !WITH_PRERENDERING
-  # ----------------------------------- Create hyperstack.js
-
-  file 'app/javascript/packs/hyperstack.js', <<-CODE
-  // Import all the modules
-  import React from 'react';
-  import ReactDOM from 'react-dom';
-
-  // for opal/hyperstack modules to find React and others they must explicitly be saved
-  // to the global space, otherwise webpack will encapsulate them locally here
-  global.React = React;
-  global.ReactDOM = ReactDOM;
-  CODE
-
-  # ----------------------------------- View template
-
-  inject_into_file 'app/views/layouts/application.html.erb', before: %r{<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>} do
-  <<-CODE
-  <%= javascript_pack_tag 'hyperstack' %>
-  CODE
-  end
 
   # ----------------------------------- application.js
 
-  inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
+inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
 <<-CODE
 //= require jquery
 //= require jquery_ujs
 //= require hyperstack-loader
 CODE
-  end
-else
-  # ----------------------------------- Create client_and_server.js
-
-  file 'app/javascript/packs/client_and_server.js', <<-CODE
-//app/javascript/packs/client_and_server.js
-// these packages will be loaded both during prerendering and on the client
-React = require('react');                      // react-js library
-History = require('history');                  // react-router history library
-ReactRouter = require('react-router');         // react-router js library
-ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
-ReactRailsUJS = require('react_ujs');          // interface to react-rails
-// to add additional NPM packages call run add yarn package-name@version
-// then add the require here.
-CODE
-
-  # ----------------------------------- Create client_only.js
-
-  file 'app/javascript/packs/client_only.js', <<-CODE
-//app/javascript/packs/client_only.js
-// add any requires for packages that will run client side only
-ReactDOM = require('react-dom');               // react-js client side code
-jQuery = require('jquery');
-// to add additional NPM packages call run add yarn package-name@version
-// then add the require here.
-CODE
-
-  # ----------------------------------- add asset paths
-
-  # note before this was just public/packs now its public/paths/js.  WHY???
-  append_file 'config/initializers/assets.rb' do
-    <<-RUBY
-Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js').to_s
-    RUBY
-  end
-  inject_into_file 'config/environments/test.rb', before: /^end/ do
-    <<-RUBY
-
-# added by hyperstack installer
-config.assets.paths << Rails.root.join('public', 'packs-test', 'js').to_s
-    RUBY
-
-
-  # ----------------------------------- application.js
-
-  inject_into_file 'app/assets/javascripts/application.js', before: %r{//= require_tree .} do
-<<-CODE
-//= require hyperstack-loader
-CODE
-  end
 end
+
+# ----------------------------------- Uglifier for ES6
+
+gsub_file 'config/environments/production.rb', /(?:\:uglifier)\n/, "Uglifier.new(harmony: true)\n"
 
 # ----------------------------------- Procfile
 
@@ -236,8 +187,11 @@ class App < HyperComponent
   # Route('/user/:id/name', mounts: UserName) : path segments beginning with a colon will be captured in the match param
   # see the hyper-router gem documentation for more details
 
-  render do
+  render(DIV) do
     H1 { "Hello world from Hyperstack!" }
+    BUTTON {"Click me"}.on(:click) do
+      alert("All working!")
+    end
   end
 end
 CODE
@@ -247,10 +201,12 @@ CODE
 # must be inserted AFTER route get ... so it ends up before in the route file!
 route "mount Hyperstack::Engine => '/hyperstack'"
 
-# ----------------------------------- Commit Hyperstack setup
+
+# ----------------------------------- Commit Hyperstack setup and create db
 
 after_bundle do
   run 'bundle exec rails webpacker:install'
   git add:    "."
   git commit: "-m 'Hyperstack config complete'"
+  run 'rake db:create'
 end

@@ -59,6 +59,10 @@ if RUBY_ENGINE == 'opal'
         ticker
       end
 
+      def init(scale: 1, resolution: 10)
+        update_lolex(Time.now, scale, resolution)
+      end
+
       def update_lolex(time, scale, resolution)
         `#{@lolex}.uninstall()` && return if scale.nil?
         @mock_start_time = time.to_f * 1000
@@ -77,6 +81,14 @@ if RUBY_ENGINE == 'opal'
         @ticker = create_ticker
         nil # must return nil otherwise we try to return a timer to server!
       end
+    end
+  end
+
+  # create an alias for Lolex.init so we can say Timecop.init on the client
+
+  class Timecop
+    def self.init(*args)
+      Lolex.init(*args)
     end
   end
 

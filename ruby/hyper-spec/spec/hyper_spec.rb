@@ -6,7 +6,7 @@ describe 'hyper-spec', js: true do
     expect(page).to have_content('Hello there Fred')
   end
 
-  it "can the mount a component defined in mounts code block" do
+  it "can the mount a component defined in the mounts code block" do
     mount 'ShowOff' do
       class ShowOff
         include Hyperstack::Component
@@ -18,7 +18,7 @@ describe 'hyper-spec', js: true do
 
   context "the client_option method" do
 
-    it "can rendered server side only" do
+    it "can render server side only" do
       client_option render_on: :server_only
       mount 'SayHello', name: 'George'
       expect(page).to have_content('Hello there George')
@@ -84,8 +84,7 @@ describe 'hyper-spec', js: true do
 
     it 'evaluate_promise will wait for the promise to resolve' do
       start = Time.now
-      answer =
-      evaluate_promise do
+      answer = evaluate_promise do
         wait(DELAY)
       end
       expect(answer).to eq(DELAY)
@@ -153,7 +152,7 @@ describe 'hyper-spec', js: true do
 
   end
 
-  it "can add classes during testing" do
+  it "can add style classes during testing" do
     add_class :some_class, borderStyle: :solid
     mount 'StyledDiv' do
       class StyledDiv
@@ -222,6 +221,59 @@ describe 'hyper-spec', js: true do
       end
       expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(1).of(Time.now.to_i+@sync_gap)
     end
+  end
+
+  context "new style rspec expressions" do
+
+    before(:each) do
+      @str = 'hello'
+    end
+
+    let(:another_string) { 'a man a plan a canal panama' }
+
+    it 'can evaluate expressions on the client using the on_client_to method' do
+      expect { 12 + 12 }.on_client_to eq 24
+    end
+
+    it 'with the on_client_to on a new line' do
+      expect do
+        12 + 12
+      end
+        .on_client_to eq 24
+    end
+
+    it 'can evaluate expressions on the client using the on_client_not_to method' do
+      expect { 12 + 12 }.on_client_not_to eq 25
+    end
+
+    it 'can use the to_then method to evaluate promises on the client' do
+      expect do
+        Promise.new.tap { |p| after(1) { p.resolve('done') } }
+      end.to_then eq('done')
+    end
+
+    it 'will copy local vars to the client' do
+      str = 'hello'
+      expect { str.reverse }.on_client_to eq str.reverse
+    end
+
+    it 'will copy instance vars to the client' do
+      expect { @str.reverse }.on_client_to eq @str.reverse
+    end
+
+    it 'will copy memoized values to the client' do
+      expect { another_string.gsub(/\W/, '') }.on_client_to eq another_string.gsub(/\W/, '')
+    end
+
+    it 'aliases evaluate_ruby as on_client and c?' do
+      expect(on_client { 12 % 5 }).to eq(2)
+      expect(c? { 12 % 5 }).to eq(2)
+    end
+
+    it 'allows local variables on the client to be set using the with method' do
+      expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
+    end
+
   end
 end
 

@@ -57,10 +57,13 @@ module ActiveRecord
       end
       dealiased_attrs = {}
       attrs.each { |attr, value| dealiased_attrs[_dealias_attribute(attr)] = value }
+      dealiased_attrs
     end
 
-    def find(id)
-      find_by(primary_key => id)
+    def find(*args)
+      args = args[0] if args[0].is_a? Array
+      return args.collect { |id| find(id) } if args.count > 1
+      find_by(primary_key => args[0])
     end
 
     def find_by(attrs = {})
@@ -295,11 +298,12 @@ module ActiveRecord
         assoc = Associations::AssociationReflection.new(self, macro, name, opts)
         if macro == :has_many
           define_method(name) { @backing_record.get_has_many(assoc, nil) }
-          define_method("#{name}=") { |val| @backing_record.set_has_many(assoc, val) }
+          define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_has_many(assoc, val) }
         else
           define_method(name) { @backing_record.get_belongs_to(assoc, nil) }
-          define_method("#{name}=") { |val| @backing_record.set_belongs_to(assoc, val) }
+          define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_belongs_to(assoc, val) }
         end
+        alias_method "#{name}=", "_hyperstack_internal_setter_#{name}"
         assoc
       end
     end
@@ -308,11 +312,12 @@ module ActiveRecord
       reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
       if reflection.klass < ActiveRecord::Base
         define_method(name) { @backing_record.get_ar_aggregate(reflection, nil) }
-        define_method("#{name}=") { |val| @backing_record.set_ar_aggregate(reflection, val) }
+        define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_ar_aggregate(reflection, val) }
       else
         define_method(name) { @backing_record.get_non_ar_aggregate(name, nil) }
-        define_method("#{name}=") { |val| @backing_record.set_non_ar_aggregate(reflection, val) }
+        define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_non_ar_aggregate(reflection, val) }
       end
+      alias_method "#{name}=", "_hyperstack_internal_setter_#{name}"
     end
 
     def column_names
@@ -337,22 +342,16 @@ module ActiveRecord
         vector = args.count.zero? ? name : [[name] + args]
         @backing_record.get_server_method(vector, true)
       end
+      define_method("_hyperstack_internal_setter_#{name}") do |val|
+        backing_record.set_attr_value(name, val)
+      end
     end
 
-    # def define_attribute_methods
-    #   columns_hash.each do |name, column_hash|
-    #     next if name == primary_key
-    #     column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
-    #
-    #     define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
-    #     define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
-    #     define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
-    #     define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
-    #     define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
-    #   end
-    #   self.inheritance_column = nil if inheritance_column && !columns_hash.key?(inheritance_column)
-    # end
-
+    # define all the methods for each column.  To allow overriding the methods they will NOT
+    # be defined if already defined (i.e. by the model)  See the instance_methods module for how
+    # super calls are handled in this case.   The _hyperstack_internal_setter_... methods
+    # are used by the load_from_json method when bringing in data from the server, and so therefore
+    # does not want to be overriden.
 
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
@@ -361,10 +360,11 @@ module ActiveRecord
         # easier by keeping the columns_hash the same if there are no seralized strings
         # see rspec ./spec/batch1/column_types/column_type_spec.rb:100
         column_hash[:serialized?] = true if ReactiveRecord::Base.serialized?[self][name]
-        
+
         define_method(name) { @backing_record.get_attr_value(name, nil) } unless method_defined?(name)
         define_method("#{name}!") { @backing_record.get_attr_value(name, true) } unless method_defined?("#{name}!")
-        define_method("#{name}=") { |val| @backing_record.set_attr_value(name, val) } unless method_defined?("#{name}=")
+        define_method("_hyperstack_internal_setter_#{name}") { |val| @backing_record.set_attr_value(name, val) }
+        alias_method "#{name}=", "_hyperstack_internal_setter_#{name}" unless method_defined?("#{name}=")
         define_method("#{name}_changed?") { @backing_record.changed?(name) } unless method_defined?("#{name}_changed?")
         define_method("#{name}?") { @backing_record.get_attr_value(name, nil).present? } unless method_defined?("#{name}?")
       end
@@ -397,18 +397,23 @@ module ActiveRecord
             associations = reflect_on_all_associations
 
             already_processed_keys = Set.new
-            old_param = param.dup
 
             param = param.collect do |key, value|
               next if already_processed_keys.include? key
 
               model_name = model_id = nil
 
+              # polymorphic association is where the belongs_to side holds the
+              # id, and the type of the model the id points to
+
+              # belongs_to :duplicate_of, class_name: 'Report', required: false
+              # has_many :duplicates, class_name: 'Report', foreign_key: 'duplicate_of_id'
+
               assoc = associations.detect do |poly_assoc|
                 if key == poly_assoc.polymorphic_type_attribute
                   model_name = value
                   already_processed_keys << poly_assoc.association_foreign_key
-                elsif key == poly_assoc.association_foreign_key
+                elsif key == poly_assoc.association_foreign_key && (poly_assoc.polymorphic_type_attribute || poly_assoc.macro == :belongs_to)
                   model_id = value
                   already_processed_keys << poly_assoc.polymorphic_type_attribute
                 end

@@ -3,7 +3,7 @@ module ActiveRecord
   class Base
 
     def self.reflect_on_all_associations
-      base_class.instance_eval { @associations ||= superclass.instance_eval { (@associations && @associations.dup) || [] } }
+      @associations ||= superclass.instance_eval { @associations&.dup || [] }
     end
 
     def self.reflect_on_association(attr)
@@ -11,7 +11,7 @@ module ActiveRecord
     end
 
     def self.reflect_on_association_by_foreign_key(key)
-      reflection_finder { |assoc| assoc.association_foreign_key == key }
+      reflection_finder { |assoc| assoc.association_foreign_key == key && assoc.macro != :has_many }
     end
 
     def self.reflection_finder(&block)
@@ -161,6 +161,7 @@ module ActiveRecord
       def find_inverse(model)  # private
         the_klass = klass(model)
         the_klass.reflect_on_all_associations.each do |association|
+          next if association == self
           next if association.association_foreign_key != @association_foreign_key
           next if association.attribute == attribute
           return association if association.polymorphic? || association.klass == owner_class

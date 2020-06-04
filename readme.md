@@ -27,23 +27,22 @@ In the code above, if the `good_books` scope changed (even on the server), the U
 
 ## Website and documentation
 
-Please see the website for full documentation, or find the same content in the [/docs](/docs) folder in this repo if you prefer.
+Please see the documentation site for full documentation, or find the same content in the [/docs](/docs) folder in this repo if you prefer.
 
 + Website: [hyperstack.org](https://hyperstack.org)
-
-Our website serves as a Hyperstack example application. All the doc content is loaded dynamically from this repo and converted to HTML on the fly. It uses React Semantic UI and a client-side JavaScript full-text search engine. Its a Rails app hosted on Heroku.
++ Docs: [docs.hyperstack.org](https://docs.hyperstack.org/)
 
 ## Setup and installation
 
 You can be up and running in **less than 5 minutes**. Just follow the simple setup guide for a new Rails application all correctly configured and ready to go with Hyperstack.
 
-+ Setup and Installation: [/install](/install)
++ [Setup and Installation docs](https://docs.hyperstack.org/installation/man-installation)
 
 ## Community and support
 
 Hyperstack is supported by a friendly, helpful community, both for users, and contributors. We welcome new people, please reach out and say hello.
 
-+ [Join](https://hyperstack.org/slack-invite) our new Slack group
++ [Join](https://join.slack.com/t/hyperstack-org/shared_invite/enQtNTg4NTI5NzQyNTYyLWQ4YTZlMGU0OGIxMDQzZGIxMjNlOGY5MjRhOTdlMWUzZWYyMTMzYWJkNTZmZDRhMDEzODA0NWRkMDM4MjdmNDE) our Slack group
 + After you have joined there is a shortcut at https://hyperstack.org/slack
 
 ### StackOverflow Questions

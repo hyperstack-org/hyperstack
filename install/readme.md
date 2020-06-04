@@ -11,8 +11,15 @@ And for a full system that includes Webpack for managing javascript assets you w
 #### - Yarn ([Install Instructions](https://yarnpkg.com/en/docs/install))
 #### - NodeJS: ([Install Instructions](https://nodejs.org))
 
+## Creating a new app with a Rails template
 
-## Creating a Test Rails App
+This template will create a new app with Webpacker, Hyperstack and Postgres and will deploy to Heroku
+
+```shell
+rails new MyApp --database=postgresql --template=https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
+```
+
+## Creating a Test Rails App (without using the template)
 
 You can install Hyperstack in existing Rails apps, or you can create a new Rails app using the Rails `new` command.  For example to create a new app called `MyApp` you would run
 
@@ -314,7 +321,7 @@ Using the Rails `webpacker` gem you can easily add other NPM (node package manag
 > [Yarn Install Instructions](https://yarnpkg.com/en/docs/install)  
 > [Node Install Instructions](https://nodejs.org)
 
-For details on how to import and use NPM packages in your application see [Importing React Components](https://hyperstack.org/edge/docs/dsl-client/components#javascript-components)
+For details on how to import and use NPM packages in your application see [Importing React Components](https://docs.hyperstack.org/client-dsl/javascript-components#importing-javascript-or-react-libraries)
 
 To integrate webpacker with an existing Hyperstack application - for example if you just added a couple of components and now
 want to try webpacker - use the `hyperstack:install:webpack` task:
@@ -365,11 +372,12 @@ These two files look like this and are placed in the `app/javascript/packs` dire
 ```javascript
 //app/javascript/packs/client_and_server.js
 // these packages will be loaded both during prerendering and on the client
-React = require('react');                      // react-js library
-History = require('history');                  // react-router history library
-ReactRouter = require('react-router');         // react-router js library
-ReactRouterDOM = require('react-router-dom');  // react-router DOM interface
-ReactRailsUJS = require('react_ujs');          // interface to react-rails
+React = require('react');                         // react-js library
+createReactClass = require('create-react-class'); // backwards compatibility with ECMA5
+History = require('history');                     // react-router history library
+ReactRouter = require('react-router');            // react-router js library
+ReactRouterDOM = require('react-router-dom');     // react-router DOM interface
+ReactRailsUJS = require('react_ujs');             // interface to react-rails
 // to add additional NPM packages call run yarn add package-name@version
 // then add the require here.
 ```
@@ -406,15 +414,16 @@ end
 
 #### Manage the Hyperstack dependencies with yarn
 
-As you can see above the NPM modules that Hyperstack depends on are part of the webpacker manifests.
-But by default Hyperstack will pull copies of these packages into the old-school Rails sprockets asset pipeline.
-So if you are using Webpacker you need to add the packages using yarn, and then tell Hyperstack not to
-include them in the sprockets asset pipeline.
+The above changes will pull the necessary NPM modules in as part of the webpacker manifests.
+But by default Hyperstack will try to pull copies of these packages from the Hyperstack gem set using the old-school Rails sprockets asset pipeline.
+
+So instead, when using webpacker, you need to add the packages using the `yarn` package manager, and then tell Hyperstack not to include them in the sprockets asset pipeline.
 
 To add the packages using yarn run these commands:
 
 ```bash
 yarn add react@16
+yarn add create-react-class
 yarn add react-dom@16
 yarn add react-router@^5.0.0
 yarn add react-router-dom@^5.0.0
@@ -489,7 +498,7 @@ As your application develops you can begin defining more restrictive policies (o
 > Note: The policy mechanism does not depend on [Pundit](https://github.com/varvet/pundit) but is compatible with it.  You can add pundit style
 policies for legacy parts of your system.  
 >  
-> For details on creating policies see the [policy documentation](https://hyperstack.org/edge/docs/dsl-isomorphic/policies).
+> For details on creating policies see the [policy documentation](https://docs.hyperstack.org/isomorphic-dsl/hyper-policy).
 
 #### Moving the `application_record.rb` File.
 

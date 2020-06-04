@@ -1,6 +1,6 @@
 # Debugging
 
-**Work in progress - ALPHA (docs and code)**
+**Work in progress - ALPHA \(docs and code\)**
 
 ## Debugging tips
 
@@ -12,15 +12,15 @@ At any time during program execution you can breakout into the JavaScript consol
 
 `debugger;`
 
-If you have source maps turned on you will then be able to see your ruby code (and the compiled JavaScript code) and set browser breakpoints, examine values and continue execution. See Opal Source Maps if you are not seeing source maps.
+If you have source maps turned on you will then be able to see your ruby code \(and the compiled JavaScript code\) and set browser breakpoints, examine values and continue execution. See Opal Source Maps if you are not seeing source maps.
 
 You can also inspect ruby objects from the JavaScript console.
 
-Here are some tips: https://dev.mikamai.com/2014/11/19/3-tricks-to-debug-opal-code-from-your-browser/
+Here are some tips: [https://dev.mikamai.com/2014/11/19/3-tricks-to-debug-opal-code-from-your-browser/](https://dev.mikamai.com/2014/11/19/3-tricks-to-debug-opal-code-from-your-browser/)
 
 ### Puts is your friend
 
-Anywhere in your HyperReact code you can simply puts any_value which will display the contents of the value in the browser console. This can help you understand React program flow as well as how data changes over time.
+Anywhere in your HyperReact code you can simply puts any\_value which will display the contents of the value in the browser console. This can help you understand React program flow as well as how data changes over time.
 
 ```ruby
 class Thing < Hyperstack::Component
@@ -50,3 +50,4 @@ class Thing < Hyperstack::Component
   end
 end
 ```
+

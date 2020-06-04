@@ -1,6 +1,19 @@
 module ActiveRecord
   module InstanceMethods
 
+    # if methods are missing, then they must be a column, which we look up
+    # in the columns_hash.
+
+    # For effeciency all attributes will by default have all the methods defined,
+    # when the class is loaded.  See define_attribute_methods class method.
+    # However a model may override the attribute methods definition, but then call
+    # super.  Which will result in the method missing call.
+
+    # When loading data from the server we do NOT want to call overridden methods
+    # so we also define a _hyperstack_internal_setter_... method for each attribute
+    # as well as for belongs_to relationships, server_methods, and the special
+    # type and model_name methods.  See the ClassMethods module for details.
+
     def method_missing(missing, *args, &block)
       column = self.class.columns_hash.detect { |name, *| missing =~ /^#{name}/ }
       if column
@@ -14,6 +27,19 @@ module ActiveRecord
         end
       else
         super
+      end
+    end
+
+    # ignore load_from_json when it calls _hyperstack_internal_setter_id
+    def _hyperstack_internal_setter_id(*); end
+
+    # the system assumes that there is "virtual" model_name and type attribute so
+    # we define the internal setter here.  If the user defines some other attributes
+    # or uses these names no harm is done since the exact same method would have been
+    # defined by the define_attribute_methods class method anyway.
+    %i[model_name type].each do |attr|
+      define_method("_hyperstack_internal_setter_#{attr}") do |val|
+        @backing_record.set_attr_value(:model_name, val)
       end
     end
 
