@@ -21,7 +21,8 @@ module ReactiveRecord
           @attributes[attr] = Collection.new(assoc.klass, @ar_instance, assoc)
         else
           sync_attribute attr, Collection.new(assoc.klass, @ar_instance, assoc, *vector, attr)
-        end
+          # getter common returns nil if record is destroyed so we return an empty one instead
+        end || Collection.new(assoc.klass, @ar_instance, assoc)
       end
     end
 
