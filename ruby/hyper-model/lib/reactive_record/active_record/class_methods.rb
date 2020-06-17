@@ -95,7 +95,8 @@ module ActiveRecord
     end
 
     def alias_attribute(new_name, old_name)
-      ['', '=', '_changed?'].each do |variant|
+      # ['', '=', '_changed?']
+      [''].each do |variant|
         define_method("#{new_name}#{variant}") { |*args, &block| send("#{old_name}#{variant}", *args, &block) }
       end
       _attribute_aliases[new_name] = old_name
