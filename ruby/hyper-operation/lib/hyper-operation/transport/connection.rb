@@ -108,7 +108,7 @@ module Hyperstack
         # in these cases there are no channels so we return nothing
         return [] unless table_exists?
         if Hyperstack.on_server?
-          expired.delete_all
+          expired.destroy_all
           refresh_connections if needs_refresh?
         end
         all.pluck(:channel).uniq
@@ -170,7 +170,7 @@ module Hyperstack
           connection = find_by(channel: channel, session: nil)
           connection.update(refresh_at: next_refresh) if connection
         end
-        inactive.delete_all
+        inactive.destroy_all
       end
     end
   end
