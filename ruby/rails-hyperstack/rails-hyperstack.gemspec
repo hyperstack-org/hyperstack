@@ -71,7 +71,7 @@ You can control how much of the stack gets installed as well:
   # spec.add_development_dependency 'geminabox', '>= 0.13.11'
 
 
-  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperstack::VERSION
   spec.add_development_dependency 'pry'

@@ -51,7 +51,6 @@ RSpec.configure do |_config|
   Capybara.default_max_wait_time = 10
 
   Capybara.register_driver :chrome do |app|
-    binding.pry
     options = {}
     options.merge!(
       args: %w[auto-open-devtools-for-tabs]) #,
