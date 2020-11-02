@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'hyper-component', HyperModel::VERSION
   spec.add_dependency 'hyper-operation', HyperModel::VERSION
-  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper', '1.2.0'
   spec.add_development_dependency 'libv8', '~> 7.3.492.27.1'
