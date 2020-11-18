@@ -53,11 +53,11 @@ RSpec.configure do |_config|
   Capybara.register_driver :chrome do |app|
     options = {}
     options.merge!(
-      args: %w[auto-open-devtools-for-tabs],
-      prefs: { 'devtools.open_docked' => false, "devtools.currentDockState" => "undocked", devtools: {currentDockState: :undocked} }
-    ) unless ENV['NO_DEBUGGER']
+      args: %w[auto-open-devtools-for-tabs]) #,
+      #prefs: { 'devtools.open_docked' => false, "devtools.currentDockState" => "undocked", devtools: {currentDockState: :undocked} }
+    #) unless ENV['NO_DEBUGGER']
     # this does not seem to work properly.  Don't document this feature yet.
-    options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
+    #options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
     capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(chromeOptions: options)
     Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
   end

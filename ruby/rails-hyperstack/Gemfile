@@ -7,4 +7,5 @@ gem 'hyper-model',       path: '../hyper-model'
 gem 'hyper-router',      path: '../hyper-router'
 gem 'hyper-spec',        path: '../hyper-spec'
 gem 'rails', '~> 5.2'
+gem 'webpacker'
 gemspec
