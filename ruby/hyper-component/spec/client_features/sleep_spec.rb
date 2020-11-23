@@ -5,7 +5,7 @@ describe 'Kernel#sleep redefinition', js: true do
     [1, 3].each do |t|
       start_time = Time.parse(evaluate_ruby("Time.now"))
       evaluate_promise "sleep(#{t})"
-      expect(Time.now-start_time).to be_between(t, t+1)
+      expect(Time.now-start_time).to be_between(t, t+1.5)
     end
   end
 
