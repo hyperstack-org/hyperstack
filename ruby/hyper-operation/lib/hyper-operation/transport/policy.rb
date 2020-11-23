@@ -467,7 +467,7 @@ module Hyperstack
 
     def send_message(header, channel, attribute_set, &block)
       record = filter(@obj.react_serializer, attribute_set)
-      previous_changes = filter(@obj.previous_changes, attribute_set)
+      previous_changes = filter(@obj.saved_changes, attribute_set)
       return if record.empty? && previous_changes.empty?
       message = header.merge(
         channel: channel_to_string(channel),

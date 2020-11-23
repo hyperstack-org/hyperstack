@@ -270,6 +270,10 @@ module ActiveRecord
         Hyperstack::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self.class} regulation denies scope access.  Called from #{caller_locations(1)}")
       end
 
+      def saved_changes
+        previous_changes
+      end unless method_defined :saved_changes
+
       # call do_not_synchronize to block synchronization of a model
 
       def self.do_not_synchronize
@@ -297,7 +301,7 @@ module ActiveRecord
       end
 
       def synchromesh_after_change
-        return if do_not_synchronize? || previous_changes.empty?
+        return if do_not_synchronize? || saved_changes.empty?
         ReactiveRecord::Broadcast.after_commit :change, self
       end
 
