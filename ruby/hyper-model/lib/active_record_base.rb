@@ -270,9 +270,11 @@ module ActiveRecord
         Hyperstack::InternalPolicy.raise_operation_access_violation(:scoped_denied, "#{self.class} regulation denies scope access.  Called from #{caller_locations(1)}")
       end
 
-      def saved_changes
-        previous_changes
-      end unless method_defined :saved_changes
+      unless method_defined? :saved_changes # for backwards compatibility to Rails < 5.1.7
+        def saved_changes
+          previous_changes
+        end
+      end
 
       # call do_not_synchronize to block synchronization of a model
 
