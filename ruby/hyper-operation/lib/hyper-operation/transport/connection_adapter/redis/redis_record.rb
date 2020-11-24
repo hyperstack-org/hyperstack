@@ -99,7 +99,7 @@ module Hyperstack
 
             def dejsonize_attributes(attrs)
               attrs.map do |attr, value|
-                [attr, JSON.parse(value)]
+                [attr, value && JSON.parse(value)]
               end.to_h
             end
 
@@ -110,7 +110,8 @@ module Hyperstack
             end
 
             def get_dejsonized_attribute(id, attr)
-              JSON.parse(client.hget("#{table_name}:#{id}", attr))
+              value = client.hget("#{table_name}:#{id}", attr)
+              JSON.parse(value) if value
             end
           end
 
