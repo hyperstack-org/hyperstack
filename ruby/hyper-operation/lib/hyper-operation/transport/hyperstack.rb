@@ -71,6 +71,7 @@ module Hyperstack
       require 'redis'
 
       connection[:redis_url] ||= 'redis://127.0.0.1:6379/hyperstack'
+      connection[:pool]      ||= 10
     end
   end
 

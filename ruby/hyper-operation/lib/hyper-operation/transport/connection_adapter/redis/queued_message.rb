@@ -7,9 +7,10 @@ module Hyperstack
     module Redis
       class QueuedMessage < RedisRecord::Base
         self.table_name = 'hyperstack:queued_messages'
-        self.column_names = %w[id data connection_id].freeze
 
-        attr_accessor(*column_names.map(&:to_sym))
+        attributes id:            String,
+                   data:          String,
+                   connection_id: String
 
         class << self
           def for_session(session)

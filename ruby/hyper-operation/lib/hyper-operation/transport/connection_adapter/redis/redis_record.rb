@@ -6,10 +6,24 @@ module Hyperstack
       module RedisRecord
         class Base
           class << self
-            attr_accessor :table_name, :column_names
+            attr_accessor :table_name
+
+            def connection_pool
+              @connection_pool ||= ConnectionPool.new(size: Hyperstack.connection[:pool]) do
+                ::Redis.new(url: Hyperstack.connection[:redis_url])
+              end
+            end
 
             def client
-              @client ||= ::Redis.new(url: Hyperstack.connection[:redis_url])
+              connection_pool.with { |c| return c }
+            end
+
+            def attributes(attrs = nil)
+              if attrs
+                @attributes = attrs
+              else
+                @attributes
+              end
             end
 
             def scope(&block)
@@ -91,64 +105,72 @@ module Hyperstack
               true
             end
 
-            def jsonize_attributes(attrs)
-              attrs.map do |attr, value|
-                [attr, value.to_json]
-              end.to_h
-            end
-
-            def dejsonize_attributes(attrs)
-              attrs.map do |attr, value|
-                [attr, JSON.parse(value)]
-              end.to_h
-            end
-
             protected
 
             def instantiate(id)
-              new(dejsonize_attributes(client.hgetall("#{table_name}:#{id}")))
+              new(client.hgetall("#{table_name}:#{id}"))
             end
+          end
 
-            def get_dejsonized_attribute(id, attr)
-              JSON.parse(client.hget("#{table_name}:#{id}", attr))
-            end
+          attr_reader :attributes
+
+          def key
+            "#{table_name}:#{attributes['id']}"
           end
 
           def initialize(opts = {})
-            opts.each { |k, v| send(:"#{k}=", v) }
+            @attributes = {}
+
+            opts.each { |k, v| attributes[k.to_s] = v }
           end
 
           def save
-            self.class.client.hmset("#{table_name}:#{id}", *self.class.jsonize_attributes(attributes))
+            client.hmset(key, *attributes)
+            client.sadd(table_name, attributes['id'])
 
-            unless self.class.client.smembers(table_name).include?(id)
-              self.class.client.sadd(table_name, id)
-            end
+            update_indexes
 
             true
           end
 
+          def update_indexes
+            self.class.attributes.each do |column_name, _klass|
+              value = attributes[column_name.to_s]
+              value ||= -1 # We use -1 so we can filter out nil entries
+
+              client.zadd("#{table_name}_#{column_name}", value.to_i, key)
+            end
+          end
+
+          def remove_indexes
+            self.class.attributes.each do |column_name, _klass|
+              client.zrem("#{table_name}_#{column_name}", key)
+            end
+          end
+
           def update(opts = {})
-            opts.each { |k, v| send(:"#{k}=", v) }
+            opts.each { |k, v| attributes[k.to_s] = v }
+
             save
           end
 
           def destroy
-            self.class.client.srem(table_name, id)
+            remove_indexes
+            client.srem(table_name, attributes["id"])
 
-            self.class.client.hdel("#{table_name}:#{id}", attributes.keys)
+            client.hdel(key, attributes.keys)
 
             true
           end
 
-          def attributes
-            self.class.column_names.map do |column_name|
-              [column_name, instance_variable_get("@#{column_name}")]
-            end.to_h
-          end
-
           def table_name
             self.class.table_name
+          end
+
+          protected
+
+          def client
+            self.class.connection_pool.with { |c| return c }
           end
         end
       end
