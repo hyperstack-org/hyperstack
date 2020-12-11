@@ -87,3 +87,4 @@ Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop
 + Old Github: https://github.com/ruby-hyperloop
 + Legacy branch: https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy
 + Legacy install script: https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy/install
+ 
