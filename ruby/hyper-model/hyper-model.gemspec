@@ -65,5 +65,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'spring-commands-rspec', '~> 1.0.4'
   spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153, '~> 1.3.6'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
-  spec.add_development_dependency 'unparser' '~> 0.4.2' #
+  spec.add_development_dependency 'unparser', '~> 0.4.2' #
 end
