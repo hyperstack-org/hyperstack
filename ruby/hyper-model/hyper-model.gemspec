@@ -32,9 +32,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara', '~> 3.33.0'
   spec.add_development_dependency 'chromedriver-helper', '1.2.0'
-  spec.add_development_dependency 'libv8', '~> 7.3.492.27.1'
+  spec.add_development_dependency 'libv8'
   spec.add_development_dependency 'mini_racer', '~> 0.2.6'
-  spec.add_development_dependency 'selenium-webdriver', '~> 3.142.7'
+  spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
   #spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
