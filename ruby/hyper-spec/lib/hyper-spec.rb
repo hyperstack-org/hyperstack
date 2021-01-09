@@ -46,6 +46,33 @@ RSpec.configure do |config|
 
 end
 
+# TODO: figure out why we need this patch - its because we are on an old version of Selenium Webdriver, but why?
+require 'selenium-webdriver'
+
+module Selenium
+  module WebDriver
+    module Chrome
+      module Bridge
+        COMMANDS = remove_const(:COMMANDS).dup
+        COMMANDS[:get_log] = [:post, 'session/:session_id/log']
+        COMMANDS.freeze
+
+        def log(type)
+          data = execute :get_log, {}, {type: type.to_s}
+
+          Array(data).map do |l|
+            begin
+              LogEntry.new l.fetch('level', 'UNKNOWN'), l.fetch('timestamp'), l.fetch('message')
+            rescue KeyError
+              next
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
 # Capybara config
 RSpec.configure do |config|
   config.add_setting :wait_for_initialization_time

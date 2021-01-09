@@ -55,18 +55,20 @@ module ReactiveRecord
         end
       end
 
+      FALSY_VALUES = [false, nil, 0, "0", "f", "F", "false", "FALSE", "off", "OFF"]
+
       def build_default_value_for_boolean
-        @column_hash[:default] || false
+        !FALSY_VALUES.include?(@column_hash[:default])
       end
 
       def build_default_value_for_float
-        @column_hash[:default] || Float(0.0)
+        @column_hash[:default]&.to_f || Float(0.0)
       end
 
       alias build_default_value_for_decimal build_default_value_for_float
 
       def build_default_value_for_integer
-        @column_hash[:default] || Integer(0)
+        @column_hash[:default]&.to_i || Integer(0)
       end
 
       alias build_default_value_for_bigint build_default_value_for_integer

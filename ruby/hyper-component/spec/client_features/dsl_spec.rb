@@ -65,6 +65,7 @@ describe 'the React DSL', js: true do
         end
       end
     end
+
     expect(find('input')['data-reactroot']).to eq('')
     expect(find('input')['data-foo']).to eq('12')
   end
@@ -94,7 +95,7 @@ describe 'the React DSL', js: true do
   end
 
   it "in prerendering has a .br short hand String method" do
-    client_option render_on: :both
+    client_option render_on: :server_only
     client_option raise_on_js_errors: :off
     mount 'Foo' do
       class Foo

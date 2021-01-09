@@ -297,8 +297,16 @@ describe "column types on client", js: true do
     r = DefaultTest.create(string: "no no no")
     expect_evaluate_ruby do
       t = DefaultTest.find(1)
-      [t.string, t.date, t.datetime]
-    end.to eq(["I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json])
+      [
+        t.string, t.date, t.datetime, t.integer_from_string, t.integer_from_int,
+        t.float_from_string, t.float_from_float,
+        t.boolean_from_falsy_string, t.boolean_from_truthy_string, t.boolean_from_falsy_value
+      ]
+    end.to eq([
+      "I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json, 99, 98,
+      0.02, 0.01,
+      false, true, false
+    ])
     check_errors
   end
 

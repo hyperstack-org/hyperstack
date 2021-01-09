@@ -108,15 +108,19 @@ module HyperSpec
     end
 
     def evaluate_ruby(str = '', opts = {}, &block)
+      # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
+      # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
       insure_mount
+      JSON.parse(evaluate_script("[#{compile_to_ruby(str, &block)}].$to_json()"), opts).first
+    end
+
+    # handy for debugging extreme issues where we want to see what the compiler actually generates
+    def compile_to_ruby(str = '', &block)
       if block
         str = "#{str}\n#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}"
       end
-      js = Opal.compile(str).gsub("// Prepare super implicit arguments\n", "")
-               .delete("\n").gsub('(Opal);', '(Opal)')
-      # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
-      # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
-      JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
+      Opal.compile(str).gsub("// Prepare super implicit arguments\n", "")
+          .delete("\n").gsub('(Opal);', '(Opal)')
     end
 
     def expect_evaluate_ruby(str = '', opts = {}, &block)

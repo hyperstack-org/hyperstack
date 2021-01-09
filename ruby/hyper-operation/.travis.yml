@@ -7,6 +7,7 @@ rvm:
   - ruby-head
 services:
   - mysql
+  - redis-server
 env:
   - DRIVER=google-chrome TZ=Europe/Berlin
 matrix:

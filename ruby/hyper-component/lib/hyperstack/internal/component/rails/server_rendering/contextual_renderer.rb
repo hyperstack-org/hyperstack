@@ -13,7 +13,7 @@ module Hyperstack
 
           class ContextualRenderer < React::ServerRendering::BundleRenderer
             def initialize(options = {})
-              super(options)
+              super({ files: ['hyperstack-prerender-loader.js'] }.merge(options))
               ComponentLoader.new(v8_context).load
             end
 

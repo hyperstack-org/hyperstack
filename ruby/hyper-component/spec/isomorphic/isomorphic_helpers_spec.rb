@@ -81,11 +81,14 @@ describe Hyperstack::Component::IsomorphicHelpers do
     end
 
     def react_context
-      if ::Rails.application.assets['react-server.js']
-        test_context(['server_rendering.js', 'react-server.js'])
-      else
-        test_context(['components', 'react.js'])
-      end
+      test_context(['hyperstack-prerender-loader.js'])
+      # TODO: remove following once we are sure everything works.... looks like legacy
+      # from some past history...
+      # if ::Rails.application.assets['react-server.js']
+      #   test_context(['server_rendering.js', 'react-server.js'])
+      # else
+      #   test_context(['components', 'react.js'])
+      # end
     end
 
     let(:v8_context) { TestV8Context.new }

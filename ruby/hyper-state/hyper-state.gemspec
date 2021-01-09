@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hyperstack-config', Hyperstack::State::VERSION
-  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperstack::State::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperstack::State::VERSION

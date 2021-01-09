@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyperstack-config', Hyperstack::Legacy::Store::VERSION
   spec.add_dependency 'hyper-state', Hyperstack::Legacy::Store::VERSION
   spec.add_dependency 'opal', '>= 0.11.0', '< 2.0'
-  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperstack::Legacy::Store::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperstack::Legacy::Store::VERSION

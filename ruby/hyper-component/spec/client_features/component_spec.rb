@@ -143,7 +143,7 @@ describe 'React::Component', js: true do
             raise 'ErrorFoo Error'
           end
         end
-        Foo.class_eval do
+        class Foo
           def self.get_error
             @@error
           end
@@ -163,7 +163,7 @@ describe 'React::Component', js: true do
         end
       end
       expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
-      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo\n    in div\n    in Foo\n    in Hyperstack::Internal::Component::TopLevelRailsComponent")
+      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo (created by Foo)\n    in div (created by Foo)\n    in Foo (created by Hyperstack::Internal::Component::TopLevelRailsComponent)\n    in Hyperstack::Internal::Component::TopLevelRailsComponent")
     end
   end
 
@@ -657,10 +657,14 @@ describe 'React::Component', js: true do
       expect_evaluate_ruby do
         @foo = Foo.new(nil)
         return_values = []
-        EMPTIES.each do |empty1|
-          EMPTIES.each do |empty2|
-            @foo.instance_eval { @native.JS[:state] = JS.call(:eval, "function bla(){return #{empty1};}bla();") }
-            return_values << @foo.should_component_update?({}, Hash.new(empty2))
+        EMPTIES.length.times do |i|
+          EMPTIES.length.times do |j|
+            e1 = EMPTIES[i]
+            @foo.instance_eval do
+              @native.JS[:state] =
+                JS.call(:eval, "function bla(){return #{`JSON.stringify(e1)`};}bla();")
+            end
+            return_values << @foo.should_component_update?({}, Hash.new(EMPTIES[j]))
           end
         end
         return_values
@@ -668,11 +672,16 @@ describe 'React::Component', js: true do
     end
 
     it "returns true if old state is empty, but new state is not" do
+
       expect_evaluate_ruby do
         @foo = Foo.new(nil)
         return_values = []
-        EMPTIES.each do |empty|
-          @foo.instance_eval { @native.JS[:state] = JS.call(:eval, "function bla(){return #{empty};}bla();") }
+        EMPTIES.length.times do |i|
+          empty = EMPTIES[i]
+          @foo.instance_eval do
+            @native.JS[:state] =
+              JS.call(:eval, "function bla(){return #{`JSON.stringify(empty)`};}bla();")
+          end
           return_values << @foo.should_component_update?({}, {foo: 12})
         end
         return_values
