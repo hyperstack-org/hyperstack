@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 describe 'mutation client integration', js: true do
   it "can load and run the mutation gem on the client" do
     isomorphic do

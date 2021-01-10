@@ -25,10 +25,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-store', HyperRouter::VERSION
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mini_racer', '~> 0.2.6'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
+  spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0.0'
   # spec.add_development_dependency 'parser'
   spec.add_development_dependency 'puma'
-  spec.add_development_dependency 'rails', '>= 4.0.0'
+  spec.add_development_dependency 'rails', '>= 5.0.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'rspec-expectations'
@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'shoulda-matchers'
   # spec.add_development_dependency 'sinatra'
   # spec.add_development_dependency 'spring-commands-rspec'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3', '~> 1.4.2' # see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'timecop', '~> 0.8.1'
   # spec.add_development_dependency 'unparser' # ?
   # spec.add_development_dependency 'webdrivers'  # ?

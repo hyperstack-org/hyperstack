@@ -21,6 +21,14 @@ Capybara.server = :puma
 
 RSpec.configure do |config|
 
+  if config.formatters.empty?
+    module Hyperstack
+      def self.log_import(s)
+        # turn off import logging unless in verbose mode
+      end
+    end
+  end
+
   config.after :each do
     Rails.cache.clear
   end

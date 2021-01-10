@@ -4,6 +4,7 @@ Hyperstack.import    'hyper-state'
 Hyperstack.js_import 'react/react-source-browser', client_only: true, defines: %w[ReactDOM React]
 Hyperstack.js_import 'react/react-source-server', server_only: true, defines: 'React'
 Hyperstack.import    'browser/delay', client_only: true
+Hyperstack.import    'browser/interval', client_only: true
 Hyperstack.js_import 'react_ujs', defines: 'ReactRailsUJS'
 Hyperstack.import    'hyper-component'  # TODO: confirm this does not break anything.  Added while converting hyperloop->hyperstack
 Hyperstack.import    'hyperstack/component/auto-import'  # TODO: confirm we can cancel the import

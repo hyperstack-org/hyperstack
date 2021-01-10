@@ -1,6 +1,22 @@
 module Hyperstack
 
   class << self
+
+    # redefine this method ito avoid logging imports.
+    # typically in rspec - for example:
+    #
+    # if config.formatters.empty?
+    #   module Hyperstack
+    #     def self.log_import(s)
+    #       # turn off import logging
+    #     end
+    #   end
+    # end
+
+    def log_import(s)
+      puts s
+    end
+
     def import_list
       @import_list ||= []
     end
@@ -52,7 +68,7 @@ module Hyperstack
       return [] unless sys
       ["puts \"require 'config/initializers/inflections.rb'\""] +
         File.open(Rails.root.join('config', 'initializers', 'inflections.rb'), &:readlines).tap do
-          puts "    require 'config/initializers/inflections.rb'"
+          log_import "    require 'config/initializers/inflections.rb'"
         end
     rescue Errno::ENOENT
       []
@@ -61,7 +77,7 @@ module Hyperstack
     def add_opal(sys)
       return [] unless sys
 
-      puts "    require 'opal'"
+      log_import "    require 'opal'"
       ["require 'opal'; puts \"require 'opal'\""]
     end
 
@@ -77,7 +93,7 @@ module Hyperstack
           generate_require_tree(value, render_on_server, render_on_client)
         elsif kind == :gem
           r = "require '#{value}' #{client_guard(render_on_server, render_on_client)}"
-          puts "    #{r}"
+          log_import "    #{r}"
           "puts \"#{r}\"; #{r}"
         else
           generate_directive(:require, value, file, render_on_server, render_on_client)
@@ -93,7 +109,7 @@ module Hyperstack
         comp_path.shift
       end
       r = "#{directive} '#{(['.'] + ['..'] * gem_path.length + comp_path).join('/')}' #{client_guard(render_on_server, render_on_client)}"
-      puts "    #{r}"
+      log_import "    #{r}"
       "puts \"#{r}\"; #{r}"
     end
 
@@ -105,7 +121,7 @@ module Hyperstack
         if fname =~ /(\.js$)|(\.rb$)|(\.jsx$)/
           fname = fname.gsub(/(\.js$)|(\.rb$)|(\.jsx$)/, '')
           r = "require '#{fname}' #{client_guard(render_on_server, render_on_client)}"
-          puts "    #{r}"
+          log_import "    #{r}"
           "puts \"#{r}\"; #{r}"
         end
       end.compact.join("\n")
