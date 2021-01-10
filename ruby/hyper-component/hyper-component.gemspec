@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyperstack-config', Hyperstack::Component::VERSION
   spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'mini_racer', '~> 0.2.6'
-  spec.add_dependency 'opal' #, '>= 0.11.0', '< 0.12.0'
+  spec.add_dependency 'opal', '>= 0.11.0', '< 2.0'
   spec.add_dependency 'opal-activesupport', '~> 0.3.1'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mime-types'
   spec.add_development_dependency 'nokogiri'
   spec.add_development_dependency 'opal-jquery'
-  spec.add_development_dependency 'opal-rails'#, '~> 0.9.4'
+  spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
   #spec.add_development_dependency 'opal-rspec'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'pry-rescue'
@@ -47,6 +47,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3'#, '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3', '~> 1.4.2'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
 end
