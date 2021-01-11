@@ -6,5 +6,7 @@ gem 'hyperstack-config', path: '../hyperstack-config'
 gem 'hyper-state',      path: '../hyper-state'
 gem 'hyper-component',  path: '../hyper-component'
 gem 'hyper-operation',  path: '../hyper-operation'
+gem 'hyper-spec', path: '../hyper-spec'
+gem 'hyperstack-config', path: '../hyperstack-config'
 
 gemspec

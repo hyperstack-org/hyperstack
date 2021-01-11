@@ -50,7 +50,24 @@ array.each do |e|
 ------------
   search around for references to config.react.server_renderer_options and/or "server_rendering.js"
   inconsistent... should now default to hyperstack_prerender_loader.js
-  and more over there is a hyperstack option as well, so the server_renderer file option should match 
+  and more over there is a hyperstack option as well, so the server_renderer file option should match
+------------
+
+Opal splat works properly in 1.0!  
+
+```ruby
+foo(*[1, 2], [[3, 4]])
+
+def foo(*x)
+  # 0.9 x == [1, 2, [3, 4]]
+  # 1.0 x == [1, 2, [[3, 4]]]
+end
+```
+
+is there a fix that works for both 1.0 and 0.9 ? or do we need a SWITCH???
+
+Found this first in hyper-model, so in hyper-model
+these are going to be marked with # SPLAT BUG with the old code until things get sorted
 ------------
 
 Can't inherit directly from ApplicationController::Base in Rails 6.0 ...

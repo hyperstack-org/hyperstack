@@ -1,6 +1,6 @@
-//= require 'react'
-//= require 'react_ujs'
-//= require 'components'
+//xx= require 'react'
+//xx= require 'react_ujs'
+//xx= require 'components'
 //= require action_cable
-//= require 'hyperstack/pusher'
-Opal.load('components');
+//xx= require 'hyperstack/pusher'
+//= require hyperstack-loader
