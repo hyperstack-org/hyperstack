@@ -14,7 +14,21 @@ module ActiveRecord
     # as well as for belongs_to relationships, server_methods, and the special
     # type and model_name methods.  See the ClassMethods module for details.
 
+    # meanwhile in Opal 1.0 there is currently an issue where the name of the method
+    # does not get passed to method_missing from super.
+    # https://github.com/opal/opal/issues/2165
+    # So the following hack works around that issue until its fixed.
+
+    %x{
+      Opal.orig_find_super_dispatcher = Opal.find_super_dispatcher
+      Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, allow_stubs) {
+        Opal.__name_of_super = mid;
+        return Opal.orig_find_super_dispatcher(obj, mid, current_func, defcheck, allow_stubs)
+      }
+    }
+
     def method_missing(missing, *args, &block)
+      missing ||= `Opal.__name_of_super`
       column = self.class.columns_hash.detect { |name, *| missing =~ /^#{name}/ }
       if column
         name = column[0]

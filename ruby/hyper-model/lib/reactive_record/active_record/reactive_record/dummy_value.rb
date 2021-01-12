@@ -1,4 +1,4 @@
-# add mehods to Object to determine if this is a dummy object or not
+# add methods to Object to determine if this is a dummy object or not
 class Object
   def loaded?
     !loading?
@@ -6,10 +6,6 @@ class Object
 
   def loading?
     false
-  end
-
-  def present?
-    !!self
   end
 end
 
@@ -91,10 +87,6 @@ module ReactiveRecord
       end
 
       def loaded?
-        false
-      end
-
-      def present?
         false
       end
 

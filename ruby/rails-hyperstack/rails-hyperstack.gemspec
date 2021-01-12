@@ -64,13 +64,6 @@ You can control how much of the stack gets installed as well:
   spec.add_dependency 'mini_racer', '~> 0.2.6'
   spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
-  spec.add_dependency 'opal', ENV['OPAL_VERSION'] if ENV['OPAL_VERSION']
-
-
-  # spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
-  # #spec.add_development_dependency 'chromedriver-helper'
-  # spec.add_development_dependency 'geminabox', '>= 0.13.11'
-
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
@@ -78,7 +71,6 @@ You can control how much of the stack gets installed as well:
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'bootsnap'
-  #spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'sqlite3', '~> 1.4' # was 1.3.6 -- see https://github.com/rails/rails/issues/35153
@@ -96,5 +88,4 @@ You can control how much of the stack gets installed as well:
   spec.add_development_dependency 'jbuilder', '~> 2.5'
   spec.add_development_dependency 'foreman'
   spec.add_development_dependency 'database_cleaner'
-
 end
