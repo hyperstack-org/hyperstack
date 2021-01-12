@@ -2,10 +2,10 @@
 module Native
   module Wrapper
     def self.included(klass)
-      if defined? Native::Helpers
-        klass.extend Native::Helpers
-      else
+      if Native.instance_methods.include? :to_n
         klass.include Native
+      else
+        klass.extend Native::Helpers
       end
     end
   end

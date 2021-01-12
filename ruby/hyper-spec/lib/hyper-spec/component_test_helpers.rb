@@ -6,7 +6,9 @@ require 'method_source'
 require_relative '../../lib/hyper-spec/time_cop.rb'
 
 Parser::Builders::Default.emit_procarg0 = true
-Parser::Builders::Default.emit_arg_inside_procarg0 = true
+if Parser::Builders::Default.respond_to? :emit_arg_inside_procarg0
+  Parser::Builders::Default.emit_arg_inside_procarg0 = true   # not available in parser 2.3
+end
 
 module HyperSpec
   module ComponentTestHelpers

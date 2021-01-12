@@ -63,7 +63,8 @@ You can control how much of the stack gets installed as well:
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_dependency 'mini_racer', '~> 0.2.6'
   spec.add_dependency 'libv8', '~> 7.3.492.27.1'
-  spec.add_dependency 'rails', '>= 4.0.0'
+  spec.add_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
+  spec.add_dependency 'opal', ENV['OPAL_VERSION'] if ENV['OPAL_VERSION']
 
 
   # spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153

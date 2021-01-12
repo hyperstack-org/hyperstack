@@ -21,9 +21,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'hyperstack-config', Hyperstack::Legacy::Store::VERSION
   spec.add_dependency 'hyper-state', Hyperstack::Legacy::Store::VERSION
-  spec.add_dependency 'opal', '>= 0.11.0', '< 2.0'
+  spec.add_dependency 'hyperstack-config', Hyperstack::Legacy::Store::VERSION
+
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperstack::Legacy::Store::VERSION
@@ -32,10 +32,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mini_racer', '~> 0.2.6'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
-  spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'pry-rescue'
+  spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'puma'
-  spec.add_development_dependency 'rails', '>= 4.0.0'
+  spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec', '~> 3.7.0'

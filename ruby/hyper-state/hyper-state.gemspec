@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hyperstack-config', Hyperstack::State::VERSION
+
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperstack::State::VERSION
@@ -30,10 +31,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mini_racer', '~> 0.2.4'
   spec.add_development_dependency 'opal-browser', '~> 0.2.0'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
-  spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'pry-rescue'
+  spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'puma'
-  spec.add_development_dependency 'rails', '>= 5.0.0'
+  spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec', '~> 3.7.0'
@@ -42,5 +43,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'sqlite3', '~> 1.4.2' # see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'timecop', '~> 0.8.1'
-
 end

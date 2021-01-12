@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 gem 'hyper-spec', path: '../hyper-spec'
-gem 'opal-browser', git: 'https://github.com/opal/opal-browser'
+# gem 'opal-browser', git: 'https://github.com/opal/opal-browser'
 gemspec

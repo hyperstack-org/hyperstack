@@ -661,8 +661,11 @@ describe 'React::Component', js: true do
           EMPTIES.length.times do |j|
             e1 = EMPTIES[i]
             @foo.instance_eval do
+              # semantically check if we are using Opal 1.0 or better
+              # if so we need to stringify e1
+              e1 = `JSON.stringify(e1)` if 24 == `12+12`
               @native.JS[:state] =
-                JS.call(:eval, "function bla(){return #{`JSON.stringify(e1)`};}bla();")
+                JS.call(:eval, "function bla(){return #{e1};}bla();")
             end
             return_values << @foo.should_component_update?({}, Hash.new(EMPTIES[j]))
           end
@@ -679,8 +682,11 @@ describe 'React::Component', js: true do
         EMPTIES.length.times do |i|
           empty = EMPTIES[i]
           @foo.instance_eval do
+            # semantically check if we are using Opal 1.0 or better
+            # if so we need to stringify e1
+            empty = `JSON.stringify(empty)` if 24 == `12+12`
             @native.JS[:state] =
-              JS.call(:eval, "function bla(){return #{`JSON.stringify(empty)`};}bla();")
+              JS.call(:eval, "function bla(){return #{empty};}bla();")
           end
           return_values << @foo.should_component_update?({}, {foo: 12})
         end
