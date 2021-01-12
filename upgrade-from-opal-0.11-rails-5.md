@@ -179,3 +179,18 @@ end
 TODO: figure out if we have to depend on this old version
 
 ---
+
+### BasicObject responds_to the class method
+
+This means that a `DummyValue` returns `DummyValue` instead of the class its wrapping.  Simple fix is to add
+
+```ruby
+def class
+  notify
+  @object.class
+end
+```
+
+which is what the method missing would do...
+
+---

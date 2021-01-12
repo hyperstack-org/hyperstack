@@ -106,6 +106,11 @@ module ReactiveRecord
         true
       end
 
+      def class
+        notify
+        @object.class
+      end
+
       def method_missing(method, *args, &block)
         if method.start_with?("build_default_value_for_")
           nil
