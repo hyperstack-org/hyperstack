@@ -15,15 +15,17 @@ module Hyperstack
         serialize :data
 
         belongs_to :hyperstack_connection,
-                  class_name: 'Hyperstack::ConnectionAdapter::ActiveRecord::Connection',
-                  foreign_key: 'connection_id'
+                   class_name:  'Hyperstack::ConnectionAdapter::ActiveRecord::Connection',
+                   foreign_key: 'connection_id',
+                   optional:    true
 
         scope :for_session,
               ->(session) { joins(:hyperstack_connection).where('session = ?', session) }
 
         # For simplicity we use QueuedMessage with connection_id 0
         # to store the current path which is used by consoles to
-        # communicate back to the server
+        # communicate back to the server. The belongs_to connection
+        # therefore must be optional.
 
         default_scope { where('connection_id IS NULL OR connection_id != 0') }
 

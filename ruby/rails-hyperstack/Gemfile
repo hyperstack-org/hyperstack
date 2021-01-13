@@ -6,6 +6,5 @@ gem 'hyper-operation',   path: '../hyper-operation'
 gem 'hyper-model',       path: '../hyper-model'
 gem 'hyper-router',      path: '../hyper-router'
 gem 'hyper-spec',        path: '../hyper-spec'
-# gem 'rails', '~> 5.2'
-gem 'webpacker'
+gem 'webpacker' # TODO: figure out why this is necessary!gi
 gemspec

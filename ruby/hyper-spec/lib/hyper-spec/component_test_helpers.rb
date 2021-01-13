@@ -4,6 +4,7 @@ require 'unparser'
 require 'hyper-spec/unparser_patch'
 require 'method_source'
 require_relative '../../lib/hyper-spec/time_cop.rb'
+require 'filecache'
 
 Parser::Builders::Default.emit_procarg0 = true
 if Parser::Builders::Default.respond_to? :emit_arg_inside_procarg0
@@ -26,6 +27,36 @@ module HyperSpec
       def display_example_description
         "<script type='text/javascript'>console.log('%c#{current_example.description}'"\
         ",'color:green; font-weight:bold; font-size: 200%')</script>"
+      end
+
+      RAILS_CACHE = false
+
+      def file_cache
+        @file_cache ||= FileCache.new("cache", "/tmp/hyper-spec-caches", 30, 3)
+      end
+
+      def cache_read(key)
+        if RAILS_CACHE
+          ::Rails.cache.read(key)
+        else
+          file_cache.get(key)
+        end
+      end
+
+      def cache_write(key, value)
+        if RAILS_CACHE
+          ::Rails.cache.write(key, value)
+        else
+          file_cache.set(key, value)
+        end
+      end
+
+      def cache_delete(key)
+        if RAILS_CACHE
+          ::Rails.cache.write(key, value)
+        else
+          file_cache.delete(key)
+        end
       end
     end
 
@@ -60,7 +91,7 @@ module HyperSpec
         controller.class_eval do
           define_method(:test) do
             route_root = self.class.name.gsub(/Controller$/, '').underscore
-            test_params = ::Rails.cache.read("/#{route_root}/#{params[:id]}")
+            test_params = ComponentTestHelpers.cache_read("/#{route_root}/#{params[:id]}")
             @component_name = test_params[0]
             @component_params = test_params[1]
             render_params = test_params[2]
@@ -255,16 +286,16 @@ module HyperSpec
       end
 
       component_name ||= 'Hyperstack::Internal::Component::TestDummy'
-      ::Rails.cache.write(test_url, [component_name, params, opts])
+      ComponentTestHelpers.cache_write(test_url, [component_name, params, opts])
       test_code_key = "hyper_spec_prerender_test_code.js"
       @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
       if opts[:render_on] == :both || opts[:render_on] == :server_only
         unless opts[:code].blank?
-          ::Rails.cache.write(test_code_key, opts[:code])
+          ComponentTestHelpers.cache_write(test_code_key, opts[:code])
           ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files + [test_code_key]
           ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
         else
-          ::Rails.cache.delete(test_code_key)
+          ComponentTestHelpers.cache_delete(test_code_key)
           ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files
           ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
         end

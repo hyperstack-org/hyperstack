@@ -23,7 +23,8 @@ namespace :spec do
           sh('bundle exec rails generate model Sample name:string description:text')
           sh('mv app/models/sample.rb app/hyperstack/models/sample.rb')
           sh('bundle exec rake db:migrate')
-          sh('bundle exec rails dev:cache') # not tested yet...
+          sh('RAILS_ENV=test bundle exec rake db:setup')
+          # sh('bundle exec rails dev:cache') # not tested yet...
         end
       end
     end

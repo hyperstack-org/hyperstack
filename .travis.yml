@@ -55,31 +55,31 @@ _deploy_gem: &_deploy_gem
 jobs:
   include:
     - <<: *_test_gem
-      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_ENV='development'
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1
     - <<: *_test_gem
-      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_ENV='development' OPAL_VERSION='~>0.11'
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
     - <<: *_test_gem
-      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_ENV='development' RAILS_VERSION='~>5.0'
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
 
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-i18n
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-trace
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-state
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-component
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-model
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-operation
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-router
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-spec
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyper-store
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=rails-hyperstack
-    # - <<: *_deploy_gem
-    #   env: COMPONENT=hyperstack-config
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-i18n
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-trace
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-state
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-component
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-model
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-operation
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-router
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-spec
+    - <<: *_deploy_gem
+      env: COMPONENT=hyper-store
+    - <<: *_deploy_gem
+      env: COMPONENT=rails-hyperstack
+    - <<: *_deploy_gem
+      env: COMPONENT=hyperstack-config
