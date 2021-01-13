@@ -8,9 +8,13 @@ require 'hyper-spec/wait_for_ajax'
 require 'selenium/web_driver/firefox/profile'
 
 RSpec.configure do |config|
-  config.include HyperSpec::ComponentTestHelpers
-  config.include HyperSpec::WaitForAjax
-  config.include Capybara::DSL
+
+  # these three were config.include, but that did not
+  # add the methods to the page object
+  # so you couldn't say page.evaluate_ruby for example
+  include HyperSpec::ComponentTestHelpers
+  include HyperSpec::WaitForAjax
+  include Capybara::DSL
 
   config.mock_with :rspec
 

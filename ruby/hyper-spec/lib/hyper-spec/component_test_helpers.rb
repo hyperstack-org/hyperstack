@@ -12,6 +12,7 @@ end
 
 module HyperSpec
   module ComponentTestHelpers
+
     TOP_LEVEL_COMPONENT_PATCH =
       Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
     TIME_COP_CLIENT_PATCH =
@@ -376,9 +377,8 @@ module HyperSpec
       ComponentTestHelpers.current_example = example
       ComponentTestHelpers.description_displayed = false
     end
-
-    if defined?(ActiveRecord)
-      config.before(:all) do
+    config.before(:all) do
+      if defined?(ActiveRecord)
         ActiveRecord::Base.class_eval do
           def attributes_on_client(page)
             page.evaluate_ruby("#{self.class.name}.find(#{id}).attributes", symbolize_names: true)

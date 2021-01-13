@@ -169,7 +169,7 @@ module Hyperstack
       config_hash = {
         transport: Hyperstack.transport,
         id: id,
-        acting_user_id: (controller.acting_user && controller.acting_user.id),
+        acting_user_id: (controller.acting_user.respond_to?(:id) && controller.acting_user.id),
         env: ::Rails.env,
         client_logging: Hyperstack.client_logging,
         pusher_fake_js: pusher_fake_js,
