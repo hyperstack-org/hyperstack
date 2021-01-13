@@ -291,6 +291,10 @@ module HyperSpec
       @client_code = "#{@client_code}ComponentHelpers.add_class('#{class_name}', #{style})\n"
     end
 
+    def attributes_on_client(model)
+      evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes", symbolize_names: true)
+    end
+
     def open_in_chrome
       if false && ['linux', 'freebsd'].include?(`uname`.downcase)
         `google-chrome http://#{page.server.host}:#{page.server.port}#{page.current_path}`
@@ -376,15 +380,6 @@ module HyperSpec
     config.before(:each) do |example|
       ComponentTestHelpers.current_example = example
       ComponentTestHelpers.description_displayed = false
-    end
-    config.before(:all) do
-      if defined?(ActiveRecord)
-        ActiveRecord::Base.class_eval do
-          def attributes_on_client(page)
-            page.evaluate_ruby("#{self.class.name}.find(#{id}).attributes", symbolize_names: true)
-          end
-        end
-      end
     end
   end
 end

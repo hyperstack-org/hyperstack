@@ -114,7 +114,7 @@ describe "authorization integration", js: true do
     mount "TestComponent2"
     model1 = FactoryBot.create(:test_model, test_attribute: "hello")
     wait_for_ajax
-    model1.attributes_on_client(page).should eq({id: 1})
+    attributes_on_client(model1).should eq({id: 1})
     wait_for_ajax
     ApplicationController.acting_user = User.new(name: "fred")
     evaluate_ruby('Hyperstack.connect("TestApplication")')
@@ -127,7 +127,7 @@ describe "authorization integration", js: true do
     # make sure time zone doesn't matter, as it is about time in space
     # we get only seconds precision, millisecs are dropped in AR adapters here, but they are in the db with pg
     # compare only with seconds precision
-    m1_attr_cl1 = model1.attributes_on_client(page)
+    m1_attr_cl1 = attributes_on_client(model1)
     m1_attr_cl1[:id].should eq(1)
     m1_attr_cl1[:created_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.created_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
     m1_attr_cl1[:updated_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.updated_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
@@ -137,7 +137,7 @@ describe "authorization integration", js: true do
     sleep 2
     model1.update_attribute(:completed, true)
     wait_for_ajax
-    m1_attr_cl2 = model1.attributes_on_client(page)
+    m1_attr_cl2 = attributes_on_client(model1)
     m1_attr_cl2[:id].should eq(1)
     m1_attr_cl2[:test_attribute].should eq("george")
     m1_attr_cl2[:completed].should eq(true)
@@ -152,7 +152,7 @@ describe "authorization integration", js: true do
     evaluate_ruby('Hyperstack.connect("TestApplication")')
     model1.update_attribute(:test_attribute, 'george')
     wait_for_ajax
-    model1.attributes_on_client(page).should eq({id: 1})
+    attributes_on_client(model1).should eq({id: 1})
     expect_promise('Hyperstack::Model.load { TestModel.find_by_test_attribute("hello") }').to be_nil
   end
 
@@ -164,7 +164,7 @@ describe "authorization integration", js: true do
     evaluate_ruby("Hyperstack.connect(['TestModel', #{model1.id}])")
     model1.update_attribute(:completed, true)
     wait_for_ajax
-    model1.attributes_on_client(page).should eq({id: 1})
+    attributes_on_client(model1).should eq({id: 1})
   end
 
 end

@@ -227,6 +227,18 @@ TODO: verify this works in all cases...
 
 ---
 
+### HyperSpec ApplicationController fix breaks client_driver.rb
+
+A couple of specs were setting `ApplicationController.acting_user = true`.  But HyperSpec was not
+using the ApplicationController when mounting (see above problem fix) so acting_user remained nil
+as far as the client code was concerned.
+
+Once the above fix was made however client_driver was attempting to do a `controller.acting_user.id`
+where acting_user was true, causing a method missing.  The code in client_driver was checking for
+acting_user being nil, but is now changed to check for `acting_user.respond_to? :id`
+
+---
+
 ### Trying to set window size outside of a JS spec no longer works
 
 Who knows why, but for now we just rescue any failure, and keep going.
@@ -235,8 +247,15 @@ Who knows why, but for now we just rescue any failure, and keep going.
 
 ### page.evaluate_ruby no longer works but plain evaluate_ruby does.
 
-Only one spec files was doing that, so just upgraded.
+Only one spec files was doing that, so just upgraded.  
+You can sort of fix it by doing an include instead of config.include in the hyper_spec.rb file
+but this causes other problems, including a warning from rspec to not do it.
 
-TODO: get page.evaluate_ruby working again.
+Probably will require a general cleanup of application code changing page.evaluate_ruby to just
+evaluate_ruby.
+
+Related to this there was a method called attributes_on_client that was being added to
+ActiveRecord::Base.  But in order for it to work the "page" was being passed so that you could do
+a page.evaluate_ruby, but the whole method was backwards.  It should be a capybara helper method that takes a active record model.  This is fixed.
 
 ---
