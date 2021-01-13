@@ -60,7 +60,6 @@ jobs:
       env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
     - <<: *_test_gem
       env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-
     - <<: *_deploy_gem
       env: COMPONENT=hyper-i18n
     - <<: *_deploy_gem
