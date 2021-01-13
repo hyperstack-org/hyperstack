@@ -194,3 +194,21 @@ end
 which is what the method missing would do...
 
 ---
+
+### Opal 1.0 has trouble with super and method_missing
+
+If super is called within a method that is not defined in the super class, the superclasses' method missing
+is called, but the method name is not provided.
+
+This has been worked around, and a bug has been filed.
+
+---
+
+### Object.present? should not have been defined
+
+The DummyValue system was defining present? in both DummyValue and Object.  This should not be necessary as
+present? is defined by activesupport.  In 0.11 it didnt' matter because the load order defined activesupport's
+version AFTER the bogus one in the dummy value system.  In 1.0 the order for some reason is reversed, so
+the correct version in activesupport was being overwritten.
+
+I don't believe this will have any effect on application code.

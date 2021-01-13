@@ -82,7 +82,7 @@ describe "authorization integration", js: true do
     end
     wait_for_ajax
     ApplicationController.acting_user = User.new(name: 'fred')
-    page.evaluate_ruby('Hyperstack.connect("TestApplication")')
+    evaluate_ruby('Hyperstack.connect("TestApplication")')
     evaluate_ruby do
       TestModel.all[0].test_attribute
     end
@@ -100,7 +100,7 @@ describe "authorization integration", js: true do
     mount 'TestComponent2'
     wait_for_ajax
     ApplicationController.acting_user = User.new(name: 'fred')
-    page.evaluate_ruby('Hyperstack.connect("TestApplication")')
+    evaluate_ruby('Hyperstack.connect("TestApplication")')
     TestModel.before_save { self.test_attribute ||= 'top secret' }
     expect_promise do
       model = TestModel.new(updated_at: 12)
@@ -117,7 +117,7 @@ describe "authorization integration", js: true do
     model1.attributes_on_client(page).should eq({id: 1})
     wait_for_ajax
     ApplicationController.acting_user = User.new(name: "fred")
-    page.evaluate_ruby('Hyperstack.connect("TestApplication")')
+    evaluate_ruby('Hyperstack.connect("TestApplication")')
     wait_for_ajax
     # sleep a little, to make sure that on fast systems the seconds precision is covered
     sleep 2
@@ -132,7 +132,7 @@ describe "authorization integration", js: true do
     m1_attr_cl1[:created_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.created_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
     m1_attr_cl1[:updated_at].to_time.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z').should eq(model1.updated_at.localtime(0).strftime('%Y-%m-%dT%H:%M:%S%z'))
     ApplicationController.acting_user = User.new(name: "george")
-    page.evaluate_ruby("Hyperstack.connect(['TestModel', #{model1.id}])")
+    evaluate_ruby("Hyperstack.connect(['TestModel', #{model1.id}])")
     wait_for_ajax
     sleep 2
     model1.update_attribute(:completed, true)
@@ -149,7 +149,7 @@ describe "authorization integration", js: true do
     client_option raise_on_js_errors: :off
     mount "TestComponent2"
     model1 = FactoryBot.create(:test_model, test_attribute: "hello")
-    page.evaluate_ruby('Hyperstack.connect("TestApplication")')
+    evaluate_ruby('Hyperstack.connect("TestApplication")')
     model1.update_attribute(:test_attribute, 'george')
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})
@@ -161,7 +161,7 @@ describe "authorization integration", js: true do
     mount "TestComponent2"
     model1 = FactoryBot.create(:test_model, test_attribute: "george")
     ApplicationController.acting_user = User.new(name: "fred")
-    page.evaluate_ruby("Hyperstack.connect(['TestModel', #{model1.id}])")
+    evaluate_ruby("Hyperstack.connect(['TestModel', #{model1.id}])")
     model1.update_attribute(:completed, true)
     wait_for_ajax
     model1.attributes_on_client(page).should eq({id: 1})

@@ -350,6 +350,8 @@ module HyperSpec
       Capybara.current_session.current_window
               .resize_to(width + RSpec.configuration.debugger_width, height)
       wait_for_size(width + RSpec.configuration.debugger_width, height)
+    rescue StandardError
+      true
     end
   end
 

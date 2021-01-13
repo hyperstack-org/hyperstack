@@ -471,7 +471,7 @@ module ComponentTestHelpers
   def pause(message = nil)
     if message
       puts message
-      page.evaluate_ruby "puts #{message.inspect}.to_s + ' (type go() to continue)'"
+      evaluate_ruby "puts #{message.inspect}.to_s + ' (type go() to continue)'"
     end
     page.evaluate_script("window.hyper_spec_waiting_for_go = true")
     loop do
@@ -522,7 +522,7 @@ RSpec.configure do |config|
   config.before(:all) do
     ActiveRecord::Base.class_eval do
       def attributes_on_client(page)
-        page.evaluate_ruby("#{self.class.name}.find(#{id}).attributes", symbolize_names: true)
+        evaluate_ruby("#{self.class.name}.find(#{id}).attributes", symbolize_names: true)
       end
     end
   end
