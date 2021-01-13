@@ -212,3 +212,31 @@ version AFTER the bogus one in the dummy value system.  In 1.0 the order for som
 the correct version in activesupport was being overwritten.
 
 I don't believe this will have any effect on application code.
+
+---
+
+### HyperSpec is not using ApplicationController
+
+HyperModel had its own version of HyperSpec.  In that version the test controller was subclassed from ApplicationController.  In the new version its subclassed from ActionController::Base.
+
+In some HyperModel specs it was setting up mocks in ApplicationController, and these were not being used.
+
+so now hyper-spec tries to use ApplicationController and falls back to ::ActionController::Base.
+
+TODO: verify this works in all cases...
+
+---
+
+### Trying to set window size outside of a JS spec no longer works
+
+Who knows why, but for now we just rescue any failure, and keep going.
+
+---
+
+### page.evaluate_ruby no longer works but plain evaluate_ruby does.
+
+Only one spec files was doing that, so just upgraded.
+
+TODO: get page.evaluate_ruby working again.
+
+---

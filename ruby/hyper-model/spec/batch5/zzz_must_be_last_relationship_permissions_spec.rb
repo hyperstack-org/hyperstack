@@ -278,7 +278,6 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
       end
 
       it 'will allow access via scopes' do
-        Hyperstack::Connection.show_diagnostics = true
         isomorphic do
           TodoItem.scope :annuder_scope, ->() { all }
           TodoItem.scope :test_scope, ->() { all }, regulate: :always_allow
@@ -291,7 +290,6 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
             end
           end
         end
-        binding.pry
         expect(page).to have_content("There is 1 TodoItem")
         TodoItem.create
         expect(page).to have_content("There is 2 TodoItem")

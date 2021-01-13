@@ -28,10 +28,26 @@ module HyperSpec
       end
     end
 
+    # TODO: verify this works in all cases...
+    # at one time it was ApplicationController
+    # then it changed to ::ActionController::Base (going to rails 5?)
+    # but HyperModel has specs that depend on it being ApplicationController
+    # We could use the controller param in those cases, but it seems reasonable
+    # that by default we would use ApplicationController if it exists and fallback
+    # to ActionController::Base
+
+    def new_controller
+      if defined? ApplicationController
+        Class.new ApplicationController
+      else
+        Class.new ::ActionController::Base
+      end
+    end
+
     def build_test_url_for(controller)
       unless controller
         unless defined?(::HyperstackTestController)
-          Object.const_set('HyperstackTestController', Class.new(::ActionController::Base))
+          Object.const_set('HyperstackTestController', new_controller)
         end
 
         controller = ::HyperstackTestController
