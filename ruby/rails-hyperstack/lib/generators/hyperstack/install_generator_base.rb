@@ -21,7 +21,7 @@ module Rails
           @file_name = component_array.last
           @indent = 0
           template template,
-                   File.join('app', 'hyperstack', 'components',
+                   Rails.root.join('app', 'hyperstack', 'components',
                              *@modules.map(&:downcase),
                              "#{@file_name.underscore}.rb")
         end
@@ -30,12 +30,12 @@ module Rails
 
 
       def clear_cache
-        run 'rm -rf tmp/cache' unless Dir.exist?(File.join('app', 'hyperstack'))
+        run 'rm -rf tmp/cache' unless Dir.exist?(Rails.root.join('app', 'hyperstack'))
       end
 
       def insure_hyperstack_loader_installed
         hyperstack_loader = %r{//=\s+require\s+hyperstack-loader\s+}
-        application_js = File.join(
+        application_js = Rails.root.join(
           'app', 'assets', 'javascripts', 'application.js'
         )
         if File.exist? application_js
@@ -70,7 +70,7 @@ module Rails
             " ***********************************************************\n"
           application_pack_tag =
             /\s*\<\%\=\s+javascript_pack_tag\s+(\'|\")application(\'|\").*\%\>.*$/
-          Dir.glob(File.join('app', 'views', '**', '*.erb')) do |file|
+          Dir.glob(Rails.root.join('app', 'views', '**', '*.erb')) do |file|
             if File.foreach(file).any? { |l| l =~ application_pack_tag }
               inject_into_file file, after: application_pack_tag do
                 "\n    <%= javascript_include_tag 'application' %>"
@@ -82,7 +82,7 @@ module Rails
 
       def insure_base_component_class_exists
         @component_base_class = options['base-class'] || Hyperstack.component_base_class
-        file_name = File.join(
+        file_name = Rails.root.join(
           'app', 'hyperstack', 'components', "#{@component_base_class.underscore}.rb"
         )
         template 'hyper_component_template.rb', file_name unless File.exist? file_name

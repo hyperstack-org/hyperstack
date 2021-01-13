@@ -9,12 +9,12 @@ module Hyperstack
     class_option 'webpack-only', type: :boolean
     class_option 'hyper-model-only', type: :boolean
 
-    def add_clexer
-      gem 'c_lexer'
-      Bundler.with_clean_env do
-        run 'bundle update'
-      end
-    end
+    # def add_clexer
+    #   gem 'c_lexer'
+    #   Bundler.with_clean_env do
+    #     run 'bundle update'
+    #   end
+    # end
 
     def add_component
       if skip_adding_component?
@@ -115,12 +115,13 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       Bundler.with_clean_env do
         run 'bundle install'
       end
-      run 'bundle exec rails webpacker:install'
+      `spring stop`
+      Dir.chdir(Rails.root.join.to_s) { run 'bundle exec rails webpacker:install' }
     end
 
     def create_policies_directory
       return if skip_hyper_model?
-      policy_file = File.join('app', 'policies', 'hyperstack', 'application_policy.rb')
+      policy_file = Rails.root.join('app', 'policies', 'hyperstack', 'application_policy.rb')
       unless File.exist? policy_file
         create_file policy_file, <<-RUBY
   # #{policy_file}
@@ -148,10 +149,10 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
 
     def move_and_update_application_record
       return if skip_hyper_model?
-      rails_app_record_file = File.join('app', 'models', 'application_record.rb')
-      hyper_app_record_file = File.join('app', 'hyperstack', 'models', 'application_record.rb')
+      rails_app_record_file = Rails.root.join('app', 'models', 'application_record.rb')
+      hyper_app_record_file = Rails.root.join('app', 'hyperstack', 'models', 'application_record.rb')
       unless File.exist? hyper_app_record_file
-        empty_directory File.join('app', 'hyperstack', 'models')
+        empty_directory Rails.root.join('app', 'hyperstack', 'models')
         `mv #{rails_app_record_file} #{hyper_app_record_file}`
         create_file rails_app_record_file, <<-RUBY
 # #{rails_app_record_file}
@@ -184,7 +185,7 @@ require 'models/application_record.rb'
         say '👩‍✈️ Basic development policy defined.  See app/policies/application_policy.rb 👨🏽‍✈️', :green
         say '💽 HyperModel installed. Move any Active Record models to the app/hyperstack/models to access them from the client 📀', :green
       end
-      if File.exist?(init = File.join('config', 'initializers', 'hyperstack.rb'))
+      if File.exist?(init = Rails.root.join('config', 'initializers', 'hyperstack.rb'))
         say "☑️  Check #{init} for other configuration options. ☑️", :green
       end
       unless skip_hotloader?
@@ -217,7 +218,7 @@ require 'models/application_record.rb'
     def new_rails_app?
       # check to see if there are any routes set up and remember it, cause we might add a route in the process
       @new_rails_app ||= begin
-        route_file = File.join('config', 'routes.rb')
+        route_file = Rails.root.join('config', 'routes.rb')
         count = File.foreach(route_file).inject(0) do |c, line|
           line = line.strip
           next c if line.empty?
@@ -230,7 +231,7 @@ require 'models/application_record.rb'
     end
 
     def inject_into_initializer(s)
-      file_name = File.join('config', 'initializers', 'hyperstack.rb')
+      file_name = Rails.root.join('config', 'initializers', 'hyperstack.rb')
       if File.exist?(file_name)
         prepend_to_file(file_name) { "#{s}\n" }
       else

@@ -1,20 +1,23 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
+require 'pry'
 
 RSpec::Core::RakeTask.new(:spec)
 
 namespace :spec do
   task :prepare do
+    rails_version = `bundle info rails`.match(/\* rails \((.+)\)/)[1]
+    opal_version = `bundle info opal`.match(/\* opal \((.+)\)/)[1]
     Dir.chdir('spec') do
       sh('rm -rf test_app')
       Bundler.with_clean_env do
-        sh('rails -v')
-        sh('rails _6.0.2.1_ new test_app -T')
+        sh("rails _#{rails_version}_ new test_app -T")
       end
       Bundler.with_clean_env do
         Dir.chdir('test_app') do
           sh('cat ../gems.rb >> Gemfile')
-          sh('bundle update')
+          sh("echo 'gem \"opal\", \"#{opal_version}\"' >> Gemfile")
+          sh("bundle update")
           sh('spring stop')
           sh('bundle exec rails g hyperstack:install')
           sh('bundle exec rails generate model Sample name:string description:text')
