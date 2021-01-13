@@ -57,6 +57,8 @@ module HyperSpec
         else
           file_cache.delete(key)
         end
+      rescue StandardError
+        nil
       end
     end
 
