@@ -31,7 +31,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'method_source'
   spec.add_dependency 'mini_racer', '~> 0.2.6'
   spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 2.0'
-  spec.add_dependency 'parser', '>= 2.3'
+  spec.add_dependency 'parser', '>= 2.3.3.1'  # on rails-6 this is now >= 2.3
   spec.add_dependency 'rspec-rails'
   spec.add_dependency 'selenium-webdriver'
   spec.add_dependency 'timecop', '~> 0.8.1'
