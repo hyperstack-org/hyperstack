@@ -471,16 +471,20 @@ module HyperSpec
               }
             end
           end
-          # class React::Component::HyperTestDummy < React::Component::Base
-          #       def render; end
-          # end
+          class Hyperstack::Internal::Component::TestDummy
+            include Hyperstack::Component
+            render {}
+          end
           #{@_hyperspec_private_client_code}
           #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
         code
         opts[:code] = opal_compile(block_with_helpers)
       end
       @_hyperspec_private_client_code = nil
-      #component_name ||= 'React::Component::HyperTestDummy'
+      # TODO: TestDummy is here to initialize the Hyper stack, but it also means you can't use
+      # hyper-spec without hyper-component.  Figure out a better way to do this, or configure it.
+      # perhaps just some config setting to include certain code on init if needed?
+      component_name ||= 'Hyperstack::Internal::Component::TestDummy'
       value = [component_name, params, @_hyperspec_private_html_block, opts]
       ComponentTestHelpers.cache_write(test_url, value)
       @_hyperspec_private_html_block = nil
