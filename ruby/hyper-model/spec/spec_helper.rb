@@ -25,7 +25,7 @@ RSpec.configure do |config|
       end
     end
   end
-  
+
   config.color = true
   config.fail_fast = ENV['FAIL_FAST'] || false
   config.fixture_path = File.join(File.expand_path(File.dirname(__FILE__)), "fixtures")
@@ -318,6 +318,8 @@ RSpec.configure do |config|
   #   Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
   # end
 
+  # Use legacy hyper-spec on_client behavior
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
 
 FactoryBot.define do

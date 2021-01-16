@@ -52,6 +52,8 @@ RSpec.configure do |config|
       raise JavaScriptError, errors.join("\n\n") if errors.present?
     end
   end
+
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
 
 # Stubbing the React calls so we can test outside of Opal

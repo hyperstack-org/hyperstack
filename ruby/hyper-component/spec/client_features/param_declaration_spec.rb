@@ -7,11 +7,11 @@ describe 'the param macro', js: true do
         collect_other_params_as :foo
 
         render do
-          DIV { @Foo[:bar] }
+          DIV(class: :foo) { @Foo[:bar] }
         end
       end
     end
-    expect(page.body[-35..-19]).to include("<div>biz</div>")
+    expect(find('div.foo')).to have_content 'biz'
   end
 
   it 'can override PropsWrapper.instance_var_name' do
@@ -28,11 +28,11 @@ describe 'the param macro', js: true do
         collect_other_params_as :foo
 
         render do
-          DIV { @foo[:bar] }
+          DIV(class: :foo) { @foo[:bar] }
         end
       end
     end
-    expect(page.body[-35..-19]).to include("<div>biz</div>")
+    expect(find('div.foo')).to have_content 'biz'
   end
 
   it 'defines collect_other_params_as method on params proxy' do
@@ -66,11 +66,11 @@ describe 'the param macro', js: true do
         param :foo
 
         render do
-          DIV { @Foo }
+          DIV(class: :foo) { @Foo }
         end
       end
     end
-    expect(page.body[-35..-19]).to include("<div>bar</div>")
+    expect(find('div.foo')).to have_content 'bar'
   end
 
   it "can give a param an accessor alias" do
@@ -79,11 +79,11 @@ describe 'the param macro', js: true do
         param :foo, alias: :bar
 
         render do
-          DIV { @bar }
+          DIV(class: :foo) { @bar }
         end
       end
     end
-    expect(page.body[-35..-19]).to include("<div>bar</div>")
+    expect(find('div.foo')).to have_content 'bar'
   end
 
   it "can create and access an optional params" do

@@ -465,7 +465,7 @@ describe 'React::Component', js: true do
 
     describe 'Default props' do
       it 'sets default props using validation helper' do
-        on_client do
+        before_mount do
           class Foo
             include Hyperstack::Component
             params do
@@ -474,14 +474,14 @@ describe 'React::Component', js: true do
             end
 
             render do
-              DIV { @Foo + '-' + @Bar}
+              DIV(class: :foo) { @Foo + '-' + @Bar}
             end
           end
         end
         mount 'Foo'
-        expect(page.body[-40..-19]).to include("<div>foo-bar</div>")
+        expect(find('div.foo')).to have_content('foo-bar')
         mount 'Foo', foo: 'lorem'
-        expect(page.body[-40..-19]).to include("<div>lorem-bar</div>")
+        expect(find('div.foo')).to have_content('lorem-bar')
       end
     end
   end
@@ -581,7 +581,14 @@ describe 'React::Component', js: true do
           end
         end
       end
-      expect(page.body).to include('<div data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent" data-react-props="{&quot;render_params&quot;:{},&quot;component_name&quot;:&quot;Foo&quot;,&quot;controller&quot;:&quot;HyperstackTest&quot;}"><div></div></div>')
+      expect(
+        JSON.parse(
+          find(
+            'div[data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent"]',
+            visible: false
+          )['data-react-props']
+        ).with_indifferent_access
+      ).to include render_params: {}, component_name: 'Foo', controller: 'HyperSpecTest'
     end
   end
 

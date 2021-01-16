@@ -131,6 +131,9 @@ RSpec.configure do |config|
   #               #.reject { |e| e =~ /Unexpected response code: 200/ }
   #   raise JavaScriptError, errors.join("\n\n") if errors.present?
   # end
+
+  # Use legacy hyper-spec on_client behavior
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
 
 module HyperSpec

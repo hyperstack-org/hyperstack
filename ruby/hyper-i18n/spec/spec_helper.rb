@@ -14,4 +14,7 @@ RSpec.configure do |config|
   config.before(:all) do
     `rm -rf spec/test_app/tmp/cache/`
   end
+
+  # Use legacy hyper-spec on_client behavior
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end

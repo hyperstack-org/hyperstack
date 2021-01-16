@@ -80,9 +80,9 @@ jobs:
       env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part3
     - <<: *_test_gem
       env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1
-    #
-    # - <<: *_test_gem
-    #   env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
+
+    - <<: *_test_gem
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
     # - <<: *_test_gem
     #   env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
     # - <<: *_test_gem
@@ -108,8 +108,8 @@ jobs:
     # - <<: *_test_gem
     #   env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
     #
-    # - <<: *_test_gem
-    #   env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
+    - <<: *_test_gem
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
     # - <<: *_test_gem
     #   env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
     # - <<: *_test_gem

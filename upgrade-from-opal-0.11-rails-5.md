@@ -259,3 +259,26 @@ ActiveRecord::Base.  But in order for it to work the "page" was being passed so 
 a page.evaluate_ruby, but the whole method was backwards.  It should be a capybara helper method that takes a active record model.  This is fixed.
 
 ---
+
+### Hyperspec changes behavior of on_client
+
+New hyperspec aliases evaluate_ruby as on_client for readability, the old on_client is now called before_mount.
+
+You can either update calls to on_client to be before_mount, or
+
+You can get legacy behavior by executing this line in the spec_helper:
+```ruby
+HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
+```
+
+---
+
+### HyperSpec todos
+
+TODO: Hyperspec is dependent on HyperComponent for mounting components, and initializing the system.
+
+However we want to make sure you can use HyperSpec without HyperComponent
+
+TODO: Investigate why we need before_mount...
+
+---

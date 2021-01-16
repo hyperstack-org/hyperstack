@@ -101,11 +101,15 @@ describe 'the React DSL', js: true do
       class Foo
         include Hyperstack::Component
         render do
-          DIV { "hello".br }
+          DIV(class: :foo) { "hello".br }
         end
       end
     end
-    expect(page.body[-285..-233]).to match(/(<div data-reactroot=""|<div)><span>hello<(br|br\/|br \/)><\/span><\/div>/)
+    expect(
+      find(
+        'div[data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent"] div.foo span'
+      )['innerHTML']
+    ).to eq 'hello<br>'
   end
 
   it "has a .td short hand String method" do
