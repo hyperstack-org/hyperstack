@@ -271,7 +271,8 @@ module HyperSpec
         str = "#{name} = #{value.to_opal_expression}\n#{str}"
       end
       str = add_opal_block(str, block) if block
-      js = opal_compile(str).delete("\n").gsub('(Opal);', '(Opal)')
+      js = opal_compile(str).gsub("// Prepare super implicit arguments\n", '')
+                            .delete("\n").gsub('(Opal);', '(Opal)')
       # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
       # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
       JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
@@ -533,7 +534,7 @@ module HyperSpec
     end
 
     def attributes_on_client(model)
-      evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes", symbolize_names: true)
+      evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes").symbolize_keys
     end
 
 
