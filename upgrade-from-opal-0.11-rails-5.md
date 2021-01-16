@@ -270,7 +270,6 @@ You can get legacy behavior by executing this line in the spec_helper:
 ```ruby
 HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 ```
-
 ---
 
 ### HyperSpec todos
@@ -280,5 +279,8 @@ TODO: Hyperspec is dependent on HyperComponent for mounting components, and init
 However we want to make sure you can use HyperSpec without HyperComponent
 
 TODO: Investigate why we need before_mount...
+
+TODO: add_locals method only works on simple cases.  For now make it experimental (i.e. make the method called
+  experimental_add_locals, which you can alias, or include a module that switches on the behavior.)
 
 ---

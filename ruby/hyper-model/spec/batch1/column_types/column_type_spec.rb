@@ -184,7 +184,7 @@ describe "column types on client", js: true do
 
   it 'loads and converts the value' do  # randomly generates an error, but the exactual spec passed... perhaps move it up or down? (tried moving down one step)
     t = Timex.parse('1/2/2003')
-    r = TypeTest.create(
+    TypeTest.create(
       boolean: true,
       date: t.time,
       datetime: t.time,
