@@ -149,8 +149,10 @@ describe "column types on client", js: true do
       TypeTest.serialize :string
       TypeTest.serialize :text
     end
-    [:string, :text].each do |attr|
-      expect_evaluate_ruby("TypeTest.find(1).#{attr}.class").to eq('NilClass')
+    %i[string text].each_with_index do |attr, i|
+      # find a different record for each iteration to prevent finding a model
+      # which is loaded
+      expect { TypeTest.find(i + 1)[attr].class }.on_client_to eq('NilClass')
     end
   end
 
