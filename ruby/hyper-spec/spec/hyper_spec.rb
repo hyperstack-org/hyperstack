@@ -269,6 +269,27 @@ describe 'hyper-spec', js: true do
       expect { another_string.gsub(/\W/, '') }.on_client_to eq another_string.gsub(/\W/, '')
     end
 
+    it 'will deal with unserailized local vars, instance vars and memoized values correctly' do
+      foo_bar = page
+      expect do
+        evaluate_ruby { foo_bar }
+      end.to raise_error(Exception, /foo_bar/)
+    end
+
+    it 'will ignore unserailized local vars, instance vars and memoized values if not accessed' do
+      foo_bar = page
+      good_value = 12
+      expect { good_value * 2 }.on_client_to eq good_value * 2
+    end
+
+    it 'will allow unserailized local vars, instance vars and memoized values can be redefined on the client' do
+      foo_bar = page
+      expect do 
+        foo_bar = 12
+        foo_bar * 2
+      end.on_client_to eq 24
+    end
+
     it 'aliases evaluate_ruby as on_client and c?' do
       expect(on_client { 12 % 5 }).to eq(2)
       expect(c? { 12 % 5 }).to eq(2)

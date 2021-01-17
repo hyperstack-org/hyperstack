@@ -69,17 +69,10 @@ class Time
     "Time.parse('#{inspect}')"
   end
 end
-#
-# class NilClass
-#   def to_opal_expression
-#     self.inspect
-#   end
-# end
 
 module HyperSpec
 
   # add a before eval hook to pry so we can capture the source
-
   if defined? Pry
     class << self
       attr_accessor :current_pry_code_block
@@ -272,7 +265,14 @@ module HyperSpec
 
     def set_local_var(name, object)
       serialized = object.opal_serialize
-      "#{name} = #{serialized}" if serialized
+      if serialized
+        "#{name} = #{serialized}"
+      else
+        "self.class.define_method(:#{name}) "\
+        "{ raise 'Attempt to access the variable #{name} "\
+        'that was defined in the spec, but its value could not be serialized '\
+        "so it is undefined on the client.' }"
+      end
     end
 
     def evaluate_ruby(p1 = nil, p2 = nil, p3 = nil, &block)
@@ -349,21 +349,19 @@ module HyperSpec
 
       memoized = b.eval('__memoized').instance_variable_get(:@memoized)
       in_str = memoized.inject(in_str) do |str, pair|
-        str = "#{str}\n#{set_local_var(pair.first, pair.last)}"
-        # "#{str}\n#{pair.first} = #{pair.last.to_opal_expression}"
+        "#{str}\n#{set_local_var(pair.first, pair.last)}"
       end if memoized
 
       in_str = b.local_variables.inject(in_str) do |str, var|
         next str if PRIVATE_VARIABLES.include? var
-        str = "#{str}\n#{set_local_var(var, b.local_variable_get(var))}"
-        # "#{str}\n#{var} = #{b.local_variable_get(var).to_opal_expression}"
+
+        "#{str}\n#{set_local_var(var, b.local_variable_get(var))}"
       end
 
       in_str = b.eval('instance_variables').inject(in_str) do |str, var|
         next str if PRIVATE_VARIABLES.include? var
 
-        str = "#{str}\n#{set_local_var(var, b.eval("instance_variable_get('#{var}')"))}"
-        # "#{str}\n#{var} = #{b.eval("instance_variable_get('#{var}')").to_opal_expression}"
+        "#{str}\n#{set_local_var(var, b.eval("instance_variable_get('#{var}')"))}"
       end
       in_str
     end
@@ -723,8 +721,7 @@ module RSpec
         @target = target
         @args_str = args.collect do |name, value|
           set_local_var(name, value)
-          # "#{name} = #{value.to_opal_expression}"
-        end.compact.join("\n")
+        end.join("\n")
       end
     end
 
