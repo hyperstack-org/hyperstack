@@ -1,10 +1,3 @@
-class Time
-  def self._load(*args)
-    debugger
-    nil
-  end
-end
-
 module Hyperstack
   module Internal
     module Component

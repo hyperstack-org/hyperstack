@@ -59,7 +59,6 @@ else
   require "reactive_record/active_record/public_columns_hash"
   require "reactive_record/serializers"
   require "reactive_record/pry"
-  require "hyper_spec/component_test_helpers"
   require_relative 'active_record_base'
   require 'hyper_model/version'
 
