@@ -647,6 +647,10 @@ module HyperSpec
     rescue StandardError
       true
     end
+
+    def attributes_on_client(model)
+      evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes").symbolize_keys
+    end
   end
 
   RSpec.configure do |config|
