@@ -317,17 +317,9 @@ RSpec.configure do |config|
   #   caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "--window-size=200,200" ]})
   #   Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
   # end
-end
 
-module HyperSpec
-  module ComponentTestHelpers
-    # Use legacy hyper-spec on_client behavior
-    # turn off add_locals
-    alias_method :on_client, :before_mount
-    def add_locals(in_str, block)
-      in_str
-    end
-  end
+  # Use legacy hyper-spec on_client behavior
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
 
 FactoryBot.define do

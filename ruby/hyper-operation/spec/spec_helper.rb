@@ -131,19 +131,10 @@ RSpec.configure do |config|
   #               #.reject { |e| e =~ /Unexpected response code: 200/ }
   #   raise JavaScriptError, errors.join("\n\n") if errors.present?
   # end
-end
 
-module HyperSpec
-  module ComponentTestHelpers
-    # Use legacy hyper-spec on_client behavior
-    # turn off add_locals
-    alias_method :on_client, :before_mount
-    def add_locals(in_str, block)
-      in_str
-    end
-  end
+  # Use legacy hyper-spec on_client behavior
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
-
 
 module HyperSpec
   module ComponentTestHelpers

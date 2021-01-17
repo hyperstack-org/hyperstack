@@ -33,10 +33,34 @@ module MethodSource
 end
 
 class Object
-  def to_opal_expression
-    to_json
-  rescue Exception
-    to_s
+  def opal_serialize
+    nil
+  end
+end
+
+class Hash
+  def opal_serialize
+    "{#{collect { |k, v| "#{k.opal_serialize} => #{v.opal_serialize}"}.join(', ')}}"
+  end
+end
+
+class Array
+  def opal_serialize
+    "[#{collect { |v| v.opal_serialize }.join(', ')}]"
+  end
+end
+
+[FalseClass, Float, Integer, NilClass, String, Symbol, TrueClass].each do |klass|
+  klass.send(:define_method, :opal_serialize) do
+    inspect
+  end
+end
+
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0')
+  [Bignum, Fixnum].each do |klass|
+    klass.send(:define_method, :opal_serialize) do
+      inspect
+    end
   end
 end
 
@@ -45,12 +69,12 @@ class Time
     "Time.parse('#{inspect}')"
   end
 end
-
-class NilClass
-  def to_opal_expression
-    self.inspect
-  end
-end
+#
+# class NilClass
+#   def to_opal_expression
+#     self.inspect
+#   end
+# end
 
 module HyperSpec
 
@@ -246,6 +270,11 @@ module HyperSpec
       before_mount(&block)
     end
 
+    def set_local_var(name, object)
+      serialized = object.opal_serialize
+      "#{name} = #{serialized}" if serialized
+    end
+
     def evaluate_ruby(p1 = nil, p2 = nil, p3 = nil, &block)
       insure_page_loaded
       # TODO:  better error message here...either you give us a block
@@ -268,7 +297,8 @@ module HyperSpec
       end
 
       args.each do |name, value|
-        str = "#{name} = #{value.to_opal_expression}\n#{str}"
+        str = "#{set_local_var(name, value)}\n#{str}"
+        # str = "#{name} = #{value.to_opal_expression}\n#{str}"
       end
       str = add_opal_block(str, block) if block
       js = opal_compile(str).gsub("// Prepare super implicit arguments\n", '')
@@ -319,19 +349,21 @@ module HyperSpec
 
       memoized = b.eval('__memoized').instance_variable_get(:@memoized)
       in_str = memoized.inject(in_str) do |str, pair|
-        "#{str}\n#{pair.first} = #{pair.last.to_opal_expression}"
+        str = "#{str}\n#{set_local_var(pair.first, pair.last)}"
+        # "#{str}\n#{pair.first} = #{pair.last.to_opal_expression}"
       end if memoized
 
       in_str = b.local_variables.inject(in_str) do |str, var|
         next str if PRIVATE_VARIABLES.include? var
-
-        "#{str}\n#{var} = #{b.local_variable_get(var).to_opal_expression}"
+        str = "#{str}\n#{set_local_var(var, b.local_variable_get(var))}"
+        # "#{str}\n#{var} = #{b.local_variable_get(var).to_opal_expression}"
       end
 
       in_str = b.eval('instance_variables').inject(in_str) do |str, var|
         next str if PRIVATE_VARIABLES.include? var
 
-        "#{str}\n#{var} = #{b.eval("instance_variable_get('#{var}')").to_opal_expression}"
+        str = "#{str}\n#{set_local_var(var, b.eval("instance_variable_get('#{var}')"))}"
+        # "#{str}\n#{var} = #{b.eval("instance_variable_get('#{var}')").to_opal_expression}"
       end
       in_str
     end
@@ -442,6 +474,14 @@ module HyperSpec
       opts = client_options opts
       test_url = build_test_url_for(opts.delete(:controller))
       if block || @_hyperspec_private_client_code || component_name.nil?
+        if defined? ::Hyperstack::Component
+          test_dummy = <<-code
+            class Hyperstack::Internal::Component::TestDummy
+              include Hyperstack::Component
+              render {}
+            end
+          code
+        end
         block_with_helpers = <<-code
           module ComponentHelpers
             def self.js_eval(s)
@@ -472,25 +512,19 @@ module HyperSpec
               }
             end
           end
-          class Hyperstack::Internal::Component::TestDummy
-            include Hyperstack::Component
-            render {}
-          end
+          #{test_dummy}
           #{@_hyperspec_private_client_code}
           #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
         code
         opts[:code] = opal_compile(block_with_helpers)
       end
       @_hyperspec_private_client_code = nil
-      # TODO: TestDummy is here to initialize the Hyper stack, but it also means you can't use
-      # hyper-spec without hyper-component.  Figure out a better way to do this, or configure it.
-      # perhaps just some config setting to include certain code on init if needed?
-      component_name ||= 'Hyperstack::Internal::Component::TestDummy'
+      component_name ||= 'Hyperstack::Internal::Component::TestDummy' if defined? ::Hyperstack::Component
       value = [component_name, params, @_hyperspec_private_html_block, opts]
       ComponentTestHelpers.cache_write(test_url, value)
       @_hyperspec_private_html_block = nil
       test_code_key = "hyper_spec_prerender_test_code.js"
-      if defined? ::Hyperstack::Component # was ::React in old hyperloop version
+      if defined? ::Hyperstack::Component
         @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
         if opts[:render_on] == :both || opts[:render_on] == :server_only
           unless opts[:code].blank?
@@ -532,11 +566,6 @@ module HyperSpec
     def add_class(class_name, style)
       @_hyperspec_private_client_code = "#{@_hyperspec_private_client_code}ComponentHelpers.add_class('#{class_name}', #{style})\n"
     end
-
-    def attributes_on_client(model)
-      evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes").symbolize_keys
-    end
-
 
     def open_in_chrome
       if false && ['linux', 'freebsd'].include?(`uname`.downcase)
@@ -689,8 +718,9 @@ module RSpec
 
         @target = target
         @args_str = args.collect do |name, value|
-          "#{name} = #{value.to_opal_expression}"
-        end.join("\n")
+          set_local_var(name, value)
+          # "#{name} = #{value.to_opal_expression}"
+        end.compact.join("\n")
       end
     end
 
