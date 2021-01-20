@@ -3,7 +3,11 @@ require 'parser/current'
 require 'unparser'
 require 'hyper-spec/unparser_patch' # not present in original version of refactored hyperspec
 require 'method_source'
-require 'pry'
+begin
+  require 'pry'
+rescue LoadError
+  nil
+end
 require_relative '../../lib/hyper-spec/time_cop.rb'
 require 'filecache'
 
@@ -298,7 +302,6 @@ module HyperSpec
 
       args.each do |name, value|
         str = "#{set_local_var(name, value)}\n#{str}"
-        # str = "#{name} = #{value.to_opal_expression}\n#{str}"
       end
       str = add_opal_block(str, block) if block
       js = opal_compile(str).gsub("// Prepare super implicit arguments\n", '')

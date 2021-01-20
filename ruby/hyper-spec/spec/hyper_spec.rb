@@ -284,7 +284,7 @@ describe 'hyper-spec', js: true do
 
     it 'will allow unserailized local vars, instance vars and memoized values can be redefined on the client' do
       foo_bar = page
-      expect do 
+      expect do
         foo_bar = 12
         foo_bar * 2
       end.on_client_to eq 24
@@ -298,7 +298,6 @@ describe 'hyper-spec', js: true do
     it 'allows local variables on the client to be set using the with method' do
       expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
-
   end
 end
 
