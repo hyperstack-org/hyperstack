@@ -86,6 +86,101 @@ module HyperSpec
     end
   end
 
+  module ControllerHelpers
+    TOP_LEVEL_COMPONENT_PATCH =
+      Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
+    TIME_COP_CLIENT_PATCH =
+      Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
+      "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
+
+    def initialize!
+      head(:no_content) && return if params[:id] == 'ping'
+      route_root = self.class.name.gsub(/Controller$/, '').underscore
+      key = "/#{route_root}/#{params[:id]}"
+      test_params = ComponentTestHelpers.cache_read(key)
+      @component_name =   test_params[0]
+      @component_params = test_params[1]
+      @html_block =       test_params[2]
+      @render_params =    test_params[3]
+      @render_on =        @render_params.delete(:render_on) || :client_only
+      @_mock_time =       @render_params.delete(:mock_time)
+      @style_sheet =      @render_params.delete(:style_sheet)
+      @javascript =       @render_params.delete(:javascript)
+      @code =             @render_params.delete(:code)
+
+      @page = "</body>\n"
+    end
+
+    def mount_component!
+      @page = '<%= react_component @component_name, @component_params, '\
+              "{ prerender: #{@render_on != :client_only} } %>\n#{@page}"
+    end
+
+    def client_code!
+      if @component_name
+        @page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{@page}"
+      end
+      @page = "<script type='text/javascript'>\n#{@code}\n</script>\n#{@page}" if @code
+    end
+
+    def time_cop_patch!
+      @page = "<script type='text/javascript'>\n#{TIME_COP_CLIENT_PATCH}\n</script>\n#{@page}"
+    end
+
+    def application!
+      @page = "<%= javascript_include_tag '#{@javascript || 'application'}' %>\n#{@page}"
+    end
+
+    def style_sheet!
+      @page = "<%= stylesheet_link_tag '#{@style_sheet || 'application'}' %>\n#{@page}"
+    end
+
+    def go_function!
+      @page = "<script type='text/javascript'>go = function() "\
+              "{window.hyper_spec_waiting_for_go = false}</script>\n#{@page}"
+    end
+
+    def client_title!
+      title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
+      title = "#{title}...continued." if ComponentTestHelpers.description_displayed
+
+      @page = "<script type='text/javascript'>console.log('%c#{title}',"\
+              "'color:green; font-weight:bold; font-size: 200%')</script>\n#{@page}"
+
+      ComponentTestHelpers.description_displayed = true
+    end
+
+    def html_block!
+      @page = "<body>\n#{@html_block}\n#{@page}"
+    end
+
+    def deliver!
+      @render_params[:inline] = @page
+      response.headers['Cache-Control'] = 'max-age=120'
+      response.headers['X-Tracking-ID'] = '123456'
+      render @render_params
+    end
+
+    def server_only?
+      @render_on == :server_only
+    end
+
+    def test
+      initialize!
+      # TODO: reverse the the layout in the above methods so they can run in
+      # the right order
+      mount_component! if @component_name
+      client_code!     unless server_only?
+      time_cop_patch!  if !server_only? || Lolex.initialized?
+      application!     if (!server_only? && !@render_params[:layout]) || @javascript
+      style_sheet!     if !@render_params[:layout] || @style_sheet
+      go_function!
+      client_title!    if ComponentTestHelpers.current_example
+      html_block!
+      deliver!
+    end
+  end
+
   module ComponentTestHelpers
     def self.opal_compile(s)
       Opal.compile(s)
@@ -97,13 +192,6 @@ module HyperSpec
     def opal_compile(s)
       ComponentTestHelpers.opal_compile(s)
     end
-
-    TOP_LEVEL_COMPONENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
-    TIME_COP_CLIENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
-      "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
-
 
     class << self
       attr_accessor :current_example
@@ -160,102 +248,43 @@ module HyperSpec
     # to ActionController::Base
 
     def new_controller
-      if defined? ApplicationController
-        Class.new ApplicationController
-      else
-        Class.new ::ActionController::Base
-      end
+      return ::HyperSpecTestController if defined?(::HyperSpecTestController)
+
+      controller = if defined? ApplicationController
+                     Class.new ApplicationController
+                   elsif defined? ::ActionController::Base
+                     Class.new ::ActionController::Base
+                   end
+
+      raise raise 'No HyperSpecTestController class found' unless controller
+
+      Object.const_set('HyperSpecTestController', controller)
     end
 
-    def build_test_url_for(controller, ping = nil)
-      unless controller
-        unless defined?(::HyperSpecTestController)
-          Object.const_set('HyperSpecTestController', new_controller)
-        end
+    def add_rails_route(route_root)
+      routes = ::Rails.application.routes
+      routes.disable_clear_and_finalize = true
+      routes.clear!
+      routes.draw { get "/#{route_root}/:id", to: "#{route_root}#test" }
+      ::Rails.application.routes_reloader.paths.each { |path| load(path) }
+      routes.finalize!
+      ActiveSupport.on_load(:action_controller) { routes.finalize! }
+    ensure
+      routes.disable_clear_and_finalize = false
+    end
 
-        controller = ::HyperSpecTestController
-      end
-
+    def build_test_url_for(controller = nil, ping = nil)
+      controller ||= new_controller
       route_root = controller.name.gsub(/Controller$/, '').underscore
 
       unless controller.method_defined?(:test)
-        controller.class_eval do
-          define_method(:test) do
-            head(:no_content) && return if params[:id] == 'ping'
-            route_root = self.class.name.gsub(/Controller$/, '').underscore
-            key = "/#{route_root}/#{params[:id]}"
-            test_params = ComponentTestHelpers.cache_read(key)
-            @component_name = test_params[0]
-            @component_params = test_params[1]
-            html_block = test_params[2]
-            render_params = test_params[3]
-            render_on = render_params.delete(:render_on) || :client_only
-            _mock_time = render_params.delete(:mock_time)
-            style_sheet = render_params.delete(:style_sheet)
-            javascript = render_params.delete(:javascript)
-            code = render_params.delete(:code)
-            #page = "#{html_block}\n</body>\n"
-            page = "</body>\n"
-
-            page = '<%= react_component @component_name, @component_params, '\
-                   "{ prerender: #{render_on != :client_only} } %>\n#{page}" if @component_name
-            #page = "<body>\n#{page}"
-            unless render_on == :server_only
-              page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}" if @component_name
-              page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
-            end
-
-            if render_on != :server_only || Lolex.initialized?
-              page = "<script type='text/javascript'>\n#{TIME_COP_CLIENT_PATCH}\n</script>\n#{page}"
-            end
-
-            if (render_on != :server_only && !render_params[:layout]) || javascript
-              page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n#{page}"
-            end
-
-            if !render_params[:layout] || style_sheet
-              page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' %>\n#{page}"
-            end
-            page = "<script type='text/javascript'>go = function() "\
-                   "{window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
-
-            if ComponentTestHelpers.current_example
-
-              title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
-              title = "#{title}...continued." if ComponentTestHelpers.description_displayed
-
-              page = "<script type='text/javascript'>console.log('%c#{title}',"\
-                     "'color:green; font-weight:bold; font-size: 200%')</script>\n#{page}"
-
-              ComponentTestHelpers.description_displayed = true
-            end
-            page = "<body>\n#{html_block}\n#{page}"
-            render_params[:inline] = page
-            response.headers['Cache-Control'] = 'max-age=120'
-            response.headers['X-Tracking-ID'] = '123456'
-            render render_params
-          end
-        end
-
-        begin
-          routes = ::Rails.application.routes
-          routes.disable_clear_and_finalize = true
-          routes.clear!
-          routes.draw do
-            get "/#{route_root}/:id", to: "#{route_root}#test"
-          end
-          ::Rails.application.routes_reloader.paths.each { |path| load(path) }
-          routes.finalize!
-          ActiveSupport.on_load(:action_controller) { routes.finalize! }
-        ensure
-          routes.disable_clear_and_finalize = false
-        end
+        controller.include ControllerHelpers
+        add_rails_route(route_root)
       end
-      if ping
-        "/#{route_root}/ping"
-      else
-        "/#{route_root}/#{ComponentTestHelpers.test_id}"
-      end
+
+      id = ping ? 'ping' : ComponentTestHelpers.test_id
+
+      "/#{route_root}/#{id}"
     end
 
     def insert_html(str)
