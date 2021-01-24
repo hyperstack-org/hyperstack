@@ -72,19 +72,10 @@ module HyperSpec
               "{window.hyper_spec_waiting_for_go = false}</script>\n#{@page}"
     end
 
-    def escape_javascript(str)
-      ComponentTestHelpers.escape_javascript(str)
-    end
-
-    def client_title!
-      title =
-        ComponentTestHelpers.escape_javascript(ComponentTestHelpers.current_example.description)
-      title = "#{title}...continued." if ComponentTestHelpers.description_displayed
-
+    def example_title!
+      title = ComponentTestHelpers.current_example_description!
       @page = "<script type='text/javascript'>console.log('%c#{title}',"\
               "'color:green; font-weight:bold; font-size: 200%')</script>\n#{@page}"
-
-      ComponentTestHelpers.description_displayed = true
     end
 
     def html_block!
@@ -113,7 +104,7 @@ module HyperSpec
       application!     if (!server_only? && !@render_params[:layout]) || @javascript
       style_sheet!     if !@render_params[:layout] || @style_sheet
       go_function!
-      client_title!    if ComponentTestHelpers.current_example
+      example_title!   if ComponentTestHelpers.current_example
       html_block!
       deliver!
     end

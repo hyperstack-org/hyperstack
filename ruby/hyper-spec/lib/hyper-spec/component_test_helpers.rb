@@ -8,10 +8,8 @@ module HyperSpec
       raise e
     end
 
-    extend ActionView::Helpers::JavaScriptHelper
-
-    def opal_compile(s)
-      ComponentTestHelpers.opal_compile(s)
+    def opal_compile(str)
+      ComponentTestHelpers.opal_compile(str)
     end
 
     class << self
@@ -23,9 +21,12 @@ module HyperSpec
         @_hyperspec_private_test_id += 1
       end
 
-      def display_example_description
-        "<script type='text/javascript'>console.log('%c#{current_example.description}'"\
-        ",'color:green; font-weight:bold; font-size: 200%')</script>"
+      include ActionView::Helpers::JavaScriptHelper
+
+      def current_example_description!
+        title = "#{title}...continued." if description_displayed
+        self.description_displayed = true
+        "#{escape_javascript(current_example.description)}#{title}"
       end
 
       def file_cache
