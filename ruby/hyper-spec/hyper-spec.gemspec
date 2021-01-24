@@ -24,6 +24,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'actionview'
   spec.add_dependency 'capybara'
   spec.add_dependency 'chromedriver-helper', '1.2.0'
   spec.add_dependency 'filecache'

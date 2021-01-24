@@ -1,193 +1,14 @@
 # see component_test_helpers_spec.rb for examples
-require 'parser/current'
-require 'unparser'
-require 'hyper-spec/unparser_patch' # not present in original version of refactored hyperspec
-require 'method_source'
-begin
-  require 'pry'
-rescue LoadError
-  nil
-end
-require_relative '../../lib/hyper-spec/time_cop.rb'
-require 'filecache'
-
-Parser::Builders::Default.emit_procarg0 = true # not present in original version of refactored hyperspec
-if Parser::Builders::Default.respond_to? :emit_arg_inside_procarg0
-  Parser::Builders::Default.emit_arg_inside_procarg0 = true   # not available in parser 2.3
-end
-
-module MethodSource
-  class << self
-    alias original_lines_for_before_hyper_spec lines_for
-    alias original_source_helper_before_hyper_spec source_helper
-
-    def source_helper(source_location, name=nil)
-      source_location[1] = 1 if source_location[0] == '(pry)'
-      original_source_helper_before_hyper_spec source_location, name
-    end
-
-    def lines_for(file_name, name = nil)
-      if file_name == '(pry)'
-        HyperSpec.current_pry_code_block
-      else
-        original_lines_for_before_hyper_spec file_name, name
-      end
-    end
-  end
-end
-
-class Object
-  def opal_serialize
-    nil
-  end
-end
-
-class Hash
-  def opal_serialize
-    "{#{collect { |k, v| "#{k.opal_serialize} => #{v.opal_serialize}"}.join(', ')}}"
-  end
-end
-
-class Array
-  def opal_serialize
-    "[#{collect { |v| v.opal_serialize }.join(', ')}]"
-  end
-end
-
-[FalseClass, Float, Integer, NilClass, String, Symbol, TrueClass].each do |klass|
-  klass.send(:define_method, :opal_serialize) do
-    inspect
-  end
-end
-
-if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0')
-  [Bignum, Fixnum].each do |klass|
-    klass.send(:define_method, :opal_serialize) do
-      inspect
-    end
-  end
-end
-
-class Time
-  def to_opal_expression
-    "Time.parse('#{inspect}')"
-  end
-end
-
 module HyperSpec
-
-  # add a before eval hook to pry so we can capture the source
-  if defined? Pry
-    class << self
-      attr_accessor :current_pry_code_block
-      Pry.hooks.add_hook(:before_eval, "hyper_spec_code_capture") do |code|
-        HyperSpec.current_pry_code_block = code
-      end
-    end
-  end
-
-  module ControllerHelpers
-    TOP_LEVEL_COMPONENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
-    TIME_COP_CLIENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
-      "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
-
-    def initialize!
-      head(:no_content) && return if params[:id] == 'ping'
-      route_root = self.class.name.gsub(/Controller$/, '').underscore
-      key = "/#{route_root}/#{params[:id]}"
-      test_params = ComponentTestHelpers.cache_read(key)
-      @component_name =   test_params[0]
-      @component_params = test_params[1]
-      @html_block =       test_params[2]
-      @render_params =    test_params[3]
-      @render_on =        @render_params.delete(:render_on) || :client_only
-      @_mock_time =       @render_params.delete(:mock_time)
-      @style_sheet =      @render_params.delete(:style_sheet)
-      @javascript =       @render_params.delete(:javascript)
-      @code =             @render_params.delete(:code)
-
-      @page = "</body>\n"
-    end
-
-    def mount_component!
-      @page = '<%= react_component @component_name, @component_params, '\
-              "{ prerender: #{@render_on != :client_only} } %>\n#{@page}"
-    end
-
-    def client_code!
-      if @component_name
-        @page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{@page}"
-      end
-      @page = "<script type='text/javascript'>\n#{@code}\n</script>\n#{@page}" if @code
-    end
-
-    def time_cop_patch!
-      @page = "<script type='text/javascript'>\n#{TIME_COP_CLIENT_PATCH}\n</script>\n#{@page}"
-    end
-
-    def application!
-      @page = "<%= javascript_include_tag '#{@javascript || 'application'}' %>\n#{@page}"
-    end
-
-    def style_sheet!
-      @page = "<%= stylesheet_link_tag '#{@style_sheet || 'application'}' %>\n#{@page}"
-    end
-
-    def go_function!
-      @page = "<script type='text/javascript'>go = function() "\
-              "{window.hyper_spec_waiting_for_go = false}</script>\n#{@page}"
-    end
-
-    def client_title!
-      title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
-      title = "#{title}...continued." if ComponentTestHelpers.description_displayed
-
-      @page = "<script type='text/javascript'>console.log('%c#{title}',"\
-              "'color:green; font-weight:bold; font-size: 200%')</script>\n#{@page}"
-
-      ComponentTestHelpers.description_displayed = true
-    end
-
-    def html_block!
-      @page = "<body>\n#{@html_block}\n#{@page}"
-    end
-
-    def deliver!
-      @render_params[:inline] = @page
-      response.headers['Cache-Control'] = 'max-age=120'
-      response.headers['X-Tracking-ID'] = '123456'
-      render @render_params
-    end
-
-    def server_only?
-      @render_on == :server_only
-    end
-
-    def test
-      initialize!
-      # TODO: reverse the the layout in the above methods so they can run in
-      # the right order
-      mount_component! if @component_name
-      client_code!     unless server_only?
-      time_cop_patch!  if !server_only? || Lolex.initialized?
-      application!     if (!server_only? && !@render_params[:layout]) || @javascript
-      style_sheet!     if !@render_params[:layout] || @style_sheet
-      go_function!
-      client_title!    if ComponentTestHelpers.current_example
-      html_block!
-      deliver!
-    end
-  end
-
   module ComponentTestHelpers
-    def self.opal_compile(s)
-      Opal.compile(s)
+    def self.opal_compile(str)
+      Opal.compile(str)
     rescue Exception => e
-      puts "puts could not compile: \n\n#{s}\n\n"
+      puts "puts could not compile: \n\n#{str}\n\n"
       raise e
     end
+
+    extend ActionView::Helpers::JavaScriptHelper
 
     def opal_compile(s)
       ComponentTestHelpers.opal_compile(s)
@@ -206,34 +27,21 @@ module HyperSpec
         "<script type='text/javascript'>console.log('%c#{current_example.description}'"\
         ",'color:green; font-weight:bold; font-size: 200%')</script>"
       end
-      RAILS_CACHE = false
 
       def file_cache
         @file_cache ||= FileCache.new("cache", "/tmp/hyper-spec-caches", 30, 3)
       end
 
       def cache_read(key)
-        if RAILS_CACHE
-          ::Rails.cache.read(key)
-        else
-          file_cache.get(key)
-        end
+        file_cache.get(key)
       end
 
       def cache_write(key, value)
-        if RAILS_CACHE
-          ::Rails.cache.write(key, value)
-        else
-          file_cache.set(key, value)
-        end
+        file_cache.set(key, value)
       end
 
       def cache_delete(key)
-        if RAILS_CACHE
-          ::Rails.cache.write(key, value)
-        else
-          file_cache.delete(key)
-        end
+        file_cache.delete(key)
       rescue StandardError
         nil
       end
@@ -275,16 +83,15 @@ module HyperSpec
 
     def build_test_url_for(controller = nil, ping = nil)
       controller ||= new_controller
-      route_root = controller.name.gsub(/Controller$/, '').underscore
 
       unless controller.method_defined?(:test)
         controller.include ControllerHelpers
-        add_rails_route(route_root)
+        add_rails_route(controller.route_root)
       end
 
       id = ping ? 'ping' : ComponentTestHelpers.test_id
 
-      "/#{route_root}/#{id}"
+      "/#{controller.route_root}/#{id}"
     end
 
     def insert_html(str)
@@ -680,89 +487,6 @@ module HyperSpec
 
     def attributes_on_client(model)
       evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes").symbolize_keys
-    end
-  end
-
-  RSpec.configure do |config|
-    config.before(:each) do |example|
-      ComponentTestHelpers.current_example = example
-      ComponentTestHelpers.description_displayed = false
-    end
-  end
-end
-
-module RSpec
-  module Expectations
-    class ExpectationTarget
-    end
-
-    module HyperSpecInstanceMethods
-
-      def self.included(base)
-        base.include HyperSpec::ComponentTestHelpers
-      end
-
-      def to_on_client(matcher, message = nil, &block)
-        evaluate_client('ruby').to(matcher, message, &block)
-      end
-
-      alias on_client_to to_on_client
-
-      def to_on_client_not(matcher, message = nil, &block)
-        evaluate_client('ruby').not_to(matcher, message, &block)
-      end
-
-      alias on_client_to_not to_on_client_not
-      alias on_client_not_to to_on_client_not
-      alias to_not_on_client to_on_client_not
-      alias not_to_on_client to_on_client_not
-
-      def to_then(matcher, message = nil, &block)
-        evaluate_client('promise').to(matcher, message, &block)
-      end
-
-      alias then_to to_then
-
-      def to_then_not(matcher, message = nil, &block)
-        evaluate_client('promise').not_to(matcher, message, &block)
-      end
-
-      alias then_to_not to_then_not
-      alias then_not_to to_then_not
-      alias to_not_then to_then_not
-      alias not_to_then to_then_not
-
-      private
-
-      def evaluate_client(method)
-        source = add_opal_block(@args_str, @target)
-        value = @target.binding.eval("evaluate_#{method}(#{source.inspect}, {}, {})")
-        ExpectationTarget.for(value, nil)
-      end
-    end
-
-    class OnClientWithArgsTarget
-      include HyperSpecInstanceMethods
-
-      def initialize(target, args)
-        unless args.is_a? Hash
-          raise ExpectationNotMetError,
-                "You must pass a hash of local var, value pairs to the 'with' modifier"
-        end
-
-        @target = target
-        @args_str = args.collect do |name, value|
-          set_local_var(name, value)
-        end.join("\n")
-      end
-    end
-
-    class BlockExpectationTarget < ExpectationTarget
-      include HyperSpecInstanceMethods
-
-      def with(args)
-        OnClientWithArgsTarget.new(@target, args)
-      end
     end
   end
 end
