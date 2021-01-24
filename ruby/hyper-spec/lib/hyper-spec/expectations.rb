@@ -5,7 +5,6 @@ module RSpec
     end
 
     module HyperSpecInstanceMethods
-
       def self.included(base)
         base.include HyperSpec::ComponentTestHelpers
       end
