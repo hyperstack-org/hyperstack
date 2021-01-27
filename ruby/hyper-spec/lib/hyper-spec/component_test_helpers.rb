@@ -48,51 +48,38 @@ module HyperSpec
       end
     end
 
-    # TODO: verify this works in all cases...
-    # at one time it was ApplicationController
-    # then it changed to ::ActionController::Base (going to rails 5?)
-    # but HyperModel has specs that depend on it being ApplicationController
-    # We could use the controller param in those cases, but it seems reasonable
-    # that by default we would use ApplicationController if it exists and fallback
-    # to ActionController::Base
+    # By default we assume we are operating in a Rails environment and will
+    # hook in using a rails controller.  To override this define the
+    # HyperSpecController class in your spec helper.  See the rack.rb file
+    # for an example of how to do this.
 
-    def new_controller
+    def hyper_spec_test_controller
       return ::HyperSpecTestController if defined?(::HyperSpecTestController)
 
-      controller = if defined? ApplicationController
-                     Class.new ApplicationController
-                   elsif defined? ::ActionController::Base
-                     Class.new ::ActionController::Base
-                   end
-
-      raise raise 'No HyperSpecTestController class found' unless controller
-
-      Object.const_set('HyperSpecTestController', controller)
+      base = if defined? ApplicationController
+               Class.new ApplicationController
+             elsif defined? ::ActionController::Base
+               Class.new ::ActionController::Base
+             else
+               raise "Unless using Rails you must define the HyperSpecTestController\n"\
+                     'For rack apps try requiring hyper-spec/rack.'
+             end
+      Object.const_set('HyperSpecTestController', base)
     end
 
-    def add_rails_route(route_root)
-      routes = ::Rails.application.routes
-      routes.disable_clear_and_finalize = true
-      routes.clear!
-      routes.draw { get "/#{route_root}/:id", to: "#{route_root}#test" }
-      ::Rails.application.routes_reloader.paths.each { |path| load(path) }
-      routes.finalize!
-      ActiveSupport.on_load(:action_controller) { routes.finalize! }
-    ensure
-      routes.disable_clear_and_finalize = false
+    # First insure we have a controller, then make sure it responds to the test method
+    # if not, then add the rails specific controller methods.  The RailsControllerHelpers
+    # module will automatically add a top level route back to the controller.
+
+    def route_root_for(controller)
+      controller ||= hyper_spec_test_controller
+      controller.include RailsControllerHelpers unless controller.method_defined?(:test)
+      controller.route_root
     end
 
     def build_test_url_for(controller = nil, ping = nil)
-      controller ||= new_controller
-
-      unless controller.method_defined?(:test)
-        controller.include ControllerHelpers
-        add_rails_route(controller.route_root)
-      end
-
       id = ping ? 'ping' : ComponentTestHelpers.test_id
-
-      "/#{controller.route_root}/#{id}"
+      "/#{route_root_for(controller)}/#{id}"
     end
 
     def insert_html(str)
