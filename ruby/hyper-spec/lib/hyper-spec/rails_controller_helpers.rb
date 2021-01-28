@@ -21,16 +21,16 @@ module HyperSpec
       end
 
       def mount_component!
-        @page = '<%= react_component @component_name, @component_params, '\
-                "{ prerender: #{@render_on != :client_only} } %>\n#{@page}"
+        @page << '<%= react_component @component_name, @component_params, '\
+                 "{ prerender: #{@render_on != :client_only} } %>"
       end
 
       def application!(file)
-        @page = "<%= javascript_include_tag '#{file}' %>\n#{@page}"
+        @page << "<%= javascript_include_tag '#{file}' %>"
       end
 
       def style_sheet!(file)
-        @page = "<%= stylesheet_link_tag '#{file}' %>\n#{@page}"
+        @page << "<%= stylesheet_link_tag '#{file}' %>"
       end
 
       def deliver!

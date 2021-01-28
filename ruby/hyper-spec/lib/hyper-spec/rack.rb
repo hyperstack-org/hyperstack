@@ -35,13 +35,23 @@ class HyperSpecTestController < SimpleDelegator
   end
 
   def application!(file)
-    @page = Opal::Sprockets.javascript_include_tag(
+    @page << Opal::Sprockets.javascript_include_tag(
       file,
       debug: true,
       sprockets: sprocket_server.sprockets,
       prefix: asset_path
-    ) + "\n#{@page}"
+    )
   end
+
+  def json!
+    @page << Opal::Sprockets.javascript_include_tag(
+      'json',
+      debug: true,
+      sprockets: sprocket_server.sprockets,
+      prefix: asset_path
+    )
+  end
+
 
   def style_sheet!(_file_); end
 
