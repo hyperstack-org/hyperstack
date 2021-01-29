@@ -137,9 +137,37 @@ module HyperSpec
 
     alias c? evaluate_ruby
 
-    # TODO: add a compile_ruby method.  refactor evaluate_ruby and expect_evaluate ruby to use common methods
+    # TODO: add a to_js method.  refactor evaluate_ruby and expect_evaluate ruby to use common methods
     # that process the params, and produce a ruby code string, and a resulting JS string
     # compile_ruby can be useful in seeing what code opal produces...
+
+    def to_js(p1 = nil, p2 = nil, p3 = nil, &block)
+      insure_page_loaded
+      # TODO:  better error message here...either you give us a block
+      # or first argument must be a hash or a string.
+      if p1.is_a? Hash
+        str = ''
+        p3 = p2
+        p2 = p1
+      else
+        str = p1
+      end
+      if p3
+        opts = p2
+        args = p3
+      elsif p2
+        opts = {}
+        args = p2
+      else
+        opts = args = {}
+      end
+
+      args.each do |name, value|
+        str = "#{set_local_var(name, value)}\n#{str}"
+      end
+      str = add_opal_block(str, block) if block
+      opal_compile(str)
+    end
 
     def expect_evaluate_ruby(p1 = nil, p2 = nil, p3 = nil, &block)
       insure_page_loaded

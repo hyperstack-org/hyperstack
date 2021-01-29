@@ -97,6 +97,9 @@ RSpec.configure do |config|
   config.before(:all, no_reset: true) do
     HyperSpec.reset_between_examples = false
   end
+  config.before(:all, no_reset: false) do
+    HyperSpec.reset_between_examples = true
+  end
   config.after(:all) do
     HyperSpec.reset_sessions! unless HyperSpec.reset_between_examples?
   end
