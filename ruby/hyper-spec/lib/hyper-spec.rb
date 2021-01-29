@@ -24,6 +24,17 @@ rescue LoadError
   nil
 end
 
+module Capybara
+  module Selenium
+    module DeprecationSuppressor
+      def deprecate(*args, &block)
+        puts "!!!!!!!!!!!!DEPRECATION MESSAGE: #{args}"
+        super unless @suppress_for_capybara
+      end
+    end
+  end
+end
+
 Parser::Builders::Default.emit_procarg0 = true
 
 # not available in parser 2.3
