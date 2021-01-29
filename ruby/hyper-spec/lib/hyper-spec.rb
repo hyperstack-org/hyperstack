@@ -24,12 +24,18 @@ rescue LoadError
   nil
 end
 
-module Capybara
-  module Selenium
-    module DeprecationSuppressor
-      def deprecate(*args, &block)
-        puts "!!!!!!!!!!!!DEPRECATION MESSAGE: #{args}"
-        super unless @suppress_for_capybara
+module Selenium
+  module WebDriver
+    class Logger
+      def deprecate(old, new = nil, **)
+        message = +"[DEPRECATION] #{old} is deprecated"
+        message << if new
+                     ". Use #{new} instead."
+                   else
+                     ' and will be removed in the next releases.'
+                   end
+
+        warn message
       end
     end
   end
