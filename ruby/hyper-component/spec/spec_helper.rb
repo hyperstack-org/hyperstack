@@ -15,6 +15,7 @@ require 'pry'
 require 'opal-browser'
 require 'timecop'
 
+
 RSpec.configure do |config|
   config.color = true
   config.fail_fast = ENV['FAIL_FAST'] || false
@@ -30,6 +31,17 @@ RSpec.configure do |config|
 
   config.before :each do
     Rails.cache.clear
+  end
+
+  config.before :suite do
+    MiniRacer_Backup = MiniRacer
+    Object.send(:remove_const, :MiniRacer)
+  end
+
+  config.around(:each, :prerendering_on) do |example|
+    MiniRacer = MiniRacer_Backup
+    example.run
+    Object.send(:remove_const, :MiniRacer)
   end
 
   config.filter_run_including focus: true
