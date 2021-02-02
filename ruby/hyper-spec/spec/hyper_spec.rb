@@ -227,7 +227,7 @@ describe 'hyper-spec', js: true do
     end
   end
 
-  context "new style rspec expressions" do
+  context "new style rspec expressions", no_reset: true do
 
     before(:each) do
       @str = 'hello'

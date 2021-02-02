@@ -1,109 +1,16 @@
 # see component_test_helpers_spec.rb for examples
-require 'parser/current'
-require 'unparser'
-require 'hyper-spec/unparser_patch' # not present in original version of refactored hyperspec
-require 'method_source'
-begin
-  require 'pry'
-rescue LoadError
-  nil
-end
-require_relative '../../lib/hyper-spec/time_cop.rb'
-require 'filecache'
-
-Parser::Builders::Default.emit_procarg0 = true # not present in original version of refactored hyperspec
-if Parser::Builders::Default.respond_to? :emit_arg_inside_procarg0
-  Parser::Builders::Default.emit_arg_inside_procarg0 = true   # not available in parser 2.3
-end
-
-module MethodSource
-  class << self
-    alias original_lines_for_before_hyper_spec lines_for
-    alias original_source_helper_before_hyper_spec source_helper
-
-    def source_helper(source_location, name=nil)
-      source_location[1] = 1 if source_location[0] == '(pry)'
-      original_source_helper_before_hyper_spec source_location, name
-    end
-
-    def lines_for(file_name, name = nil)
-      if file_name == '(pry)'
-        HyperSpec.current_pry_code_block
-      else
-        original_lines_for_before_hyper_spec file_name, name
-      end
-    end
-  end
-end
-
-class Object
-  def opal_serialize
-    nil
-  end
-end
-
-class Hash
-  def opal_serialize
-    "{#{collect { |k, v| "#{k.opal_serialize} => #{v.opal_serialize}"}.join(', ')}}"
-  end
-end
-
-class Array
-  def opal_serialize
-    "[#{collect { |v| v.opal_serialize }.join(', ')}]"
-  end
-end
-
-[FalseClass, Float, Integer, NilClass, String, Symbol, TrueClass].each do |klass|
-  klass.send(:define_method, :opal_serialize) do
-    inspect
-  end
-end
-
-if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0')
-  [Bignum, Fixnum].each do |klass|
-    klass.send(:define_method, :opal_serialize) do
-      inspect
-    end
-  end
-end
-
-class Time
-  def to_opal_expression
-    "Time.parse('#{inspect}')"
-  end
-end
-
 module HyperSpec
-
-  # add a before eval hook to pry so we can capture the source
-  if defined? Pry
-    class << self
-      attr_accessor :current_pry_code_block
-      Pry.hooks.add_hook(:before_eval, "hyper_spec_code_capture") do |code|
-        HyperSpec.current_pry_code_block = code
-      end
-    end
-  end
-
   module ComponentTestHelpers
-    def self.opal_compile(s)
-      Opal.compile(s)
+    def self.opal_compile(str)
+      Opal.compile(str)
     rescue Exception => e
-      puts "puts could not compile: \n\n#{s}\n\n"
+      puts "puts could not compile: \n\n#{str}\n\n"
       raise e
     end
 
-    def opal_compile(s)
-      ComponentTestHelpers.opal_compile(s)
+    def opal_compile(str)
+      ComponentTestHelpers.opal_compile(str)
     end
-
-    TOP_LEVEL_COMPONENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../sources/top_level_rails_component.rb', __FILE__)))
-    TIME_COP_CLIENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../../hyper-spec/time_cop.rb', __FILE__))) +
-      "\n#{File.read(File.expand_path('../../sources/lolex.js', __FILE__))}"
-
 
     class << self
       attr_accessor :current_example
@@ -114,148 +21,65 @@ module HyperSpec
         @_hyperspec_private_test_id += 1
       end
 
-      def display_example_description
-        "<script type='text/javascript'>console.log('%c#{current_example.description}'"\
-        ",'color:green; font-weight:bold; font-size: 200%')</script>"
+      include ActionView::Helpers::JavaScriptHelper
+
+      def current_example_description!
+        title = "#{title}...continued." if description_displayed
+        self.description_displayed = true
+        "#{escape_javascript(current_example.description)}#{title}"
       end
-      RAILS_CACHE = false
 
       def file_cache
         @file_cache ||= FileCache.new("cache", "/tmp/hyper-spec-caches", 30, 3)
       end
 
       def cache_read(key)
-        if RAILS_CACHE
-          ::Rails.cache.read(key)
-        else
-          file_cache.get(key)
-        end
+        file_cache.get(key)
       end
 
       def cache_write(key, value)
-        if RAILS_CACHE
-          ::Rails.cache.write(key, value)
-        else
-          file_cache.set(key, value)
-        end
+        file_cache.set(key, value)
       end
 
       def cache_delete(key)
-        if RAILS_CACHE
-          ::Rails.cache.write(key, value)
-        else
-          file_cache.delete(key)
-        end
+        file_cache.delete(key)
       rescue StandardError
         nil
       end
     end
 
-    # TODO: verify this works in all cases...
-    # at one time it was ApplicationController
-    # then it changed to ::ActionController::Base (going to rails 5?)
-    # but HyperModel has specs that depend on it being ApplicationController
-    # We could use the controller param in those cases, but it seems reasonable
-    # that by default we would use ApplicationController if it exists and fallback
-    # to ActionController::Base
+    # By default we assume we are operating in a Rails environment and will
+    # hook in using a rails controller.  To override this define the
+    # HyperSpecController class in your spec helper.  See the rack.rb file
+    # for an example of how to do this.
 
-    def new_controller
-      if defined? ApplicationController
-        Class.new ApplicationController
-      else
-        Class.new ::ActionController::Base
-      end
+    def hyper_spec_test_controller
+      return ::HyperSpecTestController if defined?(::HyperSpecTestController)
+
+      base = if defined? ApplicationController
+               Class.new ApplicationController
+             elsif defined? ::ActionController::Base
+               Class.new ::ActionController::Base
+             else
+               raise "Unless using Rails you must define the HyperSpecTestController\n"\
+                     'For rack apps try requiring hyper-spec/rack.'
+             end
+      Object.const_set('HyperSpecTestController', base)
     end
 
-    def build_test_url_for(controller, ping = nil)
-      unless controller
-        unless defined?(::HyperSpecTestController)
-          Object.const_set('HyperSpecTestController', new_controller)
-        end
+    # First insure we have a controller, then make sure it responds to the test method
+    # if not, then add the rails specific controller methods.  The RailsControllerHelpers
+    # module will automatically add a top level route back to the controller.
 
-        controller = ::HyperSpecTestController
-      end
+    def route_root_for(controller)
+      controller ||= hyper_spec_test_controller
+      controller.include RailsControllerHelpers unless controller.method_defined?(:test)
+      controller.route_root
+    end
 
-      route_root = controller.name.gsub(/Controller$/, '').underscore
-
-      unless controller.method_defined?(:test)
-        controller.class_eval do
-          define_method(:test) do
-            head(:no_content) && return if params[:id] == 'ping'
-            route_root = self.class.name.gsub(/Controller$/, '').underscore
-            key = "/#{route_root}/#{params[:id]}"
-            test_params = ComponentTestHelpers.cache_read(key)
-            @component_name = test_params[0]
-            @component_params = test_params[1]
-            html_block = test_params[2]
-            render_params = test_params[3]
-            render_on = render_params.delete(:render_on) || :client_only
-            _mock_time = render_params.delete(:mock_time)
-            style_sheet = render_params.delete(:style_sheet)
-            javascript = render_params.delete(:javascript)
-            code = render_params.delete(:code)
-            #page = "#{html_block}\n</body>\n"
-            page = "</body>\n"
-
-            page = '<%= react_component @component_name, @component_params, '\
-                   "{ prerender: #{render_on != :client_only} } %>\n#{page}" if @component_name
-            #page = "<body>\n#{page}"
-            unless render_on == :server_only
-              page = "<script type='text/javascript'>\n#{TOP_LEVEL_COMPONENT_PATCH}\n</script>\n#{page}" if @component_name
-              page = "<script type='text/javascript'>\n#{code}\n</script>\n#{page}" if code
-            end
-
-            if render_on != :server_only || Lolex.initialized?
-              page = "<script type='text/javascript'>\n#{TIME_COP_CLIENT_PATCH}\n</script>\n#{page}"
-            end
-
-            if (render_on != :server_only && !render_params[:layout]) || javascript
-              page = "<%= javascript_include_tag '#{javascript || 'application'}' %>\n#{page}"
-            end
-
-            if !render_params[:layout] || style_sheet
-              page = "<%= stylesheet_link_tag '#{style_sheet || 'application'}' %>\n#{page}"
-            end
-            page = "<script type='text/javascript'>go = function() "\
-                   "{window.hyper_spec_waiting_for_go = false}</script>\n#{page}"
-
-            if ComponentTestHelpers.current_example
-
-              title = view_context.escape_javascript(ComponentTestHelpers.current_example.description)
-              title = "#{title}...continued." if ComponentTestHelpers.description_displayed
-
-              page = "<script type='text/javascript'>console.log('%c#{title}',"\
-                     "'color:green; font-weight:bold; font-size: 200%')</script>\n#{page}"
-
-              ComponentTestHelpers.description_displayed = true
-            end
-            page = "<body>\n#{html_block}\n#{page}"
-            render_params[:inline] = page
-            response.headers['Cache-Control'] = 'max-age=120'
-            response.headers['X-Tracking-ID'] = '123456'
-            render render_params
-          end
-        end
-
-        begin
-          routes = ::Rails.application.routes
-          routes.disable_clear_and_finalize = true
-          routes.clear!
-          routes.draw do
-            get "/#{route_root}/:id", to: "#{route_root}#test"
-          end
-          ::Rails.application.routes_reloader.paths.each { |path| load(path) }
-          routes.finalize!
-          ActiveSupport.on_load(:action_controller) { routes.finalize! }
-        ensure
-          routes.disable_clear_and_finalize = false
-        end
-      end
-      if ping
-        "/#{route_root}/ping"
-      else
-        "/#{route_root}/#{ComponentTestHelpers.test_id}"
-      end
+    def build_test_url_for(controller = nil, ping = nil)
+      id = ping ? 'ping' : ComponentTestHelpers.test_id
+      "/#{route_root_for(controller)}/#{id}"
     end
 
     def insert_html(str)
@@ -313,9 +137,37 @@ module HyperSpec
 
     alias c? evaluate_ruby
 
-    # TODO: add a compile_ruby method.  refactor evaluate_ruby and expect_evaluate ruby to use common methods
+    # TODO: add a to_js method.  refactor evaluate_ruby and expect_evaluate ruby to use common methods
     # that process the params, and produce a ruby code string, and a resulting JS string
     # compile_ruby can be useful in seeing what code opal produces...
+
+    def to_js(p1 = nil, p2 = nil, p3 = nil, &block)
+      insure_page_loaded
+      # TODO:  better error message here...either you give us a block
+      # or first argument must be a hash or a string.
+      if p1.is_a? Hash
+        str = ''
+        p3 = p2
+        p2 = p1
+      else
+        str = p1
+      end
+      if p3
+        opts = p2
+        args = p3
+      elsif p2
+        opts = {}
+        args = p2
+      else
+        opts = args = {}
+      end
+
+      args.each do |name, value|
+        str = "#{set_local_var(name, value)}\n#{str}"
+      end
+      str = add_opal_block(str, block) if block
+      opal_compile(str)
+    end
 
     def expect_evaluate_ruby(p1 = nil, p2 = nil, p3 = nil, &block)
       insure_page_loaded
@@ -651,89 +503,6 @@ module HyperSpec
 
     def attributes_on_client(model)
       evaluate_ruby("#{model.class.name}.find(#{model.id}).attributes").symbolize_keys
-    end
-  end
-
-  RSpec.configure do |config|
-    config.before(:each) do |example|
-      ComponentTestHelpers.current_example = example
-      ComponentTestHelpers.description_displayed = false
-    end
-  end
-end
-
-module RSpec
-  module Expectations
-    class ExpectationTarget
-    end
-
-    module HyperSpecInstanceMethods
-
-      def self.included(base)
-        base.include HyperSpec::ComponentTestHelpers
-      end
-
-      def to_on_client(matcher, message = nil, &block)
-        evaluate_client('ruby').to(matcher, message, &block)
-      end
-
-      alias on_client_to to_on_client
-
-      def to_on_client_not(matcher, message = nil, &block)
-        evaluate_client('ruby').not_to(matcher, message, &block)
-      end
-
-      alias on_client_to_not to_on_client_not
-      alias on_client_not_to to_on_client_not
-      alias to_not_on_client to_on_client_not
-      alias not_to_on_client to_on_client_not
-
-      def to_then(matcher, message = nil, &block)
-        evaluate_client('promise').to(matcher, message, &block)
-      end
-
-      alias then_to to_then
-
-      def to_then_not(matcher, message = nil, &block)
-        evaluate_client('promise').not_to(matcher, message, &block)
-      end
-
-      alias then_to_not to_then_not
-      alias then_not_to to_then_not
-      alias to_not_then to_then_not
-      alias not_to_then to_then_not
-
-      private
-
-      def evaluate_client(method)
-        source = add_opal_block(@args_str, @target)
-        value = @target.binding.eval("evaluate_#{method}(#{source.inspect}, {}, {})")
-        ExpectationTarget.for(value, nil)
-      end
-    end
-
-    class OnClientWithArgsTarget
-      include HyperSpecInstanceMethods
-
-      def initialize(target, args)
-        unless args.is_a? Hash
-          raise ExpectationNotMetError,
-                "You must pass a hash of local var, value pairs to the 'with' modifier"
-        end
-
-        @target = target
-        @args_str = args.collect do |name, value|
-          set_local_var(name, value)
-        end.join("\n")
-      end
-    end
-
-    class BlockExpectationTarget < ExpectationTarget
-      include HyperSpecInstanceMethods
-
-      def with(args)
-        OnClientWithArgsTarget.new(@target, args)
-      end
     end
   end
 end

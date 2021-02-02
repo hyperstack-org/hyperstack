@@ -25,7 +25,7 @@ _test_gem: &_test_gem
     # must remove this zombie for new yarn to work
     - sudo rm -f /usr/local/bin/yarn
     - nvm install 10
-    - rvm install 2.5.1
+    - rvm install 2.6.3  # was 2.5.1
     - gem install bundler
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
   before_script:
