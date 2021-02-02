@@ -24,23 +24,6 @@ rescue LoadError
   nil
 end
 
-module Selenium
-  module WebDriver
-    class Logger
-      def deprecate(old, new = nil, **)
-        message = +"[DEPRECATION] #{old} is deprecated"
-        message << if new
-                     ". Use #{new} instead."
-                   else
-                     ' and will be removed in the next releases.'
-                   end
-
-        warn message
-      end
-    end
-  end
-end
-
 Parser::Builders::Default.emit_procarg0 = true
 
 # not available in parser 2.3
@@ -201,9 +184,8 @@ RSpec.configure do |config|
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    Capybara::Selenium::Driver.new(
-      app, browser: :chrome, driver_path: '/usr/lib/chromium-browser/chromedriver', options: options
-    )
+    Selenium::WebDriver::Chrome::Service.driver_path = '/usr/lib/chromium-browser/chromedriver'
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
 
   Capybara.register_driver :firefox_headless do |app|
