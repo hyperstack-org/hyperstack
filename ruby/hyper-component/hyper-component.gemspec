@@ -28,12 +28,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'mini_racer', '~> 0.2.6'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperstack::Component::VERSION
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'listen'
   spec.add_development_dependency 'mime-types'
+  spec.add_development_dependency 'mini_racer'
   spec.add_development_dependency 'nokogiri'
   spec.add_development_dependency 'opal-jquery'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
