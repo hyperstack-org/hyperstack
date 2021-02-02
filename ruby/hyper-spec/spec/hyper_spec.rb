@@ -22,7 +22,7 @@ describe 'hyper-spec', js: true do
 
   context "the client_option method" do
 
-    it "can render server side only" do
+    it "can render server side only", :prerendering_on do
       client_option render_on: :server_only
       mount 'SayHello', name: 'George'
       expect(page).to have_content('Hello there George')

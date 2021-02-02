@@ -9,6 +9,18 @@ require 'hyper-spec'
 require 'hyper-i18n'
 
 RSpec.configure do |config|
+
+  config.before :suite do
+    MiniRacer_Backup = MiniRacer
+    Object.send(:remove_const, :MiniRacer)
+  end
+
+  config.around(:each, :prerendering_on) do |example|
+    MiniRacer = MiniRacer_Backup
+    example.run
+    Object.send(:remove_const, :MiniRacer)
+  end
+
   config.color = true
   config.formatter = :documentation
   config.before(:all) do

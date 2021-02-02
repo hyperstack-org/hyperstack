@@ -18,7 +18,7 @@ describe 'Hyperstack::Component::Element', js: true do
   end
 
   describe "Event Subscription" do
-    it "keeps the original params, and ignores false, nil, and blank event names" do
+    it "keeps the original params, and ignores false, nil, and blank event names", :prerendering_on do
       client_option render_on: :both
       mount 'Foo' do
         class Foo

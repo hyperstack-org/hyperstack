@@ -22,7 +22,7 @@ describe 'I18n client methods', js: true do
     end
   end
   [['component rendering', :client_only], ['prerendering', :server_only]].each do |mode, flag|
-    it "will translate during #{mode}" do
+    it "will translate during #{mode}", prerendering_on: flag == :server_only do
       mount 'Components::TestComponent', {}, render_on: flag
       expect(find('#tp1')).to have_content('I am a key')
       expect(find('#tp2')).to have_content('Hello world')
