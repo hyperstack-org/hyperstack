@@ -13,7 +13,7 @@ RSpec.describe Hyperstack::Internal::Component::Rails::ComponentMount do
       expect(html).to match(/<div.*><\/div>/)
     end
 
-    it 'accepts a pre-render option' do
+    it 'accepts a pre-render option', :prerendering_on do
       html = helper.react_component('Components::HelloWorld', {}, prerender: true)
       expect(html).to match(/<div.*><span.*>Hello, World!<\/span><\/div>/)
     end

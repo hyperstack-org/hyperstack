@@ -45,7 +45,7 @@ describe "reactive-record edge cases", js: true do
   end
 
 
-  it "prerenders a belongs to relationship" do
+  it "prerenders a belongs to relationship", :prerendering_on do
     # must be first otherwise check for ajax fails because of race condition
     # with previous test
     user_item = User.create(name: 'Fred')
@@ -86,7 +86,7 @@ describe "reactive-record edge cases", js: true do
     end.to eq(1)
   end
 
-  it "fetches data during prerendering" do
+  it "fetches data during prerendering", :prerendering_on do
     5.times do |i|
       FactoryBot.create(:todo, title: "Todo #{i}")
     end

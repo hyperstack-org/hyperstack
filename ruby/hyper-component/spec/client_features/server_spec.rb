@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe 'React::Server', js: true do
+describe 'React::Server', :js, :prerendering_on do
 
   describe "render_to_string" do
     it "should render a React.Element to string" do

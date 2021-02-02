@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'listen', '~> 3.0' # for hot loader
-  spec.add_dependency 'mini_racer', '~> 0.2.6'
+  # spec.add_dependency 'mini_racer', '~> 0.2.6'
   spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 2.0'
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'uglifier'

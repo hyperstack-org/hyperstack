@@ -132,7 +132,7 @@ describe Hyperstack::Component::IsomorphicHelpers do
         end
       ]}
 
-      it 'raises an error when react cannot be loaded' do
+      it 'raises an error when react cannot be loaded', :prerendering_on do
         context = described_class.new('unique-id', v8_context, controller, name)
         context.instance_variable_set(:@ctx, test_context)
         expect {
@@ -140,7 +140,7 @@ describe Hyperstack::Component::IsomorphicHelpers do
         }.to raise_error(/No Hyperstack components found/)
       end
 
-      it 'executes method with args inside opal rubyracer context' do
+      it 'executes method with args inside opal rubyracer context', :prerendering_on do
         ctx = react_context
         context = described_class.new('unique-id', ctx, controller, name)
         context.eval(opal_code)
@@ -148,7 +148,7 @@ describe Hyperstack::Component::IsomorphicHelpers do
         expect(result).to eq('Hello, world!')
       end
 
-      it 'executes the method inside opal rubyracer context' do
+      it 'executes the method inside opal rubyracer context', :prerendering_on do
         ctx = react_context
         context = described_class.new('unique-id', ctx, controller, name)
         context.eval(opal_code)
