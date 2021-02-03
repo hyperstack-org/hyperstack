@@ -154,7 +154,7 @@ module HyperSpec
     def add_promise_wrapper(str)
 <<RUBY
   (#{str}).tap do |r|
-    if r.is_a?(Promise)
+    if defined?(Promise) && r.is_a?(Promise)
       r.then { |args| `window.hyper_spec_promise_result = [args]` }
     else
       #after(0) do
