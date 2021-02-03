@@ -1,7 +1,8 @@
 # see component_test_helpers_spec.rb for examples
 module HyperSpec
   module ComponentTestHelpers
-    def self.opal_compile(str)
+    def self.opal_compile(str, _opts = nil)
+      # _opts allows second dummy param to be passed from to_js
       Opal.compile(str)
     rescue Exception => e
       puts "puts could not compile: \n\n#{str}\n\n"
@@ -103,36 +104,21 @@ module HyperSpec
       end
     end
 
-    def evaluate_ruby(p1 = nil, p2 = nil, p3 = nil, &block)
+    def evaluate_ruby(*args, &block)
       insure_page_loaded
-      # TODO:  better error message here...either you give us a block
-      # or first argument must be a hash or a string.
-      if p1.is_a? Hash
-        str = ''
-        p3 = p2
-        p2 = p1
-      else
-        str = p1
-      end
-      if p3
-        opts = p2
-        args = p3
-      elsif p2
-        opts = {}
-        args = p2
-      else
-        opts = args = {}
-      end
-
-      args.each do |name, value|
-        str = "#{set_local_var(name, value)}\n#{str}"
-      end
-      str = add_opal_block(str, block) if block
+      str, opts = process_params(*args, &block)
+      str = add_promise_wrapper(str)
       js = opal_compile(str).gsub("// Prepare super implicit arguments\n", '')
                             .delete("\n").gsub('(Opal);', '(Opal)')
-      # workaround for firefox 58 and geckodriver 0.19.1, because firefox is unable to find .$to_json:
-      # JSON.parse(evaluate_script("(function(){var a=Opal.Array.$new(); a[0]=#{js}; return a.$to_json();})();"), opts).first
-      JSON.parse(evaluate_script("[#{js}].$to_json()"), opts).first
+      page.execute_script("window.hyper_spec_promise_result = false; #{js}")
+      Timeout.timeout(Capybara.default_max_wait_time) do
+        loop do
+          break if page.evaluate_script('!!window.hyper_spec_promise_result')
+
+          sleep 0.25
+        end
+      end
+      JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first
     end
 
     alias c? evaluate_ruby
@@ -141,56 +127,22 @@ module HyperSpec
     # that process the params, and produce a ruby code string, and a resulting JS string
     # compile_ruby can be useful in seeing what code opal produces...
 
-    def to_js(p1 = nil, p2 = nil, p3 = nil, &block)
-      insure_page_loaded
-      # TODO:  better error message here...either you give us a block
-      # or first argument must be a hash or a string.
-      if p1.is_a? Hash
-        str = ''
-        p3 = p2
-        p2 = p1
-      else
-        str = p1
-      end
-      if p3
-        opts = p2
-        args = p3
-      elsif p2
-        opts = {}
-        args = p2
-      else
-        opts = args = {}
-      end
-
-      args.each do |name, value|
-        str = "#{set_local_var(name, value)}\n#{str}"
-      end
-      str = add_opal_block(str, block) if block
-      opal_compile(str)
+    def to_js(*args, &block)
+      opal_compile *process_params(*args, &block)
     end
 
-    def expect_evaluate_ruby(p1 = nil, p2 = nil, p3 = nil, &block)
-      insure_page_loaded
-      if p1.is_a? Hash
-        str = ''
-        p3 = p2
-        p2 = p1
-      else
-        str = p1
-      end
-      if p3
-        opts = p2
-        args = p3
-      elsif p2
-        opts = {}
-        args = p2
-      else
-        opts = args = {}
-      end
-      args.each do |name, value|
+    def process_params(*args, &block)
+      args = ['', *args] if args[0].is_a? Hash
+      args = [args[0], {}, args[1] || {}] if args.length < 3
+      str, opts, vars = args
+      vars.each do |name, value|
         str = "#{name} = #{value.inspect}\n#{str}"
       end
-      expect(evaluate_ruby(add_opal_block(str, block), opts, {}))
+      [add_opal_block(str, block), opts]
+    end
+
+    def expect_evaluate_ruby(*args, &block)
+      expect(evaluate_ruby(*args, &block))
     end
 
     PRIVATE_VARIABLES = %i[
@@ -198,6 +150,21 @@ module HyperSpec
       @fixture_connections @connection_subscriber @loaded_fixtures @_hyperspec_private_client_options
       b __ _ _ex_ pry_instance _out_ _in_ _dir_ _file_
     ]
+
+    def add_promise_wrapper(str)
+<<RUBY
+  (#{str}).tap do |r|
+    if r.is_a?(Promise)
+      r.then { |args| `window.hyper_spec_promise_result = [args]` }
+    else
+      #after(0) do
+        #puts "setting window.hyper_spec_promise_result = [\#{r}]"
+        `window.hyper_spec_promise_result = [r]`
+      #end
+    end
+  end
+RUBY
+    end
 
     def add_locals(in_str, block)
       b = block.binding
@@ -258,27 +225,9 @@ module HyperSpec
       "#{add_locals(str, block)}\n#{Unparser.unparse ast.children.last}"
     end
 
-    def evaluate_promise(str = '', opts = {}, _dummy = nil, &block)
-      insure_page_loaded
-      str = add_opal_block(str, block)
-      str = "(#{str}).then { |args| args = [args]; `window.hyper_spec_promise_result = args` }"
-      js = opal_compile(str).gsub("\n","").gsub("(Opal);","(Opal)")
-      page.evaluate_script("window.hyper_spec_promise_result = false")
-      page.execute_script(js)
-      Timeout.timeout(Capybara.default_max_wait_time) do
-        loop do
-          sleep 0.25
-          break if page.evaluate_script("!!window.hyper_spec_promise_result")
-        end
-      end
-      JSON.parse(page.evaluate_script("window.hyper_spec_promise_result.$to_json()"), opts).first
-    end
+    alias evaluate_promise evaluate_ruby
 
-    alias promise? evaluate_promise
-
-    def expect_promise(str = '', opts = {}, &block)
-      expect(evaluate_promise(add_opal_block(str, block), opts))
-    end
+    alias expect_promise expect_evaluate_ruby
 
     def ppr(str)
       js = opal_compile(str).delete("\n").gsub('(Opal);', '(Opal)')

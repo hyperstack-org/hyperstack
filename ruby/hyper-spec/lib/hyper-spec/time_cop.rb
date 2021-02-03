@@ -156,7 +156,9 @@ else
 
       def run_pending_evaluations
         return if pending_evaluations.empty?
+        puts "time cop evaluating ruby"
         @capybara_page.evaluate_ruby(pending_evaluations.collect(&:call).join("\n"))
+        puts "done"
         @pending_evaluations ||= []
       end
     end

@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe 'hyper-spec', js: true do
+
+  after(:each) { |e| binding.pry if e.exception }
+
   it 'can visit a page' do
     visit 'test'
   end
@@ -198,7 +201,7 @@ describe 'hyper-spec', js: true do
 
     it "will use TimeCop travelling time with scaling" do
       Timecop.scale 60, Time.now-1.year do
-        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(2).of(Time.now.to_i)
+        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(3).of(Time.now.to_i)
         start_time = Time.now
         sleep 1 # sleep is still in "real time" but Time will move 60 times faster
         expect(start_time).to be_within(1).of(Time.now-1.minute)
