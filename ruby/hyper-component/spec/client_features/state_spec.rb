@@ -16,7 +16,7 @@ describe 'React::State', js: true do
     end.to eq('bar')
   end
 
-  it 'ignores state updates during rendering' do
+  it 'ignores state updates during rendering', :prerendering_on do
     client_option render_on: :both
     evaluate_ruby do
       class StateTest < Hyperloop::Component

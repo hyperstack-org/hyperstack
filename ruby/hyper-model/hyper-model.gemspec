@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
   spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
+  spec.add_development_dependency 'mini_racer'
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
   spec.add_development_dependency 'pry-rescue'

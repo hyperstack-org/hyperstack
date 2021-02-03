@@ -5,7 +5,7 @@ RSpec.describe Hyperstack::Internal::Component::Rails::ServerRendering::Contextu
   let(:init) { Proc.new {} }
   let(:options) { { context_initializer: init } }
 
-  describe '#render' do
+  describe '#render', :prerendering_on do
     it 'pre-renders HTML' do
       result = renderer.render('Components.Todo',
                                 { todo: 'finish reactive-ruby' },
