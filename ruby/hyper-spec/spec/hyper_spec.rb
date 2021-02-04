@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'hyper-spec', js: true do
 
-  after(:each) { |e| binding.pry if e.exception }
+  # after(:each) { |e| binding.pry if e.exception }
 
   it 'can visit a page' do
     visit 'test'
@@ -205,9 +205,9 @@ describe 'hyper-spec', js: true do
         start_time = Time.now
         sleep 1 # sleep is still in "real time" but Time will move 60 times faster
         expect(start_time).to be_within(1).of(Time.now-1.minute)
-        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(2).of(Time.now.to_i)
+        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(3).of(Time.now.to_i)
       end
-      expect(evaluate_ruby('Time.now.to_i')).to be_within(2).of(Time.now.to_i+@sync_gap)
+      expect(evaluate_ruby('Time.now.to_i')).to be_within(3).of(Time.now.to_i+@sync_gap)
     end
 
     it "will advance time along with time cop freezing" do
@@ -216,7 +216,7 @@ describe 'hyper-spec', js: true do
       Timecop.freeze Time.now-2.years
       expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(1).of(Time.now.to_i)
       Timecop.return
-      expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(2).of(Time.now.to_i+@sync_gap)
+      expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(3).of(Time.now.to_i+@sync_gap)
     end
 
     it "can temporarily return to true time" do

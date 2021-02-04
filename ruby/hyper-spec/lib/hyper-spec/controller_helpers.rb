@@ -4,16 +4,16 @@ module HyperSpec
   module ControllerHelpers
     # These methods are dependent on the stack being used.  See the
     # RailsControllerHelpers module and rack.rb for two implementations.
-    # Each method should append the appropriate data to the @page variable
+    # Each method should append the appropriate code to the @page array
 
-    # return an empty 204 status
-    # either by setting headers or returning and appropriate response for rack.
+    # return an empty 204 status either by setting headers or
+    # returning and appropriate response for rack.
     def ping!
       raise 'must implement'
     end
 
     def json!
-      # this can be a no-op but if json included by the application,
+      # this can be a no-op but if json is not included by the application,
       # hyper-spec will fail, with an error complaining about to_json
     end
 
@@ -69,7 +69,7 @@ module HyperSpec
       @render_on != :server_only
     end
 
-    # The controllers behavior is kept as an array of values in the ComponentTestHelpers cache
+    # The controllers behavior is kept as an array of values in the Controller cache
     # under a unique id for each test run.  Grab the parameters and move them to instance vars
 
     # If this is just a ping! Then we can just exit with nil.
@@ -78,7 +78,7 @@ module HyperSpec
       return if params[:id] == 'ping'
 
       key =               "/#{self.class.route_root}/#{params[:id]}"
-      test_params =       ComponentTestHelpers.cache_read(key)
+      test_params =       Internal::Controller.cache_read(key)
 
       @component_name =   test_params[0]
       @component_params = test_params[1]
@@ -106,7 +106,7 @@ module HyperSpec
 
     # patch time cop and lolex so they stay in sync across the client and server
     TIME_COP_CLIENT_PATCH =
-      Opal.compile(File.read(File.expand_path('../hyper-spec/time_cop.rb', __dir__))) +
+      Opal.compile(File.read(File.expand_path('../hyper-spec/internal/time_cop.rb', __dir__))) +
       "\n#{File.read(File.expand_path('../sources/lolex.js', __dir__))}"
 
     def client_code!
@@ -130,7 +130,7 @@ module HyperSpec
     # First lines displayed on the console will be the name of the spec
 
     def example_title!
-      title = ComponentTestHelpers.current_example_description!
+      title = Internal::Controller.current_example_description!
       @page << "<script type='text/javascript'>console.log('%c#{title}',"\
                "'color:green; font-weight:bold; font-size: 200%')</script>"
     end
@@ -149,11 +149,11 @@ module HyperSpec
       return ping! unless initialize!
 
       html_block!
-      example_title!                 if ComponentTestHelpers.current_example
+      example_title!                 if Internal::Controller.current_example
       go_function!                   if on_client?
       style_sheet!(style_sheet_file) if style_sheet_file
       application!(application_file) if application_file
-      json!                          # MUST BE AFTER application_file which
+      json!
       time_cop_patch!                if on_client? || Lolex.initialized?
       client_code!                   if on_client?
       mount_component!               if @component_name

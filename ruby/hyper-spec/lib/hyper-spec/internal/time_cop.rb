@@ -148,7 +148,7 @@ else
 
       def evaluate_ruby(&block)
         if @capybara_page
-          @capybara_page.evaluate_ruby(yield)
+          @capybara_page.on_client(yield)
         else
           pending_evaluations << block
         end
@@ -156,9 +156,7 @@ else
 
       def run_pending_evaluations
         return if pending_evaluations.empty?
-        puts "time cop evaluating ruby"
-        @capybara_page.evaluate_ruby(pending_evaluations.collect(&:call).join("\n"))
-        puts "done"
+        @capybara_page.on_client(pending_evaluations.collect(&:call).join("\n"))
         @pending_evaluations ||= []
       end
     end

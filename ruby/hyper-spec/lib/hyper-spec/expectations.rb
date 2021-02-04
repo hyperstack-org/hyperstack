@@ -4,7 +4,7 @@ module RSpec
     class ExpectationTarget; end
     module HyperSpecInstanceMethods
       def self.included(base)
-        base.include HyperSpec::ComponentTestHelpers
+        base.include HyperSpec::Helpers
       end
 
       def to_on_client(matcher, message = nil, &block)
