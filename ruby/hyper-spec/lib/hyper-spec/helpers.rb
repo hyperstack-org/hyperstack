@@ -124,6 +124,15 @@ module HyperSpec
 
     alias on_client internal_evaluate_ruby
 
+    # attempt to set the window to a particular size
+
+    def size_window(width = nil, height = nil)
+      hs_internal_resize_to(*adjust_size(width, height))
+    rescue StandardError => e
+      binding.pry
+      true
+    end
+
     # same signature as on_client, but just returns the compiled
     # js code.  Useful for debugging suspected issues with the
     # Opal compiler, etc.
@@ -201,42 +210,5 @@ module HyperSpec
 
     # short hand for use in pry sessions
     alias c? internal_evaluate_ruby
-
-    def size_window(width = nil, height = nil)
-      # return if @window_cannot_be_resized
-      # original_width = evaluate_script('window.innerWidth')
-      # original_height = evaluate_script('window.innerHeight')
-      width, height = [height, width] if width == :portrait
-      width, height = width if width.is_a? Array
-      portrait = true if height == :portrait
-
-      case width
-      when :small
-        width, height = [480, 320]
-      when :mobile
-        width, height = [640, 480]
-      when :tablet
-        width, height = [960, 640]
-      when :large
-        width, height = [1920, 6000]
-      when :default, nil
-        width, height = [1024, 768]
-      end
-
-      width, height = [height, width] if portrait
-
-      unless RSpec.configuration.debugger_width
-        Capybara.current_session.current_window.resize_to(1000, 500)
-        sleep RSpec.configuration.wait_for_initialization_time
-        wait_for_size(1000, 500)
-        inner_width = evaluate_script('window.innerWidth')
-        RSpec.configuration.debugger_width = 1000 - inner_width
-      end
-      Capybara.current_session.current_window
-              .resize_to(width + RSpec.configuration.debugger_width, height)
-      wait_for_size(width + RSpec.configuration.debugger_width, height)
-    rescue StandardError
-      true
-    end
   end
 end

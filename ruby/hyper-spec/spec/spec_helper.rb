@@ -17,13 +17,13 @@ module Helpers
   end
   def calculate_window_restrictions
     return if @min_width
-    size_window(100,100)
+    size_window(100, 100)
     @min_width = width
-    size_window(500,500)
-    @height_adjust = 500-height
+    size_window(500, 500)
+    @height_adjust = 500 - height
     size_window(6000, 6000)
     @max_width = width
-    @max_height = height
+    @max_height = height-@height_adjust
   end
   def height
     evaluate_script('window.innerHeight')
