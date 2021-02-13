@@ -1,7 +1,6 @@
 module HyperSpec
   module Internal
     module WindowSizing
-
       private
 
       STD_SIZES = {
@@ -12,7 +11,7 @@ module HyperSpec
         default: [1024, 768]
       }
 
-      def adjust_size(width, height)
+      def determine_size(width, height)
         width, height = [height, width] if width == :portrait
         width, height = width if width.is_a? Array
         portrait = true if height == :portrait
@@ -30,12 +29,10 @@ module HyperSpec
           inner_width = evaluate_script('window.innerWidth')
           1000 - inner_width
         end
-        puts "debugger_width: #{RSpec.configuration.debugger_width}"
         RSpec.configuration.debugger_width
       end
 
       def hs_internal_resize_to(width, height)
-        puts "hs_internal_resize_to(#{width}, #{height})"
         Capybara.current_session.current_window.resize_to(width, height)
         yield if block_given?
         wait_for_size(width, height)
@@ -48,7 +45,6 @@ module HyperSpec
         loop do
           sleep 0.05
           curr_size = evaluate_script('[window.innerWidth, window.innerHeight]')
-          puts "waiting for size: #{width}, #{height} currently: #{curr_size}"
 
           return true if curr_size == [width, height] || stalled?(prev_size, curr_size)
 

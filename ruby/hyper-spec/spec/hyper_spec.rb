@@ -317,7 +317,6 @@ RSpec::Steps.steps "will size_window to", js: true do
 
   it "the default portrait size" do
     size_window(:portrait)
-    binding.pry
     expect(dims).to eq(adjusted(768, 1024))
   end
 

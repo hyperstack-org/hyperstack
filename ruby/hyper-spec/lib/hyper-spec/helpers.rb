@@ -127,9 +127,8 @@ module HyperSpec
     # attempt to set the window to a particular size
 
     def size_window(width = nil, height = nil)
-      hs_internal_resize_to(*adjust_size(width, height))
-    rescue StandardError => e
-      binding.pry
+      hs_internal_resize_to(*determine_size(width, height))
+    rescue StandardError
       true
     end
 
