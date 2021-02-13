@@ -45,7 +45,7 @@ else
   require 'hyper-operation/transport/client_drivers'
   require 'hyper-operation/transport/acting_user'
   require 'opal-activesupport'
-  require 'hyper-operation/delay_and_interval'
+  # require 'hyper-operation/delay_and_interval'
   require 'hyper-operation/exception'
   require 'hyper-operation/promise'
   require 'hyper-operation/railway'
