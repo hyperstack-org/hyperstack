@@ -454,7 +454,7 @@ module ActiveRecord
                   [assoc.attribute, { id: [value]}]
                 end
               else
-                [key, [value]]
+                [*key, [value]]
               end
             end.compact
             ReactiveRecord::Base.load_data do
