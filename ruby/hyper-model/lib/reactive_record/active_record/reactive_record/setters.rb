@@ -68,6 +68,8 @@ module ReactiveRecord
     end
 
     def update_simple_attribute(attr, value)
+      debugger if attr.is_a?(Array) && attr.first.is_a?(Array) && attr.first.first.is_a?(Array)
+
       if data_loading?
         @synced_attributes[attr] = value
       else

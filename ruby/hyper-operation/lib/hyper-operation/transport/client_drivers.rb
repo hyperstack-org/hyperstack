@@ -120,7 +120,10 @@ module Hyperstack
                   },
                   received: function(data) {
                     if (#{ClientDrivers.env == 'development'}) { console.log("ActionCable received: ", data); }
+                    #{st = Time.now; puts "receiving at #{Time.now}"}
                     #{ClientDrivers.sync_dispatch(JSON.parse(`JSON.stringify(data)`)['data'])}
+                    #{puts "synced dispatch at #{Time.now} total time = #{Time.now - st}"
+                    }
                   }
                 }
               )

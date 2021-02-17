@@ -146,18 +146,25 @@ To determine this sync_scopes first asks if the record being changed is in the s
         # the broadcast record and the value on the client is out of sync
         # not running set_pre_sync_related_records will cause sync scopes
         # to refresh all related scopes
+        st = Time.now; puts "outer sync_scopes started at #{st}"
         Hyperstack::Internal::State::Mapper.bulk_update do
+          puts "getting started in #{Time.now - st}"
           record = broadcast.record_with_current_values
+          puts "record with current values in #{Time.now - st}"
           apply_to_all_collections(
             :set_pre_sync_related_records,
             record, broadcast.new?
           ) if record
+          puts "apply to all collections in #{Time.now - st}"
           record = broadcast.record_with_new_values
+          puts "record with new values in #{Time.now - st}"
           apply_to_all_collections(
             :sync_scopes,
             record, record.destroyed?
           )
+          puts "apply_to_all_collections round 2 in #{Time.now - st}"
           record.backing_record.sync_unscoped_collection! if record.destroyed? || broadcast.new?
+          puts "all done at #{Time.now} #{Time.now - st}"
         end
       end
 
@@ -249,10 +256,12 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
     # NOTE sync_scopes is overridden in scope_description.rb
     def sync_scopes(related_records, record, filtering = true)
+      st = Time.now; puts "in collection.sync_scopes start time = #{st}"
       #related_records = related_records.intersection([*@collection])
       related_records = in_this_collection(related_records) if filtering
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
       notify_of_change unless related_records.empty?
+      puts "leaving collection.sync_scopes at #{Time.now} total time: #{Time.now - st}"
     ensure
       @pre_sync_related_records = nil
     end

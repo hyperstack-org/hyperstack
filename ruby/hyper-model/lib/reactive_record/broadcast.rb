@@ -63,6 +63,7 @@ module ReactiveRecord
     end
 
     SendPacket.on_dispatch do |params|
+      ts = Time.now; puts "SendPacket.on_dispatch at #{ts}"
       in_transit[params.broadcast_id].receive(params) do |broadcast|
         if params.operation == :destroy
           ReactiveRecord::Collection.sync_scopes broadcast
@@ -70,6 +71,7 @@ module ReactiveRecord
           ReactiveRecord::Collection.sync_scopes broadcast.process_previous_changes
         end
       end
+      puts "leaving SendPacket.on_dispatch at #{Time.now} total time #{Time.now - ts}"
     end if RUBY_ENGINE == 'opal'
 
     def self.to_self(record, data = {})
@@ -87,14 +89,20 @@ module ReactiveRecord
     end
 
     def record_with_current_values
+      st = Time.now; puts "record_with_current_values starting at #{Time.now}"
       ReactiveRecord::Base.load_data do
+        puts "inside load_data block in #{Time.now - st}"
         backing_record = @backing_record || klass.find(record[:id]).backing_record
+        puts "got the backing_record in #{Time.now - st}"
         if destroyed?
           backing_record.ar_instance
         else
+          puts "starting merge in #{Time.now - st}"
           merge_current_values(backing_record)
         end
       end
+    ensure
+      puts "leaving record_with_current_values at #{Time.now} in #{Time.now - st}"
     end
 
     def record_with_new_values
@@ -156,13 +164,16 @@ module ReactiveRecord
     end
 
     def receive(params)
+      st = Time.now; puts "receive at #{st}"
       @destroyed = params.operation == :destroy
       @channels ||= Hyperstack::IncomingBroadcast.open_channels.intersection params.channels
       @received << params.channel
       @klass ||= params.klass
       @record.merge! params.record
       @previous_changes.merge! params.previous_changes
+      puts "before when_not_saving #{Time.now - st}"
       ReactiveRecord::Base.when_not_saving(klass) do
+        puts "now we are not saving #{Time.now - st}"
         @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
 
         # first check to see if we already destroyed it and if so exit the block
@@ -187,6 +198,7 @@ module ReactiveRecord
 
         # pusher fake can send duplicate records which will result in a nil broadcast
         # so we also check that before yielding
+        puts "before the yield #{Time.now - st}"
         if @channels == @received && (broadcast = complete!)
           yield broadcast
         end
@@ -221,6 +233,7 @@ module ReactiveRecord
     end
 
     def process_previous_changes
+      st = Time.now; puts "process_previous_changes started at #{st}"
       return self unless @backing_record
       integrity_check
       return self if destroyed?
@@ -230,9 +243,12 @@ module ReactiveRecord
         @previous_changes.delete(attr)
       end
       self
+    ensure
+      puts "process_previous_changes finished at #{Time.now} #{Time.now-st}"
     end
 
     def merge_current_values(br)
+      puts "merge_current_values started at #{st = Time.now}"
       current_values = Hash[*@previous_changes.collect do |attr, values|
         value = attr == :id ? record[:id] : values.first
         if br.attributes.key?(attr) &&
@@ -245,7 +261,10 @@ module ReactiveRecord
         end
         [attr, value]
       end.compact.flatten(1)]
+      puts "flattened in #{Time.now-st}"
       klass._react_param_conversion(br.attributes.merge(current_values))
+    ensure
+      puts "merge_current_values done in #{Time.now - st}"
     end
   end
 end

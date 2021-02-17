@@ -20,6 +20,7 @@ module ReactiveRecord
     end
 
     def sync_scopes(related_records, record, filtering = true)
+      st = Time.now; puts "in scoped_collection.sync_scopes start time = #{st}"
       filtering =
         @pre_sync_related_records && filtering &&
         ReactiveRecord::Base.catch_db_requests do
@@ -27,6 +28,7 @@ module ReactiveRecord
         end
       reload_from_db if !filtering && joins_with?(record)
       live_scopes.each { |scope| scope.sync_scopes(related_records, record, filtering) }
+      puts "leaving scoped_collection.sync_scopes at #{Time.now} total time: #{Time.now - st}"
     ensure
       @pre_sync_related_records = nil
     end

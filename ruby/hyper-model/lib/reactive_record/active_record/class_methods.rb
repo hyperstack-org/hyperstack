@@ -381,6 +381,7 @@ module ActiveRecord
     end
 
     def _react_param_conversion(param, opt = nil)
+      puts "_react_param_conversion(#{param}) started at #{st = Time.now}"
       param = Native(param)
       param = JSON.from_object(param.to_n) if param.is_a? Native::Object
       result =
@@ -453,8 +454,8 @@ module ActiveRecord
                 else
                   [assoc.attribute, { id: [value]}]
                 end
-              else
-                [*key, [value]]
+              elsif !key.is_a?(Array)
+                [key, [value]]
               end
             end.compact
             ReactiveRecord::Base.load_data do
@@ -465,6 +466,8 @@ module ActiveRecord
         end
 
       result
+    ensure
+      puts "_react_param_conversion finished at #{Time.now} (in #{Time.now - st})"
     end
   end
 end
