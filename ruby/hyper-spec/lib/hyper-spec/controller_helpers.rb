@@ -31,7 +31,7 @@ module HyperSpec
 
     # deliver the page.  The @page variable will contain the html ready to go,
     # any additional options that are passed through from the spec will be
-    # in the @render_params variable.  For example layout: 'my special layout'
+    # in the @render_params variable.  For example layout: 'my_special_layout'
 
     def deliver!
       raise 'must implement'
