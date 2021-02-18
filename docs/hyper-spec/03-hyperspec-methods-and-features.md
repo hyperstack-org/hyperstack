@@ -43,7 +43,7 @@ These methods have the following aliases to make your specs more readable:
 + [`to_not_then`](#client-expectation-targets)
 + [`not_to_then`](#client-expectation-targets)
 
-
+in addition
 + [`with`](#client-expectation-targets) - can be chained with the above methods to pass data to initialize local variables on the client
 
 ### Other Debugging Aids
