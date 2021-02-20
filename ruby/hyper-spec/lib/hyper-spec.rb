@@ -3,20 +3,31 @@ require 'action_view'
 require 'opal'
 require 'unparser'
 require 'method_source'
-require 'hyper-spec/time_cop.rb'
 require 'filecache'
 
 require 'capybara/rspec'
-require 'hyper-spec/component_test_helpers'
+require 'hyper-spec/internal/client_execution'
+require 'hyper-spec/internal/component_mount'
+require 'hyper-spec/internal/controller'
+require 'hyper-spec/internal/copy_locals'
+require 'hyper-spec/internal/patches'
+require 'hyper-spec/internal/rails_controller_helpers'
+require 'hyper-spec/internal/time_cop.rb'
+require 'hyper-spec/internal/window_sizing'
+
 require 'hyper-spec/controller_helpers'
-require 'hyper-spec/patches'
-require 'hyper-spec/rails_controller_helpers'
-require 'hyper-spec/version'
+
 require 'hyper-spec/wait_for_ajax'
+
+require 'hyper-spec/helpers'
 require 'hyper-spec/expectations'
+
 require 'parser/current'
 require 'selenium/web_driver/firefox/profile'
 require 'selenium-webdriver'
+
+require 'hyper-spec/version'
+
 
 begin
   require 'pry'
@@ -109,7 +120,7 @@ RSpec.configure do |config|
 end
 
 RSpec.configure do |config|
-  config.include HyperSpec::ComponentTestHelpers
+  config.include HyperSpec::Helpers
   config.include HyperSpec::WaitForAjax
   config.include Capybara::DSL
 
@@ -153,8 +164,8 @@ end
 # Capybara config
 RSpec.configure do |config|
   config.before(:each) do |example|
-    HyperSpec::ComponentTestHelpers.current_example = example
-    HyperSpec::ComponentTestHelpers.description_displayed = false
+    HyperSpec::Internal::Controller.current_example = example
+    HyperSpec::Internal::Controller.description_displayed = false
   end
 
   config.add_setting :wait_for_initialization_time

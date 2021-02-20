@@ -65,7 +65,7 @@ RSpec.configure do |config|
     end
   end
 
-  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
+  HyperSpec::Helpers.alias_method :on_client, :before_mount
 end
 
 # Stubbing the React calls so we can test outside of Opal

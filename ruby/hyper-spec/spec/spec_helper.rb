@@ -15,27 +15,37 @@ module Helpers
       "window.getComputedStyle(document.querySelector('#{selector}'))['#{prop}']"
     )
   end
+
   def calculate_window_restrictions
     return if @min_width
-    size_window(100,100)
+
+    size_window(100, 100)
     @min_width = width
-    size_window(500,500)
-    @height_adjust = 500-height
+    @min_height = height
+    size_window(500, 500)
+    @height_adjust = 500 - height
     size_window(6000, 6000)
     @max_width = width
     @max_height = height
   end
+
   def height
     evaluate_script('window.innerHeight')
   end
+
   def width
     evaluate_script('window.innerWidth')
   end
+
   def dims
     [width, height]
   end
+
   def adjusted(width, height)
-    [[@max_width, [width, @min_width].max].min, [@max_height, height-@height_adjust].min]
+    [
+      [@max_width, [width, @min_width].max].min,
+      [@max_height, [height - @height_adjust, @min_height].max].min
+    ]
   end
 end
 

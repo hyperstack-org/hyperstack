@@ -9,7 +9,9 @@ module Hyperstack
         module ServerRendering
           class HyperTestAssetContainer
             def find_asset(logical_path)
-              HyperSpec::ComponentTestHelpers.cache_read(logical_path)
+              # we skip the container if it raises an error so we
+              # don't care if we are running under hyperspec or not
+              HyperSpec::Internal::Controller.cache_read(logical_path)
             end
           end
 
@@ -24,7 +26,7 @@ module Hyperstack
               if React::ServerRendering::WebpackerManifestContainer.compatible?
                 @ass_containers << React::ServerRendering::WebpackerManifestContainer.new
               end
-              @ass_containers << HyperTestAssetContainer.new  if ::Rails.env.test?
+              @ass_containers << HyperTestAssetContainer.new
             end
 
             def find_asset(logical_path)

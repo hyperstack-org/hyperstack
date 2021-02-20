@@ -148,7 +148,7 @@ else
 
       def evaluate_ruby(&block)
         if @capybara_page
-          @capybara_page.evaluate_ruby(yield)
+          @capybara_page.internal_evaluate_ruby(yield)
         else
           pending_evaluations << block
         end
@@ -156,7 +156,7 @@ else
 
       def run_pending_evaluations
         return if pending_evaluations.empty?
-        @capybara_page.evaluate_ruby(pending_evaluations.collect(&:call).join("\n"))
+        @capybara_page.internal_evaluate_ruby(pending_evaluations.collect(&:call).join("\n"))
         @pending_evaluations ||= []
       end
     end
