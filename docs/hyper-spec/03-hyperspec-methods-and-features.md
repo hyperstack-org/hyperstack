@@ -1,4 +1,4 @@
-# Summary of Methods and Features
+# HyperSpec Methods and Features
 
 ### Expectation Helpers
 
@@ -69,6 +69,10 @@ You can use the Timecop gem to control the flow of time within your specs.  Hype
 
 See the [Client Initialization Options](#client-initialization-options) section for how to control the client time zone, and clock resolution.
 
+### The `no_reset` flag
+
+By default the client environment will be reinitialized at the beginning of every spec.  If this is not needed you can speed things up by adding the `no_reset` flag to a block of specs.
+
 # Details
 
 ### The `on_client` method
@@ -129,9 +133,42 @@ across blocks executed on the client.  For example:
   end
 ```
 
+> Be especially careful of this this when using the [`no_reset`](#the-no_reset-flag) as instance variables will retain their values between each spec in this mode.
+
+#### White and Black Listing Variables
+
+By default all local variables, memoized variables, and instance variables in scope in the spec will be copied to the client.  This can be controlled through the `include_vars` and `exclude_vars` [client options](#client-initialization-options).
+
+`include_vars` can be set to  
++ an array of symbols: only those vars will be copied,
++ a single symbol: only that var will be copied,
++ any other truthy value: all vars will be copied (the default)
++ or nil, false, or an empty array: no vars will be copied.
+
+`exclude_vars` can be set to
++ an array of symbols - those vars will **not** be copied,
++ a single symbol - only that var will be excluded,
++ any other truthy value - no vars will be copied,
++ or nil, false, or an empty array - all vars will be copied (the default).
+
+Examples:
+
+```Ruby
+  # don't copy vars at all.
+  client_option exclude_vars: true
+  # only copy var1 and the instance var @var2
+  client_option include_vars: [:var1, :@var2]
+  # only exclude foo_var
+  client_option exclude_vars: :foo_var
+```
+
+Note that the exclude_vars list will take precedence over the include_vars list.
+
+The exclude/include lists can be overridden on an individual spec using the `with` method - See [Client Expectation Targets](#client-expectation-targets).
+
 ### The `isomorphic` method
 
-The `isomorphic` works the same as `on_client` but in addition it also executes the same block on the server. It is especially useful when doing some testing of
+The `isomorphic` method works the same as `on_client` but in addition it also executes the same block on the server. It is especially useful when doing some testing of
 ActiveRecord models, where you might want to modify the behavior of the model on server and the client.
 
 ```ruby
@@ -148,25 +185,26 @@ ActiveRecord models, where you might want to modify the behavior of the model on
   end
 ```
 
-
 ### Client Initialization Options
 
 The first time a spec runs code on the client, it has to initialize a browser context.  You can use the `client_options` (aka `client_option`) method to specify the following options when the page is loaded.
 
 + `time_zone` - browsers always run in the local time zone, if you want to force the browser to act as if its in a different zone, you can use the time_zone option, and provide any valid zone that the rails `in_time_zone` method will accept.<br/>
-Example: `client_option 'WorldClock', time_zone: 'Hawaii'`
-+ `render_on`: `:client_only` (default), `:server_only`, or `:both`  
-Hyperstack components can be prerendered on the server.  The `render_on` option controls this feature.  For example `server_only` is useful to insure components are properly prerendered.  *(See the mount method below for more details on rendering components)*
+Example: `client_option time_zone: 'Hawaii'`
 + `clock_resolution`:  Indicates the resolution that the simulated clock will run at on the client, when using the TimeCop gem.  The default value is 20 (milliseconds).
++ `include_vars`: white list of all vars to be copied to the client.  See [Accessing Variables on the Client](#accessing-variables-on-the-client) for details.
++ `exclude_vars`: black list of all vars not to be copied to the client.  See [Accessing Variables on the Client](#accessing-variables-on-the-client) for details.
++ `render_on`: `:client_only` (default), `:server_only`, or `:both`  
+Hyperstack components can be prerendered on the server.  The `render_on` option controls this feature.  For example `server_only` is useful to insure components are properly prerendered.  *See the `mount` method [below](#mounting-components) for more details on rendering components*
 + `no_wait`: After the page is loaded the system will by default wait until all javascript requests to the server complete, before proceeding. Specifying `no_wait: true` will skip this.
 + `javascript`: The javascript asset to load when mounting the component.  By default it will be `application` (.js is assumed).  Note that the standard Hyperstack configuration will compile all the client side Ruby assets as well as javascript packages into the `application.js` file, so the default will work fine.
 + `style_sheet`: The style sheet asset to load when mounting the component.  By default it will be `application` (.css is assumed).
-+ `controller` - **expert zone** specify a controller that will be used to mount the
++ `controller` - **(expert zone!)** specify a controller that will be used to mount the
 component.  By default hyper-spec will build a controller and route to handle the request from the client to mount the component.
 
 Any other options not listed above will be passed along to the Rail's controller `render` method.  So for example you could specify some other specific layout using `client_option layout: 'special_layout'`
 
-Note that this method can be used in the before(:each) block of a spec context, to provide options for all the specs in the block.
+Note that this method can be used in the `before(:each)` block of a spec context to provide options for all the specs in the block.
 
 ### Mounting Components
 
@@ -189,7 +227,7 @@ The `mount` method is used to render a component on a page:
 
 The `mount` method has a few options.  In it's simplest form you specify just the name of the component that is already defined in your hyperstack code and it will be mounted.
 
-You can add parameters that will be passed to the component as in the above example.  As the above example also shows you can also define code within the block. The code does not have to be the component being mounted, but might be just some logic to help with the test.
+You can add parameters that will be passed to the component as in the above example.  As the above example also shows you can also define code within the block. This is just shorthand for defining the code before hand using `on_client`.  The code does not have to be the component being mounted, but might be just some logic to help with the test.
 
 In addition `mount` can take any of the options provided to `client_options` (see above.)   To provide these options, you must provide a (possibly) empty params hash.  For example:  
 ```ruby
@@ -238,20 +276,20 @@ Components *receive* parameters, and may send callbacks and events back out.  To
   end
 ```
 
-> Note that you must declare the params as type Proc, or use
-the fires method to declare an event, for the history mechanism to work.
+> Note that you must declare the params as type `Proc`, or use
+the `fires` method to declare an event for the history mechanism to work.
 
 ### Other Helpers
 
 #### `before_mount`
 
-Specifies a block of code to be executed before the first call to `mount`, `isomorphic` or `on_client`.  This is primarly useful to add to a rspec before(:each) block containing common client code needed by all the specs in the context.  
+Specifies a block of code to be executed before the first call to `mount`, `isomorphic` or `on_client`.  This is primarly useful to add to an rspec `before(:each)` block containing common client code needed by all the specs in the context.  
 
 > Unlike `mount`, `isomorphic` and `on_client`, `before_mount` does not load the client page, but will wait for the first of the other methods to be called.
 
 #### `run_on_client`
 
-same as `on_client` but no value is returned.  Useful when the return value may be to complex to marshall and unmarshall using JSON.
+same as `on_client` but no value is returned.  Useful when the return value may be too complex to marshall and unmarshall using JSON.
 
 #### `reload_page`
 
@@ -259,7 +297,7 @@ Shorthand for `mount` with no parameters.   Useful if you need to reset the clie
 
 #### `add_class`
 
-Adds a CSS class.  The first parameter is the name of the class, and the second is a hash of styles, represented in the react style format.
+Adds a CSS class.  The first parameter is the name of the class, and the second is a hash of styles, represented in the React [style format.](https://reactjs.org/docs/dom-elements.html#style)
 
 Example: `add_class :some_class, borderStyle: :solid` adds a class with style `border-style: 'solid'`  
 
@@ -283,7 +321,7 @@ So for example the following are all equivalent:
 
 #### `attributes_on_client`
 
-returns any `ActiveModel` attributes loaded on the client.  HyperModel will normally begin a load cycle as soon as you access the attribute of a client.  However it is sometimes useful to see what attributes have already been loaded.
+returns any `ActiveModel` attributes loaded on the client.  HyperModel will normally begin a load cycle as soon as you access the attribute on the client.  However it is sometimes useful to see what attributes have already been loaded.
 
 ### Client Expectation Targets
 
@@ -326,8 +364,7 @@ In addition the `with` method can be chained with the above methods to pass data
   end
 ```
 
-Note that there are other ways to pass values into the client context as noted above but the `with` might be preferable to some to keep things
-nicely localized.
+By default HyperSpec will copy all local variables, memoized variables, and instance variables defined in a spec to the client.  The specific variables can also be white listed and black listed.  The `with` method overrides any white or black listed values.  So for example if you prefer to use the more explicit `with` method to pass values to the client, you can add `client_option exclude_vars: true` in a `before(:all)` block in your spec helper.  See [Accessing Variables on the Client](#accessing-variables-on-the-client) for details.
 
 ### Useful Debug Methods
 
@@ -357,6 +394,11 @@ javascript object.
 #### `c?`
 
 Shorthand for `on_console`, useful for entering expressions in pry console, to investigate the state of the client.
+
+```ruby
+pry:> c? { puts 'hello on the console' } # prints hello on the client
+-> nil
+```
 
 #### `debugger`
 

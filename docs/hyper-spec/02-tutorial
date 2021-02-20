@@ -96,7 +96,7 @@ will see will continue to be available to us later in the spec.
 > something like `let` be used here instead of an instance variable. Shall we
 > say its on the todo list.
 
-Now that we have our test component setup we can test its `format_number`
+Now that we have our test component setup we can test it's `format_number`
 method.  To do this we put the test expression in a block followed by
 `on_client_to`.  Again the block will be compiled using Opal, executed on
 the client, and the result will be returned to the expectation.
@@ -113,7 +113,7 @@ This has covered the basics of Hyperspec - in summary:
 for unit testing components.
 + `on_client`:  Execute Ruby code on the client (and return the result).
 + `on_client_to`: Execute the expectation block on the client, and then check
-the expectation (on the server.) 
+the expectation (on the server.)
 + Instance variables retain their values between client execution blocks.
 + All variables accessible to the spec are copied to the client if possible.
 

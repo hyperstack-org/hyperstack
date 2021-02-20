@@ -3,6 +3,7 @@ module HyperSpec
     include Internal::ClientExecution
     include Internal::Controller
     include Internal::ComponentMount
+    include Internal::CopyLocals
     include Internal::WindowSizing
 
     ##
@@ -90,6 +91,8 @@ module HyperSpec
     def client_option(opts = {})
       @_hyperspec_private_client_options ||= {}
       @_hyperspec_private_client_options.merge! opts
+      build_var_inclusion_lists
+      @_hyperspec_private_client_options
     end
 
     alias client_options client_option

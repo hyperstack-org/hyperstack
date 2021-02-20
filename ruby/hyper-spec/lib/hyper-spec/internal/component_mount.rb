@@ -91,6 +91,22 @@ module HyperSpec
         @_hyperspec_private_html_block = nil
       end
 
+      # test_code_key = "hyper_spec_prerender_test_code.js"
+      # if defined? ::Hyperstack::Component
+      #   @@original_server_render_files ||= ::Rails.configuration.react.server_renderer_options[:files]
+      #   if opts[:render_on] == :both || opts[:render_on] == :server_only
+      #     unless opts[:code].blank?
+      #       ComponentTestHelpers.cache_write(test_code_key, opts[:code])
+      #       ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files + [test_code_key]
+      #       ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
+      #     else
+      #       ComponentTestHelpers.cache_delete(test_code_key)
+      #       ::Rails.configuration.react.server_renderer_options[:files] = @@original_server_render_files
+      #       ::React::ServerRendering.reset_pool # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher doesnt look for cache changes
+      #     end
+      #   end
+      # end
+
       def setup_prerendering(opts)
         return unless defined?(::Hyperstack::Component) && prerendering?(opts)
 
@@ -100,7 +116,7 @@ module HyperSpec
           Controller.cache_delete(TEST_CODE_KEY)
         else
           Controller.cache_write(TEST_CODE_KEY, opts[:code])
-          @@original_server_render_files += [TEST_CODE_KEY]
+          ::Rails.configuration.react.server_renderer_options[:files] += [TEST_CODE_KEY]
         end
         ::React::ServerRendering.reset_pool
         # make sure contexts are reloaded so they dont use code from cache, as the rails filewatcher

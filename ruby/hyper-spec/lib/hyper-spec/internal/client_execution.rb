@@ -8,36 +8,6 @@ module HyperSpec
 
       private
 
-      PRIVATE_VARIABLES = %i[
-        @__inspect_output @__memoized @example @_hyperspec_private_client_code
-        @_hyperspec_private_html_block @fixture_cache
-        @fixture_connections @connection_subscriber @loaded_fixtures
-        @_hyperspec_private_client_options
-        b __ _ _ex_ pry_instance _out_ _in_ _dir_ _file_
-      ]
-
-      def add_locals(in_str, block)
-        b = block.binding
-
-        memoized = b.eval('__memoized').instance_variable_get(:@memoized)
-        in_str = memoized.inject(in_str) do |str, pair|
-          "#{str}\n#{set_local_var(pair.first, pair.last)}"
-        end if memoized
-
-        in_str = b.local_variables.inject(in_str) do |str, var|
-          next str if PRIVATE_VARIABLES.include? var
-
-          "#{str}\n#{set_local_var(var, b.local_variable_get(var))}"
-        end
-
-        in_str = b.eval('instance_variables').inject(in_str) do |str, var|
-          next str if PRIVATE_VARIABLES.include? var
-
-          "#{str}\n#{set_local_var(var, b.eval("instance_variable_get('#{var}')"))}"
-        end
-        in_str
-      end
-
       def add_opal_block(str, block)
         return str unless block
 
@@ -113,17 +83,6 @@ module HyperSpec
           node.children.first.type == :send
       end
 
-      def set_local_var(name, object)
-        serialized = object.opal_serialize
-        if serialized
-          "#{name} = #{serialized}"
-        else
-          "self.class.define_method(:#{name}) "\
-          "{ raise 'Attempt to access the variable #{name} "\
-          'that was defined in the spec, but its value could not be serialized '\
-          "so it is undefined on the client.' }"
-        end
-      end
 
       def opal_compile(str, *)
         Opal.hyperspec_compile(str)
