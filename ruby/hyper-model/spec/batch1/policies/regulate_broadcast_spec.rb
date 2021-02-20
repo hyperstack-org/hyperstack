@@ -56,7 +56,7 @@ describe "regulate_broadcast" do
     )
   end
 
-  it "will raise an error if the policy is not sent" do
+  it "will raise an error if the to method is not used" do
     stub_const "TestModel1Policy", Class.new
     TestModel1Policy.class_eval do
       regulate_broadcast do | policy |
@@ -67,6 +67,19 @@ describe "regulate_broadcast" do
     expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.
     to raise_error("TestModel1 instance broadcast policy not sent to any channel")
   end
+
+  it "will not raise an error if sending to the empty set" do
+    stub_const "TestModel1Policy", Class.new
+    TestModel1Policy.class_eval do
+      regulate_broadcast do | policy |
+        policy.send_all.to
+      end
+    end
+    model = TestModel1.new(id: 1, attr1: 1, attr2: 2, attr3: 3, attr4: 4, attr5: 5)
+    expect { |b| Hyperstack::InternalPolicy.regulate_broadcast(model, &b) }.
+    not_to raise_error("TestModel1 instance broadcast policy not sent to any channel")
+  end
+
 
   it "will intersect all policies for the same channel" do
     stub_const "TestModel1Policy", Class.new

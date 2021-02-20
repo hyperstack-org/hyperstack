@@ -328,9 +328,9 @@ module Hyperstack
       regulations[instance].regulations.each do |regulation|
         instance.instance_exec wrap_policy(policy, regulation), &regulation
       end
-      if policy.has_unassigned_sets?
-        raise "#{instance.class.name} instance broadcast policy not sent to any channel"
-      end
+      return if policy.has_to_been_called?
+
+      raise "#{instance.class.name} instance broadcast policy not sent to any channel"
     end
   end
 
@@ -425,10 +425,15 @@ module Hyperstack
     end
 
     def send_set_to(send_set, channels)
+      @to_has_been_called = true
       channels.flatten(1).each do |channel|
         merge_set(send_set, channel) if channel_available? channel
         @unassigned_send_sets.delete(send_set)
       end
+    end
+
+    def has_to_been_called?
+      !has_unassigned_sets? || @to_has_been_called
     end
 
     def merge_set(send_set, channel)
