@@ -55,11 +55,13 @@ module HyperSpec
 
       def insure_page_loaded(only_if_code_or_html_exists = nil)
         return if only_if_code_or_html_exists && !@_hyperspec_private_client_code && !@_hyperspec_private_html_block
+
         # if we are not resetting between examples, or think its mounted
         # then look for Opal, but if we can't find it, then ping to clear and try again
         if !HyperSpec.reset_between_examples? || page.instance_variable_get('@hyper_spec_mounted')
           r = evaluate_script('Opal && true') rescue nil
           return if r
+
           page.visit build_test_url_for(nil, true) rescue nil
         end
         load_page

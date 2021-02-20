@@ -2,8 +2,6 @@ require 'spec_helper'
 
 describe 'hyper-spec', js: true do
 
-  # after(:each) { |e| binding.pry if e.exception }
-
   it 'can visit a page' do
     visit 'test'
   end
@@ -21,6 +19,14 @@ describe 'hyper-spec', js: true do
       end
     end
     expect(page).to have_content('Now how cool is that???')
+  end
+
+  it 'can add some html code before mounting' do
+    insert_html <<-HTML
+      <DIV>insert some code</DIV>
+    HTML
+    mount
+    expect(page).to have_content('insert some code')
   end
 
   context "the client_option method" do

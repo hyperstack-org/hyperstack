@@ -71,13 +71,13 @@ end
 If you are familiar with Capybara then the first spec should
 look similar to an integration spec.  The difference is instead
 of visiting a page, we `mount` the `OrdersShipped` component on a blank page
-that hyper-spec will set up for us.  This let's us unit test
+that hyper-spec will set up for us.  This lets us unit test
 components outside of any application specific view logic.
 
 > Note that like Capybara we indicate that a client environment should
 > be set up by adding the :js tag.
 
-Once mounted we can use Capybara finders and matchers, to check
+Once mounted we can use Capybara finders and matchers to check
 if our content is as expected.  Because we are running on the server
 we can easily add and delete orders, and check the response on the UI.
 
@@ -96,7 +96,7 @@ will see will continue to be available to us later in the spec.
 > something like `let` be used here instead of an instance variable. Shall we
 > say its on the todo list.
 
-Now that we have our test component setup we can test it's `format_number`
+Now that we have our test component setup we can test its `format_number`
 method.  To do this we put the test expression in a block followed by
 `on_client_to`.  Again the block will be compiled using Opal, executed on
 the client, and the result will be returned to the expectation.

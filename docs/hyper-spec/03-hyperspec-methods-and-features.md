@@ -8,6 +8,7 @@ These can be used any where within your specs:
 + [`isomorphic`](#the-isomorphic-method) - executes code on the client *and* the server
 + [`mount`](#mounting-components) - mounts a hyperstack component in an empty window
 + [`before_mount`](#before_mount) - specifies a block of code to be executed before the first call to `mount`, `isomorphic` or `on_client`
++ [`insert_html`](#insert_html) - insert some html into a page
 + [`client_options`](#client-initialization-options) - allows options to be specified globally
 + [`run_on_client`](#run_on_client) - same as `on_client` but no value is returned
 + [`reload_page`](#reload_page) - resets the page environment
@@ -50,7 +51,8 @@ in addition
 
 The following methods are used primarly at a debug break point, most require you use binding.pry as your debugger:
 
-+ [`to_js`](#to_js) - returns the ruby code compiled to JS.  
++ [`to_js`](#to_js) - returns the ruby code compiled to JS.
++ [`c?`](#c?) - alias for `on_client`.  
 + [`ppr`](#ppr) - print the results of the ruby expression on the client console.
 + [`debugger`](#debugger) - Sets a debug breakpoint on code running on the client.
 + [`open_in_chrome`](#open_in_chrome) - Opens a chrome browser that will load the current state.  
@@ -65,7 +67,7 @@ DRIVER=chrome bundle exec rspec
 
 ### Timecop Integration
 
-You can use the Timecop gem to control the flow of time within your specs.  Hyperspec will coordinate things with the client so the time on the client is kept in sync with the time on the server.  So for example if you use Timecop to advance time 1 day on the server, time on the browser will also advance by one day.  
+You can use the [`timecop` gem](https://github.com/travisjeffery/timecop) to control the flow of time within your specs.  Hyperspec will coordinate things with the client so the time on the client is kept in sync with the time on the server.  So for example if you use Timecop to advance time 1 day on the server, time on the browser will also advance by one day.  
 
 See the [Client Initialization Options](#client-initialization-options) section for how to control the client time zone, and clock resolution.
 
@@ -133,7 +135,7 @@ across blocks executed on the client.  For example:
   end
 ```
 
-> Be especially careful of this this when using the [`no_reset`](#the-no_reset-flag) as instance variables will retain their values between each spec in this mode.
+> Be especially careful of this when using the [`no_reset`](#the-no_reset-flag) as instance variables will retain their values between each spec in this mode.
 
 #### White and Black Listing Variables
 
@@ -164,7 +166,15 @@ Examples:
 
 Note that the exclude_vars list will take precedence over the include_vars list.
 
-The exclude/include lists can be overridden on an individual spec using the `with` method - See [Client Expectation Targets](#client-expectation-targets).
+The exclude/include lists can be overridden on an individual call to on_client by providing a hash of names and values to on_client:
+
+```ruby
+  result = on_client(var: 12) { var * var }
+  expect(result).to eq(144)
+```
+
+You can do the same thing on expectations using the `with` method - See [Client Expectation Targets](#client-expectation-targets).
+
 
 ### The `isomorphic` method
 
@@ -196,7 +206,7 @@ Example: `client_option time_zone: 'Hawaii'`
 + `exclude_vars`: black list of all vars not to be copied to the client.  See [Accessing Variables on the Client](#accessing-variables-on-the-client) for details.
 + `render_on`: `:client_only` (default), `:server_only`, or `:both`  
 Hyperstack components can be prerendered on the server.  The `render_on` option controls this feature.  For example `server_only` is useful to insure components are properly prerendered.  *See the `mount` method [below](#mounting-components) for more details on rendering components*
-+ `no_wait`: After the page is loaded the system will by default wait until all javascript requests to the server complete, before proceeding. Specifying `no_wait: true` will skip this.
++ `no_wait`: After the page is loaded the system will by default wait until all javascript requests to the server complete before proceeding. Specifying `no_wait: true` will skip this.
 + `javascript`: The javascript asset to load when mounting the component.  By default it will be `application` (.js is assumed).  Note that the standard Hyperstack configuration will compile all the client side Ruby assets as well as javascript packages into the `application.js` file, so the default will work fine.
 + `style_sheet`: The style sheet asset to load when mounting the component.  By default it will be `application` (.css is assumed).
 + `controller` - **(expert zone!)** specify a controller that will be used to mount the
@@ -287,6 +297,12 @@ Specifies a block of code to be executed before the first call to `mount`, `isom
 
 > Unlike `mount`, `isomorphic` and `on_client`, `before_mount` does not load the client page, but will wait for the first of the other methods to be called.
 
+#### `add_class`
+
+Adds a CSS class.  The first parameter is the name of the class, and the second is a hash of styles, represented in the React [style format.](https://reactjs.org/docs/dom-elements.html#style)
+
+Example: `add_class :some_class, borderStyle: :solid` adds a class with style `border-style: 'solid'`  
+
 #### `run_on_client`
 
 same as `on_client` but no value is returned.  Useful when the return value may be too complex to marshall and unmarshall using JSON.
@@ -294,12 +310,6 @@ same as `on_client` but no value is returned.  Useful when the return value may 
 #### `reload_page`
 
 Shorthand for `mount` with no parameters.   Useful if you need to reset the client within a spec.
-
-#### `add_class`
-
-Adds a CSS class.  The first parameter is the name of the class, and the second is a hash of styles, represented in the React [style format.](https://reactjs.org/docs/dom-elements.html#style)
-
-Example: `add_class :some_class, borderStyle: :solid` adds a class with style `border-style: 'solid'`  
 
 #### `size_window`
 
@@ -322,6 +332,11 @@ So for example the following are all equivalent:
 #### `attributes_on_client`
 
 returns any `ActiveModel` attributes loaded on the client.  HyperModel will normally begin a load cycle as soon as you access the attribute on the client.  However it is sometimes useful to see what attributes have already been loaded.
+
+#### `insert_html`
+
+takes a string and inserts it into test page when it is mounted.  Useful for testing code that is not dependent on Hyper Components.
+For example an Opal library that adds some jQuery extensions.
 
 ### Client Expectation Targets
 
@@ -370,6 +385,15 @@ By default HyperSpec will copy all local variables, memoized variables, and inst
 
 These methods are primarily designed to help debug code and specs.
 
+#### `c?`
+
+Shorthand for `on_console`, useful for entering expressions in pry console, to investigate the state of the client.
+
+```ruby
+pry:> c? { puts 'hello on the console' } # prints hello on the client
+-> nil
+```
+
 #### `to_js`
 
 Takes a block like `on_client` but rather than running the code on the client, simply returns the resulting code.  This is useful for debugging obscure problems when the Opal compiler or some feature of
@@ -390,15 +414,6 @@ Takes a block like `on_client` and prints the result on the client console using
 This is useful when the result cannot be usefully returned to the server,
 or when the result of interest is better looked at as the raw
 javascript object.
-
-#### `c?`
-
-Shorthand for `on_console`, useful for entering expressions in pry console, to investigate the state of the client.
-
-```ruby
-pry:> c? { puts 'hello on the console' } # prints hello on the client
--> nil
-```
 
 #### `debugger`
 
@@ -422,4 +437,4 @@ You can also run specs in a visible chrome window by setting the `DRIVER` enviro
 #### `pause`
 The method is typically not needed assuming you are using a multithreaded server like Puma.  If for whatever reason the pry debug session is not multithreaded, *and* you want to try some kind of experiment on the javascript console, *and* those experiments make requests to the server, you may not get a response, because all threads are in use.  
 
-You can resolve this by using the `pause` method in the debug session which will put the debug session into a non-blocking loop.  You then release the  pause by executing `go()` in the *javascript* debug console.
+You can resolve this by using the `pause` method in the debug session which will put the server debug session into a non-blocking loop.  You can then experiment in the JS console, and when done release the pause by executing `go()` in the *javascript* debug console.
