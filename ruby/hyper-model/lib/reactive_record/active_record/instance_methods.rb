@@ -81,26 +81,13 @@ module ActiveRecord
       if hash.is_a? ReactiveRecord::Base
         @backing_record = hash
       else
-        # standard active_record new -> creates a new instance, primary key is ignored if present
+        # standard active_record new -> creates a new instance
         # we have to build the backing record first then initialize it so associations work correctly
         @backing_record = ReactiveRecord::Base.new(self.class, {}, self)
         if self.class.inheritance_column && !hash.key?(self.class.inheritance_column)
           hash[self.class.inheritance_column] = self.class.name
         end
-        @backing_record.instance_eval do
-          h = {}
-          hash.each do |a, v|
-            a = model._dealias_attribute(a)
-            h[a] = convert(a, v).itself
-          end
-          self.class.load_data do
-            h.each do |attribute, value|
-              next if attribute == primary_key
-              @ar_instance[attribute] = value
-              changed_attributes << attribute
-            end
-          end
-        end
+        assign_attributes(hash)
       end
     end
 
@@ -142,7 +129,8 @@ module ActiveRecord
       return false unless ar_instance.is_a?(ActiveRecord::Base)
       return false if ar_instance.new_record?
       return false unless self.class.base_class == ar_instance.class.base_class
-      id == ar_instance.id
+      return id == ar_instance.id unless id.nil?
+      attributes == ar_instance.attributes
     end
 
     def [](attr)
@@ -220,13 +208,19 @@ module ActiveRecord
       @backing_record.object_id
     end
 
+    def assign_attributes(attrs)
+      attrs.each { |attr, v| public_send "#{attr}=", v }
+    end
+
+    alias attributes= assign_attributes
+
     def update_attribute(attr, value, &block)
       send("#{attr}=", value)
       save(validate: false, &block)
     end
 
     def update(attrs = {}, &block)
-      attrs.each { |attr, value| send("#{attr}=", value) }
+      assign_attributes attrs
       save(&block)
     end
 

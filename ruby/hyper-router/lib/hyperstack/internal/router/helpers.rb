@@ -39,6 +39,18 @@ module Hyperstack
           }
         end
 
+        def history
+          Hyperstack::Router::History.new(`#{@__hyperstack_component_native}.props.history`)
+        end
+
+        def location
+          Hyperstack::Router::Location.new(`#{@__hyperstack_component_native}.props.location`)
+        end
+
+        def match
+          Hyperstack::Router::Match.new(`#{@__hyperstack_component_native}.props.match`)
+        end
+
         def Route(to, opts = {}, &block)
           Hyperstack::Internal::State::Mapper.observed! Hyperstack::Router::Location
 
