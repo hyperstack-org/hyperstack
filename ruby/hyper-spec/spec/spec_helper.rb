@@ -44,4 +44,15 @@ RSpec.configure do |config|
   # config.after :each do
   #   Rails.cache.clear
   # end
+
+  config.before :suite do
+    MiniRacer_Backup = MiniRacer
+    Object.send(:remove_const, :MiniRacer)
+  end
+
+  config.around(:each, :prerendering_on) do |example|
+    MiniRacer = MiniRacer_Backup
+    example.run
+    Object.send(:remove_const, :MiniRacer)
+  end
 end

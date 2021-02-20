@@ -1,6 +1,8 @@
 require 'set'
 require 'hyperstack-config'
-require 'hyper-component'
+
+Hyperstack.import 'hyper-model'
+
 if RUBY_ENGINE == 'opal'
   require 'hyper-operation'
   require 'active_support'

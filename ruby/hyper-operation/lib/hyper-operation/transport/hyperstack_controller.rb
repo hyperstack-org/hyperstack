@@ -11,6 +11,10 @@ module Hyperstack
       end
     end if defined? ::WebConsole::Middleware
 
+
+    # The purpose of this is to prevent massive amounts of logging
+    # if using simple polling. If polling is on then only actual messages
+    # with content will be shown, other wise the log message is dropped.
     module ::Rails
       module Rack
         class Logger < ActiveSupport::LogSubscriber

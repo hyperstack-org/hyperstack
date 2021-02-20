@@ -12,10 +12,9 @@ require 'opal-rails'
 module TestApp
   class Application < Rails::Application
     config.action_cable.allowed_request_origins = [/http\:\/\/127\.0\.0\.1\:[0-9]*/]
-    config.eager_load_paths += %W(#{config.root}/app/models/public)
-    config.autoload_paths += %W(#{config.root}/app/models/public)
+    # config.eager_load_paths += %W(#{config.root}/app/models/public)
+    # config.autoload_paths += %W(#{config.root}/app/models/public)
     config.assets.paths << ::Rails.root.join('app', 'models').to_s
-    config.hyperstack.auto_config = false
     config.opal.method_missing = true
     config.opal.optimized_operators = true
     config.opal.arity_check = false
@@ -25,7 +24,6 @@ module TestApp
     config.opal.spec_location = 'spec-opal'
 
     config.assets.cache_store = :null_store
-    config.hyperstack.auto_config = false
 
     config.react.server_renderer_options = {
       files: ['server_rendering.js']

@@ -1,7 +1,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
-require 'opal-rspec'
+#require 'opal-rspec'
 require 'opal-jquery'
 
 begin
@@ -14,6 +14,7 @@ require 'hyper-spec'
 require 'pry'
 require 'opal-browser'
 require 'timecop'
+
 
 RSpec.configure do |config|
   config.color = true
@@ -30,6 +31,17 @@ RSpec.configure do |config|
 
   config.before :each do
     Rails.cache.clear
+  end
+
+  config.before :suite do
+    MiniRacer_Backup = MiniRacer
+    Object.send(:remove_const, :MiniRacer)
+  end
+
+  config.around(:each, :prerendering_on) do |example|
+    MiniRacer = MiniRacer_Backup
+    example.run
+    Object.send(:remove_const, :MiniRacer)
   end
 
   config.filter_run_including focus: true
@@ -52,6 +64,8 @@ RSpec.configure do |config|
       raise JavaScriptError, errors.join("\n\n") if errors.present?
     end
   end
+
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
 
 # Stubbing the React calls so we can test outside of Opal

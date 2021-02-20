@@ -1,4 +1,9 @@
-//= require 'react' 
+//= require 'react'
 //= require 'react_ujs'
 //= require 'components'
-Opal.load('components');
+if (typeof(OpalLoaded)=='undefined') {
+  Opal.load('components');
+} else {
+  Opal.loaded(OpalLoaded || []);
+  Opal.require('components');
+}

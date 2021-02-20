@@ -5,15 +5,15 @@ require File.expand_path('../boot', __FILE__)
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups(assets: %w(development test)))
-require 'jquery-rails'
-require 'opal'
-require 'opal-jquery'
-require 'opal-browser'
-require 'opal-rails'
-require 'react-rails'
-require 'hyper-store'
-require 'hyper-component'
-require 'hyper-spec'
+# require 'jquery-rails'
+# require 'opal'
+# require 'opal-jquery'
+# require 'opal-browser'
+# require 'opal-rails'
+# require 'react-rails'
+# require 'hyper-store'
+# require 'hyper-component'
+# require 'hyper-spec'
 
 module TestApp
   class Application < Rails::Application
@@ -24,13 +24,13 @@ module TestApp
     config.opal.dynamic_require_severity = :ignore
     config.opal.enable_specs = true
     config.opal.spec_location = 'spec-opal'
-    config.hyperstack.auto_config = false
+    # config.hyperstack.auto_config = false
 
     config.assets.cache_store = :null_store
 
-    config.react.server_renderer_options = {
-      files: ["server_rendering.js"]
-    }
+    # config.react.server_renderer_options = {
+    #   files: ["server_rendering.js"]
+    # }
     config.react.server_renderer_directories = ["/app/assets/javascripts"]
 
     # Initialize configuration defaults for originally generated Rails version.

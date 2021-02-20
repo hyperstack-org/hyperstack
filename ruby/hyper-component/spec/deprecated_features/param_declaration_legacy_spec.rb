@@ -102,7 +102,7 @@ describe 'the param macro', js: true do
       end
     end
   end
-  
+
   it 'defines collect_other_params_as method on params proxy' do
     mount 'Foo', bar: 'biz' do
       class Foo < Hyperloop::Component
@@ -110,11 +110,11 @@ describe 'the param macro', js: true do
         collect_other_params_as :foo
 
         render do
-          DIV { params.foo[:bar] }
+          DIV(class: :foo) { params.foo[:bar] }
         end
       end
     end
-    expect(page.body[-35..-19]).to include("<div>biz</div>")
+    expect(find('div.foo')).to have_content 'biz'
   end
 
   it 'defines collect_other_params_as method on params proxy' do
@@ -151,11 +151,11 @@ describe 'the param macro', js: true do
         param :foo
 
         render do
-          DIV { params.foo }
+          DIV(class: :foo) { params.foo }
         end
       end
     end
-    expect(page.body[-35..-19]).to include("<div>bar</div>")
+    expect(find('div.foo')).to have_content 'bar'
   end
 
   it "can create and access an optional params" do

@@ -27,31 +27,23 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activemodel'
   spec.add_dependency 'activerecord', '>= 4.0.0'
-  spec.add_dependency 'hyper-component', HyperModel::VERSION
   spec.add_dependency 'hyper-operation', HyperModel::VERSION
-  spec.add_development_dependency 'bundler', ['>= 1.17.3', '< 2.1']
-  spec.add_development_dependency 'capybara'
-  spec.add_development_dependency 'chromedriver-helper', '1.2.0'
-  spec.add_development_dependency 'libv8', '~> 7.3.492.27.1'
-  spec.add_development_dependency 'mini_racer', '~> 0.2.6'
-  spec.add_development_dependency 'selenium-webdriver'
+
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails'
-  #spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
+  spec.add_development_dependency 'hyper-spec', HyperModel::VERSION
+  spec.add_development_dependency 'mini_racer'
   spec.add_development_dependency 'mysql2'
-  spec.add_development_dependency 'opal-activesupport', '~> 0.3.1'
-  spec.add_development_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
-  spec.add_development_dependency 'parser'
-  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
   spec.add_development_dependency 'pry-rescue'
+  spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
-  spec.add_development_dependency 'rails', '>= 4.0.0'
+  spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.7.0'
-  spec.add_development_dependency 'reactrb-rails-generator'
+  spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'rspec-expectations'
   spec.add_development_dependency 'rspec-its'
@@ -62,8 +54,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'shoulda-matchers'
-  spec.add_development_dependency 'spring-commands-rspec'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153, '~> 1.3.6'
+  spec.add_development_dependency 'spring-commands-rspec', '~> 1.0.4'
+  spec.add_development_dependency 'sqlite3', '~> 1.4.2' # see https://github.com/rails/rails/issues/35153, '~> 1.3.6'
   spec.add_development_dependency 'timecop', '~> 0.8.1'
-  spec.add_development_dependency 'unparser'
 end

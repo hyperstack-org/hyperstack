@@ -9,7 +9,7 @@ describe "regulate_all_broadcasts" do
       def react_serializer
         as_json # does not include type: xxx as per reactive-record
       end
-      def previous_changes
+      def saved_changes
         Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
       def attribute_names
@@ -23,7 +23,7 @@ describe "regulate_all_broadcasts" do
       def react_serializer
         as_json # does not include type: xxx as per reactive-record
       end
-      def previous_changes
+      def saved_changes
         Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
       def attribute_names

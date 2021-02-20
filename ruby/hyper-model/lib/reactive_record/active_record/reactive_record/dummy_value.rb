@@ -1,4 +1,4 @@
-# add mehods to Object to determine if this is a dummy object or not
+# add methods to Object to determine if this is a dummy object or not
 class Object
   def loaded?
     !loading?
@@ -6,10 +6,6 @@ class Object
 
   def loading?
     false
-  end
-
-  def present?
-    !!self
   end
 end
 
@@ -55,18 +51,20 @@ module ReactiveRecord
         end
       end
 
+      FALSY_VALUES = [false, nil, 0, "0", "f", "F", "false", "FALSE", "off", "OFF"]
+
       def build_default_value_for_boolean
-        @column_hash[:default] || false
+        !FALSY_VALUES.include?(@column_hash[:default])
       end
 
       def build_default_value_for_float
-        @column_hash[:default] || Float(0.0)
+        @column_hash[:default]&.to_f || Float(0.0)
       end
 
       alias build_default_value_for_decimal build_default_value_for_float
 
       def build_default_value_for_integer
-        @column_hash[:default] || Integer(0)
+        @column_hash[:default]&.to_i || Integer(0)
       end
 
       alias build_default_value_for_bigint build_default_value_for_integer
@@ -92,16 +90,17 @@ module ReactiveRecord
         false
       end
 
-      def present?
-        false
-      end
-
       def nil?
         true
       end
 
       def !
         true
+      end
+
+      def class
+        notify
+        @object.class
       end
 
       def method_missing(method, *args, &block)
@@ -158,7 +157,13 @@ module ReactiveRecord
 
       alias inspect to_s
 
-      `#{self}.$$proto.toString = Opal.Object.$$proto.toString`
+      %x{
+        if (Opal.Object.$$proto) {
+          #{self}.$$proto.toString = Opal.Object.$$proto.toString
+        } else {
+          #{self}.$$prototype.toString = Opal.Object.$$prototype.toString
+        }
+       }
 
       def to_f
         notify

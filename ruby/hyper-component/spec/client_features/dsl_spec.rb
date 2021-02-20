@@ -55,7 +55,7 @@ describe 'the React DSL', js: true do
     expect(page.body[-60..-19]).to include('<div>hello</div>')
   end
 
-  it "in prerender will pass converted props through event handlers" do
+  it "in prerender will pass converted props through event handlers", :prerendering_on do
     client_option render_on: :both
     mount 'Foo' do
       class Foo
@@ -65,6 +65,7 @@ describe 'the React DSL', js: true do
         end
       end
     end
+
     expect(find('input')['data-reactroot']).to eq('')
     expect(find('input')['data-foo']).to eq('12')
   end
@@ -93,18 +94,22 @@ describe 'the React DSL', js: true do
     expect(page.body[-70..-19]).to include('<div><span>hello</span><span>goodby</span></div>')
   end
 
-  it "in prerendering has a .br short hand String method" do
-    client_option render_on: :both
+  it "in prerendering has a .br short hand String method", :prerendering_on do
+    client_option render_on: :server_only
     client_option raise_on_js_errors: :off
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
         render do
-          DIV { "hello".br }
+          DIV(class: :foo) { "hello".br }
         end
       end
     end
-    expect(page.body[-285..-233]).to match(/(<div data-reactroot=""|<div)><span>hello<(br|br\/|br \/)><\/span><\/div>/)
+    expect(
+      find(
+        'div[data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent"] div.foo span'
+      )['innerHTML']
+    ).to eq 'hello<br>'
   end
 
   it "has a .td short hand String method" do
@@ -181,7 +186,7 @@ describe 'the React DSL', js: true do
           .to match(/Comp does not appear to be a react component./)
   end
 
-  it 'raises a method missing error' do
+  it 'raises a method missing error', :prerendering_on do
     client_option render_on: :both
     client_option raise_on_js_errors: :off
     expect_evaluate_ruby do

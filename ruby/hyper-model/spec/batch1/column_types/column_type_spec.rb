@@ -149,8 +149,10 @@ describe "column types on client", js: true do
       TypeTest.serialize :string
       TypeTest.serialize :text
     end
-    [:string, :text].each do |attr|
-      expect_evaluate_ruby("TypeTest.find(1).#{attr}.class").to eq('NilClass')
+    %i[string text].each_with_index do |attr, i|
+      # find a different record for each iteration to prevent finding a model
+      # which is loaded
+      expect { TypeTest.find(i + 1)[attr].class }.on_client_to eq('NilClass')
     end
   end
 
@@ -184,7 +186,7 @@ describe "column types on client", js: true do
 
   it 'loads and converts the value' do  # randomly generates an error, but the exactual spec passed... perhaps move it up or down? (tried moving down one step)
     t = Timex.parse('1/2/2003')
-    r = TypeTest.create(
+    TypeTest.create(
       boolean: true,
       date: t.time,
       datetime: t.time,
@@ -297,8 +299,16 @@ describe "column types on client", js: true do
     r = DefaultTest.create(string: "no no no")
     expect_evaluate_ruby do
       t = DefaultTest.find(1)
-      [t.string, t.date, t.datetime]
-    end.to eq(["I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json])
+      [
+        t.string, t.date, t.datetime, t.integer_from_string, t.integer_from_int,
+        t.float_from_string, t.float_from_float,
+        t.boolean_from_falsy_string, t.boolean_from_truthy_string, t.boolean_from_falsy_value
+      ]
+    end.to eq([
+      "I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json, 99, 98,
+      0.02, 0.01,
+      false, true, false
+    ])
     check_errors
   end
 

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "resetting contexts" do
 
   it "does not reset any predefined boot receivers", js: true do
-    on_client do
+    before_mount do
       class Store
         include Hyperstack::Legacy::Store
         class << self

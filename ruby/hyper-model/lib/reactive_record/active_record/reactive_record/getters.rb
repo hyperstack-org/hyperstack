@@ -38,7 +38,8 @@ module ReactiveRecord
 
     def get_server_method(attr, reload = nil)
       non_relationship_getter_common(attr, reload) do |has_key|
-        sync_ignore_dummy attr, Base.load_from_db(self, *(vector ? vector : [nil]), attr), has_key
+        # SPLAT BUG: was sync_ignore_dummy attr, Base.load_from_db(self, *(vector ? vector : [nil]), attr), has_key
+        sync_ignore_dummy attr, Base.load_from_db(self, *(vector || [nil]), *attr), has_key
       end
     end
 
@@ -80,7 +81,8 @@ module ReactiveRecord
         if new?
           yield has_key if block
         elsif on_opal_client?
-          sync_ignore_dummy attr, Base.load_from_db(self, *(vector ? vector : [nil]), attr), has_key
+          # SPLAT BUG: was sync_ignore_dummy attr, Base.load_from_db(self, *(vector ? vector : [nil]), attr), has_key
+          sync_ignore_dummy attr, Base.load_from_db(self, *(vector || [nil]), *attr), has_key
         elsif id.present?
           sync_attribute attr, fetch_by_id(attr)
         else

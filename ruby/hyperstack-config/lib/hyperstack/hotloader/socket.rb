@@ -16,7 +16,7 @@ module Hyperstack
         Browser.supports? :WebSocket
       end
 
-      include Native
+      include Native::Wrapper
       include IO::Writable
 
       def on(str, &block)

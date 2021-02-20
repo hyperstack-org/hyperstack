@@ -1,6 +1,5 @@
 # Hyperstack
-
-[![Build Status](https://travis-ci.org/hyperstack-org/hyperstack.svg?branch=edge)](https://travis-ci.org/hyperstack-org/hyperstack)
+[![Build Status](https://travis-ci.com/hyperstack-org/hyperstack.svg?branch=edge)](https://travis-ci.com/hyperstack-org/hyperstack)
 
 This is the edge branch - the system is stable, and there are approx 1000 test specs passig.  For current status on development see [current status.](https://github.com/hyperstack-org/hyperstack/blob/edge/current-status.md)
 
@@ -88,3 +87,4 @@ Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop
 + Old Github: https://github.com/ruby-hyperloop
 + Legacy branch: https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy
 + Legacy install script: https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy/install
+ 

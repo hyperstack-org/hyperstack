@@ -5,6 +5,7 @@ module Hyperstack
   end
 end
 if RUBY_ENGINE == 'opal'
+  require 'hyperstack/native_wrapper_compatibility' # needs to be early...
   require 'hyperstack/deprecation_warning'
   require 'hyperstack/string'
   require 'hyperstack/client_stubs'

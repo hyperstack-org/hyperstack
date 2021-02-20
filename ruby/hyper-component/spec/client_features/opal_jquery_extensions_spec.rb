@@ -86,11 +86,12 @@ describe 'opal-jquery extensions', js: true do
     end
 
     it "accepts plain js object as selector" do
-      evaluate_ruby do
+      expect_evaluate_ruby do
         Element[JS.call(:eval, "(function () { return window; })();")]
-      end
+        true
+      end.to be_truthy
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-          .not_to match(/Exception|Error/)
+        .not_to match(/Exception|Error/)
     end
 
     it "can dynamically mount components" do
@@ -110,9 +111,10 @@ describe 'opal-jquery extensions', js: true do
           end
         end
       end
-      evaluate_ruby do
+      expect_evaluate_ruby do
         Element['body'].mount_components
-      end
+        true
+      end.to be_truthy
       expect(page).to have_content('I got rendered')
     end
   end

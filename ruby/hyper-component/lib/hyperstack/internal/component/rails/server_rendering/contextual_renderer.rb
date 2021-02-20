@@ -13,7 +13,11 @@ module Hyperstack
 
           class ContextualRenderer < React::ServerRendering::BundleRenderer
             def initialize(options = {})
-              super(options)
+              unless v8_runtime?
+                raise "Hyperstack prerendering only works with MiniRacer. Add 'mini_racer' to your Gemfile"
+              end
+
+              super({ files: ['hyperstack-prerender-loader.js'] }.merge(options))
               ComponentLoader.new(v8_context).load
             end
 

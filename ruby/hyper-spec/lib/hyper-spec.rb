@@ -1,11 +1,112 @@
-require 'capybara/rspec'
+# hyper-spec
+require 'action_view'
 require 'opal'
-require 'selenium-webdriver'
+require 'unparser'
+require 'method_source'
+require 'hyper-spec/time_cop.rb'
+require 'filecache'
 
+require 'capybara/rspec'
 require 'hyper-spec/component_test_helpers'
+require 'hyper-spec/controller_helpers'
+require 'hyper-spec/patches'
+require 'hyper-spec/rails_controller_helpers'
 require 'hyper-spec/version'
 require 'hyper-spec/wait_for_ajax'
+require 'hyper-spec/expectations'
+require 'parser/current'
 require 'selenium/web_driver/firefox/profile'
+require 'selenium-webdriver'
+
+begin
+  require 'pry'
+rescue LoadError
+  nil
+end
+
+Parser::Builders::Default.emit_procarg0 = true
+
+# not available in parser 2.3
+if Parser::Builders::Default.respond_to? :emit_arg_inside_procarg0
+  Parser::Builders::Default.emit_arg_inside_procarg0 = true
+end
+
+module HyperSpec
+  if defined? Pry
+    # add a before eval hook to pry so we can capture the source
+    class << self
+      attr_accessor :current_pry_code_block
+      Pry.hooks.add_hook(:before_eval, 'hyper_spec_code_capture') do |code|
+        HyperSpec.current_pry_code_block = code
+      end
+    end
+  end
+
+  def self.reset_between_examples=(value)
+    RSpec.configuration.reset_between_examples = value
+  end
+
+  def self.reset_between_examples?
+    RSpec.configuration.reset_between_examples
+  end
+
+  def self.reset_sessions!
+    Capybara.old_reset_sessions!
+  end
+end
+
+# TODO: figure out why we need this patch - its because we are on an old version
+# of Selenium Webdriver, but why?
+require 'selenium-webdriver'
+
+module Selenium
+  module WebDriver
+    module Chrome
+      module Bridge
+        COMMANDS = remove_const(:COMMANDS).dup
+        COMMANDS[:get_log] = [:post, 'session/:session_id/log']
+        COMMANDS.freeze
+
+        def log(type)
+          data = execute :get_log, {}, type: type.to_s
+
+          Array(data).map do |l|
+            begin
+              LogEntry.new l.fetch('level', 'UNKNOWN'), l.fetch('timestamp'), l.fetch('message')
+            rescue KeyError
+              next
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+module Capybara
+  class << self
+    alias old_reset_sessions! reset_sessions!
+    def reset_sessions!
+      old_reset_sessions! if HyperSpec.reset_between_examples?
+    end
+  end
+end
+
+RSpec.configure do |config|
+  config.add_setting :reset_between_examples, default: true
+  config.before(:all, no_reset: true) do
+    HyperSpec.reset_between_examples = false
+  end
+  config.before(:all, no_reset: false) do
+    HyperSpec.reset_between_examples = true
+  end
+  config.after(:all) do
+    HyperSpec.reset_sessions! unless HyperSpec.reset_between_examples?
+  end
+  config.before(:each) do |example|
+    insure_page_loaded(true) if example.metadata[:js] && !HyperSpec.reset_between_examples?
+  end
+end
 
 module HyperSpec
   def self.reset_between_examples=(value)
@@ -54,17 +155,21 @@ RSpec.configure do |config|
 
 
   config.before(:each) do
-    Hyperstack.class_eval do
-      def self.on_server?
-        true
+    if defined?(Hyperstack)
+      Hyperstack.class_eval do
+        def self.on_server?
+          true
+        end
       end
-    end if defined?(Hyperstack)
+    end
     # for compatibility with HyperMesh
-    HyperMesh.class_eval do
-      def self.on_server?
-        true
+    if defined?(HyperMesh)
+      HyperMesh.class_eval do
+        def self.on_server?
+          true
+        end
       end
-    end if defined?(HyperMesh)
+    end
   end
 
   config.before(:each, js: true) do
@@ -83,33 +188,29 @@ RSpec.configure do |config|
 end
 
 # Capybara config
-RSpec.configure do |_config|
+RSpec.configure do |config|
+  config.before(:each) do |example|
+    HyperSpec::ComponentTestHelpers.current_example = example
+    HyperSpec::ComponentTestHelpers.description_displayed = false
+  end
+
+  config.add_setting :wait_for_initialization_time
+  config.wait_for_initialization_time = 3
+
   Capybara.default_max_wait_time = 10
 
   Capybara.register_driver :chrome do |app|
     options = {}
     options.merge!(
-      args: %w[auto-open-devtools-for-tabs]) #,
-      #prefs: { 'devtools.open_docked' => false, "devtools.currentDockState" => "undocked", devtools: {currentDockState: :undocked} }
-    #) unless ENV['NO_DEBUGGER']
-    # this does not seem to work properly.  Don't document this feature yet.
-    # options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
+      w3c: false,
+      args: %w[auto-open-devtools-for-tabs]
+    )
     options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
-    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(chromeOptions: options)
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+      chromeOptions: options, 'goog:loggingPrefs' => { browser: 'ALL' }
+    )
     Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
   end
-
-  # Capybara.register_driver :chrome do |app|
-  #   options = {}
-  #   options.merge!(
-  #       args: %w[auto-open-devtools-for-tabs],
-  #       prefs: { 'devtools.open_docked' => false, "devtools.currentDockState" => "undocked", devtools: {currentDockState: :undocked} }
-  #     ) unless ENV['NO_DEBUGGER']
-  #   # this does not seem to work properly.  Don't document this feature yet.
-  #     options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
-  #   capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(chromeOptions: options)
-  #   Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
-  # end
 
   Capybara.register_driver :firefox do |app|
     Capybara::Selenium::Driver.new(app, browser: :firefox)
@@ -120,7 +221,8 @@ RSpec.configure do |_config|
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    Capybara::Selenium::Driver.new(app, browser: :chrome, :driver_path => "/usr/lib/chromium-browser/chromedriver", options: options)
+    Selenium::WebDriver::Chrome::Service.driver_path = '/usr/lib/chromium-browser/chromedriver'
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
 
   Capybara.register_driver :firefox_headless do |app|
@@ -152,5 +254,4 @@ RSpec.configure do |_config|
     when 'travis' then :chrome_headless_docker_travis
     else :selenium_chrome_headless
     end
-
 end

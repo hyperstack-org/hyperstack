@@ -21,11 +21,11 @@ begin
   require 'opal-rails'
   require 'hyper-model'
   require 'hyper-router'
+  require 'mini_racer'
 rescue LoadError
 end
 require 'react-rails'
 require 'opal-browser'
-require 'mini_racer'
 require 'hyperstack/version'
 
 class RailsHyperstack < Rails::Railtie

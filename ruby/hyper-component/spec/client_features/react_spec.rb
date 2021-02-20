@@ -155,7 +155,7 @@ describe 'React', js: true do
 
       it "should match the instance cycle to ReactComponent life cycle" do
         expect_evaluate_ruby do
-          Foo.class_eval do
+          class Foo
             def initialize(native)
               @@count ||= 0
               @@count += 1

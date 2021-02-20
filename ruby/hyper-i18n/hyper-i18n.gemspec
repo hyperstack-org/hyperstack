@@ -22,15 +22,17 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-operation', Hyperstack::I18n::VERSION
   spec.add_dependency 'i18n'
 
-  spec.add_development_dependency 'bundler' #, '~> 1.16'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-model', Hyperstack::I18n::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperstack::I18n::VERSION
-  spec.add_development_dependency 'opal-rails', '~> 0.9.4'
+  spec.add_development_dependency 'mini_racer'
+  spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0.0'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3', '~> 1.4.2' # see https://github.com/rails/rails/issues/35153
 end

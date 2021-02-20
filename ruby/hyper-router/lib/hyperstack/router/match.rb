@@ -1,7 +1,7 @@
 module Hyperstack
   module Router
     class Match
-      include Native
+      include Native::Wrapper
 
       def initialize(native)
         @native = native

@@ -1,12 +1,16 @@
 require 'spec_helper'
 
 describe 'hyper-spec', js: true do
+  it 'can visit a page' do
+    visit 'test'
+  end
+
   it 'will mount a component' do
     mount "SayHello", name: 'Fred'
     expect(page).to have_content('Hello there Fred')
   end
 
-  it "can the mount a component defined in the mounts code block" do
+  it "can mount a component defined in the mounts code block" do
     mount 'ShowOff' do
       class ShowOff
         include Hyperstack::Component
@@ -18,7 +22,7 @@ describe 'hyper-spec', js: true do
 
   context "the client_option method" do
 
-    it "can render server side only" do
+    it "can render server side only", :prerendering_on do
       client_option render_on: :server_only
       mount 'SayHello', name: 'George'
       expect(page).to have_content('Hello there George')
@@ -223,7 +227,7 @@ describe 'hyper-spec', js: true do
     end
   end
 
-  context "new style rspec expressions" do
+  context "new style rspec expressions", no_reset: true do
 
     before(:each) do
       @str = 'hello'
@@ -265,6 +269,27 @@ describe 'hyper-spec', js: true do
       expect { another_string.gsub(/\W/, '') }.on_client_to eq another_string.gsub(/\W/, '')
     end
 
+    it 'will deal with unserailized local vars, instance vars and memoized values correctly' do
+      foo_bar = page
+      expect do
+        evaluate_ruby { foo_bar }
+      end.to raise_error(Exception, /foo_bar/)
+    end
+
+    it 'will ignore unserailized local vars, instance vars and memoized values if not accessed' do
+      foo_bar = page
+      good_value = 12
+      expect { good_value * 2 }.on_client_to eq good_value * 2
+    end
+
+    it 'will allow unserailized local vars, instance vars and memoized values can be redefined on the client' do
+      foo_bar = page
+      expect do
+        foo_bar = 12
+        foo_bar * 2
+      end.on_client_to eq 24
+    end
+
     it 'aliases evaluate_ruby as on_client and c?' do
       expect(on_client { 12 % 5 }).to eq(2)
       expect(c? { 12 % 5 }).to eq(2)
@@ -273,7 +298,6 @@ describe 'hyper-spec', js: true do
     it 'allows local variables on the client to be set using the with method' do
       expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
-
   end
 end
 

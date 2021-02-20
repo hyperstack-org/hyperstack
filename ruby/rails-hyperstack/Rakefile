@@ -1,25 +1,34 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
+require 'pry'
 
 RSpec::Core::RakeTask.new(:spec)
 
 namespace :spec do
   task :prepare do
+    rails_version = `bundle info rails`.match(/\* rails \((.+)\)/)[1]
+    opal_version = `bundle info opal`.match(/\* opal \((.+)\)/)[1]
     Dir.chdir('spec') do
       sh('rm -rf test_app')
-      sh('bundle exec rails new test_app')
-      Dir.chdir('test_app') do
-        sh('bundle exec rails g hyperstack:install')
-        sh('mv Gemfile _Gemfile_')
-        sh('bundle exec rails generate model Sample name:string description:text')
-        sh('mv app/models/sample.rb app/hyperstack/models/sample.rb')
-        sh('bundle exec rake db:migrate')
-        sh('bundle exec rails dev:cache')
+      Bundler.with_clean_env do
+        sh("rails _#{rails_version}_ new test_app -T")
+      end
+      Bundler.with_clean_env do
+        Dir.chdir('test_app') do
+          sh('cat ../gems.rb >> Gemfile')
+          sh("echo 'gem \"opal\", \"#{opal_version}\"' >> Gemfile")
+          sh("bundle update")
+          sh('spring stop')
+          sh('bundle exec rails g hyperstack:install')
+          sh('bundle exec rails generate model Sample name:string description:text')
+          sh('mv app/models/sample.rb app/hyperstack/models/sample.rb')
+          sh('bundle exec rake db:migrate')
+          sh('RAILS_ENV=test bundle exec rake db:setup')
+          # sh('bundle exec rails dev:cache') # not tested yet...
+        end
       end
     end
   end
 end
 
-task :default do
-  
-end
+task :default => :spec

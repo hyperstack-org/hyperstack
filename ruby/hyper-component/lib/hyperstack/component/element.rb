@@ -15,7 +15,7 @@ module Hyperstack
     # by using method missing
     #
     class Element
-      include Native
+      include Native::Wrapper
 
       alias_native :element_type, :type
       alias_native :props, :props

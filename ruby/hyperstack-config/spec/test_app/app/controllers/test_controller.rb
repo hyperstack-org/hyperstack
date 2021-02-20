@@ -1,4 +1,4 @@
-class TestController < ActionController::Base
+class TestController < ApplicationController
   def app
     render inline: 'hello', :layout => "application"
   end

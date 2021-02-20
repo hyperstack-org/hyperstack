@@ -21,6 +21,14 @@ Capybara.server = :puma
 
 RSpec.configure do |config|
 
+  if config.formatters.empty?
+    module Hyperstack
+      def self.log_import(s)
+        # turn off import logging unless in verbose mode
+      end
+    end
+  end
+
   config.after :each do
     Rails.cache.clear
   end
@@ -86,6 +94,12 @@ RSpec.configure do |config|
     # end
   end
 
+  config.before(:each) do
+    if Hyperstack.connection[:adapter] == :redis
+      Hyperstack::Connection.adapter::RedisRecord::Base.client.flushdb
+    end
+  end
+
   config.before(:each, :js => true) do
     # -sfc george DatabaseCleaner.strategy = :truncation
   end
@@ -117,6 +131,9 @@ RSpec.configure do |config|
   #               #.reject { |e| e =~ /Unexpected response code: 200/ }
   #   raise JavaScriptError, errors.join("\n\n") if errors.present?
   # end
+
+  # Use legacy hyper-spec on_client behavior
+  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
 end
 
 module HyperSpec

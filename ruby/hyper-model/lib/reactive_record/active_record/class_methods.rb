@@ -1,11 +1,20 @@
 module ActiveRecord
-
   module ClassMethods
-
-    alias _new_without_sti_type_cast new
-
-    def new(*args, &block)
-      _new_without_sti_type_cast(*args, &block).cast_to_current_sti_type
+    begin
+      # Opal 0.11 super did not work with new, but new was defined
+      alias _new_without_sti_type_cast new
+      def new(*args, &block)
+        _new_without_sti_type_cast(*args, &block).cast_to_current_sti_type
+      end
+    rescue NameError
+      def self.extended(base)
+        base.singleton_class.class_eval do
+          alias_method :_new_without_sti_type_cast, :new
+          define_method :new do |*args, &block|
+            _new_without_sti_type_cast(*args, &block).cast_to_current_sti_type
+          end
+        end
+      end
     end
 
     def base_class

@@ -9,7 +9,7 @@ module Hyperstack
         module ServerRendering
           class HyperTestAssetContainer
             def find_asset(logical_path)
-              ::Rails.cache.read(logical_path)
+              HyperSpec::ComponentTestHelpers.cache_read(logical_path)
             end
           end
 

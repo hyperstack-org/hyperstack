@@ -13,7 +13,7 @@ describe "regulate_broadcast" do
       def attribute_names
         [:id, :attr1, :attr2, :attr3, :attr4, :attr5]
       end
-      def previous_changes
+      def saved_changes
         Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
       attr_accessor :id, :attr1, :attr2, :attr3, :attr4, :attr5
@@ -27,7 +27,7 @@ describe "regulate_broadcast" do
       def attribute_names
         [:id, :attrA, :attrB, :attrC, :attrD, :attrE]
       end
-      def previous_changes
+      def saved_changes
         Hash[*as_json.keys.collect { |attr| [attr, send(attr)] }.flatten(1)]
       end
       attr_accessor :id, :attrA, :attrB, :attrC, :attrD, :attrE
