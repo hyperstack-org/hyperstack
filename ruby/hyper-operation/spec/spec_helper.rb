@@ -137,7 +137,7 @@ RSpec.configure do |config|
 end
 
 module HyperSpec
-  module ComponentTestHelpers
+  module Helpers
     alias old_expect_promise expect_promise
     def expect_promise(str_or_promise = nil, &block)
       if str_or_promise.is_a? Promise
