@@ -29,6 +29,17 @@ describe 'hyper-spec', js: true do
     expect(page).to have_content('insert some code')
   end
 
+  it 'can pause the server', skip: 'unreliable' do
+    # this is pretty ugly with these dead waits, but any attempt to do an evaluate_script "go()" without the
+    # wait breaks
+    th = Thread.new { pause('hello') }
+    sleep 5
+    expect(th).to be_alive
+    evaluate_script "go()"
+    sleep 1
+    expect(th).not_to be_alive
+  end
+
   context "the client_option method" do
 
     it "can render server side only", :prerendering_on do

@@ -23,7 +23,7 @@ require 'hyper-spec/helpers'
 require 'hyper-spec/expectations'
 
 require 'parser/current'
-require 'selenium/web_driver/firefox/profile'
+require 'selenium/web_driver/firefox/profile' if defined?(Selenium::WebDriver::Firefox)
 require 'selenium-webdriver'
 
 require 'hyper-spec/version'
@@ -203,7 +203,7 @@ RSpec.configure do |config|
     options = Selenium::WebDriver::Firefox::Options.new
     options.headless!
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
-  end
+  end if defined?(Selenium::WebDriver::Firefox)
 
   Capybara.register_driver :selenium_with_firebug do |app|
     profile = Selenium::WebDriver::Firefox::Profile.new
@@ -211,7 +211,7 @@ RSpec.configure do |config|
     profile.enable_firebug
     options = Selenium::WebDriver::Firefox::Options.new(profile: profile)
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
-  end
+  end if defined?(Selenium::WebDriver::Firefox)
 
   Capybara.register_driver :safari do |app|
     Capybara::Selenium::Driver.new(app, browser: :safari)

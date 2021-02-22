@@ -187,7 +187,7 @@ module HyperSpec
     def pause(message = nil)
       if message
         puts message
-        page.evaluate_ruby "puts #{message.inspect}.to_s + ' (type go() to continue)'"
+        internal_evaluate_ruby "puts #{message.inspect}.to_s + ' (type go() to continue)'"
       end
 
       page.evaluate_script('window.hyper_spec_waiting_for_go = true')
