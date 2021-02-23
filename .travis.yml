@@ -6,9 +6,17 @@ language: bash
 services:
   - postgresql
 addons:
-  postgresql: '11.2'
+  postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
+env:
+  global:
+  - PGPORT=5433  
 before_script:
   - psql -c 'create database hyper_mesh_test_db;' -U postgres
+
 #
 # _test_gem: &_test_gem
 #   stage: test
