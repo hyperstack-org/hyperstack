@@ -62,7 +62,7 @@ _deploy_gem: &_deploy_gem
 jobs:
   include:
     - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part1
+      env: PGPORT=5433 COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part1
 
 # language: bash
 # cache:
