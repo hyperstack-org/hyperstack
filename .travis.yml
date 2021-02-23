@@ -33,9 +33,9 @@ _test_gem: &_test_gem
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
   before_script:
     - echo creating pg database hyper_mesh_test_db
-    - psql --version
-    - psql -c 'CREATE DATABASE hyper_mesh_test_db;' -U postgres
-    - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
+    # - psql --version
+    # - psql -c 'CREATE DATABASE hyper_mesh_test_db;' -U postgres
+    # - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
     - echo before_script $COMPONENT
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
