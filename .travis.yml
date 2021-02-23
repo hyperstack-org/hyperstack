@@ -22,8 +22,8 @@ _test_gem: &_test_gem
         - google-chrome-stable
         - yarn
         - redis-server
-    mariadb: '10.3' # mariadb works fine...
-    # postgresql: "9.6"
+    # mariadb: '10.3' # mariadb works fine...
+    postgresql: "9.6"
   before_install:
     - echo installing $COMPONENT
     - sudo rm -f /usr/local/bin/yarn
@@ -33,13 +33,12 @@ _test_gem: &_test_gem
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
   before_script:
     - echo creating pg database hyper_mesh_test_db
-    # - psql --version
-    # - psql -c 'CREATE DATABASE hyper_mesh_test_db;' -U postgres
-    # - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
+    - psql --version
+    - psql -c 'CREATE DATABASE hyper_mesh_test_db;' -U postgres
+    - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
     - echo before_script $COMPONENT
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
-    # - psql -c 'create database hyper_mesh_test_db;' -U postgres
     - bundle exec rake spec:prepare
     - google-chrome --version
     - which google-chrome
