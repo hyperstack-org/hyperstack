@@ -34,9 +34,9 @@ before_install:
 #   - PGPORT=5433
 
 _test_gem: &_test_gem
-  env:
-    global:
-    - PGPORT=5433
+  # env:
+  #   global:
+  #   - PGPORT=5433
   stage: test
   services:
     - postgresql
@@ -53,18 +53,18 @@ _test_gem: &_test_gem
         - yarn
         - redis-server
     mariadb: '10.3'
-    postgresql: "11.2"
+    postgresql: "9.6"
   before_install:
-    - sudo apt-get update
-    - sudo apt-get --yes remove postgresql\*
-    - sudo apt-get install -y postgresql-11 postgresql-client-11
-    - sudo cat /etc/postgresql/11/main/pg_hba.conf
-    #- sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
-    # - sudo ls /etc
-    # - sudo ls /etc/tmp
-    # - sudo cp /etc/tmp/pg_hba.conf /etc/postgresql/11/main/pg_hba.conf
-
-    - sudo service postgresql restart 11
+    # - sudo apt-get update
+    # - sudo apt-get --yes remove postgresql\*
+    # - sudo apt-get install -y postgresql-11 postgresql-client-11
+    # - sudo cat /etc/postgresql/11/main/pg_hba.conf
+    # #- sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+    # # - sudo ls /etc
+    # # - sudo ls /etc/tmp
+    # # - sudo cp /etc/tmp/pg_hba.conf /etc/postgresql/11/main/pg_hba.conf
+    #
+    # - sudo service postgresql restart 11
     - echo installing $COMPONENT
     # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
     # must remove this zombie for new yarn to work
