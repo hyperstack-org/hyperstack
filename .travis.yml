@@ -13,12 +13,12 @@ cache:
 # before_script:
 #   - psql -c 'create database hyper_mesh_test_db;' -U postgres
 
-# before_install:
-#   - sudo apt-get update
-#   - sudo apt-get --yes remove postgresql\*
-#   - sudo apt-get install -y postgresql-11 postgresql-client-11
-#   - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
-#   - sudo service postgresql restart 11
+before_install:
+  - sudo apt-get update
+  - sudo apt-get --yes remove postgresql\*
+  - sudo apt-get install -y postgresql-11 postgresql-client-11
+  - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+  - sudo service postgresql restart 11
 # before_script:
 #   - psql --version
 #   - psql -c 'CREATE DATABASE hyper_mesh_test_db;' -U postgres
@@ -50,12 +50,6 @@ _test_gem: &_test_gem
     mariadb: '10.3'
     postgresql: "11.2"
   before_install:
-    - echo 'installing PG 11'
-    - sudo apt-get update
-    - sudo apt-get --yes remove postgresql\*
-    - sudo apt-get install -y postgresql-11 postgresql-client-11
-    - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
-    - sudo service postgresql restart 11
     - echo installing $COMPONENT
     # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
     # must remove this zombie for new yarn to work
