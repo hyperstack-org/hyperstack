@@ -32,6 +32,12 @@ module ReactiveRecord
         @column_hash[:default] || nil
       end
 
+      def build_default_value_for_json
+        ::JSON.parse(@column_hash[:default]) if @column_hash[:default]
+      end
+
+      alias build_default_value_for_jsonb build_default_value_for_json
+
       def build_default_value_for_datetime
         if @column_hash[:default]
           ::Time.parse(@column_hash[:default].gsub(' ','T')+'+00:00')

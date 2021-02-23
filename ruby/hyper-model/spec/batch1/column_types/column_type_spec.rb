@@ -35,7 +35,7 @@ describe "column types on client", js: true do
       def time_only
         utc_time = Timex.new(self).utc
         start_time = Time.parse('2000-01-01T00:00:00.000-00:00').utc
-        Timex.new (start_time+(utc_time-utc_time.beginning_of_day.to_i).to_i).localtime
+        Timex.new(start_time+(utc_time-utc_time.beginning_of_day.to_i).to_i).localtime
       end
 
       class << self
@@ -131,15 +131,17 @@ describe "column types on client", js: true do
       string: "hello",
       text: "goodby",
       time: t,
-      timestamp: t
+      timestamp: t,
+      json: {kind: :json},
+      jsonb: {kind: :jsonb}
     )
-    expect_evaluate_ruby do
+    expect do
       TypeTest.columns_hash.collect do |attr, _info|
         TypeTest.find(1).send(attr).class
       end
-    end.to eq([
+    end.to_on_client eq([
       'Number', 'NilClass', 'Boolean', 'Date', 'Time', 'Number', 'Number', 'Number',
-      'Number', 'String', 'String', 'Time', 'Time'
+      'Number', 'String', 'String', 'Time', 'Time', 'NilClass', 'NilClass'
     ])
     check_errors
   end
@@ -169,15 +171,15 @@ describe "column types on client", js: true do
       string: "hello",
       text: "goodby",
       time: t,
-      timestamp: t
+      timestamp: t # see default tests below for json and jsonb
     )
-    expect_evaluate_ruby do
+    expect do
       t = TypeTest.find(1)
       [
         !t.boolean, t.date+1, t.datetime+2.days, t.decimal + 5, t.float + 6, t.integer + 7,
         t.bigint + 8, t.string.length, t.text.length, t.time+3.days, t.timestamp+4.days
       ]
-    end.to eq([
+    end.on_client_to eq([
       true, "2001-01-02", (Timex.sqlmin+2.days).as_json, 5, 6, 7,
       8, 0, 0, (Timex.sqlmin+3.days).as_json, (Timex.sqlmin+4.days).as_json
     ])
@@ -197,15 +199,17 @@ describe "column types on client", js: true do
       string: "hello",
       text: "goodby",
       time: t.time,
-      timestamp: t.time
+      timestamp: t.time,
+      json: {kind: :json},
+      jsonb: {kind: :jsonb}
     )
-    expect_promise do
-      ReactiveRecord.load do
+    expect do
+      Hyperstack::Model.load do
         TypeTest.columns_hash.collect do |attr, _info|
           [TypeTest.find(1).send(attr).class, TypeTest.find(1).send(attr)]
         end.flatten
       end
-    end.to eq([
+    end.to_then eq([
       'Number', 1,
       'NilClass', nil,
       'Boolean', true,
@@ -218,7 +222,9 @@ describe "column types on client", js: true do
       'String', 'hello',
       'String', 'goodby',
       'Time', t.time_only.as_json, # date is indeterminate for active record time
-      'Time', t.as_json
+      'Time', t.as_json,
+      'Hash', {'kind' => 'json'},
+      'Hash', {'kind' => 'jsonb'}
     ])
     check_errors
   end
@@ -302,12 +308,14 @@ describe "column types on client", js: true do
       [
         t.string, t.date, t.datetime, t.integer_from_string, t.integer_from_int,
         t.float_from_string, t.float_from_float,
-        t.boolean_from_falsy_string, t.boolean_from_truthy_string, t.boolean_from_falsy_value
+        t.boolean_from_falsy_string, t.boolean_from_truthy_string, t.boolean_from_falsy_value,
+        t.json[:kind], t.jsonb[:kind]  # the default for json and jsonb is nil so we will test dummy operations here
       ]
     end.to eq([
       "I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json, 99, 98,
       0.02, 0.01,
-      false, true, false
+      false, true, false,
+      'json', 'jsonb'
     ])
     check_errors
   end
