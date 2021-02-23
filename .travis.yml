@@ -41,6 +41,9 @@ services:
   - postgresql
 addons:
   postgresql: "11.2"
+env:
+  global:
+  - PGPORT=5433
 
 #
 # _test_gem: &_test_gem
