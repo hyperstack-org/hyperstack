@@ -1,19 +1,27 @@
-language: bash
+#language: bash
 # cache:
 #   bundler: true
 #   directories:
 #   - node_modules # NPM packages
+# services:
+#   - postgresql
+# addons:
+#   postgresql: "10"
+#   apt:
+#     packages:
+#     - postgresql-10
+#     - postgresql-client-10
+# env:
+#   global:
+#   - PGPORT=5433
+# before_script:
+#   - psql -c 'create database hyper_mesh_test_db;' -U postgres
 services:
-  - postgresql
+    - postgresql
+
 addons:
-  postgresql: "10"
-  apt:
-    packages:
-    - postgresql-10
-    - postgresql-client-10
-env:
-  global:
-  - PGPORT=5433  
+    postgresql: '9.6'
+
 before_script:
   - psql -c 'create database hyper_mesh_test_db;' -U postgres
 
