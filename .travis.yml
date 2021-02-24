@@ -29,12 +29,12 @@ _test_gem: &_test_gem
     - sudo apt-get --yes remove postgresql\*
     - sudo apt-get install -y postgresql-11 postgresql-client-11
     - |
-      sudo cat <<EOF >/etc/postgresql/11/main/pg_hba.conf
-      local   all             postgres                                trust
-      local   all             all                                     trust
-      host    all             all             127.0.0.1/32            trust
-      host    all             all             ::1/128                 trust
-      EOF
+    sudo cat <<EOF >/etc/postgresql/11/main/pg_hba.conf
+    local   all             postgres                                trust
+    local   all             all                                     trust
+    host    all             all             127.0.0.1/32            trust
+    host    all             all             ::1/128                 trust
+    EOF
     # - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
     - sudo cat /etc/postgresql/11/main/pg_hba.conf
     - echo installing $COMPONENT
