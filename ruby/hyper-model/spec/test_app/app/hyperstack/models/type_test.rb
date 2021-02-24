@@ -13,8 +13,6 @@ class TypeTest < ActiveRecord::Base
       t.text(:text)
       t.time(:time)
       t.timestamp(:timestamp)
-      t.json(:json)
-      t.jsonb(:jsonb)
     end
   end
 end

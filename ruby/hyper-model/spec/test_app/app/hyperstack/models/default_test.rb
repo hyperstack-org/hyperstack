@@ -11,8 +11,6 @@ def self.build_tables
       t.boolean  :boolean_from_falsy_string,  default: "OFF"
       t.boolean  :boolean_from_truthy_string, default: "something-else"
       t.boolean  :boolean_from_falsy_value,   default: false
-      t.json     :json,                       default: {kind: :json}
-      t.jsonb    :jsonb,                      default: {kind: :jsonb}
     end
   end
 end
