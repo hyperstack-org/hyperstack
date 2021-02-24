@@ -26,7 +26,7 @@ addons:
   postgresql: "9.6"
 before_install:
   # - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
-  - sudo ls /etc/postgresql/
+  - sudo cat /etc/postgresql/10/main/pg_hba.conf
   - echo installing $COMPONENT
   - sudo rm -f /usr/local/bin/yarn
   - nvm install 10
