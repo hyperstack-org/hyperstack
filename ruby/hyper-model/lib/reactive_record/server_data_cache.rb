@@ -474,7 +474,7 @@ keys:
           end
         end
 
-        if (id_value = tree[target.class.try(:primary_key)]) && id_value.is_a?(Array)
+        if (id_value = tree[target.class.try(:primary_key)] || tree[:id]) && id_value.is_a?(Array)
           target.id = id_value.first
         end
         tree.each do |method, value|

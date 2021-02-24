@@ -88,7 +88,7 @@ module ReactiveRecord
 
     def record_with_current_values
       ReactiveRecord::Base.load_data do
-        backing_record = @backing_record || klass.find(record[:id]).backing_record
+        backing_record = @backing_record || klass.find(record[klass.primary_key]).backing_record
         if destroyed?
           backing_record.ar_instance
         else
@@ -148,7 +148,7 @@ module ReactiveRecord
       @klass = record.class.name
       @record = data
       record.backing_record.destroyed = false
-      @record[:id] = record.id if record.id
+      @record[@klass.primary_key] = record.id if record.id
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
       @previous_changes = record.changes
@@ -163,7 +163,7 @@ module ReactiveRecord
       @record.merge! params.record
       @previous_changes.merge! params.previous_changes
       ReactiveRecord::Base.when_not_saving(klass) do
-        @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
+        @backing_record = ReactiveRecord::Base.exists?(klass, params.record[klass.primary_key])
 
         # first check to see if we already destroyed it and if so exit the block
         return if @backing_record&.destroyed
@@ -180,7 +180,7 @@ module ReactiveRecord
         # it is possible that we are recieving data on a record for which we are also waiting
         # on an an inital data load in which case we have not yet set the loaded id, so we
         # set if now.
-        @backing_record&.loaded_id = params.record[:id]
+        @backing_record&.loaded_id = params.record[klass.primary_key]
 
         # once we have received all the data from all the channels (applies to create and update only)
         # we yield and process the record
@@ -234,7 +234,7 @@ module ReactiveRecord
 
     def merge_current_values(br)
       current_values = Hash[*@previous_changes.collect do |attr, values|
-        value = attr == :id ? record[:id] : values.first
+        value = attr == klass.primary_key ? record[klass.primary_key] : values.first
         if br.attributes.key?(attr) &&
            br.attributes[attr] != br.convert(attr, value) &&
            br.attributes[attr] != br.convert(attr, values.last)

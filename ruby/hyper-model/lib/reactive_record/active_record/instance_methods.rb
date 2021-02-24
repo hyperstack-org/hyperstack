@@ -92,7 +92,7 @@ module ActiveRecord
           end
           self.class.load_data do
             h.each do |attribute, value|
-              next if attribute == primary_key
+              next if attribute == :id
               @ar_instance[attribute] = value
               changed_attributes << attribute
             end
