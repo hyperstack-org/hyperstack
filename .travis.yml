@@ -22,12 +22,19 @@ _test_gem: &_test_gem
         - google-chrome-stable
         - yarn
         - redis-server
-    # mariadb: '10.3' # mariadb works fine...
+    mariadb: '10.3' # mariadb works fine...
     postgresql: "11.2"
   before_install:
     - sudo apt-get update
     - sudo apt-get --yes remove postgresql\*
     - sudo apt-get install -y postgresql-11 postgresql-client-11
+    - |
+      cat <<EOF >/etc/postgresql/11/main/pg_hba.conf
+      local   all             postgres                                trust
+      local   all             all                                     trust
+      host    all             all             127.0.0.1/32            trust
+      host    all             all             ::1/128                 trust
+      EOF
     # - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
     - sudo cat /etc/postgresql/11/main/pg_hba.conf
     - echo installing $COMPONENT
