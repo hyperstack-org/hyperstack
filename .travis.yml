@@ -40,6 +40,62 @@
 # script:
 #    - DRIVER=travis bundle exec rspec spec/batch1/column_types/column_type_spec.rb:121
 #---------------------------------------------------------------------------------------
+#
+# This fails because within the job the db does not exist
+# see job 718: https://travis-ci.com/github/hyperstack-org/hyperstack/builds/218243353
+#
+# dist: xenial
+#
+# addons:
+#   apt:
+#     sources:
+#       - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+#         key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+#       - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+#         key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+#     packages:
+#       - postgresql-11
+#       - chromium-chromedriver
+#       - google-chrome-stable
+#       - yarn
+#       - redis-server
+#   postgresql: '11'
+#
+# before_install:
+#   - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
+#   - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+#   - sudo service postgresql stop
+#   - sudo service postgresql start 11
+#   - postgres --version
+#   - sudo rm -f /usr/local/bin/yarn
+#   - nvm install 10
+#   - rvm install 2.6.3  # was 2.5.1
+#   - gem install bundler
+#   - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
+#   - echo 'install completed'
+#
+# before_script:
+#   - psql -c 'create database hyper_mesh_test_db;' -U postgres
+#
+# _test_gem: &_test_gem
+#   before_script:
+#     - cd ruby/$COMPONENT
+#     - bundle install --jobs=3 --retry=3
+#     - google-chrome --version
+#     - which google-chrome
+#     - yarn install
+#   script:
+#     - DRIVER=travis bundle exec rspec spec/batch1/column_types/column_type_spec.rb:121
+#
+# jobs:
+#   include:
+#     - <<: *_test_gem
+#       env: COMPONENT=hyper-model
+#---------------------------------------------------------------------------------------
+#
+# This fails because within the job the db does not exist
+# see job 718: https://travis-ci.com/github/hyperstack-org/hyperstack/builds/218243353
+#
 dist: xenial
 
 addons:
@@ -57,24 +113,22 @@ addons:
       - redis-server
   postgresql: '11'
 
-before_install:
-  - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
-  - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
-  - sudo service postgresql stop
-  - sudo service postgresql start 11
-  - postgres --version
-  - sudo rm -f /usr/local/bin/yarn
-  - nvm install 10
-  - rvm install 2.6.3  # was 2.5.1
-  - gem install bundler
-  - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
-  - echo 'install completed'
-
-before_script:
-  - psql -c 'create database hyper_mesh_test_db;' -U postgres
-
 _test_gem: &_test_gem
+  before_install:
+    - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
+    - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+    - sudo service postgresql stop
+    - sudo service postgresql start 11
+    - postgres --version
+    - sudo rm -f /usr/local/bin/yarn
+    - nvm install 10
+    - rvm install 2.6.3  # was 2.5.1
+    - gem install bundler
+    - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
+    - echo 'install completed'
+
   before_script:
+    - psql -c 'create database hyper_mesh_test_db;' -U postgres
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - google-chrome --version
@@ -87,7 +141,6 @@ jobs:
   include:
     - <<: *_test_gem
       env: COMPONENT=hyper-model
-
 # ------------------
 
 #
