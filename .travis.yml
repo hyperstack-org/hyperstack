@@ -36,7 +36,7 @@ before_script:
    - which google-chrome
    - yarn install
 script:
-   - DRIVER=travis bundle exec rspec spec/batch1/column_types/column_types_spec.rb:121
+   - DRIVER=travis bundle exec rspec spec/batch1/column_types/column_type_spec.rb:121
 #
 #
 #
