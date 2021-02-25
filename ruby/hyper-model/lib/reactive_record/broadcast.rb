@@ -148,7 +148,7 @@ module ReactiveRecord
       @klass = record.class.name
       @record = data
       record.backing_record.destroyed = false
-      @record[@klass.primary_key] = record.id if record.id
+      @record[record.primary_key] = record.id if record.id
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
       @previous_changes = record.changes
