@@ -129,7 +129,7 @@ _test_gem_pg: &_test_gem_pg
     - echo 'install completed'
 
   before_script:
-    - psql -c 'create database $DB;' -U postgres
+    - psql -c "create database ${DB};" -U postgres
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - google-chrome --version
