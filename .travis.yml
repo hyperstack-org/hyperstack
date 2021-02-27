@@ -115,6 +115,7 @@ addons:
 
 _test_gem: &_test_gem
   before_install:
+    - [ ! -z "${USE_PG}" ] && echo 'installing postgresql'
     - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
     - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
     - sudo service postgresql stop
@@ -140,7 +141,7 @@ _test_gem: &_test_gem
 jobs:
   include:
     - <<: *_test_gem
-      env: COMPONENT=hyper-model
+      env: COMPONENT=hyper-model USE_PG=hyper_mesh_test_db
 # ------------------
 
 #
