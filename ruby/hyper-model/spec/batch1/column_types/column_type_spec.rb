@@ -131,7 +131,9 @@ describe "column types on client", js: true do
       string: "hello",
       text: "goodby",
       time: t,
-      timestamp: t
+      timestamp: t,
+      json: {kind: :json},
+      jsonb: {kind: :jsonb}
     )
     expect do
       TypeTest.columns_hash.collect do |attr, _info|
@@ -139,7 +141,7 @@ describe "column types on client", js: true do
       end
     end.to_on_client eq([
       'Number', 'NilClass', 'Boolean', 'Date', 'Time', 'Number', 'Number', 'Number',
-      'Number', 'String', 'String', 'Time', 'Time'
+      'Number', 'String', 'String', 'Time', 'Time', 'NilClass', 'NilClass'
     ])
     check_errors
   end
@@ -169,7 +171,7 @@ describe "column types on client", js: true do
       string: "hello",
       text: "goodby",
       time: t,
-      timestamp: t
+      timestamp: t # see default tests below for json and jsonb
     )
     expect do
       t = TypeTest.find(1)
@@ -197,7 +199,9 @@ describe "column types on client", js: true do
       string: "hello",
       text: "goodby",
       time: t.time,
-      timestamp: t.time
+      timestamp: t.time,
+      json: {kind: :json},
+      jsonb: {kind: :jsonb}
     )
     expect do
       Hyperstack::Model.load do
@@ -218,7 +222,9 @@ describe "column types on client", js: true do
       'String', 'hello',
       'String', 'goodby',
       'Time', t.time_only.as_json, # date is indeterminate for active record time
-      'Time', t.as_json
+      'Time', t.as_json,
+      'Hash', {'kind' => 'json'},
+      'Hash', {'kind' => 'jsonb'}
     ])
     check_errors
   end
@@ -302,12 +308,14 @@ describe "column types on client", js: true do
       [
         t.string, t.date, t.datetime, t.integer_from_string, t.integer_from_int,
         t.float_from_string, t.float_from_float,
-        t.boolean_from_falsy_string, t.boolean_from_truthy_string, t.boolean_from_falsy_value
+        t.boolean_from_falsy_string, t.boolean_from_truthy_string, t.boolean_from_falsy_value,
+        t.json[:kind], t.jsonb[:kind]  # the default for json and jsonb is nil so we will test dummy operations here
       ]
     end.to eq([
       "I'm a string!", r.date.as_json, Timex.new(r.datetime.localtime).as_json, 99, 98,
       0.02, 0.01,
-      false, true, false
+      false, true, false,
+      'json', 'jsonb'
     ])
     check_errors
   end
