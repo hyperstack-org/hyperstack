@@ -1,10 +1,10 @@
 dist: xenial
 
-language: bash
-cache:
-  bundler: true
-  directories:
-  - node_modules # NPM packages
+# language: bash
+# cache:
+#   bundler: true
+#   directories:
+#   - node_modules # NPM packages
 
 addons:
   apt:
