@@ -113,9 +113,9 @@ addons:
       - redis-server
   postgresql: '11'
 
-_test_gem: &_test_gem
+_test_gem_pg: &_test_gem_pg
   before_install:
-    - [ ! -z "${USE_PG}" ] && echo 'installing postgresql'
+    - echo 'installing postgresql'
     - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
     - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
     - sudo service postgresql stop
@@ -129,7 +129,7 @@ _test_gem: &_test_gem
     - echo 'install completed'
 
   before_script:
-    - psql -c 'create database hyper_mesh_test_db;' -U postgres
+    - psql -c 'create database $DB;' -U postgres
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - google-chrome --version
@@ -140,8 +140,8 @@ _test_gem: &_test_gem
 
 jobs:
   include:
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model USE_PG=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model DB=hyper_mesh_test_db
 # ------------------
 
 #
