@@ -49,7 +49,6 @@ class CreateTestModels < ActiveRecord::Migration[5.2]
       t.references :author
       t.integer  "user_id"
       t.integer  "todo_item_id"
-      t.datetime "updated_at"
     end
 
     create_table "addresses" do |t|
