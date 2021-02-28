@@ -32,7 +32,7 @@ end
 
 namespace :spec do
   task :prepare do
-    sh %(cd spec/test_app; bundle exec rails db:setup)
+    sh %(cd spec/test_app; rm db/schema.rb; RAILS_ENV=test bundle exec rails db:setup; RAILS_ENV=test bundle exec rails db:migrate)
   end
   (1..7).each do |batch|
     RSpec::Core::RakeTask.new(:"batch#{batch}") do |t|

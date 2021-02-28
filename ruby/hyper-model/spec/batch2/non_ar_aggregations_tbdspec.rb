@@ -41,7 +41,6 @@ RSpec::Steps.steps 'using non-ar aggregations', js: true do
       User.find_by_first_name("Data").save
     end
     expect(User.find_by_first_name("Data").data.big_string).to eq("hellohellohello")
-    binding.pry
   end
 
   it "read it" do
