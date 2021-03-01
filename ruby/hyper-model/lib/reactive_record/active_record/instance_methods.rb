@@ -162,6 +162,14 @@ module ActiveRecord
       # end
     end
 
+    def increment!(attr)
+      load(attr).then { |current_value| update(attr => current_value + 1) }
+    end
+
+    def decrement!(attr)
+      load(attr).then { |current_value| update(attr => current_value - 1) }
+    end
+
     def load(*attributes, &block)
       first_time = true
       ReactiveRecord.load do
