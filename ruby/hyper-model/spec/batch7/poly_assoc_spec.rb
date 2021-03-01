@@ -242,7 +242,7 @@ describe "polymorphic relationships", js: true do
     it 'changing belongs to relationship on client' do
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12']
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22']
-      on_client do
+      evaluate_ruby do
         p = Picture.find(1)
         p.imageable = Product.find(1)
         p.save
