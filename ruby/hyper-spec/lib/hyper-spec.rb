@@ -53,8 +53,8 @@ module HyperSpec
     end
   end
 
-  def self.reset_between_examples=(value)
-    RSpec.configuration.reset_between_examples = value
+  def self.reset_between_examples
+    @reset_between_examples ||= []
   end
 
   def self.reset_between_examples?
@@ -106,13 +106,16 @@ end
 RSpec.configure do |config|
   config.add_setting :reset_between_examples, default: true
   config.before(:all, no_reset: true) do
-    HyperSpec.reset_between_examples = false
+    HyperSpec.reset_between_examples << RSpec.configuration.reset_between_examples
+    RSpec.configuration.reset_between_examples = false
   end
   config.before(:all, no_reset: false) do
-    HyperSpec.reset_between_examples = true
+    HyperSpec.reset_between_examples << RSpec.configuration.reset_between_examples
+    RSpec.configuration.reset_between_examples = true
   end
   config.after(:all) do
     HyperSpec.reset_sessions! unless HyperSpec.reset_between_examples?
+    RSpec.configuration.reset_between_examples = HyperSpec.reset_between_examples.pop
   end
   config.before(:each) do |example|
     insure_page_loaded(true) if example.metadata[:js] && !HyperSpec.reset_between_examples?
