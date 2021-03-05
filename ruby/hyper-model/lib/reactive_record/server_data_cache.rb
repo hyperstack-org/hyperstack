@@ -486,7 +486,7 @@ keys:
           elsif !target
             load_from_json(value, Object.const_get(method))
           elsif method == "*count"
-            target.set_count_state(value.first)
+            target.count_state = value.first
           elsif method.is_a? Integer or method =~ /^[0-9]+$/
             new_target = target.push_and_update_belongs_to(method)
           elsif method.is_a? Array

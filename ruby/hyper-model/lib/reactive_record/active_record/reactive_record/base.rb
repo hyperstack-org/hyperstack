@@ -38,6 +38,7 @@ module ReactiveRecord
     attr_accessor :aggregate_owner
     attr_accessor :aggregate_attribute
     attr_accessor :destroyed
+    attr_accessor :being_destroyed
     attr_accessor :updated_during
     attr_accessor :synced_attributes
     attr_accessor :virgin

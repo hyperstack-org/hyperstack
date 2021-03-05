@@ -93,7 +93,7 @@ module ReactiveRecord
     class Destroy < Base
       param :acting_user, nils: true
       param :model
-      param :id
+      param :id, nils: true
       param :vector
       step do
         ReactiveRecord::Base.destroy_record(

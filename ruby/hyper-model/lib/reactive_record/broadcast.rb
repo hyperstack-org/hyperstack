@@ -115,6 +115,10 @@ module ReactiveRecord
       @destroyed
     end
 
+    def local?
+      @is_local
+    end
+
     def klass
       Object.const_get(@klass)
     end
@@ -135,7 +139,7 @@ module ReactiveRecord
       @in_transit ||= Hash.new { |h, k| h[k] = new(k) }
     end
 
-    def initialize(id)
+    def initialize(id = nil)
       @id = id
       @received = Set.new
       @record = {}
@@ -144,6 +148,7 @@ module ReactiveRecord
 
     def local(operation, record, data)
       @destroyed = operation == :destroy
+      @is_local = true
       @is_new = operation == :create
       @klass = record.class.name
       @record = data
@@ -166,7 +171,7 @@ module ReactiveRecord
         @backing_record = ReactiveRecord::Base.exists?(klass, params.record[klass.primary_key])
 
         # first check to see if we already destroyed it and if so exit the block
-        return if @backing_record&.destroyed
+        break if @backing_record&.destroyed
 
         # We ignore whether the record is being created or not, and just check and see if in our
         # local copy we have ever loaded this id before.  If we have then its not new to us.

@@ -76,7 +76,6 @@ describe 'getting ref from an Element', js: true do
         render(DIV) { "another component named #{@Others[:foo]}"}
       end
       class TestComponent < HyperComponent
-        after_mount { debugger unless @ref_1.ref == @ref_2.ref; nil }
         render do
           @ref_1 = AnotherComponent().as_node
           @ref_2 = @ref_1.render(foo: :bar)

@@ -16,7 +16,7 @@ module ActiveRecord
     )
 
     def self.__hyperstack_internal_scoped_find_by(attrs)
-      collection = all.apply_scope(:___hyperstack_internal_scoped_find_by, attrs)
+      collection = all.apply_scope(:___hyperstack_internal_scoped_find_by, attrs).observed
       if !collection.collection
         collection._find_by_initializer(self, attrs)
       else

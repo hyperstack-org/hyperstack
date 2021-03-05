@@ -126,8 +126,8 @@ module ActiveRecord
       @backing_record.revert
     end
 
-    def changed?
-      @backing_record.changed?
+    def changed?(attr = nil)
+      @backing_record.changed?(*attr)
     end
 
     def dup

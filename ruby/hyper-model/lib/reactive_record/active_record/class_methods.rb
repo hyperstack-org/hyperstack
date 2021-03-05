@@ -317,6 +317,14 @@ module ActiveRecord
       end
     end
 
+    def table_name
+      @table_name || name.downcase.pluralize
+    end
+
+    def table_name=(name)
+      @table_name = name
+    end
+
     def composed_of(name, opts = {})
       reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
       if reflection.klass < ActiveRecord::Base

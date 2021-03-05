@@ -230,7 +230,7 @@ module ReactiveRecord
       def respond_to?(method)
         return true if method == :acts_as_string?
         return true if %i[inspect to_date to_f to_i to_numeric to_number to_s to_time].include? method
-        return @object.respond_to? if @object
+        return @object.respond_to?(method) if @object
         false
       end
 

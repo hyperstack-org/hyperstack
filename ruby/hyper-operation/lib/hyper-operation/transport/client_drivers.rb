@@ -97,7 +97,7 @@ module Hyperstack
           %x{
             var channel = #{ClientDrivers.opts[:pusher_api]}.subscribe(#{channel.gsub('::', '==')});
             channel.bind('dispatch', #{ClientDrivers.opts[:dispatch]})
-            channel.bind('pusher:subscription_succeeded', #{lambda {ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
+            channel.bind('pusher:subscription_succeeded', #{->(*) { ClientDrivers.get_queued_data("connect-to-transport", channel_string)}})
           }
           @pusher_dispatcher_registered = true
         elsif ClientDrivers.opts[:transport] == :action_cable

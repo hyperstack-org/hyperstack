@@ -1,6 +1,6 @@
 RSpec.configure do |config|
   config.before(:all) do
-    on_client do
+    before_mount do
       class TestComponent < HyperComponent
         param scope: :all
         render(DIV) do

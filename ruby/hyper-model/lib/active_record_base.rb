@@ -5,17 +5,46 @@ module ActiveRecord
   # processes these arguments, and the will always leave the true server side scoping
   # proc in the `:server` opts.   This method is common to client and server.
   class Base
-    def self._synchromesh_scope_args_check(args)
-      opts = if args.count == 2 && args[1].is_a?(Hash)
-               args[1].merge(server: args[0])
-             elsif args[0].is_a? Hash
-               args[0]
-             else
-               { server: args[0] }
-             end
-      return opts if opts && opts[:server].respond_to?(:call)
-      raise 'must provide either a proc as the first arg or by the '\
-            '`:server` option to scope and default_scope methods'
+    class << self
+      def _synchromesh_scope_args_check(args)
+        opts = if args.count == 2 && args[1].is_a?(Hash)
+                 args[1].merge(server: args[0])
+               elsif args[0].is_a? Hash
+                 args[0]
+               else
+                 { server: args[0] }
+               end
+        return opts if opts && opts[:server].respond_to?(:call)
+        raise 'must provide either a proc as the first arg or by the '\
+              '`:server` option to scope and default_scope methods'
+      end
+
+      alias pre_hyperstack_has_and_belongs_to_many has_and_belongs_to_many unless RUBY_ENGINE == 'opal'
+
+      def has_and_belongs_to_many(other, opts = {}, &block)
+        join_table_name = [other.to_s, table_name].sort.join('_')
+        join_model_name = "HyperstackInternalHabtm#{join_table_name.singularize.camelize}"
+        join_model =
+          if Object.const_defined? join_model_name
+            Object.const_get(join_model_name)
+          else
+            Object.const_set(join_model_name, Class.new(ActiveRecord::Base))
+          end
+
+        join_model.class_eval { belongs_to other.to_s.singularize.to_sym }
+
+        has_many join_model_name.underscore.pluralize.to_sym
+
+        if RUBY_ENGINE == 'opal'
+          Object.const_set("HABTM_#{other.to_s.camelize}", join_model)
+          join_model.inheritance_column = nil
+          has_many other, through: join_model_name.underscore.pluralize.to_sym
+        else
+          join_model.table_name = join_table_name
+          join_model.belongs_to other
+          pre_hyperstack_has_and_belongs_to_many(other, opts, &block)
+        end
+      end
     end
   end
   if RUBY_ENGINE != 'opal'

@@ -141,6 +141,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
 
 =end
+
       def sync_scopes(broadcast)
         # record_with_current_values will return nil if data between
         # the broadcast record and the value on the client is out of sync
@@ -336,25 +337,24 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def observed
-      return if @observing || ReactiveRecord::Base.data_loading?
+      return self if @observing || ReactiveRecord::Base.data_loading?
       begin
         @observing = true
         link_to_parent
         reload_from_db(true) if @out_of_date
         Hyperstack::Internal::State::Variable.get(self, :collection)
+        self
       ensure
         @observing = false
       end
     end
 
-    def set_count_state(val)
+    def count_state=(val)
       unless ReactiveRecord::WhileLoading.observed?
         Hyperstack::Internal::State::Variable.set(self, :collection, collection, true)
       end
       @count = val
     end
-
-
 
     def _count_internal(load_from_client)
       # when count is called on a leaf, count_internal is called for each
@@ -557,7 +557,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       notify_of_change new_array
     end
 
-    def delete(item)
+    def destroy_non_habtm(item)
       Hyperstack::Internal::State::Mapper.bulk_update do
         unsaved_children.delete(item)
         if @owner && @association
@@ -572,6 +572,23 @@ To determine this sync_scopes first asks if the record being changed is in the s
         end.tap { Hyperstack::Internal::State::Variable.set(self, :collection, collection) }
       end
     end
+
+    def destroy(item)
+      return destroy_non_habtm(item) unless @association&.habtm?
+
+      ta = @association.through_association
+      item_foreign_key = @association.source_belongs_to_association.association_foreign_key
+      join_record = ta.klass.find_by(
+        ta.association_foreign_key => @owner.id,
+        item_foreign_key => item.id
+      )
+      return destroy_non_habtm(item) if join_record.nil? ||
+                                        join_record.backing_record.being_destroyed
+
+      join_record&.destroy
+    end
+
+    alias delete destroy
 
     def delete_internal(item)
       if collection
