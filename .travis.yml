@@ -38,6 +38,8 @@ _test_gem_pg: &_test_gem_pg
 
   before_script:
     - echo before_script $COMPONENT
+    - echo updating chrome driver
+    - chromedriver-update 89.0.4389.23
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - bundle exec rake spec:prepare
@@ -78,6 +80,8 @@ _test_gem: &_test_gem
 
   before_script:
     - echo before_script $COMPONENT
+    - echo updating chrome driver
+    - chromedriver-update 89.0.4389.23
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - bundle exec rake spec:prepare
