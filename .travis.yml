@@ -80,13 +80,13 @@ _test_gem: &_test_gem
 
   before_script:
     - echo before_script $COMPONENT
-    - echo updating chrome driver
-    - chromedriver-update 89.0.4389.23
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - bundle exec rake spec:prepare
     - google-chrome --version
     - which google-chrome
+    - echo updating chrome driver
+    - bundle exec rake webdrivers:chromedriver:update
     - yarn install
   script:
     - echo running script $COMPONENT
