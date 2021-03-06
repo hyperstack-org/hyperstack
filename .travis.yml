@@ -1,7 +1,5 @@
 dist: xenial
 
-language: bash
-
 addons:
   apt:
     sources:
@@ -19,10 +17,13 @@ addons:
 
 _test_gem_pg: &_test_gem_pg
   stage: test
+
+  language: ruby
   cache:
     bundler: true
     directories:
     - node_modules # NPM packages
+
   before_install:
     - echo 'installing postgresql'
     - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
@@ -39,8 +40,12 @@ _test_gem_pg: &_test_gem_pg
 
   before_script:
     - echo before_script $COMPONENT
+    - echo updating chrome driver
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
+    - bundle exec ruby -e 'require "webdrivers";  Webdrivers::Chromedriver.update; puts Webdrivers::Chromedriver.current_version'
+    - ls -la ~/.webdrivers
+    - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
     - bundle exec rake spec:prepare
     - google-chrome --version
     - which google-chrome
@@ -51,10 +56,13 @@ _test_gem_pg: &_test_gem_pg
 
 _test_gem: &_test_gem
   stage: test
+
+  language: ruby
   cache:
     bundler: true
     directories:
     - node_modules # NPM packages
+
   addons:
     apt:
       sources:
@@ -78,16 +86,17 @@ _test_gem: &_test_gem
     - nvm install 10
     - rvm install 2.6.3  # was 2.5.1
     - gem install bundler
-    - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
     - echo 'install completed'
 
   before_script:
     - echo before_script $COMPONENT
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
-    - bundle exec rake spec:prepare
     - google-chrome --version
-    - which google-chrome
+    - bundle exec ruby -e 'require "webdrivers";  Webdrivers::Chromedriver.update; puts Webdrivers::Chromedriver.current_version'
+    - ls -la ~/.webdrivers
+    - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
+    - bundle exec rake spec:prepare
     - yarn install
   script:
     - echo running script $COMPONENT
