@@ -8,11 +8,11 @@ dist: xenial
 
 addons:
   apt:
-    # sources:
-    #   - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
-    #     key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
-    #   - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
-    #     key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+    sources:
+      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+      - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+        key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
     packages:
       - postgresql-11
       # - chromium-chromedriver
@@ -54,11 +54,11 @@ _test_gem: &_test_gem
   stage: test
   addons:
     apt:
-      # sources:
-      #   - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
-      #     key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
-      #   - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
-      #     key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+      sources:
+        - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+          key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+        - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+          key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
       packages:
         # - chromium-chromedriver
         - google-chrome-stable
