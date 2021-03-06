@@ -84,7 +84,7 @@ _test_gem: &_test_gem
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - bundle exec rake webdrivers:chromedriver:version
-    - bundle exec sudo rake webdrivers:chromedriver:update
+    - sudo bundle exec rake webdrivers:chromedriver:update
     - bundle exec rake webdrivers:chromedriver:version
     - ls $WD_INSTALL_DIR
     - bundle exec rake spec:prepare
