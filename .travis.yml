@@ -15,7 +15,7 @@ addons:
         key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
     packages:
       - postgresql-11
-      # - chromium-chromedriver
+      - chromium-chromedriver
       - google-chrome-stable
       - yarn
       - redis-server
@@ -60,7 +60,7 @@ _test_gem: &_test_gem
         - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
           key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
       packages:
-        # - chromium-chromedriver
+        - chromium-chromedriver
         - google-chrome-stable
         - yarn
         - redis-server
@@ -75,6 +75,7 @@ _test_gem: &_test_gem
     - nvm install 10
     - rvm install 2.6.3  # was 2.5.1
     - gem install bundler
+    # /usr/lib/chromium-browser/chromedriver
     # - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
     - echo 'install completed'
 
