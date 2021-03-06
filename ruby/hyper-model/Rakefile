@@ -1,7 +1,5 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
-require 'webdrivers'
-load 'webdrivers/Rakefile'
 
 def run_batches(batches)
   failed = false
