@@ -1,11 +1,5 @@
 dist: xenial
 
-# language: bash
-# cache:
-#   bundler: true
-#   directories:
-#   - node_modules # NPM packages
-
 addons:
   apt:
     sources:
@@ -22,6 +16,14 @@ addons:
   postgresql: '11'
 
 _test_gem_pg: &_test_gem_pg
+  stage: test
+
+  language: ruby
+  cache:
+    bundler: true
+    directories:
+    - node_modules # NPM packages
+
   before_install:
     - echo 'installing postgresql'
     - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
@@ -54,6 +56,13 @@ _test_gem_pg: &_test_gem_pg
 
 _test_gem: &_test_gem
   stage: test
+  
+  language: ruby
+  cache:
+    bundler: true
+    directories:
+    - node_modules # NPM packages
+
   addons:
     apt:
       sources:
