@@ -115,6 +115,11 @@ RSpec.configure do |config|
   end
   config.after(:all) do
     HyperSpec.reset_sessions! unless HyperSpec.reset_between_examples?
+    # If rspecs step is used first in a file, it will NOT call config.before(:all) causing the
+    # reset_between_examples stack to be mismatched, so we check, if its already empty we
+    # just leave.
+    next if HyperSpec.reset_between_examples.empty?
+
     RSpec.configuration.reset_between_examples = HyperSpec.reset_between_examples.pop
   end
   config.before(:each) do |example|
