@@ -15,7 +15,7 @@ addons:
         key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
     packages:
       - postgresql-11
-      # - chromium-chromedriver
+      - chromium-chromedriver
       - google-chrome-stable
       - yarn
       - redis-server
