@@ -99,6 +99,21 @@ describe 'hyper-spec', js: true do
     end.to eq(12)
   end
 
+  describe 'isomorphic code using the isomorphic method' do
+    before(:each) do
+      isomorphic do
+        class FooBar123
+          def foo
+            12
+          end
+        end
+      end
+    end
+    it 'can run the isomorphic method in the before each block' do
+      expect { FooBar123.new.foo }.on_client_to eq(FooBar123.new.foo)
+    end
+  end
+
   it "can load isomorphic code using the isomorphic method" do
     isomorphic do
       def factorial(n)
