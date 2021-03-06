@@ -84,7 +84,7 @@ _test_gem: &_test_gem
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - rake webdrivers:chromedriver:version
-    - rake webdrivers:chromedriver:update
+    - sudo rake webdrivers:chromedriver:update
     - rake webdrivers:chromedriver:version
     - ls $WD_INSTALL_DIR
     - bundle exec rake spec:prepare
@@ -117,7 +117,7 @@ jobs:
     - <<: *_test_gem
       env: COMPONENT=hyper-trace       RUBY_VERSION=2.5.1
     - <<: *_test_gem
-      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1 WD_INSTALL_DIR="/usr/lib/chromium-browser/"
+      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1 WD_INSTALL_DIR="/usr/lib/chromium-browser"
     - <<: *_test_gem
       env: COMPONENT=hyper-state       RUBY_VERSION=2.5.1
     - <<: *_test_gem
