@@ -88,7 +88,7 @@ _test_gem: &_test_gem
     - bundle exec rake webdrivers:chromedriver:version
     - bundle exec rake webdrivers:chromedriver:update
     - ls -la ~/.webdrivers
-    - sudo ln -s  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
+    - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
     - bundle exec rake webdrivers:chromedriver:version
     - bundle exec rake webdrivers:chromedriver:version WD_INSTALL_DIR='/usr/lib/chromium-browser'
     - ls /usr/lib/chromium-browser
