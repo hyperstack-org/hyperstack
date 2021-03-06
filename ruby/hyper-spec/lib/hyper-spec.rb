@@ -25,6 +25,7 @@ require 'hyper-spec/expectations'
 require 'parser/current'
 require 'webdrivers/chromedriver'
 Webdrivers.logger.level = :DEBUG
+puts 'logger level set to :DEBUG'
 if defined?(Selenium::WebDriver::Firefox)
   require 'selenium/web_driver/firefox/profile'
   require 'webdrivers/geckodriver'
