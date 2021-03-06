@@ -83,13 +83,17 @@ _test_gem: &_test_gem
     - echo before_script $COMPONENT
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
-    - bundle exec rake webdrivers:chromedriver:version
-    - sudo bundle exec rake webdrivers:chromedriver:update
-    - bundle exec rake webdrivers:chromedriver:version
-    - ls $WD_INSTALL_DIR
-    - bundle exec rake spec:prepare
     - google-chrome --version
     - which google-chrome
+    - bundle exec rake webdrivers:chromedriver:version
+    - bundle exec rake webdrivers:chromedriver:update
+    - ls -la ~/bin/.webdrivers
+    - sudo ln -s  ~/bin/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
+    - bundle exec rake webdrivers:chromedriver:version
+    - bundle exec rake webdrivers:chromedriver:version WD_INSTALL_DIR='/usr/lib/chromium-browser'
+    - ls /usr/lib/chromium-browser
+    - bundle exec rake spec:prepare
+
     - yarn install
   script:
     - echo running script $COMPONENT
@@ -117,7 +121,7 @@ jobs:
     - <<: *_test_gem
       env: COMPONENT=hyper-trace       RUBY_VERSION=2.5.1
     - <<: *_test_gem
-      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1 WD_INSTALL_DIR="/usr/lib/chromium-browser"
+      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1 WD_INSTALL_DIRX="/usr/lib/chromium-browser"
     - <<: *_test_gem
       env: COMPONENT=hyper-state       RUBY_VERSION=2.5.1
     - <<: *_test_gem
