@@ -15,7 +15,7 @@ addons:
         key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
     packages:
       - postgresql-11
-      # - chromium-chromedriver
+      - chromium-chromedriver
       - google-chrome-stable
       - yarn
       - redis-server
@@ -60,7 +60,7 @@ _test_gem: &_test_gem
         - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
           key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
       packages:
-        # - chromium-chromedriver
+        - chromium-chromedriver
         - google-chrome-stable
         - yarn
         - redis-server
@@ -89,7 +89,7 @@ _test_gem: &_test_gem
     - bundle exec ruby -e 'require "webdrivers";  Webdrivers::Chromedriver.update; puts Webdrivers::Chromedriver.current_version'
     # - bundle exec rake webdrivers:chromedriver:version
     # - bundle exec rake webdrivers:chromedriver:update
-    # - ls -la ~/.webdrivers
+    - ls -la ~/.webdrivers
     - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
     # - bundle exec rake webdrivers:chromedriver:version
     # - bundle exec rake webdrivers:chromedriver:version WD_INSTALL_DIR='/usr/lib/chromium-browser'
