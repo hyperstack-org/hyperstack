@@ -23,7 +23,11 @@ require 'hyper-spec/helpers'
 require 'hyper-spec/expectations'
 
 require 'parser/current'
-require 'selenium/web_driver/firefox/profile' if defined?(Selenium::WebDriver::Firefox)
+require 'webdrivers/chromedriver'
+if defined?(Selenium::WebDriver::Firefox)
+  require 'selenium/web_driver/firefox/profile'
+  require 'webdrivers/geckodriver'
+end
 require 'selenium-webdriver'
 
 require 'hyper-spec/version'

@@ -85,8 +85,6 @@ _test_gem: &_test_gem
     - bundle exec rake spec:prepare
     - google-chrome --version
     - which google-chrome
-    - echo updating chrome driver
-    - bundle exec rake webdrivers:chromedriver:update
     - yarn install
   script:
     - echo running script $COMPONENT
