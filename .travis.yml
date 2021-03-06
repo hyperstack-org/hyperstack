@@ -15,7 +15,7 @@ addons:
         key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
     packages:
       - postgresql-11
-      - chromium-chromedriver
+      # - chromium-chromedriver
       - google-chrome-stable
       - yarn
       - redis-server
@@ -39,7 +39,7 @@ _test_gem_pg: &_test_gem_pg
   before_script:
     - echo before_script $COMPONENT
     - echo updating chrome driver
-    - chromedriver-update 89.0.4389.23
+    # - chromedriver-update 89.0.4389.23
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
     - bundle exec rake spec:prepare
@@ -60,8 +60,8 @@ _test_gem: &_test_gem
         - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
           key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
       packages:
-        - chromium-chromedriver
-        - google-chrome-stable
+        # - chromium-chromedriver
+        # - google-chrome-stable
         - yarn
         - redis-server
     mariadb: '10.3'
