@@ -77,7 +77,7 @@ _test_gem: &_test_gem
     - gem install bundler
     # /usr/lib/chromium-browser/chromedriver <- is that a dir of a file?
     # - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
-    - sudo ln -s /usr/lib/chromium-browser ~/.webdrivers
+    # - sudo ln -s /usr/lib/chromium-browser ~/.webdrivers
     - echo 'install completed'
 
   before_script:
@@ -90,7 +90,7 @@ _test_gem: &_test_gem
     # - bundle exec rake webdrivers:chromedriver:version
     # - bundle exec rake webdrivers:chromedriver:update
     # - ls -la ~/.webdrivers
-    # - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
+    - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
     # - bundle exec rake webdrivers:chromedriver:version
     # - bundle exec rake webdrivers:chromedriver:version WD_INSTALL_DIR='/usr/lib/chromium-browser'
     - ls /usr/lib/chromium-browser
