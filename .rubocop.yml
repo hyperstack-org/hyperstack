@@ -1,5 +1,4 @@
 AllCops:
-  TargetRubyVersion: 2.3
   Exclude:
     - 'db/schema.rb'
     - 'db/seeds.rb'
@@ -31,14 +30,11 @@ Metrics/BlockLength:
   Description: 'Avoid long blocks with many lines.'
   Enabled: false
 
-Metrics/LineLength:
-  Max: 100
-
 
 ## Performance
 
-Performance/RegexpMatch:
-  Enabled: false
+# Performance/RegexpMatch:
+#   Enabled: false
 
 
 ## Style
@@ -139,3 +135,19 @@ Style/MutableConstant:
 
 Style/SafeNavigation:
   Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+  Exclude:
+    - Gemfile
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+  Exclude:
+    - app/hyperstack/components
+    - app/hyperstack/libs
+
+Layout/MultilineMethodCallIndentation:
+  Exclude:
+    - 'bin/yarn'
+    - app/hyperstack/components

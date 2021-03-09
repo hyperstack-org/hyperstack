@@ -91,12 +91,12 @@ module Hyperstack
           # two child Elements will be generated.
           #
           # the final value of the block should either be
-          #   1 an object that responds to :acts_as_string?
-          #   2 a string,
-          #   3 an element that is NOT yet pushed on the rendering buffer
-          #   4 or the last element pushed on the buffer
+          #   1 a hyper model dummy value that is being loaded,
+          #   2 a string (or if the buffer is empty any value to which to_s can be applied)
+          #   3 an Element that is NOT yet pushed on the rendering buffer
+          #   4 or the last Element pushed on the buffer
           #
-          # in case 1 we render a span
+          # in case 1 we render a span wrapping the dummy value
           # in case 2 we automatically push the string onto the buffer
           # in case 3 we also push the Element onto the buffer IF the buffer is empty
           # case 4 requires no special processing
@@ -105,31 +105,62 @@ module Hyperstack
           # outer rendering scope.  In this case react only allows us to generate 1 Element
           # so we insure that is the case, and also check to make sure that element in the buffer
           # is the element returned
+          #
+          # Note that the reason we only allow Strings to be automatically pushed is to avoid
+          # confusing results in situations like this:
+          #   DIV { collection.each { |item| SPAN { item } } }
+          # If we accepted any object to be rendered this would generate:
+          #   DIV { SPAN { collection[0] } SPAN { collection[n] } collection.to_s }
+          # which is probably not the desired output.  If it was you would just append to_s
+          # to the end of the expression, to force it to be added to the output buffer.
+          #
+          # However if the buffer is empty then it makes sense to automatically apply the `.to_s`
+          # to the value, and push it on the buffer
 
           def run_child_block(is_outer_scope)
             result = yield
-            if result.respond_to?(:acts_as_string?) && result.acts_as_string?
-              # hyper-mesh DummyValues respond to acts_as_string, and must
+            if dummy_value?(result)
+              # hyper-mesh DummyValues must
               # be converted to spans INSIDE the parent, otherwise the waiting_on_resources
               # flag will get set in the wrong context
               RenderingContext.render(:span) { result.to_s }
-            elsif result.is_a?(String) || (result.is_a?(Hyperstack::Component::Element) && @buffer.empty?)
+            elsif pushable?(result)
               @buffer << result
             end
-            raise_render_error(result) if is_outer_scope && @buffer != [result]
+            buffer_integrity_error if is_outer_scope && @buffer != [result]
           end
 
-          # heurestically raise a meaningful error based on the situation
+          def dummy_value?(result)
+            result.respond_to?(:loading?) && result.loading?
+          end
 
-          def raise_render_error(result)
-            improper_render 'A different element was returned than was generated within the DSL.',
-                            'Possibly improper use of Element#delete.' if @buffer.count == 1
-            improper_render "Instead #{@buffer.count} elements were generated.",
-                            'Do you want to wrap your elements in a div?' if @buffer.count > 1
-            improper_render "Instead the component #{result} was returned.",
-                            "Did you mean #{result}()?" if result.try :hyper_component?
-            improper_render "Instead the #{result.class} #{result} was returned.",
-                            'You may need to convert this to a string.'
+          def pushable?(result)
+            # if result is an Element, and buffer is empty then push the Element on, otherwise assume
+            # it has been pushed on already, and the integrity check will confirm
+            return @buffer.empty? if result.is_a?(Hyperstack::Component::Element)
+
+            # check for a common error of saying (for example) DIV (without parens)
+            # which returns the DIV component class instead of a rendered DIV
+            if result.try :hyper_component?
+              improper_render "Instead the component class #{result} was returned.",
+                              "Did you mean #{result}()?"
+            end
+
+            # if the buffer is not empty we will only push on strings, and ignore anything else
+            return result.is_a?(String) unless @buffer.empty?
+
+            # if the buffer IS empty then we can push on anything
+            true
+          end
+
+          def buffer_integrity_error
+            if @buffer.count == 1
+              improper_render "A different element was returned than was generated within the DSL.",
+                              "Possibly improper use of Element#delete."
+            else
+              improper_render "Instead #{@buffer.count} elements were generated.",
+                              "Do you want to wrap your elements in a div?"
+            end
           end
 
           def improper_render(message, solution)
@@ -143,7 +174,7 @@ module Hyperstack
 end
 
 class Object
-  [:span, :td, :th].each do |tag|
+  %i[span td th].each do |tag|
     define_method(tag) do |*args, &block|
       args.unshift(tag)
       # legacy hyperloop allowed tags to be lower case as well so if self is a component
@@ -155,21 +186,23 @@ class Object
       # in the component.
       # If we fully deprecate lowercase tags, then this next line can go...
       return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
+
       Hyperstack::Internal::Component::RenderingContext.render(*args) { to_s }
     end
   end
-
 
   def para(*args, &block)
     args.unshift(:p)
     # see above comment
     return send(*args, &block) if respond_to?(:hyper_component?) && hyper_component?
+
     Hyperstack::Internal::Component::RenderingContext.render(*args) { to_s }
   end
 
   def br
     # see above comment
     return send(:br) if respond_to?(:hyper_component?) && hyper_component?
+
     Hyperstack::Internal::Component::RenderingContext.render(:span) do
       Hyperstack::Internal::Component::RenderingContext.render(to_s)
       Hyperstack::Internal::Component::RenderingContext.render(:br)

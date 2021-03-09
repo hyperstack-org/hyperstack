@@ -237,6 +237,26 @@ describe 'React::Component', js: true do
       expect(page).to have_content("paramchildparamchild")
     end
 
+    it "will convert only the final value to a string if the buffer is empty" do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render { {'foo' => 'bar'} }
+        end
+      end
+      expect(page).to have_content("#{{'foo' => 'bar'}}")
+    end
+
+    it "will convert only the final value to a string if the buffer is empty" do
+      # note that the spec 'can create an element without buffering' effectively
+      # checks other cases where the return value is  elements have been rendered to the buffer
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render { DIV { SPAN { 'foo-' }; 'bar' } }
+        end
+      end
+      expect(page).to have_content("foo-bar")
+    end
+
     it 'can receive and render a component class' do
       mount 'Baz' do
         class Bar < Hyperloop::Component
@@ -505,15 +525,6 @@ describe 'React::Component', js: true do
   end
 
   describe 'Render Error Handling' do
-    it "will generate a message if render returns something other than an Element or a String" do
-      mount 'Foo' do
-        class Foo < Hyperloop::Component
-          render { Hash.new }
-        end
-      end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-          .to match(/You may need to convert this to a string./)
-    end
     it "will generate a message if render returns a Component class" do
       mount 'Foo' do
         class Foo < Hyperloop::Component

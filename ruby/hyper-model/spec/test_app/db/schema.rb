@@ -46,21 +46,6 @@ ActiveRecord::Schema.define(version: 2021_02_28_200459) do
     t.index ["todo_id"], name: "index_comments_on_todo_id"
   end
 
-  create_table "default_tests", force: :cascade do |t|
-    t.string "string", default: "I'm a string!"
-    t.date "date", default: "2021-02-27"
-    t.datetime "datetime", default: "2021-02-27 22:45:41"
-    t.integer "integer_from_string", default: 99
-    t.integer "integer_from_int", default: 98
-    t.float "float_from_string", default: 0.02
-    t.float "float_from_float", default: 0.01
-    t.boolean "boolean_from_falsy_string", default: false
-    t.boolean "boolean_from_truthy_string", default: true
-    t.boolean "boolean_from_falsy_value", default: false
-    t.json "json", default: {"kind"=>"json"}
-    t.jsonb "jsonb", default: {"kind"=>"jsonb"}
-  end
-
   create_table "hyperstack_connections", force: :cascade do |t|
     t.string "channel"
     t.string "session"
@@ -109,23 +94,6 @@ ActiveRecord::Schema.define(version: 2021_02_28_200459) do
     t.bigint "owner_id"
     t.index ["created_by_id"], name: "index_todos_on_created_by_id"
     t.index ["owner_id"], name: "index_todos_on_owner_id"
-  end
-
-  create_table "type_tests", force: :cascade do |t|
-    t.binary "binary"
-    t.boolean "boolean"
-    t.date "date"
-    t.datetime "datetime"
-    t.decimal "decimal", precision: 5, scale: 2
-    t.float "float"
-    t.integer "integer"
-    t.bigint "bigint"
-    t.string "string"
-    t.text "text"
-    t.time "time"
-    t.datetime "timestamp"
-    t.json "json"
-    t.jsonb "jsonb"
   end
 
   create_table "users", force: :cascade do |t|
