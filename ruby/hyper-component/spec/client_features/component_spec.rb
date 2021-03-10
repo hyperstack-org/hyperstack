@@ -122,7 +122,7 @@ describe 'React::Component', js: true do
       mount 'Foo' do
         class Foo
           include Hyperstack::Component
-          before_mount { @count = 0}
+          before_mount { @count = 0 }
           after_render do
             @count += 1
             after(0) { force_update! } if @count <= 2

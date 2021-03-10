@@ -66,9 +66,9 @@ module Hyperstack
         def self.create_native_react_class(type)
           raise "createReactClass is undefined. Add the 'react-create-class' npm module, and import it as 'createReactClass'" if `typeof(createReactClass)=='undefined'`
           raise "Provided class should define `render` method"  if !(type.method_defined? :render)
-          render_fn = (type.method_defined? :_render_wrapper) ? :_render_wrapper : :render
+          old_school = !type.method_defined?(:_render_wrapper)
+          render_fn = old_school ? :render : :_render_wrapper
           # this was hashing type.to_s, not sure why but .to_s does not work as it Foo::Bar::View.to_s just returns "View"
-
           @@component_classes[type] ||= begin
             comp = %x{
               createReactClass({
@@ -88,7 +88,7 @@ module Hyperstack
                   return #{type.respond_to?(:default_props) ? type.default_props.to_n : `{}`};
                 },
                 propTypes: #{type.respond_to?(:prop_types) ? type.prop_types.to_n : `{}`},
-                componentWillMount: function() {
+                componentWillMount: old_school && function() {
                   if (#{type.method_defined? :component_will_mount}) {
                     this.__opalInstanceSyncSetState = true;
                     this.__opalInstance.$component_will_mount();
@@ -102,7 +102,7 @@ module Hyperstack
                     this.__opalInstance.$component_did_mount();
                   }
                 },
-                componentWillReceiveProps: function(next_props) {
+                UNSAFE_componentWillReceiveProps: function(next_props) {
                   if (#{type.method_defined? :component_will_receive_props}) {
                     this.__opalInstanceSyncSetState = true;
                     this.__opalInstance.$component_will_receive_props(Opal.Hash.$new(next_props));
@@ -115,7 +115,7 @@ module Hyperstack
                     return this.__opalInstance["$should_component_update?"](Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));
                   } else { return true; }
                 },
-                componentWillUpdate: function(next_props, next_state) {
+                UNSAFE_componentWillUpdate: function(next_props, next_state) {
                   if (#{type.method_defined? :component_will_update}) {
                     this.__opalInstanceSyncSetState = false;
                     this.__opalInstance.$component_will_update(Opal.Hash.$new(next_props), Opal.Hash.$new(next_state));

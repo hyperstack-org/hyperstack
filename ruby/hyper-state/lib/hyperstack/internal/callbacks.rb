@@ -34,7 +34,7 @@ module Hyperstack
             Hotloader.when_file_updates do
               send(wrapper_name).delete_if { |item| item.equal? args }
             end
-            after_define_hook.call(*args, &block) if after_define_hook
+            after_define_hook.call(self, *args, &block) if after_define_hook
           end
         end
 

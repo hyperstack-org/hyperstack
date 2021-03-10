@@ -21,13 +21,22 @@ module Hyperstack
         class_attribute :initial_state
         define_callback :before_mount
         define_callback :after_mount
-        define_callback :before_new_params
-        define_callback :before_update
+        define_callback :before_new_params do |klass|
+          klass.deprecation_warning "`before_new_params` has been deprecated.  "\
+                                    "The base method componentWillReceiveProps is deprecated in React without replacement"
+        end
+        define_callback(:before_update) do |klass, *args, &block|
+          [*args, *block].detect do |method|
+            method = klass.instance_method(method) unless method.is_a?(Proc)
+            next if method.arity.zero?
+
+            klass.deprecation_warning "In the future before_update callbacks will not receive any parameters."
+          end
+        end
         define_callback :after_update
         define_callback :__hyperstack_component_after_render_hook
         define_callback :__hyperstack_component_rescue_hook
-        #define_callback :before_unmount defined already by Async module
-        define_callback(:after_error) { Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(base) }
+        define_callback(:after_error) { |klass| Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(klass) }
       end
       base.extend(Hyperstack::Internal::Component::ClassMethods)
       unless `Opal.__hyperstack_component_original_defn`
@@ -168,10 +177,22 @@ module Hyperstack
       run_callback(:__hyperstack_component_after_render_hook, element) { |*args| args }.first
     end
 
+    def _run_before_render_callbacks
+      # eventually add before_update if @__component_mounted
+      # but that will not perfectly match the current React behavior.
+      # However that behavior is deprecated, and so once we have
+      # given a chance for the code to be updated we can switch this over
+      # and switch the deprecation notice to an error.
+      component_will_mount unless @__component_mounted
+      @__component_mounted = true
+    end
+
+
     def _render_wrapper
+      _run_before_render_callbacks
       observing(rendering: true) do
         element = Hyperstack::Internal::Component::RenderingContext.render(nil) do
-          render || ''
+          render || ""
         end
         @__hyperstack_component_waiting_on_resources =
           element.waiting_on_resources if element.respond_to? :waiting_on_resources
