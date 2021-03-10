@@ -32,6 +32,14 @@ module Hyperstack
           const_set tag.upcase, tag
         end
 
+        const_set "FRAGMENT", (
+          Class.new do
+            include Hyperstack::Component
+            render {}
+            Hyperstack::Internal::Component::ReactWrapper.import_native_component(self, `React.Fragment`)
+          end
+        )
+
         # this is used for haml style (i.e. DIV.foo.bar) class tags which is deprecated
         def self.html_tag_class_for(tag)
           downcased_tag = tag.downcase

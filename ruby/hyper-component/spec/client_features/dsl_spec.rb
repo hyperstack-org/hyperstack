@@ -250,6 +250,15 @@ describe 'the React DSL', js: true do
     expect(page.body[-80..-19]).to include('<span data-size="12">Hyperstack::Component::Element</span>')
   end
 
+  it "the delete method (alias as_node) removes the node from the render buffer" do
+    mount 'Foo' do
+      class Foo < Hyperloop::Component
+        render { "hello".span; "goodby".span.delete }
+      end
+    end
+    expect(find('span').text).to eq('hello')
+  end
+
   it "has a dom_node method" do
     mount 'Foo' do
       class Foo
