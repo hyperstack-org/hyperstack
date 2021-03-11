@@ -26,7 +26,7 @@ module TestApp
     config.assets.paths << ::Rails.root.join('app', 'models').to_s
     config.opal.method_missing = true
     config.opal.optimized_operators = true
-    config.opal.arity_check = false
+    config.opal.arity_check = true
     config.opal.const_missing = true
     config.opal.dynamic_require_severity = :ignore
     config.opal.enable_specs = true

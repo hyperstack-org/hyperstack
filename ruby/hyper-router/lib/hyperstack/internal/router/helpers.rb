@@ -31,7 +31,7 @@ module Hyperstack
           React::Router::Redirect(opts)
         end
 
-        def format_params(e)
+        def format_params(e, *)
           {
             match:    Hyperstack::Router::Match.new(`#{e}.match`),
             location: Hyperstack::Router::Location.new(`#{e}.location`),
@@ -47,16 +47,16 @@ module Hyperstack
           if opts[:mounts]
             component = opts.delete(:mounts)
 
-            opts[:component] = lambda do |e|
-              route_params = format_params(e)
+            opts[:component] = lambda do |*e|
+              route_params = format_params(*e)
 
               Hyperstack::Component::ReactAPI.create_element(component, route_params).to_n
             end
           end
 
           if block
-            opts[:render] = lambda do |e|
-              route_params = format_params(e)
+            opts[:render] = lambda do |*e|
+              route_params = format_params(*e)
 
               yield(*route_params.values).to_n
             end

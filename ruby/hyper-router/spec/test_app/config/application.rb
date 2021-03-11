@@ -14,6 +14,7 @@ require 'hyper-component'
 
 module TestApp
   class Application < Rails::Application
+    config.opal.arity_check_enabled = true
     # config.opal.method_missing = true
     # config.opal.optimized_operators = true
     # config.opal.arity_check = false
