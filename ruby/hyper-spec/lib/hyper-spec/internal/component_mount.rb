@@ -44,7 +44,7 @@ module HyperSpec
           #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
         RUBY
         @_hyperspec_private_client_code = nil
-        opts[:code] = Opal.hyperspec_compile(block_with_helpers)
+        opts[:code] = opal_compile(block_with_helpers)
       end
       # rubocop:enable Metrics/MethodLength
 

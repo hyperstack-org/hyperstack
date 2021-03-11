@@ -164,7 +164,7 @@ module HyperSpec
     end
 
     def ppr(str)
-      js = Opal.hyperspec_compile(str)
+      js = opal_compile(str)
       execute_script("console.log(#{js})")
     end
 

@@ -89,11 +89,11 @@ describe "isomorphic operations", js: true do
       class ServerFacts < Hyperstack::ServerOp
         step { abort! }
       end
-      expect_promise do
+      expect do
         ServerFacts.run(n: 5).fail do |exception|
           Promise.new.resolve(exception.inspect)
         end
-      end.to eq('#<Hyperstack::Operation::Exit: Hyperstack::Operation::Exit>')
+      end.on_client_to eq("#<Hyperstack::Operation::Exit: failed>")
       expect(response_spy).to have_received(:status=).with(500)
     end
 

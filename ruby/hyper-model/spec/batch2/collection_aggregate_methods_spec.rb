@@ -36,57 +36,51 @@ RSpec::Steps.steps "collection aggregate methods", js: true do
     it "will not retrieve the entire collection when using #{method}" do
       FactoryBot.create(:test_model)
 
-      expect_promise(
-        <<~RUBY
-          Hyperstack::Model
-          .load { TestModel.#{method} }
-          .then do |val|
-            if TestModel.all.instance_variable_get('@collection')
-              "unnecessary fetch of all"
-            else
-              val
-            end
+      expect do
+        Hyperstack::Model
+        .load { TestModel.send(method) }
+        .then do |val|
+          if TestModel.all.instance_variable_get('@collection')
+            "unnecessary fetch of all"
+          else
+            val
           end
-        RUBY
-      ).to eq(TestModel.all.send(method))
+        end
+      end.on_client_to eq(TestModel.all.send(method))
     end
   end
 
   %i[any? none?].each do |method|
-    it 'will retrieve the entire collection when using any? if an arg is passed in' do
+    it "will retrieve the entire collection when using #{method} if an arg is passed in" do
       FactoryBot.create(:test_model)
 
-      expect_promise(
-        <<~RUBY
-          Hyperstack::Model.load do
-            TestModel.#{method}(TestModel)
-          end.then do |val|
-            if TestModel.all.instance_variable_get('@collection')
-              'necessary fetch of all'
-            else
-              val
-            end
+      expect do
+        Hyperstack::Model.load do
+          TestModel.send(method, TestModel)
+        end.then do |val|
+          if TestModel.all.instance_variable_get('@collection')
+            'necessary fetch of all'
+          else
+            val
           end
-        RUBY
-      ).to eq('necessary fetch of all')
-    end
+        end
+      end.on_client_to eq('necessary fetch of all')
+    end unless Opal::VERSION.split('.')[0..1] == ['0', '11']  # opal 0.11 didn't support a value passed to any
 
     it 'will retrieve the entire collection when using any? if a block is passed in' do
       FactoryBot.create(:test_model)
 
-      expect_promise(
-        <<~RUBY
-          Hyperstack::Model.load do
-            TestModel.#{method} { |test_model| test_model }
-          end.then do |val|
-            if TestModel.all.instance_variable_get('@collection')
-              'necessary fetch of all'
-            else
-              val
-            end
+      expect do
+        Hyperstack::Model.load do
+          TestModel.send(method) { |test_model| test_model }
+        end.then do |val|
+          if TestModel.all.instance_variable_get('@collection')
+            'necessary fetch of all'
+          else
+            val
           end
-        RUBY
-      ).to eq('necessary fetch of all')
+        end
+      end.on_client_to eq('necessary fetch of all')
     end
   end
 end

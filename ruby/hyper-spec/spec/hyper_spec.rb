@@ -455,6 +455,13 @@ describe 'hyper-spec', js: true do
       expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
   end
+
+  it "will use the arity_check option" do
+    client_option arity_check: true
+    expect { -> (x, y: 2) { }.parameters }.on_client_to eq [["req", "x"], ["key", "y"]]
+    client_option arity_check: false
+    expect { -> (x, y: 2) { }.parameters }.on_client_to eq []
+  end
 end
 
 RSpec::Steps.steps "will size_window to", js: true do

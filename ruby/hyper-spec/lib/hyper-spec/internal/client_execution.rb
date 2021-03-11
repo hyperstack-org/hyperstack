@@ -84,8 +84,8 @@ module HyperSpec
       end
 
 
-      def opal_compile(str, *)
-        Opal.hyperspec_compile(str)
+      def opal_compile(str)
+        Opal.hyperspec_compile(str, arity_check: client_options[:arity_check])
       end
     end
   end
