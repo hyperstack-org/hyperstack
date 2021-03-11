@@ -1,8 +1,8 @@
 module Opal
   # strips off stuff that confuses things when transmitting to the client
   # and prints offending code if it can't be compiled
-  def self.hyperspec_compile(str)
-    compile(str).gsub("// Prepare super implicit arguments\n", '')
+  def self.hyperspec_compile(str, opts = {})
+    compile(str, opts).gsub("// Prepare super implicit arguments\n", '')
                 .delete("\n").gsub('(Opal);', '(Opal)')
   # rubocop:disable Lint/RescueException
   # we are going to reraise it anyway, so its fine to catch EVERYTHING!

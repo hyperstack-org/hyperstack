@@ -227,10 +227,10 @@ module ReactiveRecord
       # to convert it to a string, for rendering
       # advantage over a try(:method) is, that it doesnt raise und thus is faster
       # which is important during render
-      def respond_to?(method)
+      def respond_to?(method, all = false)
         return true if method == :acts_as_string?
         return true if %i[inspect to_date to_f to_i to_numeric to_number to_s to_time].include? method
-        return @object.respond_to?(method) if @object
+        return @object.respond_to?(method, all) if @object
         false
       end
 

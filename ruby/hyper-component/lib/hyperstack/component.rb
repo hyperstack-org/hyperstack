@@ -25,18 +25,24 @@ module Hyperstack
           klass.deprecation_warning "`before_new_params` has been deprecated.  "\
                                     "The base method componentWillReceiveProps is deprecated in React without replacement"
         end
-        define_callback(:before_update) do |klass, *args, &block|
-          [*args, *block].detect do |method|
-            method = klass.instance_method(method) unless method.is_a?(Proc)
-            next if method.arity.zero?
-
-            klass.deprecation_warning "In the future before_update callbacks will not receive any parameters."
-          end
-        end
+        define_callback(:__hyperstack_deprecated_before_update)
+        define_callback(:__hyperstack_new_style_before_update)
         define_callback :after_update
         define_callback :__hyperstack_component_after_render_hook
         define_callback :__hyperstack_component_rescue_hook
         define_callback(:after_error) { |klass| Hyperstack::Internal::Component::ReactWrapper.add_after_error_hook(klass) }
+
+        define_singleton_method(:before_update) do |*methods, &block|
+          methods << block if block
+          methods.each do |method|
+            if (method.is_a?(Proc) ? method : instance_method(method)).arity.zero?
+              __hyperstack_new_style_before_update method
+            else
+              deprecation_warning "In the future before_update callbacks will not receive any parameters."
+              __hyperstack_deprecated_before_update method
+            end
+          end
+        end
       end
       base.extend(Hyperstack::Internal::Component::ClassMethods)
       unless `Opal.__hyperstack_component_original_defn`
@@ -116,7 +122,10 @@ module Hyperstack
     end
 
     def component_will_update(next_props, next_state)
-      observing { run_callback(:before_update, next_props, next_state) }
+      observing do
+        run_callback(:__hyperstack_deprecated_before_update, next_props, next_state)
+        run_callback(:__hyperstack_new_style_before_update)
+      end
       if @__hyperstack_component_receiving_props
         @__hyperstack_component_params_wrapper.reload(next_props)
       end
