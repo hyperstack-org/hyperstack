@@ -88,7 +88,7 @@ describe "has_and_belongs_to_many", js: true do
     expect { Physician.first.patients.count }.on_client_to eq(1)
 
     Patient.create(name: 'Spock').physicians << mccoy
-    expect { Physician.first.patients.count }.on_client_to eq(2)  # this line fails intermittently with == 3!
+    expect { Hyperstack::Model.load { Physician.first.patients.count } }.on_client_to eq(2)
 
     on_client { Patient.create(name: 'Uhuru') }
     2.times do
