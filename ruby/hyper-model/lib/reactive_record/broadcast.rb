@@ -11,7 +11,7 @@ module ReactiveRecord
         if !Hyperstack.on_server? && Hyperstack::Connection.root_path
           send_to_server(operation, data) rescue nil # fails if server no longer running so ignore
         else
-          SendPacket.run(data, operation: operation)
+          SendPacket.run(data, operation: operation, updated_at: model.__synchromesh_update_time)
         end
       end
     rescue ActiveRecord::StatementInvalid => e
@@ -47,6 +47,7 @@ module ReactiveRecord
       param :record
       param :operation
       param :previous_changes
+      param :updated_at
 
       unless RUBY_ENGINE == 'opal'
         validate do
@@ -130,6 +131,7 @@ module ReactiveRecord
     # private
 
     attr_reader :record
+    attr_reader :updated_at
 
     def self.open_channels
       @open_channels ||= Set.new
@@ -167,6 +169,7 @@ module ReactiveRecord
       @klass ||= params.klass
       @record.merge! params.record
       @previous_changes.merge! params.previous_changes
+      @updated_at = params.updated_at
       ReactiveRecord::Base.when_not_saving(klass) do
         @backing_record = ReactiveRecord::Base.exists?(klass, params.record[klass.primary_key])
 

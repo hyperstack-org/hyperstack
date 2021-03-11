@@ -321,6 +321,16 @@ module ActiveRecord
         self.class.do_not_synchronize?
       end
 
+      before_create  :synchromesh_mark_update_time
+      before_update  :synchromesh_mark_update_time
+      before_destroy :synchromesh_mark_update_time
+
+      attr_reader :__synchromesh_update_time
+
+      def synchromesh_mark_update_time
+        @__synchromesh_update_time = Time.now.to_f
+      end
+
       after_commit :synchromesh_after_create,  on: [:create]
       after_commit :synchromesh_after_change,  on: [:update]
       after_commit :synchromesh_after_destroy, on: [:destroy]

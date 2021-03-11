@@ -141,8 +141,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
 
 =end
+      attr_accessor :broadcast_updated_at
 
       def sync_scopes(broadcast)
+        self.broadcast_updated_at = broadcast.updated_at
         # record_with_current_values will return nil if data between
         # the broadcast record and the value on the client is out of sync
         # not running set_pre_sync_related_records will cause sync scopes
@@ -160,6 +162,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
           )
           record.backing_record.sync_unscoped_collection! if record.destroyed? || broadcast.new?
         end
+      ensure
+        self.broadcast_updated_at = nil
       end
 
       def apply_to_all_collections(method, record, dont_gather)
@@ -353,6 +357,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       unless ReactiveRecord::WhileLoading.observed?
         Hyperstack::Internal::State::Variable.set(self, :collection, collection, true)
       end
+      @count_updated_at = ReactiveRecord::Operations::Base.last_response_sent_at
       @count = val
     end
 
@@ -462,16 +467,18 @@ To determine this sync_scopes first asks if the record being changed is in the s
     alias << push
 
     def _internal_push(item)
-      item.itself # force get of at least the id
-      if collection
-        self.force_push item
-      else
-        unsaved_children << item
-        update_child(item)
-        @owner.backing_record.sync_has_many(@association.attribute) if @owner && @association
-        if !@count.nil?
-          @count += item.destroyed? ? -1 : 1
-          notify_of_change self
+      insure_sync do
+        item.itself # force get of at least the id
+        if collection
+          self.force_push item
+        else
+          unsaved_children << item
+          update_child(item)
+          @owner.backing_record.sync_has_many(@association.attribute) if @owner && @association
+          if !@count.nil?
+            @count += (item.destroyed? ? -1 : 1)
+            notify_of_change self
+          end
         end
       end
       self
@@ -588,15 +595,25 @@ To determine this sync_scopes first asks if the record being changed is in the s
       join_record&.destroy
     end
 
+    def insure_sync
+      if Collection.broadcast_updated_at && @count_updated_at && Collection.broadcast_updated_at < @count_updated_at
+        reload_from_db
+      else
+        yield
+      end
+    end
+
     alias delete destroy
 
     def delete_internal(item)
-      if collection
-        all.delete(item)
-      elsif !@count.nil?
-        @count -= 1
+      insure_sync do
+        if collection
+          all.delete(item)
+        elsif !@count.nil?
+          @count -= 1
+        end
+        yield if block_given? # was yield item, but item is not used
       end
-      yield if block_given? # was yield item, but item is not used
       item
     end
 
