@@ -34,7 +34,16 @@ describe 'Deprecation Notices', js: true do
   context "when params are expected in the before_update callback" do
 
     it "no errors if no params" do
-      mount "NoParamsPlease"
+      mount "TestComp" do
+        class TestComp < HyperComponent
+          def no_params_please
+            @message = "hello"
+          end
+          after_mount { mutate @message = "goodby" }
+          before_update :no_params_please
+          render { @message }
+        end
+      end
       expect(page).to have_content('hello')
     end
 

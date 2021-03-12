@@ -89,10 +89,14 @@ module HyperSpec
     # Allows options to the mount method to be specified globally
 
     def client_option(opts = {})
-      @_hyperspec_private_client_options ||= {}
+      @_hyperspec_private_client_options ||= { arity_check: default_arity_check }
       @_hyperspec_private_client_options.merge! opts
       build_var_inclusion_lists
       @_hyperspec_private_client_options
+    end
+
+    def default_arity_check
+      Rails&.application&.config&.opal&.arity_check_enabled if defined? Rails
     end
 
     alias client_options client_option

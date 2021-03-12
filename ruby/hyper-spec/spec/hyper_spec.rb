@@ -457,10 +457,12 @@ describe 'hyper-spec', js: true do
   end
 
   it "will use the arity_check option" do
-    client_option arity_check: true
+    # We run the specs with arity_check_enabled so this should default to being on
     expect { -> (x, y: 2) { }.parameters }.on_client_to eq [["req", "x"], ["key", "y"]]
     client_option arity_check: false
     expect { -> (x, y: 2) { }.parameters }.on_client_to eq []
+    client_option arity_check: true
+    expect { -> (x, y: 2) { }.parameters }.on_client_to eq [["req", "x"], ["key", "y"]]
   end
 end
 

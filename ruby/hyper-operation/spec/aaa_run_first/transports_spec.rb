@@ -373,7 +373,7 @@ end
         expect_evaluate_ruby('Hyperstack.anti_csrf_token').to be_present
       end
 
-      it 'wait for an instance channel to be loaded before connecting' do
+      it 'wait for an instance channel to be loaded before connecting' do # 2 = action_cable
         # Make a pretend mini model, and allow it to be accessed by user-123
         stub_const "UserModelPolicy", Class.new
         stub_const "UserModel", Class.new
