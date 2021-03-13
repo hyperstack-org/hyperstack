@@ -27,7 +27,7 @@ module Hyperstack
 
         after_error do |error, info|
           args = RescueWrapper.after_error_args || [error, info]
-          found, * = @Child.run_callback(:__hyperstack_component_rescue_hook, found, *args) { |a| a }
+          found, * = @Child.run_callback(:__hyperstack_component_rescue_hook, found, *args)
           unless found
             RescueWrapper.after_error_args = args
             raise error

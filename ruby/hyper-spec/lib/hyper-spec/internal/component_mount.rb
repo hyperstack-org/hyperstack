@@ -41,7 +41,7 @@ module HyperSpec
           end
           #{test_dummy}
           #{@_hyperspec_private_client_code}
-          #{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last) if block}
+          #{"#{add_locals('', block)}\n#{Unparser.unparse(Parser::CurrentRuby.parse(block.source).children.last)}" if block}
         RUBY
         @_hyperspec_private_client_code = nil
         opts[:code] = opal_compile(block_with_helpers)

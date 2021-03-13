@@ -74,8 +74,7 @@ module HyperSpec
 
     def before_mount(&block)
       @_hyperspec_private_client_code =
-        "#{@_hyperspec_private_client_code}"\
-        "#{Unparser.unparse Parser::CurrentRuby.parse(block.source).children.last}\n"
+        "#{@_hyperspec_private_client_code}#{add_opal_block('', block)}"
     end
 
     # Execute the block both on the client and on the server.  Useful
