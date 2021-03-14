@@ -95,7 +95,9 @@ module HyperSpec
     end
 
     def default_arity_check
-      Rails&.application&.config&.opal&.arity_check_enabled if defined? Rails
+      Rails.application.config.opal.arity_check_enabled if defined? Rails
+    rescue StandardError
+      false
     end
 
     alias client_options client_option
