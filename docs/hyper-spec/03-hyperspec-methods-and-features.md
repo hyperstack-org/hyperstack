@@ -89,7 +89,7 @@ The on_client method takes a block.  The ruby code inside the block will be exec
   end
 ```
 
-If the block returns a promise Hyperspec will wait for the promise to be resolved before returning.  For example:
+If the block returns a promise Hyperspec will wait for the promise to be resolved (or rejected) before returning.  For example:
 
 ```ruby
   it 'waits for a promise' do
@@ -135,7 +135,7 @@ across blocks executed on the client.  For example:
   end
 ```
 
-> Be especially careful of this when using the [`no_reset`](#the-no_reset-flag) as instance variables will retain their values between each spec in this mode.
+> Be especially careful of this when using the [`no_reset` flag](#the-no_reset-flag) as instance variables will retain their values between each spec in this mode.
 
 #### White and Black Listing Variables
 
@@ -387,7 +387,7 @@ These methods are primarily designed to help debug code and specs.
 
 #### `c?`
 
-Shorthand for `on_console`, useful for entering expressions in pry console, to investigate the state of the client.
+Shorthand for `on_client`, useful for entering expressions in the pry console, to investigate the state of the client.
 
 ```ruby
 pry:> c? { puts 'hello on the console' } # prints hello on the client
@@ -432,7 +432,7 @@ end
 #### `open_in_chrome`
 By default specs are run with headless chrome, so there is no visible browser window.  The `open_in_chrome` method will open a browser window, and load it with the current state.
 
-You can also run specs in a visible chrome window by setting the `DRIVER` environment variable to `CHROME`
+You can also run specs in a visible chrome window by setting the `DRIVER` environment variable to `chrome`.  i.e. (`DRIVER=chrome bundle exec rspec ...`)
 
 #### `pause`
 The method is typically not needed assuming you are using a multithreaded server like Puma.  If for whatever reason the pry debug session is not multithreaded, *and* you want to try some kind of experiment on the javascript console, *and* those experiments make requests to the server, you may not get a response, because all threads are in use.  

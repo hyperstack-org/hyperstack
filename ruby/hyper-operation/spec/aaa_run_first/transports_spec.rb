@@ -181,7 +181,7 @@ end
       it 'opens the connection' do
         mount 'TestComponent'
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
           Hyperstack::Connection.active
@@ -201,7 +201,7 @@ end
       it 'sees the connection going offline' do
         mount 'TestComponent'
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
           Hyperstack::Connection.active
@@ -260,7 +260,7 @@ end
       it 'opens the connection' do
         mount 'TestComponent'
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
           Hyperstack::Connection.active
