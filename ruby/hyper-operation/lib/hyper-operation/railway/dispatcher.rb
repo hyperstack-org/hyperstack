@@ -1,7 +1,6 @@
 module Hyperstack
   class Operation
     class Railway
-
       def receivers
         self.class.receivers
       end

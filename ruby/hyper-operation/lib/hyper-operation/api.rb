@@ -47,7 +47,8 @@ module Hyperstack
           @_railway.process_validations
           @_railway.run
           @_railway.dispatch
-          @_railway.result
+          # return the result from dispatch in case there is an error
+          # @_railway.result
         end
       end
 

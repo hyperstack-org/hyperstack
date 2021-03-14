@@ -381,8 +381,8 @@ RSpec::Steps.steps 'Hyperstack::Operation execution (client side)', js: true do
       TestOperation.class_eval do
         param :xxx
         extend HelloCounter
-        def say_hello(test = false)
-          self.class.say_hello(test)
+        def say_hello
+          self.class.say_hello
         end
         step   { say_hello }
         step   :say_hello

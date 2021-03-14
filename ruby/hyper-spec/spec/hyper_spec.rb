@@ -137,6 +137,14 @@ describe 'hyper-spec', js: true do
       end.to eq(DELAY)
       expect(Time.now-start).to be >= DELAY
     end
+
+    it "will raise an error if a promise is rejected" do
+      begin
+        on_client { Promise.new.reject("foo") }
+      rescue StandardError => e
+        expect(e.message).to start_with "javascript error: foo\n"
+      end
+    end
   end
 
   context 'event and callback handlers' do

@@ -25,6 +25,7 @@ module HyperSpec
         Timeout.timeout(Capybara.default_max_wait_time) do
           loop do
             break if page.evaluate_script('!!window.hyper_spec_promise_result')
+            page.evaluate_script('!!window.hyper_spec_promise_failed && Opal.Opal.$raise(window.hyper_spec_promise_failed)')
 
             sleep 0.25
           end
@@ -37,6 +38,7 @@ module HyperSpec
           (#{str}).tap do |r|
             if defined?(Promise) && r.is_a?(Promise)
               r.then { |args| `window.hyper_spec_promise_result = [args]` }
+               .fail { |e| `window.hyper_spec_promise_failed = e` }
             else
               #after(0) do
                 #puts "setting window.hyper_spec_promise_result = [\#{r}]"
