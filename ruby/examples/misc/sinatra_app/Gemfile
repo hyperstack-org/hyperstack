@@ -1,0 +1,14 @@
+source "https://rubygems.org"
+
+gem "sinatra"
+gem "rspec"
+gem "pry"
+gem "opal"
+gem "opal-sprockets"
+gem "rack"
+gem "puma"
+gem "hyper-spec", path: "../../../hyper-spec"
+# gem 'hyper-spec',
+#     git: 'git://github.com/hyperstack-org/hyperstack.git',
+#     branch: 'edge',
+#     glob: 'ruby/*/*.gemspec'

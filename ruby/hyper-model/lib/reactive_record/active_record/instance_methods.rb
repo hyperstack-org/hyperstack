@@ -44,9 +44,6 @@ module ActiveRecord
       end
     end
 
-    # ignore load_from_json when it calls _hyperstack_internal_setter_id
-    def _hyperstack_internal_setter_id(*); end
-
     # the system assumes that there is "virtual" model_name and type attribute so
     # we define the internal setter here.  If the user defines some other attributes
     # or uses these names no harm is done since the exact same method would have been
@@ -95,7 +92,7 @@ module ActiveRecord
           end
           self.class.load_data do
             h.each do |attribute, value|
-              next if attribute == primary_key
+              next if attribute == :id
               @ar_instance[attribute] = value
               changed_attributes << attribute
             end
@@ -129,8 +126,8 @@ module ActiveRecord
       @backing_record.revert
     end
 
-    def changed?
-      @backing_record.changed?
+    def changed?(attr = nil)
+      @backing_record.changed?(*attr)
     end
 
     def dup
@@ -163,6 +160,14 @@ module ActiveRecord
       # else
         self
       # end
+    end
+
+    def increment!(attr)
+      load(attr).then { |current_value| update(attr => current_value + 1) }
+    end
+
+    def decrement!(attr)
+      load(attr).then { |current_value| update(attr => current_value - 1) }
     end
 
     def load(*attributes, &block)

@@ -145,7 +145,6 @@ module Hyperstack
 
         def send_to_opal(method_name, *args)
           return unless @ctx
-          args = [1] if args.length == 0
           Hyperstack::Internal::Component::Rails::ComponentLoader.new(@ctx).load!
           method_args = args.collect do |arg|
             quarg = "#{arg}".tr('"', "'")

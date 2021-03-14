@@ -141,7 +141,10 @@ To determine this sync_scopes first asks if the record being changed is in the s
 
 
 =end
+      attr_accessor :broadcast_updated_at
+
       def sync_scopes(broadcast)
+        self.broadcast_updated_at = broadcast.updated_at
         # record_with_current_values will return nil if data between
         # the broadcast record and the value on the client is out of sync
         # not running set_pre_sync_related_records will cause sync scopes
@@ -159,6 +162,8 @@ To determine this sync_scopes first asks if the record being changed is in the s
           )
           record.backing_record.sync_unscoped_collection! if record.destroyed? || broadcast.new?
         end
+      ensure
+        self.broadcast_updated_at = nil
       end
 
       def apply_to_all_collections(method, record, dont_gather)
@@ -336,25 +341,25 @@ To determine this sync_scopes first asks if the record being changed is in the s
     end
 
     def observed
-      return if @observing || ReactiveRecord::Base.data_loading?
+      return self if @observing || ReactiveRecord::Base.data_loading?
       begin
         @observing = true
         link_to_parent
         reload_from_db(true) if @out_of_date
         Hyperstack::Internal::State::Variable.get(self, :collection)
+        self
       ensure
         @observing = false
       end
     end
 
-    def set_count_state(val)
+    def count_state=(val)
       unless ReactiveRecord::WhileLoading.observed?
         Hyperstack::Internal::State::Variable.set(self, :collection, collection, true)
       end
+      @count_updated_at = ReactiveRecord::Operations::Base.last_response_sent_at
       @count = val
     end
-
-
 
     def _count_internal(load_from_client)
       # when count is called on a leaf, count_internal is called for each
@@ -462,16 +467,18 @@ To determine this sync_scopes first asks if the record being changed is in the s
     alias << push
 
     def _internal_push(item)
-      item.itself # force get of at least the id
-      if collection
-        self.force_push item
-      else
-        unsaved_children << item
-        update_child(item)
-        @owner.backing_record.sync_has_many(@association.attribute) if @owner && @association
-        if !@count.nil?
-          @count += item.destroyed? ? -1 : 1
-          notify_of_change self
+      insure_sync do
+        item.itself # force get of at least the id
+        if collection
+          self.force_push item
+        else
+          unsaved_children << item
+          update_child(item)
+          @owner.backing_record.sync_has_many(@association.attribute) if @owner && @association
+          if !@count.nil?
+            @count += (item.destroyed? ? -1 : 1)
+            notify_of_change self
+          end
         end
       end
       self
@@ -557,7 +564,7 @@ To determine this sync_scopes first asks if the record being changed is in the s
       notify_of_change new_array
     end
 
-    def delete(item)
+    def destroy_non_habtm(item)
       Hyperstack::Internal::State::Mapper.bulk_update do
         unsaved_children.delete(item)
         if @owner && @association
@@ -573,13 +580,40 @@ To determine this sync_scopes first asks if the record being changed is in the s
       end
     end
 
-    def delete_internal(item)
-      if collection
-        all.delete(item)
-      elsif !@count.nil?
-        @count -= 1
+    def destroy(item)
+      return destroy_non_habtm(item) unless @association&.habtm?
+
+      ta = @association.through_association
+      item_foreign_key = @association.source_belongs_to_association.association_foreign_key
+      join_record = ta.klass.find_by(
+        ta.association_foreign_key => @owner.id,
+        item_foreign_key => item.id
+      )
+      return destroy_non_habtm(item) if join_record.nil? ||
+                                        join_record.backing_record.being_destroyed
+
+      join_record&.destroy
+    end
+
+    def insure_sync
+      if Collection.broadcast_updated_at && @count_updated_at && Collection.broadcast_updated_at < @count_updated_at
+        reload_from_db
+      else
+        yield
       end
-      yield if block_given? # was yield item, but item is not used
+    end
+
+    alias delete destroy
+
+    def delete_internal(item)
+      insure_sync do
+        if collection
+          all.delete(item)
+        elsif !@count.nil?
+          @count -= 1
+        end
+        yield if block_given? # was yield item, but item is not used
+      end
       item
     end
 

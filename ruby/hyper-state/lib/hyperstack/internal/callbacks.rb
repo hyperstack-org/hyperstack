@@ -12,29 +12,30 @@ module Hyperstack
 
       def run_callback(name, *args)
         self.class.callbacks_for(name).flatten.each do |callback|
-          result = if callback.is_a?(Proc)
-                     instance_exec(*args, &callback)
-                   else
-                     send(callback, *args)
-                   end
-          args = yield(result) if block_given?
+          callback = method(callback) unless callback.is_a? Proc
+          args = self.class.send("_#{name}_before_call_hook", name, self, callback, *args)
         end
         args
       end
 
       module ClassMethods
-        def define_callback(callback_name, &after_define_hook)
+        def define_callback(callback_name, before_call_hook: nil, after_define_hook: nil)
           wrapper_name = "_#{callback_name}_callbacks"
           define_singleton_method(wrapper_name) do
             Context.set_var(self, "@#{wrapper_name}", force: true) { [] }
           end
+          before_call_hook ||= lambda do |_name, sself, proc, *args|
+            sself.instance_exec(*args, &proc)
+            args
+          end
+          define_singleton_method("_#{callback_name}_before_call_hook", &before_call_hook)
           define_singleton_method(callback_name) do |*args, &block|
             args << block if block_given?
             send(wrapper_name).push args
             Hotloader.when_file_updates do
               send(wrapper_name).delete_if { |item| item.equal? args }
             end
-            after_define_hook.call(*args, &block) if after_define_hook
+            after_define_hook.call(self) if after_define_hook
           end
         end
 

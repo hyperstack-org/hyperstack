@@ -133,11 +133,11 @@ RSpec.configure do |config|
   # end
 
   # Use legacy hyper-spec on_client behavior
-  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
+  HyperSpec::Helpers.alias_method :on_client, :before_mount
 end
 
 module HyperSpec
-  module ComponentTestHelpers
+  module Helpers
     alias old_expect_promise expect_promise
     def expect_promise(str_or_promise = nil, &block)
       if str_or_promise.is_a? Promise

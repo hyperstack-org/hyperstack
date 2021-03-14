@@ -28,5 +28,5 @@ RSpec.configure do |config|
   end
 
   # Use legacy hyper-spec on_client behavior
-  HyperSpec::ComponentTestHelpers.alias_method :on_client, :before_mount
+  HyperSpec::Helpers.alias_method :on_client, :before_mount
 end

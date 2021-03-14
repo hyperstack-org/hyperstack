@@ -210,7 +210,7 @@ describe 'defaultValue special handling', js: true do
     expect(find('#controlled-select').value).to eq('another value')
     expect(find('#controlled-textarea').value).to eq('another value')
 
-    find('#uncontrolled-input').set 'I was set by the user'
+    find('#uncontrolled-input').set 'I was set by the user', clear: :backspace
     expect(find('#uncontrolled-input').value).to eq('I was set by the user')
 
     find('#uncontrolled-checkbox').set(false)

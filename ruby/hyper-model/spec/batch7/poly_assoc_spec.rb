@@ -240,32 +240,25 @@ describe "polymorphic relationships", js: true do
     end
 
     it 'changing belongs to relationship on client' do
-      # not working yet
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12']
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22']
-      evaluate_promise do
+      evaluate_ruby do
         p = Picture.find(1)
         p.imageable = Product.find(1)
         p.save
       end
-      # wait_for_ajax # so pusher can initialize
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture12'], false
-      compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture11', 'picture21', 'picture22'], false
+      compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22', 'picture11'], false
     end
 
     it 'changing belongs to relationship on server' do
-      # compare_to_server @picture11, 'imageable.name',        'imageable1'  # here for debug assist
-      # compare_to_server @picture11, 'imageable.ss',          '123'          # here for debug assist
-
-      # just debugging here... when id doesn't change we don't realize that data is changing
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture11', 'picture12']
       compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22']
       p = Picture.find_by_name('picture11')
       p.imageable = @imageable2
       p.save
-      # wait_for_ajax # so pusher can initialize
       compare_to_server @imageable1, 'pictures.collect(&:name)', ['picture12']
-      compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture11', 'picture21', 'picture22']
+      compare_to_server @imageable2, 'pictures.collect(&:name)', ['picture21', 'picture22', 'picture11']
     end
 
 

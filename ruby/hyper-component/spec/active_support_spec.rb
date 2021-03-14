@@ -51,7 +51,7 @@ describe 'Active Support Helpers', js: true do
     expect_evaluate_ruby do
       odd_numbers = numbers.extract! { |number| number.odd? }
     end.to eq [1, 3, 5, 7, 9]
-    expect_evaluate_ruby do 
+    expect_evaluate_ruby do
       numbers.extract! { |number| number.odd? }
       numbers
     end.to eq [0, 2, 4, 6, 8]

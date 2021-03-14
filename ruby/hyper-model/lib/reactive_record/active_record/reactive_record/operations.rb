@@ -12,6 +12,10 @@ module ReactiveRecord
 
       FORMAT = '0x%x'
 
+      class << self
+        attr_accessor :last_response_sent_at
+      end
+
       def self.serialize_params(hash)
         hash['associations'].each do |assoc|
           assoc['parent_id'] = FORMAT % assoc['parent_id']
@@ -38,6 +42,7 @@ module ReactiveRecord
         response[:saved_models].each do |saved_model|
           saved_model[0] = FORMAT % saved_model[0]
         end if response.is_a?(Hash) && response[:saved_models]
+        response[:sent_at] = Time.now.to_f
         response
       end
 
@@ -45,6 +50,7 @@ module ReactiveRecord
         response[:saved_models].each do |saved_model|
           saved_model[0] = saved_model[0].to_i(16)
         end if response.is_a?(Hash) && response[:saved_models]
+        Base.last_response_sent_at = response.delete(:sent_at)
         response
       end
     end
@@ -93,7 +99,7 @@ module ReactiveRecord
     class Destroy < Base
       param :acting_user, nils: true
       param :model
-      param :id
+      param :id, nils: true
       param :vector
       step do
         ReactiveRecord::Base.destroy_record(

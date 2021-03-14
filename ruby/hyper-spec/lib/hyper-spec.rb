@@ -3,20 +3,33 @@ require 'action_view'
 require 'opal'
 require 'unparser'
 require 'method_source'
-require 'hyper-spec/time_cop.rb'
 require 'filecache'
 
 require 'capybara/rspec'
-require 'hyper-spec/component_test_helpers'
+require 'hyper-spec/internal/client_execution'
+require 'hyper-spec/internal/component_mount'
+require 'hyper-spec/internal/controller'
+require 'hyper-spec/internal/copy_locals'
+require 'hyper-spec/internal/patches'
+require 'hyper-spec/internal/rails_controller_helpers'
+require 'hyper-spec/internal/time_cop.rb'
+require 'hyper-spec/internal/window_sizing'
+
 require 'hyper-spec/controller_helpers'
-require 'hyper-spec/patches'
-require 'hyper-spec/rails_controller_helpers'
-require 'hyper-spec/version'
+
 require 'hyper-spec/wait_for_ajax'
+
+require 'hyper-spec/helpers'
 require 'hyper-spec/expectations'
+
 require 'parser/current'
-require 'selenium/web_driver/firefox/profile'
+if defined?(Selenium::WebDriver::Firefox)
+  require 'selenium/web_driver/firefox/profile'
+end
 require 'selenium-webdriver'
+
+require 'hyper-spec/version'
+
 
 begin
   require 'pry'
@@ -42,8 +55,8 @@ module HyperSpec
     end
   end
 
-  def self.reset_between_examples=(value)
-    RSpec.configuration.reset_between_examples = value
+  def self.reset_between_examples
+    @reset_between_examples ||= []
   end
 
   def self.reset_between_examples?
@@ -95,13 +108,21 @@ end
 RSpec.configure do |config|
   config.add_setting :reset_between_examples, default: true
   config.before(:all, no_reset: true) do
-    HyperSpec.reset_between_examples = false
+    HyperSpec.reset_between_examples << RSpec.configuration.reset_between_examples
+    RSpec.configuration.reset_between_examples = false
   end
   config.before(:all, no_reset: false) do
-    HyperSpec.reset_between_examples = true
+    HyperSpec.reset_between_examples << RSpec.configuration.reset_between_examples
+    RSpec.configuration.reset_between_examples = true
   end
   config.after(:all) do
     HyperSpec.reset_sessions! unless HyperSpec.reset_between_examples?
+    # If rspecs step is used first in a file, it will NOT call config.before(:all) causing the
+    # reset_between_examples stack to be mismatched, so we check, if its already empty we
+    # just leave.
+    next if HyperSpec.reset_between_examples.empty?
+
+    RSpec.configuration.reset_between_examples = HyperSpec.reset_between_examples.pop
   end
   config.before(:each) do |example|
     insure_page_loaded(true) if example.metadata[:js] && !HyperSpec.reset_between_examples?
@@ -109,7 +130,7 @@ RSpec.configure do |config|
 end
 
 RSpec.configure do |config|
-  config.include HyperSpec::ComponentTestHelpers
+  config.include HyperSpec::Helpers
   config.include HyperSpec::WaitForAjax
   config.include Capybara::DSL
 
@@ -153,8 +174,8 @@ end
 # Capybara config
 RSpec.configure do |config|
   config.before(:each) do |example|
-    HyperSpec::ComponentTestHelpers.current_example = example
-    HyperSpec::ComponentTestHelpers.description_displayed = false
+    HyperSpec::Internal::Controller.current_example = example
+    HyperSpec::Internal::Controller.description_displayed = false
   end
 
   config.add_setting :wait_for_initialization_time
@@ -192,7 +213,7 @@ RSpec.configure do |config|
     options = Selenium::WebDriver::Firefox::Options.new
     options.headless!
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
-  end
+  end if defined?(Selenium::WebDriver::Firefox)
 
   Capybara.register_driver :selenium_with_firebug do |app|
     profile = Selenium::WebDriver::Firefox::Profile.new
@@ -200,7 +221,7 @@ RSpec.configure do |config|
     profile.enable_firebug
     options = Selenium::WebDriver::Firefox::Options.new(profile: profile)
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
-  end
+  end if defined?(Selenium::WebDriver::Firefox)
 
   Capybara.register_driver :safari do |app|
     Capybara::Selenium::Driver.new(app, browser: :safari)

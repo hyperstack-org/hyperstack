@@ -181,7 +181,7 @@ end
       it 'opens the connection' do
         mount 'TestComponent'
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
           Hyperstack::Connection.active
@@ -201,7 +201,7 @@ end
       it 'sees the connection going offline' do
         mount 'TestComponent'
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
           Hyperstack::Connection.active
@@ -260,7 +260,7 @@ end
       it 'opens the connection' do
         mount 'TestComponent'
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
           Hyperstack::Connection.active
@@ -373,7 +373,11 @@ end
         expect_evaluate_ruby('Hyperstack.anti_csrf_token').to be_present
       end
 
-      it 'wait for an instance channel to be loaded before connecting' do
+      # after(:each) do |example|
+      #   binding.pry #if example.exception
+      # end
+
+      it 'wait for an instance channel to be loaded before connecting' do # 2 = action_cable
         # Make a pretend mini model, and allow it to be accessed by user-123
         stub_const "UserModelPolicy", Class.new
         stub_const "UserModel", Class.new
@@ -399,8 +403,8 @@ end
         isomorphic do
           class CheckIn < Hyperstack::ControllerOp
             param :id
-            validate { params.id == '123' }
-            step { params.id }
+            validate { puts "validating params.id == '123': #{params.id == '123'}"; params.id == '123' }
+            step { params.id }  # return the id to the client simulating checkin of valid user
           end
         end
 
@@ -408,9 +412,11 @@ end
           # Stub the user model on the client
           class UserModel
             def initialize(id)
+              puts "UserModel.new(#{id})"
               @id = id
             end
             def id
+              puts "self.id = #{@id}"
               @id.to_s
             end
           end
@@ -419,6 +425,7 @@ end
           module Hyperstack
             module Model
               def self.load
+                puts "loading id from server - simulating HyperModel load of id for an object"
                 CheckIn.run(id: yield)
               end
             end
@@ -433,11 +440,15 @@ end
         end
 
         expect(CheckIn).to receive(:run).and_call_original
-        evaluate_ruby 'Hyperstack.connect(UserModel.new(123))'
+        evaluate_ruby { puts "setting up connecting"; Hyperstack.connect(UserModel.new(123)) }
         # the suite previously redefined connect so we have to call this to initiate
         # the connection
-        evaluate_ruby 'Hyperstack.go_ahead_and_connect'
-        wait(10.seconds).for { Hyperstack::Connection.active }.to eq(['UserModel-123'])
+        evaluate_ruby { puts "connecting"; Hyperstack.go_ahead_and_connect }
+        Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in)
+        wait_for do
+          sleep 0.25
+          Hyperstack::Connection.active.tap { |c| puts "active = [#{c}]"}
+        end.to eq(['UserModel-123'])
       end
     end
   end

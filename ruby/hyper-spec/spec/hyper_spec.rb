@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe 'hyper-spec', js: true do
+
   it 'can visit a page' do
     visit 'test'
   end
@@ -20,11 +21,45 @@ describe 'hyper-spec', js: true do
     expect(page).to have_content('Now how cool is that???')
   end
 
+  it 'can add some html code before mounting' do
+    insert_html <<-HTML
+      <DIV>insert some code</DIV>
+    HTML
+    mount
+    expect(page).to have_content('insert some code')
+  end
+
+  it 'can pause the server', skip: 'unreliable' do
+    # this is pretty ugly with these dead waits, but any attempt to do an evaluate_script "go()" without the
+    # wait breaks
+    th = Thread.new { pause('hello') }
+    sleep 5
+    expect(th).to be_alive
+    evaluate_script "go()"
+    sleep 1
+    expect(th).not_to be_alive
+  end
+
   context "the client_option method" do
 
     it "can render server side only", :prerendering_on do
       client_option render_on: :server_only
       mount 'SayHello', name: 'George'
+      expect(page).to have_content('Hello there George')
+      expect(evaluate_script('typeof React')).to eq('undefined')
+    end
+
+    it "can render server side only with code defined in the mount", :prerendering_on do
+      client_option render_on: :server_only
+      mount 'SayHello2', name: 'George' do
+        class SayHello2
+          include Hyperstack::Component
+          param :name
+          render(DIV) do
+            "Hello there #{@Name}"
+          end
+        end
+      end
       expect(page).to have_content('Hello there George')
       expect(evaluate_script('typeof React')).to eq('undefined')
     end
@@ -101,6 +136,14 @@ describe 'hyper-spec', js: true do
         wait(DELAY)
       end.to eq(DELAY)
       expect(Time.now-start).to be >= DELAY
+    end
+
+    it "will raise an error if a promise is rejected" do
+      begin
+        on_client { Promise.new.reject("foo") }
+      rescue StandardError => e
+        expect(e.message).to start_with "javascript error: foo\n"
+      end
     end
   end
 
@@ -198,13 +241,13 @@ describe 'hyper-spec', js: true do
 
     it "will use TimeCop travelling time with scaling" do
       Timecop.scale 60, Time.now-1.year do
-        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(2).of(Time.now.to_i)
+        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(3).of(Time.now.to_i)
         start_time = Time.now
         sleep 1 # sleep is still in "real time" but Time will move 60 times faster
         expect(start_time).to be_within(1).of(Time.now-1.minute)
-        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(2).of(Time.now.to_i)
+        expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(3).of(Time.now.to_i)
       end
-      expect(evaluate_ruby('Time.now.to_i')).to be_within(2).of(Time.now.to_i+@sync_gap)
+      expect(evaluate_ruby('Time.now.to_i')).to be_within(3).of(Time.now.to_i+@sync_gap)
     end
 
     it "will advance time along with time cop freezing" do
@@ -213,7 +256,7 @@ describe 'hyper-spec', js: true do
       Timecop.freeze Time.now-2.years
       expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(1).of(Time.now.to_i)
       Timecop.return
-      expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(2).of(Time.now.to_i+@sync_gap)
+      expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(3).of(Time.now.to_i+@sync_gap)
     end
 
     it "can temporarily return to true time" do
@@ -224,6 +267,28 @@ describe 'hyper-spec', js: true do
         end
       end
       expect(evaluate_ruby('puts ""; Time.now.to_i')).to be_within(1).of(Time.now.to_i+@sync_gap)
+    end
+  end
+
+  context 'the no-reset flag', :no_reset do
+    it 'will mount the component first' do
+      mount 'TestComponent' do
+        class TestComponent
+          include Hyperstack::Component
+          include Hyperstack::State::Observable
+          class << self
+            state_accessor :title
+          end
+          render(DIV) do
+            TestComponent.title
+          end
+        end
+      end
+      on_client { TestComponent.title = 'The Title' }
+      expect(page).to have_content('The Title')
+    end
+    it 'but will not mount it again' do
+      expect(page).to have_content('The Title')
     end
   end
 
@@ -256,38 +321,137 @@ describe 'hyper-spec', js: true do
       end.to_then eq('done')
     end
 
-    it 'will copy local vars to the client' do
-      str = 'hello'
-      expect { str.reverse }.on_client_to eq str.reverse
-    end
+    context 'copying local vars:' do
+      let!(:memoized_var) { true }
+      let!(:another_memoized_var) { true }
+      before(:each) do
+        on_client do
+          send(:remove_instance_variable, :@instance_var) rescue nil
+          send(:remove_instance_variable, :@another_instance_var) rescue nil
+        end
+      end
 
-    it 'will copy instance vars to the client' do
-      expect { @str.reverse }.on_client_to eq @str.reverse
-    end
+      it 'will copy local vars to the client' do
+        str = 'hello'
+        expect { str.reverse }.on_client_to eq str.reverse
+      end
 
-    it 'will copy memoized values to the client' do
-      expect { another_string.gsub(/\W/, '') }.on_client_to eq another_string.gsub(/\W/, '')
-    end
+      it 'will copy instance vars to the client' do
+        expect { @str.reverse }.on_client_to eq @str.reverse
+      end
 
-    it 'will deal with unserailized local vars, instance vars and memoized values correctly' do
-      foo_bar = page
-      expect do
-        evaluate_ruby { foo_bar }
-      end.to raise_error(Exception, /foo_bar/)
-    end
+      it 'will copy memoized values to the client' do
+        expect { another_string.gsub(/\W/, '') }.on_client_to eq another_string.gsub(/\W/, '')
+      end
 
-    it 'will ignore unserailized local vars, instance vars and memoized values if not accessed' do
-      foo_bar = page
-      good_value = 12
-      expect { good_value * 2 }.on_client_to eq good_value * 2
-    end
+      it 'will deal with unserailized local vars, instance vars and memoized values correctly' do
+        foo_bar = page
+        expect do
+          evaluate_ruby { foo_bar }
+        end.to raise_error(Exception, /foo_bar/)
+      end
 
-    it 'will allow unserailized local vars, instance vars and memoized values can be redefined on the client' do
-      foo_bar = page
-      expect do
-        foo_bar = 12
-        foo_bar * 2
-      end.on_client_to eq 24
+      it 'will ignore unserailized local vars, instance vars and memoized values if not accessed' do
+        foo_bar = page
+        good_value = 12
+        expect { good_value * 2 }.on_client_to eq good_value * 2
+      end
+
+      it 'will allow unserailized local vars, instance vars and memoized values can be redefined on the client' do
+        foo_bar = page
+        expect do
+          foo_bar = 12
+          foo_bar * 2
+        end.on_client_to eq 24
+      end
+
+      context 'the include_vars option' do
+        [false, nil, []].each do |include_vars|
+          it "will not copy any vars if the include_vars option is #{include_vars}" do
+            client_option include_vars: include_vars
+            @instance_var = true
+            local_var = true
+            expect { @instance_var }.on_client_to be_nil
+            expect { defined?(local_var) }.on_client_to be_falsy
+            expect { defined?(memoized_var) }.on_client_to be_falsy
+          end
+        end
+        it "will copy all the vars if the include_vars option is a non-array truthy value" do
+          client_option include_vars: 123
+          @instance_var = true
+          local_var = true
+          expect { @instance_var }.on_client_to be true
+          expect { local_var }.on_client_to be true
+          expect { memoized_var }.on_client_to be true
+        end
+        %i[@instance_var memoized_var local_var].each do |var|
+          it "will copy only a single var if the include_vars option is a name like #{var}" do
+            client_option include_vars: var
+            @instance_var = true
+            local_var = true
+            expect { @instance_var.nil? }.on_client_to eq(var != :@instance_var)
+            expect { !!defined?(local_var) }.on_client_to eq(var == :local_var)
+            expect { !!defined?(memoized_var) }.on_client_to eq(var == :memoized_var)
+          end
+        end
+        it 'will only copy vars listed in the include_vars option' do
+          client_option include_vars: [:another_memoized_var, :@another_instance_var, :another_local_var]
+          @instance_var = true
+          local_var = true
+          @another_instance_var = true
+          another_local_var = true
+          expect { @instance_var }.on_client_to be_nil
+          expect { defined?(local_var) }.on_client_to be_falsy
+          expect { defined?(memoized_var) }.on_client_to be_falsy
+          expect { @another_instance_var }.on_client_to be true
+          expect { another_local_var }.on_client_to be true
+          expect { another_memoized_var }.on_client_to be true
+        end
+      end
+
+      context 'the exclude_vars option' do
+        [false, nil, []].each do |exclude_vars|
+          it "will copy all vars if the exclude_vars option is #{exclude_vars}" do
+            client_option exclude_vars: exclude_vars
+            @instance_var = true
+            local_var = true
+            expect { @instance_var }.on_client_to be true
+            expect { local_var }.on_client_to be true
+            expect { memoized_var }.on_client_to be true
+          end
+        end
+        it "will not copy any vars if the exclude_vars option is a non-array truthy value" do
+          client_option exclude_vars: 123
+          @instance_var = true
+          local_var = true
+          expect { @instance_var }.on_client_to be_nil
+          expect { defined?(local_var) }.on_client_to be_falsy
+          expect { defined?(memoized_var) }.on_client_to be_falsy
+        end
+        %i[@instance_var memoized_var local_var].each do |var|
+          it "will exclude a single var if the exclude_vars option is a name like #{var}" do
+            client_option exclude_vars: var
+            @instance_var = true
+            local_var = true
+            expect { @instance_var.nil? }.on_client_to eq(var == :@instance_var)
+            expect { !!defined?(local_var) }.on_client_to eq(var != :local_var)
+            expect { !!defined?(memoized_var) }.on_client_to eq(var != :memoized_var)
+          end
+        end
+        it 'will not copy vars listed in the exclude_vars option' do
+          client_option exclude_vars: [:memoized_var, :@instance_var, :local_var]
+          @instance_var = true
+          local_var = true
+          @another_instance_var = true
+          another_local_var = true
+          expect { @instance_var }.on_client_to be_nil
+          expect { defined?(local_var) }.on_client_to be_falsy
+          expect { defined?(memoized_var) }.on_client_to be_falsy
+          expect { @another_instance_var }.on_client_to be true
+          expect { another_local_var }.on_client_to be true
+          expect { another_memoized_var }.on_client_to be true
+        end
+      end
     end
 
     it 'aliases evaluate_ruby as on_client and c?' do
@@ -298,6 +462,15 @@ describe 'hyper-spec', js: true do
     it 'allows local variables on the client to be set using the with method' do
       expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
+  end
+
+  it "will use the arity_check option" do
+    # We run the specs with arity_check_enabled so this should default to being on
+    expect { -> (x, y: 2) { }.parameters }.on_client_to eq [["req", "x"], ["key", "y"]]
+    client_option arity_check: false
+    expect { -> (x, y: 2) { }.parameters }.on_client_to eq []
+    client_option arity_check: true
+    expect { -> (x, y: 2) { }.parameters }.on_client_to eq [["req", "x"], ["key", "y"]]
   end
 end
 

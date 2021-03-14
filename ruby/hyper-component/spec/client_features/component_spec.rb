@@ -122,7 +122,7 @@ describe 'React::Component', js: true do
       mount 'Foo' do
         class Foo
           include Hyperstack::Component
-          before_mount { @count = 0}
+          before_mount { @count = 0 }
           after_render do
             @count += 1
             after(0) { force_update! } if @count <= 2
@@ -208,6 +208,44 @@ describe 'React::Component', js: true do
       expect_evaluate_ruby('Foo.instance == Foo.instance.force_update!').to be_truthy
     end
 
+    it "can generate multiple elements on outer render using FRAGMENT" do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render(FRAGMENT) do
+            UL do
+              SomeLIs()
+              LI { "the end" }
+            end
+            "random string at the end"
+          end
+        end
+        class SomeLIs < Hyperloop::Component
+          render(FRAGMENT) { LI { "hello" }; LI { "goodby" } }
+        end
+      end
+      expect(page.find('ul').all('li').collect(&:text)).to eq(['hello', 'goodby', 'the end'])
+      expect(page.find('div').text).to end_with("random string at the end")
+    end
+
+    it "can generate multiple elements on outer render by returning arrays" do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render do
+            UL(key: 1) do
+              SomeLIs()
+              LI(key: 3) { "the end" }
+            end
+            "random string at the end".span(key: 2)
+          end
+        end
+        class SomeLIs < Hyperloop::Component
+          render { LI(key: 1) { "hello" }; LI(key: 2) { "goodby" } }
+        end
+      end
+      expect(page.find('ul').all('li').collect(&:text)).to eq(['hello', 'goodby', 'the end'])
+      expect(page.find('div').text).to end_with("random string at the end")
+    end
+
     it 'can buffer an element' do
       mount 'Foo' do
         class Bar < Hyperloop::Component
@@ -235,6 +273,26 @@ describe 'React::Component', js: true do
         end
       end
       expect(page).to have_content("paramchildparamchild")
+    end
+
+    it "will convert only the final value to a string if the buffer is empty" do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render { {'foo' => 'bar'} }
+        end
+      end
+      expect(page).to have_content("#{{'foo' => 'bar'}}")
+    end
+
+    it "will convert only the final value to a string if the buffer is empty" do
+      # note that the spec 'can create an element without buffering' effectively
+      # checks other cases where the return value is  elements have been rendered to the buffer
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render { DIV { SPAN { 'foo-' }; 'bar' } }
+        end
+      end
+      expect(page).to have_content("foo-bar")
     end
 
     it 'can receive and render a component class' do
@@ -505,15 +563,6 @@ describe 'React::Component', js: true do
   end
 
   describe 'Render Error Handling' do
-    it "will generate a message if render returns something other than an Element or a String" do
-      mount 'Foo' do
-        class Foo < Hyperloop::Component
-          render { Hash.new }
-        end
-      end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-          .to match(/You may need to convert this to a string./)
-    end
     it "will generate a message if render returns a Component class" do
       mount 'Foo' do
         class Foo < Hyperloop::Component
@@ -521,25 +570,7 @@ describe 'React::Component', js: true do
         end
       end
       expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/Did you mean Foo()/)
-    end
-    it "will generate a message if more than 1 element is generated" do
-      mount 'Foo' do
-        class Foo < Hyperloop::Component
-          render { "hello".span; "goodby".span }
-        end
-      end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/Do you want to wrap your elements in a div?/)
-    end
-    it "will generate a message if the element generated is not the element returned" do
-      mount 'Foo' do
-        class Foo < Hyperloop::Component
-          render { "hello".span; "goodby".span.delete }
-        end
-      end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-        .to match(/Possibly improper use of Element#delete./)
+        .to match(/did you mean to say Foo()/)
     end
   end
 

@@ -25,48 +25,64 @@ describe 'Hyperstack::Internal::Callbacks', js: true do
         define_callback :before_dinner
         before_dinner :wash_hands, :turn_off_laptop
 
-        def wash_hands;end
-        def turn_off_laptop;end
+        attr_reader :washed_hands
+        attr_reader :turned_off_laptop
+
+        def wash_hands(*args)
+          @washed_hands = args
+        end
+        def turn_off_laptop(*args)
+          @turned_off_laptop = args
+        end
       end
     end
-    expect_evaluate_ruby do
-      instance = Foo.new
-      [ instance.respond_to?(:wash_hands),
-        instance.respond_to?(:turn_off_laptop),
-        instance.run_callback(:before_dinner, 1, 2, 3) ]
-    end.to eq([true, true, [1, 2, 3]])
+    evaluate_ruby { @instance = Foo.new }
+    expect { @instance.respond_to?(:wash_hands) }.on_client_to be_truthy
+    expect { @instance.respond_to?(:turn_off_laptop) }.on_client_to be_truthy
+    expect { @instance.run_callback(:before_dinner, 1, 2, 3) }.on_client_to eq [1, 2, 3]
+    expect { @instance.washed_hands }.on_client_to eq [1, 2, 3]
+    expect { @instance.turned_off_laptop }.on_client_to eq [1, 2, 3]
   end
 
   context 'using Hyperloop::Context.reset!' do
-    #after(:all) do
-    #  Hyperloop::Context.instance_variable_set(:@context, nil)
-    #end
     it 'clears callbacks on Hyperloop::Context.reset!' do
       on_client do
         Hyperstack::Context.reset!
-
         class Foo
           include Hyperstack::Internal::Callbacks
           define_callback :before_dinner
-
           before_dinner :wash_hands, :turn_off_laptop
 
-          def wash_hands;end
+          attr_reader :washed_hands
+          attr_reader :turned_off_laptop
 
-          def turn_off_laptop;end
+          def wash_hands(*args)
+            @washed_hands = args
+          end
+          def turn_off_laptop(*args)
+            @turned_off_laptop = args
+          end
         end
       end
-      expect_evaluate_ruby do
-        instance = Foo.new
-
+      evaluate_ruby { @instance = Foo.new }
+      expect { @instance.run_callback(:before_dinner, 1, 2, 3) }.on_client_to eq [1, 2, 3]
+      expect { @instance.washed_hands }.on_client_to eq [1, 2, 3]
+      expect { @instance.turned_off_laptop }.on_client_to eq [1, 2, 3]
+      evaluate_ruby do
+        @instance = Foo.new
         Hyperstack::Context.reset!
-
+      end
+      expect { @instance.run_callback(:before_dinner, 1, 2, 3) }.on_client_to eq [1, 2, 3]
+      expect { @instance.washed_hands }.on_client_to be_nil
+      expect { @instance.turned_off_laptop }.on_client_to be_nil
+      evaluate_ruby do
         Foo.class_eval do
           before_dinner :wash_hands
         end
-
-        instance.run_callback(:before_dinner, 1, 2, 3)
-      end.to eq([1, 2, 3])
+      end
+      expect { @instance.run_callback(:before_dinner, 4, 5) }.on_client_to eq [4, 5]
+      expect { @instance.washed_hands }.on_client_to eq [4, 5]
+      expect { @instance.turned_off_laptop }.on_client_to be_nil
     end
   end
 

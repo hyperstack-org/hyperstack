@@ -26,7 +26,6 @@ RSpec::Steps.steps 'Load From Json', js: true do
   end
 
   it '*all key' do
-    binding.pry
     evaluate_ruby do
       User.all.count
     end

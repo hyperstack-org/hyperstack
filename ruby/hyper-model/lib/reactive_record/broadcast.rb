@@ -11,7 +11,7 @@ module ReactiveRecord
         if !Hyperstack.on_server? && Hyperstack::Connection.root_path
           send_to_server(operation, data) rescue nil # fails if server no longer running so ignore
         else
-          SendPacket.run(data, operation: operation)
+          SendPacket.run(data, operation: operation, updated_at: model.__synchromesh_update_time)
         end
       end
     rescue ActiveRecord::StatementInvalid => e
@@ -47,6 +47,7 @@ module ReactiveRecord
       param :record
       param :operation
       param :previous_changes
+      param :updated_at
 
       unless RUBY_ENGINE == 'opal'
         validate do
@@ -88,7 +89,7 @@ module ReactiveRecord
 
     def record_with_current_values
       ReactiveRecord::Base.load_data do
-        backing_record = @backing_record || klass.find(record[:id]).backing_record
+        backing_record = @backing_record || klass.find(record[klass.primary_key]).backing_record
         if destroyed?
           backing_record.ar_instance
         else
@@ -115,6 +116,10 @@ module ReactiveRecord
       @destroyed
     end
 
+    def local?
+      @is_local
+    end
+
     def klass
       Object.const_get(@klass)
     end
@@ -126,6 +131,7 @@ module ReactiveRecord
     # private
 
     attr_reader :record
+    attr_reader :updated_at
 
     def self.open_channels
       @open_channels ||= Set.new
@@ -135,7 +141,7 @@ module ReactiveRecord
       @in_transit ||= Hash.new { |h, k| h[k] = new(k) }
     end
 
-    def initialize(id)
+    def initialize(id = nil)
       @id = id
       @received = Set.new
       @record = {}
@@ -144,11 +150,12 @@ module ReactiveRecord
 
     def local(operation, record, data)
       @destroyed = operation == :destroy
+      @is_local = true
       @is_new = operation == :create
       @klass = record.class.name
       @record = data
       record.backing_record.destroyed = false
-      @record[:id] = record.id if record.id
+      @record[record.primary_key] = record.id if record.id
       record.backing_record.destroyed = @destroyed
       @backing_record = record.backing_record
       @previous_changes = record.changes
@@ -162,11 +169,12 @@ module ReactiveRecord
       @klass ||= params.klass
       @record.merge! params.record
       @previous_changes.merge! params.previous_changes
+      @updated_at = params.updated_at
       ReactiveRecord::Base.when_not_saving(klass) do
-        @backing_record = ReactiveRecord::Base.exists?(klass, params.record[:id])
+        @backing_record = ReactiveRecord::Base.exists?(klass, params.record[klass.primary_key])
 
         # first check to see if we already destroyed it and if so exit the block
-        return if @backing_record&.destroyed
+        break if @backing_record&.destroyed
 
         # We ignore whether the record is being created or not, and just check and see if in our
         # local copy we have ever loaded this id before.  If we have then its not new to us.
@@ -180,7 +188,7 @@ module ReactiveRecord
         # it is possible that we are recieving data on a record for which we are also waiting
         # on an an inital data load in which case we have not yet set the loaded id, so we
         # set if now.
-        @backing_record&.loaded_id = params.record[:id]
+        @backing_record&.loaded_id = params.record[klass.primary_key]
 
         # once we have received all the data from all the channels (applies to create and update only)
         # we yield and process the record
@@ -234,7 +242,7 @@ module ReactiveRecord
 
     def merge_current_values(br)
       current_values = Hash[*@previous_changes.collect do |attr, values|
-        value = attr == :id ? record[:id] : values.first
+        value = attr == klass.primary_key ? record[klass.primary_key] : values.first
         if br.attributes.key?(attr) &&
            br.attributes[attr] != br.convert(attr, value) &&
            br.attributes[attr] != br.convert(attr, values.last)

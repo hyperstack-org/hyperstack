@@ -92,6 +92,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
 
     def add_webpacks
       return if skip_webpack?
+
       yarn 'react', '16'
       yarn 'react-dom', '16'
       yarn 'react-router', '^5.0.0'
@@ -102,10 +103,15 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
     end
 
     def cancel_react_source_import
-      return if skip_webpack?
       inject_into_initializer(
-        "Hyperstack.cancel_import 'react/react-source-browser' "\
-        '# bring your own React and ReactRouter via Yarn/Webpacker'
+        if skip_webpack?
+          "Hyperstack.import 'react/react-source-browser' "\
+          "# bring in hyperstack's copy of react, comment this out "\
+          'if you bring it in from webpacker'
+        else
+          "# Hyperstack.import 'react/react-source-browser' "\
+          '# uncomment this line if you want hyperstack to use its copy of react'
+        end
       )
     end
 

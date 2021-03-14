@@ -13,7 +13,9 @@ module Hyperstack
             map_object[0]
           end
 
-          def set(obj, name, value)
+          def set(obj, name, value, _x = nil)
+            # _x is some legacy function, which I think queued up state changes to the end
+            # which is perhaps now the default.
             map_object = legacy_map[obj][name]
             map_object[0] = value
             Hyperstack::Internal::State::Mapper.mutated!(map_object.object_id)

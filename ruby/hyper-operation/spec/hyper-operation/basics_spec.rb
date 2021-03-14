@@ -189,6 +189,7 @@ describe 'Hyperstack::Operation basics' do
   it "will use the promise returned by execute", js: true do
     isomorphic do
       class MyOperation < Hyperstack::Operation
+        include Hyperstack::AsyncSleep
         param :wait, type: Float, min: 0
         param :result
         step do

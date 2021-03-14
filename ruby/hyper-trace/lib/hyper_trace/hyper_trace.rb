@@ -6,17 +6,7 @@ class Class
   alias hypertrace hyper_trace
 end
 
-class Method
-  def parameters
-    /.*function[^(]*\(([^)]*)\)/
-      .match(`#{@method}.toString()`)[1]
-      .split(',')
-      .collect { |param| [:req, param.strip.to_sym] }
-  end
-end
-
 module HyperTrace
-
   class Config
     def initialize(klass, instrument_class, opts, &block)
       @klass = klass
@@ -116,15 +106,11 @@ module HyperTrace
     def instrumentation_off(config)
       if config.instrument_class?
         config.klass.methods.grep(/^__hyper_trace_pre_.+$/).each do |method|
-          config.klass.class_eval do
-            class << self
-              alias_method method.gsub(/^__hyper_trace_pre_/, ''), method
-            end
-          end
+          config.klass.singleton_class.alias_method method.gsub(/^__hyper_trace_pre_/, ''), method
         end
       else
         config.klass.instance_methods.grep(/^__hyper_trace_pre_.+$/).each do |method|
-          config.klass.class_eval { alias_method method.gsub(/^__hyper_trace_pre_/, ''), method }
+          config.klass.alias_method method.gsub(/^__hyper_trace_pre_/, ''), method
         end
       end
     end
@@ -145,17 +131,12 @@ module HyperTrace
 
     def instrument_method(method, config)
       if config.instrument_class?
-        config.klass.class_eval do
-          class << self
-            alias_method "__hyper_trace_pre_#{method}", method unless method_defined? "__pre_hyper_trace_#{method}"
-          end
+        unless config.klass.singleton_class.method_defined? "__pre_hyper_trace_#{method}"  # is this right?
+          config.klass.singleton_class.alias_method "__hyper_trace_pre_#{method}", method
         end
-        add_hyper_trace_method(method, config)
       else
         unless config.klass.method_defined? "__pre_hyper_trace_#{method}"
-          config.klass.class_eval do
-            alias_method "__hyper_trace_pre_#{method}", method
-          end
+          config.klass.alias_method "__hyper_trace_pre_#{method}", method
         end
       end
       add_hyper_trace_method(method, config)
@@ -194,28 +175,77 @@ module HyperTrace
       end
     end
 
+    def required(arity, actual_length)
+      if arity.negative?
+        req_count = - arity - 1
+        raise ArgumentError, "missing required arguments: #{actual_length} for #{req_count}" if req_count > actual_length
+      else
+        req_count = arity
+        raise ArgumentError, "incorrect number of arguments, expected #{req_count} got #{actual_length}" if req_count != actual_length
+      end
+      req_count
+    end
+
+    # [["req", "x"], ["opt", "y"], ["rest"], ["keyreq", "z"], ["key", "opt"], ["block", "flop"]]
+
+    def map_parameters(instance, name, actual, format = true)
+      method = instance.method("__hyper_trace_pre_#{name}")
+      map_with_specs(method, actual.dup, format) || map_without_specs(actual, format)
+    end
+
+    def key?(actual, key)
+      actual&.last&.respond_to?(:key?) && actual.last.key?(key)
+    end
+
+    def map_with_specs(method, actual, show_blank_rest)
+      specs = method.parameters
+      req_count = required(method.arity, actual.length)
+      args = {}
+
+      specs.each do |type, key|
+        case type
+        when :req
+          args[key] = actual.shift
+          req_count -= 1
+        when :opt
+          args[key] = actual.shift if actual.length > req_count
+        when (key || show_blank_rest) && :rest
+          args[key || '*'] = [*actual[0..-req_count - 1]]
+        when :keyreq
+          raise ArgumentError, "missing keyword argument: #{key}" unless key?(actual, key)
+
+          args[key] = actual.last[key]
+        when key?(actual, key) && :key
+          args[key] = actual.last[key]
+        end
+      end
+      args
+    rescue ArgumentError, Interrupt, SignalException => e
+      raise e
+    rescue Exception => e
+      nil
+    end
+
+    def map_without_specs(actual, format)
+      args = {}
+      prefix = 'p' unless format
+      actual.each_with_index { |value, i| args["#{prefix}#{i + 1}"] = value }
+      args
+    end
+
     def format_head(instance, name, args, &block)
       @formatting = true
-      method = instance.method("__hyper_trace_pre_#{name}")
       if args.any?
         group(" #{name}(...)#{instance_tag(instance)}") do
-          params = method.parameters
-          group("args:", collapsed: true) do
-            params.each_with_index do |param_spec, i|
-              arg_name = param_spec[1]
-              if arg_name == '$a_rest'
-                arg_name = '*'
-                arg = args[i..-1]
-              else
-                arg = args[i]
-              end
-              if safe_i(arg).length > 30 || show_js_object(arg)
-                group "#{arg_name}: #{safe_s(arg)}"[0..29], collapsed: true do
-                  puts safe_i(arg)
-                  log arg if show_js_object(arg)
+          group("args: (#{args.length})", collapsed: true) do
+            map_parameters(instance, name, args).each do |arg, value|
+              if safe_i(value).length > 30 || show_js_object(value)
+                group "#{arg}: #{safe_s(value)}"[0..29], collapsed: true do
+                  puts safe_i(value)
+                  log value if show_js_object(value)
                 end
               else
-                group "#{arg_name}: #{safe_i(arg)}"
+                group "#{arg}: #{safe_i(value)}"
               end
             end
           end
@@ -286,7 +316,10 @@ module HyperTrace
       @formatting = true
       if safe_i(result).length > 40
         group "raised: #{safe_s(result)}"[0..40], collapsed: true do
-          puts safe_i(result)
+          puts result.backtrace[0]
+          result.backtrace[1..-1].each do |line|
+            log line
+          end
         end
       else
         group "raised: #{safe_i(result)}"
@@ -305,23 +338,22 @@ module HyperTrace
 
     def breakpoint(location, config, name, args, instance, result = nil)
       if should_break? location, config, name, args, instance, result
-        method = instance.method("__hyper_trace_pre_#{name}")
+        params = map_parameters(instance, name, args, false)
         fn_def = ['RESULT']
-        fn_def += method.parameters.collect { |p| p[1] }
+        fn_def += params.keys
         fn_def += ["//break on #{location} of #{name}\nvar self = this;\ndebugger;\n;"]
         puts "break on #{location} of #{name}"
         fn = `Function.apply(#{self}, #{fn_def}).bind(#{instance})`
-        fn.call(result, *args)
+        fn.call(result, *params.values)
       end
     end
 
-    def call_original(instance, method, *args, &block)
+    def call_original(instance, method, args, &block)
       @formatting = false
       instance.send "__hyper_trace_pre_#{method}", *args, &block
     ensure
       @formatting = true
     end
-
 
     def add_hyper_trace_method(method, config)
       def_method = config.instrument_class? ? :define_singleton_method : :define_method
@@ -330,7 +362,7 @@ module HyperTrace
         if HyperTrace.formatting?
           begin
             send "__hyper_trace_pre_#{method}", *args, &block
-          rescue Exception
+          rescue StandardError
             "???"
           end
         else
@@ -338,11 +370,13 @@ module HyperTrace
             HyperTrace.format_head(self, method, args) do
               HyperTrace.format_instance_internal(self)
               HyperTrace.breakpoint(:enter, config, method, args, self)
-              result = HyperTrace.call_original self, method, *args, &block
+              result = HyperTrace.call_original self, method, args, &block
               HyperTrace.format_result(result)
               HyperTrace.breakpoint(:exit, config, method, args, self, result)
               result
             end
+          rescue Interrupt, SignalException => e
+            raise e
           rescue Exception => e
             HyperTrace.format_exception(e)
             debugger unless HyperTrace.exclusions[self.class][:rescue].include? :method

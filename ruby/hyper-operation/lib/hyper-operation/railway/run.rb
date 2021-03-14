@@ -4,9 +4,12 @@ module Hyperstack
     class Exit < StandardError
       attr_reader :state
       attr_reader :result
-      def initialize(state, result)
+      def initialize(state, result = nil)
         @state = state
         @result = result
+      end
+      def to_s
+        @state
       end
     end
 

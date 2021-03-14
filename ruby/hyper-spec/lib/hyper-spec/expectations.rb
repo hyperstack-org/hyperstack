@@ -1,49 +1,38 @@
 # don't put this in directory lib/rspec/ as that will cause stack overflow with rails/rspec loads
 module RSpec
   module Expectations
-    class ExpectationTarget
-    end
-
+    class ExpectationTarget; end
     module HyperSpecInstanceMethods
       def self.included(base)
-        base.include HyperSpec::ComponentTestHelpers
+        base.include HyperSpec::Helpers
       end
 
       def to_on_client(matcher, message = nil, &block)
-        evaluate_client('ruby').to(matcher, message, &block)
+        evaluate_client.to(matcher, message, &block)
       end
 
       alias on_client_to to_on_client
+      alias to_then to_on_client
+      alias then_to to_on_client
 
       def to_on_client_not(matcher, message = nil, &block)
-        evaluate_client('ruby').not_to(matcher, message, &block)
+        evaluate_client.not_to(matcher, message, &block)
       end
 
       alias on_client_to_not to_on_client_not
       alias on_client_not_to to_on_client_not
       alias to_not_on_client to_on_client_not
       alias not_to_on_client to_on_client_not
-
-      def to_then(matcher, message = nil, &block)
-        evaluate_client('promise').to(matcher, message, &block)
-      end
-
-      alias then_to to_then
-
-      def to_then_not(matcher, message = nil, &block)
-        evaluate_client('promise').not_to(matcher, message, &block)
-      end
-
-      alias then_to_not to_then_not
-      alias then_not_to to_then_not
-      alias to_not_then to_then_not
-      alias not_to_then to_then_not
+      alias then_to_not to_on_client_not
+      alias then_not_to to_on_client_not
+      alias to_not_then to_on_client_not
+      alias not_to_then to_on_client_not
 
       private
 
-      def evaluate_client(method)
+      def evaluate_client
         source = add_opal_block(@args_str, @target)
-        value = @target.binding.eval("evaluate_#{method}(#{source.inspect}, {}, {})")
+        value = @target.binding.eval("evaluate_ruby(#{source.inspect}, {}, {})")
         ExpectationTarget.for(value, nil)
       end
     end

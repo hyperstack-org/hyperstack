@@ -317,6 +317,14 @@ module ActiveRecord
       end
     end
 
+    def table_name
+      @table_name || name.downcase.pluralize
+    end
+
+    def table_name=(name)
+      @table_name = name
+    end
+
     def composed_of(name, opts = {})
       reflection = Aggregations::AggregationReflection.new(base_class, :composed_of, name, opts)
       if reflection.klass < ActiveRecord::Base
@@ -364,7 +372,7 @@ module ActiveRecord
 
     def define_attribute_methods
       columns_hash.each do |name, column_hash|
-        next if name == primary_key
+        next if name == :id
         # only add serialized key if its serialized.  This just makes testing a bit
         # easier by keeping the columns_hash the same if there are no seralized strings
         # see rspec ./spec/batch1/column_types/column_type_spec.rb:100
@@ -454,7 +462,7 @@ module ActiveRecord
                   [assoc.attribute, { id: [value]}]
                 end
               else
-                [key, [value]]
+                [*key, [value]]
               end
             end.compact
             ReactiveRecord::Base.load_data do

@@ -143,6 +143,71 @@ describe "reactive-record edge cases", js: true do
     end.to be_nil
   end
 
+  it "will reload scopes when data arrives too late" do
+    class ActiveRecord::Base
+      class << self
+        def public_columns_hash
+          @public_columns_hash ||= {}
+        end
+      end
+    end
+
+    class BelongsToModel < ActiveRecord::Base
+      def self.build_tables
+        connection.create_table :belongs_to_models, force: true do |t|
+          t.string :name
+          t.belongs_to :has_many_model
+          t.timestamps
+        end
+        ActiveRecord::Base.public_columns_hash[name] = columns_hash
+      end
+    end
+
+    class HasManyModel < ActiveRecord::Base
+      def self.build_tables
+        connection.create_table :has_many_models, force: true do |t|
+          t.string :name
+          t.timestamps
+        end
+        ActiveRecord::Base.public_columns_hash[name] = columns_hash
+      end
+    end
+
+    BelongsToModel.build_tables #rescue nil
+    HasManyModel.build_tables #rescue nil
+
+    isomorphic do
+      class BelongsToModel < ActiveRecord::Base
+        belongs_to :has_many_model
+      end
+
+      class HasManyModel < ActiveRecord::Base
+        has_many :belongs_to_models
+      end
+    end
+
+    class HasManyModel < ActiveRecord::Base
+      def belongs_to_models
+        sleep 0.3 if name == "sleepy-time"
+        super
+      end
+    end
+
+    class ActiveRecord::Base
+      alias orig_synchromesh_after_create synchromesh_after_create
+      def synchromesh_after_create
+        sleep 0.4 if try(:name) == "sleepy-time"
+        orig_synchromesh_after_create
+      end
+    end
+    
+    has_many1 = HasManyModel.create(name: "has_many1")
+    2.times { |i| BelongsToModel.create(name: "belongs_to_#{i}", has_many_model: has_many1) }
+    expect { HasManyModel.first.belongs_to_models.count }.on_client_to eq(1)
+    BelongsToModel.create(name: "sleepy-time", has_many_model: has_many1)
+    expect { Hyperstack::Model.load { HasManyModel.first.belongs_to_models.count } }.on_client_to eq(3)
+  end
+
   describe 'can use finder methods on scopes' do
 
     before(:each) do

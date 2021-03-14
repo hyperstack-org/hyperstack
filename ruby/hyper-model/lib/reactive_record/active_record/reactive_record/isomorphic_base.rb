@@ -457,7 +457,7 @@ module ReactiveRecord
               parent.send("#{association[:attribute]}=", aggregate)
               #puts "updated  is frozen? #{aggregate.frozen?}, parent attributes = #{parent.send(association[:attribute]).attributes}"
             elsif parent.class.reflect_on_association(association[:attribute].to_sym).nil?
-              raise "Missing association :#{association[:attribute]} for #{parent.class.name}.  Was association defined on opal side only?"
+               raise "Missing association :#{association[:attribute]} for #{parent.class.name}.  Was association defined on opal side only?"
             elsif parent.class.reflect_on_association(association[:attribute].to_sym).collection?
               #puts ">>>>>>>>>> #{parent.class.name}.send('#{association[:attribute]}') << #{reactive_records[association[:child_id]]})"
               dont_save_list.delete(parent)
@@ -549,13 +549,11 @@ module ReactiveRecord
     if RUBY_ENGINE == 'opal'
 
       def destroy(&block)
+        return if @destroyed || @being_destroyed
 
-        return if @destroyed
-
-        #destroy_associations
+        # destroy_associations
 
         promise = Promise.new
-
         if !data_loading? && (id || vector)
           Operations::Destroy.run(model: ar_instance.model_name.to_s, id: id, vector: vector)
           .then do |response|
@@ -567,7 +565,7 @@ module ReactiveRecord
           destroy_associations
           # sync_unscoped_collection! # ? should we do this here was NOT being done before hypermesh integration
           yield true, nil if block
-          promise.resolve({success: true})
+          promise.resolve(success: true)
         end
 
         # DO NOT CLEAR ATTRIBUTES.  Records that are not found, are destroyed, and if they are searched for again, we want to make
@@ -587,18 +585,16 @@ module ReactiveRecord
       def self.destroy_record(model, id, vector, acting_user)
         model = Object.const_get(model)
         record = if id
-          model.find(id)
-        else
-          ServerDataCache.new(acting_user, {})[*vector]
-        end
-
+                   model.find(id)
+                 else
+                   ServerDataCache.new(acting_user, {})[*vector].value
+                 end
 
         record.check_permission_with_acting_user(acting_user, :destroy_permitted?).destroy
-        {success: true, attributes: {}}
-
+        { success: true, attributes: {} }
       rescue Exception => e
-        #ReactiveRecord::Pry.rescued(e)
-        {success: false, record: record, message: e}
+        # ReactiveRecord::Pry.rescued(e)
+        { success: false, record: record, message: e }
       end
     end
   end

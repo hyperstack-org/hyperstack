@@ -32,7 +32,7 @@ module ActiveRecord
   module Associations
 
     class AssociationReflection
-
+      attr_reader :klass_name
       attr_reader :association_foreign_key
       attr_reader :attribute
       attr_reader :macro
@@ -77,6 +77,10 @@ module ActiveRecord
 
       def singular?
         @macro != :has_many
+      end
+
+      def habtm?
+        through_association&.klass_name =~ /^HyperstackInternalHabtm/
       end
 
       def through_association

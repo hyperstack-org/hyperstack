@@ -38,6 +38,8 @@ module Hyperstack
           end
 
           Connection.all.pluck(:channel).uniq
+        rescue ::ActiveRecord::StatementInvalid
+          []
         end
 
         def open(channel, session = nil, root_path = nil)

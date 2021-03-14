@@ -46,8 +46,12 @@ module Hyperstack
           @_railway.process_params(args)
           @_railway.process_validations
           @_railway.run
-          @_railway.dispatch
-          @_railway.result
+          # return the result from dispatch in case there is an error
+          if (dispatch_result = @_railway.dispatch).rejected?
+            dispatch_result
+          else
+            @_railway.result
+          end
         end
       end
 

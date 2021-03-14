@@ -1,11 +1,68 @@
-language: bash
-cache:
-  bundler: true
-  directories:
-  - node_modules # NPM packages
+dist: xenial
+
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+      - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
+        key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+    packages:
+      - postgresql-11
+      - chromium-chromedriver
+      - google-chrome-stable
+      - yarn
+      - redis-server
+  postgresql: '11'
+
+_test_gem_pg: &_test_gem_pg
+  stage: test
+
+  language: ruby
+  cache:
+    bundler: true
+    directories:
+    - node_modules # NPM packages
+
+  before_install:
+    - echo 'installing postgresql'
+    - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
+    - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+    - sudo service postgresql stop
+    - sudo service postgresql start 11
+    - postgres --version
+    - sudo rm -f /usr/local/bin/yarn
+    - nvm install 10
+    - rvm install 2.6.3  # was 2.5.1
+    - gem install bundler
+    - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
+    - echo 'install completed'
+
+  before_script:
+    - echo before_script $COMPONENT
+    - echo updating chrome driver
+    - cd ruby/$COMPONENT
+    - bundle install --jobs=3 --retry=3
+    - bundle exec ruby -e 'require "webdrivers";  Webdrivers::Chromedriver.update; puts Webdrivers::Chromedriver.current_version'
+    - ls -la ~/.webdrivers
+    - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
+    - bundle exec rake spec:prepare
+    - google-chrome --version
+    - which google-chrome
+    - yarn install
+  script:
+    - echo running script $COMPONENT
+    - DRIVER=travis bundle exec rake $TASK
 
 _test_gem: &_test_gem
   stage: test
+
+  language: ruby
+  cache:
+    bundler: true
+    directories:
+    - node_modules # NPM packages
+
   addons:
     apt:
       sources:
@@ -19,6 +76,8 @@ _test_gem: &_test_gem
         - yarn
         - redis-server
     mariadb: '10.3'
+  services:
+    - redis-server
   before_install:
     - echo installing $COMPONENT
     # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
@@ -27,14 +86,17 @@ _test_gem: &_test_gem
     - nvm install 10
     - rvm install 2.6.3  # was 2.5.1
     - gem install bundler
-    - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
+    - echo 'install completed'
+
   before_script:
     - echo before_script $COMPONENT
     - cd ruby/$COMPONENT
     - bundle install --jobs=3 --retry=3
-    - bundle exec rake spec:prepare
     - google-chrome --version
-    - which google-chrome
+    - bundle exec ruby -e 'require "webdrivers";  Webdrivers::Chromedriver.update; puts Webdrivers::Chromedriver.current_version'
+    - ls -la ~/.webdrivers
+    - sudo cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
+    - bundle exec rake spec:prepare
     - yarn install
   script:
     - echo running script $COMPONENT
@@ -52,6 +114,7 @@ _deploy_gem: &_deploy_gem
         secure: "ORJMyp20YFCkvujBfxoDPwEZy8R8YJaKwRhHZUDTPZPiS84mJA7Mqd0JjvRlF0mlH/WzspruM7hZV0CuMU8F/0raRhSUU9RBh5veZ/4ij9kboCYnfuqBVt6qPRtaf8DgKe7CWGioUrTISJCVKLnygY6gZd2aFXCEbqZMrkUvC7y43ymOoFoeyCLsXC0j5uJxdHgNfbaIUetIl2DQJUbC2Rgq1Iaxvi72Ae97TR2xRCu+ko8DopRpQCug6U81IhzXftizGfKwzecqVFjuMn3XEf+UDlU6xbvwWWkcwjYNAbP2Kk+mWwUMx36s+1Pyx8MOveYLTwnQJ6gHocZHzh7WJOD548JNU3F5oXIlUB4EzD20bCSIeRKOdxTuKrNk7W3a5qGERuQi4rkIlkKaFIBP55IkliUxvYxqr0WujsjO2reRcNhNcLVGCOaX6LZbWFR5bf0WiEOL4vOxPNw66sI2JVHoMmQeAYtL2ghxikdSPXKRc+inT3QiRBsh+ns8YrAP7sV4lX6r/qyWUtPh6kY8xIeTP4VzMviyf20m5u++omao/FSEtVnU3cro5KjrZLg3ILg4NpNG+xoRqPS/Hmxry5ZPrggqNrxoqWuO7pLd/NnV/AnLiT8rd2P0PTriP9uRIM8+fFfyOeGwbplOLrbWUPnCdQVWp6dYOrNgE2yDJ/I="
       on:
         tags: true
+
 jobs:
   include:
     - <<: *_test_gem
@@ -72,12 +135,12 @@ jobs:
       env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1
     - <<: *_test_gem
       env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part1
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part2
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part3
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part1 DB=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part2 DB=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part3 DB=hyper_mesh_test_db
     - <<: *_test_gem
       env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1
 
@@ -99,12 +162,12 @@ jobs:
       env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
     - <<: *_test_gem
       env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' TASK=part1
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' TASK=part2
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' TASK=part3
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' TASK=part1 DB=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' TASK=part2 DB=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' TASK=part3 DB=hyper_mesh_test_db
     - <<: *_test_gem
       env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11'
 
@@ -126,12 +189,12 @@ jobs:
       env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
     - <<: *_test_gem
       env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part1
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part2
-    - <<: *_test_gem
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part3
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part1 DB=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part2 DB=hyper_mesh_test_db
+    - <<: *_test_gem_pg
+      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part3 DB=hyper_mesh_test_db
     - <<: *_test_gem
       env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
 

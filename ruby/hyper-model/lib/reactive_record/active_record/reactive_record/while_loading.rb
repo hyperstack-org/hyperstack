@@ -353,7 +353,7 @@ module ReactiveRecord
 
       end
 
-      def after_mount_and_update
+      def after_mount_and_update(*)
         @waiting_on_resources = @Loading
         node = dom_node
         %x{
