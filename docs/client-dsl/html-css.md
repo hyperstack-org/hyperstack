@@ -8,7 +8,7 @@ A Hyperstack user-interface is composed of HTML elements, conditional logic and 
 
 ```ruby
 UL do
-  10.times { |n| LI { "Number #{n}" }}
+  5.times { |n| LI { "Number #{n}" }}
 end
 ```
 
