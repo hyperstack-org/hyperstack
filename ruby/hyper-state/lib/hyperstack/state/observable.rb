@@ -12,13 +12,13 @@ module Hyperstack
             Internal::Receiver.mount(self, *args, &block)
           end
           base.send(:"define_#{kind}", :observe) do |*args, &block|
-            result = block && block.call || args.last
+            result = block ? block.call : args.last
             Internal::State::Mapper.observed! self
             result
           end
           base.send(:"define_#{kind}", :mutate) do |*args, &block|
             # any args will be ignored thus allowing us to say `mutate @foo = 123, @bar[:x] = 7` etc
-            result = block && block.call || args.last
+            result = block ? block.call : args.last
             Internal::State::Mapper.mutated! self
             result
           end
