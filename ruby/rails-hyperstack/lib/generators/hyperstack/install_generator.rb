@@ -122,7 +122,7 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
     def check_javascript_link_directory
       manifest_js_file = Rails.root.join("app", "assets", "config", "manifest.js")
       return unless File.exist? manifest_js_file
-      return unless File.readlines(manifest_js_file).grep(/javascript \.js/).empty?
+      return unless File.readlines(manifest_js_file).grep(/javascripts \.js/).empty?
 
       append_file manifest_js_file, "//= link_directory ../javascripts .js\n"
     end
@@ -162,13 +162,13 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       unless File.exist? hyper_app_record_file
         empty_directory Rails.root.join('app', 'hyperstack', 'models')
         `mv #{rails_app_record_file} #{hyper_app_record_file}`
-        create_file rails_app_record_file, <<-RUBY
-# #{rails_app_record_file}
-# the presence of this file prevents rails migrations from recreating application_record.rb
-# see https://github.com/rails/rails/issues/29407
-
-require 'models/application_record.rb'
-        RUBY
+#         create_file rails_app_record_file, <<-RUBY
+# # #{rails_app_record_file}
+# # the presence of this file prevents rails migrations from recreating application_record.rb
+# # see https://github.com/rails/rails/issues/29407
+#
+# require 'models/application_record.rb'
+#         RUBY
       end
     end
 
@@ -245,6 +245,15 @@ require 'models/application_record.rb'
       else
         create_file file_name, <<-RUBY
 #{s}
+# server_side_auto_require will patch the ActiveSupport Dependencies module
+# so that you can define classes and modules with files in both the
+# app/hyperstack/xxx and app/xxx directories.  For example you can split
+# a Todo model into server and client related definitions and place this
+# in `app/hyperstack/models/todo.rb`, and place any server only definitions in
+# `app/models/todo.rb`.
+
+require "hyperstack/server_side_auto_require.rb"
+
 # set the component base class
 
 Hyperstack.component_base_class = 'HyperComponent' # i.e. 'ApplicationComponent'

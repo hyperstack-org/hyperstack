@@ -13,11 +13,17 @@ The DSL has the following major areas:
 
 ## HyperComponent
 
-By convention your Hyperstack Components will inherit from the `HyperComponent` class, which at a minimum looks like this:
+By convention your Hyperstack Components will inherit from the `HyperComponent` class, which typically would look like this:
 
 ```ruby
 class HyperComponent
+  # All component classes must include Hyperstack::Component
   include Hyperstack::Component
+  # The Observable module adds state handling
+  include Hyperstack::State::Observable
+  # The following turns on the new style param accessor
+  # i.e. param :foo is accessed by the foo method
+  param_accessor_style :accessors
 end
 
 # and is used like this:
@@ -330,7 +336,7 @@ end
 
 A core design concept taken from React is that data flows down to child Components via params and params \(called props in React\) are immutable.
 
-However for complex objects 
+However for complex objects
 
 In Hyperstack, there are **two exceptions** to this rule:
 
