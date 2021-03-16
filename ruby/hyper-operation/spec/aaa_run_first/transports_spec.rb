@@ -200,11 +200,12 @@ end
 
       it 'sees the connection going offline' do
         mount 'TestComponent'
+        puts "active connections after mounting: #{Hyperstack::Connection.active}"
         evaluate_ruby 'Hyperstack.go_ahead_and_connect'
         Timecop.travel(Time.now + Hyperstack::Connection.transport.expire_new_connection_in - 1)
         wait_for do
           sleep 0.25
-          Hyperstack::Connection.active
+          Hyperstack::Connection.active.tap { |c| puts "active connections now = #{c}"}
         end.to eq(['ScopeIt::TestApplication'])
         ApplicationController.acting_user = true
         mount 'TestComponent'

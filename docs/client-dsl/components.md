@@ -6,7 +6,7 @@ The DSL has the following major areas:
 
 * The `HyperComponent` class
 * HTML DSL elements
-* Component Lifecycle Methods \(`before_mount`, `render`, `after_mount`, `after_update`, `after_error`\)
+* Component Lifecycle Methods \(`before_mount`, `after_mount`, `after_update`\)
 * The `param` and `render` methods
 * Event handlers
 * Miscellaneous methods
@@ -23,6 +23,7 @@ end
 # and is used like this:
 
 class AnotherComponent < HyperComponent
+  ...
 end
 ```
 
@@ -30,7 +31,7 @@ Having an Application wide HyperComponent class allows you to modify component b
 
 ## The `render` Callback
 
-At a minimum every component class must define a `render` callback which returns one or more child elements. Those children may in turn have an arbitrarily deep structure.
+At a minimum every component class must define a `render` block which returns one or more child elements. Those children may in turn have an arbitrarily deep structure.
 
 ```ruby
 class Component < HyperComponent
@@ -40,7 +41,7 @@ class Component < HyperComponent
 end
 ```
 
-To save a little typing you can also include the top level element to be rendered:
+To save a little typing you can also specify the top level element to be rendered:
 
 ```ruby
 class Component < HyperComponent
@@ -50,7 +51,7 @@ class Component < HyperComponent
 end
 ```
 
-To render a component, you reference its class name in the DSL as a method call. This creates a new instance, passes any parameters proceeds with the component lifecycle.
+To render a component, you reference its class name as a method call from another component. This creates a new instance, passes any parameters and proceeds with the component lifecycle.
 
 ```ruby
 class FirstComponent < HyperComponent
@@ -60,17 +61,18 @@ class FirstComponent < HyperComponent
 end
 ```
 
-Note that you should never redefine the `new` or `initialize` methods, or call them directly. The equivalent of `initialize` is the `before_mount` method.
+Note that you should never redefine the `new` or `initialize` methods, or call them directly. The equivalent of `initialize` is the `before_mount` method.  
+
+> The one exception to using `new` is within a spec to create a "headless" component in order to access its internal state and methods.
 
 ### Invoking Components
 
 > Note: when invoking a component **you must have** a \(possibly empty\) parameter list or \(possibly empty\) block.
-
-```ruby
+> ```ruby
 MyCustomComponent()  # ok
 MyCustomComponent {} # ok
 MyCustomComponent    # <--- breaks
-```
+> ```
 
 ## Multiple Components
 
@@ -89,9 +91,9 @@ class Avatar < HyperComponent
   param :user_name
 
   render(DIV) do
-    # the user_name param has been converted to @UserName immutable instance variable
-    ProfilePic(user_name: @UserName)
-    ProfileLink(user_name: @UserName)
+    # for each param a method with the same name is defined
+    ProfilePic(user_name: user_name)
+    ProfileLink(user_name: user_name)
   end
 end
 
@@ -99,15 +101,15 @@ class ProfilePic < HyperComponent
   param :user_name
 
   render do
-    IMG(src: "https://graph.facebook.com/#{@UserName}/picture")
+    IMG(src: "https://graph.facebook.com/#{user_name}/picture")
   end
 end
 
 class ProfileLink < HyperComponent
   param :user_name
   render do
-    A(href: "https://www.facebook.com/#{@UserName}") do
-      @UserName
+    A(href: "https://www.facebook.com/#{user_name}") do
+      user_name
     end
   end
 end
@@ -207,16 +209,20 @@ class MyComponent < HyperComponent
 end
 ```
 
-### The children method
+> The `to_key` method:  Any ruby object can be a key.  Under the hood the HyperComponent DSL will call the object's `to_key` method which will respond with a unique value representing the object.  For example if you pass an ActiveRecord model instance as a key, the result will be the database id of the model.  
 
-Along with params components may be passed a block which is used to build the components children.
+### The children and render methods
 
-The instance method `children` returns an enumerable that is used to access the unrendered children of a component.
+Along with the params hash components may be passed a block which is used to build the components children.
+
+The instance method `children` returns an enumerable that is used to access the *unrendered* children of a component.  The children can then be rendered
+using the `render` method which will merge any additional parameters and
+render the child.
 
 ```ruby
 class Indenter < HyperComponent
   render(DIV) do
-    IndentEachLine(by: 100) do # see IndentEachLine below
+    IndentEachLine(by: 10) do # see IndentEachLine below
       DIV {"Line 1"}
       DIV {"Line 2"}
       DIV {"Line 3"}
@@ -267,7 +273,7 @@ class ListItems < HyperComponent
 end
 ```
 
-The only param that FRAGMENT may take is a key, which is useful if there will be multiple fragments being merged, at some higher level.
+The only param that FRAGMENT may take is a key, which is useful if there will be multiple fragments being merged at some higher level.
 
 
 ### Data Flow
@@ -276,7 +282,7 @@ In React, data flows from owner to owned component through the params as discuss
 
 ### Stores
 
-Managing state between components is best done using Stores as many Components can access one store. This saves passing data btween Components. Please see the [Store documentation](https://github.com/hyperstack-org/hyperstack/tree/a530e3955296c5bd837c648fd452617e0a67a6ed/docs/dsl-client/hyper-store/README.md) for details.
+Managing state between components is best done using Stores as many Components can access one store. This saves passing data between Components. Please see the [Store documentation](https://docs.hyperstack.org/client-dsl/hyper-store) for details.
 
 ### Reusable Components
 
@@ -294,7 +300,7 @@ Examples:
 
 ```ruby
 param :foo # declares that we must be provided with a parameter foo when the component is instantiated or re-rerendered.
-param :foo, alias: :something       # the alias name will be used for the param (instead of @Foo)
+param :foo, alias: :something       # the alias name will be used for the param (instead of Foo)
 param :foo => "some default"        # declares that foo is optional, and if not present the value "some default" will be used.
 param foo: "some default"           # same as above using ruby 1.9 JSON style syntax
 param :foo, default: "some default" # same as above but uses explicit default key
@@ -323,6 +329,8 @@ end
 ### Immutable params
 
 A core design concept taken from React is that data flows down to child Components via params and params \(called props in React\) are immutable.
+
+However for complex objects 
 
 In Hyperstack, there are **two exceptions** to this rule:
 

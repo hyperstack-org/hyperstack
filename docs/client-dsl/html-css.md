@@ -14,19 +14,19 @@ end
 
 > **Notice that the HTML elements \(BUTTON, DIV, etc.\) are in CAPS**. We know this is bending the standard Ruby style rules, but we think it reads better this way.
 
-For example, to render a `<div>`:
+For example
 
 ```ruby
 DIV(class: 'green-text') { "Let's gets started!" }
 ```
 
-Would create the following HTML:
+would create the following HTML:
 
 ```markup
 <div class="green-text">Let's gets started!</div>
 ```
 
-And to render a table:
+And this would render a table:
 
 ```ruby
 TABLE(class: 'ui celled table') do
@@ -52,7 +52,7 @@ The following HTML and SVG elements are available:
 <details>
 <summary>HTML Tags</summary>
 
-```markup
+```
 A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO  
 B BASE BDI BDO BIG BLOCKQUOTE BODY BR BUTTON  
 CANVAS CAPTION CITE CODE COL COLGROUP  
@@ -80,7 +80,7 @@ WBR
 <details>
 <summary>SVG Tags</summary>
 
-```markup
+```
 CIRCLE CLIPPATH  
 DEFS  
 ELLIPSE  
@@ -122,4 +122,19 @@ For `style` you need to pass a hash using the [React style conventions](https://
 
 ```ruby
 PARA(style: { display: item[:some_property] == "some state" ? :block : :none })
+```
+
+### Complex Arguments
+
+You can pass multiple hashes which will be merged, and any individual symbols
+(or strings) will be treated as `=true`.  For example
+
+```ruby
+A(:flag, {href: '/'}, {class: 'my_class'})
+```
+
+will generate
+
+```HTML
+<a flag=true href='/' class='myclass'></a>
 ```
