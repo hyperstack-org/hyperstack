@@ -227,7 +227,7 @@ describe 'React::Component', js: true do
       expect(page.find('div').text).to end_with("random string at the end")
     end
 
-    it "can generate multiple elements on outer render by returning arrays" do
+    it "can generate multiple elements on outer render by rendering multiple values" do
       mount 'Foo' do
         class Foo < Hyperloop::Component
           render do
@@ -244,6 +244,49 @@ describe 'React::Component', js: true do
       end
       expect(page.find('ul').all('li').collect(&:text)).to eq(['hello', 'goodby', 'the end'])
       expect(page.find('div').text).to end_with("random string at the end")
+    end
+
+    it "fragments can be nested and have keys" do
+      mount 'Foo' do
+        class Foo < Hyperloop::Component
+          render do
+            UL(key: 1) do
+              3.times do |i|
+                FRAGMENT(key: i) do
+                  LI { "first #{i}" }
+                  LI { "second #{i}" }
+                end
+              end
+            end
+          end
+        end
+      end
+      expect(page.find('ul').all('li').collect(&:text)).to eq([*0..2].collect { |i| ["first #{i}", "second #{i}"] }.flatten)
+    end
+
+    xit "will only render once" do # see issue #329
+      mount "Parent" do
+        class Child
+          include Hyperstack::Component
+          param_accessor_style :accessors
+          param :do_something
+          render do
+            puts "child: #{do_something.object_id}"
+          end
+        end
+        class Parent
+          include Hyperstack::Component
+          param_accessor_style :accessors
+          before_mount do
+            @do_something = -> { puts "we did it!" }
+            after(2) { force_update! }
+          end
+          render do
+            puts "parent: #{@do_something.object_id}"
+            Child(do_something: @do_something)
+          end
+        end
+      end
     end
 
     it 'can buffer an element' do

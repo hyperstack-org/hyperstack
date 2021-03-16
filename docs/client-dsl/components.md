@@ -1,10 +1,10 @@
 # Hyperstack Component DSL
 
-Hyperstack Component DSL is a set of class and instance methods that are used to describe React components and render the user-interface.
+The Hyperstack Component DSL is a set of class and instance methods that are used to describe React components and render the user-interface.
 
 The DSL has the following major areas:
 
-* The `Hyperstack::Component` mixin or your own `HyperComponent` class
+* The `HyperComponent` class
 * HTML DSL elements
 * Component Lifecycle Methods \(`before_mount`, `render`, `after_mount`, `after_update`, `after_error`\)
 * The `param` and `render` methods
@@ -13,18 +13,24 @@ The DSL has the following major areas:
 
 ## HyperComponent
 
-Hyperstack Components classes include the `Hyperstack::Component` mixin or \(for ease of use\) are a subclass of a `HyperComponent` class which includes the mixin:
+By convention your Hyperstack Components will inherit from the `HyperComponent` class, which at a minimum looks like this:
 
 ```ruby
 class HyperComponent
   include Hyperstack::Component
 end
 
+# and is used like this:
+
 class AnotherComponent < HyperComponent
 end
 ```
 
-At a minimum every component class must define a `render` method which returns **one single** child element. That child may in turn have an arbitrarily deep structure.
+Having an Application wide HyperComponent class allows you to modify component behavior on an application basis, similar to the way Rails uses `ApplicationRecord` and `ApplicationController` classes.
+
+## The `render` Callback
+
+At a minimum every component class must define a `render` callback which returns one or more child elements. Those children may in turn have an arbitrarily deep structure.
 
 ```ruby
 class Component < HyperComponent
@@ -34,7 +40,7 @@ class Component < HyperComponent
 end
 ```
 
-You may also include the top level element to be rendered:
+To save a little typing you can also include the top level element to be rendered:
 
 ```ruby
 class Component < HyperComponent
@@ -130,9 +136,8 @@ Parent { Child() }
 ```ruby
 param :items
 render do
-  # notice how the items param is accessed in CamelCase (to indicate that it is read-only)
   items.each do |item|
-    PARA do
+    P do
       item[:text]
     end
   end
@@ -229,6 +234,41 @@ class IndentEachLine < HyperComponent
   end
 end
 ```
+
+### Rendering Multiple Values and the FRAGMENT component
+
+A render block may generate multiple values.  React assumes when a Component generates multiple items, the item order and quantity may
+change over time and so will give a warning unless each element has a key:
+
+```ruby
+class ListItems < HyperComponent
+  render do
+    LI(key: 1) { 'item 1' }
+    LI(key: 2) { 'item 2' }
+    LI(key: 3) { 'item 3' }
+  end
+end
+
+# somewhere else:
+   UL do
+     ListItems()
+   end
+```
+
+If you are sure that the order and number of elements will not change over time you may wrap the items in the FRAGMENT pseudo component:
+
+```ruby
+class ListItems < HyperComponent
+  render(FRAGMENT) do
+    LI { 'item 1' }
+    LI { 'item 2' }
+    LI { 'item 3' }
+  end
+end
+```
+
+The only param that FRAGMENT may take is a key, which is useful if there will be multiple fragments being merged, at some higher level.
+
 
 ### Data Flow
 
@@ -424,4 +464,3 @@ end
 ```
 
 Note: `collect_other_params_as` builds a hash, so you can merge other data in or even delete elements out as needed.
-

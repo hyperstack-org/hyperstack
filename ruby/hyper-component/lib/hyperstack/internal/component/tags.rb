@@ -93,6 +93,7 @@ module Hyperstack
 
         def lookup_const(name)
           return nil unless name =~ /^[A-Z]/
+          return Hyperstack::Internal::Component::Tags::FRAGMENT if name == "FRAGMENT"
           scopes = self.class.name.to_s.split('::').inject([Object]) do |nesting, next_const|
             nesting + [nesting.last.const_get(next_const)]
           end.reverse

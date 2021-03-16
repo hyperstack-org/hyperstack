@@ -10,10 +10,10 @@ namespace :spec do
     opal_version = `bundle info opal`.match(/\* opal \((.+)\)/)[1]
     Dir.chdir('spec') do
       sh('rm -rf test_app')
-      Bundler.with_clean_env do
+      Bundler.with_unbundled_env do
         sh("rails _#{rails_version}_ new test_app -T")
       end
-      Bundler.with_clean_env do
+      Bundler.with_unbundled_env do
         Dir.chdir('test_app') do
           sh('cat ../gems.rb >> Gemfile')
           sh("echo 'gem \"opal\", \"#{opal_version}\"' >> Gemfile")

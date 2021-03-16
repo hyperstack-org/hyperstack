@@ -214,7 +214,7 @@ hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
     end
 
     def install
-      Bundler.with_clean_env do
+      Bundler.with_unbundled_env do
         run "bundle install"
       end
       run 'bundle exec rails webpacker:install'

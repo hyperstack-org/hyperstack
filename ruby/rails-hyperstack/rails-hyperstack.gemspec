@@ -57,7 +57,7 @@ You can control how much of the stack gets installed as well:
   spec.add_dependency 'hyper-model', Hyperstack::VERSION
   spec.add_dependency 'hyper-router', Hyperstack::ROUTERVERSION
   spec.add_dependency 'hyperstack-config', Hyperstack::VERSION
-  spec.add_dependency 'opal-rails'#, '~> 1.0'
+  spec.add_dependency 'opal-rails' #, '~> 2.0'
 
   spec.add_dependency 'opal-browser', '~> 0.2.0'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'
@@ -74,7 +74,7 @@ You can control how much of the stack gets installed as well:
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop', '~> 0.51.0'
   spec.add_development_dependency 'sqlite3', '~> 1.4' # was 1.3.6 -- see https://github.com/rails/rails/issues/35153
-  spec.add_development_dependency 'sass-rails', '~> 5.0'
+  spec.add_development_dependency 'sass-rails', '>= 5.0'
   # Use Uglifier as compressor for JavaScript assets
   spec.add_development_dependency 'uglifier', '>= 1.3.0'
   # See https://github.com/rails/execjs#readme for more supported runtimes

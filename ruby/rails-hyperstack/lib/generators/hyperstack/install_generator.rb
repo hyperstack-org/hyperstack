@@ -9,13 +9,6 @@ module Hyperstack
     class_option 'webpack-only', type: :boolean
     class_option 'hyper-model-only', type: :boolean
 
-    # def add_clexer
-    #   gem 'c_lexer'
-    #   Bundler.with_clean_env do
-    #     run 'bundle update'
-    #   end
-    # end
-
     def add_component
       if skip_adding_component?
         # normally this is handled by the hyper:component
@@ -117,12 +110,21 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
 
     def install_webpacker
       return if skip_webpack?
-      gem 'webpacker'
-      Bundler.with_clean_env do
-        run 'bundle install'
+
+      gem "webpacker" unless defined? ::Webpacker
+      Bundler.with_unbundled_env do
+        run "bundle install"
       end
       `spring stop`
       Dir.chdir(Rails.root.join.to_s) { run 'bundle exec rails webpacker:install' }
+    end
+
+    def check_javascript_link_directory
+      manifest_js_file = Rails.root.join("app", "assets", "config", "manifest.js")
+      return unless File.exist? manifest_js_file
+      return unless File.readlines(manifest_js_file).grep(/javascript \.js/).empty?
+
+      append_file manifest_js_file, "//= link_directory ../javascripts .js\n"
     end
 
     def create_policies_directory

@@ -2,40 +2,20 @@
 
 You can install Hyperstack either
 
-* using a template - best for new applications \(not working for Rails 6\) yet;
-* using a Rails generator - best for existing Rails apps;
+* using a Rails generator,
 * or manually walking through the detailed installation instructions below.
 
-Even if you use the template or generator, later reading through the detailed installation instructions can be helpful to understand how the system fits together and the generators work.
+Even if you use the generator later reading through the detailed installation instructions can be helpful to understand how the system fits together and the generators work.
 
 ## Pre-Requisites
 
-#### - Rails 5.x [Install Instructions](http://railsinstaller.org/en)
+#### - Rails >= 5.x [Install Instructions](http://railsinstaller.org/en)
 
-And for a full system as setup by the template or install generator you will need
+And for a full system as setup generator you will need
 
 #### - Yarn [Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable)
 
-## Installing using the template
-
-This template will create a **new** Rails app with Webpacker from Hyperstack edge branch. This is the easiest way to get started.
-
-### Run the template
-
-Simply run the command below to create a new Rails app with Hyperstack all configured:
-
-```text
-rails new MyApp -T -m https://rawgit.com/hyperstack-org/hyperstack/edge/install/rails-webpacker.rb
-```
-
-> Note: The -T flag will not install minitest directories, leaving room for Rspec and Hyperspec. See the HyperSpec readme under "Tools" for more info.
-
-### Start the Rails app
-
-* `foreman start` to start Rails and the Hotloader
-* Navigate to `http://localhost:5000/`
-
-## Installing in an Existing Rails App
+## Installing Using the Generator
 
 If you have an existing Rails app, you can use the built in generator to install Hyperstack. Best to create a new branch of course before trying this out.
 
@@ -702,4 +682,3 @@ Another approach is to add a simple component using the component generator:
 and then mount this component using ERB from within an existing view:
 
 `<% render_component 'HyperTest' %>`
-
