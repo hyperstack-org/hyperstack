@@ -2,7 +2,7 @@
 
 * [Welcome](README.md)
 * [Rails Installation and Configuration](rails-installation/README.md)
-  * [Prerequisites](rails-installation/prerequistes.md)
+  * [Prerequisites](rails-installation/prerequisites.md)
   * [Using the Hyperstack Installer](rails-installation/using-the-installer.md)
   * [Using the Generators](rails-installation/generators.md)
   * [File Structure](rails-installation/file-structure.md)
