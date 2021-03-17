@@ -37,7 +37,7 @@
 
 <%="  "* @indent %>  before_unmount do
 <%="  "* @indent %>    # cleanup any thing before component is destroyed
-<%="  "* @indent %>    # note timers are broadcast receivers are cleaned up
+<%="  "* @indent %>    # note timers and broadcast receivers are cleaned up
 <%="  "* @indent %>    # automatically
 <%="  "* @indent %>  end
 

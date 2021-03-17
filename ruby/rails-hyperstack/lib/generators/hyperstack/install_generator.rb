@@ -9,17 +9,6 @@ module Hyperstack
     class_option 'webpack-only', type: :boolean
     class_option 'hyper-model-only', type: :boolean
 
-    def add_component
-      if skip_adding_component?
-        # normally this is handled by the hyper:component
-        # generator, but if we are skipping it we will check it
-        # now.
-        insure_hyperstack_loader_installed
-      else
-        generate 'hyper:router App --add-route'
-      end
-    end
-
     def add_hotloader
       return if skip_hotloader?
       unless Hyperstack.imported? 'hyperstack/hotloader'
@@ -37,94 +26,27 @@ hot-loader: bundle exec hyperstack-hotloader -p 25222 -d app/hyperstack
       end
     end
 
-    def insure_yarn_loaded
-      return if skip_webpack?
-      begin
-        yarn_version = `yarn --version`
-        raise Errno::ENOENT if yarn_version.blank?
-      rescue Errno::ENOENT
-        raise Thor::Error.new("please insure nodejs is installed and the yarn command is available if using webpacker")
-      end
-    end
+    def install_webpack
+      return super unless skip_webpack?
 
-    def add_webpacker_manifests
-      return if skip_webpack?
-      create_file 'app/javascript/packs/client_and_server.js', <<-JAVASCRIPT
-//app/javascript/packs/client_and_server.js
-// these packages will be loaded both during prerendering and on the client
-React = require('react');                         // react-js library
-createReactClass = require('create-react-class'); // backwards compatibility with ECMA5
-History = require('history');                     // react-router history library
-ReactRouter = require('react-router');            // react-router js library
-ReactRouterDOM = require('react-router-dom');     // react-router DOM interface
-ReactRailsUJS = require('react_ujs');             // interface to react-rails
-// to add additional NPM packages run `yarn add package-name@version`
-// then add the require here.
-      JAVASCRIPT
-      create_file 'app/javascript/packs/client_only.js', <<-JAVASCRIPT
-//app/javascript/packs/client_only.js
-// add any requires for packages that will run client side only
-ReactDOM = require('react-dom');               // react-js client side code
-jQuery = require('jquery');                    // remove if you don't need jQuery
-// to add additional NPM packages call run yarn add package-name@version
-// then add the require here.
-      JAVASCRIPT
-      append_file 'config/initializers/assets.rb' do
-        <<-RUBY
-Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js').to_s
-        RUBY
-      end
-      inject_into_file 'config/environments/test.rb', before: /^end/ do
-        <<-RUBY
-
-  # added by hyperstack installer
-  config.assets.paths << Rails.root.join('public', 'packs-test', 'js').to_s
-        RUBY
-      end
-    end
-
-    def add_webpacks
-      return if skip_webpack?
-
-      yarn 'react', '16'
-      yarn 'react-dom', '16'
-      yarn 'react-router', '^5.0.0'
-      yarn 'react-router-dom', '^5.0.0'
-      yarn 'react_ujs', '^2.5.0'
-      yarn 'jquery', '^3.4.1'
-      yarn 'create-react-class'
-    end
-
-    def cancel_react_source_import
       inject_into_initializer(
-        if skip_webpack?
-          "Hyperstack.import 'react/react-source-browser' "\
-          "# bring in hyperstack's copy of react, comment this out "\
-          'if you bring it in from webpacker'
-        else
-          "# Hyperstack.import 'react/react-source-browser' "\
-          '# uncomment this line if you want hyperstack to use its copy of react'
-        end
+        "Hyperstack.import 'react/react-source-browser' "\
+        "# bring in hyperstack's copy of react, comment this out "\
+        "if you bring it in from webpacker\n"
       )
     end
 
-    def install_webpacker
-      return if skip_webpack?
-
-      gem "webpacker" unless defined? ::Webpacker
-      Bundler.with_unbundled_env do
-        run "bundle install"
+    def add_component
+      # add_component AFTER webpack so component generator webpack check works
+      if skip_adding_component?
+        # normally this is handled by the hyper:component
+        # generator, but if we are skipping it we will check it
+        # now.
+        insure_hyperstack_loader_installed
+        check_javascript_link_directory
+      else
+        generate 'hyper:router App --add-route'
       end
-      `spring stop`
-      Dir.chdir(Rails.root.join.to_s) { run 'bundle exec rails webpacker:install' }
-    end
-
-    def check_javascript_link_directory
-      manifest_js_file = Rails.root.join("app", "assets", "config", "manifest.js")
-      return unless File.exist? manifest_js_file
-      return unless File.readlines(manifest_js_file).grep(/javascripts \.js/).empty?
-
-      append_file manifest_js_file, "//= link_directory ../javascripts .js\n"
     end
 
     def create_policies_directory
@@ -146,9 +68,6 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       regulate_all_broadcasts { |policy| policy.send_all }
       # Allow all changes to models
       allow_change(to: :all, on: [:create, :update, :destroy]) { true }
-      # allow remote access to all scopes - i.e. you can count or get a list of ids
-      # for any scope or relationship
-      ApplicationRecord.regulate_scope :all
     end unless Rails.env.production?
   end
         RUBY
@@ -162,6 +81,12 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
       unless File.exist? hyper_app_record_file
         empty_directory Rails.root.join('app', 'hyperstack', 'models')
         `mv #{rails_app_record_file} #{hyper_app_record_file}`
+        inject_into_file hyper_app_record_file, before: /^end/, verbose: false do
+          "  # allow remote access to all scopes - i.e. you can count or get a list of ids\n"\
+          "  # for any scope or relationship\n"\
+          "  ApplicationRecord.regulate_scope :all unless Hyperstack.env.production?\n"
+        end
+
 #         create_file rails_app_record_file, <<-RUBY
 # # #{rails_app_record_file}
 # # the presence of this file prevents rails migrations from recreating application_record.rb
@@ -170,6 +95,19 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
 # require 'models/application_record.rb'
 #         RUBY
       end
+    end
+
+    def turn_on_transport
+      inject_into_initializer <<-RUBY
+
+# transport controls how push (websocket) communications are
+# implemented.  The default is :none.
+# Other possibilities are :action_cable, :pusher (see www.pusher.com)
+# or :simple_poller which is sometimes handy during system debug.
+
+Hyperstack.transport = :action_cable # :pusher, :simple_poller or :none
+
+      RUBY
     end
 
     def add_engine_route
@@ -236,62 +174,6 @@ Rails.application.config.assets.paths << Rails.root.join('public', 'packs', 'js'
         end
         count <= 2
       end
-    end
-
-    def inject_into_initializer(s)
-      file_name = Rails.root.join('config', 'initializers', 'hyperstack.rb')
-      if File.exist?(file_name)
-        prepend_to_file(file_name) { "#{s}\n" }
-      else
-        create_file file_name, <<-RUBY
-#{s}
-# server_side_auto_require will patch the ActiveSupport Dependencies module
-# so that you can define classes and modules with files in both the
-# app/hyperstack/xxx and app/xxx directories.  For example you can split
-# a Todo model into server and client related definitions and place this
-# in `app/hyperstack/models/todo.rb`, and place any server only definitions in
-# `app/models/todo.rb`.
-
-require "hyperstack/server_side_auto_require.rb"
-
-# set the component base class
-
-Hyperstack.component_base_class = 'HyperComponent' # i.e. 'ApplicationComponent'
-
-# prerendering is default :off, you should wait until your
-# application is relatively well debugged before turning on.
-
-Hyperstack.prerendering = :off # or :on
-
-# transport controls how push (websocket) communications are
-# implemented.  The default is :action_cable.
-# Other possibilities are :pusher (see www.pusher.com) or
-# :simple_poller which is sometimes handy during system debug.
-
-Hyperstack.transport = :action_cable # or :none, :pusher,  :simple_poller
-
-# add this line if you need jQuery AND ARE NOT USING WEBPACK
-# Hyperstack.import 'hyperstack/component/jquery', client_only: true
-
-# change definition of on_error to control how errors such as validation
-# exceptions are reported on the server
-module Hyperstack
-  def self.on_error(operation, err, params, formatted_error_message)
-    ::Rails.logger.debug(
-      "\#{formatted_error_message}\\n\\n" +
-      Pastel.new.red(
-        'To further investigate you may want to add a debugging '\\
-        'breakpoint to the on_error method in config/initializers/hyperstack.rb'
-      )
-    )
-  end
-end if Rails.env.development?
-        RUBY
-      end
-      # whenever we modify the initializer its best to empty the cache, BUT
-      # we only need to it once per generator execution
-      run 'rm -rf tmp/cache' unless @cache_emptied_already
-      @cache_emptied_already = true
     end
   end
 end

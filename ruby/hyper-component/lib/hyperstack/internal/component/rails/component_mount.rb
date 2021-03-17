@@ -43,6 +43,9 @@ module Hyperstack
           end
 
           def footers
+            return if @hyperstack_footers_rendered
+
+            @hyperstack_footers_rendered = true
             Hyperstack::Component::IsomorphicHelpers.prerender_footers(controller)
           end
         end

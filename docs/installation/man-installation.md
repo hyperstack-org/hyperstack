@@ -1,45 +1,4 @@
-# Installation
-
-You can install Hyperstack either
-
-* using a Rails generator,
-* or manually walking through the detailed installation instructions below.
-
-Even if you use the generator later reading through the detailed installation instructions can be helpful to understand how the system fits together and the generators work.
-
-## Pre-Requisites
-
-#### - Rails >= 5.x [Install Instructions](http://railsinstaller.org/en)
-
-And for a full system as setup generator you will need
-
-#### - Yarn [Install Instructions](https://yarnpkg.com/en/docs/install#mac-stable)
-
-## Installing Using the Generator
-
-If you have an existing Rails app, you can use the built in generator to install Hyperstack. Best to create a new branch of course before trying this out.
-
-* add `gem 'rails-hyperstack', "~> 1.0.alpha1.0"` to your gem file
-* run `bundle install`
-* run `bundle exec rails g hyperstack:install`
-
-> Note: if you want to use the unreleased edge branch your gem specification will be:
->
-> ```ruby
-> gem 'rails-hyperstack',
->      git: 'git://github.com/hyperstack-org/hyperstack.git',
->      branch: 'edge',
->      glob: 'ruby/*/*.gemspec'
-> ```
->
-> ### Start the Rails app
-
-* `bundle exec foreman start` to start Rails and the Hotloader
-* Navigate to `http://localhost:5000/`
-
-> Note that the generator will add a wild card route to the beginning of your routes file. This will let you immediately test Hyperstack, but will also mean that all of your existing routes are now unreachable. So after getting Hyperstack up, you will want to adjust things to your needs. See the first in the **Manual Installation** section for more info.
-
-## Manual Installation
+# Manual Installation
 
 To manually install a complete Hyperstack system there are quite a few steps. However these can be broken down into six separate activities each of which will leave your system in a working and testable state:
 
@@ -87,6 +46,7 @@ and visit `localhost:3000/test` and you will see **TestApp** displayed.
 This command accomplishes four tasks which you can also manually perform if you prefer:
 
 1. Insure that the `hyperstack-loader` is required in your `application.js` file;
+2. Insure that the webpacker manifest file is loading JS files;
 2. Insure that you have a `HyperComponent` base class defined;
 3. Add a skeleton `TestApp` component and
 4. Add a route to the `TestApp` component in your rails routes file.
@@ -104,7 +64,15 @@ The `hyperstack-loader` is a dynamically generated asset manifest that will load
 //= require_tree .
 ```
 
-Once this is added to your `application.js` file you will see the hyperstack asset manifest on the Rails console and the browser's debug console which looks like this:
+#### Check the webpacker manifest file
+
+In Rails 6 the webpacker default installation no longer links to the javascripts directory, but because Opal uses sprockets we need to add it back in.  Check to see if you have a `app/assets/config/manifest.js` file, and if you do, insure it has the following line:
+
+```javascript
+//= link_directory ../javascripts .js
+```
+
+Once hyperstack-loader and link_directory directives are added you can reload any page you will see the hyperstack asset manifest on the Rails console and the browser's debug console which looks like this:
 
 ```text
 require 'opal'
@@ -133,7 +101,7 @@ require 'config/initializers/inflections.rb'
 
 All your Hyperstack code goes into the `app/hyperstack` directory, which is at the same level as `app/models`, `app/views`, `app/controllers`, etc.
 
-Inside this directory are subdirectories for each of the different parts of you hyperstack application code. Components go in the `app/hyperstack/components` directory.
+Inside this directory are subdirectories for each of the different parts of you Hyperstack application code. Components go in the `app/hyperstack/components` directory.
 
 Like Rails models, and Rails controllers, Hyperstack components by convention inherit from an application defined base class. So while a typical Rails model inherits from the `ApplicationRecord` class, your Hyperstack components will inherit from the `HyperComponent` class.
 
@@ -222,7 +190,6 @@ will render the component named `TestApp` at that position in your view.
 
 You can also use `render_component` in a controller in place of the standard Rails render method. Like the `render_component` view helper you can pass the component parameters in from the controller.
 
-There are quite a few steps, but each has a specific, and understandable purpose.
 
 ## Installing the Hotloader
 
@@ -232,7 +199,7 @@ There are three steps to installing the Hotloader:
 
 1. Importing Hotloader into your `hyperstack-loader` manifest;
 2. Adding the `foreman` gem to your `Gemfile` and
-3. Adding a `Procfile` to the root of our application directory.
+3. Adding a `Procfile` to the root of our application directory.``
 
 By default the Hotloader is **not** included in the hyperstack manifest so the first step is to add the `config/initializers/hyperstack.rb` initializer file, and _import_ the Hotloader:
 

@@ -9,7 +9,7 @@ module ReactiveRecord
         puts "Broadcast aftercommit hook: #{data}" if Hyperstack::Connection.show_diagnostics
 
         if !Hyperstack.on_server? && Hyperstack::Connection.root_path
-          send_to_server(operation, data) rescue nil # fails if server no longer running so ignore
+          send_to_server(operation, data, model.__synchromesh_update_time) rescue nil # fails if server no longer running so ignore
         else
           SendPacket.run(data, operation: operation, updated_at: model.__synchromesh_update_time)
         end
@@ -18,7 +18,7 @@ module ReactiveRecord
       raise e unless e.message == "Could not find table 'hyperstack_connections'"
     end unless RUBY_ENGINE == 'opal'
 
-    def self.send_to_server(operation, data)
+    def self.send_to_server(operation, data, updated_at)
       salt = SecureRandom.hex
       authorization = Hyperstack.authorization(salt, data[:channel], data[:broadcast_id])
       raise 'no server running' unless Hyperstack::Connection.root_path
@@ -27,6 +27,7 @@ module ReactiveRecord
           Hyperstack::Connection.root_path,
           data,
           operation: operation,
+          updated_at: updated_at,
           salt: salt,
           authorization: authorization
         ).tap { |p| raise p.error if p.rejected? }
