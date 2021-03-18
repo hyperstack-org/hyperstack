@@ -7,6 +7,7 @@
   * [Using the Generators](rails-installation/generators.md)
   * [File Structure](rails-installation/file-structure.md)
   * [Other Rails Configuration Details](rails-installation/other-details.md)
+  * [Why Rails and Other Frameworks](rails-installation/why-rails.md)
 * [Client DSL](client-dsl/README.md)
   * [HTML & CSS DSL](client-dsl/html-css.md)
   * [Component DSL](client-dsl/components.md)
