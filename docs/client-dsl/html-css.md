@@ -49,7 +49,31 @@ end
 
 The following HTML and SVG elements are available:
 
-{% fold summary="He wishes for the Cloths of Heaven", open=false, style="background: #fafafa;padding: 10px 20px;" %}
+<details><summary>HTML Tags</summary><div><pre><code>
+A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO  
+B BASE BDI BDO BIG BLOCKQUOTE BODY BR BUTTON  
+CANVAS CAPTION CITE CODE COL COLGROUP  
+DATA DATALIST DD DEL DETAILS DFN DIALOG DIV DL DT  
+EM EMBED  
+FIELDSET FIGCAPTION FIGURE FOOTER FORM  
+H1 H2 H3 H4 H5 H6 HEAD HEADER HR HTML  
+I IFRAME IMG INPUT INS  
+KBD KEYGEN  
+LABEL LEGEND LI LINK  
+MAIN MAP MARK MENU MENUITEM META METER  
+NAV NOSCRIPT  
+OBJECT OL OPTGROUP OPTION OUTPUT  
+P PARAM PICTURE PRE PROGRESS  
+Q  
+RP RT RUBY  
+S SAMP SCRIPT SECTION SELECT SMALL SOURCE SPAN STRONG STYLE SUB SUMMARY SUP  
+TABLE TBODY TD TEXTAREA TFOOT TH THEAD TIME TITLE TR TRACK  
+U UL  
+VAR VIDEO  
+WBR
+</code></pre></div></details>
+
+<!-- {% fold summary="HTML Tags" %}
 ```
 A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO  
 B BASE BDI BDO BIG BLOCKQUOTE BODY BR BUTTON  
@@ -73,11 +97,23 @@ U UL
 VAR VIDEO  
 WBR
 ```
-{% endfold %}
+{% endfold %} -->
 
-<details>
-<summary>SVG Tags</summary>
+<details><summary>SVG Tags</summary><div><pre><code>
+CIRCLE CLIPPATH  
+DEFS  
+ELLIPSE  
+G  
+LINE LINEARGRADIENT  
+MASK  
+PATH PATTERN POLYGON POLYLINE  
+RADIALGRADIENT RECT  
+STOP  
+SVG  
+TEXT TSPAN
+</code></pre></div></details>
 
+<!-- {% fold summary="SVG Tags" %}
 ```
 CIRCLE CLIPPATH  
 DEFS  
@@ -91,7 +127,7 @@ STOP
 SVG  
 TEXT TSPAN
 ```
-</details>
+{% endfold %} -->
 
 ### HTML parameters
 
