@@ -4,7 +4,7 @@ The easiest way to get the full benefit of Hyperstack is to integrate it with a 
 
 Adding Hyperstack to your existing Rails App is as simple as adding the gem and running the installer.
 
-Read on to make sure you have the necessary prerequisites.
+Continue to the next section to make sure you have the necessary prerequisites on your machine: [Prerequisites](https://docs.hyperstack.org/rails-installation/prerequisites)
 > #### Why Rails?
 >
 >Rails provides a robust, tried and true tool chain that takes care of much of the day to day details of building your app.  Hyperstack builds on the Rails philosophy of convention over configuration, meaning that there is almost no boiler plate code in your Rails-Hyperstack application.  Almost every line that you write for your Hyperstack application will deal with the application requirements.  We have seen real reductions of up to 400% in the lines of code needed to deliver high quality functionality.

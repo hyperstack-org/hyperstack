@@ -33,7 +33,7 @@ Our website serves as a Hyperstack example application. All the doc content is l
 
 You can be up and running in **less than 5 minutes**. Just follow the simple setup guide for a new Rails application all correctly configured and ready to go with Hyperstack.
 
-* Setup and Installation: https://docs.hyperstack.org/installation/man-installation
+* Setup and Installation: https://docs.hyperstack.org/rails-installation
 
 Beyond the installation we strongly suggest new developers work trough the [todo tutorial](https://docs.hyperstack.org/tutorial). As it gives a minimal understanding of the Hyperstack framework.
 
@@ -66,14 +66,3 @@ More specifically, we have a [Feature Matrix](https://github.com/hyperstack-org/
 ## License
 
 Hyperstack is developed and released under the MIT License. See the [LICENSE](https://github.com/hyperstack-org/hyperstack/blob/edge/LICENSE) file for further details.
-
-## History
-
-Hyperstack is an evolution of [Ruby-Hyperloop](https://github.com/ruby-hyperloop). We decided to rename the project to drop the Ruby suffix and also took the opportunity to simplify the repos and project overall.  
-Hyperloop was started by the developers of the reactrb gem.
-
-* Old website: [http://ruby-hyperloop.org/](http://ruby-hyperloop.org/)
-* Old Github: [https://github.com/ruby-hyperloop](https://github.com/ruby-hyperloop)
-* Legacy branch: [https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy](https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy)
-* Legacy install script: [https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy/install](https://github.com/hyperstack-org/hyperstack/tree/hyperloop-legacy/install)
-

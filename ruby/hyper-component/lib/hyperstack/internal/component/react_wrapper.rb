@@ -30,6 +30,7 @@ module Hyperstack
         def self.eval_native_react_component(name)
           component = `eval(name)`
           raise "#{name} is not defined" if `#{component} === undefined`
+
           component = `component.default` if `component.__esModule`
           is_component_class = `#{component}.prototype !== undefined` &&
                                 (`!!#{component}.prototype.isReactComponent` ||
@@ -43,9 +44,11 @@ module Hyperstack
 
         def self.native_react_component?(name = nil)
           return false unless name
+
           eval_native_react_component(name)
           true
-        rescue
+        # Exception to be compatible with all versions of opal
+        rescue Exception # rubocop:disable Lint/RescueException
           false
         end
 

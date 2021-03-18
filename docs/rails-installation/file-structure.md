@@ -16,12 +16,12 @@ In addition there are configuration settings in existing Rails files that are ex
 
 ### The `/app/hyperstack/` Directory
 
-Here lives all your Hyperstack code.  Some of the subdirectories are *isomorphic* meaning the code is shared between the client and the server, other directories are client only.
+Here lives all your Hyperstack code that will run on the client.  Some of the subdirectories are *isomorphic* meaning the code is shared between the client and the server, other directories are client only.
 
 Within the `hyperstack` directory there will be the following sub-directories:
 
 + `components` *(client-only)* is where your components live.   
- Following Rails conventions a component with a class of Bar::None::FooManchu should be in a file named `components/bar/none/foo_manchu.rb`
+ Following Rails conventions a component with a class of `Bar::None::FooManchu` should be in a file named `components/bar/none/foo_manchu.rb`
 
 + `models` *(isomorphic)* is where ActiveRecord models are shared with the client.  More on this below.
 

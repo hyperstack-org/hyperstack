@@ -26,10 +26,10 @@ bundle exec rails g hyper:component ComponentName
 
 #### File directories and Name Spacing Components
 
-The above will create a new class definition for `ComponentName` in a file named `component_name.rb` and place it in 
+The above will create a new class definition for `ComponentName` in a file named `component_name.rb` and place it in
 the `app/hyperstack/components/` directory.  The component may be name spaced and
 will be placed in the appropriate subdirectory.  I.e. `Foo::BarSki` will generate
-`app/hyperstack/components/foo/barski.rb`
+`app/hyperstack/components/foo/bar_ski.rb`
 
 #### The `--no-help` flag
 

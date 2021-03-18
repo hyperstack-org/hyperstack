@@ -20,6 +20,14 @@
 
 You will see an empty page with the word "App" displayed.
 
+Open your editor and find the file `/app/hyperstack/components/app.rb`
+
+Change the `'App'` to `'Hello World'` and save the file.
+
+You should see the page on the browser change to "Hello World"
+
+You are in business!
+
 ### Installer Options
 
 You can control what gets installed with the following options:
@@ -35,4 +43,4 @@ bundle exec rails hyperstack:install:skip-hotloader   # skip the hotloader
 
 > Note that the `:webpack` and `:skip-webpack` options control whether the installer will
 add the webpacker Gem.  If webpacker is already installed in the Gemfile then the
-installer will always integrate with webpacker. 
+installer will always integrate with webpacker.
