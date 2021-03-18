@@ -49,9 +49,7 @@ end
 
 The following HTML and SVG elements are available:
 
-<details>
-<summary>HTML Tags</summary>
-
+{% fold summary="He wishes for the Cloths of Heaven", open=false, style="background: #fafafa;padding: 10px 20px;" %}
 ```
 A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO  
 B BASE BDI BDO BIG BLOCKQUOTE BODY BR BUTTON  
@@ -75,7 +73,7 @@ U UL
 VAR VIDEO  
 WBR
 ```
-</details>
+{% endfold %}
 
 <details>
 <summary>SVG Tags</summary>
