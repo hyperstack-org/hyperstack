@@ -46,13 +46,11 @@ end
 
 ### Naming Conventions
 
-To distinguish between HTML and SVG tags, builtin components and Application Defined components, the following
+To distinguish between HTML and SVG tags, builtin components and application defined components the following
 naming conventions are followed:
 
-+ `ALLCAPS` denotes a HTML, SVG or builtin React psuedo component such as `FRAGMENT`.
++ `ALLCAPS` denotes a HTML, SVG or builtin React psuedo components such as `FRAGMENT`.
 + `CamelCase` denotes an application defined component class like `TodoList`.
-
-
 
 ### HTML parameters
 
@@ -77,7 +75,7 @@ P(class: :bright) { }
 P(class: [:bright, :blue]) { } # class='bright blue'
 ```
 
-For `style` you need to pass a hash using the [React style conventions](https://reactjs.org/docs/dom-elements.html#style):
+For `style` you need to pass a hash using the **[React style conventions](https://reactjs.org/docs/dom-elements.html#style):**
 
 ```ruby
 P(style: { display: item[:some_property] == "some state" ? :block : :none })
@@ -98,4 +96,4 @@ will generate
 <a flag=true href='/' class='myclass'></a>
 ```
 
-> **[more on passing hashes to methods](notes.html#ruby-hash-params)**
+> **[more on passing hashes to methods](notes#ruby-hash-params)**
