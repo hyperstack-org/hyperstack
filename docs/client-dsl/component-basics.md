@@ -20,11 +20,11 @@ class MyComponent < HyperComponent
   ...
 end
 ```
-> **[More on the HyperComponent base class](notes#the-hypercomponent-base-class)**
+> **[More on the HyperComponent base class](notes.md#the-hypercomponent-base-class)**
 
 ## The `render` Callback
 
-At a minimum every *concrete* component class must define a `render` block which generates one or more child elements. Those children may in turn have an arbitrarily deep structure.  **[More on concrete and abstract components](notes#abstract-and-concrete-components)**
+At a minimum every *concrete* component class must define a `render` block which generates one or more child elements. Those children may in turn have an arbitrarily deep structure.  **[More on concrete and abstract components](notes.md#abstract-and-concrete-components)**
 
 ```ruby
 class Component < HyperComponent
@@ -33,7 +33,7 @@ class Component < HyperComponent
   end
 end
 ```  
-> The code between the `do` and `end` is called a block.  **[More here...](notes#blocks-in-ruby)**
+> The code between the `do` and `end` is called a block.  **[More here...](notes.md#blocks-in-ruby)**
 
 To save a little typing you can also specify the top level element to be rendered:
 

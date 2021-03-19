@@ -96,4 +96,4 @@ will generate
 <a flag=true href='/' class='myclass'></a>
 ```
 
-> **[more on passing hashes to methods](notes#ruby-hash-params)**
+> **[more on passing hashes to methods](notes.md#ruby-hash-params)**

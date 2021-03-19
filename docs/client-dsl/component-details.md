@@ -35,9 +35,9 @@ end
 ```
 Here we don't determine the actual number or contents of the `LI` children until runtime.
 
->**[The `word_count` method...](notes#word-count-method)**
+>**[The `word_count` method...](notes.md#word-count-method)**
 
->Dynamically generating components creates a new concept called ownership.  **[More here...](notes#ownership)**
+>Dynamically generating components creates a new concept called ownership.  **[More here...](notes.md#ownership)**
 
 ### Keys
 
@@ -62,7 +62,7 @@ identify the ones that are the same:
 You don't have to stress out too much about keys, its easy to add them later.  Just keep the concept in
 mind when you are generating long lists, tables, and divs with many children.
 
-> **[More on how Hyperstack generates keys...](notes#generating-keys)**
+> **[More on how Hyperstack generates keys...](notes.md#generating-keys)**
 
 
 
