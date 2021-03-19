@@ -1,114 +1,27 @@
-# Hyperstack Component DSL
+## Component Ownership, Children, Keys, and Fragments
 
-The Hyperstack Component DSL is a set of class and instance methods that are used to describe React components and render the user-interface.
+### Ownership
 
-The DSL has the following major areas:
+In the following example (copied from the previous section) instances of `Avatar` _own_ instances of `ProfilePic` and `ProfileLink`. In Hyperstack (like React), **an owner is the component that sets the `params` of other components**. More formally, if a component `X` is created in component `Y`'s `render` method, it is said that `X` is _owned by_ `Y`. As will be discussed later a component cannot mutate its `params` — they are always consistent with what its owner sets them to. This fundamental invariant leads to UIs that are guaranteed to be consistent.
 
-* The `HyperComponent` class
-* HTML DSL elements
-* Component Lifecycle Methods \(`before_mount`, `after_mount`, `after_update`\)
-* The `param` and `render` methods
-* Event handlers
-* Miscellaneous methods
-
-## HyperComponent
-
-By convention your Hyperstack Components will inherit from the `HyperComponent` class, which typically would look like this:
-
-```ruby
-class HyperComponent
-  # All component classes must include Hyperstack::Component
-  include Hyperstack::Component
-  # The Observable module adds state handling
-  include Hyperstack::State::Observable
-  # The following turns on the new style param accessor
-  # i.e. param :foo is accessed by the foo method
-  param_accessor_style :accessors
-end
-
-# and is used like this:
-
-class AnotherComponent < HyperComponent
-  ...
-end
-```
-
-Having an Application wide HyperComponent class allows you to modify component behavior on an application basis, similar to the way Rails uses `ApplicationRecord` and `ApplicationController` classes.
-
-## The `render` Callback
-
-At a minimum every component class must define a `render` block which returns one or more child elements. Those children may in turn have an arbitrarily deep structure.
-
-```ruby
-class Component < HyperComponent
-  render do
-    DIV { } # render an empty div
-  end
-end
-```
-
-To save a little typing you can also specify the top level element to be rendered:
-
-```ruby
-class Component < HyperComponent
-  render(DIV, class: 'my-special-class') do
-    # everything will be rendered in a div
-  end
-end
-```
-
-To render a component, you reference its class name as a method call from another component. This creates a new instance, passes any parameters and proceeds with the component lifecycle.
-
-```ruby
-class FirstComponent < HyperComponent
-  render do
-    NextComponent() # ruby syntax requires either () or {} following the class name
-  end
-end
-```
-
-Note that you should never redefine the `new` or `initialize` methods, or call them directly. The equivalent of `initialize` is the `before_mount` method.  
-
-> The one exception to using `new` is within a spec to create a "headless" component in order to access its internal state and methods.
-
-### Invoking Components
-
-> Note: when invoking a component **you must have** a \(possibly empty\) parameter list or \(possibly empty\) block.
-> ```ruby
-MyCustomComponent()  # ok
-MyCustomComponent {} # ok
-MyCustomComponent    # <--- breaks
-> ```
-
-## Multiple Components
-
-So far, we've looked at how to write a single component to display data. Next let's examine one of React's finest features: composability.
-
-### Motivation: Separation of Concerns
-
-By building modular components that reuse other components with well-defined interfaces, you get much of the same benefits that you get by using functions or classes. Specifically you can _separate the different concerns_ of your app however you please simply by building new components. By building a custom component library for your application, you are expressing your UI in a way that best fits your domain.
-
-### Composition Example
-
-Let's create a simple Avatar component which shows a profile picture and username using the Facebook Graph API.
+It's important to draw a distinction between the owner-owned-by relationship and the parent-child relationship. The owner-owned-by relationship is specific to Hyperstack/React, while the parent-child relationship is simply the one you know and love from the DOM. In the example above, `Avatar` owns the `DIV`, `ProfilePic` and `ProfileLink` instances, and `DIV` is the **parent** \(but not owner\) of the `ProfilePic` and `ProfileLink` instances.
 
 ```ruby
 class Avatar < HyperComponent
   param :user_name
 
-  render(DIV) do
-    # for each param a method with the same name is defined
-    ProfilePic(user_name: user_name)
-    ProfileLink(user_name: user_name)
+  render do # this can be shortened to render(DIV) do - see the previous section
+    DIV do
+      ProfilePic(user_name: user_name)  # belongs to Avatar, owned by DIV
+      ProfileLink(user_name: user_name) # belongs to Avatar, owned by DIV
+    end
   end
 end
 
 class ProfilePic < HyperComponent
   param :user_name
-
-  render do
-    IMG(src: "https://graph.facebook.com/#{user_name}/picture")
-  end
+  # note that in Ruby blocks can use do...end or { ... }
+  render { IMG(src: "https://graph.facebook.com/#{user_name}/picture") }
 end
 
 class ProfileLink < HyperComponent
@@ -121,38 +34,42 @@ class ProfileLink < HyperComponent
 end
 ```
 
-### Ownership
-
-In the above example, instances of `Avatar` _own_ instances of `ProfilePic` and `ProfileLink`. In React, **an owner is the component that sets the `params` of other components**. More formally, if a component `X` is created in component `Y`'s `render` method, it is said that `X` is _owned by_ `Y`. As discussed earlier, a component cannot mutate its `params` — they are always consistent with what its owner sets them to. This fundamental invariant leads to UIs that are guaranteed to be consistent.
-
-It's important to draw a distinction between the owner-ownee relationship and the parent-child relationship. The owner-ownee relationship is specific to React, while the parent-child relationship is simply the one you know and love from the DOM. In the example above, `Avatar` owns the `div`, `ProfilePic` and `ProfileLink` instances, and `div` is the **parent** \(but not owner\) of the `ProfilePic` and `ProfileLink` instances.
-
 ### Children
 
-When you create a React component instance, you can include additional React components or JavaScript expressions between the opening and closing tags like this:
+Parent components may be provided a *block* (an anonymous Ruby function or callback) that the parent will use to generate its children.  Inside
+the block can be abitrary Ruby code that can generate any number of children *Elements* that will be rendered by the parent.
 
 ```ruby
-Parent { Child() }
+  DIV do
+    # this DIV will have two children
+    ProfilePic(user_name: user_name)  
+    ProfileLink(user_name: user_name)
+  end
+# or
+  A(href: "https://www.facebook.com/#{user_name}") do
+    # the anchor tag will have a single child the user_name string
+    user_name
+  end
 ```
 
-`Parent` can iterate over its children by accessing its `children` method.
+Note that as well as calling other Components (such as ProfilePic) the child block may return a string that will used as the single child content of
+parent.  If the child block has already generated a other components this final string will be ignored.
+
 
 ### Child Reconciliation
 
-**Reconciliation is the process by which React updates the DOM with each new render pass.** In general, children are reconciled according to the order in which they are rendered. For example, suppose we have the following render method displaying a list of items. On each pass the items will be completely re-rendered:
+**Reconciliation is the process by which the underlying React engine updates the DOM with each new render pass.** In general, children are reconciled according to the order in which they are rendered. For example, suppose we have the following render method displaying a list of items. On each pass the items will be regenerated and then merged into the DOM by React.
 
 ```ruby
 param :items
 render do
   items.each do |item|
-    P do
-      item[:text]
-    end
+    P { item[:text] }
   end
 end
 ```
 
-What if the first time items was `[{text: "foo"}, {text: "bar"}]`, and the second time items was `[{text: "bar"}]`? Intuitively, the paragraph `<p>foo</p>` was removed. Instead, React will reconcile the DOM by changing the text content of the first child and destroying the last child. React reconciles according to the _order_ of the children.
+What if the first time items was `[{text: "foo"}, {text: "bar"}]`, and the second time items was `[{text: "bar"}]`? Intuitively, the paragraph `<p>foo</p>` was removed. Instead, React will reconcile the DOM by changing the text content of the first child and destroying the last child. React reconciles according to the _order_ of the children.  
 
 ### Dynamic Children
 
@@ -171,8 +88,7 @@ The situation gets more complicated when the children are shuffled around \(as i
 
 When React reconciles the keyed children, it will ensure that any child with `key` will be reordered \(instead of clobbered\) or destroyed \(instead of reused\).
 
-The `key` should _always_ be supplied directly to the components in the array, not to the container HTML child of each component in the array:
-
+> For best results the `key` is supplied at highest level possible.
 ```ruby
 # WRONG!
 class ListItemWrapper < HyperComponent
@@ -193,7 +109,6 @@ class MyComponent < HyperComponent
   end
 end
 ```
-
 ```ruby
 # CORRECT
 class ListItemWrapper < HyperComponent
@@ -215,7 +130,9 @@ class MyComponent < HyperComponent
 end
 ```
 
-> The `to_key` method:  Any ruby object can be a key.  Under the hood the HyperComponent DSL will call the object's `to_key` method which will respond with a unique value representing the object.  For example if you pass an ActiveRecord model instance as a key, the result will be the database id of the model.  
+### The `to_key` method
+
+Any ruby object can be a key.  Under the hood Hyperstack will call the object's `to_key` method which will respond with an appropriate unique value representing the object.  For example if you pass an ActiveRecord model instance as a key, the result will be the database id of the model.  
 
 ### The children and render methods
 

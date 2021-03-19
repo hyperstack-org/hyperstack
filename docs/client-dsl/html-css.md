@@ -1,7 +1,5 @@
 # HTML and CSS DSL
 
-## HTML DSL
-
 ### HTML elements
 
 A Hyperstack user-interface is composed of HTML elements, conditional logic and Components.
@@ -11,9 +9,6 @@ UL do
   5.times { |n| LI { "Number #{n}" }}
 end
 ```
-
-> **Notice that the HTML elements \(BUTTON, DIV, etc.\) are in CAPS**. We know this is bending the standard Ruby style rules, but we think it reads better this way.
-
 For example
 
 ```ruby
@@ -47,50 +42,16 @@ TABLE(class: 'ui celled table') do
 end
 ```
 
-The following HTML and SVG elements are available:
+**[See the predefined tags summary for the complete list of HTML and SVG elements.](predefined-tags.md)**
 
-<details>
-<summary>HTML Tags</summary><div><pre><code>
-A ABBR ADDRESS AREA ARTICLE ASIDE AUDIO  
-B BASE BDI BDO BIG BLOCKQUOTE BODY BR BUTTON  
-CANVAS CAPTION CITE CODE COL COLGROUP  
-DATA DATALIST DD DEL DETAILS DFN DIALOG DIV DL DT  
-EM EMBED  
-FIELDSET FIGCAPTION FIGURE FOOTER FORM  
-H1 H2 H3 H4 H5 H6 HEAD HEADER HR HTML  
-I IFRAME IMG INPUT INS  
-KBD KEYGEN  
-LABEL LEGEND LI LINK  
-MAIN MAP MARK MENU MENUITEM META METER  
-NAV NOSCRIPT  
-OBJECT OL OPTGROUP OPTION OUTPUT  
-P PARAM PICTURE PRE PROGRESS  
-Q  
-RP RT RUBY  
-S SAMP SCRIPT SECTION SELECT SMALL SOURCE SPAN STRONG STYLE SUB SUMMARY SUP  
-TABLE TBODY TD TEXTAREA TFOOT TH THEAD TIME TITLE TR TRACK  
-U UL  
-VAR VIDEO  
-WBR
-</code></pre></div>
-</details>
+### Naming Conventions
 
+To distinguish between HTML and SVG tags, builtin components and Application Defined components, the following
+naming conventions are followed:
 
-<details>
-<summary>SVG Tags</summary><div><pre><code>
-CIRCLE CLIPPATH  
-DEFS  
-ELLIPSE  
-G  
-LINE LINEARGRADIENT  
-MASK  
-PATH PATTERN POLYGON POLYLINE  
-RADIALGRADIENT RECT  
-STOP  
-SVG  
-TEXT TSPAN
-</code></pre></div>
-</details>
++ `ALLCAPS` denotes a HTML, SVG or builtin React psuedo component such as `FRAGMENT`.
++ `CamelCase` denotes an application defined component class like `TodoList`.
+
 
 
 ### HTML parameters
@@ -119,7 +80,7 @@ P(class: [:bright, :blue]) { } # class='bright blue'
 For `style` you need to pass a hash using the [React style conventions](https://reactjs.org/docs/dom-elements.html#style):
 
 ```ruby
-PARA(style: { display: item[:some_property] == "some state" ? :block : :none })
+P(style: { display: item[:some_property] == "some state" ? :block : :none })
 ```
 
 ### Complex Arguments
@@ -128,7 +89,7 @@ You can pass multiple hashes which will be merged, and any individual symbols
 (or strings) will be treated as `=true`.  For example
 
 ```ruby
-A(:flag, {href: '/'}, {class: 'my_class'})
+A(:flag, {href: '/'}, class: 'my_class')
 ```
 
 will generate
@@ -136,3 +97,5 @@ will generate
 ```HTML
 <a flag=true href='/' class='myclass'></a>
 ```
+
+> **[more on passing hashes to methods](notes.html#ruby-hash-params)**

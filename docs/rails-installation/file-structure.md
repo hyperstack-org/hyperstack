@@ -18,10 +18,10 @@ In addition there are configuration settings in existing Rails files that are ex
 
 Here lives all your Hyperstack code that will run on the client.  Some of the subdirectories are *isomorphic* meaning the code is shared between the client and the server, other directories are client only.
 
-Within the `hyperstack` directory there will be the following sub-directories:
+Within the `hyperstack` directory there can be the following sub-directories:
 
 + `components` *(client-only)* is where your components live.   
- Following Rails conventions a component with a class of `Bar::None::FooManchu` should be in a file named `components/bar/none/foo_manchu.rb`
+> Following Rails conventions a component with a class of `Bar::None::FooManchu` should be in a file named `components/bar/none/foo_manchu.rb`
 
 + `models` *(isomorphic)* is where ActiveRecord models are shared with the client.  More on this below.
 
@@ -33,9 +33,17 @@ Within the `hyperstack` directory there will be the following sub-directories:
 
 ### Sharing Models and Operations
 
-Files in the `hyperstack` `/models` and `/operations` directories are loaded on the client and the server.  So when you place a model's class definition in the `hyperstack/models` directory the class is available on the client.  
+Files in the `hyperstack` `/models` and `/operations` directories are loaded on the client *and* the server.  So when you place a model's class definition in the `hyperstack/models` directory the class is available on the client.  
 
+Assuming:
 ```Ruby
+# app/hyperstack/models/todo.rb
+class Todo < ApplicationRecord
+  ...
+end
+```
+Then
+```
   Todo.count # will return the same value on the client and the server
 ```
 
@@ -53,13 +61,13 @@ This works because Ruby classes are *open*, so that you can define a class (or m
 
 ### Server Side Operations
 
-Operations are Hyperstack's way of providing *Service Objects*: classes that perform some operation not strictly belonging to a single model, and often involving other services such as remote APIs.  
+Operations are Hyperstack's way of providing *Service Objects*: classes that perform some operation not strictly belonging to a single model, and often involving other services such as remote APIs.  *The idea of Operations comes from the [Trailblazer Framework.](https://trailblazer.to/2.0/gems/operation/2.0/index.html)*
 
 As such Operations can be useful strictly on the server side, and so can be added to the `app/operations` directory.
 
 Server side operations can also be remotely run from the client.  Such operations are defined as subclasses of `Hyperstack::ServerOp`.  
 
-The right way to define a `ServerOp` is to place its basic definition including its parameter signature in the `hyperstack/operations` directory, and then placing the rest of the operations definition in the `app/operations` directory.
+The right way to define a `ServerOp` is to place its basic definition including its parameter signature in the `hyperstack/operations` directory, and then placing the rest of the operation's definition in the `app/operations` directory.
 
 ### Policies
 

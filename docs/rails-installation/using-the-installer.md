@@ -1,6 +1,8 @@
 ## Installing HyperStack
 
-* add `gem 'rails-hyperstack', "~> 1.0.alpha1.0"` to your gem file
+In the directory of your existing or newly created Rails app:
+
+* add `gem 'rails-hyperstack', "~> 1.0.alpha1.0"` to your `Gemfile`
 * run `bundle install`
 * run `bundle exec rails hyperstack:install`
 
@@ -27,6 +29,8 @@ Change the `'App'` to `'Hello World'` and save the file.
 You should see the page on the browser change to "Hello World"
 
 You are in business!
+
+> If this does not work, please contact us on *[slack](https://hyperstack.org/slack)*, or **[create an issue on github.](https://github.com/hyperstack-org/hyperstack/issues/new)**
 
 ### Installer Options
 

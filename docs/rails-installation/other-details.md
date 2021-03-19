@@ -1,6 +1,6 @@
 ## Other Rails Configuration Details
 
-Hyperstack sets a number of Rails configurations as outlined below.  
+Hyperstack internally sets a number of Rails configurations as outlined below.  
 
 >These are all setup
 automatically by the hyperstack generators and installers. They are documented here for advanced configuration or in the sad chance that something gets broken during your setup.  Please report any issues with setup, or if you feel you have to manually tweak things.
@@ -91,15 +91,15 @@ Otherwise the following settings are automatically applied in test and staging:
 # This will prevent any data transmitted by HyperOperation from appearing in logs
 config.filter_parameters << :hyperstack_secured_json
 
-# Add the hyperstack directories
-config.eager_load_paths += %W(#{config.root}/app/hyperstack/models)
-config.eager_load_paths += %W(#{config.root}/app/hyperstack/models/concerns)
-config.eager_load_paths += %W(#{config.root}/app/hyperstack/operations)
-config.eager_load_paths += %W(#{config.root}/app/hyperstack/shared)
+  # Add the hyperstack directories
+  config.eager_load_paths += %W(#{config.root}/app/hyperstack/models)
+  config.eager_load_paths += %W(#{config.root}/app/hyperstack/models/concerns)
+  config.eager_load_paths += %W(#{config.root}/app/hyperstack/operations)
+  config.eager_load_paths += %W(#{config.root}/app/hyperstack/shared)
 
-# But remove the outer hyperstack directory so rails doesn't try to load its
-# contents directly
-delete_first config.eager_load_paths, "#{config.root}/app/hyperstack"
+  # But remove the outer hyperstack directory so rails doesn't try to load its
+  # contents directly
+  delete_first config.eager_load_paths, "#{config.root}/app/hyperstack"
 ```
 but in production we autoload instead of eager load.
 ```ruby
@@ -111,5 +111,4 @@ but in production we autoload instead of eager load.
 
   # except for the outer hyperstack directory
   delete_first config.autoload_paths, "#{config.root}/app/hyperstack"
-end
 ```
