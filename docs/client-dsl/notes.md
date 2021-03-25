@@ -58,7 +58,7 @@ Having an application wide `HyperComponent` class allows you to modify component
 > This is just a convention.  Any class that includes the `Hyperstack::Component` module can be used as a Component.  You also do not have
 to name it `HyperComponent`.  For example some teams prefer `ApplicationComponent` more closely following the
 Rails convention.  If you use a different name for this class be sure to set the `Hyperstack.component_base_class` setting so the
-Rails generators will use the proper name when generating your components.  **[more details...](/rails-installation/generators.html#specifying-the-base-class)**
+Rails generators will use the proper name when generating your components.  **[more details...](/rails-installation/generators.md#specifying-the-base-class)**
 
 ### Abstract and Concrete Components
 
@@ -118,11 +118,11 @@ end
 ### Generating Keys
 
 Every Hyperstack object whether its a string, integer, or some complex class responds to the `to_key` method.
-When you provide a component's key parameter with any object, the object's to_key method will be called, and
+When you provide a component's key parameter with any object, the object's `to_key` method will be called, and
 return a unique key appropriate to that object.
 
 For example strings, and numbers return themselves.   Other complex objects return the internal `object_id`, and
-some classes provide their own `to_key` method that returns some invariant value for that class.  HyperModel records
+some classes provide their own `to_key` method that returns some invariant value for each instance of that class.  HyperModel records
 return the database id for example.
 
 If you are creating your own data classes keep this in mind.  You simply define a `to_key` method on the class
@@ -131,7 +131,7 @@ default to the one provided by Hyperstack.
 
 ### Proper Use Of Keys
 
-> For best results the `key` is supplied at highest level possible.  (NOTE THIS MAY NO LONGER BE AN ISSUE IN LATEST REACT)
+> For best results the `key` is supplied at highest level possible.  (NOTE THIS MAY NO LONGER BE AN ISSUE IN LATEST REACT)  
 ```ruby
 # WRONG!
 class ListItemWrapper < HyperComponent
@@ -172,3 +172,63 @@ class MyComponent < HyperComponent
   end
 end
 ```
+
+### Ruby Procs
+
+A core class of objects in Ruby is the *Proc*.  A Proc (Procedure) is an
+object that can be *called*.
+
+```Ruby
+some_proc.call(1, 2, 3)
+```
+
+Ruby has several ways to create procs:
+
+```Ruby
+# create a proc that will add its three parameters together
+# using Proc.new
+some_proc = Proc.new { |a, b, c| a + b + c }
+# using the lambda method:
+some_proc = lambda { |a, b, c| a + b + c }
+# or the hash rocket notation:
+some_proc = -> (a, b, c) { a + b + c }
+# using a method (assuming self responds to foo)
+some_proc = method(:foo)
+```
+
+And there are several more ways, each with its differences and uses.  You can
+find lots of details on Procs by searching online.  **[Here is a good article to get you started...](https://blog.appsignal.com/2018/09/04/ruby-magic-closures-in-ruby-blocks-procs-and-lambdas.html)**
+
+The most common ways you will use Procs in your Hyperstack code is to define
+either lifecycle or component callbacks:
+
+```Ruby
+class Foo < HyperComponent
+  before_mount :do_it_before
+  after_mount { puts "I did it after" }
+  render do
+    BUTTON(on_click: ->() { puts "clicked Using a lambda" } ) { "click me" }
+    BUTTON { "no click me" }.on(:click) { puts "clicked using the on method" }
+  end
+  def do_it_before
+    puts "I did it before"
+  end
+end
+```
+
+The different ways of specifying callbacks allow you to keep your code clear and consise, but in the end they do the same thing.
+
+> Note that there are subtle differences between Proc.new and lambda, that are beyond the scope of this note.
+
+### Javascript
+
+Opal-Ruby uses the backticks and `%x{ ... }` to drop blocks of Javascript code directly into your Ruby code.
+
+```ruby
+def my_own_console(message)
+  # crab-claws can be used to escape back out to Ruby
+  `console.log(#{message})`
+end
+```
+
+Both the backticks and `%x{ ... }` work the same, but the `%{ ... }` notation is useful for multiple lines of code.

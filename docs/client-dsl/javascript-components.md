@@ -2,11 +2,9 @@
 
 Hyperstack gives you full access to the entire universe of JavaScript libraries and components directly within your Ruby code.
 
-Everything you can do in JavaScript is simple to do in Ruby; this includes passing parameters between Ruby and JavaScript and even passing Ruby methods as JavaScript callbacks. See the JavaScript section for more information.
+Everything you can do in JavaScript is simple to do in Opal-Ruby; this includes passing parameters between Ruby and JavaScript and even passing Ruby methods as JavaScript callbacks. See the JavaScript section for more information.
 
-While it is quite possible to develop large applications purely in Hyperstack Components with a ruby back end like rails, you may eventually find you want to use some pre-existing React Javascript library. Or you may be working with an existing React-JS application, and want to just start adding some Hyperstack Components.
-
-Either way you are going to need to import Javascript components into the Hyperstack namespace. Hyperstack provides both manual and automatic mechanisms to do this depending on the level of control you need.
+> **[For more information on writing Javascript within your Ruby code...](/notes.md#Javascript)**
 
 ## Importing React Components
 
@@ -15,13 +13,23 @@ Let's say you have an existing React Component written in Javascript that you wo
 Here is a simple hello world component:
 
 ```javascript
-window.SayHello = React.createClass({
-  displayName: "SayHello",
-  render: function render() {
-    return React.createElement("div", null, "Hello ", this.props.name);
+window.SayHello = class extends React.Component {
+  constructor(props) {
+    super(props);
+    this.displayName = "SayHello"
   }
-})
+  render() { return React.createElement("div", null, "Hello ", this.props.name); }
+}
 ```
+
+> I'm sorry I can't resist.  Really?  
+```ruby
+class SayHello < HyperComponent
+  param :name
+  render(DIV) { "Hello #{name}"}
+end
+```
+In what world is the Ruby not much better than that JS hot mess.
 
 Assuming that this component is loaded some place in your assets, you can then access this from Hyperstack by creating a wrapper Component:
 
@@ -365,4 +373,3 @@ class UserDialog < HyperComponent
   end
 end
 ```
-

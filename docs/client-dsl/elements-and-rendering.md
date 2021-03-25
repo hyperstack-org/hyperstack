@@ -1,5 +1,7 @@
 # Elements and Rendering
 
+document as_node here
+
 ### React.create\_element
 
 **Note: You almost never need to directly call `create_element`, the DSL, Rails, and jQuery interfaces take care of this for you.**
@@ -158,4 +160,3 @@ DIV("data-custom-attribute" => "foo")
 ```ruby
 DIV("aria-hidden" => true)
 ```
-

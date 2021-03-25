@@ -2,13 +2,14 @@
 
 ### HTML elements
 
-A Hyperstack user-interface is composed of HTML elements, conditional logic and Components.
+Each Hyperstack component renders a series of HTML (and SVG) elements, using Ruby expressions to control the output.
 
 ```ruby
 UL do
   5.times { |n| LI { "Number #{n}" }}
 end
 ```
+
 For example
 
 ```ruby
