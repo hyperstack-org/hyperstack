@@ -3,7 +3,6 @@ Hyperstack.import 'hyper-i18n'
 
 require 'hyper-component'
 require 'hyper-operation'
-require 'hyper-state'
 
 require 'hyperstack/internal/i18n/helper_methods'
 require 'hyperstack/internal/i18n/localize'

@@ -291,8 +291,8 @@ Finally falsy values are ignored.
 You can also send `connect` directly to ActiveRecord models:
 
 ```ruby
-AdminUser.connect!    # same as Hyperloop.connect(AdminUser)
-current_user.connect! # same as Hyperloop.connect(current_user)
+AdminUser.connect    # same as Hyperloop.connect(AdminUser)
+current_user.connect # same as Hyperloop.connect(current_user)
 ```
 
 #### Connection Sequence Summary
@@ -591,4 +591,3 @@ end
 ```
 
 BTW what if you want to restrict what data is broadcast? In Hyperloop you just update the regulation. In pundit you may have to edit both the index controller method and Policy class.
-
