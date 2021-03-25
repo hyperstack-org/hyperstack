@@ -1,0 +1,535 @@
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE IF EXISTS "samples"[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (1.1ms)[0m  [1m[35mCREATE TABLE "samples" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar, "description" text, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL)[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL PRIMARY KEY)[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (1.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (20210318185111)[0m
+  [1m[35m (1.2ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES (?, ?, ?, ?)[0m  [["key", "environment"], ["value", "test"], ["created_at", "2021-03-18 18:51:17.510456"], ["updated_at", "2021-03-18 18:51:17.510456"]]
+  [1m[35m (0.5ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT  "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[36mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 09:48:46 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Compiling...
+[Webpacker] Compiled all packs in /Users/mitch/rubydev/hyperstack/docs/specs/public/packs-test
+[Webpacker] Hash: e387d361a074d5e9c6af
+Version: webpack 4.46.0
+Time: 4525ms
+Built at: 03/24/2021 9:48:53 AM
+                                           Asset       Size             Chunks                         Chunk Names
+    js/client_and_server-f16098575d2b9b8b9d4d.js   1.34 MiB  client_and_server  [emitted] [immutable]  client_and_server
+js/client_and_server-f16098575d2b9b8b9d4d.js.map   1.53 MiB  client_and_server  [emitted] [dev]        client_and_server
+          js/client_only-97804af3659765fdf93a.js   1.32 MiB        client_only  [emitted] [immutable]  client_only
+      js/client_only-97804af3659765fdf93a.js.map   1.53 MiB        client_only  [emitted] [dev]        client_only
+                                   manifest.json  785 bytes                     [emitted]              
+Entrypoint client_and_server = js/client_and_server-f16098575d2b9b8b9d4d.js js/client_and_server-f16098575d2b9b8b9d4d.js.map
+Entrypoint client_only = js/client_only-97804af3659765fdf93a.js js/client_only-97804af3659765fdf93a.js.map
+[./app/javascript/packs/client_and_server.js] 628 bytes {client_and_server} [built]
+[./app/javascript/packs/client_only.js] 330 bytes {client_only} [built]
+[./node_modules/webpack/buildin/global.js] (webpack)/buildin/global.js 905 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/module.js] (webpack)/buildin/module.js 552 bytes {client_only} [built]
+    + 45 hidden modules
+
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (16692.1ms)
+Completed 200 OK in 16728ms (Views: 16721.6ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 09:49:03 -0400
+Started GET "/assets/application-322bc23ba4adf59ff7edbac9be9398342d6106c3f32b68c8c6d14b92fd786cac.js" for 127.0.0.1 at 2021-03-24 09:49:03 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 09:50:25 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (1970.3ms)
+Completed 200 OK in 1981ms (Views: 1975.4ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 09:50:27 -0400
+Started GET "/assets/application-322bc23ba4adf59ff7edbac9be9398342d6106c3f32b68c8c6d14b92fd786cac.js" for 127.0.0.1 at 2021-03-24 09:50:27 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 09:59:46 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2121.6ms)
+Completed 200 OK in 2132ms (Views: 2126.9ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 09:59:49 -0400
+Started GET "/assets/application-322bc23ba4adf59ff7edbac9be9398342d6106c3f32b68c8c6d14b92fd786cac.js" for 127.0.0.1 at 2021-03-24 09:59:49 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:01:27 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Compiling...
+[Webpacker] Compiled all packs in /Users/mitch/rubydev/hyperstack/docs/specs/public/packs-test
+[Webpacker] Hash: 93d9ce8fd4e97867cc26
+Version: webpack 4.46.0
+Time: 3751ms
+Built at: 03/24/2021 10:01:33 AM
+                                           Asset       Size             Chunks                         Chunk Names
+    js/client_and_server-30fd3f7a048d5d92ce7b.js   3.38 MiB  client_and_server  [emitted] [immutable]  client_and_server
+js/client_and_server-30fd3f7a048d5d92ce7b.js.map   3.06 MiB  client_and_server  [emitted] [dev]        client_and_server
+          js/client_only-97804af3659765fdf93a.js   1.32 MiB        client_only  [emitted] [immutable]  client_only
+      js/client_only-97804af3659765fdf93a.js.map   1.53 MiB        client_only  [emitted] [dev]        client_only
+                                   manifest.json  785 bytes                     [emitted]              
+Entrypoint client_and_server = js/client_and_server-30fd3f7a048d5d92ce7b.js js/client_and_server-30fd3f7a048d5d92ce7b.js.map
+Entrypoint client_only = js/client_only-97804af3659765fdf93a.js js/client_only-97804af3659765fdf93a.js.map
+[./app/javascript/packs/client_and_server.js] 711 bytes {client_and_server} [built]
+[./app/javascript/packs/client_only.js] 330 bytes {client_only} [built]
+[./node_modules/webpack/buildin/global.js] (webpack)/buildin/global.js 905 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/module.js] (webpack)/buildin/module.js 552 bytes {client_only} [built]
+    + 508 hidden modules
+
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (16467.5ms)
+Completed 200 OK in 16482ms (Views: 16474.3ms | ActiveRecord: 2.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:01:43 -0400
+Started GET "/assets/application-94055c679f79d2aeeff71351e0926286bc129eb73251ef9c61087cdc23b49081.js" for 127.0.0.1 at 2021-03-24 10:01:43 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:07:02 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2037.8ms)
+Completed 200 OK in 2049ms (Views: 2044.3ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:07:04 -0400
+Started GET "/assets/application-94055c679f79d2aeeff71351e0926286bc129eb73251ef9c61087cdc23b49081.js" for 127.0.0.1 at 2021-03-24 10:07:04 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:08:11 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2030.1ms)
+Completed 200 OK in 2040ms (Views: 2034.7ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:08:13 -0400
+Started GET "/assets/application-94055c679f79d2aeeff71351e0926286bc129eb73251ef9c61087cdc23b49081.js" for 127.0.0.1 at 2021-03-24 10:08:13 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:16:22 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2197.0ms)
+Completed 200 OK in 2206ms (Views: 2201.4ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:16:24 -0400
+Started GET "/assets/application-94055c679f79d2aeeff71351e0926286bc129eb73251ef9c61087cdc23b49081.js" for 127.0.0.1 at 2021-03-24 10:16:24 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:16:55 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2031.1ms)
+Completed 200 OK in 2040ms (Views: 2035.3ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:16:57 -0400
+Started GET "/assets/application-94055c679f79d2aeeff71351e0926286bc129eb73251ef9c61087cdc23b49081.js" for 127.0.0.1 at 2021-03-24 10:16:57 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:24:06 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (1991.8ms)
+Completed 200 OK in 2000ms (Views: 1996.1ms | ActiveRecord: 1.3ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:24:08 -0400
+Started GET "/assets/application-94055c679f79d2aeeff71351e0926286bc129eb73251ef9c61087cdc23b49081.js" for 127.0.0.1 at 2021-03-24 10:24:08 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:24:58 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Compiling...
+[Webpacker] Compiled all packs in /Users/mitch/rubydev/hyperstack/docs/specs/public/packs-test
+[Webpacker] Hash: 1ad829c531f789e3428a
+Version: webpack 4.46.0
+Time: 3826ms
+Built at: 03/24/2021 10:25:04 AM
+                                                                         Asset       Size             Chunks                         Chunk Names
+                                  js/client_and_server-63f7ed4bacb425af7feb.js   3.38 MiB  client_and_server  [emitted] [immutable]  client_and_server
+                              js/client_and_server-63f7ed4bacb425af7feb.js.map   3.07 MiB  client_and_server  [emitted] [dev]        client_and_server
+                                        js/client_only-97804af3659765fdf93a.js   1.32 MiB        client_only  [emitted] [immutable]  client_only
+                                    js/client_only-97804af3659765fdf93a.js.map   1.53 MiB        client_only  [emitted] [dev]        client_only
+                                                                 manifest.json  930 bytes                     [emitted]              
+media/images/apple-touch-icon-precomposed-31d6cfe0d16ae931b73c59d7e0c089c0.png    0 bytes                     [emitted]              
+Entrypoint client_and_server = js/client_and_server-63f7ed4bacb425af7feb.js js/client_and_server-63f7ed4bacb425af7feb.js.map
+Entrypoint client_only = js/client_only-97804af3659765fdf93a.js js/client_only-97804af3659765fdf93a.js.map
+[./app/javascript/images sync recursive \.(gif|jpg|png|svg)$/] ./app/javascript/images sync \.(gif|jpg|png|svg)$/ 199 bytes {client_and_server} [built]
+[./app/javascript/images/apple-touch-icon-precomposed.png] 124 bytes {client_and_server} [optional] [built]
+[./app/javascript/packs/client_and_server.js] 956 bytes {client_and_server} [built]
+[./app/javascript/packs/client_only.js] 330 bytes {client_only} [built]
+[./node_modules/webpack/buildin/global.js] (webpack)/buildin/global.js 905 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/module.js] (webpack)/buildin/module.js 552 bytes {client_only} [built]
+    + 508 hidden modules
+
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (16194.8ms)
+Completed 200 OK in 16208ms (Views: 16200.5ms | ActiveRecord: 3.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:25:14 -0400
+Started GET "/assets/application-1136323b23d03e2bec9e044109a6734f866c6d8083c867904c1da7878e904240.js" for 127.0.0.1 at 2021-03-24 10:25:14 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:37:26 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (3468.6ms)
+Completed 200 OK in 3479ms (Views: 3473.0ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:37:29 -0400
+Started GET "/assets/application-e1ec3ddb29f630b625cd8c902d94885c1e8a3c412ed44bec8c11c04b87ea3dec.js" for 127.0.0.1 at 2021-03-24 10:37:29 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:39:04 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2104.4ms)
+Completed 200 OK in 2116ms (Views: 2110.7ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:39:06 -0400
+Started GET "/assets/application-e1ec3ddb29f630b625cd8c902d94885c1e8a3c412ed44bec8c11c04b87ea3dec.js" for 127.0.0.1 at 2021-03-24 10:39:06 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 10:49:51 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Compiling...
+[Webpacker] Compiled all packs in /Users/mitch/rubydev/hyperstack/docs/specs/public/packs-test
+[Webpacker] Hash: 8f6be2e87b2f991dca39
+Version: webpack 4.46.0
+Time: 3833ms
+Built at: 03/24/2021 10:49:57 AM
+                                                                       Asset       Size             Chunks                         Chunk Names
+                                js/client_and_server-0dbb443aa43474c9c804.js   3.38 MiB  client_and_server  [emitted] [immutable]  client_and_server
+                            js/client_and_server-0dbb443aa43474c9c804.js.map   3.07 MiB  client_and_server  [emitted] [dev]        client_and_server
+                                      js/client_only-97804af3659765fdf93a.js   1.32 MiB        client_only  [emitted] [immutable]  client_only
+                                  js/client_only-97804af3659765fdf93a.js.map   1.53 MiB        client_only  [emitted] [dev]        client_only
+                                                               manifest.json  926 bytes                     [emitted]              
+media/images/hyperloop-logo-medium-pink-2d778c41da511193deab50b237c68622.png   16.1 KiB                     [emitted]              
+Entrypoint client_and_server = js/client_and_server-0dbb443aa43474c9c804.js js/client_and_server-0dbb443aa43474c9c804.js.map
+Entrypoint client_only = js/client_only-97804af3659765fdf93a.js js/client_only-97804af3659765fdf93a.js.map
+[./app/javascript/images sync recursive \.(gif|jpg|png|svg)$/] ./app/javascript/images sync \.(gif|jpg|png|svg)$/ 197 bytes {client_and_server} [built]
+[./app/javascript/images/hyperloop-logo-medium-pink.png] 122 bytes {client_and_server} [optional] [built]
+[./app/javascript/packs/client_and_server.js] 956 bytes {client_and_server} [built]
+[./app/javascript/packs/client_only.js] 330 bytes {client_only} [built]
+[./node_modules/webpack/buildin/global.js] (webpack)/buildin/global.js 905 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/module.js] (webpack)/buildin/module.js 552 bytes {client_only} [built]
+    + 508 hidden modules
+
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (16604.9ms)
+Completed 200 OK in 16617ms (Views: 16610.1ms | ActiveRecord: 3.3ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 10:50:08 -0400
+Started GET "/assets/application-f095de39a54d94b08f1303a72c0a772ff2c038dfce79e77390e73e42d889db82.js" for 127.0.0.1 at 2021-03-24 10:50:08 -0400
+Started GET "/hyper_spec_test/ping" for 127.0.0.1 at 2021-03-24 10:58:16 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"ping"}
+Completed 204 No Content in 0ms (ActiveRecord: 0.0ms)
+Started GET "/hyper_spec_test/2" for 127.0.0.1 at 2021-03-24 10:58:16 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"2"}
+  Rendering inline template
+  Rendered inline template (6.9ms)
+Completed 200 OK in 8ms (Views: 7.0ms | ActiveRecord: 0.3ms)
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:06:57 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2040.6ms)
+Completed 200 OK in 2050ms (Views: 2045.1ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:06:59 -0400
+Started GET "/assets/application-f095de39a54d94b08f1303a72c0a772ff2c038dfce79e77390e73e42d889db82.js" for 127.0.0.1 at 2021-03-24 11:06:59 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:07:56 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2220.5ms)
+Completed 200 OK in 2238ms (Views: 2232.8ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:07:59 -0400
+Started GET "/assets/application-f095de39a54d94b08f1303a72c0a772ff2c038dfce79e77390e73e42d889db82.js" for 127.0.0.1 at 2021-03-24 11:07:59 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:12:49 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Compiling...
+[Webpacker] Compiled all packs in /Users/mitch/rubydev/hyperstack/docs/specs/public/packs-test
+[Webpacker] Hash: 8f6be2e87b2f991dca39
+Version: webpack 4.46.0
+Time: 3796ms
+Built at: 03/24/2021 11:12:55 AM
+                                                                       Asset       Size             Chunks                         Chunk Names
+                                js/client_and_server-0dbb443aa43474c9c804.js   3.38 MiB  client_and_server  [emitted] [immutable]  client_and_server
+                            js/client_and_server-0dbb443aa43474c9c804.js.map   3.07 MiB  client_and_server  [emitted] [dev]        client_and_server
+                                      js/client_only-97804af3659765fdf93a.js   1.32 MiB        client_only  [emitted] [immutable]  client_only
+                                  js/client_only-97804af3659765fdf93a.js.map   1.53 MiB        client_only  [emitted] [dev]        client_only
+                                                               manifest.json  926 bytes                     [emitted]              
+media/images/hyperloop-logo-medium-pink-2d778c41da511193deab50b237c68622.png   16.1 KiB                     [emitted]              
+Entrypoint client_and_server = js/client_and_server-0dbb443aa43474c9c804.js js/client_and_server-0dbb443aa43474c9c804.js.map
+Entrypoint client_only = js/client_only-97804af3659765fdf93a.js js/client_only-97804af3659765fdf93a.js.map
+[./app/javascript/images sync recursive \.(gif|jpg|png|svg)$/] ./app/javascript/images sync \.(gif|jpg|png|svg)$/ 197 bytes {client_and_server} [built]
+[./app/javascript/images/hyperloop-logo-medium-pink.png] 122 bytes {client_and_server} [optional] [built]
+[./app/javascript/packs/client_and_server.js] 956 bytes {client_and_server} [built]
+[./app/javascript/packs/client_only.js] 330 bytes {client_only} [built]
+[./node_modules/webpack/buildin/global.js] (webpack)/buildin/global.js 905 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/module.js] (webpack)/buildin/module.js 552 bytes {client_only} [built]
+    + 508 hidden modules
+
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (16814.8ms)
+Completed 200 OK in 16828ms (Views: 16820.2ms | ActiveRecord: 3.0ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:13:06 -0400
+Started GET "/assets/application-9b6639ebe1acd720226e43510302c31450fd39cb36788b43815315691c597a3d.js" for 127.0.0.1 at 2021-03-24 11:13:06 -0400
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:13:23 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.9ms)
+Completed 200 OK in 8ms (Views: 7.2ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:13:49 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.1ms)
+Completed 200 OK in 4ms (Views: 3.9ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:14:44 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (1.9ms)
+Completed 200 OK in 4ms (Views: 3.9ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:15:47 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (1.9ms)
+Completed 200 OK in 4ms (Views: 4.0ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:16:21 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.1ms)
+Completed 200 OK in 4ms (Views: 3.9ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:16:37 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.1ms)
+Completed 200 OK in 5ms (Views: 4.1ms | ActiveRecord: 0.2ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:16:56 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.3ms)
+Completed 200 OK in 5ms (Views: 4.6ms | ActiveRecord: 0.2ms)
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:17:27 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2058.5ms)
+Completed 200 OK in 2071ms (Views: 2065.4ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:17:29 -0400
+Started GET "/assets/application-9b6639ebe1acd720226e43510302c31450fd39cb36788b43815315691c597a3d.js" for 127.0.0.1 at 2021-03-24 11:17:29 -0400
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:17:36 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.2ms)
+Completed 200 OK in 7ms (Views: 6.0ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:17:58 -0400
+Processing by HyperstackController#App as HTML
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (1.9ms)
+Completed 200 OK in 4ms (Views: 3.8ms | ActiveRecord: 0.1ms)
+Started GET "/packs-test/media/images/hyperloop-logo-medium-pink-2d778c41da511193deab50b237c686223.png" for 127.0.0.1 at 2021-03-24 11:18:42 -0400
+Processing by HyperstackController#App as PNG
+  Parameters: {"others"=>"packs-test/media/images/hyperloop-logo-medium-pink-2d778c41da511193deab50b237c686223"}
+  Rendering inline template
+  Rendered inline template (2.0ms)
+Completed 200 OK in 3ms (Views: 3.1ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:22:32 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (3.0ms)
+Completed 200 OK in 6ms (Views: 4.8ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:26:16 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.2ms)
+Completed 200 OK in 4ms (Views: 4.0ms | ActiveRecord: 0.1ms)
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:26:40 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (1.8ms)
+Completed 200 OK in 4ms (Views: 3.7ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:27:06 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2056.8ms)
+Completed 200 OK in 2103ms (Views: 2081.8ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:27:08 -0400
+Started GET "/assets/application-9b6639ebe1acd720226e43510302c31450fd39cb36788b43815315691c597a3d.js" for 127.0.0.1 at 2021-03-24 11:27:08 -0400
+Started GET "/foo" for 127.0.0.1 at 2021-03-24 11:27:15 -0400
+Processing by HyperstackController#App as */*
+  Parameters: {"others"=>"foo"}
+  Rendering inline template within layouts/application
+  Rendered inline template within layouts/application (2.7ms)
+Completed 200 OK in 8ms (Views: 7.1ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:50:41 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (3555.0ms)
+Completed 200 OK in 3564ms (Views: 3559.2ms | ActiveRecord: 1.3ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:50:44 -0400
+Started GET "/assets/application-a13e101abe0381295128aefae17a2c4e8762dcf8904933912b9f4ea0f81ea5bb.js" for 127.0.0.1 at 2021-03-24 11:50:44 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 11:51:26 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2021.8ms)
+Completed 200 OK in 2030ms (Views: 2025.8ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 11:51:28 -0400
+Started GET "/assets/application-a13e101abe0381295128aefae17a2c4e8762dcf8904933912b9f4ea0f81ea5bb.js" for 127.0.0.1 at 2021-03-24 11:51:28 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:01:25 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2086.3ms)
+Completed 200 OK in 2097ms (Views: 2091.9ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:01:27 -0400
+Started GET "/assets/application-a13e101abe0381295128aefae17a2c4e8762dcf8904933912b9f4ea0f81ea5bb.js" for 127.0.0.1 at 2021-03-24 12:01:27 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:05:02 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2017.7ms)
+Completed 200 OK in 2030ms (Views: 2022.8ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:05:04 -0400
+Started GET "/assets/application-a13e101abe0381295128aefae17a2c4e8762dcf8904933912b9f4ea0f81ea5bb.js" for 127.0.0.1 at 2021-03-24 12:05:04 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:10:51 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (3703.6ms)
+Completed 200 OK in 3712ms (Views: 3707.3ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:10:55 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:10:55 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:12:03 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2070.3ms)
+Completed 200 OK in 2080ms (Views: 2074.9ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:12:05 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:12:05 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:19:58 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2197.7ms)
+Completed 200 OK in 2207ms (Views: 2201.5ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:20:00 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:20:00 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:22:20 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2039.0ms)
+Completed 200 OK in 2049ms (Views: 2044.8ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:22:22 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:22:22 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:26:10 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2042.2ms)
+Completed 200 OK in 2052ms (Views: 2047.2ms | ActiveRecord: 1.3ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:26:12 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:26:12 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:28:16 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2053.9ms)
+Completed 200 OK in 2064ms (Views: 2058.5ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:28:18 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:28:18 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:32:09 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2029.2ms)
+Completed 200 OK in 2043ms (Views: 2036.2ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:32:11 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:32:11 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:33:00 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2004.3ms)
+Completed 200 OK in 2039ms (Views: 2032.8ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:33:02 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:33:02 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:35:04 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2037.8ms)
+Completed 200 OK in 2047ms (Views: 2042.2ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:35:06 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:35:06 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:49:01 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2196.1ms)
+Completed 200 OK in 2207ms (Views: 2201.5ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:49:03 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:49:03 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:57:30 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2043.5ms)
+Completed 200 OK in 2052ms (Views: 2047.2ms | ActiveRecord: 1.5ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:57:32 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:57:32 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 12:58:02 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2047.0ms)
+Completed 200 OK in 2078ms (Views: 2072.9ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 12:58:04 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 12:58:04 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 14:40:18 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2395.7ms)
+Completed 200 OK in 2405ms (Views: 2400.2ms | ActiveRecord: 2.0ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 14:40:21 -0400
+Started GET "/assets/application-c72a757b8cb034811d694fe53a25ff876ae66613ef476ed6334e1de206e845ff.js" for 127.0.0.1 at 2021-03-24 14:40:21 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 14:41:21 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (3497.5ms)
+Completed 200 OK in 3507ms (Views: 3502.5ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 14:41:25 -0400
+Started GET "/assets/application-45cca056664f626e631ecf50dec26e965d2e828d8a95796c0c2d5b8e7d2972d5.js" for 127.0.0.1 at 2021-03-24 14:41:25 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-24 14:49:51 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (3466.0ms)
+Completed 200 OK in 3479ms (Views: 3471.8ms | ActiveRecord: 1.3ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 14:49:55 -0400
+Started GET "/assets/application-f62b5fd5d69b4323dbfc652754a510f98c3a28f827b8065f60669b5abd5309bc.js" for 127.0.0.1 at 2021-03-24 14:49:55 -0400

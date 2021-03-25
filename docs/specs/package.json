@@ -1,0 +1,23 @@
+{
+  "name": "test-app",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@rails/actioncable": "^6.0.0",
+    "@rails/activestorage": "^6.0.0",
+    "@rails/ujs": "^6.0.0",
+    "@rails/webpacker": "5.2.1",
+    "create-react-class": "^15.7.0",
+    "jquery": "^3.6.0",
+    "react": "16",
+    "react-dom": "16",
+    "react-router": "^5.0.0",
+    "react-router-dom": "^5.0.0",
+    "react_ujs": "^2.5.0",
+    "turbolinks": "^5.2.0"
+  },
+  "version": "0.1.0",
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.2"
+  }
+}
