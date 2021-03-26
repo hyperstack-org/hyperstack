@@ -10,11 +10,11 @@ A component may define lifecycle methods for each phase of the components lifecy
 * `render` will be called again here
 * `after_update`
 * `before_unmount`
-* `rescues`
+* `rescues` The `rescues` callback is described **[here...](/error-recovery.md)**
 
 All the Component Lifecycle methods (except `render`) may take a block or the name(s) of instance method(s) to be called.  The `render` method always takes a block.
 
-The `rescues` callback is described **[here...](/error-recovery.md)**
+> The `rescues` callback is described **[here...](/error-recovery.md)**
 
 ```ruby
 class MyComponent < HyperComponent

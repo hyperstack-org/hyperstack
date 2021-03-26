@@ -24,7 +24,7 @@ class Component < HyperComponent
   end
 end
 ```  
-> The code between the `do` and `end` is called a block.  **[More here...](notes.md#blocks-in-ruby)**
+> The code between `do` and `end` and { .. } are called blocks.  **[More here...](notes.md#blocks-in-ruby)**
 
 To save a little typing you can also specify the top level element to be rendered:
 
@@ -36,7 +36,9 @@ class Component < HyperComponent
 end
 ```
 
-To render a component, you reference its class name as a method call from another component. This creates a new instance, passes any parameters and proceeds with the component lifecycle.
+To create a component instance, you reference its class name as a method call from another component. This creates a new instance, passes any parameters and proceeds with the component lifecycle.
+
+> **[The actual type created is an Element read on for details...](/notes.html#component_instances)**
 
 ```ruby
 class FirstComponent < HyperComponent

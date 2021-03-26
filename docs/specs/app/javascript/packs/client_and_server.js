@@ -10,6 +10,7 @@ ReactRailsUJS = require('react_ujs');             // interface to react-rails
 // then add the require here.
 Mui = require('@material-ui/core')
 Button = require('@material-ui/core/Button')
+Sui = require('semantic-ui-react')
 
 webpackImagesMap = {};
 var imagesContext = require.context('../images/', true, /\.(gif|jpg|png|svg)$/i);

@@ -533,3 +533,201 @@ Processing by HyperSpecTestController#test as HTML
 Completed 200 OK in 3479ms (Views: 3471.8ms | ActiveRecord: 1.3ms)
 Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-24 14:49:55 -0400
 Started GET "/assets/application-f62b5fd5d69b4323dbfc652754a510f98c3a28f827b8065f60669b5abd5309bc.js" for 127.0.0.1 at 2021-03-24 14:49:55 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:37:14 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (4612.2ms)
+Completed 200 OK in 4623ms (Views: 4616.8ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:37:19 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:37:19 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:39:41 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2025.4ms)
+Completed 200 OK in 2035ms (Views: 2029.6ms | ActiveRecord: 1.9ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:39:43 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:39:43 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:40:41 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2058.0ms)
+Completed 200 OK in 2068ms (Views: 2063.1ms | ActiveRecord: 1.3ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:40:43 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:40:43 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:49:55 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2370.0ms)
+Completed 200 OK in 2380ms (Views: 2373.7ms | ActiveRecord: 1.7ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:49:58 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:49:58 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:50:23 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2182.4ms)
+Completed 200 OK in 2191ms (Views: 2185.8ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:50:25 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:50:25 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:51:26 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2187.8ms)
+Completed 200 OK in 2196ms (Views: 2191.0ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:51:29 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:51:29 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:52:41 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2143.2ms)
+Completed 200 OK in 2152ms (Views: 2146.6ms | ActiveRecord: 1.8ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:52:43 -0400
+Started GET "/assets/application-8018ee06403732c1468b531b3f995ffff0e6a381a5d9909d4990b4e15b6ac8a1.js" for 127.0.0.1 at 2021-03-26 13:52:43 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:53:20 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+[Webpacker] Compiling...
+[Webpacker] Compiled all packs in /Users/mitch/rubydev/hyperstack/docs/specs/public/packs-test
+[Webpacker] Hash: a911e92af5b4b230d985
+Version: webpack 4.46.0
+Time: 6593ms
+Built at: 03/26/2021 1:53:29 PM
+                                                                       Asset       Size             Chunks                         Chunk Names
+                                js/client_and_server-b0e8b4275caf9a5702c4.js   5.34 MiB  client_and_server  [emitted] [immutable]  client_and_server
+                            js/client_and_server-b0e8b4275caf9a5702c4.js.map   4.36 MiB  client_and_server  [emitted] [dev]        client_and_server
+                                      js/client_only-97804af3659765fdf93a.js   1.32 MiB        client_only  [emitted] [immutable]  client_only
+                                  js/client_only-97804af3659765fdf93a.js.map   1.53 MiB        client_only  [emitted] [dev]        client_only
+                                                               manifest.json  926 bytes                     [emitted]              
+media/images/hyperloop-logo-medium-pink-2d778c41da511193deab50b237c68622.png   16.1 KiB                     [emitted]              
+Entrypoint client_and_server = js/client_and_server-b0e8b4275caf9a5702c4.js js/client_and_server-b0e8b4275caf9a5702c4.js.map
+Entrypoint client_only = js/client_only-97804af3659765fdf93a.js js/client_only-97804af3659765fdf93a.js.map
+[./app/javascript/images sync recursive \.(gif|jpg|png|svg)$/] ./app/javascript/images sync \.(gif|jpg|png|svg)$/ 197 bytes {client_and_server} [built]
+[./app/javascript/images/hyperloop-logo-medium-pink.png] 122 bytes {client_and_server} [optional] [built]
+[./app/javascript/packs/client_and_server.js] 992 bytes {client_and_server} [built]
+[./app/javascript/packs/client_only.js] 330 bytes {client_only} [built]
+[./node_modules/webpack/buildin/amd-options.js] (webpack)/buildin/amd-options.js 80 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/global.js] (webpack)/buildin/global.js 905 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/harmony-module.js] (webpack)/buildin/harmony-module.js 631 bytes {client_and_server} [built]
+[./node_modules/webpack/buildin/module.js] (webpack)/buildin/module.js 552 bytes {client_only} [built]
+    + 1136 hidden modules
+
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+[Webpacker] Everything's up-to-date. Nothing to do
+  Rendered inline template (19791.9ms)
+Completed 200 OK in 19885ms (Views: 19878.5ms | ActiveRecord: 2.9ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:53:40 -0400
+Started GET "/assets/application-205fad576ee541c3e994883a03200e36fd13cfa770df3ac82ca8e0326024b399.js" for 127.0.0.1 at 2021-03-26 13:53:40 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:58:16 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2180.9ms)
+Completed 200 OK in 2189ms (Views: 2184.4ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:58:19 -0400
+Started GET "/assets/application-205fad576ee541c3e994883a03200e36fd13cfa770df3ac82ca8e0326024b399.js" for 127.0.0.1 at 2021-03-26 13:58:19 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:58:51 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2149.9ms)
+Completed 200 OK in 2160ms (Views: 2154.5ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:58:53 -0400
+Started GET "/assets/application-205fad576ee541c3e994883a03200e36fd13cfa770df3ac82ca8e0326024b399.js" for 127.0.0.1 at 2021-03-26 13:58:53 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 13:59:47 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2178.1ms)
+Completed 200 OK in 2190ms (Views: 2184.2ms | ActiveRecord: 1.4ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 13:59:49 -0400
+Started GET "/assets/application-205fad576ee541c3e994883a03200e36fd13cfa770df3ac82ca8e0326024b399.js" for 127.0.0.1 at 2021-03-26 13:59:49 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 14:00:14 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2105.5ms)
+Completed 200 OK in 2115ms (Views: 2109.9ms | ActiveRecord: 1.6ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 14:00:16 -0400
+Started GET "/assets/application-205fad576ee541c3e994883a03200e36fd13cfa770df3ac82ca8e0326024b399.js" for 127.0.0.1 at 2021-03-26 14:00:16 -0400
+Started GET "/hyper_spec_test/1" for 127.0.0.1 at 2021-03-26 19:29:51 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"1"}
+  Rendering inline template
+  Rendered inline template (2571.7ms)
+Completed 200 OK in 2582ms (Views: 2576.3ms | ActiveRecord: 1.8ms)
+Started GET "/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" for 127.0.0.1 at 2021-03-26 19:29:54 -0400
+Started GET "/assets/application-205fad576ee541c3e994883a03200e36fd13cfa770df3ac82ca8e0326024b399.js" for 127.0.0.1 at 2021-03-26 19:29:54 -0400
+Started GET "/hyper_spec_test/2" for 127.0.0.1 at 2021-03-26 19:29:57 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"2"}
+  Rendering inline template
+  Rendered inline template (5.5ms)
+Completed 200 OK in 6ms (Views: 5.7ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/3" for 127.0.0.1 at 2021-03-26 19:29:57 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"3"}
+  Rendering inline template
+  Rendered inline template (4.6ms)
+Completed 200 OK in 5ms (Views: 4.7ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/4" for 127.0.0.1 at 2021-03-26 19:29:58 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"4"}
+  Rendering inline template
+  Rendered inline template (4.6ms)
+Completed 200 OK in 5ms (Views: 4.7ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/5" for 127.0.0.1 at 2021-03-26 19:29:59 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"5"}
+  Rendering inline template
+  Rendered inline template (5.1ms)
+Completed 200 OK in 6ms (Views: 5.2ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/6" for 127.0.0.1 at 2021-03-26 19:30:00 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"6"}
+  Rendering inline template
+  Rendered inline template (3.7ms)
+Completed 200 OK in 4ms (Views: 3.8ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/7" for 127.0.0.1 at 2021-03-26 19:30:01 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"7"}
+  Rendering inline template
+  Rendered inline template (3.9ms)
+Completed 200 OK in 4ms (Views: 4.0ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/8" for 127.0.0.1 at 2021-03-26 19:30:01 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"8"}
+  Rendering inline template
+  Rendered inline template (3.6ms)
+Completed 200 OK in 4ms (Views: 3.7ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/9" for 127.0.0.1 at 2021-03-26 19:30:02 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"9"}
+  Rendering inline template
+  Rendered inline template (4.3ms)
+Completed 200 OK in 5ms (Views: 4.5ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/10" for 127.0.0.1 at 2021-03-26 19:30:03 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"10"}
+  Rendering inline template
+  Rendered inline template (4.3ms)
+Completed 200 OK in 5ms (Views: 4.4ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/11" for 127.0.0.1 at 2021-03-26 19:30:04 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"11"}
+  Rendering inline template
+  Rendered inline template (4.6ms)
+Completed 200 OK in 5ms (Views: 4.7ms | ActiveRecord: 0.1ms)
+Started GET "/hyper_spec_test/12" for 127.0.0.1 at 2021-03-26 19:30:05 -0400
+Processing by HyperSpecTestController#test as HTML
+  Parameters: {"id"=>"12"}
+  Rendering inline template
+  Rendered inline template (5.3ms)
+Completed 200 OK in 6ms (Views: 5.5ms | ActiveRecord: 0.1ms)

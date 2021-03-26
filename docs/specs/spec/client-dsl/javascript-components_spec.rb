@@ -101,26 +101,28 @@ describe "interfacing to javascript components", :js do
     expect(find('input#text_2').value).to eq 'hello'
   end
 
-  it "passing an element" do
+  it 'passing elements to javascript components' do
     mount "App" do
-      class Reveal < HyperComponent
-        param :content
-        render do
-          BUTTON { "#{@show ? 'hide' : 'show'} me" }
-          .on(:click) { mutate @show = !@show }
-          content.render if @show
-        end
-      end
       class App < HyperComponent
         render do
-          Reveal(content: ~DIV { 'I came from the App' })
+          tab1 = Sui::TabPane() do
+            P { "Tab 1 Content" }
+          end
+
+          tab2 = Sui::TabPane() do
+            P { "Tab 2 Content" }
+          end
+
+          panes = [
+            { menuItem: "Tab 1", render: tab1 },
+            { menuItem: "Tab 2", render: tab2 }
+          ]
+
+          Sui::Tab(panes: panes)
         end
       end
     end
-    expect(find('button').text).to eq 'show me'
-    expect(page).not_to have_content('I cam from the App')
-    find('button').click
-    expect(find('button').text).to eq 'hide me'
-    expect(page).to have_content('I cam from the App')
+    expect(page).to have_content "Tab 1 Content"
+    expect(page).to have_content "Tab 1 Content"
   end
 end

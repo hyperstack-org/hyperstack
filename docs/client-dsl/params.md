@@ -1,5 +1,6 @@
 The `param` class method gives _read-only_ access to each of the params passed to the component. Params are accessed as instance methods of the component.
-*In React params are called props, but Hyperstack use the more common Rails term `param`.*
+
+>In React params are called `props`, but Hyperstack uses the more common Rails term `param`.
 
 Within a component class the `param` method is used to define the parameter signature of the component. You can think of params as the values that would normally be sent to the instance's `initialize` method, but with the difference that a component will get new parameters during its lifecycle.
 
@@ -64,27 +65,29 @@ If no value is provided for `:an_optional_param` it will be given the value `"he
 
 Defaults can be provided by the `default` key or using the syntax `param foo: 12` which would default `foo` to 12.
 
-### Named Child Components as Params
+### Component Instances as Params
 
-You can pass a child component as a `param` and then render it in the receiving component.
+You can pass an instance of a component as a `param` and then render it in the receiving component.
 
 ```ruby
-# in the parent Component...
-button = MyButton()
-ButtonBar(button: button)
-
-class ButtonBar < HyperComponent
-  param :button
-
+class Reveal < HyperComponent
+  param :content
   render do
-    DIV(class: 'button-bar') { button.render }
+    BUTTON { "#{@show ? 'hide' : 'show'} me" }
+    .on(:click) { mutate @show = !@show }
+    content.render if @show
+  end
+end
+class App < HyperComponent
+  render do
+    Reveal(content: DIV { 'I came from the App' })
   end
 end
 ```
 
 `render` is used to render the child components. **[For details ...](component-details.md#rendering-children)**
 
-> Notice that this is just a way to pass a child to a component but instead of sending it the "block" with other children you are passing it as a named child.
+> Notice that this is just a way to pass a child to a component but instead of sending it to the "block" with other children you are passing it as a single named child.
 
 ### Other Params
 

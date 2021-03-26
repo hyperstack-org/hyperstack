@@ -5,7 +5,7 @@ When a component is rendered what it displays depends on some combination of thr
 + the state of some other objects on which a component depends
 
 Whenever one of these three things change the component will need to re-render.  In this section we
-discuss how a component's state is managed within Hyperstack.  Params were covered **[here...](params.md)** and sharing state
+discuss how a component's *internal* state is managed within Hyperstack.  Params were covered **[here...](params.md)** and sharing state
 between components will be covered **[here...](/hyper-state.md)**
 
 The idea of state is built into Ruby and is represented by the *instance* variables of an object instance.
@@ -28,7 +28,7 @@ class Clock < HyperComponent
 end
 ```
 
-The after_mount call back sets up a periodic timer that goes off every second and updates the the
+The after_mount call back sets up a periodic timer that goes off every second and updates the
 `@time` instance variable with the current time.  The assignment to `@time` is wrapped in the `mutate` method
 which signals the React Engine that the state of `Clock` has been mutated, this in turn will add `Clock` to
 the list of components that need to be re-rendered.

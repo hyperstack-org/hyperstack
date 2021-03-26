@@ -25,6 +25,14 @@ end
 ```
 Standard style reserves the `{ ... }` notation for single line blocks, and `do ... end` for multiple line blocks
 
+### Component Instances
+
+Currently when generating a component the actual value returned after processing by React is an instance of class
+`Element`.  The long term plan is to merge these two concepts back together so that Element instances and
+Component instances will be the same.  The major difference at the moment is that an Element carries all the data
+needed to create a Component Instance, but has not yet been rendered.  Through out this document we will use
+element and component instance interchangeably.
+
 ### Ruby Hash Params
 
 In Ruby if the final argument to a method is a hash you may leave the `{...}` off:
@@ -232,3 +240,58 @@ end
 ```
 
 Both the backticks and `%x{ ... }` work the same, but the `%{ ... }` notation is useful for multiple lines of code.
+
+### How Importing Works
+
+Hyperstack automates as much of the process as possible for bridging between React and Javascript, however you do have
+lower level control as needed.
+
+Let's say you have an existing React Component written in Javascript that you would like to access from Hyperstack.
+
+Here is a simple hello world component:
+
+```javascript
+window.SayHello = class extends React.Component {
+  constructor(props) {
+    super(props);
+    this.displayName = "SayHello"
+  }
+  render() { return React.createElement("div", null, "Hello ", this.props.name); }
+}
+```
+
+> I'm sorry I can't resist.  Really?  
+```ruby
+class SayHello < HyperComponent
+  param :name
+  render(DIV) { "Hello #{name}"}
+end
+```
+In what world is the Ruby not much better than that JS hot mess.
+
+Assuming that this component is loaded some place in your assets, you can then access this from Hyperstack by creating a wrapper Component:
+
+```ruby
+class SayHello < HyperComponent
+  imports 'SayHello'
+end
+
+class MyBigApp < HyperComponent
+  render(DIV) do
+    # SayHello will now act like any other Hyperstack component
+    SayHello name: 'Matz'
+  end
+end
+```
+
+The `imports` directive takes a string \(or a symbol\) and will simply evaluate it and check to make sure that the value looks like a React component, and then set the underlying native component to point to the imported component.
+
+Normally you do not have to use `imports` explicitly.  When Hyperstack finds a component named in your code that is undefined it searches for
+a Javascript class whose matches, and which acts like a React component class.  Once find it creates the class and imports for you.
+
+You may also turn off the autoimport function if necessary in your `hyperstack.rb` initializer:
+
+```ruby
+# do not use the auto-import module
+Hyperstack.cancel_import    'hyperstack/component/auto-import'
+```
