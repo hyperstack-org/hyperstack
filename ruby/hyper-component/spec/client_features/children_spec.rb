@@ -26,7 +26,7 @@ describe 'Hyperstack::Component::Children', js: true do
 
     it 'is enumerable' do
       expect_evaluate_ruby do
-        InitTest.get_children.map { |elem| elem.element_type }
+        InitTest.get_children.map { |elem| elem.type }
       end.to eq(['a', 'li'])
     end
 
@@ -40,7 +40,7 @@ describe 'Hyperstack::Component::Children', js: true do
     describe '#each' do
       it 'returns an array of elements' do
         expect_evaluate_ruby do
-          nodes = InitTest.get_children.each { |elem| elem.element_type }
+          nodes = InitTest.get_children.each { |elem| elem.type }
           [nodes.class.name, nodes.map(&:class)]
         end.to eq(["Array", ["Hyperstack::Component::Element", "Hyperstack::Component::Element"]])
       end
@@ -80,7 +80,7 @@ describe 'Hyperstack::Component::Children', js: true do
 
     it 'is enumerable containing single element' do
       expect_evaluate_ruby do
-        InitTest.get_children.map { |elem| elem.element_type }
+        InitTest.get_children.map { |elem| elem.type }
       end.to eq(["a"])
     end
 
@@ -117,7 +117,7 @@ describe 'Hyperstack::Component::Children', js: true do
 
     it 'is enumerable containing no elements' do
       expect_evaluate_ruby do
-        InitTest.get_children.map { |elem| elem.element_type }
+        InitTest.get_children.map { |elem| elem.type }
       end.to eq([])
     end
 

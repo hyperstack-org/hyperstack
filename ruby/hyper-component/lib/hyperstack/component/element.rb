@@ -15,33 +15,73 @@ module Hyperstack
     # by using method missing
     #
     class Element
-      include Native::Wrapper
 
-      alias_native :element_type, :type
-      alias_native :props, :props
+#       $$typeof: Symbol(react.element)
+#       key: null
+#       props: {}
+#       ref: null
+#       type: "div"
+# _     _owner: null
 
-      attr_reader :type
+      attr_reader   :type
+
+      attr_reader :element_type # change this so name does not conflict - change to element type
       attr_reader :properties
       attr_reader :block
+      attr_reader :to_n
 
       attr_accessor :waiting_on_resources
 
-      def initialize(native_element, type = nil, properties = {}, block = nil)
-        @type = type
+      def set_native_attributes(native_element)
+        @key =    `native_element.key`
+        @props =  `native_element.props`
+        @ref =    `native_element.ref`
+        @type =   `native_element.type`
+        @_owner = `native_element._owner`
+        @_props_as_hash = Hash.new(@props)
+      end
+
+      def props
+        @_props_as_hash
+      end
+
+      def convert_string(native_element, element_type, props, block)
+        return native_element unless `native_element['$is_a?']`
+        return native_element unless native_element.is_a? String
+        raise "Internal Error Element.new called with string, but non-nil props or block" if !props.empty? || block
+
+        if element_type == :wrap_child
+          `React.createElement(React.Fragment, null, [native_element])`
+        else
+          `React.createElement(native_element, null)`
+        end
+      end
+
+      def initialize(native_element, element_type = nil, properties = {}, block = nil)
+
+        native_element = convert_string(native_element, element_type, properties, block)
+        @element_type = element_type unless element_type == :wrap_child
         @properties = (`typeof #{properties} === 'undefined'` ? nil : properties) || {}
         @block = block
-        @native = native_element
+        `#{self}.$$typeof = native_element.$$typeof`
+        @to_n = self
+        set_native_attributes(native_element)
+      rescue Exception
+      end
+
+      def children
+        `#{@props}.children`
       end
 
       def _update_ref(x)
-        @ref = x
+        @_ref = x
         @_child_element._update_ref(x) if @_child_element
       end
 
-      def ref
-        return @ref if @ref
-        raise("The instance of #{self.type} has not been mounted yet") if properties[:ref]
-        raise("Attempt to get a ref on #{self.type} which is a static component.")
+      def ref # this will not conflict with React's on ref attribute okay because its $ref!!!
+        return @_ref if @_ref
+        raise("The instance of #{self.element_type} has not been mounted yet") if properties[:ref]
+        raise("Attempt to get a ref on #{self.element_type} which is a static component.")
       end
 
       def dom_node
@@ -57,7 +97,7 @@ module Hyperstack
           merge_event_prop!(event_name, &block)
           any_found = true
         end
-        @native = `React.cloneElement(#{@native}, #{@properties.shallow_to_n})` if any_found
+        set_native_attributes(`React.cloneElement(#{self}, #{@properties.shallow_to_n})`) if any_found
         self
       end
 
@@ -69,10 +109,10 @@ module Hyperstack
         if props.empty?
           Hyperstack::Internal::Component::RenderingContext.render(self)
         else
-          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(@type, @properties, *props)
+          props = Hyperstack::Internal::Component::ReactWrapper.convert_props(element_type, @properties, *props)
           @_child_element = Hyperstack::Internal::Component::RenderingContext.render(
-            Element.new(`React.cloneElement(#{@native}, #{props.shallow_to_n})`,
-                        type, props, block)
+            Element.new(`React.cloneElement(#{self}, #{props.shallow_to_n})`,
+                        element_type, props, block)
           )
         end
       end
@@ -80,11 +120,12 @@ module Hyperstack
       # Delete (remove) element from rendering context, the element may later be added back in
       # using the render method.
 
-      def delete
+      def ~
         Hyperstack::Internal::Component::RenderingContext.delete(self)
       end
       # Deprecated version of delete method
-      alias as_node delete
+      alias as_node ~
+      alias delete ~
 
       private
 
@@ -109,7 +150,7 @@ module Hyperstack
           merge_built_in_event_prop! name, &block
         elsif event_name == :enter
           merge_built_in_event_prop!('onKeyDown') { |evt| yield(evt) if evt.key_code == 13 }
-        elsif @type.instance_variable_get('@native_import')
+        elsif element_type.instance_variable_get('@native_import')
           merge_component_event_prop! name, &block
         else
           merge_component_event_prop! "on_#{event_name}", &block

@@ -297,7 +297,7 @@ describe 'React::Component', js: true do
         end
         class Foo < Hyperloop::Component
           render do
-            Bar.insert_element(p: "param") { "child"}
+            Bar.insert_element(p: "param") { "child" }
           end
         end
       end
@@ -859,7 +859,7 @@ describe 'React::Component', js: true do
       end
       expect_evaluate_ruby("CHILDREN.class.name").to eq('Hyperstack::Component::Children')
       expect_evaluate_ruby("CHILDREN.count").to eq(2)
-      expect_evaluate_ruby("CHILDREN.map(&:element_type)").to eq(['a', 'li'])
+      expect_evaluate_ruby("CHILDREN.map(&:type)").to eq(['a', 'li'])
     end
 
     it 'returns an empty Enumerator if there are no children' do

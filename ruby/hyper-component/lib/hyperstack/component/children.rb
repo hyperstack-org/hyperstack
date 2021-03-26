@@ -22,7 +22,7 @@ module Hyperstack
         %x{
           React.Children.forEach(#{@children}, function(context){
             #{
-              element = Element.new(`context`)
+              element = Element.new(`context`, :wrap_child)
               block.call(element)
               collection << element
             }

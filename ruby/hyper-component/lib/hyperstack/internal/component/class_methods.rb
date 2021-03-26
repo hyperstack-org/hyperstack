@@ -50,7 +50,7 @@ module Hyperstack
         def render(container = nil, params = {}, &block)
           Tags.included(self)
           if container
-            container = container.type if container.is_a? Hyperstack::Component::Element
+            container = container.element_type if container.is_a? Hyperstack::Component::Element
             define_method(:__hyperstack_component_render) do
               __hyperstack_component_select_wrappers do
                 RenderingContext.render(container, params) do

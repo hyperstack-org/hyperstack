@@ -28,7 +28,7 @@ module Hyperstack
             self,
             Hyperstack::Internal::Component::RenderingContext.build do
               Hyperstack::Internal::Component::RenderingContext.render(
-                type, @properties, args, class: haml_class_name(class_name), &new_block
+                element_type, @properties, args, class: haml_class_name(class_name), &new_block
               )
             end
           )

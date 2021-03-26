@@ -11,7 +11,6 @@ describe 'React', js: true do
     end
 
     it "should return false is passed a non React element" do
-
       expect_evaluate_ruby do
         element = Hyperstack::Component::Element.new(JS.call(:eval, "{}"))
         Hyperstack::Component::ReactAPI.is_valid_element?(element)
@@ -35,7 +34,7 @@ describe 'React', js: true do
           ELEMENT = Hyperstack::Component::ReactAPI.create_element('div') { "lorem ipsum" }
         end
         expect_evaluate_ruby("Hyperstack::Component::ReactAPI.is_valid_element?(ELEMENT)").to eq(true)
-        expect_evaluate_ruby("ELEMENT.props.children").to eq("lorem ipsum")
+        expect_evaluate_ruby("ELEMENT.children").to eq("lorem ipsum")
       end
 
       it "should create a valid element with children as array when block yield Array of element" do
@@ -46,7 +45,7 @@ describe 'React', js: true do
           end
         end
         expect_evaluate_ruby("Hyperstack::Component::ReactAPI.is_valid_element?(ELEMENT)").to eq(true)
-        expect_evaluate_ruby("ELEMENT.props.children.length").to eq(3)
+        expect_evaluate_ruby("ELEMENT.children.length").to eq(3)
       end
 
       it "should render element with children as array when block yield Array of element" do
@@ -88,7 +87,7 @@ describe 'React', js: true do
           true
         end
         expect_evaluate_ruby("INSTANCE.props[:children].is_a?(Array)").to be_falsy
-        expect_evaluate_ruby("INSTANCE.props[:children][:type]").to eq("span")
+        expect_evaluate_ruby("INSTANCE.props[:children].type").to eq("span")
       end
 
       it "should render element with more than one children correctly" do
@@ -116,7 +115,7 @@ describe 'React', js: true do
             param :foo
           end
           element = Hyperstack::Component::ReactAPI.create_element(Foo, foo: "bar")
-          element.props.foo
+          element.props[:foo]
         end.to eq("bar")
       end
 
@@ -180,7 +179,7 @@ describe 'React', js: true do
 
         expect_evaluate_ruby do
           element = Hyperstack::Component::ReactAPI.create_element("div", class_name: "foo")
-          element.props.className
+          element.props[:className]
         end.to eq("foo")
       end
 
@@ -188,7 +187,7 @@ describe 'React', js: true do
 
         expect_evaluate_ruby do
           element = Hyperstack::Component::ReactAPI.create_element("div", foo: "bar")
-          element.props.foo
+          element.props[:foo]
         end.to eq("bar")
       end
 
@@ -196,7 +195,7 @@ describe 'React', js: true do
 
         expect_evaluate_ruby do
           element = Hyperstack::Component::ReactAPI.create_element("div", foo_bar: "foo")
-          element.props.foo_bar
+          element.props[:foo_bar]
         end.to eq("foo")
       end
     end
@@ -206,7 +205,7 @@ describe 'React', js: true do
 
         expect_evaluate_ruby do
           element = Hyperstack::Component::ReactAPI.create_element("div", class_name: "foo bar")
-          element.props.className
+          element.props[:className]
         end.to eq("foo bar")
       end
     end

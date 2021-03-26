@@ -19,11 +19,16 @@ module Hyperstack
             raise NotQuiet.new("#{component} is waiting on resources")
           end
 
+          def render_string(string)
+            @buffer ||= []
+            @buffer << string
+          end
+
           def render(name, *args, &block)
             was_outer_most = !@not_outer_most
             @not_outer_most = true
             remove_nodes_from_args(args)
-            @buffer ||= [] unless @buffer
+            @buffer ||= [] #unless @buffer
             if block
               element = build do
                 saved_waiting_on_resources = nil #waiting_on_resources  what was the purpose of this its used below to or in with the current elements waiting_for_resources
@@ -200,10 +205,10 @@ class Object
   def br
     # see above comment
     return send(:br) if respond_to?(:hyper_component?) && hyper_component?
-
-    Hyperstack::Internal::Component::RenderingContext.render(:span) do
-      Hyperstack::Internal::Component::RenderingContext.render(to_s)
-      Hyperstack::Internal::Component::RenderingContext.render(:br)
+    
+    Hyperstack::Internal::Component::RenderingContext.render(Hyperstack::Internal::Component::Tags::FRAGMENT) do
+      Hyperstack::Internal::Component::RenderingContext.render(Hyperstack::Internal::Component::Tags::FRAGMENT) { to_s }
+      Hyperstack::Internal::Component::RenderingContext.render(Hyperstack::Internal::Component::Tags::BR)
     end
   end
 

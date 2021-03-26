@@ -107,7 +107,7 @@ describe 'the React DSL', js: true do
     end
     expect(
       find(
-        'div[data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent"] div.foo span'
+        'div[data-react-class="Hyperstack.Internal.Component.TopLevelRailsComponent"] div.foo'
       )['innerHTML']
     ).to eq 'hello<br>'
   end
@@ -238,22 +238,22 @@ describe 'the React DSL', js: true do
     expect(page.body[-60..-19]).to include('<span class="the-class">hello</span>')
   end
 
-  it "can generate a unrendered node using the .as_node method" do          # DIV { "hello" }.as_node
+  it "can generate a unrendered node using the ~ operator" do
     mount 'Foo' do
       class Foo
         include Hyperstack::Component
         render do
-          SPAN(data: {size: 12}) { "hello".span.as_node.class.name }.as_node.render
+          (~SPAN(data: {size: 12}) { (~"hello".span).class.name }).render
         end
       end
     end
     expect(page.body[-80..-19]).to include('<span data-size="12">Hyperstack::Component::Element</span>')
   end
 
-  it "the delete method (alias as_node) removes the node from the render buffer" do
+  it "~ operator removes the node from the render buffer" do
     mount 'Foo' do
       class Foo < Hyperloop::Component
-        render { "hello".span; "goodby".span.delete }
+        render { "hello".span; ~"goodby".span }
       end
     end
     expect(find('span').text).to eq('hello')
