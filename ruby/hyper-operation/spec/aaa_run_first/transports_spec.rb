@@ -95,7 +95,8 @@ end
           config.opts = {
             app_id: Pusher.app_id,
             key: Pusher.key,
-            secret: Pusher.secret
+            secret: Pusher.secret,
+            use_tls: false
           }.merge(PusherFake.configuration.web_options)
         end
       end

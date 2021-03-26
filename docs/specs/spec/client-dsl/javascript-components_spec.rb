@@ -100,4 +100,27 @@ describe "interfacing to javascript components", :js do
     page.send_keys 'hello'
     expect(find('input#text_2').value).to eq 'hello'
   end
+
+  it "passing an element" do
+    mount "App" do
+      class Reveal < HyperComponent
+        param :content
+        render do
+          BUTTON { "#{@show ? 'hide' : 'show'} me" }
+          .on(:click) { mutate @show = !@show }
+          content.render if @show
+        end
+      end
+      class App < HyperComponent
+        render do
+          Reveal(content: ~DIV { 'I came from the App' })
+        end
+      end
+    end
+    expect(find('button').text).to eq 'show me'
+    expect(page).not_to have_content('I cam from the App')
+    find('button').click
+    expect(find('button').text).to eq 'hide me'
+    expect(page).to have_content('I cam from the App')
+  end
 end

@@ -23,7 +23,7 @@ describe "relationship permissions" do#, dont_override_default_scope_permissions
     Hyperstack.configuration do |config|
       config.transport = :pusher
       config.channel_prefix = "synchromesh"
-      config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret}.merge(PusherFake.configuration.web_options)
+      config.opts = {app_id: Pusher.app_id, key: Pusher.key, secret: Pusher.secret, use_tls: false}.merge(PusherFake.configuration.web_options)
     end
 
   end
