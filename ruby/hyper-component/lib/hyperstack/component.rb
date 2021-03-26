@@ -1,7 +1,6 @@
 require 'hyperstack/ext/component/string'
 require 'hyperstack/ext/component/hash'
 require 'active_support/core_ext/class/attribute'
-require 'hyperstack/internal/auto_unmount'
 require 'hyperstack/internal/component/rendering_context'
 require 'hyperstack/internal/component'
 require 'hyperstack/internal/component/instance_methods'

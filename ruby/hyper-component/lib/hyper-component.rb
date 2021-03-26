@@ -1,6 +1,5 @@
 require 'hyperstack/internal/component'
 
-Hyperstack.import    'hyper-state'
 Hyperstack.js_import 'react/react-source-browser', client_only: true, defines: %w[ReactDOM React]
 Hyperstack.js_import 'react/react-source-server', server_only: true, defines: 'React'
 Hyperstack.import    'browser/delay', client_only: true
@@ -39,6 +38,7 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/component/version'
 else
   require 'opal'
+  require 'hyper-state'
   require 'opal-activesupport'
   require 'hyperstack/component/version'
   require 'hyperstack/internal/component/rails'
