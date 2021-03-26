@@ -66,7 +66,7 @@ Having an application wide `HyperComponent` class allows you to modify component
 > This is just a convention.  Any class that includes the `Hyperstack::Component` module can be used as a Component.  You also do not have
 to name it `HyperComponent`.  For example some teams prefer `ApplicationComponent` more closely following the
 Rails convention.  If you use a different name for this class be sure to set the `Hyperstack.component_base_class` setting so the
-Rails generators will use the proper name when generating your components.  **[more details...](/rails-installation/generators.md#specifying-the-base-class)**
+Rails generators will use the proper name when generating your components.  **[more details...](../rails-installation/generators.md#specifying-the-base-class)**
 
 ### Abstract and Concrete Components
 
