@@ -1,7 +1,5 @@
 # Welcome
 
-## Hyperstack
-
 Hyperstack is a Ruby-based DSL and modern web toolkit for building spectacular, interactive web applications fast!
 
 * **One language** throughout the client and server. All Ruby code is compiled by [Opal](https://opalrb.com/) into JavaScript automatically.
@@ -23,11 +21,14 @@ end
 
 In the code above, if the `good_books` scope changed \(even on the server\), the UI would update automatically. That's the magic of React and Isomorphic Models with bi-directional data at work!
 
-## Website and documentation
+## Website and Documentation
 
-* Website: [hyperstack.org](https://hyperstack.org)
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
 
-Our website serves as a Hyperstack example application. All the doc content is loaded dynamically from this repo and converted to HTML on the fly. It uses React Semantic UI and a client-side JavaScript full-text search engine. Its a Rails app hosted on Heroku.
+While we have over 1000 specs passing, in 3 different configurations, and several large apps using Hyperstack, documentation is a lagging.  If you see this icon it means we are working hard to
+get the docs up to the same state as the code.
+
+Chapters without the work-in-progress flag, are still draft, and any issues are greatly appreciated, or better yet follow the `Edit on Github` link make your propsed corrections, and submit a pull request.
 
 ## Setup and installation
 
@@ -45,9 +46,9 @@ Hyperstack is supported by a friendly, helpful community, both for users, and co
 
 ## Roadmap
 
-Hyperstack is evolving; we are improving it all the time. As much as we love Ruby today, we see ourselves embracing new languages in the future. [Crystal](https://crystal-lang.org/) perhaps? We are also watching [Wasm](https://webassembly.org/) carefully.
+We are currently driving towards our 1.0 release.  Currently we are at 1.0.alpha1.5 release candidate.  There is a list of 163 open issues including some bugs, many requested enhancements.  The plan is to triage the issues, and do a weekly release until the issues are closed as deemed not needed for a 1.0 release.  
 
-Please see the [ROADMAP](https://github.com/hyperstack-org/hyperstack/blob/edge/ROADMAP.md) for more information.
+Please consider contributing by grabbing a "good first issue", or just adding your thoughts, thumbs up, or down on any issues that interest you.
 
 ## Contributing
 

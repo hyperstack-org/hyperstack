@@ -1,6 +1,9 @@
-# Isomorphic Models
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
+HyperModel extends Rails ActiveRecord models so that you have direct access to them on the client, using the same ActiveRecord classes and methods as you
+would on the server.  Nothing new to learn, or configure, just plug in and go.
 
-**Work in progress - ALPHA \(docs and code\)**
+## This Page Under Construction
+
 
 In Hyperstack, your ActiveRecord Models are available in your Isomorphic code.
 
@@ -694,4 +697,3 @@ You can of course simulate server side changes to your Models through this conso
 * **On page load you get a message about super class mismatch for `DummyValue`** You are still have the old `reactive-record` gem in your Gemfile, remove it from your gemfile and your components manifest.
 * **On page load you get a message about no method `session` for `nil`** You are still referencing the old reactive-ruby or reactrb gems either directly or indirectly though a gem like reactrb-router. Replace any gems like `reactrb-router` with `hyper-router`. You can also just remove `reactrb`, as `hyper-model` will be included by the `hyper-model` gem.
 * **You keep seeing the message `WebSocket connection to 'ws://localhost:3000/cable' failed: WebSocket is closed before the connection is established.`** every few seconds in the console. There are probably lots of reasons for this, but it means ActionCable can't get itself going. One reason is that you are trying to run with Passenger instead of Puma, and trying to use `async` mode in cable.yml file. `async` mode requires Puma.
-

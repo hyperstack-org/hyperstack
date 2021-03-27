@@ -1,9 +1,5 @@
 # TodoMVC Tutorial Part I
 
-todo\# TodoMVC Tutorial
-
-_Based on Ruby on Rails 5.2.x_
-
 ## Prerequisites
 
 * Linux or Mac system  
@@ -1002,5 +998,4 @@ end
 
 3: Its possible to get things so messed up the hot-reloader will not work. Restart the server and reload the browser.
 
-4: Reach out to us on Gitter, we are always happy to help get you onboarded!
-
+4: Reach out to us on Slack, we are always happy to help get you onboarded!

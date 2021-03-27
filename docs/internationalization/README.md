@@ -1,10 +1,7 @@
-# Internationalization
-
-## HyperI18n
-
-**Work in progress - ALPHA \(docs and code\)**
-
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
 HyperI18n seamlessly brings Rails I18n into your Hyperstack application.
+
+## This Page Under Construction
 
 ## Installation and Setup
 
@@ -13,10 +10,6 @@ HyperI18n seamlessly brings Rails I18n into your Hyperstack application.
 1. Add `gem 'hyper-i18n', git: 'https://github.com/ruby-Hyperstack/hyper-i18n.git'` to your `Gemfile`
 2. Install the Gem: `bundle install`
 3. Add `require 'hyper-i18n'` to your components manifest
-
-## Note!
-
-This gem is in it's very early stages, and only a handful of the API has been implemented. Contributions are very welcome!
 
 ### Usage
 
@@ -71,4 +64,3 @@ end
 ### Server Rendering
 
 HyperI18n is fully compatible with server rendering! All translations are also sent to the client, so as to bypass fetching/rendering again on the client.
-

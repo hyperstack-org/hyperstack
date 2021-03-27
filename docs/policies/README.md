@@ -1,8 +1,9 @@
-# Policies
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
+**Your data is protected by Hyperstack's policy mechanism.  Policies regulate Create, Read/Broadcast, Update and Delete access based on the browsers logged in
+user.  You define in one set of files what data can be seen by who, and who can update the database**
 
-**WORK IN PROGRESS DOCS**
+## This Page Under Construction
 
-## Authorization
 
 Access to your Isomorphic Models is controlled by _Policies_ that describe how the current _acting\_user_ and _channels_ may access your Models.
 

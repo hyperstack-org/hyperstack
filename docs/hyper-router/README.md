@@ -1,6 +1,12 @@
-# Client-side Routing
 
-HyperRouter is a DSL wrapper for [ReactRouter v4.x](https://github.com/ReactTraining/react-router) to provide client-side routing for Single Page Applications (SPA).
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
+**HyperRouter is a DSL wrapper for [ReactRouter v4.x](https://github.com/ReactTraining/react-router) to provide
+client-side routing for Single Page Applications (SPA).  As the user changes "pages" instead of reloading from the server your App will mount
+different components.**
+
+## This Page Under Construction
+
+
 
 ## Usage
 

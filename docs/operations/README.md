@@ -1,8 +1,8 @@
-# Isomorphic Operations
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
+HyperOperations are HyperStack's implementation of Service Objects based on Trailblazer Operations.  Operations can be used on the client, the server, or can act like a remote procedure call mechanism communicating between the client and the server.
 
-**Work in progress - ALPHA \(docs and code\)**
+## This Page Under Construction
 
-Operations are Hyperstack's implementation of Service Object which is...
 
 > "A class that performs an action" [A simple explanation of Service Objects for Ruby on Rails](https://medium.freecodecamp.org/service-objects-explained-simply-for-ruby-on-rails-5-a8cc42a5441f)
 
@@ -1060,4 +1060,3 @@ The design of Hyperstack's Operations have been inspired by three concepts: [Tra
 | Action Data | Hyperstack::Operation parameters |
 | Dispatcher | `Hyperstack::Operation#dispatch` method |
 | Registering a Store | `Store.receives` |
-

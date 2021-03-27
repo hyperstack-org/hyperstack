@@ -1,24 +1,29 @@
-# Debugging
+Debugging any UI code is difficult.  Hyperstack's declarative approach, and lack of redundant boilerplate helps a lot.  Simply having 1/4 the code base
+to deliver the same functionality is going to make things easier.
 
-**Work in progress - ALPHA \(docs and code\)**
+However all that said, **Debugging UI Code is Difficult.**  The UI's main job is to deal with events coming from multiple directions and unpredictable sources, this makes tracking down failures difficult as timing can become an issue.
 
-## Debugging tips
-
-Tips, good practice will help you debugging your Hyperstack application.
+Here are few tips to go along with the other tools in this section (HyperSpec and HyperTrace) to make your life a bit easier.
 
 ### JavaScript Console
 
-At any time during program execution you can breakout into the JavaScript console by simply adding a line of back-ticked JavaScript to your ruby code:
+At any time during program execution you can breakout into the JavaScript console by simply adding the debugger keyword to your Ruby code.
 
-`debugger;`
+If you have source maps turned on you will then be able to see your ruby code \(and the compiled JavaScript code\) and set browser breakpoints, examine values and continue execution.
 
-If you have source maps turned on you will then be able to see your ruby code \(and the compiled JavaScript code\) and set browser breakpoints, examine values and continue execution. See Opal Source Maps if you are not seeing source maps.
+> Important Note:  The Opal compiler will not handle the `debugger` keyword at the end of blocks, method definitions, or begin..end statements.  
+```ruby
+def buggy_method
+  ...
+  debugger # this will break add any expression on the next line to fix
+end
+```
 
-You can also inspect ruby objects from the JavaScript console.
+You can also inspect Ruby objects from the JavaScript console.  The mapping between the Javascript and Ruby is fairly easy to follow thanks to the great Opal team.
 
 Here are some tips: [https://dev.mikamai.com/2014/11/19/3-tricks-to-debug-opal-code-from-your-browser/](https://dev.mikamai.com/2014/11/19/3-tricks-to-debug-opal-code-from-your-browser/)
 
-### Puts is your friend
+### The `puts` method is your friend
 
 Anywhere in your HyperReact code you can simply puts any\_value which will display the contents of the value in the browser console. This can help you understand React program flow as well as how data changes over time.
 
@@ -51,3 +56,15 @@ class Thing < Hyperstack::Component
 end
 ```
 
+### HyperTrace
+
+Sometimes popping in a trace can reveal a lot about what is going on.  [HyperTrace](hyper-trace.md) wraps your selected method calls in
+a dump of incoming parameters, instance variable state, and return values.  You can also setup conditional
+breakpoints.  So keep HyperTrace handy in your tool belt.
+
+### HyperSpec
+
+IMHO the best debugging tool is a spec.  As soon as you start creating a new feature, or find a bug, start
+writing a spec.  Once you can reproduce the problem by running a spec, you are 90% of the way to fixing the problem,
+and you will have another spec to add to your tests, making your app more robust.  [HyperSpec](hyper-spec/README.md) extends RSpec so that
+can control and interrogate the client from within your specs, using Ruby code.
