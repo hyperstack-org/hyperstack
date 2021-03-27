@@ -147,7 +147,7 @@ Besides the UI there are several other sources of events:
 The way you receive events from these sources depends on the event.  Typically though the method will either take a block, or callback proc, or in many cases will return a Promise.
 Regardless the event handler will do one of three things:  mutate some state within the component, fire an event to a higher level component, or update some shared store.
 
-> For details on updating shared stores, which is often the best answer **[see the chapter on HyperState...](../hyper-state.md)**
+> For details on updating shared stores, which is often the best answer **[see the chapter on HyperState...](../hyper-state/README.md)**
 
 You have seen the `every` method used to create events throughout this chapter, here is an example with an HTTP post (which returns a promise.)
 
