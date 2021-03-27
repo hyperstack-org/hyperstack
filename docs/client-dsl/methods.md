@@ -5,7 +5,7 @@ class.  You may also use any other Ruby constructs such as method definition as
 you would in any Ruby class.
 
 **Interface Definition**
-These methods define the signature of the components params.
+These methods define the signature of the component's params.
 + `param(*args)` - specifies params and creates accessor methods
 + `fires(name, alias: internal_name)` - specifies an event call-back
 + `others(name)` accessor method that collects all params not otherwise specified
@@ -27,16 +27,16 @@ define multiple handlers for each callback.
 + `rescues(*klasses_to_rescue, &block)`
 
 **State Management**
-Each component instance has internal state represented by the contents of instance variables,
-changes to the state is signaled using the instance `mutate` method.  The following methods
-define instance methods that access state with builtin calls to the mutate method.
+Each component instance has internal state represented by the contents of instance variables:
+changes to the state is signaled using the `mutate` method.  The following methods
+define additional instance methods that access state with built-in calls to the mutate method.
 + `mutator` defines an *instance* method with a built-in mutate.
 + `state_reader` creates an *instance* state read only accessor method.
 + `state_writer` creates an *instance* state write only accessor method.
 + `state_accessor` creates *instance* reader and writer methods.
 
 **Other Class Level Methods**
-+ `mounted_components` - returns array of all currently mounted components of this class and subclasses
++ `mounted_components` - returns an array of all currently mounted components of this class and subclasses
 + `force_update!` forces all components in this class and its subclasses to update
 + `create_element(*params, &children)` - create an element from this class
 + `insert_element(*params, &children)` - create and insert an element into the rendering buffer

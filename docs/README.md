@@ -25,10 +25,10 @@ In the code above, if the `good_books` scope changed \(even on the server\), the
 
 <img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true">
 
-While we have over 1000 specs passing, in 3 different configurations, and several large apps using Hyperstack, documentation is a lagging.  If you see this icon it means we are working hard to
+While we have over 1000 specs passing in 3 different configurations, and several large apps using Hyperstack, documentation is lagging.  If you see this icon it means we are working hard to
 get the docs up to the same state as the code.
 
-Chapters without the work-in-progress flag, are still draft, and any issues are greatly appreciated, or better yet follow the `Edit on Github` link make your propsed corrections, and submit a pull request.
+Chapters without the work-in-progress flag are still draft, and any issues are greatly appreciated, or better yet follow the `Edit on Github` link, make your proposed corrections, and submit a pull request.
 
 ## Setup and installation
 
@@ -46,7 +46,7 @@ Hyperstack is supported by a friendly, helpful community, both for users, and co
 
 ## Roadmap
 
-We are currently driving towards our 1.0 release.  Currently we are at 1.0.alpha1.5 release candidate.  There is a list of 163 open issues including some bugs, many requested enhancements.  The plan is to triage the issues, and do a weekly release until the issues are closed as deemed not needed for a 1.0 release.  
+We are currently driving towards our 1.0 release.  Currently we are at 1.0.alpha1.5 release candidate.  There is a list of 163 open issues including some bugs, documentation issues and many requested enhancements.  The plan is to triage the issues and do a weekly release until the issues are closed or deemed not needed for a 1.0 release.  
 
 Please consider contributing by grabbing a "good first issue", or just adding your thoughts, thumbs up, or down on any issues that interest you.
 
@@ -54,8 +54,6 @@ Please consider contributing by grabbing a "good first issue", or just adding yo
 
 In general, if you would like to help in any way, please read the [CONTRIBUTING](https://github.com/hyperstack-org/hyperstack/blob/edge/CONTRIBUTING.md) file for suggestions.  
 System setup for the development of Hyperstack itself is documented in this file.
-
-More specifically, we have a [Feature Matrix](https://github.com/hyperstack-org/hyperstack/blob/edge/docs/feature_matrix.md) that needs to be filled with missing features. The idea is that you can check here what the implementation status is of a Ruby \(on Rails\) feature. And if you have the time and skill you're more then encouraged to implement or fix one or two. But if you're not in a position to contribute code, just expanding and maintaining this table would be excellent.
 
 ## Links
 

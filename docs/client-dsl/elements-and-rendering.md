@@ -13,14 +13,14 @@ The only major difference between the systems is that JSX compiles directly to R
 As each React element is generated it is stored by Hyperstack in a *rendering buffer*, and when the component finishes the rendering block, the buffer is returned as the result of the components render callback.  If the expression has a child block (like `DIV { 'hello' }`) the block is passed to the `createElement` as a the child function the same
 as JSX would do.
 
-When an expression like this is evaluated (**[see the full example in the section on params...](/params#named-child-components-as-params)**)
+When an expression like this is evaluated (**[see the full example in the section on params...](../params#named-child-components-as-params)**)
 ```ruby
   Reveal(content: DIV { 'I came from the App' })
 ```
 we need to *remove* the generated `DIV` element *out* of the rendering buffer before passing it to `Reveal`.  This is done automatically by applying the `~` (remove) operator to the
 `DIV` as it is passed on.
 
-In general will never have to manually use the remove (`~`) operator, as React's declarative nature makes storing elements for later use not as helpful in more
+In general you will never have to manually use the remove (`~`) operator, as React's declarative nature makes storing elements for later use not as necessary as in more
 procedural frameworks.
 
 #### Creating Elements Programmatically

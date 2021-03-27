@@ -84,6 +84,7 @@ class App < HyperComponent
   end
 end
 ```
+[see the spec...](https://github.com/hyperstack-org/hyperstack/blob/24131990ea1cdacfc9efc328d4994a7c2d86a0f4/docs/specs/spec/client-dsl/params_spec.rb#L4-L25)
 
 `render` is used to render the child components. **[For details ...](component-details.md#rendering-children)**
 
@@ -163,7 +164,7 @@ end
 Even though we have not gotten to event handlers yet, you can see what is going on:  When we click the update button we call `force_update!`
 which will force the `App` component to rerender.
 > By the way `force_update!` is almost never used, but we are using it here
-just to make the example clear.)
+just to make the example clear.  Its also one of the reasons this example gets into trouble. Read on!
 
 Will `Comp2` rerender?  No - because even though we are creating a new hash, the old hash and new hash are equal in value.
 
@@ -194,5 +195,5 @@ So when we compare *old* verses *new* we are comparing the same object, so the v
 
 That does not seem like a very happy ending, but the case we used was not very realistic.  If you stick to passing simple scalars, or hashes and arrays
 whose values don't change after they have been passed, things will work fine.  And for situations where you do need to store and
-manipulate complex data, you can use the **[the Hyperstack::Observable module](/hyper-state/README.md)** to build safe classes that don't
+manipulate complex data, you can use the **[the Hyperstack::Observable module](../hyper-state/README.md)** to build safe classes that don't
 have the problems seen above.

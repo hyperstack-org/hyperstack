@@ -653,7 +653,7 @@ end
 
 All states in Hyperstack are simply Ruby instance variables \(ivars for short which are variables with a leading @\). Here we use the `@editing` ivar.
 
-We have already used a lot of states that are built into the HyperModel and HyperRouter. The states of these components are built out collections of instance variables like `@editing`.
+We have already used a lot of states that are built into the HyperModel and HyperRouter. The states of these components are built out of collections of instance variables like `@editing`.
 
 In the `TodoItem` component the value of `@editing` controls whether to render the `EditItem` or the INPUT, LABEL, and Anchor tags.
 

@@ -38,7 +38,7 @@ end
 
 To create a component instance, you reference its class name as a method call from another component. This creates a new instance, passes any parameters and proceeds with the component lifecycle.
 
-> **[The actual type created is an Element read on for details...](/notes.html#component_instances)**
+> **[The actual type created is an Element read on for details...](notes.md#component-instances)**
 
 ```ruby
 class FirstComponent < HyperComponent
@@ -80,7 +80,7 @@ Components can receive new params, causing the component to update.  **[More on 
 
 ## Component State
 
-Component also have *state*, which is stored in instance variables.  You signal a state change using the `mutate` method. Component state is a fundamental concept covered **[here](state.md)**.
+Components also have *state*, which is stored in instance variables.  You signal a state change using the `mutate` method. Component state is a fundamental concept covered **[here](state.md)**.
 
 
 ## Life Cycle Callbacks
@@ -101,7 +101,7 @@ class Clock < HyperComponent
 end
 ```
 
-The complete list of life cycle methods and their syntax is discussed in detail in the **[Lifecycle Methods](/lifecycle-methods)** section.
+The complete list of life cycle methods and their syntax is discussed in detail in the **[Lifecycle Methods](lifecycle-methods.md)** section.
 
 ## Events, Event Handlers, and Component Callbacks
 

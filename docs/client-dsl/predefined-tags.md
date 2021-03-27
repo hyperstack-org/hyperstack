@@ -38,4 +38,4 @@ TEXT TSPAN
 ```
 #### The FRAGMENT Tag
 
-The `FRAGMENT` tag is used to return multiple *static* children from a component or block.  The only valid param to `FRAGMENT` is `key`.  See the **[React documentation](https://reactjs.org/docs/fragments.html)** for more details.  If render block returns dynamic children that will change in number and order, each child should be assigned a unique key, and the FRAGMENT tag does not have to be used.
+The `FRAGMENT` tag is used to return multiple *static* children from a component or block.  The only valid param to `FRAGMENT` is `key`.  See the **[React documentation](https://reactjs.org/docs/fragments.html)** for more details.  If a render block returns dynamic children that will change in number and order, each child should be assigned a unique key, and the FRAGMENT tag does not have to be used.

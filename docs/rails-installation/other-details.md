@@ -64,7 +64,7 @@ Rails.application.routes.draw do
   ...
 ```
 
-To directly route from a URL to a component you can use the builting Hyperstack
+To directly route from a URL to a component you can use the builtin Hyperstack
 controller with a route like this:
 
 ```ruby

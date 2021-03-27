@@ -295,3 +295,20 @@ You may also turn off the autoimport function if necessary in your `hyperstack.r
 # do not use the auto-import module
 Hyperstack.cancel_import    'hyperstack/component/auto-import'
 ```
+
+### The Enter Event
+```ruby
+class YouSaid < HyperComponent
+  state_accessor :value
+  render(DIV) do
+    INPUT(value: value)
+    .on(:enter) do
+      alert "You said: #{value}"
+      self.value = ""
+    end
+    .on(:change) do |e|
+      self.value = e.target.value
+    end
+  end
+end
+```

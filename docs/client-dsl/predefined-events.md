@@ -21,49 +21,54 @@ H1(class: :cursor_hand) { 'Click me' }.on(:click) { do_something }
 Event handlers can be chained like so
 
 ```ruby
-INPUT ... do
+  INPUT ... do
   ...
   end.on(:key_up) do |e|
   ...
   end.on(:change) do |e|
   ...
-end
+  end
 ```
 
 ### Event Handling and Synthetic Events
 
-With React you attach event handlers to elements using the `on` method. React ensures that all events behave identically in IE8 and above by implementing a synthetic event system. That is, React knows how to bubble and capture events according to the spec, and the events passed to your event handler are guaranteed to be consistent with [the W3C spec](http://www.w3.org/TR/DOM-Level-3-Events/), regardless of which browser you're using.
+The React engine ensures that all events behave identically in IE8 and above by implementing a synthetic event system. That is, React knows how to bubble and capture events according to the spec, and the events passed to your event handler are guaranteed to be consistent with [the W3C spec](http://www.w3.org/TR/DOM-Level-3-Events/), regardless of which browser you're using.
 
 ### Under the Hood: Event Delegation
 
-React doesn't actually attach event handlers to the nodes themselves. When React starts up, it starts listening for all events at the top level using a single event listener. When a component is mounted or unmounted, the event handlers are simply added or removed from an internal mapping. When an event occurs, React knows how to dispatch it using this mapping. When there are no event handlers left in the mapping, React's event handlers are simple no-ops. To learn more about why this is fast, see [David Walsh's excellent blog post](http://davidwalsh.name/event-delegate).
+React doesn't actually attach event handlers to the nodes themselves. When React starts up, it starts listening for all events at the top level using a single event listener. When a component is mounted or unmounted, the event handlers are simply added or removed from an internal mapping. When an event occurs, React knows how to dispatch it using this mapping. When there are no event handlers left in the mapping, React's event handlers are simple no-ops. To learn more about why this is fast, see **[David Walsh's excellent blog post ...](http://davidwalsh.name/event-delegate).**
 
 ### React::Event
 
-Your event handlers will be passed instances of `React::Event`, a wrapper around react.js's `SyntheticEvent` which in turn is a cross browser wrapper around the browser's native event. It has the same interface as the browser's native event, including `stopPropagation()` and `preventDefault()`, except the events work identically across all browsers.
+Your event handlers will be passed instances of `Hyperstack::Component::Event`, a wrapper around react.js's `SyntheticEvent` which in turn is a cross browser wrapper around the browser's native event. It has the same interface as the browser's native event, including `stop_propagation()` and `prevent_default()`, except the events work identically across all browsers.
 
 For example:
 
 ```ruby
 class YouSaid < HyperComponent
-
+  state_accessor :value
   render(DIV) do
-    INPUT(value: state.value).
-    on(:key_down) do |e|
-      alert "You said: #{state.value}" if e.key_code == 13
-    end.
-    on(:change) do |e|
-      @mutate value = e.target.value
+    INPUT(value: value)
+    .on(:key_down) do |e|
+      next unless e.key_code == 13
+
+      alert "You said: #{value}"
+      self.value = ""
+    end
+    .on(:change) do |e|
+      self.value = e.target.value
     end
   end
 end
 ```
 
-If you find that you need the underlying browser event for some reason use the `native_event`.
+> Hyperstack also includes an `enter` event that fires on key_down **when** the key_code == 13.  **[See that version here ...](notes.md#the-enter-event)**
+
+If you find that you need the underlying browser event for some reason use the `native_event` method (i.e. `evt.native_event`).
 
 In the following responses shown as \(native ...\) indicate the value returned is a native object with an Opal wrapper. In some cases there will be opal methods available \(i.e. for native DOMNode values\) and in other cases you will have to convert to the native value with `.to_n` and then use javascript directly.
 
-Every `React::Event` has the following methods:
+Every `Event` has the following methods:
 
 ```ruby
 bubbles                -> Boolean
@@ -84,11 +89,8 @@ type                   -> String
 
 ### Event pooling
 
-The underlying React `SyntheticEvent` is pooled. This means that the `SyntheticEvent` object will be reused and all properties will be nullified after the event method has been invoked. This is for performance reasons. As such, you cannot access the event in an asynchronous way.
-
-### Supported Events
-
-React normalizes events so that they have consistent properties across different browsers.
+The underlying React `SyntheticEvent` is pooled. This means that the `SyntheticEvent` object will be reused and all properties will be nullified after the event method has been invoked. This is for performance reasons. As such, you cannot access the event in an asynchronous way - don't store the whole event and
+think you can use it later after you ate breakfast.
 
 ### Clipboard Events
 
@@ -202,21 +204,21 @@ shift_key               -> Boolean
 
 ### Drag and Drop example
 
-Here is a Hyperstack version of this [w3schools.com](https://www.w3schools.com/html/html5_draganddrop.asp) example:
+Here is a Hyperstack version of this **[w3schools.com](https://www.w3schools.com/html/html5_draganddrop.asp)** example:
 
 ```ruby
-DIV(id: "div1", style: {width: 350, height: 70, padding: 10, border: '1px solid #aaaaaa'})
-  .on(:drop) do |ev|
-    ev.prevent_default
-    data = `#{ev.native_event}.native.dataTransfer.getData("text")`
-    `#{ev.target}.native.appendChild(document.getElementById(data))`
-  end
-  .on(:drag_over) { |ev| ev.prevent_default }
+DIV(id: :div1, style: { width: 350, height: 70, padding: 10, border: '1px solid #aaaaaa' })
+.on(:drop) do |evt|
+  evt.prevent_default
+  data = `#{evt.native_event}.native.dataTransfer.getData("text")`
+  `#{evt.target}.native.appendChild(document.getElementById(data))`
+end
+.on(:drag_over, &:prevent_default)
 
-IMG(id: "drag1", src: "https://www.w3schools.com/html/img_logo.gif", draggable: "true", width: 336, height: 69)
-  .on(:drag_start) do |ev|
-    `#{ev.native_event}.native.dataTransfer.setData("text", #{ev.target}.native.id)`
-  end
+IMG(id: :drag1, src: "https://www.w3schools.com/html/img_logo.gif", draggable: "true", width: 336, height: 69)
+.on(:drag_start) do |evt|
+  `#{evt.native_event}.native.dataTransfer.setData("text", #{evt.target}.native.id)`
+end
 ```
 
 ### Selection events

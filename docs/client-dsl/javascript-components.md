@@ -2,9 +2,9 @@
 
 Hyperstack gives you full access to the entire universe of JavaScript libraries and components directly within your Ruby code.
 
-Everything you can do in JavaScript is simple to do in Opal-Ruby; this includes passing parameters between Ruby and JavaScript and even passing Ruby methods as JavaScript callbacks. See the JavaScript section for more information.
+Everything you can do in JavaScript is simple to do in Opal-Ruby; this includes passing parameters between Ruby and JavaScript and even passing Ruby methods as JavaScript callbacks.
 
-> **[For more information on writing Javascript within your Ruby code...](/notes.md#Javascript)**
+> **[For more information on writing Javascript within your Ruby code...](notes.md#javascript)**
 
 ## Importing Javascript or React Libraries
 
@@ -64,7 +64,7 @@ Libraries used often with Hyperstack projects:
 
 ### Making Custom Wrappers - WORK IN PROGRESS ...
 
-Hyperstack will automatically import Javascript components and component libraries as discussed above.  Sometimes for
+<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true"> Hyperstack will automatically import Javascript components and component libraries as discussed above.  Sometimes for
 complex libraries that you will use a lot it is useful to add some syntactic sugar to the wrapper.
 
 This can be done using the `imports` directive and the `Hyperstack::Component::NativeLibrary` superclass.
@@ -134,7 +134,7 @@ finally require it in your hyper_component.rb file:
 
 require 'hyperstack/component/jquery'
 ```
-You can access jQuery anywhere in your code using the `Element` or the `jQ` methods.
+You can access jQuery anywhere in your code using the `jQ` method.
 For details see https://github.com/opal/opal-jquery
 
 > Note most of the time you will not need to manipulate the dom directly.

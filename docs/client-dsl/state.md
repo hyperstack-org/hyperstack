@@ -6,7 +6,7 @@ When a component is rendered what it displays depends on some combination of thr
 
 Whenever one of these three things change the component will need to re-render.  In this section we
 discuss how a component's *internal* state is managed within Hyperstack.  Params were covered **[here...](params.md)** and sharing state
-between components will be covered **[here...](/hyper-state.md)**
+between components will be covered **[here...](../hyper-state/README.md)**
 
 The idea of state is built into Ruby and is represented by the *instance* variables of an object instance.
 
@@ -47,7 +47,7 @@ to render and send different params to lower level components, but it begins wit
 ### What Causes State To Mutate?
 
 Right!  Good question!  State is mutated by your code's reaction to some external event.  A button click, text being typed,
-or the arrival of data from the server.  We will cover these in upcoming sections, but once one an event occurs your
+or the arrival of data from the server.  We will cover these in upcoming sections, but once an event occurs your
 code will probably mutate some state as a result, causing component depending on this state to update.
 
 ### Details on the `mutate` Syntax
@@ -112,7 +112,7 @@ Again the advantage is not only less typing but also clarity of code and intenti
 
 ### Sharing State
 
-You can also use and share state at the class level and create "stateful" class libraries.  This is described in the **[chapter on HyperState...](/hyper-state.md)**
+You can also use and share state at the class level and create "stateful" class libraries.  This is described in the **[chapter on HyperState...](../hyper-state/README.md)**
 
 ### The `force_update!` Method
 

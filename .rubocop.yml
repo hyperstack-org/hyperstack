@@ -151,3 +151,7 @@ Layout/MultilineMethodCallIndentation:
   Exclude:
     - 'bin/yarn'
     - app/hyperstack/components
+
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - !ruby/regexp /_spec\.rb$/

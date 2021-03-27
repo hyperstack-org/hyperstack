@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "interfacing to javascript components", :js do
+describe "params", :js do
   it "passing an element" do
     mount "App" do
       class Reveal < HyperComponent
@@ -11,16 +11,17 @@ describe "interfacing to javascript components", :js do
           content.render if @show
         end
       end
+
       class App < HyperComponent
         render do
-          Reveal(content: DIV { 'I came from the App' })
+          Reveal(content: DIV { "I came from the App" })
         end
       end
     end
-    expect(find('button').text).to eq 'show me'
-    expect(page).not_to have_content('I came from the App', wait: 0)
-    find('button').click
-    expect(find('button').text).to eq 'hide me'
-    expect(page).to have_content('I came from the App')
+    expect(find("button").text).to eq "show me"
+    expect(page).not_to have_content("I came from the App", wait: 0)
+    find("button").click
+    expect(find("button").text).to eq "hide me"
+    expect(page).to have_content("I came from the App")
   end
 end

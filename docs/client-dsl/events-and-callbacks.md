@@ -115,14 +115,14 @@ no reason not use the `on` method to attach handlers.  Both will keep your code 
 The notation `on(:click)` is short for passing a proc to a param named `on_click`.  In general `on(:xxx)` will pass the
 given block as the `on_xxx` parameter in a Hyperstack component and `onXxx` in a JS component.  
 
-All the built-in events and many React libraries follow the `on_xxx` (or `onXxx` in JS.)  However even if a library does not use
+All the built-in events and many React libraries follow the `on_xxx` (or `onXxx` in JS) convention. However even if a library does not use
 this convention you can still attach the handler using `on('<name-of-param>')`.  Whatever string is inside the `<..>` brackets will
 be used as the param name.
 
 Likewise the `fires` method is shorthand for creating a `Proc` param following the `on_xxx` naming convention:
 
 `fires :foo` is short for  
-`param :foo, type: Proc, alias: :foo!`
+`param :on_foo, type: Proc, alias: :foo!`
 
 ### The `Event` Object
 
@@ -147,7 +147,7 @@ Besides the UI there are several other sources of events:
 The way you receive events from these sources depends on the event.  Typically though the method will either take a block, or callback proc, or in many cases will return a Promise.
 Regardless the event handler will do one of three things:  mutate some state within the component, fire an event to a higher level component, or update some shared store.
 
-> For details on updating shared stores, which is often the best answer **[see the chapter on HyperState...](/hyper-state.md)**
+> For details on updating shared stores, which is often the best answer **[see the chapter on HyperState...](../hyper-state.md)**
 
 You have seen the `every` method used to create events throughout this chapter, here is an example with an HTTP post (which returns a promise.)
 
