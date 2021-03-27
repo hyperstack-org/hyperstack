@@ -13,7 +13,7 @@ The only major difference between the systems is that JSX compiles directly to R
 As each React element is generated it is stored by Hyperstack in a *rendering buffer*, and when the component finishes the rendering block, the buffer is returned as the result of the components render callback.  If the expression has a child block (like `DIV { 'hello' }`) the block is passed to the `createElement` as a the child function the same
 as JSX would do.
 
-When an expression like this is evaluated (**[see the full example in the section on params...](../params.md#named-child-components-as-params)**)
+When an expression like this is evaluated (**[see the full example in the section on params...](params.md#named-child-components-as-params)**)
 ```ruby
   Reveal(content: DIV { 'I came from the App' })
 ```
