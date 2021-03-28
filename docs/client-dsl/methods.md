@@ -79,7 +79,7 @@ When an event occurs it will probably change state.  The mutate method is used t
 state change.
 
 + `mutate` signals that this instance's state has been mutated
-+ `toggle` i.e. `toggle(:foo)` => `mutate @foo = !@foo`
++ `toggle(:foo)` is short for `mutate @foo = !@foo`
 
 **Other Methods**
 

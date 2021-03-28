@@ -79,6 +79,5 @@ The data passed to the rescue handler is an array of two items, the Ruby error t
 
 ## Caveats
 
-1. You cannot rescue errors raised in lifecycle handlers in the same component.  Errors raised by lifecycle handlers in inner components are fine, just not
-in the same component as the rescue.
+1. You cannot rescue errors raised in lifecycle handlers in the same component.  Errors raised by lifecycle handlers in inner components are fine, just not in the same component as the rescue.
 2. Errors raised in event handlers will neither stop the rendering cycle, nor will they be caught by a rescue callback.

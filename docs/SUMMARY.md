@@ -17,6 +17,7 @@
   * [Lifecycle Methods](client-dsl/lifecycle-methods.md)
   * [Component State](client-dsl/state.md)
   * [Events and Callbacks](client-dsl/events-and-callbacks.md)
+  * [Interlude: Tic Tac Toe](client-dsl/interlude-tic-tac-toe.md)
   * [Recovering from Errors](client-dsl/error-recovery.md)
   * [JavaScript Components](client-dsl/javascript-components.md)
   * [Elements and Rendering](client-dsl/elements-and-rendering.md)
