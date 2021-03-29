@@ -14,6 +14,7 @@ In the directory of your existing or newly created Rails app:
 >      branch: 'edge',
 >      glob: 'ruby/*/*.gemspec'
 > ```
+> **HOWEVER currently we are doing weekly alpha updates, you should not need to do this.**
 
 ### Start the Rails app
 
