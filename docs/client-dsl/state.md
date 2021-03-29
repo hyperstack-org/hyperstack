@@ -94,6 +94,9 @@ is common enough that Hyperstack provides two ways to shorten this code.  The fi
 In other words `mutator` defines a method that is wrapped in a call to `mutate`.  It also has
 the advantage of clearly declaring that this method will be mutating the components state.
 
+> Important note:  If you do an early exit from the mutator using a `return` or `break` no mutation
+will occur.  If you want to do an early exit then use the `next` keyword.   
+
 ### The `state_accessor`, `state_reader` and `state_writer` Methods
 
 Often all a mutator method will do is assign a new value to a state.  For this case Hyperstack provides

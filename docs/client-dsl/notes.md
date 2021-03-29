@@ -297,6 +297,7 @@ Hyperstack.cancel_import    'hyperstack/component/auto-import'
 ```
 
 ### The Enter Event
+The :enter event is short for catching :key_down and then checking for a key code of 13.
 ```ruby
 class YouSaid < HyperComponent
   state_accessor :value

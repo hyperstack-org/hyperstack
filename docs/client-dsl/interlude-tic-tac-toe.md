@@ -4,7 +4,7 @@ At this point if you have been reading sequentially through these chapters you k
 
 The board is represented by an array of 9 cells. Cell 0 is the top left square, and cell 8 is the bottom right.
 
-Each cell will contain nil, an :X or an :O.
+Each cell will contain nil, an `:X` or an `:O`.
 
 ### Displaying the Board
 
@@ -13,7 +13,7 @@ The `DisplayBoard` component displays a board.  `DisplayBoard` accepts a `board`
 A small helper function `draw_squares` draws an individual square which is displayed as a `BUTTON`.  A click handler is attached which
 will fire the `clicked_at` event with the appropriate cell id.
 
-Notice that `DisplayBoard` has no internal state of its own.  That is handled by the `Game` component.
+Notice that `DisplayBoard` has no internal state of its own.  That is handled by the `DisplayGame` component.
 
 ```ruby
 class DisplayBoard < HyperComponent
@@ -37,7 +37,7 @@ end
 
 ### The Game State
 
-The `Game` component has two state variables:  
+The `DisplayGame` component has two state variables:  
 + `@history` which is an array of boards, each board being the array of cells.
 + `@step` which is the current step in the history (we begin at zero)
 
@@ -46,17 +46,17 @@ The `Game` component has two state variables:
 These are initialized in the `before_mount` callback.  Because Ruby will adjust the array size as needed
 and return nil if an array value is not initialized, we can simply initialize the board to an empty array.
 
-There are two reader methods that read the state:
+There are three *reader* methods that read the state:
 
-+ `player` returns the current player's token.  The first player is always :X so even steps
-are :X, and odd steps are :O.
++ `player` returns the current player's token.  The first player is always `:X` so even steps
+are `:X`, and odd steps are `:O`.
 + `current` returns the board at the current step.
 + `history` uses state_reader to encapsulate the history state.
 
 Encapsulated access to state in reader methods like this is not necessary but is good practice
 
 ```ruby
-class Game < HyperComponent
+class DisplayGame < HyperComponent
   before_mount do
     @history = [[]]
     @step = 0
@@ -79,7 +79,7 @@ end
 We also have a `current_winner?` method that will return the winning player or nil based on the value of the current board:
 
 ```ruby
-class Game < HyperComponent
+class DisplayGame < HyperComponent
   WINNING_COMBOS = [
     [0, 1, 2],
     [3, 4, 5],
@@ -93,9 +93,7 @@ class Game < HyperComponent
 
   def current_winner?
     WINNING_COMBOS.each do |a, b, c|
-      return current[a] if current[a] &&
-                           current[a] == current[b] &&
-                           current[a] == current[c]
+      return current[a] if current[a] && current[a] == current[b] && current[a] == current[c]
     end
     false
   end
@@ -110,7 +108,9 @@ There are two mutator methods that change state:
 
 The `handle_click!` mutator first checks to make sure that no one has already won at the current step, and that
 no one has played in the cell that the user clicked on.  If either of these conditions is true `handle_click!`
-returns and nothing changes.
+returns, no mutation is signaled and nothing changes.
+
+> If we had wanted to return AND signal a state mutation we would use the Ruby `next` keyword instead of `return`.s
 
 To update the board `handle_click!` duplicates the squares; adds the player's token to the cell; makes a new
 history with the new squares on the end, and finally updates the value of `@step`.
@@ -120,7 +120,7 @@ code are aware that these will change state.
 
 ```ruby
 
-class Game < HyperComponent
+class DisplayGame < HyperComponent
   mutator :handle_click! do |id|
     board = history[@step]
     return if current_winner? || board[id]
@@ -143,7 +143,7 @@ Now we have a couple of helper methods to build parts of the game display.
 + `status` provides the play state
 
 ```ruby
-class Game < HyperComponent
+class DisplayGame < HyperComponent
   def moves
     return unless history.length > 1
 
@@ -166,7 +166,7 @@ end
 And finally our render method which displays the Board and the game info:
 
 ```ruby
-class Game < HyperComponent
+class DisplayGame < HyperComponent
   render(DIV, class: :game) do
     DIV(class: :game_board) do
       DisplayBoard(board: current)

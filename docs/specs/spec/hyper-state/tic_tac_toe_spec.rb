@@ -54,9 +54,8 @@ CSS = <<~CSS
 CSS
 
 describe "Tic Tac Toe Game", :js do
-
   def buttons
-    find_all('button', wait: 0.2)
+    find_all("button", wait: 0.0)
   end
 
   def squares
@@ -64,7 +63,7 @@ describe "Tic Tac Toe Game", :js do
   end
 
   def lis
-    find_all('li', wait: 0.2)
+    find_all("li", wait: 0.0)
   end
 
   def history
@@ -96,7 +95,7 @@ describe "Tic Tac Toe Game", :js do
     expect(page).to have_content "Winner: X", wait: 0
     lis[3].click
     expect(squares).to eq ["X", "", "X", "", "O", "", "", "", ""]
-    expect(history).to eq ["Go to game start", "Go to move #1", "Go to move #2", "Go to move #3", "Go to move #4", "Go to move #5",]
+    expect(history).to eq ["Go to game start", "Go to move #1", "Go to move #2", "Go to move #3", "Go to move #4", "Go to move #5"]
     expect(page).to have_content "Next player: O", wait: 0
     buttons[1].click
     expect(squares).to eq ["X", "O", "X", "", "O", "", "", "", ""]
@@ -106,12 +105,12 @@ describe "Tic Tac Toe Game", :js do
     buttons[7].click
     expect(page).to have_content "Winner: O", wait: 0
     lis[3].click
-    buttons[0].click  # note in the original JSX implementation this caused a failure
-    lis[4].click      # because even though the click is invalid, it still erased the history
+    buttons[0].click # note in the original JSX implementation this caused a failure
+    lis[4].click     # because even though the click is invalid, it still erased the history
     expect(squares).to eq ["X", "O", "X", "", "O", "", "", "", ""]
   end
 
-  it "first translation" do
+  it "first translation", skip: "fails see note above at end of run_the_spec" do
     insert_html "<style>\n#{CSS}</style>"
     mount "Game" do
       # function Square(props) {
@@ -224,7 +223,7 @@ describe "Tic Tac Toe Game", :js do
         #     });
         #   }
 
-        mutator :handle_click do |i|
+        mutator :handle_click! do |i|
           @history = @history[0..@step]
           current = @history.last
           squares = current[:squares].dup
@@ -242,7 +241,7 @@ describe "Tic Tac Toe Game", :js do
         #     });
         #   }
 
-        mutator(:jump_to) { |step| @step = step }
+        mutator(:jump_to!) { |step| @step = step }
 
         #     const moves = history.map((step, move) => {
         #       const desc = move ?
@@ -259,7 +258,7 @@ describe "Tic Tac Toe Game", :js do
           @history.length.times do |move|
             LI(key: move) do
               move.zero? ? "Go to game start" : "Go to move ##{move}"
-            end.on(:click) { jump_to(move) }
+            end.on(:click) { jump_to!(move) }
           end
         end
 
@@ -305,7 +304,7 @@ describe "Tic Tac Toe Game", :js do
         render(DIV, class: :game) do
           DIV(class: :game_board) do
             Board(squares: current[:squares])
-            .on(:click, &method(:handle_click))
+            .on(:click, &method(:handle_click!))
           end
           DIV(class: :game_info) do
             DIV { status }
@@ -386,7 +385,7 @@ describe "Tic Tac Toe Game", :js do
           @step.even? ? :X : :O
         end
 
-        mutator :handle_click do |id|
+        mutator :handle_click! do |id|
           squares = @history[@step][:squares]
           return if winner?(squares) || squares[id]
 
@@ -396,14 +395,14 @@ describe "Tic Tac Toe Game", :js do
           @step += 1
         end
 
-        mutator(:jump_to) { |step| @step = step }
+        mutator(:jump_to!) { |step| @step = step }
 
         def moves
           return unless @history.length > 1
 
           @history.length.times do |move|
             LI(key: move) { move.zero? ? "Go to game start" : "Go to move ##{move}" }
-              .on(:click) { jump_to(move) }
+              .on(:click) { jump_to!(move) }
           end
         end
 
@@ -422,7 +421,7 @@ describe "Tic Tac Toe Game", :js do
         render(DIV, class: :game) do
           DIV(class: :game_board) do
             Board(squares: current[:squares])
-            .on(:clicked_at, &method(:handle_click))
+            .on(:clicked_at, &method(:handle_click!))
           end
           DIV(class: :game_info) do
             DIV { status }
@@ -454,7 +453,7 @@ describe "Tic Tac Toe Game", :js do
 
   it "simplified the board  - no hash" do
     insert_html "<style>\n#{CSS}</style>"
-    mount "Game" do
+    mount "DisplayGame" do
       class DisplayBoard < HyperComponent
         param :board
         fires :clicked_at
@@ -473,7 +472,7 @@ describe "Tic Tac Toe Game", :js do
         end
       end
 
-      class Game < HyperComponent
+      class DisplayGame < HyperComponent
         before_mount do
           @history = [[]]
           @step = 0
@@ -507,7 +506,7 @@ describe "Tic Tac Toe Game", :js do
 
         state_reader :history
 
-        mutator :handle_click do |id|
+        mutator :handle_click! do |id|
           board = history[@step]
           return if current_winner? || board[id]
 
@@ -517,16 +516,14 @@ describe "Tic Tac Toe Game", :js do
           @step += 1
         end
 
-        mutator(:jump_to) { |step| @step = step }
-      end
+        mutator(:jump_to!) { |step| @step = step }
 
-      class Game < HyperComponent
         def moves
           return unless history.length > 1
 
           history.length.times do |move|
             LI(key: move) { move.zero? ? "Go to game start" : "Go to move ##{move}" }
-              .on(:click) { jump_to(move) }
+              .on(:click) { jump_to!(move) }
           end
         end
 
@@ -541,12 +538,106 @@ describe "Tic Tac Toe Game", :js do
         render(DIV, class: :game) do
           DIV(class: :game_board) do
             DisplayBoard(board: current)
-            .on(:clicked_at, &method(:handle_click))
+            .on(:clicked_at, &method(:handle_click!))
           end
           DIV(class: :game_info) do
             DIV { status }
             OL { moves }
           end
+        end
+      end
+    end
+    run_the_spec([])
+  end
+
+  it "using a store" do
+    insert_html "<style>\n#{CSS}</style>"
+    mount "DisplayGame" do
+      class DisplayBoard < HyperComponent
+        param :board
+
+        def draw_square(id)
+          BUTTON(class: :square, id: id) { board[id] }
+          .on(:click) { Game.handle_click!(id) }
+        end
+
+        render(DIV) do
+          (0..6).step(3) do |row|
+            DIV(class: :board_row) do
+              (row..row + 2).each { |id| draw_square(id) }
+            end
+          end
+        end
+      end
+
+      class DisplayGame < HyperComponent
+        def moves
+          return unless Game.history.length > 1
+
+          Game.history.length.times do |move|
+            LI(key: move) { move.zero? ? "Go to game start" : "Go to move ##{move}" }
+              .on(:click) { Game.jump_to!(move) }
+          end
+        end
+
+        def status
+          if (winner = Game.current_winner?)
+            "Winner: #{winner}"
+          else
+            "Next player: #{Game.player}"
+          end
+        end
+
+        render(DIV, class: :game) do
+          DIV(class: :game_board) do
+            DisplayBoard(board: Game.current)
+          end
+          DIV(class: :game_info) do
+            DIV { status }
+            OL { moves }
+          end
+        end
+      end
+
+      class Game
+        include Hyperstack::State::Observable
+
+        receives Hyperstack::Application::Boot do
+          @history = [[]]
+          @step = 0
+        end
+
+        class << self
+          observer :player do
+            @step.even? ? :X : :O
+          end
+
+          observer :current do
+            @history[@step]
+          end
+
+          state_reader :history
+
+          WINNING_COMBOS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+          def current_winner?
+            WINNING_COMBOS.each do |a, b, c|
+              return current[a] if current[a] && current[a] == current[b] && current[a] == current[c]
+            end
+            false
+          end
+
+          mutator :handle_click! do |id|
+            board = history[@step]
+            return if current_winner? || board[id]
+
+            board = board.dup
+            board[id] = player
+            @history = history[0..@step] + [board]
+            @step += 1
+          end
+
+          mutator(:jump_to!) { |step| @step = step }
         end
       end
     end

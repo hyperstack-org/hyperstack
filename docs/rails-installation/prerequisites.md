@@ -25,7 +25,7 @@ If you don't have an existing Rails app you can create a new Rails app
 with the following command line:
 
 ```
-bundle exec rails new NameOfYourApp -T
+rails new NameOfYourApp -T
 ```
 
 To avoid much pain do not name your app `Application` as this will conflict with all sorts of
