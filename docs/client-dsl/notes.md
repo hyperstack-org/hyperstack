@@ -4,7 +4,7 @@
 
 Ruby methods may *receive* a block which is simply an anonymous function.  
 
-The following code in Ruby
+The following code in Ruby:
 
 ```ruby
 some_method(1, 2, 3) { |x| puts x }
@@ -13,7 +13,7 @@ is roughly equivilent to this Javascript
 ```JavaScript
 some_method(1, 2, 3 function(x) { console.log(x) })
 ```
-In Ruby blocks may be specified either using `do ... end` or with `{ ... }`
+In Ruby blocks may be specified either using `do ... end` or with `{ ... }`:
 
 ```Ruby
 some_method { an_expression }
@@ -23,7 +23,7 @@ some_method do
   expressions
 end
 ```
-Standard style reserves the `{ ... }` notation for single line blocks, and `do ... end` for multiple line blocks
+Standard style reserves the `{ ... }` notation for single line blocks, and `do ... end` for multiple line blocks.
 
 ### Component Instances
 
