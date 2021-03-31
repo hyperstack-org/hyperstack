@@ -9,7 +9,7 @@ The param declaration has several options providing a default value, expected ty
 Examples:
 
 ```ruby
-param :foo # declares that we must be provided with a parameter foo when the component is instantiated or re-rerendered.
+param :foo # declares that we must provide a parameter foo when the component is instantiated or re-rerendered.
 param :foo => "some default"        # declares that foo is optional, and if not present the value "some default" will be used.
 param foo: "some default"           # same as above using ruby 1.9 JSON style syntax
 param :foo, default: "some default" # same as above but uses explicit default key

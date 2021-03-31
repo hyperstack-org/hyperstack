@@ -32,7 +32,7 @@ using webpacker its actually not necessary (but doesn't hurt anything.)
 
 #### The application layout
 
-If using a recent version of rails with webpacker you may find that the application.html.erb file longer loads the application.js file.  Make sure that your layout file has this line:
+If using a recent version of rails with webpacker you may find that the application.html.erb file no longer loads the application.js file.  Make sure that your layout file has this line:
 
 ```html
    <%= javascript_include_tag 'application' %>

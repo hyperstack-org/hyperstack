@@ -36,7 +36,8 @@ Except for `render`, multiple lifecycle callbacks may be defined for each lifecy
 The lifecycle revolves around rendering the component. As the state or parameters of a component change, its render callback will be executed to generate the new HTML.
 
 ```ruby
-render do ....
+render do 
+  ...
 end
 ```
 
@@ -61,7 +62,8 @@ end
 ### Before Mounting \(first render\)
 
 ```ruby
-before_mount do ...
+before_mount do 
+  ...
 end
 ```
 
@@ -72,7 +74,8 @@ This is the only life cycle callback run during `render_to_string` used in serve
 ### After Mounting \(first render\)
 
 ```ruby
-after_mount do ...
+after_mount do 
+  ...
 end
 ```
 
@@ -83,7 +86,8 @@ If you want to integrate with other JavaScript frameworks, set timers using the 
 ### Before Receiving New Params
 
 ```ruby
-before_new_params do |new_params_hash| ...
+before_new_params do |new_params_hash| 
+  ...
 end
 ```
 
@@ -102,7 +106,8 @@ end
 ### Before Updating \(re-rendering\)
 
 ```ruby
-before_update do ...
+before_update do 
+  ...
 end
 ```
 
@@ -111,7 +116,8 @@ Invoked immediately before rendering when new params or state are being received
 ### After Updating \(re-rendering\)
 
 ```ruby
-after_update do ...
+after_update do 
+  ...
 end
 ```
 
@@ -122,7 +128,8 @@ Use this as an opportunity to operate on the DOM when the component has been upd
 ### Unmounting
 
 ```ruby
-before_unmount do ...
+before_unmount do 
+  ...
 end
 ```
 
