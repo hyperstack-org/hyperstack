@@ -139,7 +139,8 @@ default to the one provided by Hyperstack.
 
 ### Proper Use Of Keys
 
-> For best results the `key` is supplied at highest level possible.  (NOTE THIS MAY NO LONGER BE AN ISSUE IN LATEST REACT)  
+For best results the `key` is supplied at highest level possible.
+> NOTE THIS MAY NO LONGER BE AN ISSUE IN LATEST REACT)
 
 ```ruby
 # WRONG!
