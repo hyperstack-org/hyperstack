@@ -11,15 +11,6 @@ end
 
 Make sure to `bundle install`.
 
-> Note: if you want to use the unreleased edge branch your hyper-spec gem specification will be:
->
-> ```ruby
-> gem 'hyper-spec',
->      git: 'git://github.com/hyperstack-org/hyperstack.git',
->      branch: 'edge',
->      glob: 'ruby/*/*.gemspec'
-> ```
-
 HyperSpec is integrated with the `pry` gem for debugging, so it is recommended to add the `pry` gem as well.
 
 HyperSpec will also use the `timecop` gem if present to allow you to control and synchronize time on the server and the client.

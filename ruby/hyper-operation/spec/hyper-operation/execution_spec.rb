@@ -28,6 +28,42 @@ describe 'Hyperstack::Operation execution (server side)' do
     expect(MyOperation.run(i: 1).tap { MyOperation.promise.resolve(2) }.value).to eq 4
   end
 
+  it "will chain rejected promises" do
+    MyOperation.class_eval do
+      def self.promise
+        @promise ||= Promise.new
+      end
+      param :i
+      step { self.class.promise }
+      step { @took_a_bad_step = true }
+      failed { |e| e unless @took_a_bad_step }
+    end
+    expect(
+      MyOperation.run(i: 1)
+        .always { |failure| failure }
+        .tap { MyOperation.promise.reject("promise rejected") }
+        .value
+    ).to eq "promise rejected"
+  end
+
+  it "will chain promises that raise exceptions" do
+    MyOperation.class_eval do
+      def self.promise
+        @promise ||= Promise.new.then { raise "exception raised" }.tap { |p| p.resolve }
+      end
+      param :i
+      step { self.class.promise }
+      step { @took_a_bad_step = true }
+      failed { |e| e unless @took_a_bad_step }
+    end
+    expect(
+      MyOperation.run(i: 1)
+        .always { |failure| failure.message }
+        .tap { } #MyOperation.promise.resolve }
+        .value
+    ).to eq "exception raised"
+  end
+
   it "will interrupt the promise chain with async" do
     MyOperation.class_eval do
       def self.promise
@@ -217,7 +253,8 @@ RSpec::Steps.steps 'Hyperstack::Operation execution (client side)', js: true do
   before(:step) do
     on_client do
       def get_round_tuit(value)
-        Promise.new.tap { |p| after(0.1) { p.resolve(value) } }
+        Promise.new.tap { |p| after(0.2) { value == :reject ? p.reject("promise rejected") : p.resolve(value) } }
+               .then { |v| value == :exception ? raise("exception raised") : v }
       end
       module DontCallMe
         def called?
@@ -258,6 +295,40 @@ RSpec::Steps.steps 'Hyperstack::Operation execution (client side)', js: true do
         step { |r| r + params.i }
       end.run(i: 1)
     end.to eq 4
+  end
+
+  it "will chain rejected promises" do
+    expect do
+      Class.new(Hyperstack::Operation) do
+        param :i
+        step { get_round_tuit(:reject) }
+        step { @took_a_bad_step = true }
+        failed { |e| e unless @took_a_bad_step }
+      end.run(i: 1).always { |failure| failure }
+    end.on_client_to eq "promise rejected"
+  end
+
+  it "will chain promises that raise exceptions" do
+    expect do
+      Class.new(Hyperstack::Operation) do
+        param :i
+        step { get_round_tuit(:exception) }
+        step { @took_a_bad_step = true }
+        failed { |e| e unless @took_a_bad_step }
+      end.run(i: 1).always { |failure| failure }
+    end.on_client_to eq "exception raised"
+  end
+
+  it "will interrupt the promise chain with async" do
+    expect_promise do
+      Class.new(Hyperstack::Operation) do
+        param :i
+        step { get_round_tuit(2) }
+        step { |n| params.i + n }
+        step { |r| r + params.i }
+        async { 'hi' }
+      end.run(i: 1)
+    end.to eq 'hi'
   end
 
   it "will interrupt the promise chain with async" do

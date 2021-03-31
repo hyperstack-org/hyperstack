@@ -75,6 +75,9 @@ See the [Client Initialization Options](#client-initialization-options) section 
 
 By default the client environment will be reinitialized at the beginning of every spec.  If this is not needed you can speed things up by adding the `no_reset` flag to a block of specs.
 
+> Note if you are using `visit` to directly load a page and still want to use methods like `on_client` and the expectation helpers, see the last section on
+using visit at the end of this document.
+
 # Details
 
 ### The `on_client` method
@@ -438,3 +441,11 @@ You can also run specs in a visible chrome window by setting the `DRIVER` enviro
 The method is typically not needed assuming you are using a multithreaded server like Puma.  If for whatever reason the pry debug session is not multithreaded, *and* you want to try some kind of experiment on the javascript console, *and* those experiments make requests to the server, you may not get a response, because all threads are in use.  
 
 You can resolve this by using the `pause` method in the debug session which will put the server debug session into a non-blocking loop.  You can then experiment in the JS console, and when done release the pause by executing `go()` in the *javascript* debug console.
+
+### Using `visit` and the Application Layout
+Currently this is not well integrated (see [issue 398](https://github.com/hyperstack-org/hyperstack/issues/398)).  If you want to visit a page on the website
+using `visit`, the following will not work: Timecop integration, and the `insert_html` and `before_mount` methods.  You will also have to execute this line in your spec:
+```ruby
+page.instance_variable_set("@hyper_spec_mounted", true)
+```
+Upvote issue 398 if this presents a big problem for you.

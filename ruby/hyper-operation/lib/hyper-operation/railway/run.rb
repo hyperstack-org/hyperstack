@@ -64,7 +64,10 @@ module Hyperstack
 
       def failed(opts)
         @promise_chain = @promise_chain
-          .always { |result| apply(result, :failed, opts) }
+          .always do |result|
+            @state = :failed if @promise_chain.rejected? && @state != :abort
+            apply(result, :failed, opts)
+          end
       end
 
       def async(opts)

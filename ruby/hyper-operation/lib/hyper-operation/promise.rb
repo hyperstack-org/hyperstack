@@ -123,6 +123,7 @@ class Promise
 
     begin
       if block = @action[:success] || @action[:always]
+        @realized = :resolve
         value = block.call(value)
       end
 
@@ -156,6 +157,9 @@ class Promise
 
     begin
       if block = @action[:failure] || @action[:always]
+        # temporarily set values so always can determine if this
+        # was a reject or resolve
+        @realized = :reject
         value = block.call(value)
       end
 
