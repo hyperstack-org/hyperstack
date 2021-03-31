@@ -38,7 +38,7 @@ end
 
 To create a component instance, you reference its class name as a method call from another component. This creates a new instance, passes any parameters and proceeds with the component lifecycle.
 
-> **[The actual type created is an Element read on for details...](notes.md#component-instances)**
+> **[The actual type created is an Element, read on for details...](notes.md#component-instances)**
 
 ```ruby
 class FirstComponent < HyperComponent
