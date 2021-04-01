@@ -506,7 +506,7 @@ keys:
 
             target.send "#{method}=", value.first
           elsif value.is_a? Array
-            target.send("_hyperstack_internal_setter_#{method}", value.first) unless method == target.class.primary_key
+            target.send("_hyperstack_internal_setter_#{method}", value.first) unless [target.class.primary_key, :id].include? method
           elsif value.is_a?(Hash) && value[:id] && value[:id].first && (association = target.class.reflect_on_association(method))
             # not sure if its necessary to check the id above... is it possible to for the method to be an association but not have an id?
             klass = value[:model_name] ? Object.const_get(value[:model_name].first) : association.klass

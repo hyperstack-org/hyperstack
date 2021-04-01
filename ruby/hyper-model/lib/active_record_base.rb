@@ -393,7 +393,7 @@ module ActiveRecord
         end
       end
 
-      scope __hyperstack_internal_where_scope,
+      scope :__hyperstack_internal_where_scope,
         ->(attrs) { where(attrs) }, # server side we just call where
         filter: ->(attrs) { !attrs.detect { |k, v| self[k] != v } } # client side optimization
 
