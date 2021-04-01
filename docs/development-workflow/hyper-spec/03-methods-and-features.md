@@ -454,6 +454,9 @@ page.instance_variable_set("@hyper_spec_mounted", true)
 Upvote issue 398 if this presents a big problem for you.
 
 #### Some Complex Expressions Do Not Work
+> This has been fixed in Parser version 2.7 which works with Opal 1.0  
+> So the issue is only with older versions of Opal.
+
 [Issue 127](https://github.com/hyperstack-org/hyperstack/issues/127)
 
 You may get an error like this when running a spec:

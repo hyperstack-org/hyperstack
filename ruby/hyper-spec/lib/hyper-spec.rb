@@ -40,12 +40,12 @@ end
 # opt-in to most recent AST format:
 Parser::Builders::Default.emit_lambda              = true
 Parser::Builders::Default.emit_procarg0            = true
-Parser::Builders::Default.emit_encoding            = true
-Parser::Builders::Default.emit_index               = true
-Parser::Builders::Default.emit_arg_inside_procarg0 = true
-Parser::Builders::Default.emit_forward_arg         = true
-Parser::Builders::Default.emit_kwargs              = true
-Parser::Builders::Default.emit_match_pattern       = true
+(Parser::Builders::Default.emit_encoding            = true) rescue nil
+(Parser::Builders::Default.emit_index               = true) rescue nil
+(Parser::Builders::Default.emit_arg_inside_procarg0 = true) rescue nil
+(Parser::Builders::Default.emit_forward_arg         = true) rescue nil
+(Parser::Builders::Default.emit_kwargs              = true) rescue nil
+(Parser::Builders::Default.emit_match_pattern       = true) rescue nil
 
 # not available in parser 2.3
 if Parser::Builders::Default.respond_to? :emit_arg_inside_procarg0

@@ -463,7 +463,7 @@ describe 'hyper-spec', js: true do
       expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
 
-    it "works with complex expressions" do
+    it "works with complex expressions", skip: (Parser::VERSION < "2.7.2.0" ) && "Incompatible with Parser #{Parser::VERSION}" do
       expect do
         hash = { 'foo' =>  1}
         hash['foo'] += 1
