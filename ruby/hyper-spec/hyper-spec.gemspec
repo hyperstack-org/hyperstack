@@ -31,7 +31,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   # spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'method_source'
   spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 2.0'
-  spec.add_dependency 'parser', '>= 2.3.3.1'  # on rails-6 this is now >= 2.3
+  spec.add_dependency 'parser', '>= 3.0' #'>= 2.3.3.1'  # on rails-6 this is now >= 2.3
   spec.add_dependency 'rspec'
   spec.add_dependency 'selenium-webdriver'
   spec.add_dependency 'timecop', '~> 0.8.1'
@@ -56,7 +56,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'rspec-its'
   spec.add_development_dependency 'rspec-mocks'
   spec.add_development_dependency 'rspec-steps', '~> 2.1.1'
-  spec.add_development_dependency 'rubocop', '~> 0.51.0'
+  spec.add_development_dependency 'rubocop' #, '~> 0.51.0'
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec'

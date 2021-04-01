@@ -462,6 +462,14 @@ describe 'hyper-spec', js: true do
     it 'allows local variables on the client to be set using the with method' do
       expect { with_var * 2 }.with(with_var: 4).on_client_to eq(8)
     end
+
+    it "works with complex expressions" do
+      expect do
+        hash = { 'foo' =>  1}
+        hash['foo'] += 1
+        hash['foo']
+      end.on_client_to eq(2)
+    end
   end
 
   it "will use the arity_check option" do
