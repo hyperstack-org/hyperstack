@@ -37,6 +37,17 @@ describe 'React', js: true do
         expect_evaluate_ruby("ELEMENT.children").to eq("lorem ipsum")
       end
 
+      it "should create a valid element with children supplied as a proc" do
+
+        evaluate_ruby do
+          children = -> { "lorem ipsum" }
+          ELEMENT = Hyperstack::Component::ReactAPI.create_element('div', &children)
+        end
+        expect_evaluate_ruby("Hyperstack::Component::ReactAPI.is_valid_element?(ELEMENT)").to eq(true)
+        expect_evaluate_ruby("ELEMENT.children").to eq("lorem ipsum")
+      end
+
+
       it "should create a valid element with children as array when block yield Array of element" do
 
         evaluate_ruby do
