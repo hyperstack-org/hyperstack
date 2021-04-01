@@ -392,6 +392,14 @@ module ActiveRecord
           nil
         end
       end
+
+      scope __hyperstack_internal_where_scope,
+        ->(attrs) { where(attrs) }, # server side we just call where
+        filter: ->(attrs) { !attrs.detect { |k, v| self[k] != v } # client side optimization
+
+      def self.where(attrs)
+        __hyperstack_internal_where_scope(attrs)
+      end if RUBY_ENGINE == 'opal'
     end
   end
 

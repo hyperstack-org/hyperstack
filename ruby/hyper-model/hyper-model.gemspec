@@ -52,7 +52,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rspec-steps', '~> 2.1.1'
   spec.add_development_dependency 'rspec-wait'
-  spec.add_development_dependency 'rubocop', '~> 0.51.0'
+  spec.add_development_dependency 'rubocop' #, '~> 0.51.0'
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'shoulda-matchers'
   spec.add_development_dependency 'spring-commands-rspec', '~> 1.0.4'

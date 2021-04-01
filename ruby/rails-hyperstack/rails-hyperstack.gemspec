@@ -72,7 +72,7 @@ You can control how much of the stack gets installed as well:
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'bootsnap'
   spec.add_development_dependency 'rspec-rails'
-  spec.add_development_dependency 'rubocop', '~> 0.51.0'
+  spec.add_development_dependency 'rubocop' #, '~> 0.51.0'
   spec.add_development_dependency 'sqlite3', '~> 1.4' # was 1.3.6 -- see https://github.com/rails/rails/issues/35153
   spec.add_development_dependency 'sass-rails', '>= 5.0'
   # Use Uglifier as compressor for JavaScript assets
