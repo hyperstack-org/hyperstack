@@ -138,14 +138,14 @@ RSpec::Steps.steps "updating associations", js: true do
   it "and a model in a belongs_to relationship can be destroyed" do
     expect do
       ReactiveRecord.load do
-        User.find_by_first_name("Jan").todo_items.collect { |item| item.itself }.first
-      end.then do | first |
-        first.destroy.then do |response|
+        User.find_by_first_name("Jan").todo_items.collect(&:itself).first
+      end.then do |first|
+        first.destroy.then do
           User.find_by_first_name("Jan").todo_items.all
         end.tap { @was_destroyed_already = first.destroyed? }
       end
-    end.on_client_to
-    # added to check that issue #119 got fixed.  Item is not
+    end.on_client_to be_empty
+    # added following to check that issue #119 got fixed.  Item is not
     # considered destroyed until we get the status back from server
     # that it was destroyed
     expect { @was_destroyed_already }.on_client_to be_falsy

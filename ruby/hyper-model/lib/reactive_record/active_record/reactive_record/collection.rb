@@ -682,9 +682,13 @@ To determine this sync_scopes first asks if the record being changed is in the s
       elsif ScopeDescription.find(@target_klass, "_#{method}")
         apply_scope("_#{method}", *args).first
       else
+        # create a subclass of the original target class that responds to all
+        # by returning our collection back
         fake_class = Class.new(@target_klass)
-        fake_class.singleton_class.attr_accessor :all
-        fake_class.all = self
+        fake_class.instance_variable_set("@all", self)
+        # Opal 0.11 does not handle overridding the original @target_klass
+        # with an accessor, so we define the accessor as a method.
+        fake_class.define_singleton_method(:all) { @all }
         fake_class.send(method, *args, &block)
       end
     end

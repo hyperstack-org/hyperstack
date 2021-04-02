@@ -42,6 +42,7 @@ RSpec::Steps.steps 'the where method and class delegation', js: true do
   end
 
   it "can take a hash like value" do
+    client_option raise_on_js_errors: :debug
     expect do
       ReactiveRecord.load { User.where(surname: "VanDuyn").pluck(:id, :first_name) }
     end.on_client_to eq User.where(surname: "VanDuyn").pluck(:id, :first_name)
