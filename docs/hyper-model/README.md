@@ -173,11 +173,23 @@ scope :completed,
 
 `unscoped` and `all`: These builtin scopes work just like standard ActiveRecord.
 
+BTW: to save typing you can skip the `all`: Models will respond like enumerators.
+
 ```ruby
 Word.all.each { |word| LI { word.text }}
 ```
 
-BTW: to save typing you can skip the `all`: Models will respond like enumerators.
+`where`: The where method can be used to filter records:
+
+```ruby
+Word.where("LENGTH(text) = ?", n)
+```
+
+> The `where` method is implemented internally as a scope on the client that
+will execute the where method on the server.  If the parameters to the where
+method the scope will be updated on the client, but using SQL in the where as
+in the above example will get executed on the server.  
+
 
 `find`: takes an id and delivers the corresponding record.
 
@@ -193,6 +205,21 @@ Word.find_by_text('hello') # short for Word.find_by(text: 'hello')
 
 ```ruby
 Word.offset(500).limit(20) # get words 500-519
+```
+
+#### Applying Class Methods to Collections
+
+Like Rails if you define a class method on a model, you can apply it to collection of those records, allowing you
+to chain methods with scopes (and relationships)
+
+```ruby
+class Word < ApplicationRecord
+  def self.page(pg)
+    offset(pg-1 * 20).limit(20)
+  end
+end
+...
+  Word.some_scope.page(3)
 ```
 
 #### Relationships and Aggregations

@@ -677,10 +677,15 @@ To determine this sync_scopes first asks if the record being changed is in the s
         all.send(method, *args, &block)
       elsif ScopeDescription.find(@target_klass, method)
         apply_scope(method, *args)
-      elsif @target_klass.respond_to?(method) && ScopeDescription.find(@target_klass, "_#{method}")
+      elsif !@target_klass.respond_to?(method)
+        super
+      elsif ScopeDescription.find(@target_klass, "_#{method}")
         apply_scope("_#{method}", *args).first
       else
-        super
+        fake_class = Class.new(@target_klass)
+        fake_class.singleton_class.attr_accessor :all
+        fake_class.all = self
+        fake_class.send(method, *args, &block)
       end
     end
 

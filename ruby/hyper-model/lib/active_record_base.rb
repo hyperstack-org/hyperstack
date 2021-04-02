@@ -14,7 +14,7 @@ module ActiveRecord
                else
                  { server: args[0] }
                end
-        return opts if opts && opts[:server].respond_to?(:call)
+        return opts if opts[:server].respond_to?(:call) || RUBY_ENGINE == 'opal'
         raise 'must provide either a proc as the first arg or by the '\
               '`:server` option to scope and default_scope methods'
       end
@@ -393,13 +393,9 @@ module ActiveRecord
         end
       end
 
-      scope :__hyperstack_internal_where_scope,
-        ->(attrs) { where(attrs) }, # server side we just call where
-        filter: ->(attrs) { !attrs.detect { |k, v| self[k] != v } } # client side optimization
+      scope :__hyperstack_internal_where_hash_scope, ->(*args) { where(*args) }
 
-      def self.where(attrs)
-        __hyperstack_internal_where_scope(attrs)
-      end if RUBY_ENGINE == 'opal'
+      scope :__hyperstack_internal_where_sql_scope, ->(*args) { where(*args) }
     end
   end
 
