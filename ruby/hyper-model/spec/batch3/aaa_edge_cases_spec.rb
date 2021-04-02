@@ -106,6 +106,28 @@ describe "reactive-record edge cases", js: true do
     end
   end
 
+  it "destroy receives any errors added by the server" do
+    class Todo < ActiveRecord::Base
+      before_destroy do
+        return true unless title == "don't destroy me"
+        errors.add :base, "Can't destroy me"
+        throw(:abort)
+      end
+    end
+    id = Todo.create(title: "don't destroy me").id
+    expect do
+      Hyperstack::Model.load do
+        @todo = Todo.find(id)
+      end.then do |todo|
+        todo.destroy.then do |response|
+          todo.errors.messages unless response[:success]
+        end
+      end
+    end.on_client_to eq("base" => ["Can't destroy me"])
+    expect { @todo.destroyed?}.on_client_to be_falsy
+  end
+
+
   it "the limit and offset predefined scopes work" do
     5.times do |i|
       FactoryBot.create(:todo, title: "Todo #{i}")
@@ -200,7 +222,7 @@ describe "reactive-record edge cases", js: true do
         orig_synchromesh_after_create
       end
     end
-    
+
     has_many1 = HasManyModel.create(name: "has_many1")
     2.times { |i| BelongsToModel.create(name: "belongs_to_#{i}", has_many_model: has_many1) }
     expect { HasManyModel.first.belongs_to_models.count }.on_client_to eq(1)

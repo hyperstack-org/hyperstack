@@ -557,8 +557,14 @@ module ReactiveRecord
         if !data_loading? && (id || vector)
           Operations::Destroy.run(model: ar_instance.model_name.to_s, id: id, vector: vector)
           .then do |response|
-            Broadcast.to_self ar_instance
-            @destroyed = true
+            #[reactive_record_id, model.class.name, attributes, messages] model.errors.messages
+
+            if response[:success]
+              @destroyed = true
+              Broadcast.to_self ar_instance
+            else
+              errors! response[:messages]
+            end
             yield response[:success], response[:message] if block
             promise.resolve response
           end
@@ -590,10 +596,9 @@ module ReactiveRecord
                    ServerDataCache.new(acting_user, {})[*vector].value
                  end
 
-        record.check_permission_with_acting_user(acting_user, :destroy_permitted?).destroy
-        { success: true, attributes: {} }
+        success = record.check_permission_with_acting_user(acting_user, :destroy_permitted?).destroy
+        { success: success, attributes: {}, messages: record.errors.messages }
       rescue Exception => e
-        # ReactiveRecord::Pry.rescued(e)
         { success: false, record: record, message: e }
       end
     end
