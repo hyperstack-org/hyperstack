@@ -558,12 +558,14 @@ module ReactiveRecord
           Operations::Destroy.run(model: ar_instance.model_name.to_s, id: id, vector: vector)
           .then do |response|
             Broadcast.to_self ar_instance
+            @destroyed = true
             yield response[:success], response[:message] if block
             promise.resolve response
           end
         else
           destroy_associations
           # sync_unscoped_collection! # ? should we do this here was NOT being done before hypermesh integration
+          @destroyed = true
           yield true, nil if block
           promise.resolve(success: true)
         end
@@ -574,8 +576,6 @@ module ReactiveRecord
         # @attributes = {}
         # sync!
         # and modify server_data_cache so that it does NOT call destroy
-
-        @destroyed = true
 
         promise
       end

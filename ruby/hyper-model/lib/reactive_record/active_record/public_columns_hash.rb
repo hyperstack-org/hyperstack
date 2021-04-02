@@ -8,7 +8,7 @@ module ActiveRecord
   class Base
     @@hyper_stack_public_columns_hash_mutex = Mutex.new
     def self.public_columns_hash
-      @@hyper_stack_public_columns_hash_mutext.synchronize do
+      @@hyper_stack_public_columns_hash_mutex.synchronize do
         return @public_columns_hash if @public_columns_hash && Rails.env.production?
         files = []
         Hyperstack.public_model_directories.each do |dir|
