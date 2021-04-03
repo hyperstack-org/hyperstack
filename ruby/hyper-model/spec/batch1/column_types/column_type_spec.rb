@@ -27,7 +27,7 @@ describe "column types on client", js: true do
       end
 
       def as_json
-        strftime("%Y-%m-%dT%H:%M:%S%z").gsub(/\+0000$/, '-0000')
+        strftime("%Y-%m-%dT%H:%M:%S.%3N%z").gsub(/\+0000$/, '-0000')
       end
 
       attr_reader :time
@@ -251,7 +251,7 @@ describe "column types on client", js: true do
       test = TypeTest.new
       test.datetime = 12.2
       test.datetime + 60.9
-    end.to eq((Timex.at(12.2)+60.9).as_json)
+    end.to eq(Timex.at(73.1001).as_json) # extra 1 digit forces round up
     check_errors
   end
 
