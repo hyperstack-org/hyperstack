@@ -359,4 +359,9 @@ describe "column types on client", js: true do
     end.to eq(r.text)
   end
 
+  it "will update time values with millisecond accuracy" do
+    sample_time = 12_345.123
+    evaluate_ruby { TypeTest.create(datetime: Time.at(sample_time)) }
+    expect(TypeTest.last.datetime.to_f).to eq sample_time
+  end
 end

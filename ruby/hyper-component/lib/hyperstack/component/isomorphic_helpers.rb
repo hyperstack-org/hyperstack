@@ -225,8 +225,6 @@ module Hyperstack
             end
           end
         else
-          require 'json'
-
           def isomorphic_method(name, &block)
             self.class.send(:define_method, name) do | *args |
               IsomorphicHelpers::IsomorphicProcCall.new(name, block, self, *args).result
