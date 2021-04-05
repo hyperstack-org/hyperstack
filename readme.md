@@ -46,7 +46,7 @@ We now are issuing 1.0 release candidates weekly until all issues are either clo
 
 | Release<br/>Date | Version | Open<br/>Issues | Documentation<br/>Sections<br/>Draft Ready | Documentation<br/>Sections<br/>WIP |
 |--------------|---------|-------------|-------|------|
-| March 29, 2021 | 1.0.alpha1.6 | 167 | 35 | 10 |
+| April 5, 2021 | 1.0.alpha1.7 | 147 | 35 | 10 |
 
 > Open issues includes enhancements, documentation, and discussion issues as well as few bugs.
 >
