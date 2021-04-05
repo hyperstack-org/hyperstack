@@ -42,6 +42,7 @@ describe 'Hyperstack::Operation execution (server side)' do
       MyOperation.run(i: 1)
         .always { |failure| failure }
         .tap { MyOperation.promise.reject("promise rejected") }
+        .value
     ).to eq "promise rejected"
   end
 
