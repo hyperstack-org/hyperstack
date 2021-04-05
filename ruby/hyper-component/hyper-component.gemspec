@@ -8,15 +8,10 @@ Gem::Specification.new do |spec|
 
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann', 'Adam Creekroad']
   spec.email         = ['mitch@catprint.com']
-  spec.homepage      = 'http://ruby-hyperloop.org'
+  spec.homepage      = 'http://hyperstack.org'
   spec.summary       = 'Opal Ruby wrapper of React.js library.'
   spec.license       = 'MIT'
   spec.description   = 'Write React UI components in pure Ruby.'
-  # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperloop.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  # }
-
   spec.files         = `git ls-files`.split("\n").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   spec.require_paths = ['lib']

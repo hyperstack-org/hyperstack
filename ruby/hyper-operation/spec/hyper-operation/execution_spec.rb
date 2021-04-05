@@ -42,7 +42,6 @@ describe 'Hyperstack::Operation execution (server side)' do
       MyOperation.run(i: 1)
         .always { |failure| failure }
         .tap { MyOperation.promise.reject("promise rejected") }
-        .value
     ).to eq "promise rejected"
   end
 
@@ -59,7 +58,6 @@ describe 'Hyperstack::Operation execution (server side)' do
     expect(
       MyOperation.run(i: 1)
         .always { |failure| failure.message }
-        .tap { } #MyOperation.promise.resolve }
         .value
     ).to eq "exception raised"
   end

@@ -6,19 +6,14 @@ require 'hyper-spec/version'
 Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.name          = 'hyper-spec'
   spec.version       = HyperSpec::VERSION
-  spec.authors       = ['Mitch VanDuyn', 'Adam Creekroad', 'Jan Biedermann']
+  spec.authors       = ['Mitch VanDuyn', 'AdamCreekroad', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
-  spec.summary       = 'Drive your Hyperloop client and server specs from RSpec and Capybara'
-  spec.description   = 'A Hyperloop application consists of isomorphic React Components, '\
+  spec.summary       = 'Drive your Opal and Hyperstack client and server specs from RSpec and Capybara'
+  spec.description   = 'A Hyperstack application consists of isomorphic React Components, '\
                        'Active Record Models, Stores, Operations and Policiespec. '\
                        'Test them all from Rspec, regardless if the code runs on the client or server.'
-  spec.homepage      = 'http://ruby-hyperloop.org'
+  spec.homepage      = 'http://hyperstack.org'
   spec.license       = 'MIT'
-  # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperloop.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  # }
-
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
@@ -28,10 +23,9 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'capybara'
   spec.add_dependency 'chromedriver-helper', '1.2.0'
   spec.add_dependency 'filecache'
-  # spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'method_source'
   spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 2.0'
-  spec.add_dependency 'parser'#, '~> 2.7' #, '~> 2.3.3.1'  # on rails-6 this is now >= 2.3
+  spec.add_dependency 'parser'
   spec.add_dependency 'rspec'
   spec.add_dependency 'selenium-webdriver'
   spec.add_dependency 'timecop', '~> 0.8.1'

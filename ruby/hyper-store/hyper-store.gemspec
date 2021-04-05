@@ -9,13 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Mitch VanDuyn', 'Adam Creekroad', 'Jan Biedermann']
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = 'Flux Stores and more for Hyperloop'
-  spec.homepage      = 'https://ruby-hyperloop.org'
+  spec.homepage      = 'https://hyperstack.org'
   spec.license       = 'MIT'
-  # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperloop.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperloop/hyper-component'
-  # }
-
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
