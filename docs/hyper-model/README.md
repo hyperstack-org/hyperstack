@@ -15,7 +15,7 @@ In other words, one browser creates, updates, or destroys a Model, and the chang
 
 * You access your Model data in your Components, Operations, and Stores just like you would on the server or in an ERB or HAML view file.
 * If an optional push transport is connected Hyperstack broadcasts any changes made to your ActiveRecord models as they are persisted on the server or updated by one of the authorized clients.
-* Some Models can be designated as _server-only_ which means they are not available to the Isomorphic code.
+* Some Models (or even parts of Models) can be designated as _server-only_ which means they are not available to the client code.
 
 For example, consider a simple model called `Dictionary` which might be part of Wiktionary type app.
 
@@ -38,8 +38,7 @@ class WordOfTheDay < Hyperstack::Component
 
   def pick_entry!  
     # pick a random word and assign the selected record to entry
-    @entry = Dictionary.defined.all[rand(Dictionary.defined.count)]
-    force_update! # redraw our component when the word changes
+    mutate @entry = Dictionary.defined[rand(Dictionary.defined.count)]
     # Notice that we use standard ActiveRecord constructs to select our
     # random entry value
   end
@@ -61,7 +60,8 @@ class WordOfTheDay < Hyperstack::Component
   end
 ```
 
-For complete examples with _push_ updates, see any of the apps in the `examples` directory, or build your own in 5 minutes following one of the quickstart guides:
+**This is the entire code.  There are no application APIs needed.  The synchronization between server and client is completely taken care of by HyperModel.  If you have
+an existing code base little to updates to your existing Models is needed, and you will use the same ActiveRecord API you have been using.**
 
 ## Isomorphic Models
 
@@ -284,7 +284,7 @@ To force the value to be recomputed at the server append a `!` to the end of the
 
 `columns_hash`: returns the details of the columns specification. Note that on the server `columns_hash` returns a hash of objects specifying column information. On the client the entire structure is just one big hash of hashes.
 
-`abstract_class=`, `abstract_class?`, `primary_key`, `primary_key=`, `inheritance_column`, `inheritance_column=`, `model_name`: All work as on the server. See ActiveRecord documentation for more info.
+`abstract_class=`, `abstract_class?`, `primary_key`, `primary_key=`, `inheritance_column`, `inheritance_column=`, `model_name`, `serialize`, `alias_attribute`, `table_name`: All work as on the server. See ActiveRecord documentation for more info.
 
 ### Instance Methods
 
@@ -313,6 +313,10 @@ end
 
 After a save operation completes the models will have an `errors` hash \(just like on the server\) with any validation problems.
 
+`save` does not fail, but rather returns `{success: false ...}`.  If there was an
+exception the `message` key will hold the error information, otherwise the errors will
+be stored in the records error data (as on the server.)
+
 During the save operation the method `saving?` will return `true`. This can be used to instead of \(or with\) the promise to update the screen:
 
 ```ruby
@@ -333,7 +337,9 @@ end
 
 Like `save` destroy returns a promise that is resolved when the destroy completes.
 
-After the destroy completes the record's `destroyed?` method will return true.
+After the destroy completes successfully the record's `destroyed?` method will return true.
+
+Like `save` destroy never fails, but rather returns `{success: false...}`
 
 #### Other Instance Methods
 
@@ -391,12 +397,12 @@ The `load` method takes a list of attributes \(symbols\) and will insure these a
 before_mount do
   Todo.find(1).load(:name).then do |name|
     @name = name;
-    state.loaded! true
+    mutate @loaded = true
   end
 end
 ```
 
-Think hard about how you are using this, as Hyperstack already acts as flux store, and is managing state for you. It may be you are just creating a redundant store!
+> Think hard about how you are using this, as Hyperstack already acts as flux store, and is managing state for you. It may be you are just creating a redundant store!
 
 ## Client Side Scoping
 

@@ -32,7 +32,7 @@
 * [Operations](operations/README.md)
 * [Policies](policies/README.md)
 * [Internationalization](internationalization/README.md)
-* [Development Workflow and Procedures](development-workflow/README.md)
+* [Development Tools, Workflow and Procedures](development-workflow/README.md)
   * [Debugging](development-workflow/debugging.md)
   * [HyperTrace](development-workflow/hyper-trace.md)
   * [HyperSpec](development-workflow/hyper-spec/README.md)

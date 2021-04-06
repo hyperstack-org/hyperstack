@@ -9,8 +9,8 @@ The `Hyperstack::State::Observable` module allows you to build classes that shar
 
 The easiest way to understand HyperState is by example.  If you you did not see the Tic-Tac-Toe example, then **[please review it now](client-dsl/interlude-tic-tac-toe.md)**, as we are going to use this to demonstrate how to use the `Hyperstack::State::Observable` module.
 
-In our original Tic Tac Toe implementation the state of the game was stored in the `DisplayGame` component.  State was updated by
-"bubbling up" events from lower level components up to `DisplayGame` where the event handers updated the state.
+In our original Tic-Tac-Toe implementation the state of the game was stored in the `DisplayGame` component.  State was updated by
+"bubbling up" events from lower level components up to `DisplayGame` where the event handler updated the state.
 
 This is a nice simple approach but suffers from two issues:
 + Each level of lower level components must be responsible for bubbling up the events to the higher component.
@@ -366,7 +366,7 @@ the appropriate `mutate` or `observe` method.
 Typically in a large system you will have one or more central stores, and what you end up passing as parameters are either instances of those stores, or some other kind of index into the store.  Or if (as in the case of our Game) there is only one store, you
 need not pass any parameters at all.
 
-We can rewrite the last iteration of DisplayBoard to demonstrate this:
+We can rewrite the previous iteration of `DisplayBoard` to demonstrate this:
 
 ```ruby
 class DisplaySquare
@@ -391,7 +391,7 @@ Here `DisplayBoard` no longer takes any parameter (and should be renamed again t
 `DisplaySquare` takes the id of the square to display, but the game or the current board are never passed as parameters;
 there is no need to as they are implicit.
 
-Whether to not pass store objects, an instance of a store, and index into the store is a design decision that depends on
+Whether to pass (or not pass) a store class, an instance of a store, or some other index into the store is a design decision that depends on
 lots of factors, mainly how you see your application evolving over time.
 
 ### Summary of Methods
