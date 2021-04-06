@@ -107,6 +107,18 @@ module Hyperstack
         base.singleton_class.define_singleton_method(:receives) do |*args, &block|
           Internal::Receiver.mount(base, *args, &block)
         end
+
+        unless base.respond_to? :__hyperstack_state_observer_included
+          base.receives Hyperstack::Application::Boot do
+            ObjectSpace.each_object(Class) do |klass|
+              next unless klass <= base
+              next unless klass.respond_to?(:initialize)
+              next unless klass.method(:initialize).arity.zero?
+              klass.initialize
+            end
+          end
+          base.singleton_class.attr_reader :__hyperstack_state_observer_included
+        end
       end
     end
   end
