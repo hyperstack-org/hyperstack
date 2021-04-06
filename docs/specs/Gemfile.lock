@@ -1,26 +1,26 @@
 PATH
   remote: ../../ruby/hyper-component
   specs:
-    hyper-component (1.0.alpha1.5)
-      hyper-state (= 1.0.alpha1.5)
-      hyperstack-config (= 1.0.alpha1.5)
+    hyper-component (1.0.alpha1.7)
+      hyper-state (= 1.0.alpha1.7)
+      hyperstack-config (= 1.0.alpha1.7)
       opal-activesupport (~> 0.3.1)
       react-rails (>= 2.4.0, < 2.5.0)
 
 PATH
   remote: ../../ruby/hyper-model
   specs:
-    hyper-model (1.0.alpha1.5)
+    hyper-model (1.0.alpha1.7)
       activemodel
       activerecord (>= 4.0.0)
-      hyper-operation (= 1.0.alpha1.5)
+      hyper-operation (= 1.0.alpha1.7)
 
 PATH
   remote: ../../ruby/hyper-operation
   specs:
-    hyper-operation (1.0.alpha1.5)
+    hyper-operation (1.0.alpha1.7)
       activerecord (>= 4.0.0)
-      hyper-component (= 1.0.alpha1.5)
+      hyper-component (= 1.0.alpha1.7)
       mutations
       opal-activesupport (~> 0.3.1)
       tty-table
@@ -28,22 +28,22 @@ PATH
 PATH
   remote: ../../ruby/hyper-router
   specs:
-    hyper-router (1.0.alpha1.5)
-      hyper-component (= 1.0.alpha1.5)
-      hyper-state (= 1.0.alpha1.5)
+    hyper-router (1.0.alpha1.7)
+      hyper-component (= 1.0.alpha1.7)
+      hyper-state (= 1.0.alpha1.7)
       opal-browser (~> 0.2.0)
 
 PATH
   remote: ../../ruby/hyper-spec
   specs:
-    hyper-spec (1.0.alpha1.5)
+    hyper-spec (1.0.alpha1.7)
       actionview
       capybara
       chromedriver-helper (= 1.2.0)
       filecache
       method_source
       opal (>= 0.11.0, < 2.0)
-      parser (>= 2.3.3.1)
+      parser
       rspec
       selenium-webdriver
       timecop (~> 0.8.1)
@@ -54,13 +54,13 @@ PATH
 PATH
   remote: ../../ruby/hyper-state
   specs:
-    hyper-state (1.0.alpha1.5)
-      hyperstack-config (= 1.0.alpha1.5)
+    hyper-state (1.0.alpha1.7)
+      hyperstack-config (= 1.0.alpha1.7)
 
 PATH
   remote: ../../ruby/hyperstack-config
   specs:
-    hyperstack-config (1.0.alpha1.5)
+    hyperstack-config (1.0.alpha1.7)
       listen (~> 3.0)
       opal (>= 0.11.0, < 2.0)
       opal-browser (~> 0.2.0)
@@ -70,10 +70,10 @@ PATH
 PATH
   remote: ../../ruby/rails-hyperstack
   specs:
-    rails-hyperstack (1.0.alpha1.5)
-      hyper-model (= 1.0.alpha1.5)
-      hyper-router (= 1.0.alpha1.5)
-      hyperstack-config (= 1.0.alpha1.5)
+    rails-hyperstack (1.0.alpha1.7)
+      hyper-model (= 1.0.alpha1.7)
+      hyper-router (= 1.0.alpha1.7)
+      hyperstack-config (= 1.0.alpha1.7)
       opal-browser (~> 0.2.0)
       opal-rails
       rails (>= 5.0.0, < 7.0)

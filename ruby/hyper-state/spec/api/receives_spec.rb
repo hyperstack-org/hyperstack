@@ -43,4 +43,11 @@ describe 'receives method' do
     expect(broadcaster).not_to receive(:on_dispatch)
     store.receives(broadcaster)
   end
+
+  it "will attach receives to the singleton class" do
+    broadcaster = double('Broadcaster')
+    expect(store.class).to receive(:proc_called).with([1, 2, 3]).once
+    allow(broadcaster).to receive(:on_dispatch) { |&block| block.call([1, 2, 3])}
+    Store.singleton_class.receives broadcaster, :proc_called
+  end
 end

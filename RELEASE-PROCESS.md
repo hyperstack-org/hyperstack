@@ -7,5 +7,5 @@ To release a new gem set:
 5. Update `README.md` with last entry from `current-status.md`
 6. Commit all the above. <- VERY IMPORTANT TO DO THIS BEFORE ADDING THE TAG
 7. `git tag 1.0.alpha1.<new point release>`
-8. `git push origin edge` <- once build passes gems will be released!!!
+8. `git push --tags origin edge` <- once build passes gems will be released!!!
 9. Add a new release note (add release in git hub): Copy contents of the release note you created

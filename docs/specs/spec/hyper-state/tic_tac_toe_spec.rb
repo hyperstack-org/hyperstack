@@ -71,6 +71,7 @@ describe "Tic Tac Toe Game", :js do
   end
 
   def run_the_spec(initial_history)
+    binding.pry
     expect(page).to have_content "Next player: X", wait: 0
     expect(history).to eq initial_history
     expect(squares.count).to eq 9
@@ -553,6 +554,141 @@ describe "Tic Tac Toe Game", :js do
   it "using a store" do
     insert_html "<style>\n#{CSS}</style>"
     mount "DisplayGame" do
+      class Game
+        include Hyperstack::State::Observable
+
+        def initialize
+          @history = [[]]
+          @step = 0
+        end
+
+        observer :player do
+          @step.even? ? :X : :O
+        end
+
+        observer :current do
+          @history[@step]
+        end
+
+        state_reader :history
+
+        WINNING_COMBOS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+        def current_winner?
+          WINNING_COMBOS.each do |a, b, c|
+            return current[a] if current[a] && current[a] == current[b] && current[a] == current[c]
+          end
+          false
+        end
+
+        mutator :handle_click! do |id|
+          board = history[@step]
+          return if current_winner? || board[id]
+
+          board = board.dup
+          board[id] = player
+          @history = history[0..@step] + [board]
+          @step += 1
+        end
+
+        mutator(:jump_to!) { |step| @step = step }
+      end
+
+      class DisplayCurrentBoard < HyperComponent
+        param :game
+
+        def draw_square(id)
+          BUTTON(class: :square, id: id) { game.current[id] }
+          .on(:click) { game.handle_click!(id) }
+        end
+
+        render(DIV) do
+          (0..6).step(3) do |row|
+            DIV(class: :board_row) do
+              (row..row + 2).each { |id| draw_square(id) }
+            end
+          end
+        end
+      end
+
+      class DisplayGame < HyperComponent
+        before_mount { @game = Game.new }
+        def moves
+          return unless @game.history.length > 1
+
+          @game.history.length.times do |move|
+            LI(key: move) { move.zero? ? "Go to game start" : "Go to move ##{move}" }
+              .on(:click) { @game.jump_to!(move) }
+          end
+        end
+
+        def status
+          if (winner = @game.current_winner?)
+            "Winner: #{winner}"
+          else
+            "Next player: #{@game.player}"
+          end
+        end
+
+        render(DIV, class: :game) do
+          DIV(class: :game_board) do
+            DisplayCurrentBoard(game: @game)
+          end
+          DIV(class: :game_info) do
+            DIV { status }
+            OL { moves }
+          end
+        end
+      end
+
+    end
+    run_the_spec([])
+  end
+
+  it "using a class level store" do
+    insert_html "<style>\n#{CSS}</style>"
+    mount "DisplayGame" do
+      class Game
+        include Hyperstack::State::Observable
+        class << self
+          def initialize
+            @history = [[]]
+            @step = 0
+          end
+
+          observer :player do
+            @step.even? ? :X : :O
+          end
+
+          observer :current do
+            @history[@step]
+          end
+
+          state_reader :history
+
+          WINNING_COMBOS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+          def current_winner?
+            WINNING_COMBOS.each do |a, b, c|
+              return current[a] if current[a] && current[a] == current[b] && current[a] == current[c]
+            end
+            false
+          end
+
+          mutator :handle_click! do |id|
+            board = history[@step]
+            return if current_winner? || board[id]
+
+            board = board.dup
+            board[id] = player
+            @history = history[0..@step] + [board]
+            @step += 1
+          end
+
+          mutator(:jump_to!) { |step| @step = step }
+        end
+      end
+
       class DisplayBoard < HyperComponent
         param :board
 
@@ -571,6 +707,7 @@ describe "Tic Tac Toe Game", :js do
       end
 
       class DisplayGame < HyperComponent
+        before_mount { Game.initialize }
         def moves
           return unless Game.history.length > 1
 
@@ -598,7 +735,13 @@ describe "Tic Tac Toe Game", :js do
           end
         end
       end
+    end
+    run_the_spec([])
+  end
 
+  it "using the Boot broadcast to initialize the store" do
+    insert_html "<style>\n#{CSS}</style>"
+    mount "DisplayGame" do
       class Game
         include Hyperstack::State::Observable
 
@@ -638,6 +781,53 @@ describe "Tic Tac Toe Game", :js do
           end
 
           mutator(:jump_to!) { |step| @step = step }
+        end
+      end
+
+      class DisplayBoard < HyperComponent
+        param :board
+
+        def draw_square(id)
+          BUTTON(class: :square, id: id) { board[id] }
+          .on(:click) { Game.handle_click!(id) }
+        end
+
+        render(DIV) do
+          (0..6).step(3) do |row|
+            DIV(class: :board_row) do
+              (row..row + 2).each { |id| draw_square(id) }
+            end
+          end
+        end
+      end
+
+      class DisplayGame < HyperComponent
+        before_mount { Game.initialize }
+        def moves
+          return unless Game.history.length > 1
+
+          Game.history.length.times do |move|
+            LI(key: move) { move.zero? ? "Go to game start" : "Go to move ##{move}" }
+              .on(:click) { Game.jump_to!(move) }
+          end
+        end
+
+        def status
+          if (winner = Game.current_winner?)
+            "Winner: #{winner}"
+          else
+            "Next player: #{Game.player}"
+          end
+        end
+
+        render(DIV, class: :game) do
+          DIV(class: :game_board) do
+            DisplayBoard(board: Game.current)
+          end
+          DIV(class: :game_info) do
+            DIV { status }
+            OL { moves }
+          end
         end
       end
     end

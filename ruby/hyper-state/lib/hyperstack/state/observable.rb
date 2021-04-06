@@ -97,6 +97,16 @@ module Hyperstack
             state_writer(*names)
           end
         end
+        # receives is defined at the class an instance level above, but for
+        # convenience we also define it as singleton_method on the singleton class allowing this:
+        # class Foo
+        #   class << self
+        #     receives ...
+        #   end
+        # end
+        base.singleton_class.define_singleton_method(:receives) do |*args, &block|
+          Internal::Receiver.mount(base, *args, &block)
+        end
       end
     end
   end
