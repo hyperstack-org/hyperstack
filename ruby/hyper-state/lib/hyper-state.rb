@@ -12,7 +12,9 @@ require 'hyperstack/state/observable'
 require 'hyperstack/state/observer'
 require 'hyperstack/state/version'
 
-if RUBY_ENGINE != 'opal'
+if RUBY_ENGINE == 'opal'
+  require 'ext/object_space'
+else
   require 'opal'
   Opal.append_path(File.expand_path('../', __FILE__).untaint)
 end

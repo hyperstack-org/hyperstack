@@ -1,16 +1,15 @@
 
-<img align="left" width="100" height="100" style="margin-right: 20px" src="https://github.com/hyperstack-org/hyperstack/blob/edge/docs/wip.png?raw=true" /> The `Hyperstack::State::Observable` module allows you to build classes that share their state with Hyperstack Components, and have those components update when objects in those classes change state.
-
-## This Page Under Construction
-
-The `Hyperstack::State::Observable` module allows you to build classes that share their state with Hyperstack Components and have those components update when objects in those classes change state.
 
 ### Revisiting the Tic Tac Toe Game
 
 The easiest way to understand HyperState is by example.  If you you did not see the Tic-Tac-Toe example, then **[please review it now](client-dsl/interlude-tic-tac-toe.md)**, as we are going to use this to demonstrate how to use the `Hyperstack::State::Observable` module.
 
 In our original Tic-Tac-Toe implementation the state of the game was stored in the `DisplayGame` component.  State was updated by
+<<<<<<< HEAD
 "bubbling up" events from lower level components up to `DisplayGame` where the event handler updated the state.
+=======
+"bubbling up" events from lower level components up to `DisplayGame` where the event hander updated the state.
+>>>>>>> issue-402
 
 This is a nice simple approach but suffers from two issues:
 + Each level of lower level components must be responsible for bubbling up the events to the higher component.
@@ -19,11 +18,11 @@ This is a nice simple approach but suffers from two issues:
 As our applications become larger we will want a way to keep each component's interface isolated and not dependent on the overall
 architecture, and to insure good separation of concerns.  
 
-The `Hyperstack::State::Observable` module allows us to put the game's state into a separate class, which can be accessed from any
-component:  No more need to bubble up events, and no more cluttering up our `DisplayGame` component with state management stuff
+The `Hyperstack::State::Observable` module allows us to put the game's state into a separate class which can be accessed from any
+component:  No more need to bubble up events, and no more cluttering up our `DisplayGame` component with state management
 and details of the game's data structure.
 
-Here is the game state moved out of the `DisplayGame` component into its own class:
+Here is the game state and associated methods moved out of the `DisplayGame` component into its own class:
 
 ```ruby
 class Game
@@ -73,9 +72,8 @@ class Game
   include Hyperstack::State::Observable
 ```
 
-Including `Hyperstack::State::Observable` gives us access to a number of methods that allows our class to become
-a *reactive store*, and interact with other stores and components so that when the `Game` state updates so will
-any components that directly or indirectly depend on its state.
+`Game` is now in its own class and includes `Hyperstack::State::Observable`. This adds a number of methods to `Game` that allows our class to become
+a *reactive store*.  When `Game` interacts with other stores and components they will be updated as the state of  `Game` changes.
 
 ```ruby
   def initialize
@@ -84,9 +82,9 @@ any components that directly or indirectly depend on its state.
   end
 ```
 
-In the original implementation we initialized the two state variables `@history` and `@step` in the `before_mount` callback.
-There is no "mounting" of a store, so instead we will initialize our game by creating a new instance in the `DisplayGame` before
-mount callback (see below.)
+In the original implementation we initialized the two state variables `@history` and `@step` in the `before_mount` callback. The same initialization
+is now in the `initialize` method which will be called when a new instance of the game is created.  This will still be done in the  `DisplayGame`
+`before_mount` callback (see below.)
 
 ```ruby
   observer :player do
@@ -108,8 +106,7 @@ been changed `observe` and `observer` indicate that state has been accessed outs
   attr_reader :history
 ```
 
-Just as we have `mutate`, `mutator`, and `state_writer`, we have `observe`, `observer`, and `state_reader`.  The `state_accessor`
-method just combines the two together.
+Just as we have `mutate`, `mutator`, and `state_writer`, we have `observe`, `observer`, and `state_reader`.
 
 ```ruby
   WINNING_COMBOS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
@@ -178,7 +175,7 @@ end
 
 The `DisplayGame` `before_mount` callback is still responsible for initializing the game, but it no longer needs to be aware of
 the internals of the game's state.  It simply calls `Game.new` and stores the result in the `@game` instance variable. For the rest
-of the component call the appropriate method on `@game`.
+of the component's code we call the appropriate method on `@game`.
 
 We will need to pass the entire game to `DisplayBoard` (we will see why shortly) so we will rename it to `DisplayCurrentBoard`.
 
@@ -216,7 +213,7 @@ communicate back upwards via events.  Instead we communicate through the central
 
 Rather than sending params down to lower level components, and having the components bubble up events, we have created a *Flux Loop*.
 The `Game` store holds the state, the top level component reads the state and sends it down to lower level components, those
-components update the state, causing the top level component to re-rerender.  
+components update the `Game` state causing the top level component to re-rerender.  
 
 This structure greatly simplifies the structure and understanding of our components, and keeps each component functionally isolated.
 
@@ -224,11 +221,12 @@ Furthermore algorithms such as `current_winner?` now are neatly abstracted out i
 
 ### Classes and Instances
 
-If we are sure we will only want one Game board, we could define Game with class methods like this:
+If we are sure we will only want one game board, we could define `Game` with class methods like this:
 
 ```ruby
 class Game
   include Hyperstack::State::Observable
+
   class << self
     def initialize
       @history = [[]]
@@ -286,7 +284,6 @@ class DisplayBoard < HyperComponent
 end
 
 class DisplayGame < HyperComponent
-  before_mount { Game.initialize }
   def moves
     return unless Game.history.length > 1
 
@@ -316,33 +313,14 @@ class DisplayGame < HyperComponent
 end
 ```
 
+Now instead of creating an instance and passing it around we
+call the class level methods on `Game` throughout.
+
+The `Hyperstack::State::Observable` module will call any class level `initialize` methods in the class or subclasses
+before the first component mounts.
+
 Note that with this approach we can go back to passing just the current board to `DisplayBoard` as `DisplayBoard` can
 directly access `Game.handle_click!` since there is only one game.
-
-### The Boot Broadcast
-
-Observable classes can also receive information from *broadcasts*.  Hyperstack comes with one predefined broadcast: `Hyperstack::Application::Boot` which is sent when the application has finished loading but before the first component is mounted.
-
-We can hook into the Boot broadcast and replace the need for our top level component to call initialize:
-
-```ruby
-class Game
-  include Hyperstack::State::Observable
-
-  receives Hyperstack::Application::Boot do
-    @history = [[]]
-    @step = 0
-  end
-
-  class << self
-    ...
-  end
-end
-...
-```
-> Why is `receives` outside the class definitions?  The receives method can be used to attach broadcasts to either class level or
-instances.  In this case we want to attach the receiver to Game, not to Game's singleton class.  More on receivers and broadcasting
-in the chapter on Operations.
 
 ### Thinking About Stores
 
@@ -359,11 +337,9 @@ If your store's methods access other stores, you do not need worry about their s
 that the built in Ruby Array and Hash classes are **not** stores, so when you modify or read an Array or a Hash its up to you to use
 the appropriate `mutate` or `observe` method.
 
-> Why not make Arrays and Hashes stores?  For efficiency.  Its a comprimise solution.
-
 ### Stores and Parameters
 
-Typically in a large system you will have one or more central stores, and what you end up passing as parameters are either instances of those stores, or some other kind of index into the store.  Or if (as in the case of our Game) there is only one store, you
+Typically in a large system you will have one or more central stores, and what you end up passing as parameters are either instances of those stores, or some other kind of index into the store.  If there is only one store (as in the case of our Game), you
 need not pass any parameters at all.
 
 We can rewrite the previous iteration of `DisplayBoard` to demonstrate this:
@@ -387,22 +363,26 @@ class DisplayBoard < HyperComponent
 end
 ```
 
-Here `DisplayBoard` no longer takes any parameter (and should be renamed again to `DisplayCurrentBoard`) and now
-`DisplaySquare` takes the id of the square to display, but the game or the current board are never passed as parameters;
+Here `DisplayBoard` no longer takes any parameter (and could be renamed again to `DisplayCurrentBoard`) and now a new component -
+`DisplaySquare` - takes the id of the square to display, but the game or the current board are never passed as parameters;
 there is no need to as they are implicit.
 
+<<<<<<< HEAD
 Whether to pass (or not pass) a store class, an instance of a store, or some other index into the store is a design decision that depends on
+=======
+Whether to not pass a store class, an instance of a store, or some other index into the store is a design decision that depends on
+>>>>>>> issue-402
 lots of factors, mainly how you see your application evolving over time.
 
 ### Summary of Methods
 
 All the observable methods can be used either at the class or instance level.
 
-#### Observing State
+#### Observing State: `observe, observer, state_reader`
 
 The `observe` method takes any number of arguments and/or a block. The last argument evaluated or the value of the block is returned.
 
-The arguments and block are evaluated then the objects state will be *observed*.  
+The arguments and block are evaluated then the object's state will be *observed*.  
 
 If the block exits with a return or break, the state will **not** be observed.
 
@@ -416,7 +396,7 @@ observe do
 end
 ```
 
-The `observer` method defines a new method with an implicit observer call:
+The `observer` method defines a new method with an implicit observe:
 
 ```ruby
 observer :foo do |x, y, z|
@@ -449,10 +429,87 @@ def baz
 end
 ```
 
-#### Mutating State
+#### Mutating State: `mutate, mutator, state_writer, toggle`
 
+The `mutate` method takes any number of arguments and/or a block. The last argument evaluated or the value of the block is returned.
 
-receives
-mutate, mutator, state_writer
-state_accessor
-toggle
+The arguments and block are evaluated then the object's state will be *mutated*.  
+
+If the block exits with a return or break, the state will **not** be mutated.
+
+```ruby
+# evaluate and return a value
+mutate @history[@step]
+
+# evaluate a block and return its value
+mutate do
+  @history[@step]
+end
+```
+
+The `mutator` method defines a new method with an implicit mutate:
+
+```ruby
+mutator :foo do |x, y, z|
+  ...
+end
+```
+is equivilent to
+```ruby
+def foo(x, y, z)
+  mutate do
+    ...
+  end
+end
+```
+
+Again if the block exits with a `return` or `break` the state will **not** be mutated.
+
+The `state_writer` method declares one or more state accessors with an implicit state mutation:
+
+```ruby
+state_reader :bar, :baz
+```
+is equivilent to
+```ruby
+def bar=(x)
+  mutate @bar = x
+end
+def baz=(x)
+  observe @baz = x
+end
+```
+
+The `toggle` method reverses the polarity of a instance variable:
+
+```ruby
+toggle(:foo)
+```
+is equivilent to
+```ruby
+mutate @foo = !@foo
+```
+
+#### The `state_accessor` Method
+
+Combines `state_reader` and `state_writer` methods.
+
+```ruby
+state_accessor :foo, :bar
+```
+is equivilent to
+```ruby
+state_reader :foo, :bar
+state_writer :foo, :bar
+```
+
+### Components and Stores
+
+The standard `HyperComponent` base class includes `Hyperstack::State::Observable` so any `HyperComponent` has access to
+all of the above methods.  A component also always **observes itself** so you never need to use `observe` within
+a component **unless** the state will be accessed outside the component.   However once you start doing that you
+would be better off to move the state into a separate store.
+
+> In addition components also act as the **Observers** in the system.  What this means is
+that current component that is running its render method is recording all stores that call `observe`, when
+a store mutates, then all the components that recorded observations will be rerendered.
