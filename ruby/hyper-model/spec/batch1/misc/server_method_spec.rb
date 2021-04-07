@@ -88,4 +88,42 @@ RSpec::Steps.steps 'server_method', js: true do
     expect(TestModel.count).to be_zero
     expect(ChildModel.count).to be_zero
   end
+
+  it "will allow remote access to methods" do
+    TodoItem.class_eval do
+      def foo
+        "foo"
+      end
+
+      def bar
+        "bar"
+      end
+
+      def broken
+        "broken"
+      end
+
+      def defaulted
+        "defaulted"
+      end
+    end
+    isomorphic do
+      TodoItem.class_eval do
+        allow_remote_access_to(:foo, :bar) { acting_user.nil? }
+        allow_remote_access_to(:broken) { acting_user.admin? }
+        allow_remote_access_to(:dontcallme, defaulted: "loading") { true }
+      end
+    end
+    client_option raise_on_js_errors: :off
+    expect { TodoItem.last.foo }.on_client_to be_nil
+    expect { Hyperstack::Model.load { TodoItem.last.foo } }.on_client_to eq("foo")
+    expect { TodoItem.last.bar }.on_client_to be_nil
+    expect { Hyperstack::Model.load { TodoItem.last.bar } }.on_client_to eq("bar")
+    expect { Hyperstack::Model.load { TodoItem.last.broken } }.on_client_to be_nil
+    expect { TodoItem.last.defaulted }.on_client_to eq "loading"
+    expect { Hyperstack::Model.load { TodoItem.last.defaulted } }.on_client_to eq("defaulted")
+    errors = page.driver.browser.manage.logs.get(:browser).select { |m| m.level == "SEVERE" }
+    expect(errors.count).to eq(2)
+    expect(errors.first.message).to match(/the server responded with a status of 403 \(Forbidden\)/)
+  end
 end

@@ -364,6 +364,18 @@ module ActiveRecord
       end
     end
 
+    def allow_remote_access_to(*methods)
+      methods.each do |meth|
+        if meth.is_a? Hash
+          puts "defining these guys: #{meth}"
+          meth.each { |name, default| server_method(name, default: default) }
+        else
+          puts "defining this guy: #{meth}"
+          server_method(meth)
+        end
+      end
+    end
+
     # define all the methods for each column.  To allow overriding the methods they will NOT
     # be defined if already defined (i.e. by the model)  See the instance_methods module for how
     # super calls are handled in this case.   The _hyperstack_internal_setter_... methods

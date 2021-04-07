@@ -129,19 +129,31 @@ module ActiveRecord
           end
         end
 
+        def allow_remote_access_to(*methods, &block)
+          methods = methods.collect { |meth| meth.is_a?(Hash) ? meth.keys : meth }.flatten
+          methods.each do |name|
+            define_method("__secure_remote_access_to_#{name}") do |_self, acting_user, *args|
+              begin
+                old = self.acting_user
+                self.acting_user = acting_user
+                allowed = !block || instance_eval(&block) rescue nil
+                return send(name, *args) if allowed
+
+                Hyperstack::InternalPolicy.raise_operation_access_violation(
+                  :illegal_remote_access, "Access denied to #{name}"
+                )
+              ensure
+                self.acting_user = old
+              end
+            end
+          end
+        end
+
         def server_method(name, _opts = {}, &block)
           # callable from the server internally
           define_method(name, &block)
           # callable remotely from the client
-          define_method("__secure_remote_access_to_#{name}") do |_self, acting_user, *args|
-            begin
-              old = self.acting_user
-              self.acting_user = acting_user
-              send(name, *args)
-            ensure
-              self.acting_user = old
-            end
-          end
+          allow_remote_access_to(name)
         end
 
         # relationships (and scopes) are regulated using a tri-state system.  Each

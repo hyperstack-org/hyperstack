@@ -82,7 +82,11 @@ module HyperSpec
 
     def isomorphic(&block)
       yield
-      before_mount(&block)
+      if page.instance_variable_get('@hyper_spec_mounted')
+        internal_evaluate_ruby(&block)
+      else
+        before_mount(&block)
+      end
     end
 
     # Allows options to the mount method to be specified globally
