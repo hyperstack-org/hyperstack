@@ -108,6 +108,20 @@ describe 'hyper-spec', js: true do
     expect(evaluate_ruby('factorial(5)')).to eq(factorial(5))
   end
 
+  it "can load isomorphic code after loading" do
+    on_client do
+      CONSTANT = 1
+    end
+    CONSTANT = 1
+    isomorphic do
+      def factorial(n)
+        n==CONSTANT ? CONSTANT : n * factorial(n-CONSTANT)
+      end
+      nil
+    end
+    expect(evaluate_ruby('factorial(5)')).to eq(factorial(5))
+  end
+
   context 'promise helpers' do
     # just to demonstrate a few things:
     # 1 - You can use methods like mount, isomorphic, on_client in before(:each) blocks

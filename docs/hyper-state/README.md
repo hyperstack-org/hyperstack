@@ -348,6 +348,7 @@ class DisplaySquare
     .on(:click) { Game.handle_click(id) }
   end
 end
+
 class DisplayBoard < HyperComponent
   render(DIV) do
     (0..6).step(3) do |row|
@@ -503,5 +504,5 @@ a component **unless** the state will be accessed outside the component.   Howev
 would be better off to move the state into a separate store.
 
 > In addition components also act as the **Observers** in the system.  What this means is
-that current component that is running its render method is recording all stores that call `observe`, when
+that the current component that is running its render method is recording all stores that call `observe`, when
 a store mutates, then all the components that recorded observations will be rerendered.
