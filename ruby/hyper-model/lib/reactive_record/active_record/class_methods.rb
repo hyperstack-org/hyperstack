@@ -197,14 +197,18 @@ module ActiveRecord
     ]
 
     def method_missing(name, *args, &block)
-      if name == 'human_attribute_name'
+      # In MRI Ruby we would never get to this point with a nil name argument,
+      #   but currently in Opal we do, so we will mimic MRI Ruby and throw a TypeError.
+      raise TypeError, "nil is not a symbol nor a string" if name.nil?
+
+      if name == "human_attribute_name"
         opts = args[1] || {}
         opts[:default] || args[0]
       elsif args.count == 1 && name.start_with?("find_by_") && !block
-        find_by(name.sub(/^find_by_/, '') => args[0])
+        find_by(name.sub(/^find_by_/, "") => args[0])
       elsif [].respond_to?(name)
         all.send(name, *args, &block)
-      elsif name.end_with?('!')
+      elsif name.end_with?("!")
         send(name.chop, *args, &block).send(:reload_from_db) rescue nil
       elsif !SERVER_METHODS.include?(name)
         raise "#{self.name}.#{name}(#{args}) (called class method missing)"
