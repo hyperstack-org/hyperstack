@@ -11,8 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Method tracing and conditional breakpoints for Opal Ruby}
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.documentation = 'https://docs.hyperstack.org/'
-  spec.download      = 'https://github.com/hyperstack-org/hyperstack'
+  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

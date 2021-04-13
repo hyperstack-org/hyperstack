@@ -10,14 +10,8 @@ Gem::Specification.new do |spec|
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = 'HyperOperations are the swiss army knife of the Hyperstack'
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.documentation = 'https://docs.hyperstack.org/'
-  spec.download      = 'https://github.com/hyperstack-org/hyperstack'
+  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
   spec.license       = 'MIT'
-  # spec.metadata      = {
-  #   "homepage_uri" => 'http://ruby-hyperstack.org',
-  #   "source_code_uri" => 'https://github.com/ruby-hyperstack/hyper-component'
-  # }
-
   spec.files         = `git ls-files -z`
                        .split("\x0")
                        .reject { |f| f.match(%r{^(gemfiles|examples|spec)/}) }

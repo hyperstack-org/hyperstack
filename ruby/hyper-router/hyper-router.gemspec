@@ -8,8 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Adam George', 'Jan Biedermann']
   spec.email         = ['adamgeorge.31@gmail.com', 'jan@kursator.com']
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.documentation = 'https://docs.hyperstack.org/'
-  spec.download      = 'https://github.com/hyperstack-org/hyperstack'
+  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
   spec.license       = 'MIT'
   spec.summary       = 'hyper-router for Opal, part of the hyperstack framework'
 
