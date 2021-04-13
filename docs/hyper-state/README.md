@@ -2,7 +2,7 @@
 
 ### Revisiting the Tic Tac Toe Game
 
-The easiest way to understand HyperState is by example.  If you you did not see the Tic-Tac-Toe example, then **[please review it now](client-dsl/interlude-tic-tac-toe.md)**, as we are going to use this to demonstrate how to use the `Hyperstack::State::Observable` module.
+The easiest way to understand HyperState is by example.  If you you did not see the Tic-Tac-Toe example, then **[please review it now](/client-dsl/interlude-tic-tac-toe.md)**, as we are going to use this to demonstrate how to use the `Hyperstack::State::Observable` module.
 
 In our original Tic-Tac-Toe implementation the state of the game was stored in the `DisplayGame` component.  State was updated by
 "bubbling up" events from lower level components up to `DisplayGame` where the event handler updated the state.
