@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
                        'possible technologies) so changes to records on the server are '\
                        'dynamically updated on all authorised clients.'
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
+  spec.metadata      = { 'documentation_uri' => 'https://docs.hyperstack.org/' }
   spec.license       = 'MIT'
   spec.files          = `git ls-files`.split("\n").reject { |f| f.match(%r{^(examples|gemfiles|pkg|reactive_record_test_app|spec)/}) }
   # spec.executables    = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['mitch@catprint.com', 'jan@kursator.com']
   spec.summary       = 'HyperOperations are the swiss army knife of the Hyperstack'
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
+  spec.metadata      = { 'documentation_uri' => 'https://docs.hyperstack.org/' }
   spec.license       = 'MIT'
   spec.files         = `git ls-files -z`
                        .split("\x0")

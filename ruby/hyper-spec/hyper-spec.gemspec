@@ -13,7 +13,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
                        'Active Record Models, Stores, Operations and Policiespec. '\
                        'Test them all from Rspec, regardless if the code runs on the client or server.'
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
+  spec.metadata      = { 'documentation_uri' => 'https://docs.hyperstack.org/' }
   spec.license       = 'MIT'
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.bindir        = 'exe'

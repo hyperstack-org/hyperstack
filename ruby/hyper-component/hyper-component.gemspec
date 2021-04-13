@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['David Chang', 'Adam Jahn', 'Mitch VanDuyn', 'Jan Biedermann', 'Adam Creekroad']
   spec.email         = ['mitch@catprint.com']
   spec.homepage      = 'http://ruby-hyperstack.org'
-  spec.metadata      = { documentation_uri: 'https://docs.hyperstack.org/' }
+  spec.metadata      = { 'documentation_uri' => 'https://docs.hyperstack.org/' }
   spec.summary       = 'Opal Ruby wrapper of React.js library.'
   spec.license       = 'MIT'
   spec.description   = 'Write React UI components in pure Ruby.'
