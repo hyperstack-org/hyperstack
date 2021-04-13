@@ -72,34 +72,7 @@ In order for Hyperstack to see your Models \(and make them Isomorphic\) you need
 | **Location of Models** | **Scope** |
 | :--- | :--- |
 | `app\models` | Server-side code only |
-| `app\Hyperstack\models` | Isomorphic code \(client and server\) |
-
-### Rails 5.1.x
-
-Upto Rails 4.2, all models inherited from `ActiveRecord::Base`. But starting from Rails 5, all models will inherit from `ApplicationRecord`.
-
-To accommodate this change, the following file has been automatically added to models in Rails 5 applications.
-
-```ruby
-# app/models/application_record.rb
-class ApplicationRecord < ActiveRecord::Base
-  self.abstract_class = true
-end
-```
-
-For Hyperstack to see this change, this file needs to be moved \(or copied if you have some server-side models\) to the `apps/Hyperstack` folder.
-
-### Explicit Scope Access
-
-In order to prevent unauthorized access to information like scope counts, lists of record ids, etc, Hyperstack now \(see issue [https://github.com/ruby-Hyperstack/hyper-mesh/issues/43](https://github.com/ruby-Hyperstack/hyper-mesh/issues/43)\) requires you explicitly allow scopes to be viewed on the client, otherwise you will get an AccessViolation.
-
-To globally allow access to all scopes add this to the ApplicationRecord class
-
-```ruby
-class ApplicationRecord < ActiveRecord::Base
-  regulate_scope :all
-end
-```
+| `app\hyperstack\models` | Isomorphic code \(client and server\) |
 
 ## ActiveRecord API
 
@@ -109,15 +82,15 @@ Hyperstack uses a subset of the standard ActiveRecord API to give your Isomorphi
 
 Hyperstack integrates with React \(through Components\) to deliver your Model data to the client without you having to create extra APIs or specialized controllers. The key idea of React is that when state \(or params\) change, the portions of the display effected by this data will be updated.
 
-Hyperstack automatically creates React state objects that will be updated as server side data is loaded or changes. When these states change the associated parts of the display will be updated.
+On the client each database record being used by the client is represented as an observable store **([see the chapter on HyperState for details](hyper-state/README.md))** which will mutate as server side data is loaded or changes. When these states change the associated parts of the display will be updated.
 
-A brief overview of how this works will help you understand the how Hypeloop gets the job done.
+A brief overview of how this works will help you understand the how HyperStack gets the job done.
 
 #### Rendering Cycle
 
 On the UI you will be reading models in order to display data.
 
-If during the rendering of the display the Model data is not yet loaded, placeholder values \(the default values from the `columns_hash`\) will be returned by Hyperstack.
+If during the rendering of the display the Model data is not yet loaded, placeholder values \(the default values from the database schema\) will be returned by Hyperstack.
 
 Hyperstack then keeps track of where these placeholders \(or `DummyValue`s\) are displayed, and when they do get loaded, those parts of the display will re-render.
 
@@ -143,7 +116,7 @@ There are a number of methods that allow you to interact with this load cycle wh
 
 #### New and Create
 
-`new`: Takes a hash of attributes and initializes a new unsaved record. The values of any attributes not specified in the hash will be taken from the Models default values specified in the `columns_hash`.
+`new`: Takes a hash of attributes and initializes a new unsaved record. The values of any attributes not specified in the hash will be taken from the Models default values specified in the data base schema.
 
 If `new` is passed a native javascript object it will be treated as a hash and converted accordingly.
 
@@ -209,7 +182,7 @@ Word.offset(500).limit(20) # get words 500-519
 
 #### Applying Class Methods to Collections
 
-Like Rails if you define a class method on a model, you can apply it to collection of those records, allowing you
+Like Rails if you define a class method on a model, you can apply it to a collection of those records, allowing you
 to chain methods with scopes (and relationships)
 
 ```ruby
@@ -264,6 +237,9 @@ class User < ActiveRecord::Base
 end
 ```
 
+
+
+
 Sometimes it is desirable to only run the method on the server. This can be done using the `server_method` macro:
 
 ```ruby
@@ -284,7 +260,7 @@ To force the value to be recomputed at the server append a `!` to the end of the
 
 `columns_hash`: returns the details of the columns specification. Note that on the server `columns_hash` returns a hash of objects specifying column information. On the client the entire structure is just one big hash of hashes.
 
-`abstract_class=`, `abstract_class?`, `primary_key`, `primary_key=`, `inheritance_column`, `inheritance_column=`, `model_name`, `serialize`, `alias_attribute`, `table_name`: All work as on the server. See ActiveRecord documentation for more info.
+`abstract_class=`, `abstract_class?`, `primary_key`, `primary_key=`, `inheritance_column`, `inheritance_column=`, `model_name`: All work as on the server. See ActiveRecord documentation for more info.
 
 ### Instance Methods
 
@@ -313,10 +289,6 @@ end
 
 After a save operation completes the models will have an `errors` hash \(just like on the server\) with any validation problems.
 
-`save` does not fail, but rather returns `{success: false ...}`.  If there was an
-exception the `message` key will hold the error information, otherwise the errors will
-be stored in the records error data (as on the server.)
-
 During the save operation the method `saving?` will return `true`. This can be used to instead of \(or with\) the promise to update the screen:
 
 ```ruby
@@ -337,9 +309,7 @@ end
 
 Like `save` destroy returns a promise that is resolved when the destroy completes.
 
-After the destroy completes successfully the record's `destroyed?` method will return true.
-
-Like `save` destroy never fails, but rather returns `{success: false...}`
+After the destroy completes the record's `destroyed?` method will return true.
 
 #### Other Instance Methods
 
@@ -397,12 +367,12 @@ The `load` method takes a list of attributes \(symbols\) and will insure these a
 before_mount do
   Todo.find(1).load(:name).then do |name|
     @name = name;
-    mutate @loaded = true
+    state.loaded! true
   end
 end
 ```
 
-> Think hard about how you are using this, as Hyperstack already acts as flux store, and is managing state for you. It may be you are just creating a redundant store!
+Think hard about how you are using this, as Hyperstack already acts as flux store, and is managing state for you. It may be you are just creating a redundant store!
 
 ## Client Side Scoping
 
