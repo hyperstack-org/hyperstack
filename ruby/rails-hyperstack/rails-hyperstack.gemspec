@@ -11,6 +11,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ['Loic Boutet', 'Adam George', 'Mitch VanDuyn', 'Jan Biedermann']
   spec.email       = ['loic@boutet.com', 'jan@kursator.com']
   spec.homepage    = 'http://hyperstack.org'
+  spec.documentation = 'https://docs.hyperstack.org/'
+  spec.download    = 'https://github.com/hyperstack-org/hyperstack'
   spec.license     = 'MIT'
   # spec.metadata = {
   #   "homepage_uri" => 'http://hyperstack.org',

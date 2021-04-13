@@ -11,7 +11,9 @@ Gem::Specification.new do |spec|
   spec.email         = ['adamgeorge.31@gmail.com']
 
   spec.summary       = 'HyperI18n seamlessly brings Rails I18n into your Hyperstack application.'
-  spec.homepage      = 'https://www.github.com/ruby-hyperstack/hyper-i18n'
+  spec.homepage      = 'http://ruby-hyperstack.org'
+  spec.documentation = 'https://docs.hyperstack.org/'
+  spec.download      = 'https://github.com/hyperstack-org/hyperstack'
   spec.license       = 'MIT'
 
   spec.files          = `git ls-files`.split("\n")

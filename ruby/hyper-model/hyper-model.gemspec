@@ -14,6 +14,8 @@ Gem::Specification.new do |spec|
                        'possible technologies) so changes to records on the server are '\
                        'dynamically updated on all authorised clients.'
   spec.homepage      = 'http://ruby-hyperstack.org'
+  spec.documentation = 'https://docs.hyperstack.org/'
+  spec.download    = 'https://github.com/hyperstack-org/hyperstack'
   spec.license       = 'MIT'
   # spec.metadata      = {
   #   "homepage_uri" => 'http://ruby-hyperstack.org',

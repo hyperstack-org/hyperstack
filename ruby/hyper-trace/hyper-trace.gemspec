@@ -10,7 +10,9 @@ Gem::Specification.new do |spec|
   spec.email         = ["mitch@catprint.com"]
 
   spec.summary       = %q{Method tracing and conditional breakpoints for Opal Ruby}
-  spec.homepage      = "https://github.com/reactrb/hyper-trace"
+  spec.homepage      = 'http://ruby-hyperstack.org'
+  spec.documentation = 'https://docs.hyperstack.org/'
+  spec.download      = 'https://github.com/hyperstack-org/hyperstack'
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

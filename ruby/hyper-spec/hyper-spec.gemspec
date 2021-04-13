@@ -12,7 +12,9 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.description   = 'A Hyperstack application consists of isomorphic React Components, '\
                        'Active Record Models, Stores, Operations and Policiespec. '\
                        'Test them all from Rspec, regardless if the code runs on the client or server.'
-  spec.homepage      = 'http://hyperstack.org'
+  spec.homepage      = 'http://ruby-hyperstack.org'
+  spec.documentation = 'https://docs.hyperstack.org/'
+  spec.download      = 'https://github.com/hyperstack-org/hyperstack'
   spec.license       = 'MIT'
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(gemfiles|spec)/}) }
   spec.bindir        = 'exe'
