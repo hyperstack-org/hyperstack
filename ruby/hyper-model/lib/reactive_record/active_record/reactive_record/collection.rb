@@ -116,32 +116,28 @@ module ReactiveRecord
     end
 
     class << self
-
-=begin
-sync_scopes takes a newly broadcasted record change and updates all relevant currently active scopes
-This is particularly hard when the client proc is specified.  For example consider this scope:
-
-class TestModel < ApplicationRecord
-  scope :quicker, -> { where(completed: true) }, client: -> { completed }
-end
-
-and this slice of reactive code:
-
-   DIV { "quicker.count = #{TestModel.quicker.count}" }
-
-then on the server this code is executed:
-
-  TestModel.last.update(completed: false)
-
-This will result in the changes being broadcast to the client, which may cauase the value of
-TestModel.quicker.count to increase or decrease.  Of course we may not actually have the all the records,
-perhaps we just have the aggregate count.
-
-To determine this sync_scopes first asks if the record being changed is in the scope given its value
-
-
-=end
       attr_accessor :broadcast_updated_at
+
+      # sync_scopes takes a newly broadcasted record change and updates all relevant currently active scopes
+      # This is particularly hard when the client proc is specified.  For example consider this scope:
+
+      # class TestModel < ApplicationRecord
+      #   scope :quicker, -> { where(completed: true) }, client: -> { completed }
+      # end
+
+      # and this slice of reactive code:
+
+      #   DIV { "quicker.count = #{TestModel.quicker.count}" }
+
+      # then on the server this code is executed:
+
+      #   TestModel.last.update(completed: false)
+
+      # This will result in the changes being broadcast to the client, which may cauase the value of
+      # TestModel.quicker.count to increase or decrease.  Of course we may not actually have the all the records,
+      # perhaps we just have the aggregate count.
+
+      # To determine this sync_scopes first asks if the record being changed is in the scope given its value
 
       def sync_scopes(broadcast)
         self.broadcast_updated_at = broadcast.updated_at
@@ -501,6 +497,33 @@ To determine this sync_scopes first asks if the record being changed is in the s
         @dummy_collection = nil
       end
       notify_of_change self
+    end
+
+    def create(attributes = nil)
+      raise "You cannot call create unless the parent is saved" if @owner.new_record?
+
+      attributes = [attributes] unless attributes.is_a?(Array)
+
+      records = attributes.map { |a| build_record(a) }
+
+      Promise.new.tap do |promise|
+        Promise.when(*records.map(&:save)).then do
+          promise.resolve(records)
+
+          yield(*records) if block_given?
+        end
+      end
+    end
+
+    def build_record(attributes = {})
+      if (through_association = @association&.through_association)
+        through_association.klass.new(
+          @association.inverse_of => @owner,
+          @association.source => @association.klass.new(attributes)
+        )
+      else
+        @association.klass.new(attributes).tap { |r| _internal_push(r) }
+      end
     end
 
     # [:first, :last].each do |method|
