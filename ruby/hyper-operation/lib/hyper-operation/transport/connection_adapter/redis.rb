@@ -63,7 +63,7 @@ module Hyperstack
         end
 
         def disconnect(channel)
-          Connection.find_by(channel: channel, session: nil).destroy
+          Connection.find_by(channel: channel, session: nil)&.destroy
         end
 
         def root_path=(path)
