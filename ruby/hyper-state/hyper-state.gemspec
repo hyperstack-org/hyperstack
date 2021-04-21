@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyperstack-config', Hyperstack::State::VERSION
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperstack::State::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperstack::State::VERSION
   spec.add_development_dependency 'listen'
