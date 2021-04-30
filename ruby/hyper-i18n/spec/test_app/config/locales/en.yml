@@ -9,3 +9,5 @@ en:
   components:
     test_component:
       the_key: I am a key
+  test_component:
+    that_other_key: I am another key
