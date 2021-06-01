@@ -2467,18 +2467,22 @@ exports.compareByGeneratedPositionsInflated = compareByGeneratedPositionsInflate
     }
 
     function _findFunctionName(source, lineNumber/*, columnNumber*/) {
-        var syntaxes = [
-            // {name} = function ({args}) TODO args capture
-            /['"]?([$_A-Za-z][$_A-Za-z0-9]*)['"]?\s*[:=]\s*function\b/,
-            // function {name}({args}) m[1]=name m[2]=args
-            /function\s+([^('"`]*?)\s*\(([^)]*)\)/,
-            // {name} = eval()
-            /['"]?([$_A-Za-z][$_A-Za-z0-9]*)['"]?\s*[:=]\s*(?:eval|new Function)\b/,
-            // fn_name() {
-            /\b(?!(?:if|for|switch|while|with|catch)\b)(?:(?:static)\s+)?(\S+)\s*\(.*?\)\s*\{/,
-            // {name} = () => {
-            /['"]?([$_A-Za-z][$_A-Za-z0-9]*)['"]?\s*[:=]\s*\(.*?\)\s*=>/
-        ];
+        if (!this._functionNameSyntaxes) {
+            this._functionNameSyntaxes = [
+                // {name} = function ({args}) TODO args capture
+                /['"]?([$_A-Za-z][$_A-Za-z0-9]*)['"]?\s*[:=]\s*function\b/,
+                // function {name}({args}) m[1]=name m[2]=args
+                /function\s+([^('"`]*?)\s*\(([^)]*)\)/,
+                // {name} = eval()
+                /['"]?([$_A-Za-z][$_A-Za-z0-9]*)['"]?\s*[:=]\s*(?:eval|new Function)\b/,
+                // fn_name() {
+                /\b(?!(?:if|for|switch|while|with|catch)\b)(?:(?:static)\s+)?(\S+)\s*\(.*?\)\s*\{/,
+                // {name} = () => {
+                /['"]?([$_A-Za-z][$_A-Za-z0-9]*)['"]?\s*[:=]\s*\(.*?\)\s*=>/
+            ];
+        }
+
+        var syntaxes = this._functionNameSyntaxes;
         var lines = source.split('\n');
 
         // Walk backwards in the source lines until we find the line which matches one of the patterns above
@@ -2530,10 +2534,12 @@ exports.compareByGeneratedPositionsInflated = compareByGeneratedPositionsInflate
     }
 
     function _findSourceMappingURL(source) {
-        var sourceMappingUrlRegExp = /\/\/[#@] ?sourceMappingURL=([^\s'"]+)\s*$/mg;
+        if (!this._sourceMappingUrlRegexp) {
+            this._sourceMappingUrlRegExp = /\/\/[#@] ?sourceMappingURL=([^\s'"]+)\s*$/mg;
+        }
         var lastSourceMappingUrl;
         var matchSourceMappingUrl;
-        while (matchSourceMappingUrl = sourceMappingUrlRegExp.exec(source)) { // jshint ignore:line
+        while (matchSourceMappingUrl = this._sourceMappingUrlRegExp.exec(source)) { // jshint ignore:line
             lastSourceMappingUrl = matchSourceMappingUrl[1];
         }
         if (lastSourceMappingUrl) {
