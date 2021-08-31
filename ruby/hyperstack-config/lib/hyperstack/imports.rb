@@ -41,7 +41,9 @@ module Hyperstack
 
     def cancel_import(value)
       return unless value
+      puts "cancel_import: #{value}"
       current_spec = import_list.detect { |old_value, *_rest| value == old_value }
+      pp current_spec
       if current_spec
         current_spec[1] = true
       else
