@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'websocket' # for hot loader
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'

@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.7.0'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperstack::Component::VERSION
   spec.add_development_dependency 'jquery-rails'
   spec.add_development_dependency 'listen'
