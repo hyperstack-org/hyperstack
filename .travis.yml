@@ -33,7 +33,7 @@ _test_gem_pg: &_test_gem_pg
     - postgres --version
     - sudo rm -f /usr/local/bin/yarn
     - nvm install 10
-    - rvm install 2.6.3  # was 3.0.2
+    - rvm install 3.0.2
     - gem install bundler
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
     - echo 'install completed'
