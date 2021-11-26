@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-spec', Hyperstack::State::VERSION
   spec.add_development_dependency 'listen'
   # spec.add_development_dependency 'mini_racer', '< 0.4.0' # something is busted with 0.4.0 and its libv8-node dependency, '~> 0.2.4'
-  spec.add_development_dependency 'opal-browser', '~> 0.2.0'
+  spec.add_development_dependency 'opal-browser', '>= 0.2.0'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
