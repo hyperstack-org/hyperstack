@@ -255,7 +255,8 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.6)
-    puma (3.12.6)
+    puma (5.6.4)
+      nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
     rack-proxy (0.6.5)
@@ -422,7 +423,7 @@ DEPENDENCIES
   opal (= 1.0.5)
   opal-jquery
   pry
-  puma (~> 3.11)
+  puma (~> 5.6)
   rails (~> 5.2.4, >= 5.2.4.5)
   rails-hyperstack!
   rspec-rails
