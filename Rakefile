@@ -19,6 +19,7 @@ task :publish do
   }.each do|gem|
     puts "Publishing #{gem} gem"
     Dir.chdir("#{base_path}/ruby/#{gem}") do
+      #sh ['bundle', 'update']
       sh 'gem' ,'build', "#{gem}.gemspec"
       sh 'gem' ,'inabox' ,"#{gem}-#{Hyperstack::VERSION.tr("'",'')}.gem" ,'-g' ,"https://michail:#{ENV['GEM_SERVER_KEY']}@gems.ru.aegean.gr"
     end
