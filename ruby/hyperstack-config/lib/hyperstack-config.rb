@@ -42,7 +42,7 @@ else
   Hyperstack.define_setting :hotloader_ignore_callback_mapping, false
   Hyperstack.import 'opal', gem: true
   Hyperstack.import 'native', client_only: true
-  Hyperstack.import 'promise', client_only: true
+  Hyperstack.import 'promise/v2', client_only: true
   Hyperstack.import 'browser/setup/full', client_only: true
   Hyperstack.import 'hyperstack-config', gem: true
   Hyperstack.import 'hyperstack/autoloader'
