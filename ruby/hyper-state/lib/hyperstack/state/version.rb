@@ -1,5 +1,5 @@
 module Hyperstack
   module State
-    VERSION = '1.0.alpha1.8.0005'
+    VERSION = '1.0.alpha1.8.0006'
   end
 end
