@@ -1,5 +1,5 @@
 module Hyperstack
   module I18n
-    VERSION = '1.0.alpha1.8.0006'
+    VERSION = '1.0.alpha1.8.0009'
   end
 end
