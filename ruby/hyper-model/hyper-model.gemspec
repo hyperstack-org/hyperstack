@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency 'chromedriver-helper', '1.2.0'
-  spec.add_development_dependency 'libv8', '~> 6.7.0'
+  # spec.add_development_dependency 'libv8', '~> 6.7.0'
   spec.add_development_dependency 'mini_racer', '~> 0.2.4'
   spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'database_cleaner'

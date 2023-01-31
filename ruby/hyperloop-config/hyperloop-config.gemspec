@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'libv8', '~> 6.7.0'
+  # spec.add_dependency 'libv8', '~> 6.7.0'
   spec.add_dependency 'mini_racer', '~> 0.2.4'
   spec.add_dependency 'opal', '>= 0.11.0', '< 0.12.0'
   spec.add_dependency 'opal-browser', '~> 0.2.0'
