@@ -1,4 +1,4 @@
-dist: jammy
+dist: focal
 
 addons:
   apt:
