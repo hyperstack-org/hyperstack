@@ -4,6 +4,8 @@ require 'opal'
 require 'unparser'
 require 'method_source'
 require 'filecache'
+require 'webdrivers'
+
 
 require 'capybara/rspec'
 require 'hyper-spec/internal/client_execution'

@@ -8,12 +8,12 @@ addons:
       - sourceline: 'deb http://dl.google.com/linux/chrome/deb/ stable main'
         key_url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
     packages:
-      - postgresql-11
+      - postgresql-12
       - chromium-chromedriver
       - google-chrome-stable
       - yarn
       - redis-server
-  postgresql: '11'
+  postgresql: '12'
 
 _test_gem_pg: &_test_gem_pg
   stage: test

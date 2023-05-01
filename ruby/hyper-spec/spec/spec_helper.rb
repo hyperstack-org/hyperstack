@@ -1,5 +1,4 @@
 require 'hyper-spec'
-require 'webdrivers'
 require 'pry'
 require 'opal-browser'
 
