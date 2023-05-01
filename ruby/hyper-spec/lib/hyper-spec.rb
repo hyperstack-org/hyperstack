@@ -84,9 +84,11 @@ module Selenium
   module WebDriver
     module Chrome
       module Bridge
-        COMMANDS = remove_const(:COMMANDS).dup
-        COMMANDS[:get_log] = [:post, 'session/:session_id/log']
-        COMMANDS.freeze
+        if const_defined?(:COMMANDS)
+          COMMANDS = remove_const(:COMMANDS).dup
+          COMMANDS[:get_log] = [:post, 'session/:session_id/log']
+          COMMANDS.freeze
+        end
 
         def log(type)
           data = execute :get_log, {}, type: type.to_s

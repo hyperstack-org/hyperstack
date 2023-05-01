@@ -8,4 +8,5 @@ gem 'hyper-router',      path: '../hyper-router'
 gem 'hyper-spec',        path: '../hyper-spec'
 gem 'webpacker'  # TODO: figure out why these two are necessary!
 gem 'turbolinks'
+gem "selenium-webdriver", '3.142.7'
 gemspec
