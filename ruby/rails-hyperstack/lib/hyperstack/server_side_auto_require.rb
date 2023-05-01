@@ -1,4 +1,4 @@
-Rails.configuration.autoloader = :classic
+Rails.configuration.autoloader = :classic #:zeitwerk
 
 module ActiveSupport
   module Dependencies
