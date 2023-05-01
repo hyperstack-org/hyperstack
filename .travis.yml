@@ -26,10 +26,10 @@ _test_gem_pg: &_test_gem_pg
 
   before_install:
     - echo 'installing postgresql'
-    - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
-    - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+    - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/12/main/postgresql.conf
+    - sudo cp /etc/postgresql/{9.6,12}/main/pg_hba.conf
     - sudo service postgresql stop
-    - sudo service postgresql start 11
+    - sudo service postgresql start 12
     - postgres --version
     - sudo rm -f /usr/local/bin/yarn
     - nvm install 10
