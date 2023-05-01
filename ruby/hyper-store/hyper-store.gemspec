@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
-  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'puma', '<= 5.4.0'
   spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.4.0', '< 2.5.0'

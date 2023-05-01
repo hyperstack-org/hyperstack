@@ -70,7 +70,7 @@ You can control how much of the stack gets installed as well:
   spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperstack::VERSION
   spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'puma', '<= 5.4.0'
   spec.add_development_dependency 'bootsnap'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop' #, '~> 0.51.0'
