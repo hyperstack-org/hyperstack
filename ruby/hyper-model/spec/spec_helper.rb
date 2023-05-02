@@ -336,7 +336,7 @@ RSpec.configure do |config|
   # Capybara.register_driver :chrome do |app|
   #   #caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"excludeSwitches" => [ "ignore-certificate-errors" ]})
   #   caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "--window-size=200,200" ]})
-  #   Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
+  #   Capybara::Selenium::Driver.new(app, :browser => :chrome, :capabilities => caps)
   # end
 
   # Use legacy hyper-spec on_client behavior

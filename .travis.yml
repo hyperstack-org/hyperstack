@@ -1,6 +1,12 @@
 dist: focal
 
+env:
+  global:
+    - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
+
+
 addons:
+  postgresql: "11"
   apt:
     sources:
       - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
@@ -12,11 +18,8 @@ addons:
       - google-chrome-stable
       - yarn
       - redis-server
-# env:
-#   global:
-#     - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
-services:
-  - postgresql
+      - postgresql-11
+      - postgresql-client-11
 
 
 _test_gem_pg: &_test_gem_pg

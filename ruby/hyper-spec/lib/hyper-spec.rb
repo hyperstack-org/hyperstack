@@ -205,7 +205,7 @@ RSpec.configure do |config|
     capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
       chromeOptions: options, 'goog:loggingPrefs' => { browser: 'ALL' }
     )
-    Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
+    Capybara::Selenium::Driver.new(app, browser: :chrome)#, capabilities: capabilities)
   end
 
   Capybara.register_driver :firefox do |app|
