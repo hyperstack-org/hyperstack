@@ -40,7 +40,7 @@ describe 'React::State', js: true do
     end
     expect_evaluate_ruby("MARKUP").to eq('<span>Boom</span>')
     expect_evaluate_ruby("StateTest.boom").to be_falsy
-    expect(page.driver.browser.manage.logs.get(:browser).reject { |entry|
+    expect(page.driver.browser.logs.get(:browser).reject { |entry|
       entry_s = entry.to_s
       entry_s.include?("Deprecated feature") ||
       entry_s.include?("Mount() on the server. This is a no-op.") ||

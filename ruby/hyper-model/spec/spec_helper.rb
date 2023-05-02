@@ -176,7 +176,7 @@ end
 
 module CheckErrors
   def check_errors
-    logs = page.driver.browser.manage.logs.get(:browser)
+    logs = page.driver.browser.logs.get(:browser)
     errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
                 .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
     puts "WARNING - FOUND UNEXPECTED ERRORS #{errors}" if errors.present?
@@ -308,7 +308,7 @@ RSpec.configure do |config|
   class JavaScriptError < StandardError; end
 
   config.after(:each, js: true) do |spec|
-    logs = page.driver.browser.manage.logs.get(:browser)
+    logs = page.driver.browser.logs.get(:browser)
     if spec.exception
       all_messages = logs.select { |e| e.message.present? }
                          .map { |m| m.message.gsub(/\\n/, "\n") }.to_a

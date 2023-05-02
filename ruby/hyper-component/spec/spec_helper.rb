@@ -51,13 +51,13 @@ RSpec.configure do |config|
   # Fail tests on JavaScript errors in Chrome Headless
   class JavaScriptError < StandardError; end
 
-  config.after(:each, js: true) do |spec|
-    logs = page.driver.browser.manage.logs.get(:browser)
+  config.after(:each, js: true) do
+    logs = page.driver.browser.logs.get(:browser)
     errors = logs.select { |e| e.level == "SEVERE" && e.message.present? }
-                .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+                 .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
     if client_options[:deprecation_warnings] == :on
       warnings = logs.select { |e| e.level == "WARNING" && e.message.present? }
-                  .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
+                     .map { |m| m.message.gsub(/\\n/, "\n") }.to_a
       puts "\033[0;33;1m\nJavascript client console warnings:\n\n" + warnings.join("\n\n") + "\033[0;30;21m" if warnings.present?
     end
     unless client_options[:raise_on_js_errors] == :off

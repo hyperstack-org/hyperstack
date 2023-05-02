@@ -25,7 +25,6 @@ _test_gem_pg: &_test_gem_pg
   services:
     - postgresql
 
-
   before_install:
     # - echo 'installing postgresql'
     # - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/12/main/postgresql.conf
@@ -54,6 +53,7 @@ _test_gem_pg: &_test_gem_pg
     - google-chrome --version
     - which google-chrome
     - yarn install
+
   script:
     - echo running script $COMPONENT
     - DRIVER=travis bundle exec rake $TASK

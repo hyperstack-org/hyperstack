@@ -542,7 +542,7 @@ describe 'React::Component', js: true do
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
         end
-        expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+        expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
           .to match(/Warning: Failed prop( type|Type): In component `Foo`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
       end
 
@@ -560,7 +560,7 @@ describe 'React::Component', js: true do
           end
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
         end
-        expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n")).to_not match(/prop/)
+        expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n")).to_not match(/prop/)
       end
     end
 
@@ -597,7 +597,7 @@ describe 'React::Component', js: true do
 
         Hyperstack::Component::ReactTestUtils.render_component_into_document(foo)
       end
-      expect(page.driver.browser.manage.logs.get(:browser)
+      expect(page.driver.browser.logs.get(:browser)
         .reject { |entry| entry.to_s.include?('Deprecated feature') }
         .reject { |entry| entry.to_s.include?('Object freezing is not supported by Opal')}
         .map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n").size)
@@ -612,7 +612,7 @@ describe 'React::Component', js: true do
           render { Foo }
         end
       end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+      expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to match(/did you mean to say Foo()/)
     end
   end
