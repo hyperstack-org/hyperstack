@@ -4,6 +4,8 @@ env:
   global:
     - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
 
+services:
+  - postgresql
 
 addons:
   postgresql: "11"
