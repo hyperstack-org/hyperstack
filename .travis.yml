@@ -8,7 +8,7 @@ services:
   - postgresql
 
 addons:
-  postgresql: "11"
+  postgresql: "12.2"
   apt:
     sources:
       - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
@@ -20,8 +20,8 @@ addons:
       - google-chrome-stable
       - yarn
       - redis-server
-      - postgresql-11
-      - postgresql-client-11
+      - postgresql-12.2
+      - postgresql-client-12.2
 
 
 _test_gem_pg: &_test_gem_pg
