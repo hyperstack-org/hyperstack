@@ -15,9 +15,10 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/active_support_string_inquirer.rb'
   require 'hyperstack_env'
   require 'hyperstack/hotloader/stub'
+  # require 'promise'  REMOVED DURING UPGRADE TO Opal 1.7 WHY WAS THIS HERE?
 else
   require 'opal'
-  require 'opal-browser'
+  # require 'opal-browser' REMOVED DURING UPGRADE TO Opal 1.7 WHY WAS THIS HERE?
   # We need opal-rails to be loaded for Gem code to be properly included by sprockets.
   begin
     require 'opal-rails' if defined? Rails
@@ -41,7 +42,8 @@ else
   Hyperstack.define_setting :hotloader_ping, nil
   Hyperstack.define_setting :hotloader_ignore_callback_mapping, false
   Hyperstack.import 'opal', gem: true
-  Hyperstack.import 'browser', client_only: true
+  # Hyperstack.import 'promise', client_only: true REMOVED DURING UPGRADE TO Opal 1.7 WHY WAS THIS HERE?
+  # Hyperstack.import 'browser', client_only: true REMOVED DURING UPGRADE TO Opal 1.7 WHY WAS THIS HERE?
   Hyperstack.import 'hyperstack-config', gem: true
   Hyperstack.import 'hyperstack/autoloader'
   Hyperstack.import 'hyperstack/autoloader_starter'

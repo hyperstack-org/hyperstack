@@ -10,6 +10,9 @@
 require 'js'
 # require 'hyper-store'
 require 'hyperstack/internal/component/haml'
+require 'promise'
+require 'browser/delay'
+require 'browser/interval'
 
 # these mechanisms are deprecated in favor of using the features of hyper-spec.  However
 # in order to expedite getting Hyperstack 1.0 released we are just leaving these methods
