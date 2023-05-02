@@ -12,9 +12,9 @@ addons:
       - google-chrome-stable
       - yarn
       - redis-server
-env:
-  global:
-    - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
+# env:
+#   global:
+#     - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
 services:
   - postgresql
 
@@ -32,9 +32,9 @@ _test_gem_pg: &_test_gem_pg
     # - echo 'installing postgresql'
     # - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/12/main/postgresql.conf
     # - sudo cp /etc/postgresql/{9.6,12}/main/pg_hba.conf
-    - sudo service postgresql stop                # NOTE ADDING THESE TWO LINES MAKES NO DIFFERENCE
-    - sudo service postgresql start 12 -p 5433    # 
-    - postgresql --version
+    # - sudo service postgresql stop                # NOTE ADDING THESE TWO LINES MAKES NO DIFFERENCE
+    # - sudo service postgresql start 12 -p 5433    # 
+    # - postgresql --version
     - sudo rm -f /usr/local/bin/yarn
     - nvm install 10
     - rvm install 2.6.3  # was 2.5.1
