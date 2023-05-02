@@ -1,8 +1,8 @@
 dist: focal
 
-# env:
-#   global:
-#     - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
+env:
+  global:
+    - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
 
 addons:
   apt:
