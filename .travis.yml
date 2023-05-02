@@ -82,7 +82,7 @@ _test_gem: &_test_gem
     mariadb: '10.3'
   services:
     - redis-server
-\
+
   before_install:
     - echo installing $COMPONENT
     # yarn is in /usr/local/bin/yarn version 1.3.2 and is not a package
