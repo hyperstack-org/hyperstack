@@ -12,6 +12,9 @@ addons:
       - google-chrome-stable
       - yarn
       - redis-server
+services:
+  - postgresql
+
 
 _test_gem_pg: &_test_gem_pg
   stage: test
@@ -21,9 +24,6 @@ _test_gem_pg: &_test_gem_pg
     bundler: true
     directories:
     - node_modules # NPM packages
-
-  services:
-    - postgresql
 
   before_install:
     # - echo 'installing postgresql'
