@@ -12,11 +12,11 @@ addons:
       - google-chrome-stable
       - yarn
       - redis-server
-services:
-  - postgresql
 env:
   global:
-  - PGPORT=5433
+    - PGPORT=5433
+services:
+  - postgresql
 
 
 _test_gem_pg: &_test_gem_pg

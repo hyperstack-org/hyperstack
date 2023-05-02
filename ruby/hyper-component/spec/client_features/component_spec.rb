@@ -597,6 +597,7 @@ describe 'React::Component', js: true do
 
         Hyperstack::Component::ReactTestUtils.render_component_into_document(foo)
       end
+      binding.pry
       expect(page.driver.browser.logs.get(:browser)
         .reject { |entry| entry.to_s.include?('Deprecated feature') }
         .reject { |entry| entry.to_s.include?('Object freezing is not supported by Opal')}
