@@ -1,14 +1,10 @@
 dist: focal
 
-env:
-  global:
-    - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
-
-services:
-  - postgresql
+# env:
+#   global:
+#     - PGPORT=5433  # NOTE ADDING THIS MAKES NO DIFFERENCE
 
 addons:
-  postgresql: "12.2"
   apt:
     sources:
       - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
@@ -20,12 +16,11 @@ addons:
       - google-chrome-stable
       - yarn
       - redis-server
-      - postgresql-12.2
-      - postgresql-client-12.2
-
 
 _test_gem_pg: &_test_gem_pg
   stage: test
+
+  services: postgresql
 
   language: ruby
   cache:
