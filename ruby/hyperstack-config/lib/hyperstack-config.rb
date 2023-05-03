@@ -15,9 +15,9 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/active_support_string_inquirer.rb'
   require 'hyperstack_env'
   require 'hyperstack/hotloader/stub'
-  # because promises and features in opal-browsers are used everywhere we load them here
-  require 'promise'  
-  require 'opal-browser'
+  # uncommenting these lines breaks prerendering
+  # require 'promise'  
+  # require 'opal-browser'
 else
   require 'opal'
   # because promises and features in opal-browsers are used everywhere we load them here
