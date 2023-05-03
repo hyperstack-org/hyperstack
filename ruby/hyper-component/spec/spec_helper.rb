@@ -1,10 +1,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'opal'
-#require 'opal-rspec'
 require 'opal-jquery'
-require 'opal-browser'
-
 
 begin
   require File.expand_path('../test_app/config/environment', __FILE__)
@@ -15,7 +12,6 @@ require 'rspec/rails'
 require 'hyper-spec'
 require 'pry'
 require 'timecop'
-
 
 RSpec.configure do |config|
   config.color = true
