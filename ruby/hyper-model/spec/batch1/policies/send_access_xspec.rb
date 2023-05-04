@@ -42,7 +42,7 @@ describe "regulate_broadcast" do
   it "will allow sending a relationship to a relationship or scope"
   it "will allow sending a server method to a model"
   it "will allow sending count to model"
-  it "will allow sending count to relationship"
+  it "will allow sending count to relationship" do
     stub_const "TestModel1Policy", Class.new
     TestModel1Policy.class_eval do
       regulate_broadcast do | policy |

@@ -129,19 +129,31 @@ module ActiveRecord
           end
         end
 
-        def server_method(name, _opts = {}, &block)
-          # callable from the server internally
-          define_method(name, &block)
-          # callable remotely from the client
+        def allow_remote_access_to(*methods, &block)
+          methods = methods.collect { |meth| meth.is_a?(Hash) ? meth.keys : meth }.flatten
+          methods.each do |name|
           define_method("__secure_remote_access_to_#{name}") do |_self, acting_user, *args|
             begin
               old = self.acting_user
               self.acting_user = acting_user
-              send(name, *args)
+                allowed = !block || instance_eval(&block) rescue nil
+                return send(name, *args) if allowed
+
+                Hyperstack::InternalPolicy.raise_operation_access_violation(
+                  :illegal_remote_access, "Access denied to #{name}"
+                )
             ensure
               self.acting_user = old
             end
           end
+        end
+        end
+
+        def server_method(name, _opts = {}, &block)
+          # callable from the server internally
+          define_method(name, &block)
+          # callable remotely from the client
+          allow_remote_access_to(name)
         end
 
         # relationships (and scopes) are regulated using a tri-state system.  Each
@@ -274,23 +286,23 @@ module ActiveRecord
 
         alias pre_syncromesh_has_many has_many
 
-        def has_many(name, *args, &block)
+        def has_many(name,*args, **kwargs, &block)
           __synchromesh_regulate_from_macro(
-            opts = args.extract_options!,
+            kwargs,# opts = args.extract_options!,
             name,
             method_defined?(:"__secure_remote_access_to_#{name}"),
             &method(:regulate_relationship)
           )
-          pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
+          pre_syncromesh_has_many name, *args, **kwargs.except(:regulate), &block
         end
 
         %i[belongs_to has_one composed_of].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
-          define_method(macro) do |name, *aargs, &block|
-            define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|
-              this.send(name, *args)
+          define_method(macro) do |name,  **aargs, &block|
+            define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, **args|
+              this.send(name, **args)
             end
-            send(:"pre_syncromesh_#{macro}", name, *aargs, &block)
+            send(:"pre_syncromesh_#{macro}", name, **aargs, &block)
           end
         end
       end

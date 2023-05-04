@@ -43,7 +43,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'puma', '<= 5.4.0'
   spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.5.0'
+  spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.7.0'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rspec-collection_matchers'
   spec.add_development_dependency 'rspec-expectations'

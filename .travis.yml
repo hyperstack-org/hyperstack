@@ -37,7 +37,7 @@ _test_gem_pg: &_test_gem_pg
     # - postgresql --version
     - sudo rm -f /usr/local/bin/yarn
     - nvm install 10
-    - rvm install 2.6.3  # was 2.5.1
+    - rvm install 3.0.2
     - gem install bundler
     - ln -s /usr/lib/chromium-browser/chromedriver ~/bin/chromedriver
     - echo 'install completed'
@@ -92,7 +92,7 @@ _test_gem: &_test_gem
     # must remove this zombie for new yarn to work
     - sudo rm -f /usr/local/bin/yarn
     - nvm install 10
-    - rvm install 2.6.3  # was 2.5.1
+    - rvm install 3.0.2
     - gem install bundler
     - echo 'install completed'
 
@@ -126,85 +126,31 @@ _deploy_gem: &_deploy_gem
 jobs:
   include:
     - <<: *_test_gem
-      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-spec        RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-trace       RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-trace       RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1
+      env: COMPONENT=hyperstack-config RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-state       RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-state       RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-component   RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-component   RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-router      RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-router      RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-store       RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem
-      env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1
+      env: COMPONENT=hyper-operation   RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
     - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part1 DB=hyper_mesh_test_db
+      env: COMPONENT=hyper-model       RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1' TASK=part1 DB=hyper_mesh_test_db
     - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part2 DB=hyper_mesh_test_db
+      env: COMPONENT=hyper-model       RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1' TASK=part2 DB=hyper_mesh_test_db
     - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 TASK=part3 DB=hyper_mesh_test_db
+      env: COMPONENT=hyper-model       RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1' TASK=part3 DB=hyper_mesh_test_db
     - <<: *_test_gem
-      env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1
-
-    - <<: *_test_gem
-      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-trace       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-state       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-component   RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-router      RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-    - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0' TASK=part1 DB=hyper_mesh_test_db
-    - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0' TASK=part2 DB=hyper_mesh_test_db
-    - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0' TASK=part3 DB=hyper_mesh_test_db
-    - <<: *_test_gem
-      env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1 OPAL_VERSION='~>0.11' RAILS_VERSION='~>5.0'
-
-    - <<: *_test_gem
-      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-trace       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyperstack-config RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-state       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-component   RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-router      RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-store       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem
-      env: COMPONENT=hyper-operation   RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
-    - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part1 DB=hyper_mesh_test_db
-    - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part2 DB=hyper_mesh_test_db
-    - <<: *_test_gem_pg
-      env: COMPONENT=hyper-model       RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0' TASK=part3 DB=hyper_mesh_test_db
-    - <<: *_test_gem
-      env: COMPONENT=hyper-i18n        RUBY_VERSION=2.5.1 RAILS_VERSION='~>5.0'
+      env: COMPONENT=hyper-i18n        RUBY_VERSION=3.0.2 RAILS_VERSION='~>6.1'
 
     - <<: *_deploy_gem
       env: COMPONENT=hyper-i18n
