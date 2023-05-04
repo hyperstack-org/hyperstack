@@ -10,28 +10,26 @@ describe 'I18n client methods', js: true do
           include Hyperstack::Component
           include Hyperstack::I18n
           render(DIV) do
-            DIV(id: :tp1) { 'I am a key' }
-            # DIV(id: :tp1) { t(:the_key) }
-            # DIV(id: :tp2) { I18n.t(:hello) }
-            # DIV(id: :tp3) { l(Time.parse('1/1/2018 12:45')) }
-            # DIV(id: :tp4) { l(Time.parse('1/1/2018 12:45'), '%B %d, %Y at %l:%M %P') }
-            # DIV(id: :tp5) { MyModel.model_name.human }
-            # DIV(id: :tp6) { MyModel.human_attribute_name('the_attribute') }
+            DIV(id: :tp1) { t(:the_key) }
+            DIV(id: :tp2) { I18n.t(:hello) }
+            DIV(id: :tp3) { l(Time.parse('1/1/2018 12:45')) }
+            DIV(id: :tp4) { l(Time.parse('1/1/2018 12:45'), '%B %d, %Y at %l:%M %P') }
+            DIV(id: :tp5) { MyModel.model_name.human }
+            DIV(id: :tp6) { MyModel.human_attribute_name('the_attribute') }
           end
         end
       end
     end
   end
-  [['prerendering', :server_only]].each do |mode, flag| # ['component rendering', :client_only], 
+  [['component rendering', :client_only], ['prerendering', :server_only]].each do |mode, flag|
     it "will translate during #{mode}", prerendering_on: flag == :server_only do
       mount 'Components::TestComponent', {}, render_on: flag
-      binding.pry
       expect(find('#tp1')).to have_content('I am a key')
-      # expect(find('#tp2')).to have_content('Hello world')
-      # expect(find('#tp3')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45')))
-      # expect(find('#tp4')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45'), format: '%B %d, %Y at %l:%M %P'))
-      # expect(find('#tp5')).to have_content('My Model')
-      # expect(find('#tp6')).to have_content('The Attribute')
+      expect(find('#tp2')).to have_content('Hello world')
+      expect(find('#tp3')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45')))
+      expect(find('#tp4')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45'), format: '%B %d, %Y at %l:%M %P'))
+      expect(find('#tp5')).to have_content('My Model')
+      expect(find('#tp6')).to have_content('The Attribute')
     end
   end
 end
