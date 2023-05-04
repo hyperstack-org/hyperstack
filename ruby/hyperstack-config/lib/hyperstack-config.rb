@@ -15,8 +15,8 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/active_support_string_inquirer.rb'
   require 'hyperstack_env'
   require 'hyperstack/hotloader/stub'
+  require 'promise'  
   # uncommenting these lines breaks prerendering
-  # require 'promise'  
   # require 'opal-browser'
 else
   require 'opal'
