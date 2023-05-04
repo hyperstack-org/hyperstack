@@ -126,7 +126,7 @@ _deploy_gem: &_deploy_gem
 jobs:
   include:
     - <<: *_test_gem
-      env: DISABLE_SPRING=true COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1
+      env: COMPONENT=rails-hyperstack  RUBY_VERSION=2.5.1
     # - <<: *_test_gem
     #   env: COMPONENT=hyper-spec        RUBY_VERSION=2.5.1
     # - <<: *_test_gem

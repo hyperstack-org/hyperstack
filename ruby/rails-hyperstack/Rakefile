@@ -29,6 +29,7 @@ namespace :spec do
           sh('bundle exec rake db:migrate')
           sh('RAILS_ENV=test bundle exec rake db:setup')
           # sh('bundle exec rails dev:cache') # not tested yet...
+          sh('RAILS_ENV=test bundle exec rails webpacker:compile')
         end
       end
     end
