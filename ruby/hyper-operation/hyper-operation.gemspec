@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'hyper-spec', Hyperstack::Operation::VERSION
   spec.add_development_dependency 'mysql2'
   # spec.add_development_dependency 'opal-browser', '~> 0.2.0'
-  spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
+  spec.add_development_dependency 'opal-rails'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'puma', '<= 5.4.0'
