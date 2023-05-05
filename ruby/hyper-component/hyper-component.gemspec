@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mini_racer', '< 0.4.0' # something is busted with 0.4.0 and its libv8-node dependency
   spec.add_development_dependency 'nokogiri'
   spec.add_development_dependency 'opal-jquery'
-  spec.add_development_dependency 'opal-rails' , '>= 0.9.4', '< 2.0'
+  spec.add_development_dependency 'opal-rails' 
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'puma', '<= 5.4.0'
