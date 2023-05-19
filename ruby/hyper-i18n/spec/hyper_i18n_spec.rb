@@ -16,11 +16,15 @@ describe 'I18n client methods', js: true do
             DIV(id: :tp4) { l(Time.parse('1/1/2018 12:45'), '%B %d, %Y at %l:%M %P') }
             DIV(id: :tp5) { MyModel.model_name.human }
             DIV(id: :tp6) { MyModel.human_attribute_name('the_attribute') }
+            DIV(id: :tp7) { t(:hello) }
+            DIV(id: :tp8) { t(:hello_world) }
+            DIV(id: :tp9) { t(:that_other_key) }
           end
         end
       end
     end
   end
+
   [['component rendering', :client_only], ['prerendering', :server_only]].each do |mode, flag|
     it "will translate during #{mode}", prerendering_on: flag == :server_only do
       mount 'Components::TestComponent', {}, render_on: flag
@@ -30,6 +34,9 @@ describe 'I18n client methods', js: true do
       expect(find('#tp4')).to have_content(::I18n.l(Time.parse('1/1/2018 12:45'), format: '%B %d, %Y at %l:%M %P'))
       expect(find('#tp5')).to have_content('My Model')
       expect(find('#tp6')).to have_content('The Attribute')
+      expect(find('#tp7')).to have_content('Hello world')
+      expect(find('#tp8')).to have_content('Hello World')
+      expect(find('#tp9')).to have_content('I am another key')
     end
   end
 end
