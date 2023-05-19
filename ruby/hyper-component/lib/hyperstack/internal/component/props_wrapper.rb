@@ -110,9 +110,9 @@ module Hyperstack
         def fetch_from_cache(name, param_type, props)
           last, cached_value = cache[name]
           return cached_value if last.equal?(props[name])
-          convert_param(name, param_type, props).tap do |value|
-            cache[name] = [props[name], value]
-          end
+          value = convert_param(name, param_type, props)
+          cache[name] = [props[name], value]
+          return value
         end
 
         def convert_param(name, param_type, props)
