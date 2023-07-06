@@ -1,0 +1,1 @@
+ docker run -it -v .:/dojo/work -e GOCDCLI_SKIP_AUTH=false kudulab/gocd-cli-dojo:yaml "gocd configrepo syntax --yaml hyperstack.gocd.yaml"
