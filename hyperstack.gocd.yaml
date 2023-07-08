@@ -61,7 +61,7 @@ pipelines:
           keep_artifacts: false
           clean_workspace: false
           approval:
-            type: any
+            type: success
             allow_only_on_success: false
           jobs:
             cleanup:
