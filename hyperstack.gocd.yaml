@@ -69,7 +69,7 @@ pipelines:
       - ruby-version-2-7-8:
           environment_variables:
             RUBY_VERSION: 2.7.8
-          fetch_materials: true
+          fetch_materials: false
           keep_artifacts: false
           clean_workspace: false
           approval:
@@ -254,7 +254,7 @@ pipelines:
       - ruby-version-3-0-6:
           environment_variables:
             RUBY_VERSION: 3.0.6
-          fetch_materials: true
+          fetch_materials: false
           keep_artifacts: false
           clean_workspace: false
           approval:
