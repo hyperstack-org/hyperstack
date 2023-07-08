@@ -25,6 +25,6 @@ pipelines:
             tasks:
             - exec:
                 arguments:
-                - -al
-                command: ls
+                - ''
+                command: runall
                 run_if: passed
