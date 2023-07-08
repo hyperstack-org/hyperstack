@@ -4,6 +4,7 @@ service postgresql restart
 service mysql restart
 redis-server &
 sleep 1
+rbenv global $RUBY_VERSION
 psql -c 'create database hyper_mesh_test_db;' -U postgres
 ./runtests
 #DRIVER=travis COMPONENT=rails-hyperstack  RUBY_VERSION=2.7.8 ./runtests
