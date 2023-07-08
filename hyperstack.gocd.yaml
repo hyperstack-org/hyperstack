@@ -17,7 +17,7 @@ pipelines:
         branch: edge
     stages:
       - cleanup1:
-          fetch_materials: true
+          fetch_materials: false
           keep_artifacts: false
           clean_workspace: false
           approval:
