@@ -11,5 +11,4 @@ bundle exec ruby -e 'require "webdrivers";  Webdrivers::Chromedriver.update; put
 cp  ~/.webdrivers/chromedriver /usr/lib/chromium-browser/chromedriver
 
 bundle exec rake spec:prepare
-#bundle exec rake $TASK
-bundle exec rspec ./spec/deprecation_notices/render_spec.rb
+bundle exec rake $TASK
