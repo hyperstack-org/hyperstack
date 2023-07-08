@@ -2,7 +2,7 @@ format_version: 10
 environments:
   test:
     pipelines:
-      - hyperstack
+      - hyperstack-test
 pipelines:
   hyperstack-tests:
     group: hyperstack
