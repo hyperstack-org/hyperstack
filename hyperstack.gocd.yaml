@@ -2,9 +2,9 @@ format_version: 10
 environments:
   test:
     pipelines:
-      - hyperstack-test
+      - hyperstack
 pipelines:
-  hyperstack-tests:
+  hyperstack:
     group: hyperstack
     label_template: ${COUNT}
     lock_behavior: none
