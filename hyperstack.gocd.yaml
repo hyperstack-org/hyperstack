@@ -3,7 +3,34 @@ environments:
   test:
     pipelines:
       - hyperstack
+      - hyperstack-build
 pipelines:
+  hyperstack-build:
+    group: hyperstack
+    label_template: ${COUNT}
+    lock_behavior: none
+    display_order: -1
+    materials:
+      hyperstack:
+        git: https://github.com/mpantel/hyperstack.git
+        shallow_clone: false
+        auto_update: false
+        branch: edge
+    stages:
+      - build:
+          fetch_materials: true
+          keep_artifacts: false
+          clean_workspace: false
+          approval:
+            type: success
+            allow_only_on_success: false
+          jobs:
+            cleanup:
+              timeout: 0
+              tasks:
+                - exec:
+                    command: ./create-docker-image
+                    run_if: passed
   hyperstack:
     group: hyperstack
     label_template: ${COUNT}
