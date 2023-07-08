@@ -16,10 +16,10 @@ pipelines:
         auto_update: true
         branch: edge
     stages:
-    - prepare:
+    - execute:
         fetch_materials: true
         keep_artifacts: false
-        clean_workspace: false
+        clean_workspace: true
         approval:
           type: success
           allow_only_on_success: false
@@ -48,3 +48,24 @@ pipelines:
                   - hyperstack
                 command: docker
                 run_if: passed
+#    - cleanup:
+#        fetch_materials: false
+#        keep_artifacts: false
+#        clean_workspace: false
+#        approval:
+#          type: any
+#          allow_only_on_success: false
+#        jobs:
+#          cleanup:
+#            timeout: 0
+#            tasks:
+#            - exec:
+#                arguments:
+#                  - compose
+#                  - run
+#                  - -rm
+#                  - --entrypoint
+#                  - "/bin/bash -c 'chown -R 1000:1001 /root/hyperstack'"
+#                  - hyperstack
+#                command: docker
+#                run_if: passed
