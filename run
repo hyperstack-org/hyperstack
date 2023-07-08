@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run  -v .:/root/hyperstack ${PRIVATE_REGISTRY}/base20:hyperstack /bin/bash -c 'cd /root/hyperstack && ./runall'
+docker run  -v .:/root/hyperstack ${PRIVATE_REGISTRY}/base20:hyperstack "/bin/bash -c \"cd /root/hyperstack && ./runall\""
