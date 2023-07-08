@@ -23,6 +23,7 @@ module TestApp
     config.opal.enable_specs = true
     config.opal.spec_location = 'spec-opal'
     config.hyperstack.auto_config = false
+    config.active_record.yaml_column_permitted_classes = [Symbol, ActiveSupport::HashWithIndifferentAccess]
 
     config.assets.cache_store = :null_store
     # Settings in config/environments/* take precedence over those specified here.

@@ -58,18 +58,18 @@ You can control how much of the stack gets installed as well:
   spec.add_dependency 'hyper-model', Hyperstack::VERSION
   spec.add_dependency 'hyper-router', Hyperstack::ROUTERVERSION
   spec.add_dependency 'hyperstack-config', Hyperstack::VERSION
-  spec.add_dependency 'opal-rails' #, '~> 2.0'
-
-  spec.add_dependency 'opal-browser', '>= 0.2.0'
+  spec.add_dependency 'opal-rails'
+  spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 1.1'
   spec.add_dependency 'react-rails', '>= 2.4.0', '< 2.7.0'
   # spec.add_dependency 'mini_racer', '~> 0.2.6'
   # spec.add_dependency 'libv8', '~> 7.3.492.27.1'
   spec.add_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
 
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-spec', Hyperstack::VERSION
   spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'puma', '<= 5.4.0'
   spec.add_development_dependency 'bootsnap'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop' #, '~> 0.51.0'

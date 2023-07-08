@@ -90,7 +90,7 @@ describe 'opal-jquery extensions', js: true do
         Element[JS.call(:eval, "(function () { return window; })();")]
         true
       end.to be_truthy
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+      expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .not_to match(/Exception|Error/)
     end
 

@@ -182,7 +182,7 @@ describe 'the React DSL', js: true do
         class Comp; end
       end
     end
-    expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+    expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
           .to match(/Comp does not appear to be a react component./)
   end
 

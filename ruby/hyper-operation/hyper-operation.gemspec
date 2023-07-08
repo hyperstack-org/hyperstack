@@ -26,14 +26,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'tty-table'
 
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'hyper-spec', Hyperstack::Operation::VERSION
   spec.add_development_dependency 'mysql2'
-  spec.add_development_dependency 'opal-browser', '>= 0.2.0'
-  spec.add_development_dependency 'opal-rails', '>= 0.9.4', '< 2.0'
+  # spec.add_development_dependency 'opal-browser', '~> 0.2.0'
+  spec.add_development_dependency 'opal-rails'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
-  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'puma', '<= 5.4.0'
   spec.add_development_dependency 'pusher'
   spec.add_development_dependency 'pusher-fake'
   spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'

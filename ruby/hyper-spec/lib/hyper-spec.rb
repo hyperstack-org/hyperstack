@@ -6,6 +6,7 @@ require 'method_source'
 require 'filecache'
 require 'webdrivers'
 
+
 require 'capybara/rspec'
 require 'hyper-spec/internal/client_execution'
 require 'hyper-spec/internal/component_mount'
@@ -85,9 +86,11 @@ module Selenium
   module WebDriver
     module Chrome
       module Bridge
-        COMMANDS = remove_const(:COMMANDS).dup
-        COMMANDS[:get_log] = [:post, 'session/:session_id/log']
-        COMMANDS.freeze
+        if const_defined?(:COMMANDS)
+          COMMANDS = remove_const(:COMMANDS).dup
+          COMMANDS[:get_log] = [:post, 'session/:session_id/log']
+          COMMANDS.freeze
+        end
 
         def log(type)
           data = execute :get_log, {}, type: type.to_s
@@ -192,17 +195,42 @@ RSpec.configure do |config|
 
   Capybara.default_max_wait_time = 10
 
+  Capybara.register_driver :chrome_undocked do |app|
+    opts = Selenium::WebDriver::Chrome::Options.new(args: %w[auto-open-devtools-for-tabs])
+    opts.add_preference(
+      'devtools',
+      'preferences' => {
+        'currentDockState'  => '"undocked"', # Or '"bottom"', '"right"', etc.
+        'panel-selectedTab' => '"console"'
+      }
+    )
+    caps = Selenium::WebDriver::Remote::Capabilities.chrome
+    caps["goog:loggingPrefs"] = { browser: 'ALL' }
+
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: opts, desired_capabilities: caps)
+  end
+
+  Capybara.register_driver :chrome_docked do |app|
+    opts = Selenium::WebDriver::Chrome::Options.new(args: %w[auto-open-devtools-for-tabs])
+    opts.add_preference(
+      'devtools',
+      'preferences' => {
+        'currentDockState'  => '"right"', # Or '"bottom"', '"undocked"', etc.
+        'panel-selectedTab' => '"console"'
+      }
+    )
+    caps = Selenium::WebDriver::Remote::Capabilities.chrome
+    caps["goog:loggingPrefs"] = { browser: 'ALL' }
+
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: opts, desired_capabilities: caps)
+  end
+
   Capybara.register_driver :chrome do |app|
-    options = {}
-    options.merge!(
-      w3c: false,
-      args: %w[auto-open-devtools-for-tabs]
-    )
-    options['mobileEmulation'] = { 'deviceName' => ENV['DEVICE'].tr('-', ' ') } if ENV['DEVICE']
-    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
-      chromeOptions: options, 'goog:loggingPrefs' => { browser: 'ALL' }
-    )
-    Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: capabilities)
+    caps = Selenium::WebDriver::Remote::Capabilities.chrome
+
+    caps["goog:loggingPrefs"] = { browser: 'ALL' } # if ENV['LOG_JS']
+
+    Capybara::Selenium::Driver.new(app, browser: :chrome, desired_capabilities: caps)
   end
 
   Capybara.register_driver :firefox do |app|
@@ -239,6 +267,8 @@ RSpec.configure do |config|
   Capybara.javascript_driver =
     case ENV['DRIVER']
     when 'beheaded' then :firefox_headless
+    when 'chrome_undocked' then :chrome_undocked
+    when 'chrome_docked' then :chrome_docked
     when 'chrome' then :chrome
     when 'ff' then :selenium_with_firebug
     when 'firefox' then :firefox

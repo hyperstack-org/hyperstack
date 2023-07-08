@@ -18,6 +18,7 @@ describe 'Active Support Helpers', js: true do
         GenericEnumerable.new([ Payment.new(5), Payment.new(15), Payment.new(10) ])
       end
     end
+
     expect_evaluate_ruby do
       { Payment.new(5) => 5, Payment.new(15) => 15, Payment.new(10) => 10 } == payments.index_with(&:price)
     end.to be_truthy

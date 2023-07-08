@@ -15,9 +15,14 @@ if RUBY_ENGINE == 'opal'
   require 'hyperstack/active_support_string_inquirer.rb'
   require 'hyperstack_env'
   require 'hyperstack/hotloader/stub'
+  require 'promise'
+  # uncommenting these lines breaks prerendering
+  # require 'opal-browser'
 else
   require 'opal'
+  # because promises and features in opal-browsers are used everywhere we load them here
   require 'opal-browser'
+
   # We need opal-rails to be loaded for Gem code to be properly included by sprockets.
   begin
     require 'opal-rails' if defined? Rails
@@ -41,9 +46,13 @@ else
   Hyperstack.define_setting :hotloader_ping, nil
   Hyperstack.define_setting :hotloader_ignore_callback_mapping, false
   Hyperstack.import 'opal', gem: true
-  Hyperstack.import 'native', client_only: true
-  Hyperstack.import 'promise/v2', client_only: true
-  Hyperstack.import 'browser/setup/full', client_only: true
+
+  # because promises and features in opal-browsers are used everywhere we load them here
+  Hyperstack.import 'promise', client_only: true
+  Hyperstack.import 'browser', client_only: true
+  Hyperstack.import 'browser/delay', client_only: true
+  Hyperstack.import 'browser/interval', client_only: true
+
   Hyperstack.import 'hyperstack-config', gem: true
   Hyperstack.import 'hyperstack/autoloader'
   Hyperstack.import 'hyperstack/autoloader_starter'

@@ -12,6 +12,8 @@ before_script:
   - cd spec/test_app
   - bundle update
   - cd ../../
+  - chromedriver-update
+  - ls -lR ~/.chromedriver-helper/
 script:
   - bundle exec rake spec
 gemfile:

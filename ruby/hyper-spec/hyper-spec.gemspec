@@ -22,6 +22,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.add_dependency 'actionview'
   spec.add_dependency 'capybara'
+  spec.add_dependency 'chromedriver-helper', '1.2.0'
   spec.add_dependency 'filecache'
   spec.add_dependency 'method_source'
   spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 2.0'
@@ -36,11 +37,10 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'hyper-component', HyperSpec::VERSION
   spec.add_development_dependency 'mini_racer'#, '< 0.4.0' # something is busted with 0.4.0 and its libv8-node dependency
-  spec.add_development_dependency 'opal-browser', '>= 0.2.0'
   spec.add_development_dependency 'opal-rails', '>= 0.9.4'
   spec.add_development_dependency 'pry-rescue'
   spec.add_development_dependency 'pry-stack_explorer'
-  spec.add_development_dependency 'puma'
+  spec.add_development_dependency 'puma', '<= 5.4.0'
   spec.add_development_dependency 'rails', ENV['RAILS_VERSION'] || '>= 5.0.0', '< 7.0'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'react-rails', '>= 2.3.0', '< 2.7.0'

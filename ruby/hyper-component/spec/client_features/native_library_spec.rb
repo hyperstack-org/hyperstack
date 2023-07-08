@@ -171,7 +171,7 @@ describe "Hyperstack::Component::NativeLibrary", js: true do
         rename "MispelledComponent" => "Bar"
       end
     end
-    expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+    expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
       .to match(/NativeLibrary.MispelledComponent is undefined/)
       # TODO was testing for cannot import, but that message gets trunkated
   end

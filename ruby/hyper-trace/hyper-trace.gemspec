@@ -22,5 +22,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyperstack-config', HyperTrace::VERSION
   spec.add_development_dependency 'hyper-spec', HyperTrace::VERSION
   spec.add_development_dependency "bundler"
+  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency "rake"
 end

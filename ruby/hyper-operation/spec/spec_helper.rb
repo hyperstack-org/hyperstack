@@ -125,7 +125,7 @@ RSpec.configure do |config|
   # class JavaScriptError < StandardError; end
 
   # config.after(:each, js: true) do |spec|
-  #   errors = page.driver.browser.manage.logs.get(:browser)
+  #   errors = page.driver.browser.logs.get(:browser)
   #               .select { |e| e.level == "SEVERE" && e.message.present? }
   #               #.map { |m| m.message.gsub(/\\n/, "\n") }.to_a
   #               #.reject { |e| e =~ /Unexpected response code: 200/ }

@@ -70,7 +70,7 @@ module Hyperstack
     if connection[:adapter] == :redis
       require 'redis'
 
-      connection[:redis_url] ||= 'redis://127.0.0.1:6379/hyperstack'
+      connection[:redis_url] ||= 'redis://127.0.0.1:6379/0'
     end
   end
 

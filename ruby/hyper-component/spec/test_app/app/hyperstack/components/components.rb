@@ -1,14 +1,4 @@
-# require 'hyper-component'
-# if Hyperstack::Component::IsomorphicHelpers.on_opal_client?
-#   require 'browser'
-#   require 'browser/delay'
-#   #require 'react/ext/opal-jquery/element'
-#   require 'hyperstack/component/jquery'
-# end
-# require 'hyperstack/component/server'
-# require 'hyperstack/component/auto-import'
 require 'js'
-# require 'hyper-store'
 require 'hyperstack/internal/component/haml'
 
 # these mechanisms are deprecated in favor of using the features of hyper-spec.  However

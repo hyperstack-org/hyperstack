@@ -125,7 +125,7 @@ describe 'the param macro', js: true do
       end
     end
     expect(page.body[-60..-19]).to include('<div>12-string</div>')
-    expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+    expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
           .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo1` could not be converted to String/)
   end
 
@@ -155,7 +155,7 @@ describe 'the param macro', js: true do
 
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo2, bar: 10, lorem: Lorem.new)
     end
-    expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+    expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
       .to match(/Warning: Failed prop( type|Type): In component `Foo2`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
   end
 
@@ -171,7 +171,7 @@ describe 'the param macro', js: true do
       end
       Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, foo: 10, bar: '10', lorem: Lorem.new)
     end
-    expect(page.driver.browser.manage.logs.get(:browser).reject { |m| m.message =~ /(D|d)eprecated/ }.map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+    expect(page.driver.browser.logs.get(:browser).reject { |m| m.message =~ /(D|d)eprecated/ }.map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
       .not_to match(/Warning|Error/)
   end
 
@@ -191,7 +191,7 @@ describe 'the param macro', js: true do
           param :bar, type: []
         end
       end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+      expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to Array/)
     end
 
@@ -202,7 +202,7 @@ describe 'the param macro', js: true do
           param :bar, type: [String]
         end
       end
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+      expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo`\[0\] could not be converted to String/)
     end
 
@@ -227,7 +227,7 @@ describe 'the param macro', js: true do
         end
       end
       expect(page.body[-60..-19]).to include('<span>1, 2</span>')
-      expect(page.driver.browser.manage.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
+      expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
         .to match(/Warning: Failed prop( type|Type): In component `Foo`\nProvided prop `foo` could not be converted to BazWoggle/)
     end
 
