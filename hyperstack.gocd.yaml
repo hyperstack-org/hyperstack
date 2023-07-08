@@ -36,6 +36,8 @@ pipelines:
     label_template: ${COUNT}
     lock_behavior: none
     display_order: -1
+    environment_variables:
+      DRIVER: travis
     materials:
       hyperstack:
         git: https://github.com/mpantel/hyperstack.git
@@ -64,7 +66,9 @@ pipelines:
                       - hyperstack
                     command: docker
                     run_if: passed
-      - execute:
+      - ruby-version-2-7-8:
+          environment_variables:
+            RUBY_VERSION: 2.7.8
           fetch_materials: true
           keep_artifacts: false
           clean_workspace: false
@@ -72,7 +76,356 @@ pipelines:
             type: success
             allow_only_on_success: false
           jobs:
-            run:
+            rails-hyperstack:
+              environment_variables:
+                COMPONENT: rails-hyperstack
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-spec:
+              environment_variables:
+                COMPONENT: hyper-spec
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-trace:
+              environment_variables:
+                COMPONENT: hyper-trace
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyperstack-config:
+              environment_variables:
+                COMPONENT: hyperstack-config
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-state:
+              environment_variables:
+                COMPONENT: hyper-state
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-component:
+              environment_variables:
+                COMPONENT: hyper-component
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-router:
+              environment_variables:
+                COMPONENT: hyper-router
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-store:
+              environment_variables:
+                COMPONENT: hyper-store
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-operation:
+              environment_variables:
+                COMPONENT: hyper-operation
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-model-part1:
+              environment_variables:
+                COMPONENT: hyper-model
+                TASK: part1
+                DB: hyper_mesh_test_db
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-model-part2:
+              environment_variables:
+                COMPONENT: hyper-model
+                TASK: part2
+                DB: hyper_mesh_test_db
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-model-part3:
+              environment_variables:
+                COMPONENT: hyper-model
+                TASK: part3
+                DB: hyper_mesh_test_db
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-i18n:
+              environment_variables:
+                COMPONENT: hyper-i18n
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+      - ruby-version-3-0-6:
+          environment_variables:
+            RUBY_VERSION: 3.0.6
+          fetch_materials: true
+          keep_artifacts: false
+          clean_workspace: false
+          approval:
+            type: success
+            allow_only_on_success: false
+          jobs:
+            rails-hyperstack:
+              environment_variables:
+                COMPONENT: rails-hyperstack
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-spec:
+              environment_variables:
+                COMPONENT: hyper-spec
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-trace:
+              environment_variables:
+                COMPONENT: hyper-trace
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyperstack-config:
+              environment_variables:
+                COMPONENT: hyperstack-config
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-state:
+              environment_variables:
+                COMPONENT: hyper-state
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-component:
+              environment_variables:
+                COMPONENT: hyper-component
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-router:
+              environment_variables:
+                COMPONENT: hyper-router
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-store:
+              environment_variables:
+                COMPONENT: hyper-store
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-operation:
+              environment_variables:
+                COMPONENT: hyper-operation
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-model-part1:
+              environment_variables:
+                COMPONENT: hyper-model
+                TASK: part1
+                DB: hyper_mesh_test_db
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-model-part2:
+              environment_variables:
+                COMPONENT: hyper-model
+                TASK: part2
+                DB: hyper_mesh_test_db
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-model-part3:
+              environment_variables:
+                COMPONENT: hyper-model
+                TASK: part3
+                DB: hyper_mesh_test_db
+              timeout: 0
+              tasks:
+              - exec:
+                  arguments:
+                    - compose
+                    - run
+                    - --rm
+                    - hyperstack
+                  command: docker
+                  run_if: passed
+            hyper-i18n:
+              environment_variables:
+                COMPONENT: hyper-i18n
               timeout: 0
               tasks:
               - exec:

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+service postgresql restart
+service mysql restart
+redis-server &
+sleep 1
+psql -c 'create database hyper_mesh_test_db;' -U postgres
+./runtests
+#DRIVER=travis COMPONENT=rails-hyperstack  RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-spec        RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-trace       RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyperstack-config RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-state       RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-component   RUBY_VERSION=2.7.8 ./runtests
+
+#DRIVER=travis COMPONENT=hyper-router      RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-store       RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-operation   RUBY_VERSION=2.7.8 ./runtests
+#DRIVER=travis COMPONENT=hyper-model       RUBY_VERSION=2.7.8 TASK=part1 DB=hyper_mesh_test_db ./runtests
+#DRIVER=travis COMPONENT=hyper-model       RUBY_VERSION=2.7.8 TASK=part2 DB=hyper_mesh_test_db ./runtests
+#DRIVER=travis COMPONENT=hyper-model       RUBY_VERSION=2.7.8 TASK=part3 DB=hyper_mesh_test_db ./runtests
+#DRIVER=travis COMPONENT=hyper-i18n        RUBY_VERSION=2.7.8 ./runtests

@@ -29,12 +29,17 @@ services:
     domainname: ${BASE_TEST_DOMAIN}
     hostname: hyperstack
     container_name: "hyperstack"
-    entrypoint: ./runall
+    entrypoint: ./runone
     stdin_open: true
     tty: true
     working_dir: /root/hyperstack
     environment:
       BUNDLE_PATH: "/root/local_gems"
+      DRIVER: "${DRIVER}"
+      COMPONENT: "${COMPONENT}"
+      RUBY_VERSION: "${RUBY_VERSION}"
+      TASK: "${TASK}"
+      DB: "${DB}"
     volumes:
       - ${MOUNT_PATH:-..}/hyperstack:/root/hyperstack
       - local_gems:/root/local_gems
