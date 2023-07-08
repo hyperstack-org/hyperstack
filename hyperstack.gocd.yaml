@@ -30,7 +30,6 @@ pipelines:
             - exec:
                 arguments:
                   - run
-                  - -it
                   - -w
                   - /root/hyperstack
                   - -v
