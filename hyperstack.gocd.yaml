@@ -24,6 +24,19 @@ pipelines:
           type: success
           allow_only_on_success: false
         jobs:
+          cleanup:
+            timeout: 0
+            tasks:
+            - exec:
+                arguments:
+                  - compose
+                  - run
+                  - -rm
+                  - --entrypoint
+                  - "/bin/bash -c 'chown -R 1000:1001 /root/hyperstack'"
+                  - hyperstack
+                command: docker
+                run_if: passed
           setup:
             timeout: 0
             tasks:
