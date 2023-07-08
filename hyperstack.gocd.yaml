@@ -22,7 +22,7 @@ pipelines:
           keep_artifacts: false
           clean_workspace: false
           approval:
-            type: success
+            type: manual
             allow_only_on_success: false
           jobs:
             cleanup:
