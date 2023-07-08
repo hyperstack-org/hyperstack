@@ -28,7 +28,7 @@ pipelines:
             timeout: 0
             tasks:
             - exec:
-                arguments:
-                - ''
-                command: runall
+#                arguments:
+#                - ''
+                command: ./runall
                 run_if: passed
