@@ -1,3 +1,3 @@
 module Hyperstack
-  ROUTERVERSION = VERSION = '1.0.alpha1.8.0010'
+  ROUTERVERSION = VERSION = '1.0.alpha1.8.0011'
 end
