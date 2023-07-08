@@ -14,7 +14,7 @@ pipelines:
       hyperstack:
         git: https://github.com/mpantel/hyperstack.git
         shallow_clone: false
-        auto_update: false
+        auto_update: true
         branch: edge
     stages:
       - build:
