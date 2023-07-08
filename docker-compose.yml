@@ -1,0 +1,42 @@
+version: '3.5'
+
+volumes:
+  local_gems:
+    external: true
+    name: local_gems
+#  rails_cache:
+#  node_modules:
+#  packs:
+#  packs-test:
+
+networks:
+  default:
+    name: development_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${CONTAINER_SUBNET}
+
+
+services:
+  #############################
+  # Setup the base containers #
+  #############################
+
+  hyperstack:
+    image: ${PRIVATE_REGISTRY}/base20:hyperstack
+    domainname: ${BASE_TEST_DOMAIN}
+    hostname: hyperstack
+    container_name: "hyperstack"
+    entrypoint: ./runall
+    stdin_open: true
+    tty: true
+    working_dir: /root/hyperstack
+    environment:
+      BUNDLE_PATH: "/root/local_gems"
+    volumes:
+      - ${MOUNT_PATH:-..}/hyperstack:/root/hyperstack
+      - local_gems:/root/local_gems
+    networks:
+      default:

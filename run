@@ -1,2 +1,0 @@
-#!/bin/bash
-docker exec  -v .:/root/hyperstack ${PRIVATE_REGISTRY}/base20:hyperstack -w /root/hyperstack ./runall
