@@ -28,7 +28,14 @@ pipelines:
             timeout: 0
             tasks:
             - exec:
-#                arguments:
-#                - ''
-                command: ./runall
+                arguments:
+                  - run
+                  - -it
+                  - -w
+                  - /root/hyperstack
+                  - -v
+                  - .:/root/hyperstack
+                  - ${PRIVATE_REGISTRY}/base20:hyperstack
+                  - ./runall
+                command: docker
                 run_if: passed
