@@ -31,6 +31,7 @@ pipelines:
                 arguments:
                   - compose
                   - run
+                  - -rm
                   - hyperstack
                 command: docker
                 run_if: passed
