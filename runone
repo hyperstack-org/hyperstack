@@ -6,6 +6,8 @@ redis-server &
 sleep 1
 rbenv global $RUBY_VERSION
 psql -c 'create database hyper_mesh_test_db;' -U postgres
+#mysql -u root -e 'create database test_hyper_operation_db;'
+
 ./runtests
 #DRIVER=travis COMPONENT=rails-hyperstack  RUBY_VERSION=2.7.8 ./runtests
 #DRIVER=travis COMPONENT=hyper-spec        RUBY_VERSION=2.7.8 ./runtests
