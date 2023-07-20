@@ -1,3 +1,3 @@
 module HyperSpec
-  VERSION = '1.0.alpha1.8.0011'
+  VERSION = '1.0.alpha1.8.0012'
 end
