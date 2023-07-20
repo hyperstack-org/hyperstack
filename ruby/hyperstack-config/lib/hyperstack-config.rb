@@ -58,6 +58,6 @@ else
   Hyperstack.import 'hyperstack/autoloader_starter'
   # based on the environment pick the directory containing the file with the matching
   # value for the client.  This avoids use of ERB for builds outside of sprockets environment
-  Opal.append_path(File.expand_path("../hyperstack/environment/#{Hyperstack.env}/", __FILE__))
-  Opal.append_path(File.expand_path('../', __FILE__))
+  Opal.append_path(File.expand_path("../hyperstack/environment/#{Hyperstack.env}/", __FILE__).untaint)
+  Opal.append_path(File.expand_path('../', __FILE__).untaint)
 end

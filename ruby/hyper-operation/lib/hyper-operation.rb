@@ -59,7 +59,7 @@ else
   require 'hyper-operation/server_op'
   require 'hyper-operation/boot'
   Opal.use_gem 'mutations', false
-  Opal.append_path File.expand_path('../sources/', __FILE__)
-  Opal.append_path File.expand_path('../', __FILE__)
-  Opal.append_path File.expand_path('../../vendor', __FILE__)
+  Opal.append_path File.expand_path('../sources/', __FILE__).untaint
+  Opal.append_path File.expand_path('../', __FILE__).untaint
+  Opal.append_path File.expand_path('../../vendor', __FILE__).untaint
 end

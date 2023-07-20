@@ -25,5 +25,5 @@ else
   require 'hyperstack/internal/router/isomorphic_methods'
   require 'hyperstack/router/version'
 
-  Opal.append_path File.expand_path('../', __FILE__)
+  Opal.append_path File.expand_path('../', __FILE__).untaint
 end

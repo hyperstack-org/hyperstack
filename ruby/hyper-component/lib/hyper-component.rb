@@ -47,6 +47,6 @@ else
   require 'hyperstack/component/isomorphic_helpers'
   require 'hyperstack/ext/component/serializers'
 
-  Opal.append_path File.expand_path('../', __FILE__)
+  Opal.append_path File.expand_path('../', __FILE__).untaint
   require 'react/react-source'
 end
