@@ -127,7 +127,7 @@ module Hyperstack
     elsif transport == :pusher
       pusher.trigger("#{Hyperstack.channel}-#{data[1][:channel].gsub('::', '==')}", *data)
     elsif transport == :action_cable
-      ActionCable.server.broadcast("hyperstack-#{channel}", message: data[0], data: data[1])
+      ActionCable.server.broadcast("hyperstack-#{channel}", { message: data[0], data: data[1] })
     end
   end
 

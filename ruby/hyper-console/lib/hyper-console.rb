@@ -9,5 +9,5 @@ if RUBY_ENGINE == 'opal'
   require 'securerandom'
 else
   require 'hyperloop/console/engine'
-  Opal.append_path File.expand_path('../', __FILE__).untaint
+  Opal.append_path File.expand_path('../', __FILE__)
 end

@@ -286,23 +286,23 @@ module ActiveRecord
 
         alias pre_syncromesh_has_many has_many
 
-        def has_many(name, *args, &block)
+        def has_many(name, *args,**kwargs, &block)
           __synchromesh_regulate_from_macro(
-            opts = args.extract_options!,
+            opts = args.extract_options!.merge(kwargs),
             name,
             method_defined?(:"__secure_remote_access_to_#{name}"),
             &method(:regulate_relationship)
           )
-          pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
+          pre_syncromesh_has_many name, *args, **opts.except(:regulate), &block
         end
 
         %i[belongs_to has_one composed_of].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
-          define_method(macro) do |name, *aargs, &block|
-            define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|
-              this.send(name, *args)
+          define_method(macro) do |name, *aargs,**kkwargs, &block|
+            define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args,**kargs|
+              this.send(name, *args,**kargs)
             end
-            send(:"pre_syncromesh_#{macro}", name, *aargs, &block)
+            send(:"pre_syncromesh_#{macro}", name, *aargs,**kkwargs, &block)
           end
         end
       end
