@@ -1,3 +1,3 @@
 module HyperI18n
-  VERSION = '1.0.alpha1.8.0016'
+  VERSION = '1.0.alpha1.8.0017'
 end

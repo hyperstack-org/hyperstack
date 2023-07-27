@@ -202,5 +202,5 @@ else
       @_stack = []
       Lolex.unmock
     end
-  end
+  end if RUBY_ENGINE=='opal'
 end

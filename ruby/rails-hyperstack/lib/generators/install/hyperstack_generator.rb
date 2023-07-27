@@ -40,7 +40,7 @@ module Install
     end
 
     def move_and_update_application_record
-      unless File.exists? 'app/hyperstack/models/application_record.rb'
+      unless File.exist? 'app/hyperstack/models/application_record.rb'
         `mv app/models/application_record.rb app/hyperstack/models/application_record.rb`
         create_file 'app/models/application_record.rb', <<-RUBY
 # app/models/application_record.rb

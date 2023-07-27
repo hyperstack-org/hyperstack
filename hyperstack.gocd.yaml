@@ -271,7 +271,7 @@ pipelines:
           jobs: *test_jobs
       - ruby-version-3-0-6:
           environment_variables:
-            RUBY_VERSION: 3.0.6
+            RUBY_VERSION: 3.2.2
           fetch_materials: true
           keep_artifacts: false
           clean_workspace: false

@@ -37,7 +37,7 @@ module Hyperstack
           'app/assets/stylesheets',
           'app/views/components'
         ].each { |known_dir|
-          if !@directories.include?(known_dir) && File.exists?(known_dir)
+          if !@directories.include?(known_dir) && File.exist?(known_dir)
             @directories << known_dir
           end
         }
