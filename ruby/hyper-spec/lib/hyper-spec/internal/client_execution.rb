@@ -1,9 +1,9 @@
 module HyperSpec
   module Internal
     module ClientExecution
-      def internal_evaluate_ruby(*args, &block)
+      def internal_evaluate_ruby(*args,**kwargs, &block)
         insure_page_loaded
-        add_promise_execute_and_wait(*process_params(*args, &block))
+        add_promise_execute_and_wait(*process_params(*args,**kwargs, &block))
       end
 
       private

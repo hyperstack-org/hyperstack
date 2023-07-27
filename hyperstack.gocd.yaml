@@ -259,19 +259,20 @@ pipelines:
         auto_update: true
         branch: edge
     stages:
-      - ruby-version-2-7-8:
-          environment_variables:
-            RUBY_VERSION: 2.7.8
-          fetch_materials: true
-          keep_artifacts: false
-          clean_workspace: false
-          approval:
-            type: success
-            allow_only_on_success: false
-          jobs: *test_jobs
-      - ruby-version-3-0-6:
+#      - ruby-version-2-7-8:
+#          environment_variables:
+#            RUBY_VERSION: 2.7.8
+#          fetch_materials: true
+#          keep_artifacts: false
+#          clean_workspace: false
+#          approval:
+#            type: success
+#            allow_only_on_success: false
+#          jobs: *test_jobs
+      - ruby-version-3-2-2:
           environment_variables:
             RUBY_VERSION: 3.2.2
+            OPAL_VERSION: 1.5.1
           fetch_materials: true
           keep_artifacts: false
           clean_workspace: false
