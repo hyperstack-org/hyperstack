@@ -257,7 +257,7 @@ pipelines:
         git: https://github.com/mpantel/hyperstack.git
         shallow_clone: false
         auto_update: true
-        branch: edge
+        branch: ruby3
     stages:
 #      - ruby-version-2-7-8:
 #          environment_variables:
