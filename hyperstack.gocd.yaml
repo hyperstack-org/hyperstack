@@ -229,7 +229,7 @@ pipelines:
         git: https://github.com/mpantel/hyperstack.git
         shallow_clone: false
         auto_update: true
-        branch: edge
+        branch: ruby3
     stages:
       - build:
           fetch_materials: true
