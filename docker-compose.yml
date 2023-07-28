@@ -35,12 +35,13 @@ services:
     working_dir: /root/hyperstack
     environment:
       BUNDLE_PATH: "/root/local_gems"
-      DRIVER: "travis" #"${DRIVER}"
+      DRIVER: "${DRIVER}" # "travis"
       COMPONENT: "${COMPONENT}"
-      RUBY_VERSION: "3.2.2" #"${RUBY_VERSION}"
+      RUBY_VERSION: ${RUBY_VERSION}"
+#      RUBY_VERSION: "3.2.2" #"${RUBY_VERSION}"
 #      RUBY_VERSION: "3.1.4" #"${RUBY_VERSION}"
-#      RUBY_VERSION: "2.7.8" #"${RUBY_VERSION}"
 #      RUBY_VERSION: "3.0.6" #"${RUBY_VERSION}"
+#      RUBY_VERSION: "2.7.8" #"${RUBY_VERSION}"
 #      OPAL_VERSION: "1.7.3" #"${OPAL_VERSION}"
 #      OPAL_VERSION: "1.6.1" #"${OPAL_VERSION}"
       OPAL_VERSION: "1.5.1" #"${OPAL_VERSION}"

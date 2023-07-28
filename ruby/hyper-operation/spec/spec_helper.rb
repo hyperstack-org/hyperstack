@@ -14,7 +14,7 @@ require 'rspec/rails'
 require 'rspec-steps'
 require 'hyper-operation'
 
-# require "rspec/wait"
+require "rspec/wait"
 require 'database_cleaner'
 
 Capybara.server = :puma

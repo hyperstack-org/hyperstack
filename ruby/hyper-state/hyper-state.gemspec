@@ -38,5 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-steps', '~> 2.1.1'
   spec.add_development_dependency 'rubocop' #, '~> 0.51.0'
   spec.add_development_dependency 'sqlite3', '~> 1.4.2' # see https://github.com/rails/rails/issues/35153
-  spec.add_development_dependency 'timecop' #, '~> 0.8.1'
+  spec.add_development_dependency 'timecop'#, '~> 0.8.1'
 end
