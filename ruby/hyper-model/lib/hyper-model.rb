@@ -62,8 +62,8 @@ else
   require_relative 'active_record_base'
   require 'hyper_model/version'
 
-  Opal.append_path File.expand_path('../sources/', __FILE__).untaint
-  Opal.append_path File.expand_path('../', __FILE__).untaint
-  Opal.append_path File.expand_path('../../vendor', __FILE__).untaint
+  Opal.append_path File.expand_path('../sources/', __FILE__)
+  Opal.append_path File.expand_path('../', __FILE__)
+  Opal.append_path File.expand_path('../../vendor', __FILE__)
 end
 require 'enumerable/pluck'
