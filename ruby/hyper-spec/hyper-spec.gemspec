@@ -21,7 +21,6 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.add_dependency 'actionview'
   spec.add_dependency 'capybara'
-  spec.add_dependency 'chromedriver-helper', '1.2.0'
   spec.add_dependency 'filecache'
   spec.add_dependency 'method_source'
   spec.add_dependency 'opal', ENV['OPAL_VERSION'] || '>= 0.11.0', '< 2.0'
@@ -31,7 +30,6 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency 'timecop', '~> 0.8.1'
   spec.add_dependency 'uglifier'
   spec.add_dependency 'unparser', '>= 0.4.2'
-  spec.add_dependency 'webdrivers'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'hyper-component', HyperSpec::VERSION
