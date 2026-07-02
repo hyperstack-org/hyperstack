@@ -281,16 +281,16 @@ module ActiveRecord
             method_defined?(:"__secure_remote_access_to_#{name}"),
             &method(:regulate_relationship)
           )
-          pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
+          pre_syncromesh_has_many name, *args, **opts.except(:regulate), &block
         end
 
         %i[belongs_to has_one composed_of].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
-          define_method(macro) do |name, *aargs, &block|
+          define_method(macro) do |name, *aargs, **kwargs, &block|
             define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|
               this.send(name, *args)
             end
-            send(:"pre_syncromesh_#{macro}", name, *aargs, &block)
+            send(:"pre_syncromesh_#{macro}", name, *aargs, **kwargs, &block)
           end
         end
       end
@@ -399,5 +399,6 @@ module ActiveRecord
     end
   end
 
-  InternalMetadata.do_not_synchronize if defined? InternalMetadata
+  # Rails 7.1+ changed InternalMetadata to no longer inherit from ActiveRecord::Base
+  InternalMetadata.do_not_synchronize if defined?(InternalMetadata) && InternalMetadata.respond_to?(:do_not_synchronize)
 end

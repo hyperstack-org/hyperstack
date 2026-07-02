@@ -12,7 +12,7 @@ module Hyperstack
 
         do_not_synchronize
 
-        serialize :data
+        serialize :data, coder: YAML
 
         belongs_to :hyperstack_connection,
                    class_name:  'Hyperstack::ConnectionAdapter::ActiveRecord::Connection',

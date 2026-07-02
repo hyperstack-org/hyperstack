@@ -16,7 +16,7 @@ require 'timecop'
 RSpec.configure do |config|
   config.color = true
   config.fail_fast = ENV['FAIL_FAST'] || false
-  config.fixture_path = File.join(File.expand_path(File.dirname(__FILE__)), "fixtures")
+  config.fixture_paths = [File.join(File.expand_path(File.dirname(__FILE__)), "fixtures")]
   config.infer_spec_type_from_file_location!
   config.mock_with :rspec
   config.raise_errors_for_deprecations!
@@ -31,14 +31,20 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    MiniRacer_Backup = MiniRacer
-    Object.send(:remove_const, :MiniRacer)
+    if defined?(MiniRacer)
+      MiniRacer_Backup = MiniRacer
+      Object.send(:remove_const, :MiniRacer)
+    end
   end
 
   config.around(:each, :prerendering_on) do |example|
-    MiniRacer = MiniRacer_Backup
-    example.run
-    Object.send(:remove_const, :MiniRacer)
+    if defined?(MiniRacer_Backup)
+      MiniRacer = MiniRacer_Backup
+      example.run
+      Object.send(:remove_const, :MiniRacer)
+    else
+      skip 'mini_racer not available; skipping prerendering test'
+    end
   end
 
   config.filter_run_including focus: true

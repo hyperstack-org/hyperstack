@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - rails-7-compatibility
+      - edge
+  pull_request:
+    branches:
+      - edge
+
+jobs:
+  # Gems that use SQLite — no external service needed
+  test:
+    name: ${{ matrix.gem }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        gem:
+          - hyperstack-config
+          - hyper-state
+          - hyper-component
+          - hyper-store
+          - hyper-router
+
+    defaults:
+      run:
+        working-directory: ruby/${{ matrix.gem }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          working-directory: ruby/${{ matrix.gem }}
+          bundler-cache: true
+
+      - name: Prepare test app
+        run: bundle exec rake spec:prepare
+
+      - name: Run specs
+        run: bundle exec rake spec
+        env:
+          DRIVER: github
+          RAILS_ENV: test
+
+  # hyper-operation needs MySQL + Redis
+  test-operation:
+    name: hyper-operation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: hyper_operation_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    defaults:
+      run:
+        working-directory: ruby/hyper-operation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          working-directory: ruby/hyper-operation
+          bundler-cache: true
+
+      - name: Cache Opal/Sprockets assets
+        uses: actions/cache@v4
+        with:
+          path: ruby/hyper-operation/spec/test_app/tmp/cache
+          key: hyper-operation-assets-${{ hashFiles('ruby/hyper-operation/Gemfile.lock', 'ruby/hyper-operation/spec/test_app/app/**', 'ruby/**/*.rb') }}
+          restore-keys: |
+            hyper-operation-assets-
+
+      - name: Prepare test app database
+        run: bundle exec rake spec:prepare
+        env:
+          RAILS_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root
+
+      - name: Run specs
+        run: bundle exec rake spec
+        env:
+          DRIVER: github
+          RAILS_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root

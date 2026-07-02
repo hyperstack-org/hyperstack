@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'i18n'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-model', Hyperstack::I18n::VERSION
   spec.add_development_dependency 'hyper-spec', Hyperstack::I18n::VERSION
   spec.add_development_dependency 'mini_racer', '< 0.4.0' # something is busted with 0.4.0 and its libv8-node dependency
@@ -35,5 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-rails'
   spec.add_development_dependency 'rubocop' #, '~> 0.51.0'
-  spec.add_development_dependency 'sqlite3', '~> 1.4.2' # see https://github.com/rails/rails/issues/35153
+  spec.add_development_dependency 'sqlite3', '>= 1.4' # was ~> 1.4.2, see https://github.com/rails/rails/issues/35153
 end

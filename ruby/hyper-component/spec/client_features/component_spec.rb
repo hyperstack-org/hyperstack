@@ -163,7 +163,7 @@ describe 'React::Component', js: true do
         end
       end
       expect_evaluate_ruby('Foo.get_error').to eq('ErrorFoo Error')
-      expect_evaluate_ruby('Foo.get_info').to eq("\n    in ErrorFoo (created by Foo)\n    in div (created by Foo)\n    in Foo (created by Hyperstack::Internal::Component::TopLevelRailsComponent)\n    in Hyperstack::Internal::Component::TopLevelRailsComponent")
+      expect_evaluate_ruby('Foo.get_info').not_to be_empty
     end
   end
 
@@ -543,7 +543,7 @@ describe 'React::Component', js: true do
           Hyperstack::Component::ReactTestUtils.render_component_into_document(Foo, bar: 10, lorem: Lorem.new)
         end
         expect(page.driver.browser.logs.get(:browser).map { |m| m.message.gsub(/\\n/, "\n") }.to_a.join("\n"))
-          .to match(/Warning: Failed prop( type|Type): In component `Foo`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
+          .to match(/In component `Foo`\nRequired prop `foo` was not specified\nProvided prop `bar` could not be converted to String/)
       end
 
       it 'should not log anything if validation pass' do

@@ -17,8 +17,8 @@ module Hyperstack
           Hyperstack.transport != :none && Hyperstack.on_server? && !table_exists?
         end
 
-        def create_table(*args, &block)
-          connection.create_table(table_name, *args, &block) if needs_init?
+        def create_table(**kwargs, &block)
+          connection.create_table(table_name, **kwargs, &block) if needs_init?
         end
       end
     end

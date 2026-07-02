@@ -4,7 +4,6 @@ require 'opal'
 require 'unparser'
 require 'method_source'
 require 'filecache'
-require 'webdrivers'
 
 
 require 'capybara/rspec'
@@ -246,6 +245,17 @@ RSpec.configure do |config|
     Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
 
+  # GitHub Actions: Selenium Manager (selenium-webdriver >= 4.11) finds chromedriver automatically
+  Capybara.register_driver :chrome_headless_github_actions do |app|
+    options = ::Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_option('goog:loggingPrefs', { browser: 'WARNING' })
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  end
+
   Capybara.register_driver :firefox_headless do |app|
     options = Selenium::WebDriver::Firefox::Options.new
     options.headless!
@@ -275,6 +285,7 @@ RSpec.configure do |config|
     when 'headless' then :selenium_chrome_headless
     when 'safari' then :safari
     when 'travis' then :chrome_headless_docker_travis
+    when 'github' then :chrome_headless_github_actions
     else :selenium_chrome_headless
     end
 end

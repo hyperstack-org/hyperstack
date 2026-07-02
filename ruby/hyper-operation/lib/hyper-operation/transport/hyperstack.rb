@@ -127,7 +127,7 @@ module Hyperstack
     elsif transport == :pusher
       pusher.trigger("#{Hyperstack.channel}-#{data[1][:channel].gsub('::', '==')}", *data)
     elsif transport == :action_cable
-      ActionCable.server.broadcast("hyperstack-#{channel}", message: data[0], data: data[1])
+      ActionCable.server.broadcast("hyperstack-#{channel}", { message: data[0], data: data[1] })
     end
   end
 
@@ -153,7 +153,7 @@ module Hyperstack
   end
 
   def self.authorization(salt, channel, session_id)
-    secret_key = Rails.application.secrets[:secret_key_base]
+    secret_key = Rails.application.secret_key_base
     Digest::SHA1.hexdigest(
       "salt: #{salt}, channel: #{channel}, session_id: #{session_id}, secret_key: #{secret_key}"
     )
