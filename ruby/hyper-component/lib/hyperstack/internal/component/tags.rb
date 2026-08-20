@@ -63,6 +63,9 @@ module Hyperstack
         class << self
           def included(component)
             name, parent = find_name_and_parent(component)
+            # top-level components have no parent scope to install a tag method on;
+            # Opal 1.8+ raises TypeError on define_method(nil) where 1.x ignored it
+            return unless name
             tag_names_module = Module.new do
               define_method name do |*params, &children|
                 RenderingContext.render(component, *params, &children)

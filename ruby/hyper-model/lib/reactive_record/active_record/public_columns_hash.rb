@@ -10,18 +10,30 @@ module ActiveRecord
     def self.public_columns_hash
       @@hyper_stack_public_columns_hash_mutex.synchronize do
         return @public_columns_hash if @public_columns_hash && Rails.env.production?
-        files = []
+        @public_columns_hash = {}
         Hyperstack.public_model_directories.each do |dir|
           dir_length = Rails.root.join(dir).to_s.length + 1
           Dir.glob(Rails.root.join(dir, '**', '*.rb')).each do |file|
-            require_dependency(file) # still the file is loaded to make sure for development and test env
-            files << file[dir_length..-4]
-          end
-        end
-        @public_columns_hash = {}
-        # descendants only works for already loaded models!
-        descendants.each do |model|
-          if files.include?(model.name.underscore) && model.name.underscore != 'application_record'
+            class_path = file[dir_length..-4]
+            next if class_path == 'application_record'
+            # Resolve the constant by name first: when the public-directory file
+            # is a client-only mirror of a model defined elsewhere (and Zeitwerk
+            # ignores the mirror), this loads the REAL model instead of
+            # re-opening it with a mismatched superclass. Classic apps where the
+            # public file IS the model still autoload it the same way. Only if
+            # the constant cannot be autoloaded do we require the file itself.
+            model =
+              begin
+                class_path.camelize.constantize
+              rescue NameError, LoadError
+                begin
+                  require_dependency(file)
+                  class_path.camelize.constantize
+                rescue NameError, LoadError
+                  nil
+                end
+              end
+            next unless model.is_a?(Class) && model < ActiveRecord::Base
             @public_columns_hash[model.name] = model.columns_hash rescue nil # why rescue?
           end
         end

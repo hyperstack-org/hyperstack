@@ -44,11 +44,13 @@ module Hyperstack
             #   config.assets.paths.delete(hps)
             #   config.assets.paths.unshift(hps)
             # end
-            config.assets.paths.unshift ::Rails.root.join('app', 'hyperstack').to_s
-            if Rails.const_defined? 'Hyperstack::Console'
-              config.assets.precompile += %w( hyper-console-client.css )
-              config.assets.precompile += %w( hyper-console-client.min.js )
-              config.assets.precompile += %w( action_cable.js ) if Rails.const_defined? 'ActionCable'
+            if config.respond_to?(:assets)
+              config.assets.paths.unshift ::Rails.root.join('app', 'hyperstack').to_s
+              if Rails.const_defined? 'Hyperstack::Console'
+                config.assets.precompile += %w( hyper-console-client.css )
+                config.assets.precompile += %w( hyper-console-client.min.js )
+                config.assets.precompile += %w( action_cable.js ) if Rails.const_defined? 'ActionCable'
+              end
             end
          else
             delete_first config.eager_load_paths, "#{config.root}/app/hyperstack/models"
@@ -63,7 +65,7 @@ module Hyperstack
             delete_first config.autoload_paths, "#{config.root}/app/hyperstack/shared"
 
 
-            delete_first config.assets.paths, ::Rails.root.join('app', 'hyperstack').to_s
+            delete_first config.assets.paths, ::Rails.root.join('app', 'hyperstack').to_s if config.respond_to?(:assets)
           end
         end
         super
@@ -76,6 +78,14 @@ module Hyperstack
 
     config.before_configuration do |app|
       config.hyperstack.auto_config = true
+    end
+
+    # Hyperstack components are Opal/client-side code compiled by Sprockets.
+    # Tell Zeitwerk to ignore them so they are never autoloaded or eager-loaded
+    # server-side. Without this, CI environments (eager_load=true) alphabetically
+    # load component files before HyperComponent is defined, causing NameError.
+    initializer "hyperstack.ignore_client_only_paths" do
+      Rails.autoloaders.main.ignore(Rails.root.join('app/hyperstack/components'))
     end
 
     config.after_initialize do |app|

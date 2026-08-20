@@ -17,15 +17,20 @@ module ActiveSupport
   module Dependencies
     HYPERSTACK_DIR = "hyperstack"
     class << self
-      alias original_require_or_load require_or_load
-
       # before requiring_or_loading a file, first check if
       # we have the same file in the server side directory
       # and add that as a dependency
 
-      def require_or_load(file_name, const_path = nil)
-        add_server_side_dependency(file_name) { |load_path| require_dependency load_path }
-        original_require_or_load(file_name, const_path)
+      # require_or_load was removed in Rails 7.2 (only used by the classic autoloader)
+      if respond_to?(:require_or_load, true)
+        alias original_require_or_load require_or_load
+
+        def require_or_load(file_name, const_path = nil)
+          add_server_side_dependency(file_name) do |load_path|
+            respond_to?(:require_dependency) ? require_dependency(load_path) : require(load_path)
+          end
+          original_require_or_load(file_name, const_path)
+        end
       end
 
       # search the filename path from the end towards the beginning

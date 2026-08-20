@@ -22,7 +22,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hyper-store', Hyperloop::Console::VERSION
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'chromedriver-helper'
   spec.add_development_dependency 'hyper-component', Hyperloop::Console::VERSION
   spec.add_development_dependency 'hyper-operation', Hyperloop::Console::VERSION
   spec.add_development_dependency 'hyper-store', Hyperloop::Console::VERSION

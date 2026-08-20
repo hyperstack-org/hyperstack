@@ -66,12 +66,27 @@ module Hyperstack
 
     def add_inflections(sys)
       return [] unless sys
-      ["puts \"require 'config/initializers/inflections.rb'\""] +
+      ["puts \"require 'config/initializers/inflections.rb'\"", inflections_compatibility_shim] +
         File.open(Rails.root.join('config', 'initializers', 'inflections.rb'), &:readlines).tap do
           log_import "    require 'config/initializers/inflections.rb'"
         end
     rescue Errno::ENOENT
       []
+    end
+
+    # opal-activesupport's Inflections lacks some newer methods (e.g. acronym),
+    # so a host app's inflections.rb can crash the client bundle at boot.
+    # Stub the missing pieces before inlining the app's file.
+    def inflections_compatibility_shim
+      <<-RUBY
+        unless ActiveSupport::Inflector::Inflections.method_defined?(:acronym)
+          class ActiveSupport::Inflector::Inflections
+            def acronym(word)
+              (@acronyms ||= {})[word.downcase] = word
+            end
+          end
+        end
+      RUBY
     end
 
     def add_opal(sys)

@@ -21,7 +21,14 @@ module ActiveRecord
 
       alias pre_hyperstack_has_and_belongs_to_many has_and_belongs_to_many unless RUBY_ENGINE == 'opal'
 
-      def has_and_belongs_to_many(other, opts = {}, &block)
+      # Ruby 3 / Rails 7+: options must be forwarded as keywords — a positional
+      # Hash lands in AR's `scope` param and crashes on scope.arity. Accept a
+      # legacy positional opts hash for backward compatibility.
+      def has_and_belongs_to_many(other, scope = nil, **opts, &block)
+        if scope.is_a?(Hash)
+          opts = scope.merge(opts)
+          scope = nil
+        end
         join_table_name = [other.to_s, table_name].sort.join('_')
         join_model_name = "HyperstackInternalHabtm#{join_table_name.singularize.camelize}"
         join_model =
@@ -42,7 +49,7 @@ module ActiveRecord
         else
           join_model.table_name = join_table_name
           join_model.belongs_to other
-          pre_hyperstack_has_and_belongs_to_many(other, opts, &block)
+          pre_hyperstack_has_and_belongs_to_many(other, scope, **opts, &block)
         end
       end
     end
@@ -281,16 +288,16 @@ module ActiveRecord
             method_defined?(:"__secure_remote_access_to_#{name}"),
             &method(:regulate_relationship)
           )
-          pre_syncromesh_has_many name, *args, opts.except(:regulate), &block
+          pre_syncromesh_has_many name, *args, **opts.except(:regulate), &block
         end
 
         %i[belongs_to has_one composed_of].each do |macro|
           alias_method :"pre_syncromesh_#{macro}", macro
-          define_method(macro) do |name, *aargs, &block|
+          define_method(macro) do |name, *aargs, **kwargs, &block|
             define_method(:"__secure_remote_access_to_#{name}") do |this, _acting_user, *args|
               this.send(name, *args)
             end
-            send(:"pre_syncromesh_#{macro}", name, *aargs, &block)
+            send(:"pre_syncromesh_#{macro}", name, *aargs, **kwargs, &block)
           end
         end
       end
@@ -399,5 +406,6 @@ module ActiveRecord
     end
   end
 
-  InternalMetadata.do_not_synchronize if defined? InternalMetadata
+  # Rails 7.1+ changed InternalMetadata to no longer inherit from ActiveRecord::Base
+  InternalMetadata.do_not_synchronize if defined?(InternalMetadata) && InternalMetadata.respond_to?(:do_not_synchronize)
 end

@@ -8,6 +8,7 @@ gem 'hyper-state',       path: '../hyper-state'
 #   gem 'opal-browser', git: 'https://github.com/opal/opal-browser'
 # end
 gem 'hyper-trace',       path: '../hyper-trace'
+gem 'rack', '< 3'  # puma <= 5.4 requires rack < 3 (rack/handler removed in rack 3)
 
 #gem 'puma', '~> 3.11.0' # As of adding, version 3.12.0 isn't working so we are locking
 gemspec

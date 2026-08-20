@@ -70,6 +70,11 @@ module ReactiveRecord
       conversion_method = "convert_#{column_type}"
       return send(conversion_method, val) if respond_to? conversion_method
       val
+    rescue StandardError
+      # Attribute readers can legitimately return values that don't match the
+      # column type (state machines, enum overrides, etc). Never let a failed
+      # conversion abort the merge — keep the server's raw value instead.
+      val
     end
   end
 end

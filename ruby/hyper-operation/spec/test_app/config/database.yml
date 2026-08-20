@@ -29,7 +29,10 @@
 default: &default
   adapter: mysql2
   encoding: utf8
-  username: root
+  username: <%= ENV['DB_USER'] || 'root' %>
+  password: <%= ENV['DB_PASSWORD'] || '' %>
+  host: <%= ENV['DB_HOST'] || '127.0.0.1' %>
+  port: 3306
 
 development:
   <<: *default

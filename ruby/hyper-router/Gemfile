@@ -5,4 +5,5 @@ gem 'hyperstack-config', path: '../hyperstack-config'
 gem 'hyper-state',       path: '../hyper-state'
 gem 'hyper-component',   path: '../hyper-component'
 gem 'hyper-store',       path: '../hyper-store'
+gem 'rack', '< 3'  # puma <= 5.4 requires rack < 3 (rack/handler removed in rack 3)
 gemspec
